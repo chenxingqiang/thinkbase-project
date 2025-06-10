@@ -2,7 +2,7 @@
 OpenRouter example: This example demonstrates using OpenRouter to access various LLM models.
 Make sure you have set the OPENROUTER_API_KEY environment variable.
 """
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import openai
 import os
 

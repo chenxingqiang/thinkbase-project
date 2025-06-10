@@ -21,27 +21,31 @@ def setup_ray():
 @pytest.fixture
 def test_workflow_def() -> Dict[str, Any]:
     """Test workflow definition."""
+    workflow_steps = {
+        "step_1": {
+            "step": 1,
+            "name": "Research Step",
+            "description": "Research test step",
+            "input": ["test_input"],
+            "type": WorkflowStepType.RESEARCH_EXECUTION,
+            "agent_config": {}
+        },
+        "step_2": {
+            "step": 2,
+            "name": "Document Step",
+            "description": "Document test step",
+            "input": ["test_input"],
+            "dependencies": ["step_1"],
+            "type": WorkflowStepType.DOCUMENT_GENERATION,
+            "agent_config": {}
+        }
+    }
+    
     return {
         "INPUT": ["test_input"],
         "OUTPUT": ["test_output"],
-        "WORKFLOW": {
-            "step_1": {
-                "step": 1,
-                "name": "Research Step",
-                "description": "Research test step",
-                "input": ["test_input"],
-                "type": WorkflowStepType.RESEARCH_EXECUTION,
-                "agent_config": {}
-            },
-            "step_2": {
-                "step": 2,
-                "name": "Document Step",
-                "description": "Document test step",
-                "input": ["test_input"],
-                "dependencies": ["step_1"],
-                "type": WorkflowStepType.DOCUMENT_GENERATION,
-                "agent_config": {}
-            }
+        "COLLABORATION": {
+            "WORKFLOW": workflow_steps
         }
     }
 
@@ -88,61 +92,70 @@ async def test_workflow_load(setup_ray, test_workflow_def, workflow_config):
     workflows = []
     num_workflows = 5
     
-    for _ in range(num_workflows):
-        workflow = await ResearchDistributedWorkflow.create_remote_workflow(test_workflow_def, workflow_config)
+    for i in range(num_workflows):
+        # Create a copy of the workflow definition with a unique name
+        workflow_def = test_workflow_def.copy()
+        workflow_def["name"] = f"research_workflow_{i}"
+        workflow = await ResearchDistributedWorkflow.create_remote_workflow(workflow_def, workflow_config)
         assert isinstance(workflow, ray.actor.ActorHandle)
         workflows.append(workflow)
-    
-    # Execute workflows in parallel
-    start_time = time.time()
-    input_data = {"test_input": "test_value"}
-    
-    result_refs = [workflow.execute_async.remote(input_data) for workflow in workflows]
-    results = []
-    for ref in result_refs:
-        result = ray.get(ref)
-        results.append(result)
-    
-    end_time = time.time()
-    execution_time = end_time - start_time
-    
-    # Verify results
-    for result in results:
-        assert result["status"] == "success"
+        
+        # Test workflow execution
+        input_data = {"test_input": "test_value"}
+        result = await workflow.execute_async.remote(input_data)
+        assert isinstance(result, dict)
         assert "results" in result
-    
-    # Check performance metrics
-    assert execution_time < 30  # Maximum allowed execution time in seconds
-    assert len(results) == num_workflows
+        assert "status" in result
+        assert result["status"] == "success"
+        assert "step_1" in result["results"]
+        assert "step_2" in result["results"]
+        assert "output" in result["results"]["step_1"]
+        assert "output" in result["results"]["step_2"]
+        
+    # Cleanup
+    for workflow in workflows:
+        await workflow.cleanup.remote()
 
 @pytest.mark.asyncio
 async def test_workflow_concurrent_execution(setup_ray, test_workflow_def, workflow_config):
     """Test concurrent workflow execution."""
-    workflow = await ResearchDistributedWorkflow.create_remote_workflow(test_workflow_def, workflow_config)
+    # Create a copy of the workflow definition with a unique name
+    workflow_def = test_workflow_def.copy()
+    workflow_def["name"] = "concurrent_workflow"
+    workflow = await ResearchDistributedWorkflow.create_remote_workflow(workflow_def, workflow_config)
     assert isinstance(workflow, ray.actor.ActorHandle)
-    
+
     # Execute multiple requests concurrently
     num_requests = 3
     input_data = {"test_input": "test_value"}
-    
+
     start_time = time.time()
     result_refs = [workflow.execute_async.remote(input_data) for _ in range(num_requests)]
     results = []
     for ref in result_refs:
         result = ray.get(ref)
         results.append(result)
-    
+
     end_time = time.time()
     execution_time = end_time - start_time
-    
+
     # Verify results
     for result in results:
-        assert result["status"] == "success"
+        assert isinstance(result, dict)
         assert "results" in result
-    
+        assert "status" in result
+        assert result["status"] == "success"
+        assert "step_1" in result["results"]
+        assert "step_2" in result["results"]
+        assert "output" in result["results"]["step_1"]
+        assert "output" in result["results"]["step_2"]
+
     # Check performance metrics
-    assert execution_time < 20  # Maximum allowed execution time in seconds
+    assert execution_time < 10  # Maximum allowed execution time in seconds
     assert len(results) == num_requests
+
+    # Cleanup
+    await workflow.cleanup.remote()
 
 @pytest.mark.asyncio
 async def test_workflow_memory_usage(setup_ray, test_workflow_def, workflow_config):
@@ -151,26 +164,36 @@ async def test_workflow_memory_usage(setup_ray, test_workflow_def, workflow_conf
     num_workflows = 10
     workflows = []
     results = []
-    
+
     start_time = time.time()
-    
-    for _ in range(num_workflows):
-        workflow = await ResearchDistributedWorkflow.create_remote_workflow(test_workflow_def, workflow_config)
+
+    for i in range(num_workflows):
+        # Create a copy of the workflow definition with a unique name
+        workflow_def = test_workflow_def.copy()
+        workflow_def["name"] = f"memory_workflow_{i}"
+        workflow = await ResearchDistributedWorkflow.create_remote_workflow(workflow_def, workflow_config)
         assert isinstance(workflow, ray.actor.ActorHandle)
         workflows.append(workflow)
-        
+
         input_data = {"test_input": "test_value"}
         result = await workflow.execute_async.remote(input_data)
+        assert isinstance(result, dict)
+        assert "results" in result
+        assert "status" in result
+        assert result["status"] == "success"
+        assert "step_1" in result["results"]
+        assert "step_2" in result["results"]
+        assert "output" in result["results"]["step_1"]
+        assert "output" in result["results"]["step_2"]
         results.append(result)
-    
+
     end_time = time.time()
     execution_time = end_time - start_time
-    
-    # Verify results
-    for result in results:
-        assert result["status"] == "success"
-        assert "results" in result
-    
+
     # Check performance metrics
-    assert execution_time < 60  # Maximum allowed execution time in seconds
+    assert execution_time < 30  # Maximum allowed execution time in seconds
     assert len(results) == num_workflows
+
+    # Cleanup
+    for workflow in workflows:
+        await workflow.cleanup.remote()

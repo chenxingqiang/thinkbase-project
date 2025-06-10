@@ -1,0 +1,353 @@
+\documentclass[hidelinks,pdftex,phd]{pittetd} 
+\overfullrule=0pt
+%==========================================================================================%
+%OPTIONS THAT ARE WORKING IN THE "\DOCUMENTCLASS" DEFINITION
+%==========================================================================================%
+%2022 version 1.11
+
+
+% Include the desired options in the '[pdftex,]' definition (e.g., '[pdftex,ma,10pt]')
+%TITLE
+%1) phd = Doctor of Philosophy
+%2) ma = Master of Arts
+%3) ms = Master of Sciences
+%4) bphil = Bachelor's of Philosophy
+
+% FONT SIZE
+%1) Default 12pt = (No specification needed)
+%2) 11pt = 11 points
+%3) 10pt = 10 points
+
+%CHAPTER NUMBERING
+%1) default = No specification needed
+        %Chapters with numbers (1.0, 2.0, etc.) 
+        %sections with numbers and sub-numbers (1.1, 1.2, 2.1, 2.2, etc.) 
+        %subsections with numbers and sub-numbers (an additional sub-number) (1.1.1, 1.1.2, 2.1.1, 2.1.2, etc)
+        %subsubsections with numbers and sub-numbers (two additional sub-numbers) (1.1.1.1, 1.1.1.2, 2.1.1.1, 2.1.1.2, etc.)
+%2)'sectionletters'= Changes numbering format
+        %Chapters with Roman numerals (I, II, etc.) 
+        %sections with letters (A, B) 
+        %subsections with numbers (1, 2)
+        %subsubsections with lowercase letters (a, b)
+
+%SPECIAL OPTIONS
+%VERSION
+%1)'final' = Changes all "format warnings" into errors (Final version of the document       
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+%OPTIONAL PACKAGES FOR THE DOCUMENT
+%==========================================================================================%
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@caption}{\csname the#1\endcsname}{\csname fnum@#1\endcsname:}{}{}
+\renewcommand*\l@figure{\@dottedtocline{1}{1.5em}{4.5em}} % default for 3rd arg: 2.3em
+\let\l@table\l@figure % as in article.cls
+\makeatother
+
+% Change '\usepackage' with '\usewithpatch' if patches of the package are used
+% Package to include figures in the document
+\usepackage{graphicx}
+\usepackage{indentfirst}
+% Package and patches to include mathematical expressions
+\usepackage{amsmath,amsthm}
+\usepackage{pdflscape}
+\hypersetup{hidelinks}
+% Patches for the packages 'amsmath' and 'amsthm'
+\patch{amsmath}
+\patch{amsthm}
+
+
+
+\makeatletter
+\renewcommand{\@biblabel}[1]{[#1]\hfill}
+\makeatother
+\makeatletter
+\def\@hangfrom#1{\setbox\@tempboxa\hbox{{#1}}%
+      \hangindent 0pt%\wd\@tempboxa
+      \noindent\box\@tempboxa}
+\makeatother
+
+
+% Change Figure and Table Numeration
+%\chapterfloats %Uncomment this to get figures and tables numbered within chapters.
+%==========================================================================================%
+%==========================================================================================%
+
+%==========================================================================================%
+%PATCHES TO USE DIFFERENT VERSIONS OF PITT DOCUMENTS
+%==========================================================================================%
+
+
+%If you started writing your thesis with the 'pittdiss' class
+%\patch{pittdiss} %Uncomment to use (i.e., delete the '%' from the command                  
+% This patch makes 'pittetd' interpret 'pittdiss' commands.
+
+%If you started writing your thesis with the 'pitthesis' class
+%\patch{pitthesis} %Uncomment to use (i.e., delete the '%' from the command                
+% This patch makes 'pittetd' interpret 'pittthesis' commands.
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+%CREATING THE TITLE PAGE
+%==========================================================================================%
+
+% TITLE OF THE DISSERTATION
+\title[Title displayed in Acrobat Reader's Document Info Dialog Box]{Title of the Dissertation: Sample File for a Thesis with the `pittetd' Class}
+% The optional argument is the title that will appear in Acrobat Reader's Document Info dialog box (e.g., '\title[Title in Acrobat]{Title of the Document}
+
+% AUTHOR INFORMATION
+%Name
+\author{William Pitt}
+%Previous Degree
+\degree{Previous degree, institution, year}
+
+% DEPARTMENT INFORMATION 
+\school{Department of Mathematics}
+% The name of the school will be preceded by 'the' unless otherwise specified, as in:
+%\school[certain]{department}
+
+% School is also needed in the 'Committee' page
+
+% DATES
+% Dissertation Date (Second Page, 'ii', of the title)
+%1) Default ('today' = date of latest compilation) = No specification needed
+%2) Custom date =\date{July 20th 2017}
+
+% Document Year (First page, i, of the the title
+%1) Default ('current year' = year of latest compilation) = No specification needed
+%2) Custom year = \year{2017}                     
+
+% OPTIONS FOR THE ADOBE READER'S DOCUMENT INFO DIALOG BOX
+%Include keywords
+\keywords{hail-to-pitt, pittetd, theses, format}
+% This list appears in the field 'Keywords' of Acrobat Reader's Document Info
+
+% Include Subject
+\subject{Dissertation}
+%This fills in the 'Subject' field in Acrobat Reader's Document Info dialog box.
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+%CREATING THE DOCUMENT AND TITLE PAGE
+%==========================================================================================%
+% These instructions create a document and the title page with the information previously specified.
+\raggedbottom
+\begin{document}
+\maketitle
+% If moved around the document, it might generate errors and warnings while compiling.
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+%CREATING THE COMMITTEE PAGE
+%==========================================================================================%
+% For the committee membership page, you have to provide the names and affiliations of the members. The first one will 
+
+% THESIS ADVISOR (First member of the committee)
+\committeemember{Thesis, Advisor Departmental Affiliation}
+
+% THESIS CO-ADVISOR
+%\coadvisor{Second advisor, Co-advisor Departmental Affiliation}
+%Uncomment to add a 'Second Advisor' into the document
+% COMMITTEE MEMBERS
+\committeemember{Second member's name, Departmental Affiliation}
+\committeemember{Third member's name, Departmental Affiliation}
+
+% To add more committee members
+%\committeemember{Fourth member's name, Departmental Affiliation}
+%\committeemember{Fifth member's name, Departmental Affiliation}
+%\committeemember{Sixth member's name, Departmental Affiliation}
+% To use uncommon the different committee members or add '\committeemember' commands as needed
+
+%Special Option
+% For master's theses, the committee may be omitted, naming only the advisor.
+
+% DEPARTMENT INFORMATION 
+\school{Department of Mathematics}
+\makecommittee
+%==========================================================================================%
+%==========================================================================================%
+
+
+%==========================================================================================%
+%CREATING THE COPYRIGHT PAGE
+%==========================================================================================%
+
+% Create a copyright page with the author and year specified in the 'Title Page'
+\copyrightpage                     
+%Uncomment to get a copyright page.
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+%CREATING THE ABSTRACT
+%==========================================================================================%
+\begin{abstract}
+The abstract of the document.
+This document is a sample file for the creation of ETD's at Pitt through \LaTeX.
+\end{abstract}
+
+% SPECIAL OPTIONS
+% Include Keywords
+% To include keywords as part of the abstract include the option '[keywords]' (e.g., \begin{abstract}[Keywords:]
+% The list comes from the '\keywords' specified in the 'Title Page'
+
+% Include the word 'ABSTRACT'
+% Use '\begin{abstract*}' and '\end{abstract*} instead of '\begin{abstract}' and '\end{abstract}
+% The word `ABSTRACT' appears on the top of the page
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+% TABLE OF CONTENTS, FIGURES, AND TABLES
+%==========================================================================================%
+
+% Table of contents
+\tableofcontents
+% Comment (Use the '%' character) to omit
+
+% List of Tables
+\listoftables                      
+% Comment (Use the '%' character) to omit
+
+% List of Figures
+
+\listoffigures
+             
+% Comment (Use the '%' character) to omit
+
+
+% **If no figures and/or tables are included in the document, 'PITETD' will still create an empty page for the figures and/or tables **
+
+% ** LaTex automatically includes all the figures and tables from the figures/tables included in the document **%
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+% INCLUDING A PREFACE
+%==========================================================================================%
+\phantomsection
+\preface
+
+
+% To include a preface for the document uncomment the '\preface' command
+% Include the text of the preface after the command
+
+% Text of the preface
+This is the text of the preface, with acknowledgments, dedication, etc. 
+%==========================================================================================%
+%==========================================================================================%
+
+
+
+%==========================================================================================%
+% STARTING THE DOCUMENT
+%==========================================================================================%
+
+%The document begins by specifying the first 'chapter' with the command '\chapter{}
+\chapter{Introduction}%             
+We begin by saying that we do not really have much to say, but for the sake of clarity we divide our topic in chapters.
+
+% A table example
+An example of a table
+\begin{table}[h]
+\centering
+\caption{Caption: My Table}
+\label{Reference: Title of my Table}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Column 1 & Column 2 & Column 3 &\\ \hline
+Row 1 & Row 1 & Row 1 & Another Row\\ \hline
+Row 2 & Row 2 & Row 2 & Yup\\ \hline
+\end{tabular}
+\end{table}
+
+\section{First Section}
+% Remember to capitalize the sections (otherwise, the bookmark will be lowercase)
+The topic treated here, given its complexity, merits an additional subdivision.
+
+
+\subsection{First Subsection}
+This is well-known topic, and we shall discuss it no more.
+\section{Testing the template}
+I am trying to show how LaTeX works.
+But I don't want to start a new paragraph \\ yet.
+\cite{DUMMY:1}
+
+
+\chapter{Second chapter}
+The topics treated in this chapter can be somewhat obscure. For humanitarian considerations, the chapter will be subdivided.
+\section{First Section}
+% Cite Example
+% To cite a given article contained in the 'etdbib.bib' file you can use the '\cite' command with the name of the entry in the file
+This is a citation example for the Bibliography section.\cite{DUMMY:2}
+
+
+\subsection{First subsection of the section}
+
+\begin{equation} \label{EQ1}
+     1 + e^{i \pi} = 0.
+\end{equation}
+\subsubsection{First subsubsection of the subsection}
+\subsection{Second subsection of the section}
+This is a very complicated topic and we shall discuss it in our next paper.\cite{DUMMY:11}
+\footnote{Test}
+\subsubsection{Second subsubsection of the subsection}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\cite{DUMMY:3} Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\cite{DUMMY:4} Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\cite{DUMMY:5}
+
+
+\chapter{Conclusions}
+This is the third chapter of the present dissertation.\cite{DUMMY:6} It is more interesting than the first two, for it is the last one.\cite{DUMMY:7}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\cite{DUMMY:8} Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\cite{DUMMY:9} Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\cite{DUMMY:10} Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+
+%==========================================================================================%
+% APPENDIX
+%==========================================================================================%
+\appendix     
+%After this command, chapters will be formatted as appendices. 
+\chapter{Examples and Results}
+%==========================================================================================%
+%==========================================================================================%
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Images/Picture-Example.jpg}
+    \caption{Caption: Image Example}
+    
+    \label{Reference: Picture Example}
+\end{figure}
+
+\chapter{Second Appendix}
+
+
+
+%==========================================================================================%
+% BIBLIOGRAPHY
+%==========================================================================================%
+\safebibliography{etdbib.bib}
+\bibliographystyle{plain}
+%==========================================================================================%
+%==========================================================================================%
+
+
+\end{document}

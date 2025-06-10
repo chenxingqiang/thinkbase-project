@@ -1,0 +1,145 @@
+% UTF-8 encoding
+\documentclass[9pt, dvipsnames]{beamer} %
+% Beamer 设置
+\usetheme[secheader]{Boadilla} % 使用的 Beamer 主题： Boadilla
+\usecolortheme{beaver} % 使用的 Beamer 颜色：beaver
+% 字体设置
+\usefonttheme{professionalfonts} % professional 字体
+% 其他 Package
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{anyfontsize}
+\usepackage{subcaption} % 子图片
+\usepackage{graphicx} % 图片
+\usepackage[export]{adjustbox}
+\setbeamertemplate{caption}[numbered]
+\newcounter{saveenumi}
+\resetcounteronoverlays{saveenumi}
+\usepackage[multidot]{grffile} % 允许文件名带多个点
+\usepackage{tabularx} % 表格
+\usepackage{tikz}
+%%%%%%%%%%%%%%%%%%%
+% 使用背景
+\pgfdeclareimage[height=\paperheight,width=\paperwidth]{bgimage}{lzu.jpg}
+\usebackgroundtemplate{\tikz\node[opacity=0.1,inner sep=0]{\pgfuseimage{bgimage}};}
+%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{ctex} % xelatex 中文
+
+\title{Example Code of Beamer} % 标题
+\author[Your Name]{Your Name} % 作者
+\date{Jan 5, 2019} % 如果 Date 参数为空，自动显示当前日期
+
+\begin{document}
+
+    \everymath{\displaystyle}
+
+    % 标题页
+    \begin{frame}
+        \titlepage % 根据上面信息生成标题
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{\textbf{Index}}
+        \tableofcontents % 生成目录（如果为空，请编译两次）
+    \end{frame}
+
+    \section{Introduction}\label{sec:introduction}
+    \begin{frame}
+        \frametitle{\textbf{Introduction}}
+        \begin{block}{Block Title 1}
+            \begin{itemize}
+                \item Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore . {\scriptsize \color{red} Author A, Author B 2018 }
+                \item Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                \item Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.  {\scriptsize \color{red} Author A, Author B 2016 }
+            \end{itemize}
+        \end{block}
+        \begin{exampleblock}{Block Title 2}
+            \begin{itemize}
+                \item Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore . {\scriptsize \color{red} Author A, Author B 2018 }
+                \item Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                \item Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.  {\scriptsize \color{red} Author A, Author B 2016 }
+            \end{itemize}
+        \end{exampleblock}
+    \end{frame}
+
+    % \begin{frame}
+    %     \frametitle{\textbf{Example of subfigure}}
+    %     \centering
+    %     Idea A $\Longleftrightarrow$ Idea B
+    %     \vskip 2em
+    %     \begin{figure}
+    %         \begin{subfigure}[t]{0.4\textwidth}
+    %             \centering
+    %             \includegraphics[width=\linewidth]{example-image}
+    %             \caption{Image Caption}
+    %         \end{subfigure}\hskip 1em%
+    %         \begin{subfigure}[t]{0.4\textwidth}
+    %             \centering
+    %             \includegraphics[width=\linewidth]{example-image}
+    %             \caption{Image Caption}
+    %         \end{subfigure}
+    %     \end{figure}
+    % \end{frame}
+
+    \begin{frame}
+        \frametitle{\textbf{Black hole}}
+        \begin{exampleblock}{The metric and the electromagnetic field of the spherically symmetric solution}
+            \begin{align}
+                ds^2&=-fdt^2+\frac{dr^2}{f}+r^2 d\Omega_2^2\,,\label{BImetric}\\
+                F&=Edt\wedge dr\label{BIE}\,, \quad E=\frac{Q}{\sqrt{r^4+Q^2/b^2}}\,.
+            \end{align}
+        \end{exampleblock}
+
+        where
+        \begin{equation}
+            \begin{split}
+                f=&1-\frac{2M}{r}+\frac{r^2}{l^2}+\frac{2b^2}{r}\int_r^\infty \Bigl(\sqrt{r^4+\frac{Q^2}{b^2}}-r^2\Bigr)dr\nonumber\\
+                =&1-\frac{2M}{r}+\frac{r^2}{l^2}+\frac{2b^2 r^2}{3}\Bigl(1-\sqrt{1+\frac{Q^2}{b^2 r^4}}\Bigr)\nonumber\\
+                &+\frac{4Q^2}{3r^2}\,{}_2 F_1\left(\frac{1}{4},\frac{1}{2}; \frac{5}{4};-\frac{Q^2}{b^2 r^4}\right)\,,
+            \end{split}
+        \end{equation}
+
+        and $_2 F_1$ is the hypergeometry function, $M$ and $Q$ stand for black hole mass and charge. $d\Omega$ is the unit sphere on $S^2$.
+    \end{frame}
+
+    \section{Content}\label{sec:content}
+    \begin{frame}
+        \frametitle{\textbf{Content}}
+        \begin{block}{Mass $M$}
+            \begin{equation}
+                f(r_h) = 0 \Longrightarrow M = \frac{T}{v}-\frac{1-\sqrt{\frac{16}{v^4}+1}}{4 \pi }-\frac{1}{2 \pi  v^2}
+            \end{equation}
+        \end{block}
+        \begin{exampleblock}{Hawking temperature $T$}
+            \begin{equation}\label{eq:T}
+                T = f^{\prime}(r_+) / 4 \pi = \frac{1}{4\pi r_+}\!\left[1\!+\!\frac{3r_+^2}{l^2}\!+\!2b^2 r_+^2\Bigl(1\!-\!\sqrt{1\!+\!\frac{Q^2}{b^2 r_+^4}}\Bigr)\right]
+            \end{equation}
+        \end{exampleblock}
+        \begin{alertblock}{Electric potential $\Phi$}
+            \begin{equation}
+                \Phi=\int_{r_+}^\infty E dr
+                =\frac{Q}{r_+}\,{}_2 F_1\!\left(\frac{1}{4},\frac{1}{2};\frac{5}{4};-\frac{Q^2}{b^2 r_+^4}\right)\,.
+            \end{equation}
+        \end{alertblock}
+        The corresponding entropy is $S = \pi r_+^2$, The specific volume $v = 2 r_+ l_P^2$ and corresponding pressure $P = - \frac{\Lambda}{8 \pi} = \frac{3}{8 \pi l^2}$
+    \end{frame}
+
+    \section{Conclusion}\label{sec:conclusion}
+    \begin{frame}
+        \frametitle{Conclusion}
+        \begin{block}{Conclusion 1}
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        \end{block}
+        \begin{exampleblock}{Conclusion 2}
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.         \end{exampleblock}
+    \end{frame}
+    \begin{frame}[noframenumbering]
+        \centering
+        {\fontsize{40}{50}\selectfont Thank You!}
+    \end{frame}
+
+\end{document}

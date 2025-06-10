@@ -1,0 +1,202 @@
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% relaTeX - Modelo de relatório da equipe AeroDesign ITA, responsável: saulo
+%
+% Arquivos logo_equipe.pdf , logo_rodape.pdf e logo_SaeBrasil.pdf são auto-explicativos né?
+%           [vai na capa]      [no rodapé]      [canto da capa]
+%
+% Usamos e abusamos de:
+% abnTeX2: Modelo de Relatório Técnico/Acadêmico em conformidade com 
+% ABNT NBR 10719:2011 Informação e documentação - Relatório técnico e/ou
+% científico - Apresentação
+%
+% ------------------------------------------------------------------------ 
+% ------------------------------------------------------------------------
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte
+	oneside,			% para impressão em verso e anverso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	french,				% idioma adicional para hifenização
+	spanish,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+	]{AeroDesign}
+
+\newtheorem{defi}{Defini\c{c}\~ao}
+% ---
+% PACOTES
+% ---
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{caption, subcaption}
+\usepackage{multirow} %Para mesclar linhas na tabela
+\usepackage{chngpage} %Para estrapolar as margens em caso de figuras/tablas grandes
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{placeins}
+\usepackage{lmodern}			% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{pdfpages}
+\usepackage{pstricks}
+\usepackage[a4paper, left=1in, right=0.5in, top=0.5in, bottom=0.5in]{geometry}
+\graphicspath{{imgs/}}
+%##############
+\usepackage{tabu}				% usar ambiente tabu no lugar de tabular
+\setlength{\tabulinesep}{1.2mm} % Espaçando itens nas celulas da tabela
+%##############
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% -------------------------------------------
+% -------------------------------------------
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% Informar o numero da equipe 
+% O título é o nome da equipe!
+% Area é o assunto do rela
+% Colocar todos os membros como autores, pode colocar \at email se quiser..
+% ---
+\renewcommand{\nrEquipe}{03}
+\titulo{Nome da equipe}
+\renewcommand{\area}{Projeto conceitual}
+\renewcommand{\capitao}{Nome do capitão}
+\autor{
+	Integrante 1 \\
+	Integrante 2 \\
+	Integrante 3 \\
+	Você já entendeu \\
+}
+\local{Brasil}
+\data{2016, v-1.0}
+\instituicao{Instituição de ensino}
+\orientador{Prof. Orientador}
+\tipotrabalho{Relatório técnico}
+
+
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% ---
+% Identificando a categoria da equipe pela numeração
+% ---
+
+\global\edef\nrEquipepx{\nrEquipe,px}
+\ifdim \nrEquipepx>200px
+\definecolor{bgEquipe}{RGB}{0,190,100}
+\renewcommand{\clEquipe}{Classe Micro}
+\else
+\definecolor{bgEquipe}{RGB}{0,128,255}
+\renewcommand{\clEquipe}{Classe Advanced}
+\fi
+\ifdim \nrEquipepx<100px
+\definecolor{bgEquipe}{RGB}{255,60,0}
+\renewcommand{\clEquipe}{Classe Regular}
+\fi 
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={Relatório \@title}, 
+		pdfauthor={\@title},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={AeroDesign}{SAE Brasil}{abntex}{abntex2}{relatório técnico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=red,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.2cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% Espaçamento de itens dentro da celula
+\makeindex
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+
+\textual
+
+\imprimircapa
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\begin{simbolos}
+\input{simbolos.tex}
+\end{simbolos}
+
+\input{input}
+\input{texto}
+\input{output}
+
+
+
+\postextual
+
+\bibliography{bibliografia}
+
+\end{document}

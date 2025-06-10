@@ -1,0 +1,110 @@
+\documentclass[24pt, a3paper, portrait]{tikzposter}%Set paper, basic font size and orientation
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{fontspec}
+\usepackage[super]{natbib}%My preferred bibliography package, another can be used
+\usepackage[english]{babel}
+\usepackage{jabbrv}%For abbreviating journal names
+
+%------------------------Style Definitions-----------------------
+
+\setmainfont{Arial}%NHS font, use Frutiger if you have the license and the font files: https://www.overleaf.com/blog/using-your-favourite-fonts-with-sharelatex-2013-04-02
+\newcommand{\tSup}[1]{\textsuperscript{#1}}%A shortcut for superscripts
+
+\definecolorstyle{christieColourStyle} {%Colour styling. Defines colours and where to use them
+    %https://www.england.nhs.uk/nhsidentity/identity-guidelines/colours/
+    \definecolor{NHSBlue}{RGB}{0,94,184}%NHS blue
+    \definecolor{NHSDarkBlue}{RGB}{0,48,135}%NHS dark blue
+    \definecolor{NHSDarkPink}{RGB}{124,40,85}%NHS dark pink
+}{
+    %BG
+    \colorlet{backgroundcolor}{white}
+    \colorlet{framecolor}{white}
+    %Title
+    \colorlet{titlefgcolor}{NHSBlue}
+    \colorlet{titlebgcolor}{white}
+    \colorlet{authorfgcolor}{NHSDarkPink}
+    %Blocks
+    \colorlet{blocktitlebgcolor}{white}
+    \colorlet{blocktitlefgcolor}{NHSBlue}
+    \colorlet{blockbodybgcolor}{white}
+    \colorlet{blockbodyfgcolor}{black}
+    %Innerblocks
+    \colorlet{innerblocktitlebgcolor}{NHSDarkPink}
+    \colorlet{innerblocktitlefgcolor}{white}
+    \colorlet{innerblockbodybgcolor}{NHSBlue}
+    \colorlet{innerblockbodyfgcolor}{white}
+    %Notes
+    \colorlet{notefgcolor}{NHSDarkPink}
+    \colorlet{notebgcolor}{white}
+    \colorlet{noteframecolor}{NHSDarkPink}
+}
+
+\settitle {%Define the title section layout
+    \@titlegraphic \par
+    \vspace*{1em}
+    \color{titlefgcolor} {\bfseries \Huge \@title \par}
+    \vspace*{0.75em}
+    \color{authorfgcolor} {\Large \@author \par}
+    \vspace*{0.75em}
+    \color{titlefgcolor} {\large\@institute}
+}
+
+%--------------------------Title Content-------------------------
+
+\title{Christie Poster Template}
+\author{Frank Brewster\tSup{1}, Barry White\tSup{2}}
+\date{May 2021}
+\institute{\tSup{1}The Christie NHS Foundation Trust, Manchester, UK; \tSup{2}The University of Manchester, Manchester, UK}
+%A second uni logo can be added to the top using this:
+%\titlegraphic{\includegraphics[height=5cm]{Uni logo file name} \hfill \includegraphics[height=5cm]{christieLogoTight.jpg}}
+\titlegraphic{\hfill \includegraphics[height=5cm]{christieLogoTight.jpg}}
+
+\usecolorstyle{christieColourStyle}
+
+%----------------------------------------------------------------
+%--------------------------END PREAMBLE--------------------------
+%----------------------------------------------------------------
+
+\begin{document}
+
+\maketitle[width=0.95\linewidth]
+
+\block{Abstract}
+{
+    \blindtext
+}
+
+\begin{columns}%Number of columns is flexible. Different parts of the page can have different numbers of columns by starting a new columns environment
+    \column{0.33}%The size of this column
+    \block{Introduction}{\blindtext}%A section
+    
+    \block{Methodology}{\blindtext 
+        \innerblock{An inner-block}{Some inner block text to provide some emphasis on a key point within another block.}
+    \blindtext}
+    
+    \column{0.33}
+    
+    \block{Results}{I like figure \ref{fig:dummy}, it is a very nice figure.\\ \blindtext}
+    
+    \block{}{%A figure
+        \begin{tikzfigure}[some figure caption\label{fig:dummy}]
+            \includegraphics[width=\linewidth]{Large_The_Christie_embrace_RGB.jpg}
+        \end{tikzfigure}
+    }
+    
+    \block{Discussion}{A study demonstrated this\cite{VanHerk2003}.}
+    
+    \column{0.33}
+    \block{Conclusion}{\blindtext}
+    \block{}{
+        \bibliographystyle{fbPosterShort}%A custom bib style with 1 author and lots of abbreviations. Journal abbreviations by jabbrv.
+        \bibliography{bib.bib}%Your bib file
+    }
+    
+\end{columns}
+
+%Bottom embrace logo
+\node[above right,outer sep = 0.025\linewidth] at (bottomleft) {\includegraphics[height=5cm]{Large_The_Christie_embrace_RGB.jpg}};
+
+\end{document}

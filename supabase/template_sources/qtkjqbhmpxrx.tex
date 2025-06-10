@@ -1,0 +1,169 @@
+%---- Sample WMSU BSMATH BEAMER template ------
+%---- Begin editing after PREAMBLE END at line 77------
+%---- Created by: Christle Jude L. Maquilan - April 2022 --
+%---- @jmaq03.jm@gmail.com -----
+
+\documentclass[xcolor=dvipsnames,envcountsect]{beamer}
+
+%------------------------------------------------
+%------------------------------------------------
+%------------------------------------------------
+%------------------------------------------------
+%------------------------------------------------
+%----------▼▼▼▼▼ START PREAMBLE ▼▼▼▼▼----------
+
+%-------- theme --------
+\usetheme{Madrid}
+
+%-------- color --------
+\definecolor{crimsonred}{RGB}{153,0,0} % Official RGB code for Crimson Red
+\usecolortheme[named=crimsonred]{structure}
+%-------- set color of 'example block' to crimson theme --------
+\setbeamercolor{block body example}{bg=white}
+\setbeamercolor{block title example}{fg=white, bg=red!50!black}
+
+%-------- font --------
+\setbeamerfont{structure}{family=\rmfamily,series=\bfseries}
+\usefonttheme[stillsansseriftext]{structurebold}
+\setbeamerfont{section in head/foot}{size=\tiny}
+
+%-------- misc structure --------
+\useoutertheme[footline=authortitle,subsection=false]{miniframes}
+\useinnertheme{rounded}
+\addtobeamertemplate{block begin}{}{\justifying}
+\newtheorem{remark}[theorem]{Remark}
+\renewcommand{\indent}{\hspace*{2em}}
+\setbeamertemplate{theorems}[numbered]
+\setbeamertemplate{caption}[numbered]
+\usepackage[justification=centering]{caption}
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+%-------- packages to be used -------
+\usepackage{amsmath,amsfonts,amssymb,amscd,amsthm}
+\usepackage{graphicx,xcolor,comment}
+\usepackage{mathrsfs} 
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{ragged2e}
+\usepackage{caption}
+\usepackage[english]{babel}
+\usepackage{rotating}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usepackage{bm}
+\usepackage{csquotes}
+
+%-------- for bibliography -----------------
+\usepackage{biblatex}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\addbibresource{References.bib}
+\setbeamertemplate{frametitle continuation}{\frametitle{\color{white}List of References}}
+
+%-------- WMSU Backgound -------------------
+\usebackgroundtemplate{%
+	\tikz[overlay,remember picture] \node[opacity=0.02, at=(current page.center)] {
+		\includegraphics[height=4.5in,width=4.5in]{./Figures/WMSU LOGO.png}};
+}
+
+%----------▲▲▲▲▲ PREAMBLE END ▲▲▲▲▲----------
+%------------------------------------------------
+%------------------------------------------------
+%------------------------------------------------
+%------------------------------------------------
+%------------------------------------------------
+
+%---------START EDITING HERE---------------------
+\title[Outer-connected Edge Domination in Graphs]{Outer-connected Edge Domination in Graphs}
+
+\author [Maquilan, C.J. - 2016-00168]{\textbf{Christle Jude L. Maquilan (BS Mathematics)}}
+
+\institute[Western Mindanao State University] {\emph{Adviser: }\textbf{Mohammad Nur S. Paspasan, Ph.D.}\\[1em]
+	Department of Mathematics and Statistics\\College of Science and Mathematics\\Western Mindanao State University\\[1em]
+\includegraphics[scale=0.09]{./Figures/WMSU CSM DMS.png}}
+
+\date[April 21, 2022]{\footnotesize Math 197 (Special Problem) - Final Defense - \textbf{April 21, 2022}}
+%--------- START DOCUMENT ------------------
+\begin{document}
+	
+\begin{frame}{\titlepage}\end{frame}
+\begin{frame}{\frametitle{Presentation Outline}\tableofcontents}\end{frame}
+%--------- INTRODUCTION ----------------------
+\section{Introduction}
+\begin{frame}
+	\frametitle{Introduction}
+		\justifying
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ut imperdiet lorem. Sed imperdiet sit amet quam sit amet molestie. Curabitur elementum magna sem, eu viverra augue pharetra quis. Phasellus ut turpis vel nunc fermentum ornare. Maecenas sit amet semper leo. Praesent sodales vel lectus sed hendrerit.
+\end{frame}
+%---------- DEFINITION/PRELIMINARY ---------------------
+\section{Working Definitions}
+\begin{frame}
+	\frametitle{Working Definitions}
+\begin{definition}\label{d19} A  set $M \subseteq E(G)$ is an \emph{edge dominating set of $G$} if every $u \in E(G) \backslash M$ is adjacent to some $v \in M$. The \emph{edge domination number of $G$}, denoted by $\gamma_{e}(G)$, is the minimum cardinality of an edge dominating set of $G$. Any edge dominating set of $G$ with cardinality $\gamma_{e}(G)$ is referred to as a \emph{$\gamma_{e}$-set of $G$}.
+\end{definition}
+\end{frame}
+
+\begin{frame}
+		\frametitle{Working Definitions (Cont'n)}
+	\begin{example}
+	\justifying
+		\normalfont{The sets $M_{1}=\{a, c, f\}, M_{2}=\{d, h\}$, and $M_{3}=\{a, e, g, h\}$ are edge dominating sets of $G$ in Figure 1.5. Moreover, $M_{2}=\{d, h\}$ is a minimum edge dominating set of $G$. Thus, $\gamma_{e}(G)=\left|M_{2}\right|=2$.}
+		\begin{figure}[ht]
+			\centering
+			\includegraphics[width=0.35\textwidth]{./Figures/EDOM.png}
+			\captionsetup{justification=centering}
+			\caption{A graph $G$ with $\gamma_{e}(G)=2$.\label{edom}}
+		\end{figure}
+	\end{example}
+\end{frame}
+
+%----------- MAIN RESULTS ------------------------------
+\section{Results}
+\begin{frame}{Results}
+		\begin{remark}\label{rem: 1}
+		A set $S$ is an outer-connected edge dominating set of a graph $G$ if $S$ is an edge dominating set such that $H_{E(G) \backslash \mathrm{S}}$ does not have component isomorphic to $K_{2}$ or $S=E(G)$.
+		\end{remark}
+	\pause
+	\indent To see this, consider graphs $G_{1}=P_{3}, G_{2}=P_{4}$, and $G_{3}=C_{8}$ in Figure \ref{3.1}.
+	Then, $\gamma_{oce}(P_{3})=2, \gamma_{oce}(P_{4})=3$, and $\gamma_{o c e}(C_{8})=4$.
+\end{frame}
+\begin{frame}{Results (Cont'n)}
+		\begin{figure}[ht]
+		\centering
+		\includegraphics[width=0.9\textwidth]{./Figures/3.1.png}
+		\caption{Graphs with $\gamma_{oce}(P_{3})=2, \gamma_{oce}(P_{4})=3$, and $\gamma_{oce}(C_{8})=4$.\label{3.1}}
+		\end{figure} 
+\end{frame}
+
+%---------- RECOMMENDATIONS -----------------------------
+\section{Recommendations}
+\begin{frame}
+	\frametitle{Recommendations}
+	\justifying
+
+    The following problems are suggested for further study:\\
+
+	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ut imperdiet lorem. Sed imperdiet sit amet quam sit amet molestie. Curabitur elementum magna sem, eu viverra augue pharetra quis. Phasellus ut turpis vel nunc fermentum ornare. Maecenas sit amet semper leo. Praesent sodales vel lectus sed hendrerit.
+\nocite{akhbari2013outer,arumugam2009connected,berge1962theory}
+\end{frame}
+%----------- REFERENCES  -------------
+%----------- No editing in references section ----------
+%----------- edit only in References.bib ----------
+	\begin{frame}[allowframebreaks]
+		\justifying
+		\frametitle{List of References}
+		\printbibliography
+	\end{frame}
+%--------- THANK YOU Text --------------------------
+	\begin{frame}
+		\centering
+		\begin{block}
+			\scshape
+				\begin{center}
+					\Huge\emph{Thank You So Much!}
+				\end{center}
+		\end{block}
+	\end{frame}
+%----------------------------------------------------
+\end{document}

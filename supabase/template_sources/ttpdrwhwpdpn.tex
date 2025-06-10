@@ -1,0 +1,175 @@
+\documentclass[12pt]{report}
+\usepackage{setspace}
+\usepackage[utf8]{inputenc}
+\usepackage[titletoc]{appendix}
+\usepackage{graphicx}
+\usepackage{listings}
+\graphicspath{ {images/} }
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+% hyperlinks
+\usepackage{hyperref} 
+\hypersetup{ colorlinks, citecolor=red, filecolor=black, linkcolor=black, urlcolor=blue } 
+
+% blank page
+\usepackage{afterpage}
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+
+\usepackage{pgf}
+\usepackage{pgfpages}
+
+% Border
+\pgfpagesdeclarelayout{boxed}
+{
+  \edef\pgfpageoptionborder{0pt}
+}
+{
+  \pgfpagesphysicalpageoptions
+  {%
+    logical pages=1,%
+  }
+  \pgfpageslogicalpageoptions{1}
+  {
+    border code=\pgfsetlinewidth{0.5pt}\pgfstroke,%
+    border shrink=\pgfpageoptionborder,%
+    resized width=.95\pgfphysicalwidth,%
+    resized height=.95\pgfphysicalheight,%
+    center=\pgfpoint{.5\pgfphysicalwidth}{.5\pgfphysicalheight}%
+  }%
+}
+\pgfpagesuselayout{boxed}
+
+% page layout including header and footer
+\usepackage{xcolor}
+\usepackage[a4paper,top=2cm, bottom=3.5cm, left=2.54cm, right=2.54cm]{geometry}
+\definecolor{myred}{HTML}{581000}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% \fancyhead{}
+% \fancyhead[L]{\slshape\nouppercase{\leftmark}}
+% \fancyhead[R]{\slshape\nouppercase{\rightmark}}
+\fancyfoot{}
+\fancyfoot[R]{\thepage}
+\fancyfoot[L]{\textbf{Department of Electronics Engineering 2017-21 Batch}}
+% \renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{3pt}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{myred}\leaders\hrule height \footrulewidth\hfill}}
+\usepackage{caption}
+\usepackage{subcaption}
+\setcounter{page}{1}
+\setcounter{chapter}{0}
+\fancypagestyle{plain}{%
+\fancyhf{}% clear all header and footer fields
+\fancyfoot{}
+\fancyfoot[R]{\thepage}
+\fancyfoot[L]{\textbf{Department of Electronics Engineering 2017-21 Batch}}
+% \renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{3pt}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{myred}\leaders\hrule height \footrulewidth\hfill}}
+}
+
+% table format
+\usepackage{array}
+\newcolumntype{Y}{>{\centering\arraybackslash}m{4.4cm}}
+\newcolumntype{X}{>{\centering\arraybackslash}m{7cm}}
+\newcolumntype{P}{>{\centering\arraybackslash}m{2.5cm}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}m{8cm}}
+\newcolumntype{M}{>{\raggedright\arraybackslash}m{3.7cm}}
+\newcolumntype{Z}{>{\justify}m{15cm}}
+
+% references
+\usepackage{biblatex}
+\addbibresource{references.bib}
+
+\title{
+{Design and Implementation of Vehicle Control Unit in Formula Student Electric race-car}}
+\author{Arpan Biswas, 1712006 \\ Vraj Brahmbhatt, 1712007}
+\date{2021}
+
+\usepackage{nomencl}
+\makenomenclature
+
+\begin{document}
+
+% page no. roman
+\renewcommand{\thepage}{\roman{page}}
+
+
+
+\input{chapters/titlepage}
+
+\setstretch{1.5}
+
+\input{chapters/certificate}
+
+\input{chapters/examiner}
+
+\input{chapters/declaration}
+
+\addcontentsline{toc}{chapter}{Abstract}
+\input{chapters/abstract}
+
+
+\setlength{\parskip}{0pt}
+\tableofcontents
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+
+\addcontentsline{toc}{chapter}{Nomenclature}
+\input{chapters/abbreviations}
+% \afterpage{\blankpage}
+
+
+
+%%%%%%%%%%%%
+% Chapters
+
+% page number numeric
+\clearpage
+\setcounter{page}{1}
+\setcounter{chapter}{0}
+% main page numbers:  1, 2, 3, ...
+\renewcommand{\thepage}{\arabic{page}}	
+
+\setlength{\parskip}{1em}
+
+\chapter{Introduction}\label{cha:introduction}
+\input{chapters/introduction}
+
+\chapter{Literature review\label{cha:litreivew}}\label{chap:lit}
+\input{chapters/literature}
+
+\chapter{Project design\label{cha:design}}
+\input{chapters/project design}
+
+\chapter{Implementation and experimentation\label{cha:implementation}}
+\input{chapters/implementation}
+
+\chapter{Results}
+\input{chapters/results}
+
+\chapter{Conclusions and scope for further work}
+\input{chapters/conclusion}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
+
+\appendix
+% \chapter{Appendix}
+\input{chapters/appendix}
+
+\input{chapters/acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+
+\end{document}

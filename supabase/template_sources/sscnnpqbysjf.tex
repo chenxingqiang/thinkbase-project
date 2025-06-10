@@ -1,0 +1,151 @@
+\documentclass[11pt,twocolumn,twoside]{IEEEtran}
+\usepackage{amsmath}
+% Swap the comments on the two below lines to toggle the geometry view of the margins, etc...
+%\usepackage[margin=0.75in,headheight=0.45in,showframe]{geometry}
+\usepackage[margin=0.75in,headheight=0.45in]{geometry}
+\usepackage[pdftex]{epsfig}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\include{graphicsx}
+
+\pagestyle{fancy}
+%\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\rhead{\includegraphics[height=0.6in]{CI2018.jpg}}
+\fancyhead[LO]{\sc Creating Post-Event Storm Tracks\ldots} % shorter form of title to fit in space
+\fancyhead[LE]{\sc Lakshmanan, Herzog, Kingfield} % author list or et al., to fit in space
+\chead{}
+\cfoot{}
+
+\begin{document}
+\title{\vspace{0.2in}\sc Creating Post-Event Storm Tracks for Severe Weather Climatologies}
+\author{Valliappa Lakshmanan$^{1,2}$\thanks{Corresponding author: V Lakshmanan, lakshman@ou.edu $^1$Cooperative Institute of Mesoscale Meteorological Studies, University of Oklahoma $^2$National Severe Storms Laboratory, Norman, OK}, Benjamin Herzog$^{1,2}$, Darrel Kingfield$^{1,2}$}
+
+\maketitle
+\thispagestyle{fancy}
+\begin{abstract}
+Commonly employed storm tracking algorithms do not use information on the
+subsequent positions of a storm because it is not available at
+the time that associations between frames are carried out,
+but post-event analysis is
+not similarly constrained. Therefore, it should be possible to
+obtain better tracks for post-event analysis than what a real-time
+algorithm is capable of. In this paper, we describe a statistical
+procedure to determine storm tracks from a set of identified storm cells
+over time. We find that this procedure results in fewer, longer-lived tracks
+at all scales.
+\end{abstract}
+
+\section{Motivation}
+Even though storm tracking methods such as the Storm Cell Identification
+and Tracking Algorithm (SCIT~\cite{scit}), Thunderstorm Identification,
+Tracking and Nowcasting (TITAN~\cite{titan}) and Segmentation-Motion
+Estimation (w2segmotion \cite{atmosresearch,stormattr}) are constrained
+to work in a purely causal fashion, these algorithms have been widely
+employed by the meteorological research community to carry out case
+studies and formulate spatio-temporal relationships, for example by~\cite{scituse1,scituse3,segmotionuse1,titanuse1}.
+
+Using a storm tracking algorithm that is constrained to work in real-time
+to carry out post-event analysis is sub-optimal. There is more information
+(about which cells persist and the direction in which they move)
+that is available if the entire set of storm
+cell identifications over the complete dataset is used to determine
+thunderstorm tracks. In this paper, we describe a way of clustering
+a set of storm cell identifications over time into trajectories where
+a trajectory is the line (or curve) that best fits the
+position of an individual storm cell over time.
+
+This work was carried out in order to improve spatiotemporal relationships
+between radar-derived storm characteristics and the subsequent onset of
+specific weather hazards such as cloud-to-ground lightning, hail and
+tornadoes~\cite{phi}.
+Such hazard probabilities can be derived from storm attributes
+using the method of~\cite{stormattr} on a multi-year reanalysis dataset created
+as described in~\cite{hailclimo}, but the reliability and skill of
+these probabilities is limited by the quality of the storm tracks used
+to train the data mining algorithms.
+
+\section{Method}
+Given a cluster of storm cells $(x_t,y_t)$ at multiple times,
+the best constant-speed straight-line trajectory fit $u,v$
+for the cluster is the best fit slope of the line that connects the
+points in the cluster.
+\cite{theil} introduced a non-parametric, rank-invariant method for
+obtaining the best-fit slope in a dataset whereby one computes
+the median of the slopes of every pair of sample points.
+\cite{sen} modified the definition so that the median is computed
+only of points at different times ($t_2 \ne t_1$).
+Once the median of the slopes ($u$ and $v$) are obtained, and
+assuming that $t_0$ is the time of the earliest storm cell in the cluster,
+the value of $x_0$ can be obtained by computing the median value of
+$x(t) - u(t-t_0)$ over all the storm cells in the cluster.
+This value was shown by~\cite{sen} to be the value that makes the
+Kendall rank correlation coefficient~\cite{kendalltau} between
+the actual storm cell locations and the fitted values on the line
+approximately zero.
+
+The clustering method we use is a variant of K-Means clustering where
+the cluster center is defined to be Thiel-Sen fit to the set of points
+in the cluster and distance between a storm cell at $(x,y,t)$
+and the cluster is
+defined to be the Euclidean distance between the storm cell location and the
+Theil-Sen estimate at that time.
+
+\begin{figure}
+\begin{center}
+\epsfxsize=0.95\hsize \epsfbox{trackstats.png}
+\end{center}
+\caption{Effect of clustering storm tracks at different scales.}
+\label{trackstats.fig}
+\end{figure}
+
+The clustering method is as follows:
+\begin{enumerate}
+\item Find an initial estimate of tracks in the dataset. This can
+be obtained from any robust storm tracking algorithm, even a real-time
+one such as that of~\cite{scit,titan,stormattr}.
+\item Treating each track (set of storm cells with the same id) as
+a cluster, compute the Theil-Sen slope and constants ($u,v,x_0,y_0,t_0$)
+for each cluster.
+\item For every storm cell in the dataset, find the nearest cluster.
+If the nearest cluster is different from the cluster the cell is
+currently part of, and if the distance is less than some reasonable
+threshold $D$, move the storm cell to the nearest cluster.
+\item Compute the Theil-Sen fit for each cluster, prune the set of
+clusters to remove substantially identical trajectories and carry out Step 3,
+repeating steps 3 and 4
+until there are no more changes or until the number of iterations
+reaches some maximum (we used 3 iterations as this maximum number).
+\end{enumerate}
+
+\section{Evaluation}
+Following~\cite{scoretrack}, we carried out a statistical analysis of
+the set of storm tracks extracted from the radar data of June 17, 2012.
+At the most detailed (200 $km^2$)
+scale, the number of trajectories is cut by about
+a third as a result of postanalysis (See Figure~\ref{trackstats.fig}).
+The error in size fit (computed by
+fitting the sizes of the storm cells within a trajectory to a
+``growth-and-decay'' parabola
+and looking for deviations from that fit -- see~\cite{scoretrack} for
+details), an indicator
+of how likely it is that two separate tracks are wrongly combined,
+increases by a very small amount. The position error, an indicator
+of how likely it is that storm cells are added to tracks they are not
+part of, also increases but remains limited to be below the 0.1 decimal
+degree limit imposed by $D$. The fourth panel of Figure~\ref{trackstats.fig}
+demonstrates the benefit of postanalysis -- the mean duration of the
+tracks increases by about 50\%, from an average of about 2000 seconds
+to an average of over 3000 seconds. At the moderate (600 $km^2$ scale)
+and coarse (1000 $km^2$ scale), the behavior is similar.
+For a very small cost in terms of potentially wrong associations, one gets
+a significant improvement in the form of longer-lived tracks.
+
+\section*{Acknowledgments}
+Funding for the authors was provided by NOAA/Office of Oceanic and Atmospheric Research under NOAA-OU Cooperative Agreement NA11OAR4320072, U.S. Department of Commerce.
+
+\bibliographystyle{ieeetr}
+\bibliography{ci_references}
+
+\end{document}

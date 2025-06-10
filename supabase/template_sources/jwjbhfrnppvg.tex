@@ -1,0 +1,315 @@
+% Description du contenu du rapport à rendre pour l'UF temps réel en 4AE et 4IR
+% Auteur : P.-E. Hladik
+% Institut : INSA de Toulouse
+
+\documentclass[11pt, a4paper]{paper}
+\usepackage{a4wide,color}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[frenchb]{babel}
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+\usepackage{amstext}
+\usepackage{amsmath}
+
+\usepackage[ddmmyyyy]{datetime}
+
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{placeins}
+
+\newcounter{cptreq}
+
+
+\usepackage{framed}
+
+
+\title{{\Huge Rapport de projet DDS}\\
+{\large version AE-\today}\\
+---\\
+}
+\author{\color{blue}{Mettez ici vos noms et les parties sur lesquelles vous avez travaillées :}\\
+\color{blue}{conception, robot, vidéo, mission, intégration, rédaction du compte-rendu}\\
+\color{blue}{Exemple : P.-E. Hladik (conception, robot, rédaction du compte-rendu)}
+}
+
+\begin{document}
+
+%%%%%%%%%%%%%%
+% PAGE DE GARDE
+\maketitle
+
+
+{\color{red}
+\begin{framed}
+\begin{center}{\bf\Large --- Les attendus du projet --- } \end{center}
+
+Pour ce travail, il est attendu que :
+\begin{itemize}
+	\item vous réalisiez une conception de l'application en entier avec les parties communication, robot et vidéo (voir partie 1 du rapport pour plus de détails),
+	\item vous implémentiez uniquement les parties communication et robot (fonctionnalités 1 à 13),
+	\item vous fassiez une vidéo qui démontre le fonctionnement de votre application (voir partie 3).
+\end{itemize}
+
+Il est possible d'implémenter la partie vidéo, cependant ce travail n'est pas attendu et ne sera donc pas pris en considération dans l'évaluation. C'est cependant possible de le faire...
+
+\begin{center}{\bf\Large --- Ce qu'il faut faire pour le rapport --- } \end{center}
+
+{\bf Remplacez tous les textes en bleu et supprimer les textes en rouge}\\
+
+{\bf Le document à rendre par groupe doit être une archive zip ou tar. Cette archive sera
+ à déposer sur moodle avant le 26 mars 2021 23h59:
+\url{https://moodle.insa-toulouse.fr/mod/assign/view.php?id=7360}}\\
+
+
+{\bf L'archive doit contenir quatre fichiers :
+\begin{itemize}
+	\item votre rapport en format pdf, 
+	\item vos fichier {\tt tasks.h} et  {\tt tasks.cpp},
+	\item un fichier vidéo avec vos tests.\\
+\end{itemize}}
+
+Vous pouvez utiliser word ou un autre logiciel d'édition pour rédiger ce rapport, par contre vous devez  {\bf impérativement respecter la structure ci-après et le rendre au format pdf}.\\
+Remarque : si vous n'arrivez pas à déposer la vidéo sur moodle, faites un dépôt sur un drive (ou autre) et ajoutez le lien dans le rapport.\\
+\\
+
+Critères d'évaluation :
+\begin{itemize}
+	\item Qualité rédactionnelle,
+	\item Exhaustivité et justesse des règles de codage,
+	\item Qualité de la conception (clarté, respect de la syntaxe, exhaustivité, justesse),
+	\item Qualité des explications pour la validation,
+	\item Respect des règles dans la production du code.\\
+\end{itemize}
+
+Compétences évaluées :
+\begin{itemize}
+	\item rédaction et communication sur un dossier de conception,
+	\item concevoir une application concurrente temps réel,
+	\item passer d'un modèle de conception à une implémentation,
+	\item écriture de code et utilisation de primitives au niveau système,
+	\item valider un code.
+\end{itemize}
+\end{framed}
+}
+
+%%%%%%%%%%%%%%
+% DEBUT DU RAPPORT
+\newpage
+
+
+
+
+%%%%%%%%%%%%%%
+% CONCEPTION
+\section{Conception}
+
+{\color{red} {\bf La conception doit couvrir l'ensemble des fonctionnalités du cahier des charges.}
+
+Mettez dans cette partie tous les éléments de votre conception en particulier vos diagrammes AADL (vue globale du système) et les diagrammes d'activité (détails des threads). Cette partie doit être auto-suffisante pour comprendre votre application.
+
+Pour faciliter la lecture des schémas, vous allez présenter votre conception en trois parties, l'une focalisée sur la communication entre le moniteur et le superviseur, la seconde consacrée au traitement vidéo et la troisième au contrôle du robot.
+
+Si vous le souhaitez, au lieu de dessiner vos diagrammes sous un éditeur, vous pouvez joindre un scan de vos schémas — ils doivent être lisibles et propres.}
+
+% VUE GENERAL DU SYSTEME
+\subsection{Diagramme fonctionnel général}
+
+{\color{red} Mettez ici un diagramme fonctionnel qui présente les principaux blocs de votre conception. Pour cela, inspirez vous du diagramme ci-dessous (fig.~\ref{fig:diag_fonc_gen}) en indiquant pour chaque groupe de threads les données et ports partagés. La figure~\ref{fig:diag_fonc_gen} a été réalisée à partir du document de conception. {\bf Vous devez absolument conserver le découpage en trois groupes de threads ({\tt th\_group\_gestion\_moniteur}, {\tt th\_group\_vision}, {\tt th\_group\_gestion\_robot}).}}
+
+\begin{figure}[htbp]
+\begin{center}
+{\includegraphics[scale=.5]{./figures-pdf/diag_fonc_gen}}
+{\caption{Diagramme fonctionnel du système}}
+\end{center}
+\label{fig:diag_fonc_gen}
+\end{figure}
+\FloatBarrier
+
+% DIAGRAMME FONCTIONNEL GT MONITEUR
+\subsection{Groupe de threads gestion du moniteur}
+
+{\color{red}Placez ici :
+\begin{itemize}
+\item le diagramme fonctionnel en AADL décrivant le groupe de threads de gestion du moniteur (voir exemple de la figure~\ref{fig:diag_fonc_moniteur} réalisée à partir du dossier de conception),
+\item les diagrammes d'activité de chaque thread de ce groupe.
+\end{itemize}
+
+Décrivez tous les éléments (paramètres, variables, etc.) qui vous semblent pertinents pour comprendre les diagrammes.}
+
+% DIAGRAMME FONCTIONNEL GT MONITEUR
+\subsubsection{Diagramme fonctionnel du groupe gestion du moniteur}
+
+{\color{red} Exemple de diagramme fonctionnel pour le groupe de thread de gestion du moniteur. Mettez à jour ce diagramme avec votre conception.}
+
+\begin{figure}[htbp]
+\label{fig:diag_fonc_moniteur}
+\begin{center}
+{\includegraphics[scale=.5]{./figures-pdf/diag_fonc_moniteur}}
+{\caption{Diagramme fonctionnel du groupe de threads gestion du moniteur}}
+\end{center}
+\end{figure}
+\FloatBarrier
+
+
+% DIAGRAMMES D'ACTIVITE GT MONITEUR
+\subsubsection{Diagrammes d'activité  du groupe gestion du moniteur}
+{\color{red}Décrivez le comportement de chacun de vos threads avec des diagrammes d'activité. Apportez les explications qui vous semblent nécessaires pour comprendre votre conception. A titre d'exemple les diagrammes fonctionnels tirés du document de conception sont remis.}
+
+\begin{figure}[htbp]
+\label{fig:act_communiquer}
+\begin{center}
+{\includegraphics[scale=.3]{./figures-pdf/th_receiveFromMon.png}}
+{\caption{Diagramme d'activité du thread {\tt th\_receiveFromMon}}}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\label{fig:act_envoyer}
+\begin{center}
+{\includegraphics[scale=.3]{./figures-pdf/th_sendToMon}}
+{\caption{Diagramme d'activité du thread {\tt th\_sendToMon}}}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\label{fig:act_envoyer}
+\begin{center}
+{\includegraphics[scale=.3]{./figures-pdf/th_server}}
+{\caption{Diagramme d'activité du thread {\tt th\_server}}}
+\end{center}
+\end{figure}
+\FloatBarrier
+
+% DIAGRAMME FONCTIONNEL GT ROBOT
+\subsection{Groupe de threads gestion du robot}
+
+% DIAGRAMME FONCTIONNEL GT ROBOT
+\subsubsection{Diagramme fonctionnel du groupe gestion robot}
+{\color{blue} Ajoutez le diagramme fonctionnel du groupe de threads de gestion du robot.}
+
+% DIAGRAMMES D'ACTIVITE GT ROBOT
+\subsubsection{Diagrammes d'activité du groupe robot}
+{\color{blue}Décrivez le comportement de chacun de vos threads avec des diagrammes d'activité. Apportez les explications qui vous semblent nécessaires pour comprendre votre conception.}
+
+
+
+% DIAGRAMME FONCTIONNEL GT VISION
+\subsection{Groupe de threads vision}
+
+% DIAGRAMME FONCTIONNEL GT VISION
+\subsubsection{Diagramme fonctionnel du groupe vision}
+
+{\color{blue} Ajoutez le diagramme fonctionnel du groupe de threads de vision.}
+
+
+% DIAGRAMMES D'ACTIVITE GT VISION
+\subsubsection{Diagrammes d'activité du groupe vision}
+{\color{blue}Décrivez le comportement de chacun de vos threads avec des diagrammes d'activité. Apportez les explications qui vous semblent nécessaires pour comprendre votre conception.}
+
+
+
+%%%%%%%%%%%%%%%%%%%
+% TRANSFORMATION AADL2XENO
+\section{Transformation AADL vers Xenomai}
+ 
+ {\color{red} Cette section est consacrée à la méthode pour passer d'un modèle AADL à un code sous Xenomai. Pour chacun des éléments AADL, vous expliquerez {\bf comment vous l'avez traduit en code} et quels {\bf services de Xenomai} vous avez utilisés {\bf en expliquant ce qu'ils font}. Chaque élément devra être illustré avec des {\bf extraits de code de votre projet}.}
+ 
+ % THREAD
+\subsection{Thread}
+% INSTANCIATION THREAD
+\subsubsection{Instanciation et démarrage}
+ {\color{blue} Expliquer comment vous implémentez sous Xenomai l'instanciation et le démarrage d'un  thread AADL.}
+ 
+ {\color{blue} {\bf Exemple de réponse} : Chaque thread a été implémenté par un {\tt RT\_TASK} déclarés dans le fichier {\tt tasks.h}. La création de la tâche se fait à l'aide du service {\tt rt\_task\_create} et son démarrage à l'aide de {\tt rt\_task\_start}. Toutes les tâches sont crées dans la méthode {\tt init} de {\tt tasks.cpp} et démarrées dans la méthode {\tt run}.
+
+Par exemple, pour la tâche {\tt th\_server}, sa déclaration est faite ligne 73 dans le fichier {\tt tasks.h}
+\begin{verbatim}
+  RT_TASK th_server;
+\end{verbatim}
+sa création ligne 102 de {\tt tasks.cpp} lors de l'appel de
+\begin{verbatim}
+  rt_task_create(&th_server, "th_server", 0, PRIORITY_TSERVER, 0)
+\end{verbatim}
+et son démarrage ligne 146 avec
+\begin{verbatim}
+  rt_task_start(&th_server, (void(*)(void*)) & Tasks::ServerTask, this)
+\end{verbatim}
+}
+
+% CODE THREAD
+\subsubsection{Code à exécuter}
+ {\color{blue} Comment se fait le lien sous Xenomai entre le thread et le traitement à exécuter.}
+
+% PRIORITE THREAD
+\subsubsection{Niveau de priorités}
+ {\color{blue} Expliquer comment vous fixez sous Xenomai le niveau de priorité d'un thread AADL.}
+
+% PERIODICITE THREAD
+\subsubsection{Activation périodique}
+ {\color{blue} Expliquer comment vous rendez périodique l'activation d'un thread AADL sous Xenomai.}
+ 
+% DONNEE PARTAGEE
+\subsection{Donnée partagée}
+
+% INSTANCIATION DONNEE PARTAGEE
+\subsubsection{Instanciation}
+ {\color{blue} Quelle structure instancie une donnée partagée ?}
+
+% LECTURE/ECRITURE DONNEE PARTAGEE
+\subsubsection{Accès en lecture et écriture}
+ {\color{blue} Comment garantissez-vous sous Xenomai l'accès à une donnée partagée ?}
+ 
+ % PORT D'EVENEMENT
+\subsection{Port d’événement}
+
+% INSTANCIATION PORT D'EVENEMENT
+\subsubsection{Instanciation}
+ {\color{blue} Comment avez-vous instancié un port d'événement ?}
+ 
+ % ENVOI PORT D'EVENEMENT
+\subsubsection{Envoi d’un événement}
+ {\color{blue} Quels services ont été employés pour signaler un événement ?}
+
+% RECEPTION PORT D'EVENEMENT
+\subsubsection{Réception d’un événement}
+ {\color{blue} Comment se fait l'attente d'un événement ?}
+
+
+
+% PORT D'EVENEMENT-DONNEES
+\subsection{Ports d’événement-données}
+
+% INSTANCIATION PORT D'EVENEMENT-DONNEES
+\subsubsection{Instanciation}
+ {\color{blue} Donnez la solution retenue pour implémenter un port d'événement-données avec Xenomai.}
+
+% ENVOI PORT D'EVENEMENT-DONNEES
+\subsubsection{Envoi d’une donnée}
+ {\color{blue} Quels services avez-vous employés pour envoyer des données ?}
+
+% RECEPTION PORT D'EVENEMENT-DONNEES
+\subsubsection{Réception d’une donnée}
+ {\color{blue} Quels services avez-vous employés pour recevoir des données ?}
+
+%%%%%%%%%%%%%%%
+% ANALYSE ET VALIDATION
+ {\color{red}
+ \section{Analyse et validation de la conception}
+
+Cette partie sera à réaliser par la production d'une vidéo dans laquelle vous montrerez que chacune des fonctionnalités de 1 à 13 (communication et robot) sont opérationnelles. Vous n'êtes pas obligé de reprendre les fonctionnalités déjà faites (1,2,3, 4, 7, 10 et 12) sauf si vous les avez modifiées. 
+
+Faites une courte séquence vidéo pour chaque fonctionnalité et montrer clairement qu'elle respecte les besoins. Pour réaliser la vidéo, enregistrer votre écran en commentant. Une vidéo d'exemple (rapidement produite et avec le simulateur) pour les fonctionnalités (1,2,3, 4, 7, 10 et 12) est postée sur \url{https://drive.google.com/open?id=1Dk5C9FLq-bFZCgSRN2y9dTCk0oxM7fp4}}
+
+ 
+
+
+
+
+\end{document}

@@ -1,0 +1,205 @@
+\documentclass{ctexart}
+
+%-----------------------------------------------------
+% weird problem would happen if setting these fonts
+
+% \setCJKmainfont{simfang.ttf}
+% \setCJKsansfont{simhei.ttf}
+%-----------------------------------------------------
+
+% %% Language and font encodings
+% \usepackage[UTF8]{ctex}
+% \usepackage[english]{babel}
+% \usepackage[utf8x]{inputenc}
+
+\usepackage{lipsum}
+
+\usepackage[T1]{fontenc}
+\usepackage{footmisc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=2.4cm,bottom=2.4cm,left=2.7cm,right=2.7cm,marginparwidth=1.75cm]{geometry}
+
+% %% Useful packages
+\usepackage{amsmath,amsfonts,amssymb,mathrsfs}
+\usepackage{graphicx}
+\usepackage{pst-func}
+\usepackage{float}
+% \usepackage{MnSymbol}
+% \usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors = blue]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,decorations.pathmorphing,backgrounds,positioning,fit,petri,calc,external}
+\usepackage{url}
+
+\usepackage{subcaption}
+\usepackage{cleveref}
+\captionsetup[table]{skip = 3pt}
+\captionsetup[subfigure]{subrefformat=simple}
+
+\allowdisplaybreaks
+
+% section title left align
+\makeatletter
+\g@addto@macro{\CTEX@section@format}{\raggedright}
+\makeatother
+
+% Chinese section number
+\usepackage{zhnumber}
+\renewcommand\thesection{\zhnum{section}}
+% \renewcommand{\thesubsection}{\thesection.\zhnum{subsection}}
+
+\usepackage{cases}
+\usepackage{tabularx, ragged2e}
+\usepackage{booktabs}
+\usepackage{fix-cm}
+\usepackage{longtable}
+% \usepackage{supertabular}
+% \usepackage{mdframed}
+
+\usepackage{titlesec}
+\titleformat{\section}[block]{\LARGE \bfseries \filcenter}{}{1em}{}
+\usepackage{chngcntr}
+\counterwithout{subsection}{section}
+\titlelabel{\thetitle、}
+
+% \renewcommand\tabularxcolumn[1]{>{\Centering}m{#1}}
+
+\newcolumntype{M}[1]{>{\Centering\arraybackslash}m{#1}}
+
+\newcolumntype{x}[1]{>{\raggedright}m{#1}}
+\newcolumntype{z}[1]{>{\centering}m{#1}}
+\newcommand{\tn}{\tabularnewline}
+
+\renewcommand\tabularxcolumn[1]{>{\centering\arraybackslash}m{#1}} %% COMMENT
+\usepackage{makecell}
+\renewcommand\cellalign{lc}
+\usepackage{cellspace}
+\setlength\cellspacetoplimit{2pt}
+\setlength\cellspacebottomlimit{2pt}
+\addparagraphcolumntypes{x, }
+\usepackage{caption}
+
+\makeatletter
+\newcommand\HUGE{\@setfontsize\Huge{35}{46}}
+\makeatother
+
+\usepackage{hyperref}
+\hypersetup{
+   colorlinks = true,
+    linkcolor = black,
+    filecolor = magenta,      
+     urlcolor = black,
+}
+
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{listings}
+
+\usepackage{footnote}
+\usepackage{footmisc}
+
+\newcommand{\astfootnote}[1]{
+\let\oldthefootnote=\thefootnote
+\setcounter{footnote}{0}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\footnote{#1}
+\let\thefootnote=\oldthefootnote
+}
+
+\tikzexternalize[prefix=tikz/,optimize command away=\includepdf]
+
+%--------------------------------------------------------
+% project name, name of the applicant, etc.
+
+\title{京东博士后科研工作站\\ \vspace{0.4cm}
+拟申报课题研究计划书}
+\author{
+\begin{tabular}{rc}
+课题名称 & \phantom{cc}research plan title\phantom{cc} \\
+\cmidrule(l){2-2}
+项目申请人 & \phantom{cc}XXX\phantom{cc} \\
+\cmidrule(l){2-2}
+毕业学校 & \phantom{cc}XX大学\phantom{cc} \\
+\cmidrule(l){2-2}
+申报方向 &  \\
+\cmidrule(l){2-2}
+\end{tabular}
+}
+
+%-------------------------------------------------------
+
+\zhnumsetup{time=Chinese}
+\date{\zhtoday}
+
+%-------------------------------------------------------
+% set up the cover page
+
+\makeatletter         
+\def\@maketitle{
+\vspace*{\fill}
+\begin{center}
+\includegraphics[width = 15cm]{images/logo.jpg} \\
+{\HUGE \bfseries \sffamily \@title } \\ \vspace{3.9cm}
+{\LARGE  \@author} \\ \vspace{3cm}
+{\LARGE \@date}
+\end{center}
+\vspace*{\fill}}
+\makeatother
+%-------------------------------------------------------
+
+\begin{document}
+
+\clearpage\maketitle
+\thispagestyle{empty}
+
+% {\color{magenta}
+% 需要修改：项目题目缩小，增加深度
+% }
+
+\newpage
+
+\section{一、申请人基本情况}
+\setcounter{page}{1}
+\pagestyle{plain}
+
+\input{content/applicant_table}
+
+\section{二、项目具体情况}
+
+\subsection{\Large 项目阐述}
+
+\subsubsection*{\large 项目背景:}
+
+\input{content/project_background}
+
+\subsubsection*{\large 研究方法：}
+
+\input{content/research_methods}
+
+\subsubsection*{\large 拟采取的技术路线：}
+
+\input{content/technical_route}
+
+\subsubsection*{\large 可行性分析：}
+
+\input{content/feasibility_analysis}
+
+\subsection{项目创新点}
+
+\input{content/novelty_statements}
+
+\subsection{项目研究计划和预期进展}
+
+\input{content/plan_and_progress}
+
+\subsection{项目预期成果}
+
+\input{content/expected_outcome}
+
+% add bib items in references.bib
+% \bibliographystyle{plain}
+% \bibliography{references}
+
+\end{document}

@@ -1,0 +1,97 @@
+
+\RequirePackage{fix-cm}
+\documentclass[12pt,a4paper,twoside]{book}
+
+% useful packages
+\usepackage{graphicx,xcolor,textpos}
+%\usepackage{helvet}
+\usepackage{lipsum}
+\usepackage{amsmath}
+%\usepackage{multicol}
+\usepackage[authoryear]{natbib}
+\usepackage{emptypage}
+\usepackage{hyperref}
+\usepackage[toc,page]{appendix}
+\usepackage[toc,acronym,nonumberlist]{glossaries}
+\makeglossaries
+
+% settings for table of contents and section numbering
+\setcounter{secnumdepth}{1} % numbering to which sublevel?
+\setcounter{tocdepth}{1} % How many levels does the table of contents have?
+
+\newcommand*\cleartoleftpage{%
+  \clearpage
+  \ifodd\value{page}\hbox{}\newpage\fi
+}
+
+% page settings
+\topmargin -10mm
+\textwidth 160truemm
+\textheight 240truemm
+\oddsidemargin 0mm
+\evensidemargin 0mm
+
+% define the KUL colors
+\definecolor{green}{RGB}{172,196,0}
+\definecolor{bluetitle}{RGB}{29,141,176}
+\definecolor{blueaff}{RGB}{0,0,128}
+\definecolor{blueline}{RGB}{82,189,236}
+
+% define units for the text blocks
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
+
+% Define your symbols and acronyms in here
+\input{Preamble/Symbols.tex}
+\input{Preamble/Acronyms.tex}
+
+% Start of the actual document
+\begin{document}
+
+% FRONT MATTER
+\frontmatter
+\rmfamily
+
+\input{Preamble/Titlepage.tex} \cleardoublepage 
+\input{Preamble/Copyright.tex} \cleardoublepage
+\setcounter{page}{0}
+\pagenumbering{roman}
+
+\input{Preamble/Preface.tex}\cleardoublepage
+\input{Preamble/Summary.tex} \cleardoublepage
+\printglossaries \cleardoublepage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures \cleardoublepage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables \cleardoublepage
+\addcontentsline{toc}{chapter}{Contents}
+\tableofcontents \cleardoublepage
+
+% MAIN MATTER
+\mainmatter
+\setcounter{page}{0}
+\pagenumbering{arabic}
+
+\input{Chapters/Introduction.tex} \cleardoublepage
+\input{Chapters/Methods.tex} \cleardoublepage
+\input{Chapters/Results.tex} \cleardoublepage
+\input{Chapters/Conclusions.tex} \cleardoublepage
+% BACK MATTER (is dit zelfs een woord?)
+
+% BIBLIOGRAPHY
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{apalike}
+\bibliography{Bibliography/Landslide_Literature.bib}
+\cleardoublepage
+
+% APPENDIX
+\begin{appendices}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+  \input{Backmatter/Appendix.tex}
+\end{appendices}
+
+% Back side of book
+\cleartoleftpage{} % Make sure the back page is at an even page number
+\input{Backmatter/Back.tex}
+
+\end{document}

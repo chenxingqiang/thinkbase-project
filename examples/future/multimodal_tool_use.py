@@ -2,14 +2,14 @@ from PIL import Image
 import numpy as np
 from typing import List, Optional, Union, Tuple
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, ContentBlock
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, ContentBlock
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -17,7 +17,7 @@ ell2a.configure({
     "autocommit": True
 })
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def get_user_name() -> str:
     """Return the user's name."""
     return "Isac"
@@ -57,7 +57,7 @@ def generate_strawberry_image() -> Image.Image:
     return img
 
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def get_ice_cream_flavors() -> List[Union[str, Image.Image]]:
     """Return a list of ice cream flavors with an image."""
     strawberry_img = generate_strawberry_image()
@@ -69,7 +69,7 @@ async def get_ice_cream_flavors() -> List[Union[str, Image.Image]]:
     ]
 
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def ice_cream_chat(message_history: List[Message]) -> Message:
     """Chat about ice cream flavors."""
     try:

@@ -1,0 +1,425 @@
+%%%%%%%%
+%% !!! To use APA7 referencing style please see https://tex.my/2022/06/05/using-apa7-with-usmthesis/ !!!
+%%
+%% !!! As of Jan 2023, usmthesis on Github will be maintained and updated by wnarifin at https://github.com/wnarifin/usmthesis !!!
+
+%%%%%%%
+%% usmthesis.cls 2024/02/05 version V1.7_JBH_Ooi_6
+%
+% Since there have been no noticeable updates, I have updated the usmthesis.cls 
+% and usmthesis.tex files to make the output closer to USM Thesis Template V1.6. 
+% I am not a professional LaTeX user, so perhaps there are cleaner ways to achieve 
+% the changes that I have made. Regardless, I hope this helps until USM finally 
+% provides their own LaTeX template. This uses APA 7th Ed.
+%
+% Exact changes can be found in the comments and usmthesis.cls. I have added some 
+% new features that you might find useful. Refer to the official documentation or
+% LaTeX Stack Exchange on how those packages work.
+%
+% Many thanks to Lim Lian Tze and wnarrfin for maintaining the codes so far.
+%
+% P.S. I just got some feedback from IPS about some tweaks that I needed to make,
+% which is contradictory to their given Word template (in typical USM IPS fashion),  
+% so this is hopefully the final version of the LaTeX template.
+%
+% Joseph Boon Han, Ooi
+% School of Physics, USM
+% 05 Feb 2024
+%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% usmthesis.cls 2016/12/08 version V1.7.
+%%
+%% IMPORTANT MESSAGE (Dec 2016)
+%% Due to the recent numerous changes requested by IPS, USM to different
+%% candidates -- often conflicting even within the same week -- without much
+%% consistency nor in black in white, I have found it increasingly difficult
+%% to maintain a coherent version. I have therefore decided to provide some
+%% options that seem to be favored by IPS on different occasions; but will no
+%% longer update the template until an updated formatting guidelines with clear
+%% instructions and concrete samples is published.
+%%
+%% THERE WILL BE NO FURTHER UPDATES UNTIL IPS-USM PUBLISHES AN OFFICIAL
+%% UPDATED FORMATTING GUIDELINES WITH CONCRETE, CLEAR INSTRUCTIONS.
+%%
+%% Individual requests for help to modify this version for your needs will be
+%% handled on a case by case basis, depending on my mood, perhaps for a fee.
+%% Requests for help to modify past versions will NOT be entertained.
+%% Please read http://tex.my/how-to-ask-for-latex-related-help-effectively/.
+%%
+%% (Yes I'm that tired and frustrated. I know everyone just want to graduate,
+%% but I am by now genuinely put off by the tone of some requests with rude
+%% attitudes, unclear descriptions, flip-flopping conditions, etc for something
+%% that was originally for my own use.)
+%%
+%% Usmthesis _was_ fun; but it has ceased to be so for me.
+%%
+%% Submit a git pull request on https://github.com/liantze/usmthesis
+%% if you wish to contribute your changes. No timeframe is set for approvals.
+%% I cannot check through any edited usmthesis.cls of any version without
+%% CVS.
+%%
+%% Oh and if you'd like to adapt this template (the .cls and/or the .tex) for
+%% your institution, that's perfectly fine, but at least keep the license
+%% (LPPL 1.3) and the original author (me) won't you? It's just normal decency.
+%% THANK you. :-)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% From line 2. Use these settings for APA 7th Ed. Comment out if not needed.
+% Refer to https://tex.my/2022/06/05/using-apa7-with-usmthesis/ for more
+% information. Credits to Lim Lian Tze for the fix. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\RequirePackage{scrlfile}
+\PreventPackageFromLoading{apacite,multibib}
+\AfterClass{book}{
+  \RequirePackage[style=apa,natbib]{biblatex}
+  \let\bibsep\bibitemsep
+  \addbibresource{mybib.bib}
+}
+
+
+%% If you prefer -- and have been allowed -- to use
+%% Arial, then
+%% \documentclass[arial]{usmthesis}
+%% It's not really Arial, it's a Helvetica look-alike,
+%% but if you're not a designer nor a typographer, you
+%% probably can't tell the difference (I can't either)
+%%
+%% OTHER IMPORTANT OPTIONS:
+%% singespacetitle - Make title on cover and title
+%%                   page single-spaced.
+%%
+%% chapnumwords — Make chapter titles be `Chapter One'
+%% tocchapnumwords — Make the ToC use `Chaper One' too
+%%   (Engineering IPS seems to like the above two settings)
+%%
+%% tocpage   These options will add a ``Page'' label at the
+%% lotpage   top of the Table of Contents, List of Tables,
+%% lofpage   List of Figures and List of Plates respectively.
+%% loppage   I don't know lah, one moment IPS says must add at
+%%           the top of all these lists; one month later say
+%%           only the ToC, a few months later say don't add at all.
+%%           Find, mix-and-match yourself based on the instrustions you got.
+%%
+%% tocCAPSfront - Sometimes IPS wants the ``Table of Contents'', ``List of
+%%                Figures'', ``Abstract'' etc to be all-caps in the ToC;
+%%                sometimes they don't. Use this option to make them ALL CAPS.
+%%
+%% tocCAPSref - Similar to the above but for the ``References''.
+%% tocCAPSapp - Similar to the above but for the ``Appendices''.
+\documentclass[
+singlespacetitle, % Make title on cover page singlespaced
+% chapnumwords,tocchapnumwords,  %% ``Chapter One'' I think Engineering like this
+% tocpage,  % Put ``Page'' at top of ToC. Add lotpage, lofpage, loppage if
+lotpage, lofpage, loppage,   % ``Page'' is also needed for LoT, LoF and LoP.
+tocCAPSfront, % Make ``List of Tables'' etc in ToC CAPS
+tocCAPSref, % Make ``References'' in ToC CAPS
+tocCAPSapp, % Make ``Appendices'' in ToC CAPS
+]{usmthesis}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is usmthesis.tex, 6 Dec 2016. READ THE COMMENTS.
+% Some formattings are easiest changed by uncommenting
+% some lines in this .tex file or by changing certain
+% options.
+%
+% Created by Lim Lian Tze (Ph.D.)
+% liantze@gmail.com
+% http://liantze.penguinattack.org.
+% Updated by Joseph Boon Han, Ooi (V4, 04 Oct 2023)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Example of loading other packages that you may require.
+%% I'm loading the marvosym package so that I can produce a
+%% smiley face with the command \Smiley.
+\usepackage{marvosym}
+
+%% Joseph Ooi:
+% Loaded longtable package for tables that may span several pages.
+% This may be useful as an alternative to table. Refer to the
+% documentation for usage. Safe to leave alone. If you decide to 
+% remove this, remove the following setting as well.
+\usepackage{longtable}
+
+
+%% Joseph Ooi:
+% Change spacing between lines in longtable for p and m columns.
+% Use P{length} instead of p{length} to reduce vertical spacing.
+% Use M{length} to have both reduced vertical spacing and centred
+% vertical alignment in longtable.
+% This might also work with normal tables. Haven't checked that.
+\usepackage{array}
+\newcolumntype{P}[1]{>{\setstretch{1}\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\setstretch{1}\centering\arraybackslash}m{#1}}
+
+%% Also, the enumitem package is great for customising
+%% list environments.
+\usepackage{enumitem}
+
+%% Listings is a nice package for typesetting code
+%% listings. Other possible packages include fancyvrb,
+%% minted, etc.
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily,breaklines=true}
+
+%% For those who need to produce algorithms and pseudocode.
+%% There are a number of different packages available, but
+%% unfortunately they tend not to work well together!
+%% I'm using algorithmicx, specifically algpseucode, here.
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{indentfirst}
+
+%% Joseph Ooi:
+% In case you save your figures in a separate folders like
+% folder_1, folder_2, ... within the main directory, add  
+% \graphicspath{{./folder_1/}{./folder_2/}}
+% then you can just type filename.png etc. without needing to
+% specify the full path name to your figures
+
+%% Enter particulars about your thesis HERE
+% Your Name
+\author{Joseph Ooi \& Lim Lian Tze}
+% English title of your thesis
+\title{Writing Your Thesis with LaTeX with a Very, Very, Very Long Title}
+% Malay title of your thesis
+\titlems{Penulisan Tesis dengan LaTeX}
+% Year submitted
+\submityear{2024}
+% Month submitted
+\submitmonth{February}
+%% Choose only 1 degree type! :-)
+\degreetype{Doctor of Philosphy}
+% \degreetype{Master of Science}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can comment out the following line if you don't have a
+% "List of Own Publications". And make it all caps yourself
+% if it needs to be all caps in the ToC.
+%% Joseph Ooi:
+% Comment out regardless when using APA 7th Ed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \newcites{own}{LIST OF PUBLICATIONS}
+
+\usepackage[plainpages=false,bookmarksnumbered,
+bookmarksdepth=section,breaklinks=true]{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Options for generating hyperlinks when using pdfLaTeX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifpdf
+  \makeatletter
+  \hypersetup{hypertexnames=false,%
+    pdfauthor={\@author},pdftitle={\@title}}
+  \makeatother
+\fi
+
+\usepackage{ragged2e}
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Default bibliography style is apa (using
+% \RequirePackage[natbibapa]{apacite} in the class file).
+%
+% If you prefer the number system though, use bibliography
+% style "plainnat" for [1][2][3] or "alpha" for [Jon94] (the label
+% will be auto-generated).
+%% Joseph Ooi:
+% Comment out both \bibliographystyle{apacite} and
+% \bibliographystyleown{apacite} regardless when using APA 7th Ed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \bibliographystyle{apacite}
+% \bibliographystyleown{apacite}
+%\bibliographystyle{plainnat}
+%\bibliographystyleown{plainnat}
+\frontmatter
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inserts the cover page (the hard cover with gold-lettering)
+% and the title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makecover
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAKE SURE YOU HAVE A acknowledgements.tex FILE
+%% Joseph Ooi:
+% Added vertical spacing to be consistent with the rest
+% of the text after frontmatter. Ensure that value here
+% is the same as the one just after settings for List
+% of Abbreviations. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\setlength\parskip{12pt}
+\include{acknowledgements}}
+
+\tableofcontents \clearpage
+\listoftables \clearpage
+\listoffigures \clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can comment out the following line if you don't
+% have a "List of Plates"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\listofplates \clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You can comment out the following line if you don't
+% have a "List of Acronyms"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{loa} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi
+% You can comment out the following line if you don't
+% have a "List of Appendices"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\listofappendix \clearpage
+
+
+%% Joseph Ooi:
+% Paragraph spacing (originally 18pt)
+\setlength\parskip{12pt}
+% Text-float spacing (originally 24pt)
+\setlength\intextsep{12pt}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Your Malay and English abstracts, each in one file.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{abs-mal}
+\input{abs-eng}
+
+
+\mainmatter
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The actual chapters of your thesis as listed in
+% mainchaps.tex. Make sure you have the relevant
+% chapter files.
+% E.g. if you mainchaps.tex contains the lines
+%
+%  \include{hypothesis.tex}
+%  \include{proof.tex}
+%
+% Then you MUST have the files hypothesis.tex, proof.tex
+% (containing the relevant chapters) in the same directory
+% as mainchaps.tex.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{mainchaps}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The bibliography. Turn on page numbering.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\addtocontents{toc}{\protect\cftpagenumberson{chap}}
+%%%% Soooo if IPS says there should be 5cm top margin
+%%%% on the ``References'' heading page, uncomment the
+%%%% line just before and after \bibliography. Repeat for
+%%%% \bibliographyown if necessary
+%% Joseph Ooi:
+% Seems like extra spacing is not needed now.
+%% Increase spacing before chapter heading (@)
+% \titlespacing*{\chapter}{0pt}{\dimexpr2.5cm-50pt}{\baselineskip}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% Comment out following when using APA 7th Ed. Uncomment if needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \bibliography{mybib}
+%% now change it back to normal if (@) is used.
+% \titlespacing*{\chapter}{0pt}{-50pt}{\baselineskip}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% Use these settings for APA 7th Ed. Comment out if not needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printbibliography[heading=bibintoc]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% If IPS doesn't want items in the appendices showing up in 
+% LoF, LoT, LoP, uncomment the following line.
+% \captionsetup{list=no}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The appendices.
+% If you don't have any, you may delete everything below,
+% until and including \input{appendices}.
+%% Joseph Ooi:
+% I have added some required settings. Check the comments.
+% Use \appchapter instead of \chapter for Appendices.
+% If IPS wants to change the bold settings for Appendices in
+% ToC, check line 835 in usmthesis.cls.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\assignpagestyle{\chapter}{empty}
+\pagestyle{empty}
+%% * If IPS says they don't want any page numbering in the footer,
+%%   add \pagestyle{empty}
+%% * If they don't want any page numbering in the ToC either,
+%%   add \addtocontents{toc}{\protect\cftpagenumbersoff{chap}}
+%% * If they say they don't want Appendix A, B, C... to appear
+%%   in the ToC either, add next line (*). Then refer to line (#).
+\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% Change title format for appendices to best match USM Template V1.6. 
+% Kept the Appendices page as it is much neater and clear to use.
+% Apparently the whole appendix title is centred according to the
+% IPS template. Not eleganto! (IYKYK)
+% The tab space used in USM's template is 1.27cm, but here I used
+% 1.25cm. No particular reason, I just wanted nice half divisions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\titleformat{\chapter}[block]{\bfseries\filcenter}{\fontsize{12pt}{14pt}\selectfont\MakeTextUppercase{\chaptername{}\space%
+ \if@chapnumwords\formatchapnum{chapter}%
+ \else\thechapter\fi}}{1.25cm}{\MakeTextUppercase}
+\titlespacing*{\chapter}{0pt}{-50pt}{0.7\baselineskip}
+\input{appendices}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The list of own publications.  If you don't have one, you may
+% comment out the next lines until before /end{document}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% No page number for List of Publications, so this original line
+% has been commented out.
+% \assignpagestyle{\chapter}{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Uncomment/comment this line if you need the List of Publications 
+% to be bold/not bold in the ToC.
+%% Joseph Ooi: Apparently we need it to be bold now, so...
+\addtocontents{toc}{\protect\renewcommand\protect\cftchapfont{\protect\bfseries}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% (#) Add this line to make List of Publications appear in  
+% ToC if (*) is used. Restores hyperlink in ToC.
+\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% Comment out following when using APA 7th Ed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \nociteown{lim:2007,lim:latextypesetting}
+% \bibliographyown{mybib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joseph Ooi:
+% Use these settings for APA 7th Ed. Comment out if not needed.
+% You can comment out the next 4 lines if you don't have a
+% "List of Own Publications". And make it all caps yourself
+% if it needs to be all caps in the ToC.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{refsection}
+\nocite{lim:2007,lim:latextypesetting}
+\printbibliography[title={LIST OF PUBLICATIONS},heading=bibintoc]
+\end{refsection}
+
+
+\end{document}

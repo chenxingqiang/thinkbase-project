@@ -1,0 +1,316 @@
+%****************************
+%****************************
+%%%%% UW-NPS Formatting %%%%%
+%%%%%%%% DO NOT EDIT %%%%%%%%
+%****************************
+%****************************
+%
+% The author report goes into Report.tex file and references should be placed in Bibliography.bib file.
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+% 
+
+\documentclass[11pt,letterpaper, twocolumn]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[bitstream-charter]{mathdesign} %determines font
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage[hmargin=1.8cm,vmargin=1.4cm,includehead,includefoot]{geometry}
+\usepackage[sectionbib]{natbib}
+\usepackage{chapterbib}
+\let\cite\citep
+\usepackage{units}
+\usepackage{longtable}
+\usepackage[hyphens]{url}
+\urlstyle{same}
+\usepackage{cuted}
+\usepackage[usenames,dvipsnames,table]{xcolor}
+\usepackage{pdfpages}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{placeins} % allows for \FloatBarrier
+\usepackage{eqnarray} % for long equations
+\usepackage{rotating}
+\usepackage{blindtext}
+%\usepackage{siunitx}
+\usepackage{nicematrix,tikz}
+\usepackage{lastpage}
+\usepackage{newtxtext,newtxmath,amsmath}
+\usepackage{gensymb}
+\usepackage[labelsep=period,justification=justified]{caption}
+\usepackage{float}
+\usepackage{afterpage}
+
+
+%% Colors
+\definecolor{UWgold}{RGB}{255,196,37}
+\definecolor{UWbrown}{RGB}{73,47,36}
+\definecolor{LightMidnightBlue}{RGB}{83,154,203}
+
+%% Code Text
+\definecolor{light-gray}{gray}{0.95}
+\newcommand{\code}[1]{\colorbox{light-gray}{\small\texttt{#1}}}
+
+%% Table of Contents Page Style
+\usepackage{tocloft}
+\tocloftpagestyle{plain}
+
+%%% Unique Chapter Authors and Affiliations Setup %%%
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\newif\ifnewauthor
+\newauthortrue
+
+\newcounter{affils}
+
+\makeatletter
+\def\chapterauthor[#1]#2{\ifnewauthor\sffamily\Large%
+       \usefont{OT1}{phv}{b}{n}\else, \fi
+       #2\textsuperscript{\hyperref[authaffil\the\value{chapter}.#1]{#1}}%
+       \ifnewauthor\newauthorfalse\gdef\chapterauthors{#2}\else
+               \g@addto@macro\chapterauthors{, #2}\fi
+       \ignorespaces% to remove end of line spaces from \chapterauthor[foo]{bar} input lines
+}
+\makeatother
+
+\def\chapteraffil[#1]{\small\item[#1 ]%
+    \refstepcounter{affils}%
+    \label{authaffil\the\value{chapter}.#1}%
+}
+
+\makeatletter
+\newenvironment{affils}
+   {\addtocontents{toc}{\chapterauthors\string\par}%
+    \begin{itemize}[itemsep=0pt, parsep=0pt]}
+   {\end{itemize}\par
+    \global\newauthortrue
+    \@nobreaktrue
+    \aftergroup\normalfont}
+\makeatother
+
+%%% Page Margins Headers and Footers %%%
+% Section heading styles
+\usepackage[compact]{titlesec} 
+\titleformat{\chapter}{\usefont{OT1}{phv}{b}{n}\LARGE}%
+    {\thechapter.}{}{\vspace{4em}}
+\titleformat*{\section}{\Large\usefont{OT1}{phv}{b}{n}\color{darkgray}}
+\titleformat*{\subsection}{\large\usefont{OT1}{phv}{b}{n}\color{MidnightBlue}}
+\titleformat*{\subsubsection}{\large\usefont{OT1}{phv}{b}{sl}\color{darkgray}}
+
+% Section heading spacing (reduced space below headings)
+\titlespacing\section{0pt}{1.5ex plus .1ex minus .2ex}{0ex}
+\titlespacing\subsection{0pt}{1.5ex plus .1ex minus .2ex}{0ex}
+\titlespacing\subsubsection{0pt}{1.5ex plus .1ex minus .2ex}{0ex}
+
+% Header and Footer
+\usepackage{etoolbox} %for fancy headers on first pages of chapters
+\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{logo}}{}{} %works with etoolbox, overrides plain page style for new chapters
+
+\usepackage{fancyhdr}
+\fancypagestyle{nologo}{
+\fancyhead{}
+\fancyhead[L]{\usefont{OT1}{phv}{m}{n}UW--NPS Research Station Annual Report}
+\fancyhead[R]{\usefont{OT1}{phv}{m}{n}Vol. Num (Year)}
+\fancyfoot{}
+\fancyfoot[L]{\TheAuthor, \chaptermark{\chaptername}}
+\fancyfoot[R]{\footnotesize Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\footrulewidth}{1pt}
+\renewcommand{\headrulewidth}{1pt}
+\setlength{\headsep}{1em}
+}
+
+\fancypagestyle{frontmatter}{
+\fancyhead{}
+\fancyfoot{}
+}
+
+% Page Margins
+\addtolength{\topmargin}{-3cm}
+\pagestyle{nologo}
+\setlength\parindent{0in}
+\setlength\parskip{0.1in}
+\setlength\headheight{105pt}
+
+% Header
+\fancypagestyle{logo}{
+\fancyhead{}
+\fancyhead[C]{\includegraphics[width=\textwidth]{logoheader.png}
+    \vspace{-90pt}}
+\fancyhead[R]{\usefont{OT1}{phv}{m}{n}\LARGE\textcolor{white}{Annual Report Vol. 47 (2024)  }
+    \vspace{-26pt}}
+\setlength\headheight{105pt}
+\renewcommand{\footrulewidth}{1pt}
+\renewcommand{\headrulewidth}{0pt}
+}
+
+% Footer in individual 
+
+% Column separation
+\setlength{\columnsep}{0.25in}
+
+%%% Styles %%%
+% Caption style
+\captionsetup{labelfont={color=black,bf},textfont={color=black}}
+
+% Table style
+\usepackage{array}
+%\arrayrulecolor{MidnightBlue}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\renewcommand{\arraystretch}{1.25}
+\usepackage{makecell}
+\usepackage{booktabs}
+
+% Table colors
+\renewcommand\theadfont{\normalsize\bfseries}
+\definecolor{DarkKhaki}{rgb}{0.74,0.72,0.42}
+\colorlet{tableheadcolor}{DarkKhaki} % Table header colour = 25% gray
+\newcommand{\header}{\rowcolor{tableheadcolor}} %
+\colorlet{tablerowcolor}{DarkKhaki!50} % Table row separator colour = 10% gray
+\newcommand{\row}{\rowcolor{tablerowcolor}} %
+\newenvironment{tabledata}[1][1]{%
+  \renewcommand*{\extrarowheight}{0.1cm}%
+  \tabular%
+}{%
+  \endtabular
+}
+
+% Nicetabular custom columns
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1\textwidth-2\tabcolsep-1.5\arrayrulewidth}}
+\newcolumntype{Y}[1]{>{\centering\arraybackslash}p{#1\textwidth-2\tabcolsep-1.5\arrayrulewidth}}
+
+% space before/after booktab rules
+\setlength{\aboverulesep}{0pt}
+\setlength{\belowrulesep}{0pt}
+    
+\newcommand*{\belowrulesepcolor}[1]{% 
+  \noalign{% 
+    \kern-\belowrulesep 
+    \begingroup 
+      \color{#1}% 
+      \hrule height\belowrulesep 
+    \endgroup 
+  }%
+} 
+\newcommand*{\aboverulesepcolor}[1]{% 
+  \noalign{% 
+    \begingroup 
+      \color{#1}% 
+      \hrule height\aboverulesep 
+    \endgroup 
+    \kern-\aboverulesep 
+  }%
+} 
+
+% Footnotes
+%% The splitrule option draws a full width rule above the continued part of the footnote as a visual cue to readers.
+\usepackage[splitrule]{footmisc}
+
+% Endnotes
+\usepackage{endnotes}
+
+% Space around long quotes
+\renewcommand{\quote}{\list{}{\rightmargin=\leftmargin\topsep=0pt}\item\relax}
+
+% Bibliography called "References" instead
+\AtBeginDocument{\renewcommand{\bibname}{References}}
+
+% Add author abbreviation, similar to shortauthor
+% Example: author={{\acroauthor{Organization for the Advancement of Structured Information Standards}{OASIS}}}
+\newif\ifabbreviation
+\pretocmd{\thebibliography}{\abbreviationfalse}{}{}
+\AtBeginDocument{\abbreviationtrue}
+\DeclareRobustCommand\acroauthor[2]{%
+  \ifabbreviation #2\else #1 (\mbox{#2})\fi}
+
+% To Balance References Across Columns
+\usepackage{balance}
+
+% Page numbering by chapter
+\newcommand{\chapterfirstpage}{}
+\newcommand{\chapterlastpage}{}
+
+
+%% Front/main/back matter
+\makeatletter
+
+\newcommand\frontmatter{%
+    \cleardoublepage
+  %\@mainmatterfalse
+  \pagenumbering{roman}}
+
+\newcommand\mainmatter{%
+    \cleardoublepage
+ % \@mainmattertrue
+  \pagenumbering{arabic}}
+
+\newcommand\backmatter{%
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+ % \@mainmatterfalse
+   }
+
+\makeatother
+
+
+%% Document Information %%
+\title{University of Wyoming -- National Park Service Research Station}
+\author{Station Director}
+\date{##nd Annual Report 20YY}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\hypersetup{draft} %use if Latex throws \pdfendlink ended up in different nesting level than \pdfstartlink error
+
+\begin{document}
+%\fancypagestyle{plain}{} %redefines plain page style to use header
+
+\frenchspacing
+
+% Abstract Settings
+\renewenvironment{abstract}{%
+\usefont{OT1}{phv}{m}{n}\normalsize
+\hfill
+\begin{minipage}{\textwidth}
+\rule{\textwidth}{1pt}\\
+\textcolor{orange}{\textbf{\abstractname}}}
+{\par\noindent\rule{\textwidth}{1pt}\end{minipage}}
+
+% Bibliography, no "URL"
+\def\urlprefix{}\def\href#1#2#3#4{\ifstrequal{#2}{[link]}{}{#2\newline}}
+
+%\include{FrontMatter}
+
+\mainmatter
+\pagestyle{nologo}
+
+\include{Report} 
+
+\end{document}

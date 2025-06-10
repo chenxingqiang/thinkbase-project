@@ -1,0 +1,170 @@
+%\documentclass[12pt]{article}
+\documentclass[BCOR=12mm, DIV, titlepage, a4paper, oneside, 12pt]{report}
+
+% Hier eigene Daten einfügen um Kürzel zu nutzen
+\newcommand{\authorname}{Name Nachname}
+\newcommand{\matnr}{Mat. Nr.}
+\newcommand{\titelname}{Titel der Arbeit}
+\newcommand{\untertitelname}{Untertitel}
+
+\newcommand{\supervisor}{Prof.\,Dr.-Ing\,Musterprof Nachname}
+\newcommand{\chair}{Professur für Beispiele \& Prüfungen}
+\newcommand{\secsupervisor}{Prof.\,Dr.\,Eng.\,Beispiel Name}
+\newcommand{\secchair}{Professur}
+
+\newcommand{\art}{Masterarbeit}
+\newcommand{\fachgebiet}{Medieninformatik}
+\newcommand{\autor}{Hans Meier}
+\newcommand{\studienbereich}{Medieninformatik}
+\newcommand{\jahr}{2022}
+\newcommand{\ort}{Düsseldorf}
+
+\newcommand{\changefont}[3]{\fontfamily{#1} \fontseries{#2} \fontshape{#3} \selectfont}
+
+% Abk�rzungen mit korrektem Leerraum 
+\newcommand{\ua}{\mbox{u.\,a.\ }}
+\newcommand{\zB}{\mbox{z.\,B.\ }}
+\newcommand{\dahe}{\mbox{d.\,h.\ }}
+\newcommand{\Vgl}{Vgl.\ }
+\newcommand{\bzw}{bzw.\ }
+\newcommand{\evtl}{evtl.\ }
+
+\newcommand{\abbildung}[1]{Abbildung~\ref{fig:#1}}
+
+\newcommand{\bs}{$\backslash$}
+
+% erzeugt ein Listenelement mit fetter �berschrift 
+\newcommand{\itemd}[2]{\item{\textbf{#1}}\\{#2}}
+
+% einige Befehle zum Zitieren --------------------------------------------------
+\newcommand{\Zitat}[2][\empty]{\ifthenelse{\equal{#1}{\empty}}{\citep{#2}}{\citep[#1]{#2}}}
+
+% zum Ausgeben von Autoren
+\newcommand{\AutorName}[1]{\textsc{#1}}
+\newcommand{\Autor}[1]{\AutorName{\citeauthor{#1}}}
+
+% verschiedene Befehle um W�rter semantisch auszuzeichnen ----------------------
+\newcommand{\NeuerBegriff}[1]{\textbf{#1}}
+\newcommand{\Fachbegriff}[1]{\textit{#1}}
+
+\newcommand{\Eingabe}[1]{\texttt{#1}}
+\newcommand{\Code}[1]{\texttt{#1}}
+\newcommand{\Datei}[1]{\texttt{#1}}
+
+\newcommand{\Datentyp}[1]{\textsf{#1}}
+\newcommand{\XMLElement}[1]{\textsf{#1}}
+\newcommand{\Webservice}[1]{\textsf{#1}}
+
+\newcommand*{\captionsource}[2]{%
+  \caption[{#1}]{%
+    #1%
+    \\\hspace{\linewidth}%
+    \small\textbf{Quelle:} #2%
+  }%
+}
+
+% Blindtext für Template
+\usepackage{blindtext}
+
+\usepackage{scrhack}
+\usepackage[ngerman]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{caption}
+\usepackage{subfigure}
+
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{tikz,ifthen}
+\usepackage{todonotes}
+\usepackage{lipsum}
+\usepackage{minted}
+\usepackage{titlesec}
+\usepackage[export]{adjustbox}
+
+\usepackage[nohyperlinks, printonlyused, ]{acronym}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}[runin]
+{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titleformat{\subparagraph}[runin]
+{\normalfont\normalsize\bfseries}{\thesubparagraph}{1em}{}
+
+
+\usepackage[authoryear,round]{natbib}
+
+% Mittels [H] können Bilder genau an einer Stelle positioniert werden
+\usepackage{float}
+
+\usepackage{hhline}
+
+% package for colored text
+% black,white,green,red,blue,yellow,cyan,magenta
+\usepackage{color}
+
+% package for colored tables
+\usepackage{colortbl}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+%Paket zur Erzeugung von Anführungszeichen durch \enquote{Text}
+\usepackage[ngerman]{babel}
+\usepackage[babel, german=quotes]{csquotes}
+
+% bewirkt das HyperLinks in der PDF nicht umrandet oder farbig sind
+\usepackage[breaklinks]{hyperref}
+\hypersetup{colorlinks=false}
+
+\usepackage[ngerman]{cleveref}
+
+%Verhindern, dass eine neue Seite für ein einzelnes Wort/Zeile verwendet wird
+\clubpenalty = 10000 % schliesst Schusterjungen aus 
+\widowpenalty = 10000 % schliesst Hurenkinder aus (keine Beleidigung, sondern wirklich ein Fachbegriff)
+
+\usepackage{lipsum}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\begin{document}
+
+    \input{./chapter/titelseite}
+    \pagenumbering{alph}
+    \cleardoublepage
+    
+    \pagenumbering{roman}
+    \tableofcontents
+
+    \cleardoublepage
+    
+    \newpage
+    \input{./chapter/abstract}
+    \newpage
+    \pagenumbering{arabic}
+    \input{./chapter/1_Einleitung}
+    \newpage
+    \input{./chapter/2_StandDerWissenschaft}
+    \newpage
+    \input{./chapter/3_Hauptteil}
+    \newpage
+    \input{./chapter/4_Schluss}
+    
+    
+    \newpage
+    \input{./chapter/abkuerzungen}
+    \newpage
+    \include{./chapter/verzeichnisse}
+
+    \include{./chapter/eid}
+
+\end{document}

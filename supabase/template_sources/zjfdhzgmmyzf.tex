@@ -1,0 +1,148 @@
+\documentclass[8pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{titlecaps}
+\usepackage{fancyhdr}
+\usepackage[]{geometry}
+\usepackage{lastpage}
+\usepackage{pgffor}
+\usepackage{multicol}
+
+\newcommand{\namesigdate}[2][5cm]{%
+  \begin{tabular}{@{}p{#1}@{}}
+    #2 \\[2\normalbaselineskip] \hrule \\[0pt]
+    {\small \textit{Name}} \\[2\normalbaselineskip] \hrule \\[0pt]
+    {\small \textit{Signature}} \\[2\normalbaselineskip] \hrule \\[0pt]
+    {\small \textit{Date}}
+  \end{tabular}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%% MANUAL %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Full name of the first party
+\newcommand{\firstparty}{[PARTY ONE]}
+% Shorthand for the first party (eg. "henceforth \fps")
+\newcommand{\fps}{[PO]}
+% The names of the representatives of the first party in human form
+\newcommand{\fpr}{[Person One, Person Two and Person Six]}
+% The names of the representatives of the first party in array form
+\newcommand{\fprno}{Person One, Person Two, Person Six}
+
+% Full name of the second party
+\newcommand{\secondparty}{[PARTY TWO]}
+% Shorthand for the second party (eg. "henceforth \sps")
+\newcommand{\sps}{[PT]}
+% The names of the representatives of the second party in human form
+\newcommand{\spr}{[Person Four and Person Five]}
+% The names of the representatives of the second party in array form
+\newcommand{\sprno}{Person Four, Person Five}
+
+% When the contract was created
+\newcommand{\createdon}{\today}
+% When the contract becomes active
+\newcommand{\effectiveby}{\today}
+% What the type of the contract is, like "contract" or "agreement"
+\newcommand{\contract}{contract}
+
+\title{\titlecap{\contract} between \firstparty{} and \secondparty}
+\author{[Your name]}
+\date{\today}
+
+\makeatletter
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 2em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1.5em%
+    % {\large
+    %   \lineskip .5em%
+    %   \begin{tabular}[t]{c}%
+    %     \@author
+    %   \end{tabular}\par}%
+    % \vskip 1em%
+    %{\large \@date}%
+  \end{center}%
+  \par
+  \vskip 1.5em}
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{} % clear all footer and header fields and start setting them
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{Initials \fps{}:}
+\fancyfoot[C]{Initials \sps{}:}
+\fancyfoot[R]{
+Created on \createdon{}\\
+Page \thepage \hspace{1pt} of \pageref{LastPage}
+}
+\fancypagestyle{firstpage}{%
+  \fancyhf{}% clear default for head and foot
+  \fancyfoot[L]{Initials \fps{}:}
+  \fancyfoot[C]{Initials \sps{}:}
+  \fancyfoot[R]{
+    Created on \createdon{}\\
+    Page \thepage \hspace{1pt} of \pageref{LastPage}
+  }
+}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+\noindent
+This \contract{} is made on \createdon{} and entered into on \effectiveby{} by and between\\\\
+\firstparty{}, represented by \fpr{}, henceforth to be referred to as ``\fps{}''\\\\
+and\\\\
+\secondparty{}, represented by \spr{}, henceforth to be referred to as ``\sps{}''\\\\
+\textbf{Considering that}
+\begin{itemize}
+    \item Party one wants x;
+    \item Party two wants y;
+    \item etc.
+\end{itemize}
+\textbf{Agree on the following:}
+
+\section{Collary}
+\begin{itemize}
+    \item Word: definition;
+    \item Word: definition.
+\end{itemize}
+
+\section{Other agreements}
+
+\newpage
+
+By signing below, the parties agree to the terms of this \contract{}.\\\\
+
+\begin{center}
+    
+\begin{multicols}{2}
+\begin{center}
+\textbf{\firstparty{}}
+\end{center}
+
+\foreach \n in \fprno{
+\noindent
+\namesigdate{\n}\\
+}
+
+\columnbreak
+
+\begin{center}
+\textbf{\secondparty{}}
+\end{center}
+
+\foreach \n in \sprno{
+\noindent
+\namesigdate{\n}\\
+}
+
+\end{multicols}
+
+\end{center}
+
+\end{document}

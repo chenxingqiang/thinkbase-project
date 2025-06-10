@@ -1,0 +1,125 @@
+\documentclass[11pt]{article} %change font size here
+\usepackage[a4paper,margin=1in]{geometry} %change paper size (e.g. A4/letter/etc) and margin size here
+
+%==========================================
+
+\usepackage{myabstract} % custom-made preamble with packages specifying section format, some linguistics-specifics packages (e.g. linguex, tikz/qtree/forest, etc), and other packages and formatting specifications.
+
+%You can change these specifications in the file "myabstract.sty" or add your own packages here.
+
+%==========================================
+
+% FONT OPTION 1
+
+% \usepackage{times} % Times New Roman font
+
+% FONT OPTION 2
+
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Termes} % Times New Roman-like font;
+\newfontfamily\myipa{Doulos SIL} % drawback: can't use italics or boldface on IPA symbols;
+
+% use "{myipa ...}" for IPA symbols
+
+% TIPA already loaded in .sty file
+
+% "\setmainfont{TeX Gyre Termes}" allows the use of small caps (useful in glosses), as opposed to "\setmainfont{Times New Roman}"
+
+%==========================================
+
+% DEANONYMIZED VERSION
+
+% \rhead{\textit{Author, affiliation}} % you can uncommont this and add your name and affiliation, which shows up in the top-right corner, in the header area; another option below (below the title)
+\cfoot{\thepage} % comment this if you don't want page numbers
+
+%==========================================
+
+\begin{document}
+
+\setlength{\Extopsep}{0in} % no linebreak before and after example with Linguex
+
+\setlength{\parindent}{0pt} % no indentation before paragraph
+
+\abstracttitle{Title of the abstract}
+% \deanonauthor{Name, University} % you can uncomment this to add your name and affiliation in the deanonymized version
+
+%==========================================
+
+% CONTENT BEGINS HERE
+
+\section{Introduction} 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\ex.    \ag. Essa \'{e} uma senten\c{c}a em portugu\^{e}s brasileiro.\\
+            \textsc{dem.fem.sg} be.\textsc{pres.3sg} one.\textsc{fem.sg} sentence in Portuguese Brazilian\\
+            `This is a sentence in Brazilian Portuguese.'\label{lblstc1}
+        \bg.    Essa \'{e} outra senten\c{c}a em portugu\^{e}s brasileiro.\\
+            \textsc{dem.fem.sg} be.\textsc{pres.3sg} other.\textsc{fem.sg} sentence in Portuguese Brazilian\\
+            `This is another sentence in Brazilian Portuguese.'\label{lblstc2}
+
+This is what crossreferencing data with linguex looks like,  without the default dash: \ref{lblstc2}.
+
+\section{Another section}
+
+Something that is perhaps useful is to use create a numbered list without line breaks between items: \begin{inparaenum}[(i)]
+    \item first item,
+    \item second item,
+    \item third item.
+\end{inparaenum}
+
+Something else you can do to save space is to wrap text around diagrams:
+
+\begin{wrapfigure}{l}{13.5em} % adjust the placement of the figure and the size
+  \vspace{-1em} % eliminates vertical space before 
+  
+  \ex.  \leavevmode\vadjust{\vspace{-\baselineskip}}\newline %this code aligns the top of the diagram with the number
+  \begin{tikzpicture}[parent anchor=south,
+			align=center,
+			level distance=2em,
+			anchor=north,
+			sibling distance=4.5em,
+			child anchor=north]
+			\node {A}
+			child {node {B}}
+			child {node {C}
+			    child {node {D}}
+			    child {node {E}
+			        child {node {F}}
+			        child {node {G}}}}   
+			;
+			\end{tikzpicture}
+
+   \vspace{-1em} %reduces vertical space below diagram
+\end{wrapfigure}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+
+\section{Yet another section}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Here is what linear representations of syntactic diagrams, which also save space, can look like:
+
+\ex.    \tikzstyle{every picture}+=[remember picture, inner sep=0pt, baseline, anchor=base]%
+	{}[\textsubscript{XP} \tikz\node(wh2){target node}; [\textsubscript{YP} filler [\textsubscript{ZP} more filler \tikz\node(wh1){base node};]]]	\begin{tikzpicture}[overlay]
+	\draw[-latex,rounded corners=.25em](wh1.south)--+(0,-1em)-|(wh2.south)node [anchor=center,pos=0.25,fill=white] {\small\textit{annotation}};
+	\end{tikzpicture}
+
+\vspace{1.25em}
+
+Whenever possible, I cite references with a hyperlink, so that I do not have to use a References section (but the reader/reviewer can still know what I am citing): Takahashi \& Hulsey (\href{https://doi.org/10.1162/ling.2009.40.3.387}{2009}).
+
+\section{Symbols section}
+
+If you are using the \textit{fontspec} option, here is what inputting IPA symbols looks like: \myipa{t̪ ɞ ɠ ɢ ʛ ħ} (though you can also use \textit{tipa}: \textipa{\textsubbridge{t} \textcloserevepsilon{} \texthtg{} \;G \!G \textcrh}). You can input other symbols too, e.g. φ and λ.
+
+\section{Conclusion}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+% \section*{References} % if you want to add references; the added "*" eliminates the number before the section title
+
+\end{document}

@@ -1,0 +1,88 @@
+%%% Prepared by Wai Qian Tham, at 30 May 2024. 
+
+\documentclass[a4paper, twoside, 11.5pt]{report} % book class is also an option but some functionality will not work as well. 
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage{nomencl} % for nomenclature
+\usepackage{etoolbox} % to group nomenclature
+\usepackage{multirow} % for multiple columns in a page/table
+\usepackage{multicol}
+\usepackage{threeparttable} % Allow complex table formats. 
+\usepackage{siunitx}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{xcolor}
+\definecolor{tcd_blue}{RGB}{5, 105, 185}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref} % allowing hyperlinking of references. You can set the colour of the links or turn the colorlinks to false if no colour preferable. 
+\usepackage[numbers]{natbib} % for citation. 
+\usepackage{notoccite} % start citation ordering from text instead of table of contents. useful if there is citation in figure caption. 
+
+%% optional changes to the style. Uncomment (Ctrl+/) to include these options. 
+% % change font to sans-serif fonts. 
+% \renewcommand{\familydefault}{\sfdefault}
+% % Format chapter headings appropriately to include tcd blue. 
+% \usepackage{titlesec}
+% \titleformat{\chapter}[hang]{\normalfont\huge\bfseries\color{tcd_blue}}{\thechapter}{1cm}{}{}
+
+
+% input information for the title page. Other changes can be done in 0_title/title.tex
+\title{Project Title}
+\author{Name Surname}
+\newcommand{\cid}{xxxxxxxx} % college id number, optional
+
+\newcommand{\doctype}{PhD Thesis} % Other: Final Year Project Report, MAI Project Report
+\newcommand{\school}{School of Engineering}
+\newcommand{\department}{Department of Civil, Structural and Environmental Engineering}
+\newcommand{\degree}{Doctor in Philosophy}
+\newcommand{\supervisor}{Professor Name Surname}
+\newcommand{\cosupervisor}{Dr. Name Surname} % if more than one, add \\ between each name. 
+\newcommand{\inputdate}{\today} % change the date. Default set to today's date. 
+\newcommand{\inputstatement}{A dissertation submitted in partial fulfillment of the degree of \\ \degree}
+
+
+\begin{document}
+\pagenumbering{roman}
+\input{0_title/title.tex}
+% \input{0_title/title2} % alternative cover page. 
+
+%% option 1: default abstract
+\input{0_Pre_report/Declaration.tex}
+\input{0_Pre_report/Abstract.tex} 
+\input{0_Pre_report/Acknowledgement.tex}
+% \input{0_Pre_report/summary.tex}
+\setcounter{page}{5} % set it such that the cover page is page i. 
+%% option 2: chapter-like abstract
+% \input{0_pre_rep_chapStyle/Declaration}
+% \input{0_pre_rep_chapStyle/Abstract}
+% \input{0_pre_rep_chapStyle/Acknowledgement}
+
+
+\tableofcontents
+\listoffigures 
+% \listoftables
+
+\input{nomenclature}
+
+% add \pagenumbering{arabic} to the first line of the first \input{}. 
+\input{1_introduction/introduction.tex} % introduction to the project/thesis
+\input{2_background/background.tex} % literature review
+\input{3_project/Templates.tex}
+\input{4_evaluation/evaluation.tex}
+\input{5_conclusion/conclusion.tex}
+
+\bibliographystyle{unsrtnat}
+\bibliography{B_bibs/bibliography}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\input{A_appendix/appendix.tex}
+
+\end{document}

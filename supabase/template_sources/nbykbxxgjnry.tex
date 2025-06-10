@@ -1,0 +1,445 @@
+%% abtex2-modelo-trabalho-academico.tex, v-1.9.2 laurocesar
+%% Copyright 2012-2014 by abnTeX2 group at http://abntex2.googlecode.com/ 
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% 
+%% The Current Maintainer of this work is the abnTeX2 team, led
+%% by Lauro César Araujo. Further information are available on 
+%% http://abntex2.googlecode.com/
+%%
+%% This work consists of the files abntex2-modelo-trabalho-academico.tex,
+%% abntex2-modelo-include-comandos and abntex2-modelo-references.bib
+%%
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Trabalho Academico (tese de doutorado, dissertacao de
+% mestrado e trabalhos monograficos em geral) em conformidade com 
+% ABNT NBR 14724:2011: Informacao e documentacao - Trabalhos academicos -
+% Apresentacao
+% MODELO MODIFICADO POR JHON WILKER DA S. SOUSA PARA ATENDER AS ESPECIFICIDADES DO CURSO DE CIÊNCIA DA COMPUTAÇÃO DA UNIVERSIDADE ESTADUAL DO PIAUI
+% ------------------------------------------------------------------------
+% 
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág. ímpar (insere página vazia caso preciso)
+	oneside,			% para impressão em verso e anverso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	%french,				% idioma adicional para hifenização
+	%spanish,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+	]{abntex2}
+% ---
+% Pacotes básicos 
+% ---
+%\usepackage{lmodern}			% Usa a fonte Latin Modern	
+\usepackage{mathptmx}
+\renewcommand{\ABNTEXchapterfont}{\normalfont}
+%\usepackage{bookman}		
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}			% Usado pela Ficha catalográfica
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+
+
+\usepackage{epigraph}
+
+%Depois no documento escrevemos:
+
+%\epigraph{texto}{referência}
+
+
+%\usepackage{geometry}
+%\geometry{a4paper, left=3cm, right=2cm, bottom=2cm, top=3cm}
+% ---
+\graphicspath{ {./figs/} }
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+% ---
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{TITULO DO SEU TRABALHO}
+\autor{Nome do Aluno Completo}
+\local{Teresina}
+\data{2023}
+\orientador{Nome do Orientador Completo}
+\instituicao{Universidade Estadual do Piauí}
+\tipotrabalho{Monografia (Graduação)}
+% O preambulo deve conter o tipo do trabalho, o objetivo, o nome da instituição e a área de concentração 
+\preambulo{Monografia submetida à Universidade Estadual do Piauí como parte dos requisitos para a obtenção do grau de Bacharel em Ciência da Computação.}
+
+
+
+
+% Configurações de aparência do PDF final
+%\definecolor{blue}{RGB}{41,5,195}
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true:              colored links
+    	linkcolor=black,          	% color of internal links
+    	citecolor=black,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=black,
+		bookmarksdepth=4}
+
+\makeatother
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% --------------------------------------------------------------------------------------------------------
+% % Início do documento
+% --------------------------------------------------------------------------------------------------------
+\begin{document}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% Capa
+%---------------------------------------------------------------------------------------------------------
+
+    \begin{center}
+    {\ABNTEXchapterfont\large UNIVERSIDADE ESTADUAL DO PIAUÍ}\\
+    {\ABNTEXchapterfont\large CIÊNCIA DA COMPUTAÇÃO}
+    
+    \vspace*{\fill}\vspace*{\fill}
+    {\ABNTEXchapterfont\large \imprimirautor}  
+    \vspace*{\fill}
+   
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+    \ABNTEXchapterfont \bfseries \Large \imprimirtitulo
+    \end{center}
+    \vspace*{\fill}\vspace*{\fill}
+   
+  
+   \end{center}  
+
+      
+    \begin{center}
+    \vspace*{0.5cm}
+    {\ABNTEXchapterfont\large TERESINA}
+    \par
+    {\ABNTEXchapterfont\large \imprimirdata}
+    \vspace*{1cm}
+    \end{center}
+%--------------------------------------------------x------------------------------------------------------
+
+
+
+
+% Folha de Rosto
+% --------------------------------------------------------------------------------------------------------
+\begin{folhaderosto}
+
+  \begin{center}
+    {\ABNTEXchapterfont\large \imprimirautor}
+
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\Large \imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+    \end{minipage}%
+    \vspace{1.5cm}
+    Orientador: \imprimirorientador \\
+    
+    \vspace*{\fill}
+     
+   \end{center}  
+
+     \begin{center}
+    \vspace*{0.5cm}
+    {\ABNTEXchapterfont\large TERESINA}
+    \par
+    {\ABNTEXchapterfont\large \imprimirdata}
+    \vspace*{1cm}
+    \end{center}
+  
+\end{folhaderosto}
+%--------------------------------------------------x------------------------------------------------------
+
+% Folha ficha Catalográfica
+% --------------------------------------------------------------------------------------------------------
+
+%Substitua pela ficha catalografica gerada pela biblioteca da UESPI
+\begin{fichacatalografica}
+	\vspace*{\fill}					% Posição vertical
+	\hrule							% Linha horizontal
+	\begin{center}					% Minipage Centralizado
+	\begin{minipage}[c]{12.5cm}		% Largura
+	
+	\imprimirautor
+	
+	\hspace{0.5cm} 
+	{\imprimirtitulo / \imprimirautor. --	\imprimirlocal~~-- PI, Brasil, \imprimirdata.}
+	
+	{\hspace{0.5cm}\imprimirorientadorRotulo~\imprimirorientador}
+	
+	\hspace{0.5cm}\parbox[t]{\textwidth}{\imprimirtipotrabalho~--~\imprimirinstituicao, \imprimirdata.}
+
+    \hspace{0.5cm}
+		1. Embarcado.
+		2. GSM.
+        3. GPS.
+        3. RF 433 Mhz.
+		I. Nome do Orientador.
+		II. Universidade Estadual do Piauí.
+		 			
+%\hspace{8.75cm} CDU 02:141:005.7\\
+	
+	\end{minipage}
+	\end{center}
+	\hrule
+\end{fichacatalografica}
+%--------------------------------------------------x------------------------------------------------------
+
+% Folha de Aprovação
+% --------------------------------------------------------------------------------------------------------
+
+\begin{folhadeaprovacao}
+
+  \begin{center}
+    {\ABNTEXchapterfont\bfseries\Large \imprimirtitulo}\\
+    \vspace*{\fill}
+    {\ABNTEXchapterfont\large \imprimirautor}
+    
+    \vspace*{\fill}\vspace*{\fill}
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+    \end{minipage}%
+    \vspace*{\fill}
+   
+   \ABNTEXchapterfont     
+   {Trabalho aprovado. Teresina, XX de Junho de \imprimirdata}
+   \end{center}
+   
+
+   \assinatura{\textbf{\imprimirorientador} \\ Orientador} 
+   \assinatura{\textbf{Nome do Avaliador-1 Completo} \\ }
+   \assinatura{\textbf{Nome do Avaliador-2 Completo} \\ }
+
+  
+\end{folhadeaprovacao}
+%--------------------------------------------------x------------------------------------------------------
+
+
+% Dedicatória
+%---------------------------------------------------------------------------------------------------------
+\include{1_pretextuais/dedicatoria}
+%--------------------------------------------------x------------------------------------------------------
+
+% Agradecimentos
+% --------------------------------------------------------------------------------------------------------
+\include{1_pretextuais/agradecimentos}
+%--------------------------------------------------x------------------------------------------------------
+
+% Epígrafe
+% --------------------------------------------------------------------------------------------------------
+\include{1_pretextuais/epigrafe}
+%--------------------------------------------------x------------------------------------------------------
+
+
+% Resumo
+%---------------------------------------------------------------------------------------------------------
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+\ABNTEXchapterfont
+Consiste na apresentação dos pontos relevantes de um texto. O resumo deve dar uma visão rápida e clara do trabalho; constitui-se em uma sequencia de frases concisas e objetivas e não de uma simples enumeração de tópicos. Apresenta os objetivos do estudo, o problema, a metodologia, resultados alcançados e conclusão. Deve ser digitado em espaço simples e sem parágrafos, não ultrapassando a 500 palavras.
+
+
+\textbf{Palavras-chaves}: Palavra-1, Palavra-2, Palavra-3.
+\end{resumo}
+%--------------------------------------------------x------------------------------------------------------
+
+
+% Abstract
+%---------------------------------------------------------------------------------------------------------
+\begin{resumo}[Abstract]
+\ABNTEXchapterfont
+Consiste em traduzir o texto do resumo para o idioma ingles.
+
+% \begin{otherlanguage*}{english}
+%   This is the english abstract.
+%   \vspace{\onelineskip}
+%   \noindent 
+
+\textbf{Keywords}: word1. Word-2. Word-3.
+\end{resumo}
+%--------------------------------------------------x------------------------------------------------------
+
+
+% inserir lista de ilustrações
+%---------------------------------------------------------------------------------------------------------
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+%--------------------------------------------------x------------------------------------------------------
+
+
+% inserir lista de tabelas
+%---------------------------------------------------------------------------------------------------------
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+%--------------------------------------------------x------------------------------------------------------
+
+
+% inserir lista de abreviaturas e siglas
+%---------------------------------------------------------------------------------------------------------
+\begin{siglas}
+\ABNTEXchapterfont\item[TCP] Protocolo de Controle de Transmissão
+\item[UDP] Protocolo de Datagrama do Usuário 
+\item[VoIP] Voz sobre IP 
+\item[RTP] Protocolo Transporte em Tempo Real
+\item[MPRTP] Protocolo de Transporte em Tempo Real de Caminho Multiplos \item[RTCP] Protocolo de Controle de Transporte em Tempo Real
+\item[MPTCP] Protocolo de Controle de Transporte de Caminho Multiplo 
+\end{siglas}
+%--------------------------------------------------x------------------------------------------------------
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+\textual
+%--------------------------------------------------x------------------------------------------------------
+\input{2_capitulos_tex/1_Introducao}
+%--------------------------------------------------x------------------------------------------------------
+\input{2_capitulos_tex/2_Referencial}
+ % Desenvolvimento %
+%---------------------------------------------------------------------------------------------------------
+\input{2_capitulos_tex/3_Desenvolvimento}
+%--------------------------------------------------x------------------------------------------------------
+
+ % Conclusões e Trabalhos Futuros %
+%---------------------------------------------------------------------------------------------------------
+\input{2_capitulos_tex/4_Conclusao}
+%--------------------------------------------------x------------------------------------------------------
+
+%--------------------------------------------------x-----------------------------------------------------
+
+%--------------------------------------------------x-----------------------------------------------------
+
+
+%--------------------------------------------------x-----------------------------------------------------
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+%{Referencias Bibliograficas}
+%---------------------------------------------------------------------------------------------------------
+\bibliography{biblio.bib}
+\printindex
+
+% ---------------------------------------------------------------------
+    % GLOSSÁRIO
+    % --------------------------------------------------------------------- 
+    % Arquivo que contém as definições que vão aparecer no glossário
+    %\input{tex/glossario}
+    % Comando para incluir todas as definições do arquivo glossario.tex
+    %\glsaddall
+    % Impressão do glossário
+    %\printglossaries
+
+    % ----------------------------------------------------------
+    % Apêndices
+    % ----------------------------------------------------------
+    
+    % ---
+    % Inicia os apêndices
+    % ---
+   % \apendices{
+    %    \chapter{References Set}
+    %    \label{apendice:setinicial}
+    %    \input{trabRelacionados}
+
+   % }
+    % ---
+    
+
+    % ----------------------------------------------------------
+    % Anexos
+    % ----------------------------------------------------------
+    
+    % ---
+    % Inicia os anexos
+    % ---
+    %\anexos{
+    
+    
+    %\begin{anexosenv}
+    
+        
+    %\end{anexosenv}
+    %}
+    % ---
+
+
+\end{document}

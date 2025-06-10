@@ -1,0 +1,168 @@
+\RequirePackage{xcolor}
+\documentclass[portrait,20pt]{sciposter}
+
+% Einstellungen laden
+\input{einstellungen}
+
+% Titel des Posters festlegen
+\title{Titel des Posters}
+
+% Autornamen
+\author{Max Mustermann}
+ 
+% Institut und Universität
+\institute{Institut für Medizintechnik \\
+	Otto-von-Guericke-Universität, Magdeburg}
+
+% Kontakt-E-Mail-Adresse, wird unterhalb des Instituts angezeigt 
+\email{max.mustermann@ovgu.de}
+
+% \date wird momentan von \maketitle nicht benutzt
+
+% Breite der Logos und des Titels anpassen
+%\setlength{\logowidth}{0.24\textwidth}
+%\setlength{\titlewidth}{\textwidth}
+%\addtolength{\titlewidth}{-2\logowidth}
+
+% Logos festlegen
+\leftlogo[1.2]{logos/logos}% linkes Logo
+%\rightlogo[1.0]{logos/emvlogo}% rechtes Logo
+\norightlogo % kein rechtes Logo
+
+\begin{document}
+
+% Koferenznamen festlegen (Fußzeile)
+\conference{Vorgestellt auf der \enquote{Konferenztitel}, Stadt, Land, Jahr}
+
+\maketitle\vspace{-1em}
+
+%%% Begin of Multicols-Enviroment
+\begin{multicols}{3}
+
+\section{Einleitung}
+
+\begin{block}{Sinn und Zweck einer Posterpräsentation:}
+	\begin{itemize}
+		\item Darstellung der wichtigsten Ergebnisse der Arbeit
+		\item Interesse für die Arbeit/den Bericht zu wecken
+		\item Ziel: lehrreich und unterhaltsam zugleich
+	\end{itemize}
+\end{block}
+
+\begin{block}{Vorteile von \LaTeX\ mit der \textsc{sciposter}-Klasse:}
+	\begin{itemize}
+		\item sehr einfach, wenn die Arbeit bereits in \LaTeX\ erstellt wurde
+		\item verschiedene Darstellungsvarianten zur Auswahl
+		\item Folieninhalte können unter Nutzung des \emph{beamerarticle}-Pakets einfach übernommen werden
+	\end{itemize}
+\end{block}
+
+\section{Hauptteil}
+
+\subsection{Gleichungen}
+
+\begin{block}{Satz des Pythagoras:}
+	\begin{equation}
+		a^2 + b^2 = c^2 \label{eq:pythogoras}
+	\end{equation}
+\end{block}
+
+\begin{block}{Es folgt, dass:}
+	\begin{align}
+		a^2 &= c^2 - b^2 \\
+		b^2 &= c^2 - a^2
+	\end{align} 	
+\end{block}
+	
+\subsection{Tabellen}
+
+\begin{table}
+	\caption{Beispieltabelle}
+	\label{tab:beispiel}
+	\centering
+		\begin{tabular}{cc}
+			\toprule
+			Variable & Bedeutung \\
+			\midrule
+			$t$ & Zeit \\
+			$U$ & Spannung \\
+			\bottomrule
+		\end{tabular}
+\end{table}
+
+\subsection{Abbildungen}
+
+\begin{figure}
+	\centering
+		\includegraphics[width=0.7\columnwidth]{logos/unilogo}
+	\caption{Altes Logo der Universität}
+	\label{fig:unilogo}
+\end{figure}
+
+\begin{figure}
+	\centering
+		\begin{tikzpicture}
+			\begin{axis}[
+				xlabel={Zeit, $t$ (in \si{\milli\second})},
+				ylabel={Spannung, $u(t)$ (in \si{\volt})},
+				xmin=0,xmax=20,
+				ymin=-350,ymax=350,
+				legend pos=south west,
+				% Beispiel zum direkten Einfügen von Formeln
+				]
+				\addplot+[
+					domain=0:20,
+					samples=101,
+				] {sin(deg(x*2*pi/20))*sqrt(2)*230};
+				\addlegendentry{sinusförmig};
+				\addplot+[
+					domain=0:20,
+					samples=101,
+				] {cos(deg(x*2*pi/20))*sqrt(2)*230};
+				\addlegendentry{cosinusförmig};
+			\end{axis}
+		\end{tikzpicture}
+	\caption{Harmonischer Zeitverlauf einer Spannung mit einer Frequenz von \SI{50}{\hertz} und einem Effektivwert von \SI{230}{\volt}}
+	\label{fig:u_t_sinus}
+\end{figure}
+
+\begin{block}{Zitate:}
+	\begin{itemize}
+		\item Kurzzitate wie~~\cite{lanze:manuskript} können benutzt werden
+		\item Leser kann die Nummer im Literaturverzeichnis nachschlagen
+		\item Alternative: Vollzitate
+	\end{itemize}
+\end{block}
+\begin{block}{Beispiel für ein Vollzitat:}
+	\small\fullcite{hering:berichte}
+\end{block}
+
+\section{Zusammenfassung und Ausblick}
+
+\begin{block}{Zusammenfassung:}
+	\begin{itemize}
+		\item Kurzfassung der wichtigsten Ergebnisse
+		\item Aufzeigen nicht gelöster Probleme und offener Fragen
+		\item eventuell Ausblick auf weitere geplante Forschungsarbeiten
+	\end{itemize}
+\end{block}
+
+\begin{block}{Ausblick:}
+	\begin{itemize}
+		\item Welche Forschungsfragen sind noch offen?
+		\item Wo würde man weitermachen, wenn man mehr Zeit hätte?
+	\end{itemize}
+\end{block}	
+
+\begin{block}{Download von \url{http://www.musteradresse.de/} or via QR Code:}
+	\begin{center}
+		\qrcode[height=0.7\columnwidth]{http://www.musteradresse.de/}
+	\end{center}
+\end{block}
+
+\end{multicols}
+
+% Literaturverzeichnis
+\printbibliography
+
+\end{document}

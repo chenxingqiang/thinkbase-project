@@ -1,0 +1,293 @@
+%
+% Settings file
+%
+\include{settings}	% Document settings file
+
+%
+% We use the book class
+%
+\documentclass[12pt]{book}
+
+% toggle different modes
+% \Drafttrue
+% \DownscaledFinalDoctrue
+\CompactLayouttrue %smaller chapter/section headers and less whitespace around them 
+
+%
+% The geometry package allows consistent control of page layout
+%
+\usepackage[paper = a4paper,         %To be shrunk to 80% when printed
+			twoside,                 %Two-side mode, switches margins on 
+			bindingoffset = 2mm,     %Offset for binding side of page
+			hmargin = 25mm,          %Left and right margin
+			vmargin = 25mm,          %Top and bottom margin
+			dvipdfm]
+			{geometry}
+
+
+%
+% Font settings
+%
+\usepackage[T1]{fontenc}			% Activate Type 1 fonts
+%\usepackage{mathptmx}       			% Use Times font, also for math
+\usepackage[scaled]{helvet} 			% for sans serif fonts (\textsf{...} or \sffamiliy)
+%\usepackage[scaled]{luximono}			% for monospaced fonts (\texttt{...} or \ttfamily)
+
+% 
+% Header settings
+%
+\usepackage{sectsty}        			% Change section and chapter header
+%\allsectionsfont{\usefont{T1}{phv}{bc}{n}\selectfont} % Set chapter/section header to narrow helvectica (arial-like)
+\usepackage{titlesec} 				%fix header fonts
+\ifCompactLayout
+    % more compact chapter and section titles (optional, article style)
+    \titleformat{\chapter}
+      {\normalfont\sffamily\Large\bfseries}
+      {\thechapter}{10pt}{}
+      \titlespacing*{\chapter}{0pt}{0pt}{20pt}
+    \titleformat{\section}
+      {\normalfont\sffamily\large\bfseries}
+      {\thesection}{10pt}{}
+    \titleformat{\subsection}
+      {\normalfont\sffamily\bfseries}
+      {\thesubsection}{10pt}{}
+    \titleformat{\subsubsection}
+      {\normalfont\sffamily\bfseries}
+      {\thesubsubsection}{10pt}{}
+\else
+    % less compact chapter and section titles (default, book style) 
+    \titleformat{\title}[display]
+      {\normalfont\rmfamily\huge\bfseries\color{black}}
+      {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+    \titleformat{\chapter}[display]
+      {\normalfont\rmfamily\huge\bfseries\color{black}}
+      {\chaptertitlename\ \thechapter}{20pt}{\Huge}
+    \titleformat{\section}
+      {\normalfont\rmfamily\Large\bfseries\color{black}}
+      {\thesection}{1em}{}
+    \titleformat{\subsection}
+      {\normalfont\rmfamily\Large\bfseries\color{black}}
+      {\thesubsection}{1em}{}
+\fi
+
+%
+% Set fancy page header using fancyhdr package
+% 
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+% Ensure that the chapter and section headings are in lowercase
+\setlength{\headheight}{15pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+% Delete current section for header/footer
+\fancyhf{}
+
+% Define header/footer layout
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% make space for the rule
+\fancypagestyle{plain}{
+	\fancyhead{} 				%get rid of the headers on plain pages
+	\renewcommand{\headrulewidth}{0pt} 	% and the line
+}
+
+%
+% Set header height to 30pt to make room for two rows in the header
+% (useful if you have very long chapter names)
+%
+%\headheight 30pt
+
+% \raggedbottom					% may be used to avoid varying line spaceing between paragraphs at the cost of the last line on each page not appearing at the same height.
+
+%
+% Packages we may need (can be disabled/enabled depending on your requirments)
+%
+\usepackage{graphicx}       			% Handles figures
+\usepackage[utf8]{inputenc} 			% We want æøå
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[mathcal]{euscript} 			% For caligraphy fonts
+\usepackage{setspace}			       	% Easy setting of line spacing
+%\usepackage{forloop}				    % For-loops!
+
+
+%% REFERENCE PACKAGES
+%\usepackage[numbers,sort&compress]{natbib}     % Sort numerical keys for multiple cites
+%\usepackage{apacite}                    % for citation following the American Psychological Association style (APA)
+\usepackage{natbib}
+%\usepackage[authoryear,round]{natbib}	% for author year citations
+\setcitestyle{nosort}				    % preserve order of citations in body text (this may collide with some bibliography styles) 
+%\usepackage[nosort]{hypernat}       	% Avoid breaking 'backref' option of hyperref package
+\usepackage[hyphens,spaces,obeyspaces]{url}
+\usepackage[
+%	dvipdfmx,        			% Use dvipdf driver, disable for overleaf
+	backref = page,   		      	% List citing occurences in the References, option [section] (default) doesn't look nice - [page] works better, can also be disabled 
+	colorlinks,      			% Colored links
+	citecolor=black,  			% Color of cite links
+	linkcolor=black,  			% Color of links
+	urlcolor=blue,   			% Color of urls
+	]{hyperref}
+%\newcommand{\aref}[1]{\autoref*{#1}} 		% Prevent links
+\newcommand{\aref}[1]{\autoref{#1}} 		% Enable links
+
+\usepackage{float}
+\usepackage[dvipsnames]{color}   		% named colors
+\usepackage[procnames]{listings} 		% beautiful listings
+\usepackage[font={small,it,rm}]{caption}
+\usepackage[final]{pdfpages}			% to include your papers as pdf
+\usepackage{epigraph}				    % for quotation
+\setlength\epigraphwidth{8cm}
+%\usepackage{epstopdf}
+\usepackage{array}				        % to align equations, figures etc.
+\usepackage{booktabs}       			% Publication quality tables
+\usepackage{tabularx}				    % for advanced table layout
+\usepackage[table]{xcolor}
+\usepackage{tikz}				        % include after xclolor!!!
+%\usepackage{multirow}
+
+%% units
+% \usepackage{units}				    % semantically represent numbers with units
+\usepackage{siunitx}				    %siunitx may be the better alternative for numbers with units
+	\sisetup{separate-uncertainty}		% define how to display uncertainties
+	\newcommand{\SIh}[2]{\SI[number-unit-product={\text{-}}]{#1}{#2}} % command to produce hyphen separated numbers and units as in "100-m level"
+
+\usepackage{fancytabs}                  % required for creating thumb-indices for the papers (see example in 5Papers.tex)
+\usepackage[nomessages]{fp}
+
+\usepackage[euler]{textgreek}
+\usepackage{upgreek}
+\usepackage{pdflscape}
+\usepackage{wrapfig}				% for figures embedded in text
+\usepackage{textcomp}
+\usepackage{sidecap} 				% for figure caption on the side
+\usepackage{enumitem} 				% for possibility to adjust item left margin indentation
+\usepackage[multiple]{footmisc}			% 
+% \usepackage{atveryend}              % for execution of code at the end of compilation process
+%\usepackage{thumbs}
+
+% useful packages while working on the draft
+\usepackage[textsize=scriptsize]{todonotes}	% add notes to your pdf
+\usepackage{soul}
+\usepackage[normalem]{ulem}			% provides strike-out command \sout{}
+\usepackage{lipsum}                 % create dummy text
+
+
+
+
+%
+% Include user-defined macros
+%
+\include{macros}
+
+%
+% TeX is very proud of its hyphenation engine, to the point where it 
+% hyphenates _everything_ just to show off.  Increasing penalty for 
+% hyphenation, and increase tolerance for underfull boxes can make 
+% the text easier to read, at the expense of making the text less aligned
+% to the right margin
+%
+\hyphenpenalty=10
+\tolerance=1000
+
+
+
+\title{{\fontsize{25}{24}\sffamily\textbf{Thesis Title}}
+	\author{
+	\large\textbf{Your Name}\vspace{4em}\\
+		\includegraphics[width=74mm]{figures/uglo}\vspace{4em}\\
+		Dissertation for the degree of Philosophiae Doctor (PhD)\\ at the University of Bergen}
+        %\vspace{3.5em}\\
+		%Geophysical Institute, \\
+		%University of Bergen
+	%}
+	\huge\date{2023}
+}
+
+
+%====================================================
+%------------------ BEGIN DOCUMENT ------------------
+%====================================================
+\begin{document}
+%Cause all references in bibtex file to appear in the 'References' section, even
+%if they are not explicitly cite'ed in the document
+%\nocite{*}
+
+%Set the fontsize and baselineskip, if something other than 10 or 12 is required
+\ifDownscaledFinalDoc
+	\fontsize{\TextSize}{\BaseLineSkip}
+	\selectfont
+\fi
+
+%Double line spacing for draft
+\ifDraft
+	\doublespacing
+\fi
+
+\renewcommand{\familydefault}{\sfdefault} %KD
+
+%--------------------------------------------------------------------------------------------------
+% FRONT MATTER
+%--------------------------------------------------------------------------------------------------
+\pagenumbering{roman}
+\clearpage\maketitle
+\thispagestyle{empty}
+\frontmatter
+\normalfont\rmfamily
+\include{01scientific_environment}
+\include{02acknowledgements}
+\include{03abstract}
+\include{04listofpublications}
+\tableofcontents
+%\listoffigures
+%\lstlistoflistings
+
+%--------------------------------------------------------------------------------------------------
+% MAIN MATTER
+%--------------------------------------------------------------------------------------------------
+\mainmatter
+
+%
+% Main chapters
+%
+\include{1Introduction}         % Introduction
+\include{2Objectives}
+\include{3Introduction_papers}  % Introduction to the papers
+\include{4Summary_Conclusions}
+\include{5Papers}               % The papers, with cover pages
+%
+% Appendices
+%
+%\appendix
+%\include{appendixA}             % Appendix A: Something
+
+
+%--------------------------------------------------------------------------------------------------
+% BACK MATTER
+%--------------------------------------------------------------------------------------------------
+\backmatter
+
+%
+% The bibliography
+%
+
+%
+% Physics-style bibliography
+%
+%\bibliographystyle{iopart-num}
+
+%
+% Modified mathematics bibliography. Uses acm.bst
+%
+
+
+\bibliographystyle{agufull08}
+%\bibliographystyle{apacite} % use only with the apacite package and if you are a psychologist ;) (alternatives: apacitex, apacann, apacannx)
+\bibliography{Thesis}
+
+\end{document}
+

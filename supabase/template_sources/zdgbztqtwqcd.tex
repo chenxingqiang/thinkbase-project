@@ -1,0 +1,370 @@
+%%
+%% This is file `mucproc_demo.tex' v. 1.0 2017/02/22, it is a demonstration file for the mucproc.cls class.
+%% 
+%% Copyright (C) 2017 by Marei Peischl <TeX@mareipeischl.de>
+%% 
+%% This file may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3 of this license
+%% or (at your option) any later version.  The latest version of this
+%% license is in:
+%% 
+%%    http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.3 or later is part of all distributions of LaTeX version
+%% 2005/12/01 or later.
+%% 
+% !TeX program=lualatex 
+% !TeX spellcheck = de_DE
+% !TeX encoding = utf8
+% !TeX TXS-program:bibliography = txs:///biber
+%%magic comment: einige Editoren verstehen diese Kommentare und starten lualatex anstatt der Standardeinstellung als Compiler
+
+\showboxdepth=\maxdimen
+\showboxbreadth=\maxdimen
+
+\documentclass[ngerman,
+%	anonymous=true, %Für Anonymisierung der Einreichungen
+	]{mucproc}
+
+
+
+\bibliography{mucproc_demo}
+
+
+
+%Für Tabellenbeispiel
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+
+%%%%%%%%%%%%%%%%%
+%Nur wegen der Codebeispiele notwendig
+
+%%%SyntaxHighlighting: Needs pygmentize installed and -shell-escape set. See minted-documentation for for information.
+%\usepackage{minted}
+%\setminted{bgcolor=black!10,tabsize=4}
+%\NewDocumentCommand{\inlinemint}{O{}mv}{\mintinline[#1]{#2}{#3}}
+%\usemintedstyle{friendly}
+
+%%Fallback wenn minted nicht konfiguriert ist
+\usepackage{verbatim}% http://ctan.org/pkg/verbatim
+\newenvironment{minted}[2][]{\endgraf\verbatim}{\endverbatim}
+\NewDocumentCommand{\inlinemint}{omv}{\texttt{#3}}
+
+%Symbol-Font: Sonst sind die Symbolschriftarten nicht voll skalierbar
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+
+%%%%%%%%%%%%%%%%
+
+
+\begin{document}	
+	
+\title{Formatierungsvorgaben für Beiträge\\
+	zur Mensch und Computer 2017}%Tragen Sie hier den Titel Ihrer Einreichung ein.
+\subtitle{\LaTeX-Version}%Bitte für die Einreichungen keinen Untertitel benutzen
+\author{Marei Peischl\thanks[inst1]{Abteilung, Institution}\and Vorname Name\thanks{Abteilung, Institution}\and Vorname Name\thanksref{inst1}}
+
+	
+\maketitle
+
+	
+\begin{abstract}
+Dieser Text dient dazu die Verwendung der Dokumentenklasse \textsf{mucproc} als Template für Beiträge zur Konferenz \enquote{Mensch und Computer 2017} zu veranschaulichen. Für dieses Dokument wurde die eben genannte Dokumentenklasse verwendet. Es entspricht somit den Formatvorgaben für Einreichungen.
+\end{abstract}
+
+\section{Einleitung}
+Um ein einheitliches Erscheinungsbild des Tagungsbands zu erreichen, sollen alle Autoren ihre Beiträge in dem hier beschriebenen Format einreichen. Bitte reichen Sie Ihren Beitrag auch schon für die Begutachtungsphase in dieser Form ein. Sie ermöglichen uns damit, die Länge Ihres Beitrags einzuschätzen und erleichtern sich selbst – wenn Ihr Beitrag angenommen wird – die Arbeit für die Endfassung. Angenommene Beiträge werden nur dann im Tagungsband publiziert, wenn sie fristgerecht in dem hier beschriebenen Format vorliegen.
+\section{Allgemeines}
+Bitte benutzen Sie diese Formatvorlage zum Formatieren Ihres Dokuments und ersetzen diesen Text durch Ihren eigenen.
+\subsection{Schriftart}
+Als Schriftart wird Times New Roman verwendet. Die Schriftart ist als TrueType/OpenType-Zeichensatz auf Windows und macOS-Systemen serienmäßig installiert.
+
+
+\section{Einleitung}
+Um ein einheitliches Erscheinungsbild des Tagungsbands zu erreichen, sollen alle Autoren ihre Beiträge in dem hier beschriebenen Format einreichen. Bitte reichen Sie Ihren Beitrag auch schon für die Begutachtungsphase in dieser Form ein. Sie ermöglichen uns damit, die Länge Ihres Beitrags einzuschätzen und erleichtern sich selbst -- wenn Ihr Beitrag angenommen wird -- die Arbeit für die Endfassung. Angenommene Beiträge werden nur dann publiziert, wenn sie fristgerecht in dem hier beschriebenen Format vorliegen.
+
+\subsection{Spezielle Hinweise zur \LaTeX-Version}
+Bei diesem Dokument handelt es sich um die \LaTeX-Variante der Vorlage für die Mensch und Computer 2017.
+Sie verwendet die mit diesem Dokument verteilte Version der \textsf{mucproc}"=Dokumentenklasse \mucprocVersion{} und korrespondiert zur Word-Vorlage für das Jahr 2017.
+
+Sie ist auf den üblichen \TeX-Distributionen, die nicht älter sind als \TeX{} Live 2014
+unter allen Betriebssystemen kompilierbar, jedoch benötigt die endgültige Fassung Lua\LaTeX{}
+für die Einbindung der Open-Type-Schriftart und die korrekte Erstellung eines PDF/A-Formates.
+
+Allerdings verfügt die Dokumentenklasse \textsf{mucproc} über verschiedene Fallback-Mechanismen, sodass es grundsätzlich möglich ist, das Dokument auch mit \texttt{pdflatex} oder \texttt{xelatex} zu kompilieren.
+
+Damit Sie überprüfen können, ob Ihre aktuelle Ausgabe der finalen Version entspricht, gibt die Dokumentenklasse entsprechende Warnungen in der \texttt{.log}-Datei aus.
+
+Wenn Sie mit \texttt{lualatex} kompilieren möchten, so können Sie den Vorgang mit der gleichen Syntax, wie bei anderen Compilern starten:
+
+\begin{minted}{bash}
+lualatex mucproc_demo
+\end{minted}
+Ersetzen Sie dabei ggf. den Dateinamen durch Ihre Version. Sofern die Dateiendung von \texttt{.tex} abweicht, muss diese ebenfalls angegeben werden.
+
+\section{Allgemeine Verwendung}
+Bitte benutzen Sie für die Formatierung Ihres Dokuments die Dokumentenklasse \textsf{mucproc}, indem Sie sie mit
+\begin{minted}{latex}
+\documentclass[Optionen]{mucproc}
+\end{minted}
+einbinden und ersetzen diesen Text durch Ihren eigenen.
+
+Die Dokumentenklasse übernimmt die Formatierung Ihres Textes nach den Vorgaben. Ändern Sie keinesfalls das vorgegebene Layout ab.
+
+
+\subsection{Schriftart}
+Als Schriftart wird Times New Roman verwendet. Die Dokumentenklasse prüft, ob das verwendete System über diese Möglichkeit verfügt und weicht notfalls auf die Standard T1-Schriftart der verwendeten Distribution aus. Somit können Sie dieses Template mit Ihren gewohnten Einstellungen bearbeiten, ohne sich Gedanken um spezielle Anpassungen machen zu müssen.
+
+\subsection{Satzspiegel}
+Die Seitenränder sind in der Dokumentenklasse festgelegt. Bitte nehmen Sie keine Änderungen am Satzspiegelformat vor.
+
+Die Ränder entsprechen denen der Word-Vorlage:
+
+\begin{tabular}{ll<{\,cm}ll<{\,cm}}
+	oben&4,8&links&3,8\\
+	unten&5,7&rechts&4
+\end{tabular}
+
+Ändern Sie bitte keine Einstellungen der Seitenstile. Die richtigen Seitennummern werden nachträglich von uns ergänzt.
+
+
+
+\section{Titelei}
+Die Titelei wird über \inlinemint{latex}|\maketitle| automatisch erzeugt. Die Syntax entspricht hierbei der von Standard-\LaTeX:
+
+\begin{minted}{latex}
+\title{Titel}
+\author{Vorname1 Nachname1\thanks{Abteilung1, Institution1}\and
+	Vorname2 Nachname2\thanks{Abteilung2, Institution2} \and ...}
+\end{minted}
+
+Bitte verwenden Sie einen kurzen, maximal zweizeiligen Titel und keinen Untertitel.
+
+Die einzelnen Autoren innerhalb des \inlinemint{latex}|\author|-Makros werden durch \inlinemint{latex}|\and| getrennt.
+Eine Institution kann über das \texttt{\textbackslash{}thanks}-Makro wie eine Fußnote gesetzt werden, vgl. Beispieldatei. Bitte machen Sie an dieser Stelle nur Angaben zur Institution und schreiben Sie Ihre Kontaktinformationen an das Ende Ihres Beitrags, vor das Literaturverzeichnis.
+
+Falls Sie bei mehreren Autoren die selbe Institution angeben möchten, ist es möglich eine Institution zu refenzieren:
+\begin{minted}{latex}
+\author{Vorname1 Nachname1\thanks[inst:1]{Abteilung, Institution}\and
+	Vorname2 Nachname2\thanksref{inst:1}}
+\end{minted}
+Das optionale Argument von \inlinemint{latex}|thanks| entspricht in etwa einem Label. Es kann eine beliebige Zeichenkette ohne \LaTeX spezifische Sonderzeichen enthalten.
+
+\subsection{Anonymisierung für die Einreichung}
+Die Autoreninformationen werden für die Begutachtung gesondert im Konferenzmanagement"-system erfasst, um eine anonymisierte Begutachtung der Beiträge zu ermöglichen.
+
+Die Klasse \textsf{mucproc} verfügt hierfür über die Möglichkeit Ihren Beitrag \inlinemint{latex}|anonymous=true| zu anonymisieren. Setzen Sie hierfür die Option \inlinemint{latex}|anonymous=true| beim Laden der Dokumentenklasse.
+
+Wenn Ihr Beitrag angenommen wurde, können Sie über diesen Schalter die Ausgabe der Angaben für die endgültige Fassung wieder aktivieren.
+
+\subsection{Zusammenfassung}
+Die Zusammenfassung sollte nicht länger als zehn Zeilen sein und es den Lesern  ermöglichen, die Kerninhalte Ihres Beitrags in Kürze zu erfassen. Hierfür benutzt das Template die \texttt{abstract}"=Umgebung mit der üblichen Syntax.
+
+
+\section{Sprachanpassung}
+Die Dokumentensprache wird als globale Option gesetzt und intern über das \textsf{babel}-Paket verarbeitet. Damit die Silbentrennung richtig funktioniert ist es zwingend notwendig, dass diese Einstellung der von Ihnen verwendeten Sprache entspricht. In der Demo-Datei ist die neue deutsche Rechtschreibung (\texttt{ngerman}) voreingestellt.
+\begin{minted}{latex}
+\documentclass[ngerman]{mucproc}
+\end{minted}
+Falls Sie Ihre Einreichung Englisch als Dokumentensprache verwenden soll, müssen Sie somit die vorherige Zeile durch
+\begin{minted}{latex}
+\documentclass[english]{mucproc}
+\end{minted}
+ersetzen.
+
+Korrigieren Sie unsaubere Trennungen (z.\,B. bei Fremdwörtern) über die durch \textsf{babel} bereitgestellten Mechanismen manuell nach.
+
+Verwenden Sie ausschließlich typografisch korrekte Sonderzeichen, wie etwa einen Gedankenstrich \enquote{--} \inlinemint{latex}|--|. Um Anführungszeichen unabhängig von der Dokumentenklasse richtig zu setzen, lädt die \textsf{mucproc}-Klasse das \textsf{csquotes}-Paket. Somit ist es möglich, dass unabhängig von der durch \textsf{babel} gesetzten Sprache die richtigen Anführungszeichen gesetzt werden:
+
+\begin{minted}{latex}
+\enquote{Ein Satz mit \enquote{Anführungszeichen},
+	die sich je nach Einstellung anpassen.}
+\end{minted}
+Dies erzeugt die Ausgabe: \enquote{Ein Satz mit \enquote{Anführungszeichen}, die sich je nach Einstellung anpassen.}
+
+Benutzen Sie für Textauszeichnungen bei Hervorhebungen das Makro \inlinemint{latex}|\emph{}|. Vermeiden Sie manuelle Schriftauswahl, Fettdruck und Unterstreichungen.
+
+Im Deutschen sollte bei mehrteiligen Abkürzungen wie \enquote{z.\,B.} oder \enquote{d.\,h.} ein halbes geschütztes Leerzeichen gesetzt werden.
+Um den richtigen Abstand zu erhalten und zusätzlich einen Zeilenumbruch zwischen beiden Teilen zu verhindern, verwenden Sie bitte das Abstandsmakro \inlinemint{latex}|\,| in folgender Weise: \inlinemint{latex}|d.\,h.|${}\to{}$d.\,h.
+
+\section{Der Textteil}\label{sec:text}
+\subsection{Überschriften}\label{sec:sectioning}
+Verwenden Sie für die Untergliederung die Standard-Makros. Die Klasse \textsf{mucproc} verfügt über eine Untergliederung ab \texttt{\textbackslash{}section}. Zwischen zwei Überschriften sollte immer Fließtext stehen. Vermeiden Sie bitte Situationen wie in diesem Dokument bei den Abschnitten \ref{sec:text} und \ref{sec:sectioning}.
+ 
+
+
+\subsection{Fußnoten}
+Setzen Sie Fußnoten über den Standard-Mechanismus.
+
+Beispiel\footnote{Dies ist eine Beispielfußnote} erzeugt mit \inlinemint{latex}|Beispiel\footnote{Dies ist eine Beispielfußnote}|
+
+\subsection{Aufzählungen und Listen}
+Setzen Sie Aufzählungen und -listungen über die \LaTeX-Standardmechanismen.
+
+\begin{minipage}{\dimexpr.5\linewidth-.5em\relax}
+\begin{minted}{latex}
+\begin{enumerate}%nummeriert
+\item Text für das 1. Element
+\item Text für ...
+\end{enumerate}
+\end{minted}
+\end{minipage}\hfill%
+\begin{minipage}{\dimexpr.5\linewidth-.5em\relax}
+\begin{minted}{latex}
+\begin{itemize}
+\item Text für das 1. Element
+\item Text für ...
+\end{itemize}
+\end{minted}
+\end{minipage}
+
+
+\subsection{Abbildungen und Tabellen}
+Nutzen Sie für die Positionierung von Abbildungen und Tabellen die Standard-Umgebungen \inlinemint{latex}|figure| bzw. \inlinemint{latex}|table|. Verändern Sie, wenn möglich nicht die voreingestellten Positionierungs"-parameter. Setzen Sie Bild- und Tabellenunterschriften.
+
+Für das Einbinden von Grafiken lädt die \textsf{mucproc}-Klasse das \textsf{graphicx}-Paket. Abbildung \ref{fig:example} dient als Beispiel. Sie wurde über den Folgenden Code eingebunden:
+\begin{minted}{latex}
+\begin{figure}
+\centering
+\includegraphics[width=.25\linewidth]{picture}
+\caption{Bildunterschrift}
+\label{fig:example}
+\end{figure}
+\end{minted}
+\begin{figure}
+	\centering
+	\includegraphics[width=.25\linewidth]{picture}
+	\caption{Bildunterschrift}
+	\label{fig:example}
+\end{figure}
+
+Bitte achten Sie bei allen Abbildungen auf eine hinreichend hohe Auflösung, d.\,h. mindestens 300\,dpi. Wenn möglich, sollten Sie Vektorgrafiken verwenden, da diese auflösungsunabhängig sind und die beste Qualität bieten. Weitere Informationen zu Abbildungen finden Sie in der Datei \enquote{Abbildungen.pdf}.
+
+\LaTeX{} kennt verschiedene Mechanismen für die Erzeugung von Tabellen. Tabelle \ref{tab:example} zeigt eine Möglichkeit für die Erzeugung einer Tabelle, die sich der Textbreite anpasst. Hierfür wird das Paket \textsf{tabularx} und für die Linien mit verbessertem Spacing das \textsf{booktabs}-Paket benutzt.
+
+
+\begin{table}
+	\begin{tabularx}{\linewidth}{@{}rX@{}}
+		\toprule
+		\multicolumn{1}{c}{\itshape Syntax}&\itshape Wirkung\\
+		\midrule[\heavyrulewidth]
+		\multicolumn{2}{@{}l}{Tabellen mit fester Breite mithilfe von \textsf{tabularx}}\\
+		\midrule
+		\texttt{tabularx}-Umgebung& Erhält als erstes Argument eine Längenangabe als Gesamtbreite der Tabelle. In der Spaltendefinition steht über die sonst möglichen Elemente noch der Spaltentyp \texttt{X} zur Verfügung.\\
+		\texttt{X}-Spaltentyp& Dieser Spaltentyp erhält die gesamte Rest-Breite. Alle anderen Spalten werden wie sonst auch gesetzt. Die Differenz zwischen der Gesamtbreite und der bei der Umgebung angegebenen Breite wird der \texttt{X}-Spalte zugewiesen. Bei mehreren \texttt{X}-Spalten wird der verfügbare Platz gleichmäßig unter allen aufgeteilt.\\
+		\midrule[\heavyrulewidth]
+		\multicolumn{2}{@{}l}{Weitere hilfreiche Befehle bei Tabellen}\\
+		\midrule
+		\texttt{@\{\}}& Diese Syntax ist in Standard-\LaTeX{} definiert. Sie überschreibt den Spaltenzwischenraum. In diesem Fall wird er entfernt, sodass die horizontalen Linien bündig mit den äußeren Spalten abschließen.\\
+		\texttt{\textbackslash{}midrule}& Dies ist ein neuer Linientyp für horizontale Linien in Tabelle. Er wird durch das \textsf{booktabs}-Paket bereitgestellt und besitzt im Vergleich zu \texttt{\textbackslash{}hline} ein verbessertes Spacing. Zudem kann die Liniendicke über ein optionales Argument eingestellt werden.\\
+		\texttt{\textbackslash{}top/bottomrule}& Variante von \texttt{\textbackslash{}midrule}, die andere Abstände lässt. Die \texttt{\textbackslash{}toprule} ist als obere Begrenzung der Tabelle gedacht (\texttt{\textbackslash{}bottomrule} als untere).\\
+		\bottomrule
+	\end{tabularx}
+	\caption{Tabellenunterschrift bei einer Beispieltabelle mit fester Breite}
+	\label{tab:example}
+\end{table}
+
+
+
+
+
+
+
+
+\subsection{Literaturverweise}\label{sec:cite}
+Die \textsf{mucproc}-Klasse benutzt für die Umsetzung der Literaturverweise und des zugehörigen Verzeichnisses das Paket \textsf{biblatex} mit biber-Backend\footnote{biber stellt eine leichter konfigurierbare und Unicode-verträgliche Alternative zu bib\TeX{} dar.}. Die zu dieser Datei gehörige Datenbank im bib\TeX-Format heißt \enquote{mucproc\_demo.bib} und ist Teil des Template-Paketes. 
+
+Der Aufbau der Datenbank ist identisch zu Datenbanken für die klassische Verwendung mit bib\TeX{}. Der einzige Unterschied liegt darin, dass die Datei Umlaute und Sonderzeichen bei direkter Eingabe verarbeiten kann. Dafür sollte die \texttt{.bib}-Datei, wie auch die \texttt{.tex}-Dateien in UTF-8 kodiert sein\footnote{Falls Sie bereits eine entsprechende Datenbank haben, die jedoch nicht im bib}.
+
+\begin{minted}{bibtex}
+@book{Ackermann.1991,
+ year = {1991},
+ title = {Software-Ergonomie '91},
+ keywords = {Kongreß;Softwareergonomie;Zürich 1990},
+ address = {Stuttgart},
+ volume = {33},
+ publisher = {Teubner},
+ isbn = {3-519-02674-0},
+ series = {Berichte des German Chapter of the ACM},
+ editor = {Ackermann, David}
+}
+\end{minted}
+
+
+Die Literaturverweise werden, wie auch das Literaturverzeichnis durch das \textsf{biblatex}-Paket mit Biber als Backend erzeugt.
+
+Literaturverweise erscheinen im Text in Klammern, z.\,B. \parencite{Nake.1993} oder bei wörtlichen Zitaten in der Form \parencite[S.~14ff.]{Nake.1993}. Verwenden Sie für die Verweise \inlinemint{latex}|\parencite| mit der folgenden Syntax:
+
+\begin{minted}{latex}
+\parencite{Ackermann.1991}%für einfache Verweise
+\parencite[S.~2]{Ackermann.1991}%wörtliche Zitate
+\end{minted}
+
+Zur Angabe mehrerer Quellen in einem Zitat existiert eine Variante des Makros:
+\begin{minted}{latex}
+\parencites{Ackermann.1991}{Borghoff.1998}
+\end{minted}
+dies erzeugt eine Ausgabe, wie \parencites{Ackermann.1991}{Borghoff.1998}.
+Auch hier ist es möglich genaue Positionsangaben durch optionale Argumente zu übergeben. Konsultieren Sie für weitere Möglichkeiten die biblatex-Dokumentation\footnote{Zu finden unter \url{http://www.ctan.org/pkg/biblatex} oder über \texttt{texdoc}.}.
+
+Damit die Literaturdatenbank richtig verarbeitet und somit das Verzeichnis erzeugt werden kann, muss neben dem \TeX-Compiler auch noch \texttt{biber} ausgeführt werden. Über die Kommandozeile werden alle notwendigen Schritte mit folgender Befehlsabfolge ausgeführt:
+
+\begin{minted}{bash}
+lualatex <filename>.tex
+biber <filename>.bcf
+lualatex <filename>.tex
+lualatex <filename>.tex
+\end{minted}
+
+\texttt{biber} setzt als Dateiendung für das Argument nicht \texttt{.tex} sondern \texttt{.bcf} voraus. Diese Datei wird beim ersten \LaTeX-Durchlauf erzeugt.
+
+Sofern Sie eine deutlich größere Datenbank als die notwendigen Einträge benutzen, können Sie auch eine kleine Version erzeugen, die nur die im Dokument verwendeten Einträge enthält. Über den Befehl
+\begin{minted}{bash}
+biber --output_format=bibtex --output_resolve <filename>.bcf
+\end{minted}
+Die dadurch erzeugte verkleinerte Datenbank heißt \texttt{<filename>\_biber.bib} und kann dann für die Verwendung beliebig umbenannt werden.
+
+\section{Schlussteil}
+Der Schlussteil Ihres Beitrags umfasst das Literaturverzeichnis und (nur in der endgültigen Fassung!) eventuelle Danksagungen und die Kontaktinformationen der Autoren. Für die Überschriften im Schlussteil sollen nicht-nummerierte Unterüberschriften (\inlinemint{latex}|\subsection*|) verwendet werden.
+
+\subsection*{Danksagung}
+Wir danken Martin-Christoph Kindsmüller, Thilo Paul-Stueve, Claudia Völker, Andreas Auinger und Jürgen Ziegler für die Bereitstellung der Vorlagen der vorangegangen \enquote{Mensch und Computer}-Konferenzen.
+
+
+%Die folgende Deklaration dient dem Zweck den Text zwischen Literaturverzeichnisüberschrift und dem eigentlichen Verzeichnis einzufügen. Sie kann für Ihre Ausfertigung entfallen.
+\defbibnote{bibnote}{%
+Im Literaturverzeichnis ordnen Sie Ihre Angaben bitte alphabetisch nach Nachnamen des ersten Autors und dann nach Veröffentlichungsdatum (bei mehreren Titeln eines Autors).
+
+Es gibt eine Reihe sehr unterschiedlicher Regelungen und Normen für Literaturangaben. In der \textsf{mucproc}-Klasse findet der Zitierstil der \emph{American Psychological Association} (APA) unter Verwendung des entsprechenden Bib\LaTeX-Stiles\footnote{http://www.ctan.org/pkg/biblatex-apa} Anwendung.
+
+Angaben zur Formatierung der Literaturverweise finden Sie in Abschnitt \ref{sec:cite}.
+}
+
+\nocite{DIN9241}
+
+\printbibliography[prenote=bibnote]%Die Option dient dazu, die zuvor definierte bibnote zwischen Überschrift und Verzeichnis einzufügen und kann daher samt der eckigen Klammer entfallen.
+
+
+\subsection{Autoren}
+Hier haben Sie und Ihre Co-Autoren die Möglichkeit sich mit einem Foto und einer kurzen Beschreibung Ihrer Person zu präsentieren. Das Foto wird wie jede andere Abbildung auch bei den Print-on-demand Versionen in Graustufen gedruckt und sollte über eine Auflösung von 300\,dpi verfügen.
+
+Die \textsf{mucproc}-Klasse stellt für diesen Mechanismus die \texttt{authoraddendum}-Umgebung zur Verfügung. Sie verfügt über ein optionales Argument für den Bildpfad und ein notwendiges Argument für den Autorennamen.
+
+\begin{minted}[breaklines,breaksymbol={}]{latex}
+\begin{authoraddendum}[foto]{Nachname, Vorname}
+ Kurze Vita.
+\end{authoraddendum}
+\end{minted}
+
+
+\begin{authoraddendum}[foto]{Mustermann, Erika}
+	Erika Mustermann studierte Kommunikations-Psychologie an der Hochschule Musterstadt. Im Anschluss arbeitete sie in verschiedenen Agenturen als Informationsarchitektin an der Konzeption digitaler Anwendungen. Aktuell ist sie bei der Muster AG Senior User Experience Consultant tätig. Zu ihren Hauptaufgaben zählen die Sammlung der internationalen Business- und Nutzungsanforderungen, die Evaluation von In-House Lösungen sowie die Schulung von Kollegen in Bezug auf Methoden im Human-Centered Design.
+\end{authoraddendum}
+
+\begin{authoraddendum}[foto]{Nachname, Vorname}
+	Kurze Vita. Die Beschreibung der Person sollte sich auf max. 10 Zeilen beschränken
+\end{authoraddendum}
+
+
+\end{document}

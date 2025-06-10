@@ -77,3 +77,11 @@ class AgentConfigError(Exception):
 class AgentExecutionError(Exception):
     """Agent execution error."""
     pass
+
+class WorkflowError(Exception):
+    """Exception raised for workflow-related errors."""
+    pass
+
+class ContractViolationError(AgentFlowError):
+    """Exception raised when a contract is violated."""
+    pass

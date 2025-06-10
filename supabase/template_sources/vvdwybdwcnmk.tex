@@ -1,0 +1,255 @@
+\documentclass[10pt]{extarticle}
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,mathrsfs}
+\usepackage{xparse}
+\usepackage[inline,shortlabels]{enumitem}
+\setlist{topsep=2pt,itemsep=2pt,parsep=0pt,partopsep=0pt}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,top=0.5in,bottom=0.2in,left=0.5in,right=0.5in,footskip=0.3in,includefoot]{geometry}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{minted} % tcolorbox minted library, required to use the "minted" tcb listing engine (this library is not loaded by the option [most])
+\usepackage{minted} % Allows input of raw code, such as Python code
+\usepackage[colorlinks]{hyperref} % ALWAYS load this package LAST
+
+% Custom tcolorbox style for Python code (not the code or the box it appears in, just the options for the box)
+\tcbset{
+    pythoncodebox/.style={
+        enhanced jigsaw,breakable,
+        colback=gray!10,colframe=gray!20!black,
+        boxrule=1pt,top=2pt,bottom=2pt,left=2pt,right=2pt,
+        sharp corners,before skip=10pt,after skip=10pt,
+        attach boxed title to top left,
+        boxed title style={empty,
+            top=0pt,bottom=0pt,left=2pt,right=2pt,
+            interior code={\fill[fill=tcbcolframe] (frame.south west)
+                --([yshift=-4pt]frame.north west)
+                to[out=90,in=180] ([xshift=4pt]frame.north west)
+                --([xshift=-8pt]frame.north east)
+                to[out=0,in=180] ([xshift=16pt]frame.south east)
+                --cycle;
+            }
+        },
+        title={#1}, % Argument of pythoncodebox specifies the title
+        fonttitle=\sffamily\bfseries
+    },
+    pythoncodebox/.default={}, % Default is No title
+    %%% Starred version has no frame %%%
+    pythoncodebox*/.style={
+        enhanced jigsaw,breakable,
+        colback=gray!10,coltitle=gray!20!black,colbacktitle=tcbcolback,
+        frame hidden,
+        top=2pt,bottom=2pt,left=2pt,right=2pt,
+        sharp corners,before skip=10pt,after skip=10pt,
+        attach boxed title to top text left={yshift=-1mm},
+        boxed title style={empty,
+            top=0pt,bottom=0pt,left=2pt,right=2pt,
+            interior code={\fill[fill=tcbcolback] (interior.south west)
+                --([yshift=-4pt]interior.north west)
+                to[out=90,in=180] ([xshift=4pt]interior.north west)
+                --([xshift=-8pt]interior.north east)
+                to[out=0,in=180] ([xshift=16pt]interior.south east)
+                --cycle;
+            }
+        },
+        title={#1}, % Argument of pythoncodebox specifies the title
+        fonttitle=\sffamily\bfseries
+    },
+    pythoncodebox*/.default={}, % Default is No title
+}
+
+% Custom tcolorbox for Python code (not the code itself, just the box it appears in)
+\newtcolorbox{pythonbox}[1][]{pythoncodebox=#1}
+\newtcolorbox{pythonbox*}[1][]{pythoncodebox*=#1} % Starred version has no frame
+
+% Custom minted environment for Python code, NOT using tcolorbox
+\newminted{python}{autogobble,breaklines,mathescape}
+
+% Custom tcblisting environment for Python code, using the "minted" tcb listing engine
+% Adapted from https://tex.stackexchange.com/a/402096
+\NewTCBListing{python}{ !O{} !D(){} !G{} }{
+    listing engine=minted,
+    listing only,
+    pythoncodebox={#1}, % First argument specifies the title (if any)
+    minted language=python,
+    minted options/.expanded={
+        autogobble,breaklines,mathescape,
+        #2 % Second argument, delimited by (), denotes options for the minted environment
+    },
+    #3 % Third argument, delimited by {}, denotes options for the tcolorbox
+}
+
+%%% Starred version has no frame %%%
+\NewTCBListing{python*}{ !O{} !D(){} !G{} }{
+    listing engine=minted,
+    listing only,
+    pythoncodebox*={#1}, % First argument specifies the title (if any)
+    minted language=python,
+    minted options/.expanded={
+        autogobble,breaklines,mathescape,
+        #2 % Second argument, delimited by (), denotes options for the minted environment
+    },
+    #3 % Third argument, delimited by {}, denotes options for the tcolorbox
+}
+
+% verbbox environment, for showing verbatim text next to code output (for package documentation and user learning purposes)
+\NewTCBListing{verbbox}{ !O{} }{
+    listing engine=minted,
+    minted language=latex,
+    boxrule=1pt,sidebyside,skin=bicolor,
+    colback=gray!10,colbacklower=white,valign=center,
+    top=2pt,bottom=2pt,left=2pt,right=2pt,
+    #1
+} % Last argument allows more tcolorbox options to be added
+
+\setlength{\parindent}{0.2in}
+\setlength{\parskip}{0pt}
+\setlength{\columnseprule}{0pt}
+
+\makeatletter
+% Redefining the title block
+\renewcommand\maketitle{
+    \null\vspace{4mm}
+    \begin{center}
+        {\Huge\sffamily\bfseries\selectfont\@title}\\
+            \vspace{4mm}
+        {\Large\sffamily\selectfont\@author}\\
+            \vspace{4mm}
+        {\large\sffamily\selectfont\@date}
+    \end{center}
+    \vspace{6mm}
+}
+% Adapted from https://tex.stackexchange.com/questions/483953/how-to-add-new-macros-like-author-without-editing-latex-ltx?noredirect=1&lq=1
+\makeatother
+
+\title{Typing Python in \textrm{\LaTeX}}
+\author{Senan Sekhon}
+\date{April 10, 2023}
+% Created April 6, 2023
+
+\begin{document}
+
+\maketitle
+
+This template provides environments for rendering aesthetic, professional-looking \href{https://www.python.org/}{\textsf{Python}} code in \LaTeX.\\
+
+The code is rendered using the \href{https://ctan.org/pkg/minted}{\texttt{minted}} package, which is based on \href{https://pygments.org/}{\textsf{Pygments}}. The boxes surrounding them are created using the \href{https://ctan.org/pkg/tcolorbox}{\texttt{tcolorbox}} package. Note that this package must be loaded with the \texttt{minted} library, e.g. by adding \mintinline{latex}{\tcbuselibrary{minted}} to the preamble, for these to work.\\
+
+The \texttt{pythonbox} environment creates a box for Python code (just the box, not the code). The starred version \texttt{pythonbox*} creates a ``soft'' box with no border.
+
+\begin{verbbox}
+\begin{pythonbox}
+This is a \texttt{pythonbox}.
+\end{pythonbox}
+\end{verbbox}
+
+\begin{verbbox}
+\begin{pythonbox}[The title]
+This is a \texttt{pythonbox} with a title.
+\end{pythonbox}
+\end{verbbox}
+
+\begin{verbbox}
+\begin{pythonbox*}
+This is a soft \texttt{pythonbox}.
+\end{pythonbox*}
+\end{verbbox}
+
+\begin{verbbox}
+\begin{pythonbox*}[The title]
+This is a soft \texttt{pythonbox} with a title.
+\end{pythonbox*}
+\end{verbbox}
+
+The \texttt{python} environment creates Python code inside a \texttt{pythonbox}. In this environment, you can directly enter Python code and \texttt{minted} will color the text accordingly. Similarly, the starred version \texttt{python*} has no border.
+
+\begin{verbbox}
+\begin{python}
+def next_two(x):
+    lst=[x+i for i in range(3)]
+    return lst
+\end{python}
+\end{verbbox}
+
+\begin{verbbox}
+\begin{python}[The function]
+def next_two(x):
+    lst=[x+i for i in range(3)]
+    return lst
+\end{python}
+\end{verbbox}
+
+\begin{verbbox}
+\begin{python*}
+def next_two(x):
+    lst=[x+i for i in range(3)]
+    return lst
+\end{python*}
+\end{verbbox}
+
+\begin{verbbox}
+\begin{python*}[The function]
+def next_two(x):
+    lst=[x+i for i in range(3)]
+    return lst
+\end{python*}
+\end{verbbox}
+
+The \texttt{python} and \texttt{python*} boxes have three optional arguments:
+\begin{itemize}
+    \item The first argument, delimited by brackets \texttt{[ ]}, specifies the title.
+    \item The second argument, delimited by parentheses \texttt{( )}, specifies the options for the \texttt{minted} environment, i.e. the code itself. These are handled by the \texttt{minted} package.
+    \item The third argument, delimited by braces \texttt{\{ \}}, specifies the options for the box containing the code. These are handled by the \texttt{tcolorbox} package.
+\end{itemize}
+
+\begin{verbbox}[sidebyside=false]
+\begin{python}[How to calculate a factorial](style=one-dark){colback=gray!40!black,colframe=blue}
+def factorial(n):
+    product=1                   # Start with $1$
+    for k in range(2,n+1):      # For each $k=2,3,\ldots,n$,
+        product*=k              # Multiply by $k$
+    return product
+\end{python}
+\end{verbbox}
+
+In the above example, the option \texttt{style=one-dark} is an option for the \emph{code}, while the options \texttt{colback=gray!40!black} and \texttt{colframe=blue} are options for the \emph{box}. Note that the option \texttt{style} only specifies the style for the code itself, it does not change the background color --- this has to be done separately by specifying the \texttt{tcolorbox} option \texttt{colback}\footnote{This \emph{cannot} be achieved by specifying the \texttt{minted} option \texttt{bgcolor} --- doing this would only create a colored box around the code, rather than coloring the entire interior of the \texttt{tcolorbox}.}.\\
+
+See \url{https://pygments.org/styles/} for a list of available styles. You can also use other \texttt{tcolorbox} environments\footnote{For example, the \texttt{filingbox}, \texttt{railingbox} and \texttt{flagbox} environments from \href{https://www.overleaf.com/latex/templates/fun-template-2/sgqjnsftvysf}{\textsf{this template}}.}.\\
+
+The pre-defined options for the code are \texttt{autogobble} (this removes any common indentation from all lines of code), \texttt{breaklines} (to allow lines that are too long to be broken) and \texttt{mathescape} (to allow \LaTeX\ math to be rendered in code comments). See the \href{https://github.com/gpoore/minted/blob/master/source/minted.pdf}{\textsf{documentation}} for the \texttt{minted} package for a list of available options.
+
+\begin{verbbox}
+\begin{python}
+            def f(x):
+                # This function takes a number $x$ and returns $x^2$
+                return x**2
+\end{python}
+\end{verbbox}
+
+You can also typeset Python code by itself (without the box) using the \texttt{pythoncode} environment. This is based on the \mintinline{latex}{\newminted} command from the \texttt{minted} package, and contains the same pre-defined options as \texttt{python}.
+
+\begin{verbbox}
+\begin{pythoncode}
+def least_square_above(x):
+    return 0 if x<0 else (int(x**0.5)+1)**2
+\end{pythoncode}
+\end{verbbox}
+
+You can overwrite these options or provide additional options by using \texttt{pythoncode*}, but it is better to use the standard \texttt{minted} environment: \mintinline{latex}{\begin{minted}[}$\langle options\rangle$\mintinline{latex}{]{python} ... \end{minted}}.
+
+\begin{verbbox}
+\begin{pythoncode*}{style=manni}
+def least_square_above(x):
+    return 0 if x<0 else (int(x**0.5)+1)**2
+\end{pythoncode*}
+\end{verbbox}
+
+Finally, note that \LaTeX\ does not \emph{run} the Python code, it only typesets it. If you want to run the code, you can paste it into TutorialsPoint:
+\begin{center}
+    \url{https://www.tutorialspoint.com/online_python_compiler.php}
+\end{center}
+Or you can use any IDE, such as \href{https://www.jetbrains.com/pycharm/}{\textsf{PyCharm}} or \href{https://code.visualstudio.com/}{\textsf{Visual Studio Code}}.
+
+\end{document}

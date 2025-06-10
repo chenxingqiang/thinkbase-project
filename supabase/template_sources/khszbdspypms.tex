@@ -1,0 +1,243 @@
+\documentclass[urlsf]{utemclass}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%This template was originally designed and developed Lim Lian Tze of USM in 2014.
+% A major modification was made by Nor Hafeizah Hassan and Gede Pramudya in 2015.
+% Later modified further by Ahmad Sadhiqin Mohd Isira on Dec 2020 for FKEKK.
+% Later modified further for FKE by Ahmad Sadhiqin bin Mohd Isira in Apr 2022.
+% This is the "main" file for the thesis, formatted according to the Guide to the Preparation, Submission and Examination of Thesis, published by FKE UTeM for undergraduate students.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Example of packages used
+\usepackage{amsmath}
+\usepackage{cite}%citation with bibitem or bibtex
+\usepackage{titlesec}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{epstopdf}
+%\pagestyle{myheadings}
+\usepackage{pdfpages}
+
+\usepackage{verbatim}
+\usepackage{appendix}
+\usepackage{lipsum}
+\usepackage{pdflscape}
+
+%list of abbreviations
+\usepackage[acronym,smallcaps,nonumberlist]{glossaries}
+    \newglossarystyle{mylong}{%
+    \setglossarystyle{long}%
+    \renewenvironment{theglossary}%
+    {\begin{longtable}[l]{p{2cm}p{\hsize}}}% <-- change the value here
+     {\end{longtable}}}
+
+\newacronym{ny}{NY}{New York}
+\newacronym{la}{LA}{Los Angeles}
+\newacronym{un}{UN}{United Nations}
+\newacronym{utem}{UTEM}{Universiti Teknikal Malaysia Melaka (UTeM)}
+\newacronym{fkekk}{FKEKK}{Fakulti Kejuruteraan Elektronik dan Kejuruteraan Komputer}
+\newacronym{fke}{FKE}{Fakulti Kejuruteraan Elektrik (FKE)}
+\newacronym{mas}{MAS}{Multi-agents System}
+\newacronym{kba}{KBA}{Kedudukan Baik Anugerah}
+\newacronym{jkpsm}{JKPSM}{Final Year Project Committee}
+\newacronym{fyp}{FYP}{Final Year Project}
+\newacronym{beng}{BENG}{Bachelor of Electronic Engineering with Honours}
+\newacronym{benr}{BENR}{Bachelor of Computer Engineering with Honours}
+\newacronym{pc}{PC}{Personal Computer}
+
+% nomenclature/symbols for List of Symbols
+\newglossaryentry{angelsperarea}{
+  name = $a$ ,
+  description = The number of angels per unit area,
+}
+\newglossaryentry{numofangels}{
+  name = $N$ ,
+  description = The number of angels per needle point
+}
+\newglossaryentry{areaofneedle}{
+  name = $A$ ,
+  description = The area of the needle point
+}
+\newglossaryentry{laplacianmatrix}{
+  name = $\mathcal{L}$ ,
+  description = The Laplacian matrix
+}
+
+\makeglossaries
+
+
+% Particulars about your thesis are here
+% Your Name
+\author{AINE IZZATI BINTI TARMIZI}
+% English title of your thesis
+\title{PLEASE REPLACE WITH YOUR OWN TITLE}
+% Malay title of your thesis
+%\titlems{CONSENSUS CONTROL OF MULTI-AGENTS SYSTEM WITH LIPSCITZ NONLINEARITY}
+% Year submitted
+\submityear{2022}
+% Month submitted
+%\submitmonth{DEC}
+% Choose only 1 degree type
+\degreetype{Bachelor of Electrical Engineering (Electrical Power)\\ with Honours}
+
+% Options for generating hyperlinks when using pdfLaTeX - with link, color is nil, underline is nil
+% Also a TOC without dotted lines
+\ifpdf
+  \makeatletter
+  \usepackage[hidelinks,pdftex,plainpages=false,hypertexnames=false,bookmarksnumbered,pdfpagelabels,%
+    pdfauthor={\@author},pdftitle={\@title}]{hyperref}
+\renewcommand*{\cftdotsep}{\cftnodots}
+  \makeatother
+\else
+  \usepackage[dvips,plainpages=false,bookmarksnumbered,breaklinks=true]{hyperref}
+\fi
+
+\fancypagestyle{mylandscape}{
+\fancyhf{} %Clears the header/footer
+\fancyfoot{% Footer
+\makebox[\textwidth][r]{% Right
+  \rlap{\hspace{.75cm}% Push out of margin by \footskip
+    \smash{% Remove vertical height
+      \raisebox{4.87in}{% Raise vertically
+        \rotatebox{90}{\thepage}}}}}}% Rotate counter-clockwise
+\renewcommand{\headrulewidth}{0pt}% No header rule
+\renewcommand{\footrulewidth}{0pt}% No footer rule
+}
+
+
+    
+
+
+
+
+\begin{document}
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% You can choose from several bibliography styles.  It is agreed to use Harvard.
+	% One of the Harvard styles which is close the the Guide is dcu
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	 
+	
+	\lstset{fontadjust=true}
+
+	\frontmatter
+	%\addtocontents{toc}{\protect\raggedright\protect\sloppy}
+	%\addtocontents{toc}{\protect\hfill{\protect\bfseries PAGE}\\}
+	%\addtocontents{lof}{\protect\raggedright\protect\sloppy}
+	%\addtocontents{lof}{\protect{\protect\bfseries FIGURE}\hfill{\protect\bfseries TITLE}\hfill{\protect\bfseries PAGE}\\}
+	%\addtocontents{lot}{\protect\raggedright\protect\sloppy}
+	%\addtocontents{lot}{\protect{\protect\bfseries TABLE}\hfill{\protect\bfseries TITLE}\hfill{\protect\bfseries PAGE}\\}
+	%\addtocontents{lop}{\protect\raggedright\protect\sloppy}
+	%\addtocontents{lop}{\protect\hfill{\protect\bfseries PAGE}\\}
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Inserts the cover page (the hard cover with gold-lettering) and the title page. 
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\makecover
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Inserts a "Front Matter" bookmark if using pdfLaTeX
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\ifpdf
+    	\pdfbookmark[-1]{Front Matter}{front}
+	\else\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% include declaration, approval, dedication, english abstract, Malay abstrak, and acknowledgement
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%\setcounter{page}{0} %not included at page numbering
+	%\include{chapters/pengesahan}
+	%\includepdf[pages={0}]{pengesahan.pdf}
+	\setcounter{page}{0} %not included at page numbering
+	\include{chapters/declaration}
+	\setcounter{page}{0}
+	\include{chapters/approval}
+	\setcounter{page}{0}
+	\include{chapters/dedication}
+	
+    %page numbering starts from here
+	\input{chapters/abstract}
+    \newpage
+ 	\input{chapters/abstrak}
+	\include{chapters/acknowledgements} 
+    
+	\renewcommand\contentsname{Table of Contents}
+	\newcommand\tocheading{\par\bigskip\MakeUppercase{\chaptername}\hfill Page\par}
+	\renewcommand{\listfigurename}{List of Figures}
+	\renewcommand{\listtablename}{List of Tables}
+		\begin{singlespace}
+			\tableofcontents \clearpage
+			\listoftables \clearpage
+			\listoffigures \clearpage
+			\include{chapters/listofabbreviation}
+			%\listofplates \clearpage
+			\include{chapters/appendiceslist}%alter your appendices list in appendiceslist.tex in chapter folder
+		\end{singlespace}
+		
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%  List of abreviation, accronyms, symbols, and own-publications
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+		
+		%---------------------------------------------------------------
+		%Include the List of (own) Publications. Each item can not be cited, according
+		%to the convention addopted by UTeM and talk between me and TD PPS. So it
+		%should be created manually (at the moment by using 'dumb' idea)
+		% --------------------------------------------------------------
+%		\begin{singlespace}
+%		\include{lop} %under construction
+%		%\include{loptrial}
+%		\end{singlespace}
+	
+	% Paragraph spacing
+	\setlength\parskip{18pt}
+	% paragraph indentation
+	\setlength\parindent{1.1cm}
+
+	\addtocontents{toc}{\protect\setlength{\protect\cftbeforechapskip}{2.5pc}}
+	\addtocontents{toc}{\protect\cftpagenumbersoff{chap}}
+ 
+	\mainmatter
+	\ifpdf
+  		\pdfbookmark[-1]{Main Chapters}{main}
+	\else\fi
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% The actual chapters of your thesis as listed in  mainchaps.tex. Make sure you
+	%  have the relevant chapter files.  
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
+	\input{chapters/1-intro}
+	\input{chapters/2-lit-review}
+	\input{chapters/3-methodology}
+	\input{chapters/4-results-analysis}
+	\input{chapters/5-discussion}
+	\input{chapters/6-conclusion}
+
+	%-----------------------------------------------------------------
+	% include the bibliography which is titled as "References"
+	%-----------------------------------------------------------------
+	\bibliographystyle{IEEEtran}
+	\addtocontents{toc}{\protect\cftpagenumberson{chap}}
+	\renewcommand{\bibname}{REFERENCES}
+	\begin{onehalfspace}
+	    \bibliography{bibliography}
+	\end{onehalfspace}
+	\addtocontents{toc}{\protect\setlength{\protect\cftbeforechapskip}{1pc}}
+
+	%one page of blank with title "APPENDICES"
+	%\clearpage
+	%\appendix
+	%\phantomsection\addcontentsline{toc}{part}{\texorpdfstring{\bfseries\uppercase{Appendices}}{Appendices}}
+	%\thispagestyle{empty} %no page number
+	%\vspace*{\stretch{1}}
+    %\begin{center}
+    %	{\Huge\bfseries APPENDICES}
+    %\end{center}
+	%\vspace*{\stretch{2}}
+	
+    %Appendices
+    \include{chapters/appendices}
+	%\appendix
+    
+
+\end{document}

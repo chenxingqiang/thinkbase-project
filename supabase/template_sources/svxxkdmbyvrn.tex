@@ -1,0 +1,243 @@
+%%% PREAMBLE
+
+\documentclass[11pt,titlepage,oneside]{book}
+\usepackage[lmargin=1in,rmargin=1in,tmargin=1in,bmargin=1in]{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+\geometry{a4paper}
+
+%%%%%% FOR TESTING ONLY %%%%%%%%%%%%%
+\usepackage[english]{babel}
+\usepackage{blindtext}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%
+
+\usepackage{graphicx} % enhanced grpahics support
+\renewcommand{\sfdefault}{cmbr} % slightly nicer than the standard sans serif font
+\usepackage[onehalfspacing]{setspace} % line spacing
+\usepackage[T1]{fontenc} % font encoding (fixes some font-related errors)
+\usepackage{textcomp} % more font encoding
+\usepackage[printonlyused]{acronym} % To handle acronyms
+\usepackage{appendix} % For managing appendices (makes ToC neater)
+
+%%%%%%%%%%%%%%%%% DOCUMENT PROPERTIES %%%%%%%%%%%%%%%%%
+
+% Thesis details
+\newcommand{\LongTitle}{My Technical Project}
+\newcommand{\Me}{Joe Bloggs, Jr.}
+
+% Number of document levels
+\setcounter{secnumdepth}{4}
+
+% Prevent hyphenation
+\hyphenpenalty=5000
+\tolerance=1000
+
+%%%%%%%%%%%%%%%%% ACRONYMS AND SYMBOLS %%%%%%%%%%%%%%%%%
+
+\newcommand{\RT}{RT\ensuremath{_{\text{60}}}}
+\newcommand{\DEG}{\ensuremath{^\circ}}
+
+%%%%%%%%%%%%%%%%% DATE %%%%%%%%%%%%%%%%%
+
+% For placing on title page
+\usepackage{datetime}
+\newdateformat{MyMonth}{\monthname[\THEMONTH]}
+\newdateformat{MyYear}{\THEYEAR}
+\newdateformat{MyDate}{\THEYEAR}
+
+%%%%%%%%%%%%%%%%% CAPTIONS %%%%%%%%%%%%%%%%%
+
+\usepackage[margin=2em,singlelinecheck=on,font=sf,labelfont+=bf,labelformat=simple,labelsep=colon]{caption}
+
+\newcommand{\captionfontsize}{\fontsize{9}{11}\selectfont}
+\renewcommand\captionfont{\captionfontsize\sffamily}
+
+%%%%%%%%%%%%%%%%% TITLES %%%%%%%%%%%%%%%%%
+
+\usepackage[sf,raggedright,toctitles]{titlesec}
+
+% Chapter heading properties
+\titlespacing{name=\chapter}{0ex}{0ex}{.5in}[0ex]
+\titlespacing{name=\chapter,numberless}{0ex}{0ex}{.5in}[0ex]
+
+% Subsubsection heading properties
+\titleformat{name=\subsubsection,numberless}[hang]{\sf}{}{0pt}{\bfseries}
+\titlespacing{name=\subsubsection,numberless}{0em}{2ex}{0ex}
+
+%%%%%%%%%%%%%%%%% TOC / LOF / LOT / LOE %%%%%%%%%%%%%%%%%
+
+\usepackage[titles]{tocloft}
+
+\setcounter{lofdepth}{1}
+
+% put "Chapter #: " in ToC
+\renewcommand{\cftchappresnum}{\chaptername~}
+\renewcommand{\cftchapaftersnum}{:}
+\newlength{\mylen} % a "scratch" length
+\settowidth{\mylen}{\bfseries\chaptername\cftchapaftersnum} % extra space
+\addtolength{\cftchapnumwidth}{\mylen} % add the extra space
+
+% control indention
+\setlength{\cftchapindent}{0em}
+\setlength{\cftfigindent}{0em}
+\setlength{\cfttabindent}{0em}
+
+\newlength{\tocloftindent}
+\setlength{\tocloftindent}{2.3em}
+
+\setlength{\cftsecindent}{1.5em}
+
+
+\setlength{\cftsubsecindent}{3.8em}
+
+%%%%%%%%%%%%%%%%% TABLES %%%%%%%%%%%%%%%%%
+
+\usepackage{array,color,colortbl,multirow,longtable}
+
+\newcommand{\colheading}[1]{\multirow{2}{*}{\textbf{#1}}} % custom column heading command
+\newcommand{\tablesubtitle}[2]{\multicolumn{#1}{l}{\emph{#2}}} % custom table sub heading to span the specified number of columns
+\renewcommand\arraystretch{1.2} % row height
+
+%%%%%%%%%%%%%%%%% MATHS %%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath,amsbsy,amssymb}
+
+\allowdisplaybreaks
+
+% define new symbols and operators
+\newcommand{\R}{\mathfrak{R}} % Real operator
+\newcommand{\Z}{\mathbb{Z}} % set of integers
+\newcommand{\N}{\mathbb{N}} % set of natural numbers
+\newcommand{\F}{\mathcal{F}} % Fourier operator
+\newcommand{\ud}{\,\text{d}} % d in differential
+\newcommand{\fs}{f\negthinspace{}s} % sampling frequency
+\DeclareMathOperator*{\argmax}{arg\,max} % arg min
+\DeclareMathOperator*{\argmin}{arg\,min} % arg max
+\providecommand{\abs}[1]{\lvert#1\rvert} % abs brackets
+
+%%%%%%%%%%%%%%%%% CITATIONS %%%%%%%%%%%%%%%%%
+
+\usepackage[round]{natbib}
+
+\setcitestyle{aysep={ },notesep={: },citesep={;},yysep={,}}
+
+\setlength{\bibhang}{0pt}
+
+\newcommand{\citepos}[1]{\citeauthor{#1}'s \citeyearpar{#1}}
+\newcommand{\citequote}[1]{\newline \strut\hfill \citep{#1}}
+\newcommand{\cpage}[1]{p.~#1}
+\newcommand{\cpages}[2]{pp.~#1--#2}
+\renewcommand\bibname{References}
+
+%%%%%%%%%%%%%%%%% HEADER/FOOTER %%%%%%%%%%%%%%%%%
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+
+\newcommand{\myfooter}{\textsf{\thepage}}
+
+\fancypagestyle{plain}{%
+\fancyhf{}%
+\fancyfoot[R]{\myfooter}%
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{1pt}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}%
+\renewcommand{\headrulewidth}{1pt} %header line width
+\renewcommand{\footrulewidth}{1pt} % footer rule width
+\fancyhead[R]{\textsf{\nouppercase{\leftmark}}} % header right - chapter title
+\fancyfoot[R]{\myfooter} % footer right - page number
+
+%%%%%%%%%%%%%%%%% HYPERREF %%%%%%%%%%%%%%%%%
+
+% this should hopefully be the last entry in the preamble - defines properties of the typeset pdf file
+% this package makes clickable links in the pdf
+\usepackage[colorlinks,pdftex,breaklinks,pdfdisplaydoctitle,plainpages=false]{hyperref} 
+\hypersetup{pdftitle={\LongTitle},pdfauthor={\Me},
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+}
+
+\renewcommand{\equationautorefname}{Equation}
+\renewcommand{\figureautorefname}{Figure}
+\renewcommand{\Itemautorefname}{Item}
+\renewcommand{\tableautorefname}{Table}
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Section}
+\renewcommand{\subsubsectionautorefname}{Section}
+\renewcommand{\chapterautorefname}{Chapter}
+\renewcommand{\partautorefname}{Part}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% DOCUMENT %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\pdfbookmark[0]{Title page}{title} % Sets a PDF bookmark for the title page
+\setlength{\parindent}{0pt} % set paragraph indent
+\setlength{\parskip}{0ex} % set paragraph spacing
+\pagenumbering{alph} % prevents warnings about duplicated page numbering
+% \renewcommand{\@pnumwidth}{1.9em} % was 1.55em
+% \renewcommand{\@tocrmarg}{2.9em plus1fil} % raggedright toc entries (no hyphenation)
+
+\include{FrontMatter/FrontMatter}
+
+%%%%%%%%%%%%%%%%% MAIN %%%%%%%%%%%%%%%%%
+\mainmatter
+
+% change header
+\renewcommand{\chaptermark}[1]{\markboth{\chaptertitlename\ \thechapter: #1}{}}
+
+\pagenumbering{arabic}
+\setlength\abovedisplayshortskip{0.5\baselineskip}
+\setlength\belowdisplayshortskip{0.5\baselineskip}
+\setlength\abovedisplayskip{0.5\baselineskip}
+\setlength\belowdisplayskip{0.5\baselineskip}
+
+%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%
+% For example
+
+%\include{Introduction}
+
+% The argument for \include is a filename of a LaTeX file contained within the same folder at this file. It could also be placed in a subfolder; the argument can then be specified as {subfolder_name/filename}.
+
+% The \include'd file contains LaTeX commands that will, more or less, be read as if the code was contained in this file at the point the \include was called.
+
+% There is an equivalent command, \includeonly, which you should place at the top of your document. Use this command to choose the files to include (rather than commenting lines). In this way, the document will be typeset as if the files were present (so links and cross-references won't be broken), but any output associated with the files will be excluded.
+
+% Another tip: If using TeXShop, which uses synctex, you can command click on the preview to find the corresponding commands in your source. The reverse operation is also permitted. To do this from \include'd files, you need to tell TeXShop what the root file is. This is done by placing this line AT THE TOP of each \include'd file (you must include the "%"):
+% !TEX root = root_filename.tex
+% Doing this has other advantages, like being able to typeset from an included file, rather than having to typeset from the root file.
+
+% Chapter 1
+\include{Chapter1/Chapter1}
+
+% Chapter 2
+\include{Chapter2/Chapter2}
+
+%% Appendices
+%% appendices work in an identical way to chapters (in terms of syntax), but are labelled alphabetically rather than numerically
+\appendix
+% Replace "Chapter" with "Appendix"
+\addtocontents{toc}{\protect\renewcommand{\protect\cftchappresnum}{\appendixname~}}
+\addtocontents{toc}{\protect\addtolength{\cftchapnumwidth}{1em}}
+%\input{Appendix1}
+%\input{Appendix2}
+
+% Last I checked, the Appendix and Titlesec package do not get on with each other. So use "input" for appendix chapters instead. If you still want to use \includeonly, put the \input commands in another file and \include that.
+
+%%%%%%%%%%%%%%%%% BACK MATTER %%%%%%%%%%%%%%%%%
+\backmatter
+
+% header
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+\include{BackMatter/BackMatter}
+
+\end{document}

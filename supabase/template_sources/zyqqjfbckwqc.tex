@@ -1,0 +1,251 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[left=2cm,top=1.8cm,bottom=1.5cm,right=2cm,headsep=.45cm,footskip=.8cm]{geometry} % set the margins
+
+\usepackage{leading}
+\leading{12.65pt} % To get equivalent of word's single spaced text. The default leading in word is I think 1.15 x 11pt = 12.65pt. 
+
+
+
+\usepackage{xcolor}
+\usepackage{versions}
+
+\newenvironment{b1}{\begin{color}{violet}}{\end{color}}
+\newenvironment{b2}{\begin{color}{blue}}{\end{color}}
+
+%%%% For b1 uncomment below %%%%%
+%
+%\includeversion{b1}\excludeversion{b2}
+%
+%%% End b1 %%%%%%%
+
+%%%%% For b2 uncomment below %%%%%
+%
+%\includeversion{b2}\excludeversion{b1}
+%
+%%%% End b2 %%%%%%%
+
+
+\usepackage{fancyhdr}
+\fancyhf{} 
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancyhead[R]{ACRONYM} %%%% EDIT ME
+\fancyhead[L]{\emph{Last-Name}} %%%%% EDIT ME
+
+\fancyfoot[C]{\thepage}
+\fancyhead[C]{Part \protect\processifversion{b1}{B1}\protect\processifversion{b2}{B2}}
+
+
+
+\RequirePackage[compact]{titlesec} 
+%% Using latex `part` for the `section' given by the ERC template like `Section a: State of the art and objectives'
+\titleformat{\part}
+{\Large\bfseries}{}{0pt}{}
+\titlespacing*{\part}{0pt}{*1}{*.8}
+\makeatletter\@addtoreset{section}{part}\makeatother %% resets section numbering eg between `Section a: State of the art and objectives' and `Section b: Methodology'.
+
+
+\usepackage[linewidth=1pt]{mdframed} % for abstract in B1
+
+\usepackage{enumitem}
+
+\usepackage{tabularx} % for Funding ID
+\usepackage{colortbl}% for Funding ID
+
+
+\usepackage{hyperref}
+
+%For CV:
+\newcommand{\cventry}[3][2.5cm]{%
+	\par\noindent
+	\begin{minipage}[t]{#1} % Date column
+		\raggedright #2
+	\end{minipage}%
+	\hspace{0.1cm} % Space between the date and the details
+	\begin{minipage}[t]{\linewidth-#1-0.99cm} % Details column
+		#3
+	\end{minipage}
+	\par\vspace{1.65pt} % Vertical space adjusted by baseline - fontsize (not quite sure why this is needed)
+}
+
+
+
+\begin{document}
+
+
+\begin{center}
+	\bfseries\Large
+	ERC Starting Grant 2025\par
+	\begin{b1}
+		Research proposal [Part B1]
+	\end{b1}
+	\begin{b2}
+		Part B2
+	\end{b2}
+\end{center}
+
+
+\begin{b1}
+	\begin{center}
+		\normalfont\huge
+		\vspace{.5cm}My Amazing Project\par %%%% EDIT ME
+		\vspace{.2cm}ACRONYM\par %%%% EDIT ME
+	\end{center}
+ 
+        \bigskip 
+        \noindent\textbf{Cover Page}:
+		\begin{itemize}[nosep,label={-}]
+			\item Name of the Principal Investigator (PI)
+            \item Name of the PI’s Host Institution for the project
+            \item Proposal duration in months
+		\end{itemize}
+		\bigskip 
+\end{b1}
+
+
+
+
+\begin{b1}
+	\begin{mdframed}
+		
+		Abstract
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam congue pellentesque malesuada. Nullam velit mauris, lacinia et vulputate sed, hendrerit at risus. Phasellus id tortor lacus. Cras placerat justo in sem tincidunt, at convallis ante imperdiet. Sed in vulputate sem, eget maximus risus. Suspendisse porta vel turpis ut feugiat. Donec viverra consequat velit id pellentesque. Mauris sit amet leo in mi consectetur sodales. Integer tristique bibendum odio vitae eleifend. Vivamus ut magna vitae erat mollis posuere. Nam feugiat volutpat ex, vel posuere massa mollis in. Quisque eget magna eu urna sodales ultrices.
+
+	\end{mdframed}
+	\begin{mdframed}
+
+		cross-panel nature stuff
+
+	\end{mdframed}
+	\newpage
+\end{b1}
+
+
+
+\begin{b2}
+	\part{Section a: State of the art and objectives}
+\end{b2}
+\begin{b1}
+	\part{Section a: Extended Synopsis of the scientific proposal}
+\end{b1}
+
+
+\section*{About this package}
+
+This is an unofficial template for ERC projects. You must check yourself that the results follow the ERC guidance!
+
+
+
+\subsection*{Using versions}
+
+This makes use of the `versions' package. \url{https://ctan.org/pkg/versions?lang=en}
+
+There is some code in the preamble which can be uncommented to compile the B1 or B2 versions. 
+For B1 you should add/uncomment \verb*|\includeversion{b1}\excludeversion{b2}| and for B2 you should add/uncomment \verb*|\includeversion{b2}\excludeversion{b1}|
+
+
+\begin{b1}
+I'm in B1 only.
+
+More B1
+\end{b1}
+
+\begin{b2}
+I'm in B2.
+\end{b2}
+
+I'm in both. 
+
+
+
+\section*{Script to generate the versions}
+
+There is a bash script in the folder which can be run in the terminal to generate the B1 and B2 versions automatically, \verb|generate_erc_versions.sh|. Should work automatically on mac and linux. This should be run on your computer not on overleaf, so requires the documents to be on your computer. Either download the template and work on them locally or use, for example, the sync features of overleaf. 
+
+
+\begin{b2}
+\part{Section b: Methodology}
+
+
+\end{b2}
+
+Here's a reference: \cite{texbook}
+\begin{b1}
+	More stuff for b1
+\end{b1}
+
+
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{mybib.bib}
+\newpage
+
+\begin{b1}
+	
+\newpage
+\part{Section b: Curriculum vitae and Track Record}
+
+
+
+\section*{PERSONAL DETAILS}
+
+\subsection*{Education and Key Qualifications}
+	
+\cventry{xxxx-xxxx}{Blah}
+
+\noindent etc etc
+	
+\section*{RESEARCH ACHIEVEMENTS AND PEER RECOGNITION }
+	
+\cventry{xxxx}{Blah}
+\cventry{xxxx}{Blah}
+
+\bigskip \noindent Can optionally also change the width of the date column
+\cventry[1cm]{xxxx}{Blah}
+
+etc etc
+
+		
+\end{b1}
+
+
+\begin{b2}\newpage
+	\begin{center}
+		\Large \emph{
+			\textbf{Appendix: All current grants and on-going / submitted grant applications of the PI \\
+				(Funding ID)}
+		}
+	\end{center}
+	
+	
+	\subsection*{Current research grants}
+	\begin{tabularx}{\textwidth}{|X|X|X|X|m{2.5cm}|m{5cm}|}
+		\hline\rowcolor{gray!30}
+		\textbf{Project Title} & \textbf{Funding Source} & \textbf{Amount (Euros)} & \textbf{Period} & \textbf{Role of the PI} & \textbf{Relation to current ERC proposal} \\
+		\hline
+		None & & & & & \\\hline
+		 & & & & & \\\hline
+	\end{tabularx}
+	
+	\vspace{1cm}
+	
+	\subsection*{On-going / submitted grant applications}
+	\begin{tabularx}{\textwidth}{|X|X|X|X|m{2.5cm}|m{5cm}|}
+		\hline\rowcolor{gray!30}
+		\textbf{Project Title} & \textbf{Funding Source} & \textbf{Amount (Euros)} & \textbf{Period} & \textbf{Role of the PI} & \textbf{Relation to current ERC proposal} \\
+		\hline
+		None & & & & & \\\hline
+		 & & & & & \\\hline
+	\end{tabularx}
+\end{b2}
+
+
+
+
+
+\end{document}

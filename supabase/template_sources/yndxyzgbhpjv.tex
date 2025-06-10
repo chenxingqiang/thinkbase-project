@@ -1,0 +1,37 @@
+% This example demonstrates adding a custom TrueType font
+% to your Overleaf project. The custom font is Delphine, 
+% which was sourced from https://sjfonts.sourceforge.net
+
+\documentclass{article}
+\usepackage[T1]{fontenc} 
+\usepackage{iftex} % to access the \ifLuaTeX command
+
+% NOTE: the following test is required for reasons explained
+% in section 3 of The LuaTeX Reference Manual, available
+% from CTAN: http://mirrors.ctan.org/systems/doc/luatex/luatex.pdf
+
+\ifLuaTeX
+\protected\def\pdfmapline {\pdfextension mapline }
+\fi
+
+% Use \pdfmapline to update pdfteX's font map---telling it
+% about our custom font Delphine. The syntax used in \pdfmapline
+% is described in "The pdfTeX user manual" which is available on
+% CTAN: http://mirrors.ctan.org/systems/doc/pdftex/manual/pdftex-a.pdf
+
+\pdfmapline{+delphine < Delphine.ttf <T1-WGL4.enc}
+
+% Define a new command to use Delphine
+\newcommand\delphinefont[1]{{\usefont{T1}{delphine}{m}{n} #1 }}
+
+\title{Example: Using a Custom TrueType Font}
+\author{Overleaf}
+
+\begin{document}
+\maketitle
+
+Normal Font Text.
+
+\Huge\delphinefont{Custom Font Text! À Á Â Ä Å á â ã ä å è é ê ë È É Ê Ë Ò Ó Ô Õ Ö}
+
+\end{document}

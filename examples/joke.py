@@ -2,13 +2,13 @@ import random
 import numpy as np
 import os
 from typing import List, Union
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
-from agentflow.ell2a import ELL
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
+from agentflow.ell import ELL
 import time
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
 # Initialize ELL with API key
 api_key = os.getenv("OPENAI_API_KEY")
@@ -54,8 +54,8 @@ I mean, who designed this game? It's like a home renovation show where the revea
         }
     )
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -72,11 +72,11 @@ ell2a.configure({
 })
 
 # Initialize ELL instance with our process_message_fn
-ell2a.ell = ELL(
+ell.ell = ELL(
     messages=[],
     metadata={
         "model": "gpt-4",  # Changed to GPT-4
-        "config": ell2a.config
+        "config": ell.config
     },
     process_message_fn=process_joke_message
 )
@@ -84,7 +84,7 @@ ell2a.ell = ELL(
 def get_random_length():
     return int(np.random.beta(2, 5) * 300)
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def tell_joke(topic: str) -> List[Message]:
     """Generate a standup comedy routine about a given topic."""
     length = get_random_length()
@@ -111,7 +111,7 @@ and deliver strong punchlines that tie everything together.""",
     )
     
     # Process system message first
-    await ell2a.process_message(system_msg)
+    await ell.process_message(system_msg)
     
     # Then process user message
     return [system_msg, user_msg]
@@ -123,7 +123,7 @@ async def main():
     
     # Process the messages
     print("\nJoke:")
-    response = await ell2a.process_message(messages[-1])  # Process the last message
+    response = await ell.process_message(messages[-1])  # Process the last message
     print(response.content if response else "Failed to generate joke")
     print()
 

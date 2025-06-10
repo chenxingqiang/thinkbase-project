@@ -1,0 +1,215 @@
+%-----------------------Homework------------------------------------
+%-------------------Arman Shokrollahi---------------------------------
+%---------------------Coding Theory-------------------------------
+
+\documentclass[a4 paper]{article}
+% Set target color model to RGB
+\usepackage[inner=1.5cm,outer=1.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage[rgb]{xcolor}
+\usepackage{verbatim}
+\usepackage{amsgen,amsmath,amstext,amsbsy,amsopn,tikz,amssymb,tkz-linknodes}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true, urlcolor=blue,  linkcolor=blue, citecolor=blue]{hyperref}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{rotating}
+%\usetikzlibrary{through,backgrounds}
+\hypersetup{%
+pdfauthor={Arman Shokrollahi},%
+pdftitle={Homework},%
+pdfkeywords={Tikz,latex,bootstrap,uncertaintes},%
+pdfcreator={PDFLaTeX},%
+pdfproducer={PDFLaTeX},%
+}
+%\usetikzlibrary{shadows}
+\usepackage[francais]{babel}
+\usepackage{booktabs}
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+
+      \newtheorem{thm}{Theorem}[section]
+      \newtheorem{prop}[thm]{Proposition}
+      \newtheorem{lem}[thm]{Lemma}
+      \newtheorem{cor}[thm]{Corollary}
+      \newtheorem{defn}[thm]{Definition}
+      \newtheorem{rem}[thm]{Remark}
+      \numberwithin{equation}{section}
+
+\newcommand{\homework}[6]{
+   \pagestyle{myheadings}
+   \thispagestyle{plain}
+   \newpage
+   \setcounter{page}{1}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { {\bf EE567:~Coding Theory \hfill} }
+       \vspace{6mm}
+       \hbox to 6.28in { {\Large \hfill #1 (#2)  \hfill} }
+       \vspace{6mm}
+       \hbox to 6.28in { {\it Instructor: #3 \hfill Student: #5} }
+       %\hbox to 6.28in { {\it TA: #4  \hfill #6}}
+      \vspace{2mm}}
+   }
+   \end{center}
+   \markboth{#5 -- #1}{#5 -- #1}
+   \vspace*{4mm}
+}
+
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbX}{\mathbb{X}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bepsilon}{\boldsymbol{\epsilon}}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\0}{\mathbf{0}}
+
+\begin{document}
+\homework{Homework \#1}{due 10/02/14 }{Arman Shokrollahi}{}{Student's name}{}
+
+{\begin{tikzpicture}[outline/.style={draw=#1,thick,fill=#1!50}]
+\node [outline=red] at (0,1) {\bf Problem 1};
+\end{tikzpicture}}
+
+\textit{Problem $1.1$ of Ryan/Lin} (We have changed the received word):
+
+A single error has been added (modulo $2$) to a transmitted $(7,4)$ Hamming codeword, resulting in the received word $r = (1100 \; 001)$.  Using the decoding algorithm described in the chapter, find the error.
+
+\vskip 1em
+
+{\fbox{\it Solution}}
+
+We want to solve this problem in two ways.
+
+\underline{First Way}:
+
+\begin{center}
+\begin{tikzpicture}[thin,fill opacity=0.7]
+\draw [draw=none, fill=red] (90:1.5) circle (2cm);
+\draw [draw=none, fill=green] (-30:1.5) circle (2cm);
+\draw [draw=none, fill=blue] (210:1.5) circle (2cm);
+\begin{scope}
+	\clip (90:1.5) circle(2cm);
+	\draw [draw=none, fill=yellow] (-30:1.5) circle (2cm);
+\end{scope} % blue + red = magenta
+\begin{scope}
+	\clip (210:1.5) circle(2cm);
+	\draw [draw=none, fill=magenta] (90:1.5) circle (2cm);
+\end{scope}
+\node at (4.1,0) {Circle 2};
+\node at (-4.1,0) {Circle 3};
+\begin{scope} % green + blue = cyan
+	\clip (-30:1.5) circle(2cm);
+	\draw [draw=none, fill=cyan] (210:1.5) circle (2cm);
+\end{scope}
+\node at (0,4.1) {Circle 1};
+\begin{scope}
+	\clip (90:1.5) circle(2cm);
+	\clip (210:1.5) circle(2cm);
+	\draw [draw=none, fill=white] (-30:1.5) circle (2cm);	
+\end{scope}
+\node at (1,.5) {$u_0$};
+\node at (0,0) {$u_2$};
+\node at (1.8,-1.1) {$p_1$};
+\node at (-1,.5) {$u_3$};
+\node at (0,-1.2) {$u_1$};
+\node at (0,2) {$p_0$};
+\node at (-2,-1.2) {$p_2$};
+\end{tikzpicture}
+\end{center}
+%
+We know that ${\mathbf v}=({\mathbf{u \; p}})=(u_0u_1u_2u_3 \; p_0p_1p_2)$ has been transmitted. We have
+$r = (1100 \; 001)=(r_0r_1r_2r_3 \; r_4r_5r_6)$ as the received word. We rearrange the above Venn diagram as follows
+%%
+\begin{center}
+\begin{tikzpicture}[thin,fill opacity=0.7]
+\draw [draw=none, fill=red] (90:1.5) circle (2cm);
+\draw [draw=none, fill=green] (-30:1.5) circle (2cm);
+\draw [draw=none, fill=blue] (210:1.5) circle (2cm);
+\begin{scope}
+	\clip (90:1.5) circle(2cm);
+	\draw [draw=none, fill=yellow] (-30:1.5) circle (2cm);
+\end{scope} % blue + red = magenta
+\begin{scope}
+	\clip (210:1.5) circle(2cm);
+	\draw [draw=none, fill=magenta] (90:1.5) circle (2cm);
+\end{scope}
+\node at (4.1,0) {Circle $2$};
+\node at (-4.1,0) {Circle $3$};
+\begin{scope} % green + blue = cyan
+	\clip (-30:1.5) circle(2cm);
+	\draw [draw=none, fill=cyan] (210:1.5) circle (2cm);
+\end{scope}
+\node at (0,4.1) {Circle $1$};
+\begin{scope}
+	\clip (90:1.5) circle(2cm);
+	\clip (210:1.5) circle(2cm);
+	\draw [draw=none, fill=white] (-30:1.5) circle (2cm);	
+\end{scope}
+\node at (1,.5) {$r_0=1$};
+\node at (0,0) {$r_2=0$};
+\node at (1.8,-1.1) {$r_5=0$};
+\node at (-1,.5) {$r_3=0$};
+\node at (0,-1.2) {$r_1=1$};
+\node at (0,2) {$r_4=0$};
+\node at (-2,-1.2) {$r_6=1$};
+\end{tikzpicture}
+\end{center}
+
+Clearly, Circles $2$ and $3$, in the figure above, have even numbers of $1$'s, but Circle $1$ does not. We conclude that the error cannot be in Circles $2$ and $3$, because their rules are satisfied. So it must be $r_4=0$ that is in error. Thus, $r_4$ must be $1$. Hence, the decoded codeword is
+\begin{equation}
+{\mathbf{\hat{v}}}=(1100 \; 101),
+\label{equ1.1}
+\end{equation}
+from which the decoded data ${\mathbf{\hat{u}}}=(1100)$ may be recovered. \\
+
+%%
+%%
+%
+\underline{Second Way}:
+
+We want to solve the problem by some techniques based on generator and parity-check matrices. The parity-check matrix $H$ is helpful in correcting single errors in transmission when
+\begin{enumerate}
+  \item[(i)] $H$ has no column of $0$'s,
+  \item[(ii)] no two columns of $H$ are the same.
+\end{enumerate}
+Consider the following matrix
+
+$$H=\left(
+\begin{array}{cccccccc}
+  1 & 0 & 1 & 1 & \vdots & 1 & 0 & 0 \\
+  1 & 1 & 0 & 1 & \vdots & 0 & 1 & 0 \\
+  0 & 1 & 1 & 1 & \vdots & 0 & 0 & 1
+\end{array}\right).$$
+
+ It is easy to check that $H$ satisfies these two conditions and that for the number of rows ($r=3$) in $H$, we have the maximum number of columns possible. If an additional column is added, $H$ will no longer be useful for correcting single errors.\\
+The generator matrix $G$ associated with $H$ is
+$$G=\left(
+  \begin{array}{cccccccc}
+    1 & 0 & 0 & 0 &\vdots & 1 & 1 & 0 \\
+    0 & 1 & 0 & 0 & \vdots& 0 & 1 & 1 \\
+    0 & 0 & 1 & 0 & \vdots& 1 & 0 & 1 \\
+    0 & 0 & 0 & 1 &\vdots & 1 & 1 & 1 \\
+  \end{array}\right).$$
+  Consequently we have a $(7,4)$ group code. The encoding function $E:\mathbb{Z}_2^4 \rightarrow \mathbb{Z}_2^7$ encodes four-bit messages into seven-bit code words. We realize that because $H$ is determined by three parity-check equations (that is, For all $w=w_1w_2w_3w_4\in\mathbb{Z}_2^4$, and $E(w)= wG = w_1w_2w_3w_4w_5w_6w_7 \in \mathbb{Z}_2^7$, now try to find $E(w)=wG$. We get some general equations which are called the {\textit{parity-check equations}}. For more details, see pages 97, 98 of Ryan/Lin), we have now maximized the number of bits we can have in the messages (of course, under our present coding scheme). In addition, the columns of $H$, read from top to bottom, are the binary equivalents of the integers from $1$ to $7$. In general, if we start with $r$ parity-check equations, then the parity-check matrix $H$ can have as many as $2^r-1$ columns and still be used to correct single errors. We denote the transposition of $B$ by $B^{tr}$. Under these circumstances $H=[B\ | \ I_r]$, where $B$ is an $r\times (2^r-1-r)$ matrix, and $G=[I_m\ | \ B^{tr}]$ with $m=2^r-1-r$. The parity-check matrix $H$ associated with a $(2^r-1, 2^r-1-r)$ group code. \\
+  We want to use some terminologies which can be found on pages 103, 104, and 105 of Ryan/Lin. We now have the matrix $H$ for a Hamming $(7,4)$ code. It is easy to check that the coset leader for the syndrome $(100)$ is $(0000 \; 100)$. Why we are talking about  $(100)$? because it is the syndrome corresponding to our received word $r=(1100 \; 001)$; note that
+  $$H \cdot r^{tr}=
+  \left(
+    \begin{array}{c}
+      1 \\
+      0 \\
+      0 \\
+    \end{array}
+  \right).$$
+  Finally, if we assume that $c$ is the transmitted word, then $c=(0000 \; 100)+(1100 \; 001)= (1100 \; 101)\stackrel{\text{\tiny\ref{equ1.1}}}{=} \bf\hat{v}$. \\
+
+
+%
+%
+%
+%
+%
+\end{document}
+%%------------ Arman Shokrollahi--------------%%

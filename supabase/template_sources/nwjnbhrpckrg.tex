@@ -1,0 +1,119 @@
+\documentclass[11pt]{memoireuqamV2ang}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OVERLEAF: Utiliser TexLive 2021 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \usepackage{natbib}  % optionnel, doit être chargé avant babel
+\usepackage[utf8]{inputenc} % Pour utiliser les caractères accentués
+\usepackage[T1]{fontenc}
+\usepackage{url}
+\usepackage[a-1b]{pdfx}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{layout}
+\makeatletter
+\renewcommand*{\lay@value}[2]{%
+  \strip@pt\dimexpr0.351459\dimexpr\csname#2\endcsname\relax\relax mm%
+}
+\makeatother
+
+% optionnel
+\usepackage{graphicx}% Pour les figures
+\usepackage{standalone}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18} 
+
+% police similaire à calibri, optionnelle (voir https://guidemt.uqam.ca/gabarit-et-mise-en-page/#ressource-697)
+\usepackage[sfdefault,lf]{carlito}
+
+%%%%
+% Visitez http://www.labmath.uqam.ca/presentation-de-la-classe-memoireuqamV2/ pour plus details
+%%%%
+
+%%%%%%%%%%%%
+% Acronymes et symboles
+%%%%%%%%%%%%
+\usepackage[toc,acronym]{glossaries}
+\defglsentryfmt[main]{\textbf{\glsgenentryfmt}}
+\newglossary[slg]{symbols}{syi}{syg}{Notation}
+\loadglsentries{glossaries/notation}
+\loadglsentries{glossaries/acronyms}
+\loadglsentries{glossaries/glossary}
+\makenoidxglossaries
+
+\begin{document}%\layout
+
+
+%%%% PAGE TITRE FRANÇAIS %%%%%
+% Le titre
+\title{Mon titre}
+% Votre nom complet tel qu'il apparaît à votre dossier du registrariat de l'UQAM
+\author{Mon nom}
+% Année et mois courant sauf si spécifié autrement par \degreemonth et \degreeyear
+\degreemonthfrancais{mois du dépôt}
+\degreeyear{année du dépôt}
+\uqammemoire %% ou \uqamthese ou \uqamrapport ou \uqamprop 
+\matiere{mathématiques}
+\thispagestyle{empty}        % La page titre n'est pas numérotée
+\maketitle
+%%%%%%%%%%%%%%%%%%
+
+%%%% PAGE TITRE ANGLAIS %%%%%
+
+\titleanglais{My thesis}
+\degreemonth{month of submission}
+\matiereanglais{mathematics}
+\maketitleanglais
+
+
+%%%%%%%%%%%%%%%%%%%%
+% Page préliminaires
+%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{roman} % numérotation des pages en chiffres romains
+\stepcounter{page} % sauter pages titre
+\stepcounter{page}
+
+\include{remerciements}
+\tableofcontents % Pour générer la table des matières
+\listoffigures% Pour générer la liste des figures
+\listoftables % Pour générer la liste des tableaux
+
+% Ici, on suppose une liste d'acronymes et une fiche de notation. Supprimez ces lignes si elles sont sans objet.
+\glsaddall[types={acronym}]
+\printnoidxglossary[type=acronym,toctitle=ACRONYMES,nonumberlist,sort=def]
+\glsaddall[types={symbols}]
+\printnoidxglossary[type=symbols,style=tree,nonumberlist,sort=def,toctitle=NOTATION]
+\glsresetall
+
+% Vous devez inclure un résumé en français ainsi que le résumé en français
+% Utilisez l'environnement resume pour rédiger le résumé en français et abstract pour rédiger le résumé en francais
+\include{gabarit_memoire_en/resume}
+\include{gabarit_memoire_en/abstract}
+
+%%%%%%%%%%%%%%%%%%%%
+% Document principal
+%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+
+% Utilisez l'environnement  introduction pour rédiger votre introduction
+\include{introduction}
+
+\include{chapter1}
+\include{chapter2}
+
+% Utilisez l'environnement  conclusion pour rédiger votre conclusion
+\include{conclusion}
+
+%%%%%%%%%%%%%%%%%%%%
+% Page liminaires
+%%%%%%%%%%%%%%%%%%%%
+\appendix % À partir de cette ligne toutes les commandes \chapter subséquentes seront des appendices
+\include{appendix}
+% index
+\printnoidxglossary[toctitle=INDEX,title=INDEX]
+
+\bibliographystyle{apalike-uqam}
+\bibliography{references}
+\end{document}

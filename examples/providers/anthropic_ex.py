@@ -6,8 +6,8 @@ This example demonstrates using Claude to:
 3. Analyze text
 """
 from typing import Union, List
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType, ContentBlock
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType, ContentBlock
 import anthropic
 import os
 

@@ -1,0 +1,476 @@
+  \documentclass[
+	12pt,				% tamanho da fonte			
+	a4paper,			% tamanho do papel. 
+	% -- opções do pacote babel --
+    openany,
+    oneside,
+	english,			% idioma adicional para hifenização
+	french,				% idioma adicional para hifenização
+	spanish,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+	]{abntex2}
+
+
+% ---
+% PACOTES
+% ---
+
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{uarial}				% usa a fonte Latin Modern lmodern
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{blindtext}
+
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage{pdfpages}
+
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+
+
+
+% ---
+\usepackage{verbatim}			% pacote para adicionar comentários em bloco
+% ---
+% Pacotes adicionais, usados no anexo do modelo de folha de identificação e cronograma
+% ---
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{pgfgantt}%pacote do gráfico de gantt
+\usepackage{hyperref}%pacote para adicionar links internos
+% ---
+	
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+\usepackage{listings}
+
+%\usepackage{cite}
+%\renewcommand\citeleft{(}
+%\renewcommand\citeright{)}
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{gestão participativa}{gênero feminino}{IFTO}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual
+
+% ---
+% Capa
+% ---
+\include{capa}
+% ---
+
+% ---
+% Folha de rosto e Aprovação
+% ---
+\include{folharosto}
+\include{folhaaprovacao}
+
+% ---
+% Agradecimentos
+% ---
+\begin{agradecimentos}
+Lorem Ipsum é simplesmente uma simulação de texto da indústria tipográfica e de impressos, e vem sendo utilizado desde o século XVI, quando um impressor desconhecido pegou uma bandeja de tipos e os embaralhou para fazer um livro de modelos de tipos. Lorem Ipsum sobreviveu não só a cinco séculos, como também ao salto para a editoração eletrônica, permanecendo essencialmente inalterado. Se popularizou na década de 60, quando a Letraset lançou decalques contendo passagens de Lorem Ipsum, e mais recentemente quando passou a ser integrado a softwares de editoração eletrônica como Aldus PageMaker.
+\end{agradecimentos}
+% ---
+
+% ---
+% Epígrafe
+% ---
+\begin{epigrafe}
+    \vspace*{\fill}
+	\begin{flushright}
+		\textit{``primeira linha \\
+		segunda linha \\
+        terceira linha''\\
+		(autor)}
+	\end{flushright}
+\end{epigrafe}
+% ---
+% RESUMO
+% ---
+% resumo na língua vernácula (obrigatório)
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. In placerat nulla augue, et bibendum libero rhoncus eget. Donec in elementum nisi, vel suscipit velit. Donec quis hendrerit ex. Proin cursus, tortor nec vehicula ultricies, justo tellus posuere risus, eu rhoncus nisi eros nec tellus. Aliquam condimentum gravida dignissim. Nam et pharetra justo. Aliquam nisi ante, molestie vel egestas nec, accumsan sollicitudin ipsum. Nam sit amet cursus ipsum, a posuere nunc. In eleifend et mauris nec convallis. Etiam suscipit sit amet erat ac lobortis. Maecenas cursus risus et massa accumsan, ut tempor leo mollis. Pellentesque commodo suscipit elit, eget lobortis dui feugiat vitae.  \noindent
+ \textbf{Palavras-chaves}: igualdade de gênero, desenvolvimento social, liderança.
+\end{resumo}
+
+% ---
+% ABSTRACT
+% ---
+
+% abstract em língua estrangeira (inglês)
+%\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}[ABSTRACT]
+ \begin{otherlanguage*}{english}
+Resumo em Inglês
+
+  \noindent
+  \textbf{Keywords}: Palavras chaves.
+ \end{otherlanguage*}
+\end{resumo}
+% ---
+
+\clearpage
+% ---
+% inserir lista de ilustrações
+% ---
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de tabelas
+% ---
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de abreviaturas e siglas
+% ---
+\begin{siglas}
+  \item[MEC] Ministério da Educação e Cultura
+  \item[IFTO] Instituto Federal de Ciência e Tecnologia do Tocantins.
+  \item[ETF] Escola Técnica Federal Federal de Palmaas.
+  \item[EAFA] Escola Agrotécnica Federal de Araguatins.
+  \item[PRONATEC] Programa Nacional de Acesso ao Ensino e Emprego.
+  \item[TCLE] Termo de Consentimento Livre Esclarecimento.
+  \item[CNS] Conselho Nacional de Saúde
+  \item[TCC] Trabalho de Conclusão de Curso.
+\end{siglas}
+% ---
+
+
+% ---
+% inserir o sumario
+% ---
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+% ----------------------------------------------------------
+% Introdução (exemplo de capítulo sem numeração, mas presente no Sumário)
+% ----------------------------------------------------------
+\chapter{INTRODUÇÃO}
+
+Para \citeonline[p. 145]{rouleau:01}, lorem ipsum dolor sit amet, consectetur adipiscing elit. In placerat nulla augue, et bibendum libero rhoncus eget. Donec in elementum nisi, vel suscipit velit. Donec quis hendrerit ex. Proin cursus, tortor nec vehicula ultricies, justo tellus posuere risus, eu rhoncus nisi eros nec tellus. Aliquam condimentum gravida dignissim. Nam et pharetra justo. Aliquam nisi ante, molestie vel egestas nec, accumsan sollicitudin ipsum. Nam sit amet cursus ipsum, a posuere nunc. In eleifend et mauris nec convallis. Etiam suscipit sit amet erat ac lobortis. Maecenas cursus risus et massa accumsan, ut tempor leo mollis. Pellentesque commodo suscipit elit, eget lobortis dui feugiat vitae.
+
+In mollis facilisis lobortis. Vestibulum rhoncus, libero sed porttitor lobortis, quam ipsum semper velit, sed semper justo purus non nibh. Nullam quis aliquet odio, ac ultrices nibh. Aliquam erat volutpat. Nunc non velit lobortis, tempor tortor vitae, euismod quam. Maecenas hendrerit in sem consectetur egestas. Sed efficitur metus et tristique cursus. Nulla neque elit, bibendum sit amet rhoncus vitae, malesuada quis lectus. Mauris lobortis tortor quis ante convallis, quis imperdiet mauris vestibulum. Morbi blandit arcu in mi elementum convallis. Nulla congue erat nibh, pharetra aliquet dui fermentum ut.
+
+Cras in dapibus enim. Vivamus facilisis, erat ut ullamcorper aliquet, sapien nibh sodales sem, et rutrum tortor odio at velit. Nunc dapibus porta metus, id molestie erat hendrerit id. Quisque dolor ex, suscipit in nibh at, condimentum varius quam. Maecenas vitae ante sed lectus sagittis suscipit. Nunc eu odio varius, maximus metus at, ultricies justo. Morbi a mollis mauris, in elementum est. 
+
+\section{Problema}
+
+Maecenas ipsum nunc, dapibus quis lorem at, consequat sodales nisl. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras dignissim nisi at arcu elementum, ut finibus ante luctus. Phasellus egestas mi felis, vel vestibulum justo tincidunt eu. Donec tempor, justo nec sodales ultrices, nulla eros bibendum tortor, quis faucibus nisl lacus et lorem. Aliquam tincidunt dui eu semper tristique. Donec ac erat urna. Integer auctor turpis iaculis nibh feugiat lacinia.
+
+\section{Hipóteses}
+
+Nulla aliquam lacus quis nibh accumsan blandit. Integer rutrum dignissim libero in tincidunt. Quisque pharetra, est eget cursus dapibus, ante orci hendrerit velit, vel rhoncus purus enim non ante. Vivamus molestie aliquam elit, eu fermentum turpis. Nullam gravida diam quam, in volutpat leo fringilla vel. Nam tincidunt erat in turpis rhoncus posuere. Vivamus porta urna nec velit accumsan, sit amet sodales libero euismod. Morbi quis ipsum vitae ipsum sollicitudin tincidunt. In luctus felis nec urna volutpat porttitor. Sed nec quam quam. Duis ultrices tincidunt semper. Etiam at ullamcorper dolor.
+
+\section{Objetivos}
+
+\subsection{Objetivo Geral}
+
+Etiam nec laoreet augue. Mauris dictum neque non leo semper, non mollis augue condimentum. Sed scelerisque nisl ac pretium aliquet. Nunc euismod, odio non mollis auctor, lorem urna malesuada eros, at ultricies quam sapien eu neque. Quisque pellentesque nec eros ac tristique. Fusce at leo eu leo iaculis tincidunt ut facilisis eros. Aenean sit amet laoreet felis. Aenean at eleifend nulla, nec hendrerit nulla. Sed turpis ante, sagittis vel tristique a, posuere sed velit. Ut eget orci vel est egestas sagittis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aenean feugiat facilisis nisl, et viverra lorem suscipit vitae. In consequat euismod risus, interdum ultrices purus malesuada vel. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse semper bibendum lorem, eu accumsan est pharetra vestibulum. Cras tincidunt sapien ac purus laoreet vehicula.
+
+\subsection{Objetivos Específicos}
+
+\begin{itemize}
+	\item 1o objetivo específico;
+	\item 2o objetivo específico;
+	\item 3o objetivo específico.
+\end{itemize}
+
+\section{Justificativa}
+
+ Quisque iaculis justo eget ligula accumsan egestas. Pellentesque convallis mauris a eros facilisis faucibus nec a arcu. Etiam rutrum, mi eget mollis blandit, urna eros mollis mi, a dictum eros urna in mauris. Fusce vel suscipit turpis. Maecenas ultrices nisl diam, ornare molestie dui hendrerit vel. Donec et scelerisque leo. Aliquam ut leo malesuada, commodo enim ac, molestie purus. Morbi cursus risus dolor, vel sodales ipsum sagittis et. Nam mollis vel nunc nec euismod. Praesent venenatis varius massa, at interdum libero varius sed.
+
+Vestibulum lacinia tincidunt elit ut lacinia. Quisque dui ex, suscipit varius quam ut, dignissim elementum augue. Integer sit amet pulvinar sapien, ut auctor urna. Phasellus accumsan varius justo, eget eleifend mauris mattis vitae. In ultricies gravida imperdiet. Praesent ultricies nisi at massa posuere fringilla. Praesent ac ipsum congue, interdum felis ac, mattis sapien. Quisque hendrerit auctor vehicula. Quisque non efficitur orci. Donec pretium magna mi, sed dapibus nulla dignissim ac. Nunc commodo felis ex.
+
+Sed tempor odio nec tortor auctor convallis eget id purus. Cras vulputate massa neque, vitae posuere urna rhoncus ut. Ut ornare malesuada rhoncus. Pellentesque risus ligula, luctus tincidunt ultrices ut, consectetur nec orci. Nam sagittis luctus nunc, et interdum nulla. In quis purus id sem egestas venenatis. Aliquam mattis pulvinar est sit amet convallis. Sed a tempor dui. Fusce in lorem ut enim maximus tristique quis feugiat ipsum. Curabitur a risus ultricies, venenatis arcu non, maximus nibh. Quisque sollicitudin tortor eu volutpat dapibus. 
+
+\chapter{REFERENCIAL TEÓRICO}
+
+\section{Lipsum}
+
+ Vestibulum massa nunc, tristique in mollis eget, sagittis eu felis. Nunc et augue consectetur, hendrerit magna et, accumsan justo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue aliquet tellus sed dapibus. Integer aliquet quam at sapien hendrerit porta. Vestibulum pulvinar iaculis erat et hendrerit. Pellentesque eu luctus mi. In lobortis imperdiet facilisis. Aenean vulputate purus accumsan, euismod velit vel, eleifend massa. In a ligula ac leo tristique consequat ut id nisl. Fusce tempor nisi arcu, eu ultricies lorem mattis eu. Proin facilisis enim neque, a semper dui ultrices vel. A partir do Lipsum temos:
+
+\begin{citacao}
+\par Donec id pharetra augue, sed faucibus tortor. Sed dapibus sagittis leo, et finibus diam bibendum ac. Quisque vulputate vel ante quis faucibus. Morbi et vestibulum nulla. Fusce non justo elementum, maximus mi id, finibus mauris. Phasellus dapibus nec quam ut maximus. Nunc eget rhoncus neque. Suspendisse non dolor dui. Curabitur ac nulla nec nunc consectetur molestie a vel diam. Suspendisse lobortis venenatis dapibus. Suspendisse in lacus orci. Nam elementum neque at aliquam tempus. Pellentesque ac eleifend leo, vel porttitor diam. Fusce vitae ex vitae eros condimentum suscipit non sit amet quam.
+\end{citacao}
+
+Nam a vestibulum eros. Nam vehicula erat in neque condimentum finibus. Nulla rutrum risus purus, condimentum cursus elit placerat sit amet. Nulla tincidunt lacinia sem, laoreet facilisis lectus suscipit in. Quisque turpis ex, tempus imperdiet orci ut, tincidunt rhoncus tortor. Nunc id iaculis justo. Etiam suscipit elit turpis. Vivamus gravida imperdiet nunc ac vehicula. Nullam dictum ex ultrices, pulvinar augue eget, laoreet tortor. Aliquam auctor leo scelerisque augue dignissim, sit amet viverra urna cursus. Proin venenatis ut enim ac finibus. Aenean eu enim non turpis dignissim fringilla. Vestibulum sodales semper tristique. Interdum et malesuada fames ac ante ipsum primis in faucibus. 
+O conceito de gênero foi elaborado e sofreu várias transformações, para compreender melhor o assunto, \cite{beauvoir:15} traduz que:
+
+Em Lipsum:
+
+\begin{citacao}
+\par Aenean non pharetra mi. Curabitur vel elementum elit. Maecenas dapibus eros ut viverra scelerisque. Praesent consectetur neque non quam facilisis sodales. Vestibulum purus lectus, dignissim a tempor a, aliquam nec metus. Fusce est nisl, mattis vitae odio non, tincidunt rutrum ante. Cras lobortis elit nisl, in viverra turpis suscipit in.
+\end{citacao}
+
+\section{Lorem}
+
+ Maecenas dignissim orci non metus vehicula, in eleifend libero porta. Integer libero felis, tincidunt sit amet sem mollis, aliquet molestie tortor. Nulla suscipit, sem at feugiat congue, neque metus viverra sem, vel porta nibh nibh eu sapien. Nulla commodo dolor eros, vel dapibus justo dignissim at. Ut felis turpis, vulputate nec varius quis, efficitur id odio. Donec ac enim vel velit semper dignissim a at felis. Duis eu interdum eros, vel mollis velit. Sed ipsum magna, lacinia et elementum nec, volutpat at nisi. Cras volutpat vestibulum ex, sed pharetra tortor condimentum ut. Mauris suscipit cursus quam lobortis ultricies.
+
+Maecenas elit mauris, mollis in molestie id, egestas sed dolor. Donec dolor mi, elementum sed volutpat a, ultrices id est. Aliquam dictum, augue sit amet auctor elementum, sem nisl rutrum eros, feugiat laoreet nisi ex at ligula. Vivamus efficitur bibendum consectetur. Donec egestas neque sed ligula cursus, gravida eleifend neque euismod. Morbi commodo efficitur sapien efficitur finibus. In tristique condimentum metus eu cursus:
+
+\begin{citacao}
+\par In hac habitasse platea dictumst. Nulla et justo suscipit, auctor sem ut, viverra felis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Cras quis varius augue. Praesent blandit interdum ullamcorper. Vivamus maximus quam eget lorem rutrum posuere. Aenean a mollis tortor, non scelerisque neque. Duis sit amet scelerisque dui. Quisque convallis eros eu magna egestas ornare. Suspendisse ut erat tortor. Nulla facilisi. Duis ante libero, dignissim at nunc vel, mollis scelerisque neque. Aliquam luctus porttitor ipsum, quis malesuada quam imperdiet sed.
+\end{citacao}
+
+\section{Links externos}
+
+Aliquam consectetur sem lacus, vel aliquam turpis maximus quis. Fusce hendrerit nec mi vitae luctus. Suspendisse accumsan, leo sed dapibus accumsan, urna ante mattis libero, non dapibus magna nisl vel felis. Duis viverra velit eu urna ullamcorper pharetra. Proin vitae bibendum elit. Praesent mattis, nulla eu sagittis ullamcorper, eros ipsum convallis odio, at vulputate odio tellus at dui. Ut bibendum in nulla vitae rutrum. Nam consequat hendrerit aliquam. Sed id mi consequat tortor rhoncus venenatis. Curabitur eget tellus quis ante congue fermentum eget ut tellus. Duis vestibulum purus venenatis felis sodales, vitae elementum nisi sagittis. Phasellus congue dolor non orci malesuada laoreet. Praesent ac accumsan est. Quisque dapibus ligula tortor, ac feugiat arcu aliquet non. Nulla fermentum volutpat est sed rutrum. Nunc eu ultricies tellus. Exemplo de link externo: \href{http://www.planalto.gov.br/ccivil_03/LEIS/L9029.HTM}{Lei n.\textsuperscript{\d o} 9.029, de 13 de abril de 1995}.
+
+\chapter{METODOLOGIA}
+
+Morbi at libero vel nulla mattis bibendum. Etiam elementum euismod nunc, id pellentesque tortor malesuada vel. Suspendisse id lorem velit. Vivamus ut fermentum leo. Nulla facilisi. Sed convallis non augue quis rutrum. Nulla pretium ultricies lacus, ut ullamcorper tortor suscipit id. Vestibulum lacinia, nulla eget lacinia gravida, mi urna dapibus ex, ac consectetur justo odio a augue. Sed id purus egestas, gravida ex non, viverra justo. Vestibulum eleifend ipsum sit amet ultricies accumsan. Pellentesque placerat nec ligula ut rutrum. Nulla accumsan, libero at fermentum aliquet, enim orci scelerisque nunc, scelerisque venenatis lectus ante a nunc.
+
+Ut ullamcorper vel nibh at volutpat. Vivamus vitae placerat turpis. Duis mauris leo, maximus malesuada tellus ac, tempor suscipit ligula. Duis quis tristique nisl, id congue mi. Quisque suscipit justo in libero blandit lobortis. Curabitur erat odio, pharetra a augue ut, lobortis facilisis sapien. In tristique nisi sit amet varius pellentesque. Donec facilisis lorem massa, sed congue augue imperdiet sit amet. Vivamus at dui et nulla rutrum vestibulum. Maecenas tincidunt leo at neque consequat blandit. Etiam congue hendrerit tortor, ut egestas libero porta eu. Curabitur gravida et massa at faucibus. Morbi placerat ipsum urna, eu accumsan elit dapibus id. Vestibulum porttitor lectus egestas felis tincidunt mattis.
+
+Pellentesque in sapien nec lacus ultricies egestas. Vestibulum cursus elit elit, nec elementum ligula molestie a. Suspendisse condimentum ullamcorper consequat. Praesent porta risus quis auctor feugiat. Fusce consectetur ac metus sodales fringilla. Maecenas dictum consectetur odio, vitae ultrices nulla placerat eget. Vestibulum sed nulla orci. Mauris sed lorem neque. Vestibulum et eros at lacus convallis lobortis. Vestibulum a elit maximus, interdum est ac, lobortis mauris. Duis mattis viverra auctor.
+
+Vestibulum feugiat tristique orci, non eleifend lectus pretium vehicula. Nulla urna magna, feugiat quis metus non, aliquam bibendum nunc. Quisque at velit neque. Vivamus pulvinar quam a justo semper, quis porta mi dictum. Phasellus tempus, tellus eleifend laoreet ultrices, libero nisl tincidunt lectus, id imperdiet arcu nisi eu purus. In malesuada dui diam, nec ornare elit sollicitudin at. Pellentesque scelerisque blandit tempus. In finibus consectetur justo quis malesuada. Integer nisl dui, suscipit eget lacinia ac, ullamcorper quis est.
+
+Proin vitae mauris felis. Nulla facilisi. Phasellus lorem augue, elementum eu sodales ac, finibus at nibh. Aenean eu aliquet dolor. In porta semper rutrum. Duis suscipit aliquam nulla vitae iaculis. Nullam non neque imperdiet, vestibulum justo sed, semper magna.
+
+\section{População e Amostra}
+
+Maecenas eleifend leo sodales nisi fermentum sollicitudin eu ac urna. Sed auctor nec nisi a pellentesque. Proin interdum arcu et enim luctus ornare. Mauris porttitor lectus in semper vestibulum. Vestibulum semper lectus id mauris imperdiet, nec elementum lacus finibus. Morbi in leo vel elit faucibus tempus. Nunc mauris diam, feugiat fringilla volutpat quis, gravida sit amet lacus. Suspendisse ut lacus non sem auctor gravida id sit amet felis.
+
+Cras tempor diam congue metus bibendum posuere. Praesent a mi at metus viverra imperdiet non ut lacus. Praesent id feugiat justo, in tincidunt ipsum. Nullam vitae malesuada dui. Curabitur sollicitudin vehicula orci, in posuere augue semper id. Maecenas auctor pulvinar nisl. Nullam a justo interdum, hendrerit arcu ut, blandit magna. Pellentesque et elementum sapien. Ut dignissim sed lectus et varius. Vivamus mattis dolor non elit venenatis, ac auctor nulla cursus. Sed sit amet ultrices erat, non aliquam odio. Etiam et vestibulum enim. Praesent id aliquam lectus, vel molestie lorem. Aenean vel vulputate eros, non hendrerit quam. 
+
+\section{Local e Período de realização da Pesquisa}
+
+Quisque pellentesque, velit et rutrum scelerisque, mi urna pretium odio, eget maximus quam tellus nec massa. Morbi placerat enim a elit vestibulum, et venenatis lacus eleifend. Cras non egestas neque. Praesent elementum nisi quis cursus consequat. Nullam pharetra tellus nulla, at molestie orci commodo vel. Morbi ac urna vestibulum sapien tincidunt interdum. Sed rutrum, justo in commodo dapibus, dui erat viverra sem, nec pulvinar lacus lacus vel est. Donec vehicula eleifend ex laoreet dignissim. Duis dictum at sapien ac commodo. Nullam ultricies elit ut enim ullamcorper, sit amet convallis libero tincidunt. Proin nec ex consectetur, ornare urna eu, facilisis diam. Maecenas mattis dignissim eros, sit amet blandit sapien elementum nec. Curabitur mollis ornare massa, id congue lacus auctor luctus. In pretium efficitur tellus, ut luctus lacus eleifend efficitur. In ultrices vulputate leo. Vestibulum convallis justo odio, sit amet convallis arcu maximus non.
+ 
+\section{Critério de Inclusão e Exclusão}
+
+Vestibulum condimentum venenatis risus a ultrices. Sed non metus eget eros aliquam laoreet. Fusce condimentum non arcu vitae malesuada. Phasellus euismod quis purus et elementum. Duis a ipsum finibus, fermentum felis vel, viverra nulla. Phasellus dapibus sodales lacus. Maecenas eros tellus, vehicula nec dignissim vel, facilisis ut ligula.
+
+\hypertarget{variaveis}{\section{Variáveis}}
+%\section{Variáveis}
+
+Suspendisse potenti. Etiam eget venenatis lacus. Donec mi nisi, pulvinar in nisl id, sagittis laoreet neque. Nullam dui arcu, congue non accumsan ac, convallis at ligula. Aenean tincidunt nisi ex, ut ultricies velit porttitor ut.
+
+\section{Instrumentos de Coleta de Dados, estratégias de aplicação, processamento, análise e apresentação dos dados}
+
+Curabitur malesuada placerat purus a tincidunt. Curabitur pretium dolor laoreet sapien maximus, id porttitor ligula feugiat. Sed sit amet venenatis mauris. Aliquam eu est sit amet ipsum commodo maximus vel ut mi. Quisque maximus scelerisque tortor, a feugiat eros auctor luctus. Donec tincidunt dapibus lobortis. Curabitur mattis dui convallis, porta ipsum eu, laoreet turpis.
+
+Curabitur iaculis erat pulvinar mi commodo euismod. Nullam venenatis justo ipsum, ut dapibus ipsum gravida id. Nunc vehicula sodales tortor vitae placerat. Duis sapien nunc, interdum quis dui at, fringilla placerat magna. Nulla ornare odio eu orci scelerisque sagittis. Nullam sodales dignissim tincidunt. Phasellus mollis lorem et felis mollis, at euismod nunc tempor. Vestibulum sollicitudin velit enim, nec hendrerit purus pulvinar at. Vestibulum feugiat nunc odio, tincidunt tincidunt eros vulputate luctus. Ut tellus justo, accumsan vitae felis at, viverra cursus urna. Donec diam mauris, maximus in sagittis nec, tristique vitae mauris. Cras magna risus, rhoncus vel urna id, mattis sollicitudin felis. Quisque finibus volutpat dictum. Maecenas porttitor ligula non libero rhoncus, non cursus sem eleifend. Nulla aliquam efficitur dolor, a ornare nunc molestie vitae. Etiam imperdiet convallis nibh in eleifend.
+
+\section{Aspectos Éticos – Atendimento a \href{http://conselho.saude.gov.br/web_comissoes/conep/aquivos/resolucoes/23_out_versao_final_196_ENCEP2012.pdf}{Resolução CNS 196/96 versão 2012}}
+
+Maecenas a varius augue. Mauris dictum lobortis arcu id rhoncus. Praesent purus augue, sollicitudin a malesuada non, rhoncus sed turpis. Integer vel dui vitae ex tincidunt efficitur scelerisque pellentesque nibh. Nulla sed sapien nec ipsum porta tincidunt. Aliquam feugiat ex consequat hendrerit euismod. Etiam ac tristique justo. Suspendisse rutrum neque at dolor faucibus, posuere dapibus ante iaculis. Aliquam vulputate euismod turpis eget blandit. Nulla at rhoncus turpis.
+
+Aliquam vestibulum nisl non ipsum congue euismod. Ut auctor leo vel rhoncus ultrices. In hac habitasse platea dictumst. Mauris egestas pulvinar nisl, quis scelerisque dui ultricies a. Maecenas tempor volutpat magna ac interdum. Praesent sit amet consequat nulla. Vestibulum venenatis, tellus ac ornare vestibulum, dolor felis pellentesque libero, at hendrerit neque massa a risus. Maecenas condimentum sollicitudin enim, convallis vestibulum ligula aliquam nec. Integer blandit turpis vel condimentum imperdiet. Aliquam malesuada pellentesque nisi, nec tincidunt neque molestie non. Suspendisse id interdum eros. Nunc porta libero sit amet dui scelerisque, nec suscipit lacus congue. Proin sit amet posuere dui, vitae ullamcorper tellus. Proin ornare hendrerit turpis, sed lacinia ipsum feugiat in. Nam ac lectus ac turpis pellentesque condimentum vitae non lectus.
+
+\subsection{Riscos}
+
+Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Praesent ut eros vitae ante facilisis volutpat vel fringilla lorem. Donec in aliquam neque. Praesent condimentum augue nisi, id placerat quam mollis sed. Donec at feugiat tortor, vitae dapibus risus. Quisque posuere justo euismod nisi pulvinar, non finibus nisl consequat. In id mattis dui, non facilisis tortor.
+
+Sed leo massa, elementum non nulla sit amet, hendrerit sodales sem. Aenean tincidunt mauris eget mauris pretium vehicula. Duis euismod sagittis nulla nec tincidunt. Suspendisse quis risus sagittis, vehicula nunc nec, semper ante. Vivamus in elementum tellus, nec blandit tortor. Morbi id tellus nisi. Donec auctor metus ligula, ut semper dui laoreet in. Phasellus ultrices felis mauris, sit amet dignissim diam pharetra eu. Curabitur eu magna nulla.
+
+Etiam eget ante consequat, ullamcorper justo vitae, ultricies nibh. Donec in ex lorem. Etiam congue elit non odio faucibus eleifend. Morbi hendrerit nisi nibh, vel dapibus sem hendrerit ac. Nam blandit, mauris nec condimentum lobortis, tellus ex dapibus mi, eget feugiat lectus diam id purus. Vivamus sit amet condimentum justo, sed finibus lectus. Quisque mollis, lectus a placerat luctus, est metus facilisis massa, eget suscipit eros diam vitae odio. Proin fringilla sem vel tellus posuere pharetra. Praesent gravida justo sed massa tempus molestie. Sed eget eros varius, feugiat lorem nec, sollicitudin nisl. Aenean sagittis augue sit amet sapien dictum, at tincidunt nulla ultrices. Morbi quis lacus ac nulla accumsan vulputate. Nunc blandit fermentum rutrum. Morbi rhoncus et mi lobortis tincidunt.
+
+\subsection{Benefícios}
+
+Sed ornare magna faucibus, tempus leo in, lacinia orci. Phasellus at gravida diam, vehicula suscipit libero. Maecenas eleifend sagittis mi, at dictum tellus placerat et. Pellentesque ultricies, mi vel rutrum posuere, urna lorem laoreet velit, vitae molestie felis massa eget neque. Nunc rutrum interdum felis, non congue risus tincidunt at. Donec elit nibh, euismod eu interdum quis, cursus sed augue. Mauris mattis mauris ligula, vulputate tincidunt eros vulputate id. Pellentesque venenatis nisl sit amet ante egestas, vel iaculis magna fermentum. Vivamus dapibus risus vitae scelerisque placerat. Sed vitae massa sem. Cras ac malesuada ex, sit amet pharetra diam. Quisque cursus dignissim euismod. Ut pulvinar sodales eros non dictum. Nullam ultrices in felis non mollis.
+
+\subsection{Desfechos}
+
+\subsubsection{Primário}
+
+Duis gravida congue risus, eget lacinia sem ornare non. Donec arcu ipsum, iaculis ac scelerisque eget, tristique vel ipsum. Mauris dictum augue dolor, sed sodales lectus semper elementum. Integer semper, tellus vel elementum cursus, metus velit eleifend ipsum, at aliquam libero tortor ut nulla. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed sollicitudin eget turpis non vehicula. Duis a lacus vitae sem laoreet semper. 
+\subsubsection{Secundários}
+
+\begin{itemize}
+\item Item 1;
+\item Item 2;
+\item Item 3.
+\end{itemize}
+
+\chapter{ORÇAMENTO}
+
+\begin{table}[!ht]
+\begin{center}
+\begin{tabular}{|l|c|c|}
+	\hline
+	IDENTIFICAÇÃO DO ORÇAMENTO & TIPO & VALOR EM REAIS\\
+	\hline
+    Papel A4 & Custeio & R\$ 11,00\\
+    \hline
+    Caneta Esferográfica & Custeio & R\$ 9,00\\
+    \hline
+    Impressão & Custeio & R\$ 15,00\\
+    \hline
+    Cópias & Custeio & R\$ 30,00\\
+    \hline
+    Combustível & Custeio & R\$ 40,00\\
+    \hline
+    Pasta p/ Documentos & Custeio & R\$ 10,00\\
+    \hline
+    \multicolumn{2}{|c|}{\textbf{Total}} & R\$ 11,00\\
+    \hline
+\end{tabular}
+\caption{\label{tab:Orçamento}Todas essas despesas serão cobertas pela autora do trabalho}
+\end{center}
+\end{table}
+
+\chapter{CRONOGRAMA}
+
+A seguir no cronograma estão elencadas as fases principais do desenvolvimento do nosso projeto de pesquisa, essa organização nos proporcionou mais equilíbrio e agilidade nos fazendo ter noção do tempo gasto com cada parte do trabalho e o tempo necessário para o termino do projeto.
+
+\begin{figure}[!htb]
+\begin{center}
+\begin{ganttchart}[y unit title=0.4cm,
+  y unit chart=0.9cm,
+  vgrid,hgrid,
+  title height=1,
+  bar/.style={draw,fill=blue},
+  bar incomplete/.append style={fill=white},
+  bar height=.6
+ ]{1}{20}
+ \gantttitle{Abr}{4}
+ \gantttitle{Mai}{4}
+ \gantttitle{Jun}{4}
+ \gantttitle{Jul}{4}
+ \gantttitle{Ago}{4}\\
+ \ganttbar{Revisão Literária}{1}{8} \\
+ \ganttbar{Elaboração do Projeto}{5}{12} \\%[progress=100]
+ \ganttbar{Exame de Qualificação}{11}{11} \\
+ \ganttbar{Coleta de Dados}{13}{14} \\
+ \ganttbar{Análise dos Resultados}{15}{16} \\
+ \ganttbar{Apresentação do TCC}{17}{17} \\
+ \ganttbar{Entrega do Trabalho Final}{20}{20} \\
+ %relações
+
+\end{ganttchart}
+\end{center}
+\caption{Cronograma}
+\label{fig:cronograma}
+\end{figure}
+
+
+
+% ---
+% Finaliza a parte no bookmark do PDF
+% para que se inicie o bookmark na raiz
+% e adiciona espaço de parte no Sumário
+% ---
+\phantompart
+
+% ---
+% Conclusão
+% ---
+%\chapter{Considerações finais}
+
+%Inserir aqui a conclusão.
+% ---
+
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+%\nocite{bachelard:05,rodrigues:12}
+% ----------------------------------------------------------
+\bibliography{abntex2-modelo-references}
+
+\end{document}

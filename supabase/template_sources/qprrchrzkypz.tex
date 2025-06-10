@@ -1,0 +1,105 @@
+\newif \ifrev
+
+\revtrue  % activa el mode draft
+% \revfalse  % desactiva el mode draft
+
+
+\ifrev
+    \documentclass[twoside]{report}
+\else
+    \documentclass[twoside, openright]{report}
+\fi
+
+\usepackage[english]{babel}  % catalan
+\usepackage{almutils}
+\usepackage{csquotes}
+\usepackage{fancyhdr}
+\usepackage{subfiles}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage{emptypage}
+\usepackage[numbib,chapter]{tocbibind}
+
+%\setlength{\belowcaptionskip}{0pt}
+\usepackage[hyperfootnotes=true,linkcolor=blue,menucolor=black]{hyperref}
+
+\numberwithin{equation}{chapter}
+%\numberwithin{figure}{section}
+\usepackage{cleveref} % nameinlink
+\usepackage[acronym]{glossaries}
+\usepackage[sort,square]{natbib} % numbers
+\bibliographystyle{abbrvnat} %plainnat % unsrtnat % abbrvnat
+
+\graphicspath{{imgs/}{../imgs/}}
+\newcommand{\theversion}{v0}
+
+\pagestyle{fancy}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+\fancyhead[LE,RO]{\thepage}
+\renewcommand{\headrulewidth}{0.8pt}
+\fancyfoot{}
+
+\ifrev 
+\usepackage{lipsum}
+\hypersetup{colorlinks={true}}
+\usepackage[scale=5, placement=top, angle=90, position={-0.35cm, -2.5cm}, contents={Draft -- \theversion}]{background}
+\fi
+
+\settocbibname{References}
+
+\makeglossaries
+ 
+\newacronym{uab}{UAB}{Universitat Autònoma de Barcelona}
+
+\renewcommand{\tilde}[1]{\widetilde{#1}}
+
+\begin{document}
+
+    \pagestyle{empty}
+    \subfile{tex/title.tex}
+    
+    \clearpage\null\newpage
+    
+    \clearpage
+    \subfile{tex/pre/dedicatoria.tex}
+    \clearpage\pagestyle{empty}\null\newpage
+    
+    \pagestyle{plain}
+    \pagenumbering{roman}
+    \subfile{tex/pre/abstract.tex}
+    
+    \clearpage\pagestyle{empty}\null\newpage\pagestyle{plain}
+    \subfile{tex/pre/awknolegment.tex}
+
+    \clearpage\pagestyle{empty}\null\newpage\pagestyle{plain}
+    \printglossary[type=\acronymtype,title=Glossary,nonumberlist] \addcontentsline{toc}{chapter}{Glossary}
+    
+    \clearpage\pagestyle{empty}\null\newpage\pagestyle{plain}
+    \subfile{tex/pre/preface.tex}
+
+    \clearpage\pagestyle{empty}\null\newpage\pagestyle{plain}
+
+	\tableofcontents
+	
+	\clearpage\pagestyle{empty}\null\newpage
+	
+    \pagestyle{fancy}
+    \pagenumbering{arabic}
+
+    \subfile{tex/intro.tex}
+    
+    \subfile{tex/methods.tex}
+    
+    \subfile{tex/results.tex}
+    
+    %\subfile{tex/.tex}
+    
+    \subfile{tex/conclusion.tex}
+	
+    \bibliography{biblio}
+
+    \pagestyle{fancy}
+    \subfile{tex/appendix.tex}
+
+\end{document}

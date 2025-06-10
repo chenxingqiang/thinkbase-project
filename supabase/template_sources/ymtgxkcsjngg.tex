@@ -1,0 +1,131 @@
+%%**************************************************************
+%% Vorlage fuer Bachelorarbeiten (o.ä.) der DHBW
+%%
+%% Autor: Tobias Dreher, Yves Fischer
+%% Datum: 06.07.2011
+%%
+%% Autor: Michael Gruben
+%% Datum: 15.05.2013
+%%**************************************************************
+\documentclass[%
+	enabledeprecatedfontcommands,
+	pdftex,
+	oneside,		% Einseitiger Druck.
+	12pt,			% Schriftgroesse
+	parskip=half,	% Halbe Zeile Abstand zwischen Absätzen.
+	headsepline,	% Linie nach Kopfzeile.
+	footsepline,	% Linie vor Fusszeile.
+	abstracton,	    % Abstract Überschriften
+	ngerman,		% Translator
+]{scrreprt}
+\input{ads/header}
+
+% Ab jetzt können auch Umlaute verwendet werden
+
+%falls pdftitel = titel der Arbeit
+\newcommand{\titel}{\pdftitel}
+%bei unterschiedlichen Titeln
+%\newcommand{\titel}{In der Regel haben wir einen zweizeiligen
+% Bachelorthesistitel}
+\newcommand{\martrikelnr}{1234567}
+\newcommand{\kurs}{ABC2008DE}
+\newcommand{\datumAbgabe}{August 2011}
+\newcommand{\firma}{Firma GmbH}
+\newcommand{\firmenort}{Firmenort}
+\newcommand{\abgabeort}{Abgabeort}
+\newcommand{\abschluss}{Bachelor of Engineering}
+\newcommand{\studiengang}{Studienganges Vorderasiatische Archäologie}
+\newcommand{\dhbw}{Stuttgart Campus Horb}
+\newcommand{\betreuer}{Dipl.-Ing. (FH) Peter Pan}
+\newcommand{\gutachter}{Dr. Silvana Koch-Mehrin}
+\newcommand{\zeitraum}{12 Wochen}
+\newcommand{\arbeitsart}{\arbeit}
+
+\makeglossaries
+\input{ads/glossary}
+
+\begin{document}
+
+	% Deckblatt
+	\begin{spacing}{1}
+		\input{ads/deckblatt}
+	\end{spacing}
+	\newpage
+
+	\renewcommand{\thepage}{\Roman{page}}
+	\setcounter{page}{1}
+
+	% Sperrvermerk
+	\input{ads/sperrvermerk}
+	\newpage
+	
+	% Erklärung
+	\input{ads/erklaerung}
+	\newpage
+
+	% Abstract
+	\input{ads/abstract}
+	\newpage
+
+	\pagestyle{plain}
+
+	% Inhaltsverzeichnis
+	\begin{spacing}{1.1}
+		\setcounter{tocdepth}{1}
+		%für die Anzeige von Unterkapiteln im Inhaltsverzeichnis
+		%\setcounter{tocdepth}{2}
+		\tableofcontents
+	\end{spacing}
+	\newpage
+
+	\renewcommand{\thepage}{\arabic{page}}
+	\setcounter{page}{1}
+	
+	% Inhalt
+	\input{content/01kapitel}
+	\input{content/02kapitel}
+	
+	% Anhang
+	\clearpage
+	\pagenumbering{roman}
+
+	% Abbildungsverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoffig}
+	\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+	\listoffigures
+
+	%Tabellenverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoftab}
+	\addcontentsline{toc}{chapter}{Tabellenverzeichnis}
+	\listoftables
+
+	% Quellcodeverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoflist}
+	\addcontentsline{toc}{chapter}{Listings}
+	\lstlistoflistings
+
+	% Literaturverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listoflit}
+	\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+	
+	%Bib style
+	\bibliographystyle{agsm} %Havard
+	%\bibliographystyle{amsplain} %Durchnummeriert
+	%\bibliographystyle{amsalpha} %Kürzel für Autor und Jahr
+	%see more: http://amath.colorado.edu/documentation/LaTeX/reference/faq/bibstyles.pdf
+	
+	\bibliography{ArbeitBib}
+
+	% Abkürzungsverzeichnis
+	\cleardoublepage
+	\phantomsection \label{listofacs}
+	\addcontentsline{toc}{chapter}{Abkürzungsverzeichnis}
+	\input{ads/acronyms}
+	
+	% Glossar
+	\printglossary[style=altlist,title=Glossar]
+\end{document}

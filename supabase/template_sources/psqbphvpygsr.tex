@@ -1,0 +1,133 @@
+%%% Verze pro jednostranný tisk:
+\documentclass[11pt,a4paper]{report}
+\usepackage[top=25mm,bottom=25mm,right=25mm,left=30mm,head=12.5mm,foot=12.5mm]{geometry}
+\let\openright=\clearpage
+
+%%% Pokud tiskneme oboustranně:
+%\documentclass[11pt,a4paper,twoside,openright]{report}
+%\usepackage[top=25mm,bottom=25mm,right=25mm,left=30mm,head=12.5mm,foot=12.5mm]{geometry}
+%\let\openright=\cleardoublepage
+
+%%% Definice různých užitečných maker (viz popis uvnitř souboru)
+\input{makra}
+
+%%% DEFINICE ZÁKLADNÍCH PROMĚNNÝCH
+\def\TypPrace{BP}                % bakalářská práce/bachelor thesis
+%\def\TypPrace{DP}               % diplomová práce/master thesis
+\def\Jazyk{cze}                  % čeština/czech
+%\def\Jazyk{slo}                 % slovenština/slovak
+%\def\Jazyk{eng}                 % angličtina/english
+
+%%% Název práce v jazyce práce (přesně podle zadání)
+%%% Title of the thesis in the language used in the text (exact according to assignment)
+\def\NazevPrace{Název práce}
+
+\input{makra.txt}
+
+%%% Jméno autora
+%%% Author's name - First name Surname
+\def\AutorPrace{[jméno a příjmení autora vč. již dosažených titulů}
+
+%%% Rok odevzdání a měsíc (slovně)
+%%% Year of submission and month (verbally) - month YYYY
+\def\DatumOdevzdani{měsíc RRRR}
+
+%%% Vedoucí práce: Jméno a příjmení s~tituly
+%%% Supervisor: First name and surname with titles
+\def\Vedouci{jméno a příjmení vedoucího vč. titulů}
+
+%%% Konzultant práce: Jméno a příjmení s~tituly
+%%% Consultant: First name and surname with titles
+\def\Konzultant{jméno a příjmení vedoucího vč. titulů}
+
+%%% Studijní program
+%%% Study program
+\def\StudijniProgram{[Název studijního programu}
+
+%%% Studijní program - specializace
+%%% Study program - specialization
+\def\Specializace{Název specializace, pokud je do nich studijní program členěn}
+
+%%% Studijní obor
+%%% Field of study
+\def\StudijniObor{Název studijního oboru, pokud je do nich studijní program členěn}
+
+%%% Nepovinné poděkování (vedoucímu práce, konzultantovi, tomu, kdo zapůjčil software, literaturu apod.)
+%%% Optional thanks (the supervisor, the consultant, the borrower of software, literature, etc.)
+\def\Podekovani{%
+Poděkování.
+}
+
+%%% Abstrakt (doporučený rozsah cca 150-250 slov; nejedná se o zadání práce)
+\def\Abstrakt{%
+Abstrakt.
+}
+\def\AbstraktEN{%
+Abstract.
+}
+
+%%% 3 až 5 klíčových slov (doporučeno)
+\def\KlicovaSlova{klíčové slovo, další pojem, jiný důležitý termín, a ještě jeden}
+\def\KlicovaSlovaEN{keyword, important term, another topic, and another one}
+
+
+%%% Titulní strana a různé povinné informativní strany
+%%% Title page and various mandatory information pages
+\begin{document}
+\include{zacatek}
+
+%%% Strana s automaticky generovaným obsahem práce
+%%% A page with automatically generated content of the thesis
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+%%% Seznam obrázků v práci
+%%% List of figures in the thesis
+\openright
+\listoffigures
+Poznámka: Seznam obrázků je vhodný použít, pokud počet obrázků v textu práce je větší než 20. Seznam grafů je vhodný použít pouze v případě, že autor práce rozlišuje mezi obrázkem a grafem. Seznam grafů je utvářen, pokud je počet grafů větší než 20. V této šabloně závěrečné práce se grafy a obrázky nerozlišují.
+
+%%% Seznam tabulek v práci (volitelně)
+%%% List of tables in the thesis (optionally)
+\clearpage
+\listoftables
+Poznámka: Seznam tabulek je vhodný použít, pokud počet tabulek v textu práce je větší než 20.
+
+%%% Seznam zkratek v práci (volitelně)
+%%% List of abbreviations in the thesis (optionally)
+\include{zkratky}
+
+\pagestyle{fancyx}
+%%% Jednotlivé kapitoly práce jsou pro přehlednost uloženy v samostatných souborech
+%%% The individual chapters of the thesis are stored in separate files for clarity
+{%
+\pagestyle{plain}
+\include{uvod}
+}
+\include{kap01}
+\include{kap02}
+\include{kap03}
+\include{kap04}
+% \include{...}
+% \include{...}
+{%
+\pagestyle{plain}
+\include{zaver}
+}
+
+%%% Seznam použité literatury
+%%% Bibliography
+\include{literatura}
+
+%%% Přílohy k práci, existují-li. Každá příloha musí být alespoň jednou
+%%% odkazována z vlastního textu práce. Přílohy se číslují.
+%%% Attachments to thesis, if any. Each attachment must be referenced at 
+%%% least once in your own text. The appendices are numbered.
+\part*{\Prilohy\thispagestyle{empty}}
+\appendix
+\include{app01}
+\include{app02}
+% \include{...}
+% \include{...}
+
+\end{document}

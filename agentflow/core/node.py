@@ -4,12 +4,14 @@ from pydantic import BaseModel, Field, ConfigDict
 import asyncio
 import logging
 from abc import ABC, abstractmethod
-from ..ell2a.integration import ELL2AIntegration
+
+from ell import LMPType, Message
+from agentflow.ell.integration import ELLIntegration
 
 logger = logging.getLogger(__name__)
 
-# Initialize ELL2A integration
-ell2a_integration = ELL2AIntegration()
+# Initialize ELL integration
+ell_integration = ELLIntegration()
 
 class NodeType(str, Enum):
     """Node type"""
@@ -170,25 +172,25 @@ class ProcessorNode(Node):
         'latency': 0.0,
         'memory': 0
     })
-    use_ell2a: bool = Field(default=False)  # Flag to use ELL2A
-    ell2a_mode: str = Field(default="simple")  # ELL2A mode: "simple" or "complex"
+    use_ell: bool = Field(default=False)  # Flag to use ELL
+    ell_mode: str = Field(default="simple")  # ELL mode: "simple" or "complex"
 
     def __init__(self, **data):
         super().__init__(**data)
-        if self.use_ell2a:
-            from .ell2a_integration import ell2a_integration
-            self.ell2a = ell2a_integration
+        if self.use_ell:
+            from .ell_integration import ell_integration
+            self.ell = ell_integration
 
     async def execute(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """Execute processor with input data"""
-        if self.use_ell2a:
-            return await self._execute_with_ell2a(input_data)
+        if self.use_ell:
+            return await self._execute_with_ell(input_data)
         return await self._execute_standard(input_data)
 
-    async def _execute_with_ell2a(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute processor using ELL2A"""
-        # Create ELL2A message
-        message = self.ell2a.create_message(
+    async def _execute_with_ell(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute processor using ELL"""
+        # Create ELL message
+        message = Message(
             role="user",
             content=str(input_data),
             metadata={
@@ -197,31 +199,23 @@ class ProcessorNode(Node):
                 "processor": self.processor.__name__ if hasattr(self.processor, "__name__") else "processor"
             }
         )
-        self.ell2a.add_message(message)
-
-        # Execute with ELL2A based on mode
-        if self.ell2a_mode == "complex":
-            result = await self._execute_complex_ell2a(message)
-        else:
-            result = await self._execute_simple_ell2a(message)
         
-        # Update metrics
-        if "usage" in result:
-            self.metrics.update({
-                "tokens": result["usage"].get("total_tokens", 0),
-                "latency": result["usage"].get("latency", 0.0)
-            })
+        # Execute with ELL based on mode
+        try:
+            result = await self.ell.process_message(message)
+            return result.to_dict()
+        except Exception as e:
+            logger.error(f"Error executing processor with ELL: {str(e)}")
+            raise
 
-        return result
-
-    async def _execute_simple_ell2a(self, message: Any) -> Dict[str, Any]:
-        """Execute using ELL2A simple mode"""
+    async def _execute_simple_ell(self, message: Any) -> Dict[str, Any]:
+        """Execute using ELL simple mode"""
         try:
             # Get processor implementation
             processor = self._get_processor_instance()
 
-            # Execute with global ELL2A simple mode
-            @self.ell2a.with_ell2a(mode="simple")
+            # Execute with global ELL simple mode
+            @self.ell.with_ell(mode="simple")
             async def execute_processor():
                 if hasattr(processor, 'process_data'):
                     return await processor.process_data({
@@ -235,31 +229,31 @@ class ProcessorNode(Node):
 
             return await execute_processor()
         except Exception as e:
-            self.logger.error(f"Error executing processor with ELL2A simple: {str(e)}")
+            logger.error(f"Error executing processor with ELL simple: {str(e)}")
             raise
 
-    async def _execute_complex_ell2a(self, message: Any) -> Dict[str, Any]:
-        """Execute using ELL2A complex mode"""
+    async def _execute_complex_ell(self, message: Any) -> Dict[str, Any]:
+        """Execute using ELL complex mode"""
         try:
             # Get processor implementation
             processor = self._get_processor_instance()
 
-            # Execute with global ELL2A complex mode
-            @self.ell2a.with_ell2a(mode="complex")
+            # Execute with global ELL complex mode
+            @self.ell.with_ell(mode="complex")
             async def execute_processor():
                 if hasattr(processor, 'process_data'):
                     return await processor.process_data({
-                        "messages": self.ell2a.get_messages(),
+                        "messages": self.ell.get_messages(),
                         "config": self.config
                     })
                 return await processor.process({
-                    "messages": self.ell2a.get_messages(),
+                    "messages": self.ell.get_messages(),
                     "config": self.config
                 })
 
             return await execute_processor()
         except Exception as e:
-            self.logger.error(f"Error executing processor with ELL2A complex: {str(e)}")
+            logger.error(f"Error executing processor with ELL complex: {str(e)}")
             raise
 
     def _get_processor_instance(self):

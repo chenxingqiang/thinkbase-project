@@ -1,0 +1,240 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[UTF8]{ctex}
+\usepackage{biblatex}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{cases}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{minted}
+
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\ttfamily,            % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\ttfamily\color{mygreen},    
+                                   % comment style
+  deletekeywords={},               % if you want to delete keywords from the given language
+  escapeinside={},                 % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=C++,                    % the language of the code
+  morekeywords={library,use},                 % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\lstdefinelanguage{VHDL}{
+  morekeywords={
+    library,use,all,entity,is,port,in,out,end,architecture,of,
+    begin,and
+  },
+  morecomment=[l]--
+}
+\usepackage{xcolor}
+\colorlet{keyword}{blue!100!black!80}
+\colorlet{comment}{green!90!black!90}
+\lstdefinestyle{vhdl}{
+  language     = VHDL,
+  basicstyle   = \ttfamily,
+  keywordstyle = \color{keyword}\bfseries,
+  commentstyle = \color{comment}
+}
+
+\addbibresource{bib.bib}
+\setlength{\parindent}{0em}
+\bibliography{bib}
+\geometry{a4paper,scale=0.8}
+\linespread{1.5}
+\graphicspath{{Images/}}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{center}
+\linespread{1.2}\huge {\bfseries Fudan University}\\[1cm]
+\linespread{1}
+\includegraphics[width=10cm]{fudan-name.pdf}\\[3cm]
+\linespread{1.9}\huge {\bfseries 可编程器件与硬件描述语言}\\
+\linespread{1.9}\LARGE {\bfseries 作业报告}\\[2.5cm]
+
+{\Large 姓名：名字}\\[0.3cm]
+\Large 学号：123456789\\[4cm] 
+\large 2021年11月1日
+\end{center}
+\end{titlepage}
+
+
+
+\section{优先编码器}
+设计一个BCD的优先编码器电路，输入为10个开关的状态，要求输出开
+关对应的编码。输出编码用4位表示，第一个开关为0时，输出为0000时，第二个开关为0时，输出为0001时，...... 第10个开关为0时，输出为1001。第10个开关的优先级最高。当没有按键按下时，输出信号E为1。有按键按下时，输出信号E为0。
+%题干
+\subsection{顶层说明}
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{Q1TOP.png} %这里换成你的图片
+\caption{元件示意图}
+\end{figure}
+Input[9:0]为十个开关，其中Input(9)的优先级最高，Output[3:0]为四位输出，E表示是否有按键被按下。
+\begin{figure}[H]
+\centering
+\includegraphics[width=15cm]{Q1RTL.png}
+\caption{RTL图}
+\end{figure}
+\subsection{每个宏单元如何实现（对所写代码的说明）}
+代码如下：
+ \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=single,
+               fontfamily=courier,
+               framesep=4mm]{vhdl}
+---------------------------------------------------
+-- 10-bit Priority encoder
+-- by Zhang Ke, 2021/10/30 9:26PM
+---------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+---------------------------------------------------
+
+entity BCD_Encoder10 is
+  port (
+    Input  : in std_logic_vector(9 downto 0);
+    Output : out std_logic_vector(3 downto 0);
+    E      : out std_logic
+  );
+end BCD_Encoder10;
+
+---------------------------------------------------
+
+architecture rtl of BCD_Encoder10 is
+
+begin
+  process (Input)
+  begin
+    if (Input(9) = '0') then
+      Output <= "1001";
+      E      <= '0';
+    elsif (Input(8) = '0') then
+      Output <= "1000";
+      E      <= '0';
+    elsif (Input(7) = '0') then
+      Output <= "0111";
+      E      <= '0';
+    elsif (Input(6) = '0') then
+      Output <= "0110";
+      E      <= '0';
+    elsif (Input(5) = '0') then
+      Output <= "0101";
+      E      <= '0';
+    elsif (Input(4) = '0') then
+      Output <= "0100";
+      E      <= '0';
+    elsif (Input(3) = '0') then
+      Output <= "0011";
+      E      <= '0';
+    elsif (Input(2) = '0') then
+      Output <= "0010";
+      E      <= '0';
+    elsif (Input(1) = '0') then
+      Output <= "0001";
+      E      <= '0';
+    elsif (Input(0) = '0') then
+      Output <= "0000";
+      E      <= '0';
+    else
+      Output <= "XXXX";
+      E      <= '1';
+    end if;
+  end process;
+
+end rtl;
+  \end{minted}
+以上代码中，将元件输入Input定义为10位的标准逻辑向量类型，输出E和Output分别定义为标准逻辑位和4位的标准逻辑向量类型。具体architecture实现中使用IF语句进行状态判断并且输出。\\
+\subsection{时序仿真结果}
+编写Test Bench文件如下：
+ \begin{minted}[mathescape,
+               linenos,
+               numbersep=5pt,
+               gobble=0,
+               frame=single,
+               fontfamily=courier,
+               framesep=4mm]{vhdl}
+---------------------------------------------------
+-- Test Bench for 10-bit Priority encoder
+-- by Zhang Ke, 2021/10/30 9:57PM
+---------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+
+---------------------------------------------------
+
+entity Q1_BCD_Encoder_tb is
+end Q1_BCD_Encoder_tb;
+
+---------------------------------------------------
+
+architecture tbbehv of Q1_BCD_Encoder_tb is
+
+  component BCD_Encoder10
+    port (
+      Input  : in std_logic_vector(9 downto 0);
+      Output : out std_logic_vector(3 downto 0);
+      E      : out std_logic
+    );
+  end component;
+
+  signal Input  : std_logic_vector(9 downto 0) := "0000000000";
+  signal Output : std_logic_vector(3 downto 0);
+  signal E      : std_logic;
+begin
+
+  U_BCD   : BCD_Encoder10 port map(Input, Output, E);
+  inputpc : process
+  begin
+    Input <= "0000000000";  wait for 20 ns; Input <= "1000000000";  wait for 20 ns;
+    Input <= "1100000000";  wait for 20 ns; Input <= "1110000000";  wait for 20 ns;
+    Input <= "1111000000";  wait for 20 ns; Input <= "1111100000";  wait for 20 ns;
+    Input <= "1111110000";  wait for 20 ns; Input <= "1111111000";  wait for 20 ns;
+    Input <= "1111111100";  wait for 20 ns; Input <= "1111111110";  wait for 20 ns;
+    Input <= "1111111111";  wait for 20 ns; Input <= "1001100000";  wait for 20 ns;
+    Input <= "1110100000";  wait for 20 ns; Input <= "1111100100";  wait for 20 ns;
+    Input <= "1111011100";
+    wait; 
+  end process;
+
+end architecture;
+  \end{minted}
+使用上述Test Bench文件进行仿真，波形图如下：
+\begin{figure}[H]
+\centering
+\includegraphics[width=17.5cm]{Q1BL.png}
+\caption{BCD优先编码器时序仿真波形}
+\end{figure}
+
+
+\end{document}

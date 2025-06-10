@@ -1,5 +1,5 @@
 """
-Chat Assistant Example using ELL2A
+Chat Assistant Example using ELL
 Demonstrates multi-turn conversations and tool usage
 """
 
@@ -7,14 +7,14 @@ import asyncio
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-from agentflow.ell2a_integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell_integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 
-# Get ELL2A integration instance
-ell2a = ELL2AIntegration()
+# Get ELL integration instance
+ell = ELLIntegration()
 
-# Configure ELL2A
-ell2a.configure({
+# Configure ELL
+ell.configure({
     "simple": {
         "model": "gpt-4",
         "max_retries": 3,
@@ -42,13 +42,13 @@ async def search_knowledge_base(query: str) -> str:
     # Simulate knowledge base search
     kb = {
         "python": "Python is a high-level programming language.",
-        "ell2a": "ELL2A is a Language Model Programming Library.",
+        "ell": "ELL is a Language Model Programming Library.",
         "llm": "LLM stands for Large Language Model."
     }
     return kb.get(query.lower(), "No information found.")
 
 # Define chat assistant
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def chat_assistant(
     user_message: str,
     conversation_history: Optional[List[Dict[str, str]]] = None
@@ -97,7 +97,7 @@ async def interactive_chat():
             
             # Get assistant response
             messages = await chat_assistant(user_input, conversation_history)
-            response = await ell2a.process_message(messages[-1])
+            response = await ell.process_message(messages[-1])
             
             # Update conversation history
             conversation_history.append({"role": "user", "content": user_input})
@@ -112,7 +112,7 @@ async def interactive_chat():
                 current_time = await get_current_time()
                 print(f"[Tool] Current time: {current_time}")
                 
-                if "python" in user_input.lower() or "ell2a" in user_input.lower() or "llm" in user_input.lower():
+                if "python" in user_input.lower() or "ell" in user_input.lower() or "llm" in user_input.lower():
                     result = await search_knowledge_base(user_input.lower())
                     print(f"[Tool] Knowledge base: {result}")
             else:

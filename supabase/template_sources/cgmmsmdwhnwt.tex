@@ -1,0 +1,207 @@
+%% +++++++++++++++++++++++++++++++++
+%% Setzen von scrreprt
+%% +++++++++++++++++++++++++++++++++
+\documentclass[
+11pt,
+titlepage,
+a4paper,
+abstracton,
+twoside,
+openright,
+chapterprefix,
+noappendixprefix,
+headsepline,
+footsepline,
+cleardoubleplain,
+bibtotoc,
+liststotoc,
+pointlessnumbers
+]{scrreprt}
+
+%% +++++++++++++++++++++++++++++++++
+%% Einbinden von Paketen
+%% +++++++++++++++++++++++++++++++++
+\usepackage{istitle}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amscd}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{scrlayer-scrpage}
+\usepackage{bbm}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{pifont}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=colon]{caption}
+\usepackage{natbib}
+%\bibliographystyle{abbrvnat}
+
+\input{pdf}
+%\input{linkcolors-pdf} % Links klickbar, vom PDF-Viewer hervorgehoben
+%\input{linkcolors-colored} % Links klickbar, farbig hervorgehoben
+\input{linkcolors-print} % Links klickbar, aber nicht hervorgehoben
+
+
+
+%% +++++++++++++++++++++++++++++++++
+%% Header
+%% +++++++++++++++++++++++++++++++++
+
+% Seitengeometrie
+\geometry{a4paper,outer=38mm,inner=26mm,top=40mm,bottom=50mm}
+
+% Definition von arg max
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% Definition von Sternchen
+\newcommand{\sig}{\ding{73}}
+\newcommand{\ssig}{\ding{72}}
+
+% Definition von Häkchen und Kreuzchen
+\newcommand{\h}{\ding{51}}
+\newcommand{\x}{\ding{55}}
+
+% Farben definieren
+\definecolor{lightgrey}{rgb}{0.99,0.99,0.99}
+\definecolor{colKeys}{rgb}{0,0,1}
+\definecolor{colIdentifier}{rgb}{0,0,0}
+\definecolor{colComments}{rgb}{1,0,0}
+\definecolor{colString}{rgb}{0,0.5,0}
+
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{green}{rgb}{0,0.7,0}
+\definecolor{blue}{rgb}{0,0,0.7}
+\definecolor{red}{rgb}{0.7,0,0}
+\definecolor{black}{rgb}{0,0,0}
+
+% Quellcode
+\lstloadlanguages{XML} 
+\lstset{
+    float=hbp,
+    keywordstyle=\color{colKeys},
+    stringstyle=\color{colString},
+    commentstyle=\color{colComments},
+    basicstyle=\texttt\small,
+    identifierstyle=\color{colIdentifier},
+    columns=flexible,
+    tabsize=2,
+    frame=single,
+    extendedchars=true,
+    showspaces=false,
+    showstringspaces=false,
+    numbers=none,
+    numberstyle=\tiny,
+    breaklines=true,
+    backgroundcolor=\color{lightgrey},
+    breakautoindent=true,
+	captionpos=b,
+	xleftmargin=\fboxsep,
+	xrightmargin=\fboxsep,
+	frameround=tttt
+}
+
+% Kopf- und Fußzeilen
+\pagestyle{scrheadings}
+\ihead[]{}
+\chead[]{}
+\ohead[]{\textsf{\headmark}}
+%\ifoot[]{}
+%\cfoot[]{}
+%\ofoot[]{\textsf{\pagemark}}
+
+% Absätze
+\setlength{\parindent}{15pt}
+%\setlength{\parskip}{2ex}
+
+\def\topfraction{1.0} 
+\def\bottomfraction{1.0} 
+\def\textfraction{0.0}
+
+\renewcommand*{\partpagestyle}{empty}
+
+
+
+%% +++++++++++++++++++++++++++++++++
+%% Start des Dokuments
+%% +++++++++++++++++++++++++++++++++
+\begin{document}
+
+% Titelseite
+\title{Thesis Title}
+\author{Name}
+\matriculationid{1234567} 
+\studyProgram{Applied Computer Science} 
+\tutor{Professor~Dr.-Ing.~Torsten Zesch}
+{Professor~Dr.-Ing.~Manfred Mustermann}
+\thesistype{Bachelorthesis}
+
+\logo{figures/logo_uni.png}
+\timeperiod{Mai 2016}{November 2020}
+\pagenumbering{alph}
+\maketitle
+
+% Erklärung
+\cleardoublepage
+\pagestyle{empty}
+\include{Erklaerung}
+\pagestyle{empty}
+
+
+% Kurzzusammenfassung (Abstract)
+\setcounter{page}{2}
+\begin{abstract}
+\thispagestyle{plain}
+\input{Abstract}
+\end{abstract}
+
+% Inhaltsverzeichnis
+\pagestyle{scrheadings}
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+% Text
+\cleardoublepage
+\pagenumbering{arabic}
+\pagestyle{scrheadings}
+\sloppy
+
+% CAREFUL: This is just an example what the outline of your thesis might look like. Your topic might require a different approach:
+% e.g. you might not have a Data collection chapter, because you use existing data. Your Experimental Studies might be so numerous that they should be split into two chapters, maybe you need a chapter for a user study. So please asapt this template according to your specific needs.
+
+\include{01-Introduction}
+\include{02-Background_Related_Work}
+\include{03-DataCollection}
+\include{04-Experiments}
+\include{05-Conclusion}
+
+
+% Anhang
+\cleardoublepage
+\pagenumbering{roman}
+\part*{Appendix}
+\begin{appendix}
+\include{Appendix}
+\end{appendix}
+
+% Verzeichnisse
+\cleardoublepage
+\listoffigures
+\listoftables
+\bibliographystyle{natdin_lat}
+\bibliography{literature}
+
+
+
+\end{document}

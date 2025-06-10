@@ -1,0 +1,108 @@
+\documentclass[12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage[none]{hyphenat}
+\usepackage[nottoc, notlot, notlof]{tocbibind}
+\usepackage{graphicx}
+\usepackage{times}
+\usepackage{pgffor} 
+\usepackage{float}
+\usepackage{multicol}
+\usepackage[english]{babel}
+%\usepackage{anyfontsize}
+%\usepackage{extsizes}
+%\parindent 0ex
+\usepackage[hypcap=true,font={small,it}]{caption}
+\captionsetup{belowskip=2pt,aboveskip=2pt}
+%\bibliographystyle{IEEEtran}
+\setlength{\parindent}{4em}
+\setlength{\parskip}{1em}
+\renewcommand{\baselinestretch}{1.5}
+\renewcommand{\chaptername}{Chapter}
+\newcommand\inv[1]{#1\raisebox{1.15ex}{$\scriptscriptstyle-\!1$}}
+\newcommand{\latex}{\LaTeX\xspace}
+\usepackage{import}
+\usepackage{example}
+ 
+\usepackage{makeidx}
+\makeindex
+ \usepackage{xpatch}
+\usepackage{blindtext}
+
+
+\makeatletter
+
+\xpatchcmd{\@makeschapterhead}{%
+  \Huge \bfseries  #1\par\nobreak%
+}{%
+  \Huge \bfseries\centering #1\par\nobreak%
+}{\typeout{Patched makeschapterhead}}{\typeout{patching of @makeschapterhead failed}}
+
+
+\xpatchcmd{\@makechapterhead}{%
+  \huge\bfseries \@chapapp\space \thechapter
+}{%
+  \huge\bfseries\centering \@chapapp\space \thechapter
+}{\typeout{Patched @makechapterhead}}{\typeout{Patching of @makechapterhead failed}}
+
+\makeatother
+ 
+ \begin{document}
+ \pagenumbering{roman}
+%\frontmatter
+ \input{chapter/title}
+ \setcounter{page}{1}
+ 
+\chapter*{\centering Certificate of Approval}
+\addcontentsline{toc}{chapter}{Certificate of Approval}
+\input{chapter/certificate.tex}
+\clearpage
+
+\chapter*{\centering Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+\input{chapter/declaration.tex}
+\clearpage
+
+
+\chapter*{\centering Acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+\input{chapter/acknowledgement.tex}
+\clearpage
+
+\chapter*{\centering Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\input{chapter/abstract.tex}
+\clearpage
+
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    \clearpage
+\pagenumbering{arabic}
+
+    \chapter{Introduction} 
+    \input{chapter/introduction}
+   
+    \chapter{Literature Review}
+    \input{chapter/literature review}     
+    
+    \chapter{Methodology}
+     \input{chapter/methodology}
+     
+    \chapter{Results and Discussions}
+    \input{chapter/results}
+    
+    \chapter{Conclusion}
+    \input{chapter/conclusion}
+    
+    
+    \addcontentsline{toc}{chapter}{References}%
+    \bibliographystyle{IEEEtran}
+    \bibliography{IEEEabrv,bibliography}
+    
+ \appendix
+\chapter{Source Code for Application Interface}
+    \input{chapter/appendix}
+
+ \end{document}

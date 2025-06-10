@@ -1,13 +1,13 @@
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 from typing import List
 import asyncio
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -23,17 +23,17 @@ ell2a.configure({
     }
 })
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def get_user_name() -> str:
     """Return the user's name."""
     return "Isac"
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def get_ice_cream_flavors() -> List[str]:
     """Return a list of ice cream flavors."""
     return ["Vanilla", "Strawberry", "Coconut"]
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def ice_cream_chat(message_history: List[Message]) -> Message:
     """Chat about ice cream flavors."""
     try:

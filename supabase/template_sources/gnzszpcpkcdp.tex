@@ -1,0 +1,193 @@
+%%% DOCUMENT SET UP %%%
+\documentclass[12pt]{article}
+
+%%% BIBLIOGRAPHY SET UP %%%
+%I use biblatex for my bibliography, with the biber backend. It is also possible to use other things, like natbib, so do check what you are using if you're having issues! One of the homework links I'll give you uses natbib, so that will show you an example of using that. Most reference managers will give both natbib/bibtex and biblatex as options. Look in Figure 2 for examples of how to cite things. 
+\usepackage[sorting=none,style=numeric-comp, backend=biber,url=false,giveninits=true]{biblatex} %this is the typical set up I use 
+\bibliography{Dark Matter 2022} %you can load your bibliography file in the preamble
+
+%%% PACKAGES %%%
+\usepackage{siunitx} %this is one of my favourite packages to make sure I typeset units nicely
+\usepackage{fullpage} %this makes the margins of the page a bit more reasonable - the default LaTeX margins are quite big
+
+%these three packages help latex deal with images, and also let us do subfigures with subcaptions
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{placeins}
+
+%these are some packages that increase the range of things LaTeX can represent w.r.t. maths and symbols
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+
+\usepackage{longtable} %makes tables that can go over multiple pages
+
+%these two packages make hyperlinks and give references nice names
+\usepackage{hyperref}
+\usepackage[nameinlink, capitalise]{cleveref}
+
+
+%%% TITLE AND AUTHOR %%%
+\title{Getting started with \LaTeX}
+\author{Alexia Alexander Wight \\ @missneutrino}
+
+\begin{document}
+
+\maketitle %this places your title and author
+
+%%% ABSTRACT %%%
+\begin{abstract}
+%put your abstract in here if you have one - if you don't have one, just delete this section
+\end{abstract}
+
+
+\section{Getting started}
+\label{sec:start} 
+
+Labels are super important so you can easily reference things within your document, like this section, \cref{sec:start}. 
+
+Some key examples are how to do speech marks or apostrophes, where we use two different marks \verb|`| and \verb|'|:
+\begin{itemize}
+	\item ``like this'' for speech marks
+	\item or `like this' for single marks.
+\end{itemize}
+
+
+We should also clarify the difference between hyphens, en dashes and em dashes.
+\begin{itemize}
+	\item Hyphens look like this -, are denoted using \verb|-|, and are used to combine words, e.g. right-handed.
+	\item en dashes look like this --, are denoted using \verb|--|, and are used in number ranges, e.g. 10--12.
+	\item em dashes look like this ---, are denoted using \verb|---|, are used as grammatical tools like colons, e.g. they loved her a lot --- at least when she wasn't making mistakes in \LaTeX. 
+\end{itemize}
+Sometimes in British English en dashes are used in the place of em dashes, but never use hyphens in their place! 
+
+There are also several special characters in \LaTeX:
+\begin{itemize}
+    \item \(\backslash\), which is used for entering environments;
+    \item \%, which is used for comments;
+    \item \$, which can be used for inline equations or symbols;
+    \item \&, which is used in alignment environments, like \cref{eq:crosssec} and \cref{tab:rho};
+    \item \~, which is used for force adding spaces where needed;
+    \item \#, which I don't know the special use for (extra points if you can find out why it's special.
+\end{itemize}
+You'll notice that in order to make these symbols appear in on the page, I have to prefix them with \verb|\|, as that's the symbol that enters a new environment.
+
+
+
+\section{Packages}
+\label{sec:packages}
+\subsection{siunitx}
+
+\verb|siunitx| is one of my favourite packages because it typesets units really nicely, and also makes it so you don't have to worry about typesetting powers of ten nicely, because it has a built in setting for it. Below are some examples of using it, and you can find full documentation at \url{https://ctan.org/pkg/siunitx?lang=en}. 
+\begin{itemize}
+	\item \qty{12}{\electronvolt}.
+	\item \qty{e-18}{\kilogram\per\second}.
+	\item \qty{0.5}{\kilo\meter}.
+	\item \num{1e5}.
+        \item \unit{\ampere}.
+\end{itemize}
+
+\section{Equations}
+\label{sec:eq}
+%%% EXAMPLE OF SOME DIFFERENT EQUATIONS %%%
+We can do inline equations using \verb|\( \)| symbols or \verb|$$|, like so: \(E=mc^2\) or $E=mc^2$. I usually use \$ as that's what I started with, but \verb|\(| is arguably better syntax.
+
+We can also have standalone equations using the \verb|equation| environment:
+\begin{equation}
+	\Omega_{\text{DM}} h^2 = 0.1200 \pm 0.0012.
+	\label{eq:relic_density}
+\end{equation}
+
+The align environment allows us to create multiline equations which all align at a point specified by the \&:
+\begin{align}
+	\langle\sigma v \rangle =& (n^{eq})^{-2} \prod_{i=1}^{4} \frac{\mathrm{d}^3 p_i}{(2\pi)^3 2E_i} \\
+	& \times (2\pi)^4 \delta^{(3)}(p_1 +p_2-p_3-p_4)\delta(E_1+E_2-E_3-E_4) \\
+	& \times |\mathcal{M}|^2 \exp\left[-\frac{E_\nu-E_{\bar{\nu}}}{T}\right],
+	\label{eq:crosssec}
+\end{align}
+
+We can reference these using the regular \verb|\ref| command, but that just gives the number: \ref{eq:crosssec} or \ref{eq:relic_density}. If we use the \verb|cleveref| package instead with the setting given it is more useful: \cref{eq:crosssec} and \cref{eq:relic_density}.
+
+Some key things to be aware of when it comes to formatting maths: 
+\begin{itemize}
+    \item We indicate a superscript by \verb|^| and subscripts by \verb|_|; for example $E^2$ or $E_2$.
+    \item There are a whole list of symbols in Overleaf that can be accessed by clicking the $\Omega$ symbol in the top toolbar.
+    \item Next to that there is a button to insert inline and display maths, but I recommend \emph{not} using the display maths option, as display math environments are not numbered, whereas equation environments are (and we want numbered equations in physics!).
+\end{itemize}
+
+
+
+\section{Figures}
+\label{sec:fig}
+You'll see that the ordering of the figure and the table are maybe not as you expect them --- that's because \LaTeX places things where it is most appropriate for them to go, depending on the content of the page. 
+
+I've given two examples of figures here. \cref{fig:densityscale} is a typical figure, with just a single image. I've also given an example using \verb|subfigure|, \cref{fig:DM_evid}, because I love subfigures. Subfigures are great if you want to have two diagrams you're comparing, or if you want to group related figures. You can reference the whole thing, or individual figures, by just choosing which label you want: \cref{fig:DM_evid} versus \cref{fig:bulletcluster}. Subfigures are also a great way of saving space if you've got a page limit! I've done all my subfigures on one line (and have used \verb|hfill| between them to space them nicely), but you can also spread them over multiple lines by inserting a linebreak, \verb|\\|, where you want one. 
+
+%%% EXAMPLE OF A FIGURE %%%
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[width=.7\linewidth]{Graphics/cosmo_ingredients}
+	\caption{Evolution of the cosmic ingredients with scale factor, with \(a_0= 1\) today.}
+	\label{fig:densityscale}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\begin{subfigure}[t]{.25\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Graphics/rotationcurves}
+		\caption{Galactic rotation curve for NGC 6503 showing disk and gas contribution plus the dark matter halo contribution needed to match the data~\autocite{doroshkevichSolutionProblemsCusps2012}.}
+		\label{fig:rotationcurves}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{.31\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Graphics/BulletCluster}
+		\caption{A composite image of the Bullet Cluster. The green contours show the total distribution of mass as determined by lensing, whereas the background image shows the visible matter~\autocite{cloweDirectEmpiricalProof2006}.}
+		\label{fig:bulletcluster}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{.36\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{Graphics/CMB_Power}
+		\caption{The Cosmic Microwave Background power spectrum, from the Planck 2018 results~\autocite{aghanimPlanck2018Results2020}. The blue line is from the $\Lambda$CDM theoretical spectrum.}
+		\label{fig:CMB}
+	\end{subfigure}
+	\caption{Various evidence for dark matter, and some citation examples.}
+	\label{fig:DM_evid}
+\end{figure}
+
+\section{Tables}
+\label{sec:tab}
+%%% EXAMPLE OF A TABLE %%%
+\begin{table}
+	\centering
+	\begin{tabular}{|r|l|l|}
+		\hline
+			radiation: & $w=1/3$,& $\Omega_r \propto a^{-4}$; \\ \hline
+			matter: & $w=0$, & $\Omega_m \propto a^{-3}$; \\ \hline
+			cosmological constant, $\Lambda$: & $w=-1$, & $\Omega_\Lambda = \text{constant}$. \\ \hline
+		\end{tabular}
+	\caption{A table of some values.}
+	\label{tab:rho}
+\end{table}
+
+You can use a website like \url{https://www.tablesgenerator.com/} to help you create tables to start out with. Once you've built a few you should be able to start noticing patterns! The key things:
+\begin{itemize}
+    \item The opening line defines the number of columns, their alignment, and if there are lines.
+    \begin{verbatim}\begin{tabular}{|r|l|l|} \end{verbatim} 
+    \begin{itemize}
+        \item A | indicates a vertical line in the table
+        \item \verb|r,l,c| all indicate columns, with the respective alignment (right, left, centre).
+    \end{itemize}
+    \item If you want horizontal lines in the table, you need to include them as table `rows', by inserting a \verb|\hline|
+\end{itemize}
+
+\FloatBarrier %this is from the placeins packages, and means all figures will happen before this point. I like using it to make sure all figures occur before the bibliography.
+
+%%%BIBLIOGRAPHY%%%
+%This is it.
+%This is all you need to do (everything is set up in the preamble).
+%It's that easy!
+\printbibliography
+
+\end{document}

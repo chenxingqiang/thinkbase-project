@@ -1,0 +1,174 @@
+\documentclass[output=paper,colorlinks,citecolor=brown,
+% hidelinks,
+% showindex
+]{langscibook}
+
+%This is where you put the authors and their affiliations
+\author{Author 1 Name\affiliation{Author 1 Affiliation}\and Author 2 Name\affiliation{Author 2 Affiliation}\lastand  Author 3 Name\affiliation{Author 3 Affiliation}}
+
+%Insert your title here
+\title{ACAL Proceedings Template}  
+\abstract{Here is where you write the abstract of the paper.
+}
+
+
+\input{AcalProceedingsTemplatePackages.tex}
+\input{AcalProceedingsTemplateCommands.tex}
+
+\input{localpackages.tex}
+\input{localcommands.tex}
+
+% \IfFileExists{../localcommands.tex}{%hack to check whether this is being compiled as part of a collection or standalone
+%   \input{../localpackages}
+%   \input{../localcommands} 
+% \togglepaper[23]
+% }{}
+
+\begin{document}
+\maketitle
+
+\section{What is this document?}
+
+This is a template for writing proceedings papers in \LaTeX{} for the \href{https://acal.linguistlist.org}{Annual Conference on African Linguistics}, published as an \href{https://www.overleaf.com/latex/templates/acal-proceedings-template/kxmngmsjvfqq}{Overleaf template}. This is designed for people who are already familiar with \LaTeX{} and with Overleaf, and simply provides an easy template for writing papers for the ACAL proceedings. The main content contained in this document are  instructions that are specific to publishing with Language Science Press. This is not an entire style guide, rather, we include requirements on the \LaTeX{} coding that are specific to Language Science Press and that therefore may be unfamiliar to those who already write in \LaTeX{}. If you are submitting a paper to the ACAL proceedings, please format your document in accordance with the guidelines noted here. 
+
+If you want help learning \LaTeX{} for publishing in the ACAL Proceedings, please see our \href{https://www.overleaf.com/latex/templates/acal-proceedings-latex-quick-reference-guide/fncrcrtgnxhv}{Quick Reference Guide}, which (like this document) is published as an Overleaf Template.
+
+Once you are comfortable with the guidelines below, delete the text in this file and start writing your paper!
+
+\section{Main formatting requests}
+
+\textbf{Please do these things:}
+
+\begin{itemize}
+
+\item Use a LaTeX template from Language Science Press. You may use the main \href{https://www.overleaf.com/latex/templates/langsci-template-for-papers-in-edited-volumes-2020-slash-05/cpjcmcphbvph}{Language Science Press LaTeX template for papers in edited volumes}, or you may use the ACAL Proceedings template you are reading from now, which is built on LSP’s template but has packages/commands added that we thought would be useful to ACAL authors.\footnote{If you learned LaTeX from our \href{https://www.overleaf.com/latex/templates/acal-proceedings-latex-quick-reference-guide/fncrcrtgnxhv}{Quick Reference Guide}, please use this template to write in, as it matches the structure of the \href{https://www.overleaf.com/latex/templates/acal-proceedings-latex-quick-reference-guide/fncrcrtgnxhv}{Quick Reference Guide}.}
+
+\item Include first and last names for all authors in all citations. 
+
+\item Space the code for your \verb|\Tree|s out, as we have suggested in the \href{https://www.overleaf.com/latex/templates/acal-proceedings-latex-quick-reference-guide/fncrcrtgnxhv}{Quick Reference Guide}. That is to say, please put in line breaks rather than coding a tree in one straight line. This 
+
+\item Labels and cross-references: follow the LSP-requested commands for labels and cross-references outlined in the next section. 
+
+\item While some linguistics publications typeset all tables, trees, and figures as numbered examples, for Language Science Press, charts/tables are typeset as Tables, and syntactic trees and other larger diagrams are typeset as Figures. See below for specifics commands to cross-reference Tables and Figures for Language Science Press. 
+
+\item Abbreviations should be included in a separate unnumbered abbreviations section at the end of the paper (as illustrated at the end of this template). Your acknowledgments section should follow this same format.
+
+\item Bibliographic references should be included in localbibliography.bib.
+
+\end{itemize}
+
+\newpage 
+
+\noindent \textbf{Do not do these things:}
+
+\begin{itemize}
+
+\item Do not modify any of the langsci style files (langsi-basic.sty, langsci-optional.sty, langscibook.cls, etc). It is quite difficult for the ACAL Editors to debug it when changes to this file have been made. 
+
+\item Do not manually cite references and add references to the bibliography with \verb|\nocite.| 
+
+\item Do not use natbib. Use the bibliography package as given in the LSP template. (natbib commands work for in-text citations)
+
+\end{itemize}
+
+\noindent \textbf{For IPA characters:}
+
+In general, don’t use tipa to format IPA characters. If you have an IPA solution to insert IPA characters into any document (like the \href{https://keyman.com/ipa/}{Keyman IPA keyboard by SIL}), you can use that in \LaTeX{}, just use \XeLaTeX{} as your rendering engine when writing (as is built into this template and the LSP template, which use the fontspec package). You can just add your IPA characters directly into your .tex document and they should format. If you are having issues, please contact the LaTeX team at \href{mailto:acal.latex@gmail.com}{acal.latex@gmail.com}.
+
+\section{Language Science Press Cross-References} \label{sec:diercks:CrossReferences}
+
+\begin{enumerate}    
+
+\item In order to facilitate compiling disparate ACAL papers into a single volume and to avoid potential conflicts in labels, please name each label according to its purpose (section, table, etc), the first author's name, and then your specific label, as shown below. 
+
+\begin{itemize}
+
+\item Section label: \verb|\label{sec:author:yourlabel}|
+
+\item Table label: \verb|\label{tab:author:yourlabel}|
+
+\item Figure label: \verb|\label{fig:author:yourlabel}|
+
+\item Example label: \verb|\label{ex:author:yourlabel}|
+
+\end{itemize}
+
+    
+\item Rather that just using \verb|\ref{}| for all cross-references, LSP has built specific commands for different kinds of cross-references. Please use these.  
+
+\begin{itemize}
+
+\item Section reference (will read `\S \#’ in output):\\ \verb|\sectref{sec:author:yourlabel}|
+
+\item Table reference (will read `Table \#’ in output):\\ \verb|\tabref{tab:author:yourlabel}|
+
+\item Figure reference (will read `Figure \#’ in output): \\ \verb|\figref{fig:author:yourlabel}|
+
+\item Example reference with parens — note caps (will read `(\#)’ in output): \\ \verb|\REF{ex:author:yourlabel}| 
+
+\item Example reference without parens — note caps (will read `\#’ in output): \\ \verb|\ref{ex:author:yourlabel}|
+
+\end{itemize}
+\end{enumerate}
+
+\section{Linguistic examples as numbered examples}
+
+All linguistic examples should use the LSP-specific gb4e format, illustrated in the example below. Note in particular the \verb|\z| command which closes the example list environment which is started by \verb|\ea| (see below in the .tex).
+
+\ea %\label{ex:diercks:Firstexample} Optional caption (Dutch: Citation 2021) \\
+\gll  dit  is een voorbeeld.\\
+\textsc{dem} \textsc{cop} \textsc{indef} example\\
+\glt  ‘This is an example.’
+\z
+
+\noindent If you want multiple data examples to appear in one numbered example, you use the xlist environment. 
+
+\ea \label{ex:diercks:XlistExample}
+\begin{xlist}
+
+\ex This is the first example. 
+
+\ex \label{ex:diercks:SwahiliXlist}
+\gll hii ni m-fano w-a pili, kwa Ki-swahili \\
+this is 3-example 3-\Assoc{} second, of 7-Swahili \\
+\glt `This is a second example, in Swahili.' 
+
+\end{xlist}
+
+\z 
+
+\section{Tables}
+
+All tables should have a top and bottom rule using the LSP commands for drawing top and bottom rules (a modification of the booktabs package): \verb|\lsptoprule| and \verb|\lspbottomrule|. \verb|\midrule| is recommended under a header row, but not elsewhere (i.e. horizontal lines within tables are discouraged). Likewise, LSP discourages the use of vertical lines in tables. (see below for an example, and you may also consult the \href{https://www.overleaf.com/latex/templates/acal-proceedings-latex-quick-reference-guide/fncrcrtgnxhv}{ACAL Proceedings Quick Reference Guide}, or Language Science Press's guidelines.)
+
+\begin{table}
+\caption{Frequencies of word classes}
+\label{tab:Diercks:PosFrequency}
+ \begin{tabular}{lllll}
+  \lsptoprule
+            & Nouns & Verbs & Adjectives & Adverbs\\
+  \midrule
+  Absolute  &   12 & 34 & 23 & 13 \\
+  Relative  &   3.1 & 8.9 & 5.7 & 3.2 \\
+  \lspbottomrule
+ \end{tabular}
+\end{table}
+
+\section*{Abbreviations}
+
+Abbreviations should be included in this section. It is a required part of volumes with Language Science Press that an abbreviations list be included, so you cannot omit this section.
+
+\section*{Acknowledgements}
+
+Acknowledgements must be listed here, not in a footnote in the paper.
+
+\noindent For our acknowledgments for this template, see our \href{https://www.overleaf.com/latex/templates/acal-proceedings-latex-quick-reference-guide/fncrcrtgnxhv}{Quick Reference Guide}. 
+
+
+\sloppy %this command eliminates a quirk that appears in the bibliography, you can just leave it here.
+
+\printbibliography[heading=subbibliography,notkeyword=this]
+
+\end{document}
+
+%To be added to the ACAL \LaTeX{} template, someday: glossing with leipzig, advanced instructions for arrows

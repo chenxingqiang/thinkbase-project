@@ -1,0 +1,95 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+\documentclass{nccuthesisclass}
+
+% -----引入bib檔案--------------------
+\addbibresource{bibfolder/main.bib}
+%---------------------------------------------------
+
+\begin{document}
+
+
+\frontmatter
+
+\NCCUtitlepage
+% 引入封面、書名頁
+
+% 編號從這開始
+\pagenumbering{roman}
+% 頁碼改為 i, ii, ...
+\setcounter{page}{1}
+% 從頭開始計算
+
+\NCCUbookname
+
+
+%------------------授權、通過書------------------%
+% \includepdf{proofs/auth.pdf}        %授權書
+% \includepdf{proofs/accept.pdf}      %通過書
+% \includepdf{proofs/accepteng.pdf}   %通過英文書
+
+
+\restoregeometry
+
+
+\setcounter{page}{1}
+% 再度從頭開始計算
+
+\input{others/acknowledgementsCH}
+% 致謝
+
+\input{others/abstractCH} % 中文摘要
+
+\input{others/abstractEN} % 英文摘要
+
+\etocsetnexttocdepth{section}
+\tableofcontents % 目錄
+
+ % 圖目錄
+ \listoffigures
+\addcontentsline{toc}{chapter}{\listfigurename}
+
+
+% 表目錄
+\listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+
+
+% ----- Definition 目錄 -----
+\renewcommand\listtheoremname{List of Definitions
+      \markboth{List of Definitions}{List of Definitions}}
+{
+\listoftheorems[ignoreall,show=definition]
+\addcontentsline{toc}{chapter}{List of Definitions}
+}
+
+% ----- Theorem 目錄 -----
+\renewcommand\listtheoremname{List of Theorems
+      \markboth{List of Theorems}{List of Theorems}}
+{
+\listoftheorems[ignoreall,show=theorem]
+\addcontentsline{toc}{chapter}{List of Theorems}
+}
+
+%----- Abbr 目錄 及 Notation 目錄 -----
+\input{others/abbr}
+% 引入abbr頁面
+
+\input{others/notation}
+% 引入notation頁面
+
+% ----- 主要內文部分 -----
+\mainmatter
+
+\input{chapters/Introduction}
+\input{chapters/Conclusion}
+
+
+%----- 印出Reference -----
+\printbibliography[heading=bibintoc]
+
+%----- Appendix -----
+\appendix
+\input{others/appendix}
+
+\end{document}

@@ -1,0 +1,1407 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Modelo de Contrato 
+% LaTeX Template
+% Version 1.0 (December 2018)
+%
+%Esse template foi elaborado por Samira Marx para estimular o uso de LaTeX na produção de documentos na Administração Pública permitindo a utilização de ferramentas de colaboração e controle de versão.
+% https://github.com/samiramarx
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,11pt]{report} % The default font size is 12pt on A4 paper, change to 'usletter' for US Letter paper and adjust margins in structure.tex
+
+\usepackage[utf8]{inputenc} % Permite caracteres acentuados
+
+\setcounter{secnumdepth}{2} % Profundidade da numeração
+\setcounter{tocdepth}{1} % Profundidade do sumário
+
+\usepackage{titlesec} % Número e nome dos capítulos na mesma linha
+\titleformat{\chapter}[hang]
+{\normalfont\normalsize\bfseries}{\chaptertitlename\ \thechapter.}{0.5em}{} 
+\titleformat{\section}[block]
+{\normalfont\normalsize\bfseries}{\thesection}{0.5em}{} 
+
+\usepackage{titletoc}%
+\titlecontents{chapter}% <section-type>
+  [0pt]% <left>
+  {\bfseries}% <above-code>
+  {\chaptername\ \thecontentslabel.\quad}% <numbered-entry-format>
+  {}% <numberless-entry-format>
+  {\hfill\contentspage}% <filler-page-format>
+
+\renewcommand{\chaptername}{CAPÍTULO} % Altera nomes dos capítulos de "Chapter" para "Capítulo"
+\renewcommand{\thechapter}{\Roman{chapter}} %Altera numeração de capítulos para números romanos
+\renewcommand*\thesection{\arabic{section}} %Altera numeração de seções para não estarem vinculadas aos números dos capítulos
+
+\setlength{\parindent}{0pt} % Retira indentação dos parágrafos
+
+\usepackage{enumitem}
+\renewcommand*{\theenumi}{\thesection.\arabic{enumi}} % Permite numeração continuada a partir dos capítulos e seções.
+\renewcommand*{\theenumii}{\theenumi.\arabic{enumii}} % Permite numeração continuada a partir dos capítulos e seções.
+
+\usepackage{remreset} % Para numeração de seções continuamente, independente dos capítulos
+\makeatletter 
+  \@removefromreset{section}{chapter}
+\makeatother
+
+\usepackage{hyperref} % Utilizado no sistema de referência cruzada - vide arquivo "cross-reference.txt" 
+
+%\input{structure.tex} % Input the structure.tex file which specifies the document layout and style
+
+%-----------------------------------------------------------
+%	PREENCHIMENTO DE DADOS
+%-----------------------------------------------------------
+
+% Dados da Concorrência
+\newcommand{\NumeroLicitacao}{[$\bullet$]}
+\newcommand{\AnoLicitacao}{\the\year}
+\newcommand{\DataHomologacao}{$\bullet$/$\bullet$/$\bullet$}
+
+% Dados da Contratante
+\newcommand{\Contratante}{Secretaria de Estado de Planejamento e Gestão - SEPLAG}
+\newcommand{\ContratanteEndereco}{Rodovia Papa João Paulo II, nº 4001, 3º andar, Edifício Gerais, Bairro Serra Verde, Belo Horizonte-MG, CEP 31630-901}
+\newcommand{\RepresentanteContratanteNome}{Helvécio Miranda Magalhães Júnior}
+\newcommand{\RepresentanteContratanteCPF}{561.966.446-53}
+\newcommand{\RepresentanteContratanteCI}{161715-0-SSP/MG}
+
+% Dados da Contratada
+\newcommand{\Contratada}{[Concessionária]}
+\newcommand{\ContratadaEndereco}{\textbf{[$\bullet$]}}
+\newcommand{\ContratadaCNPJ}{\textbf{[$\bullet$]}}
+
+\newcommand{\RepresentanteContratadaNomeA}{\textbf{[$\bullet$]}} % Diretor 1
+\newcommand{\RepresentanteContratadaCPFA}{\textbf{[$\bullet$]}}
+\newcommand{\RepresentanteContratadaCIA}{\textbf{[$\bullet$]}}
+
+\newcommand{\RepresentanteContratadaNomeB}{\textbf{[$\bullet$]}} % Diretor 2
+\newcommand{\RepresentanteContratadaCPFB}{\textbf{[$\bullet$]}}
+\newcommand{\RepresentanteContratadaCIB}{\textbf{[$\bullet$]}}
+
+% Dados Interveniente A 
+\newcommand{\IntervenienteANome}{[Interveniente]}
+\newcommand{\IntervenienteAEndereco}{\ContratanteEndereco}
+\newcommand{\IntervenienteACNPJ}{\textbf{[$\bullet$]}}
+
+\newcommand{\RepresentanteAIntervenienteA}{\textbf{[$\bullet$]}} %Representante A
+\newcommand{\RepresentanteAIntervenienteACI}{\textbf{[$\bullet$]}}
+\newcommand{\RepresentanteAIntervenienteACPF}{\textbf{[$\bullet$]}}
+
+\newcommand{\RepresentanteBIntervenienteA}{\textbf{[$\bullet$]}} %Representante B
+\newcommand{\RepresentanteBIntervenienteACI}{\textbf{[$\bullet$]}}
+\newcommand{\RepresentanteBIntervenienteACPF}{\textbf{[$\bullet$]}}
+
+% Dados Interveniente B 
+\newcommand{\IntervenienteBNome}{[Interveniente]}
+\newcommand{\IntervenienteBEndereco}{\ContratanteEndereco}
+\newcommand{\IntervenienteBCNPJ}{\textbf{[$\bullet$]}}
+
+\newcommand{\RepresentanteAIntervenienteB}{\textbf{[$\bullet$]}} %Representante A
+\newcommand{\RepresentanteAIntervenienteBCI}{\textbf{[$\bullet$]}}
+\newcommand{\RepresentanteAIntervenienteBCPF}{\textbf{[$\bullet$]}}
+
+\newcommand{\RepresentanteBIntervenienteB}{\textbf{[$\bullet$]}} %Representante B
+\newcommand{\RepresentanteBIntervenienteBCI}{\textbf{[$\bullet$]}}
+\newcommand{\RepresentanteBIntervenienteBCPF}{\textbf{[$\bullet$]}}
+
+% Valor do Contrato e Dotação Orçamentária
+\newcommand{\ValorContrato}{[$\bullet$]}
+\newcommand{\ValorTotalCP}{[$\bullet$]}
+\newcommand{\DotacaoOrcamentaria}{$\bullet$]}
+
+% Assinatura do Contrato
+\newcommand{\DataAssinatura}{[$\bullet$]}
+%\DiaAssinatura de \MesAssinatura de \Ano Assinatura
+
+%-----------------------------------------------------------
+%	DEFINIÇÕES
+%-----------------------------------------------------------
+
+%-----------------------------------------------------------
+%	ANEXOS
+%-----------------------------------------------------------
+
+%Anexos do Edital
+\newcommand{\AnexoEditalI}{ANEXO I – MINUTA DO CONTRATO DA CONCESSÃO ADMINISTRATIVA}
+\newcommand{\AnexoEditalII}{ANEXO II – DEFINIÇÕES DA CONCESSÃO}
+\newcommand{\AnexoEditalIII}{ANEXO III – MODELOS DO EDITAL}
+\newcommand{\AnexoEditalIV}{ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS}
+\newcommand{\AnexoEditalV}{ANEXO V – RELAÇÃO DE LOCAIS PARA A IMPLANTAÇÃO DE PONTOS DE CAPTURA}
+\newcommand{\AnexoEditalVI}{ANEXO VI – CRONOGRAMA}
+\newcommand{\AnexoEditalVII}{ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO}
+\newcommand{\AnexoEditalVIII}{ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA}
+\newcommand{\AnexoEditalIX}{ANEXO IX – ALOCAÇÃO DE RISCOS E SISTEMA DE REEQUILÍBRIO ECONÔMICO-FINANCEIRO}
+\newcommand{\AnexoEditalX}{ANEXO X – ESTRUTURA DE GOVERNANÇA}
+\newcommand{\AnexoEditalXI}{ANEXO XI – MODELOS DO PLANO DE NEGÓCIOS}
+
+
+%Anexos do Contrato
+\newcommand{\AnexoContratoI}{ANEXO I - EDITAL DE CONCORRÊNCIA N.º \NumeroLicitacao/2018}
+\newcommand{\AnexoContratoII}{ANEXO II – DEFINIÇÕES DA CONCESSÃO}
+\newcommand{\AnexoContratoIII}{ANEXO III – MODELOS DO EDITAL}
+\newcommand{\AnexoContratoIV}{ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS}
+\newcommand{\AnexoContratoV}{ANEXO V – RELAÇÃO DE LOCAIS PARA A IMPLANTAÇÃO DE PONTOS DE CAPTURA}
+\newcommand{\AnexoContratoVI}{ANEXO VI – CRONOGRAMA}
+\newcommand{\AnexoContratoVII}{ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO}
+\newcommand{\AnexoContratoVIII}{ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA}
+\newcommand{\AnexoContratoIX}{ANEXO IX – ALOCAÇÃO DE RISCOS E SISTEMA DE REEQUILÍBRIO ECONÔMICO-FINANCEIRO}
+\newcommand{\AnexoContratoX}{ANEXO X – ESTRUTURA DE GOVERNANÇA}
+\newcommand{\AnexoContratoXI}{ANEXO XI – MODELOS DO PLANO DE NEGÓCIOS}
+\newcommand{\AnexoContratoXII}{ANEXO XII – PLANO DE NEGÓCIO REFERÊNCIAL}
+
+%------------------------------------------------------------
+\begin{document}
+%------------------------------------------------------------
+%	Capa
+%------------------------------------------------------------
+
+\begin{titlepage}
+
+\vspace*{\fill} % Add whitespace above to center the title page content
+
+\begin{flushright}
+{\LARGE CONCORRÊNCIA PÚBLICA \NumeroLicitacao} \\ [1.5cm]
+\end{flushright}
+
+Concorrência Pública que tem por finalidade selecionar a melhor proposta para a delegação, por meio de concessão de serviços públicos na modalidade administrativa, da prestação de serviços de implantação e operação de solução tecnológica que abranja captura, transmissão, armazenamento e tratamento de dados de veículos e cargas que trafegam pelas malhas rodoviárias localizadas em Minas Gerais, denominada \textbf{PPP DIVISA SEGURA}.
+
+\vspace{1.5\baselineskip}
+
+\hrule
+
+\begin{center}
+\AnexoContratoI
+\end{center}
+\hrule
+
+
+\end{titlepage}
+
+%-----------------------------------------------------------
+%	SUMÁRIO
+%-----------------------------------------------------------
+
+\renewcommand{\contentsname}{SUMÁRIO}
+\tableofcontents
+\pagebreak
+
+%-----------------------------------------------------------
+%	CORPO CONTRATO
+%-----------------------------------------------------------
+\setlength\parskip{2ex} % Inclui espaço entre parágrafos
+
+\chapter*{PREÂMBULO}
+\addcontentsline{toc}{chapter}{PREÂMBULO}
+
+O Estado de Minas Gerais, por meio da \Contratante, com sede na \ContratanteEndereco, representada por seu titular \RepresentanteContratanteNome, inscrito no \RepresentanteContratanteCPF, portador da Carteira de Identidade nº \RepresentanteContratanteCI, domiciliado na \ContratanteEndereco, no uso de suas atribuições que lhe são conferidos pela Lei Estadual nº 22.257 de 27 de julho de 2016, doravante designada apenas “PODER CONCEDENTE”;
+
+A \Contratada, com sede na \ContratadaEndereco, inscrita no CNPJ/MF sob o nº \ContratadaCNPJ, representada por seus Diretores \RepresentanteContratadaNomeA, portador da Carteira de Identidade nº \RepresentanteContratadaCIA, e inscrito no CPF/MF sob o nº \RepresentanteContratadaCPFA, e \RepresentanteContratadaNomeB, portador da Carteira de Identidade nº \RepresentanteContratadaCIB, e inscrito no CPF/MF sob o nº \RepresentanteContratadaCPFB, membros da Diretoria da Companhia, doravante denominada apenas “CONCESSIONÁRIA”; e
+
+O(A) \IntervenienteANome, com sede na \IntervenienteAEndereco, inscrito no CNPJ/MF sob o nº \IntervenienteACNPJ, representada por \RepresentanteAIntervenienteA, portador da Carteira de Identidade nº \RepresentanteAIntervenienteACI, e inscrito no CPF/MF sob o nº \RepresentanteAIntervenienteACPF, e \RepresentanteBIntervenienteACPF, portador da Carteira de Identidade nº \RepresentanteBIntervenienteACI, e inscrito no CPF/MF sob o nº \RepresentanteBIntervenienteACPF, doravante denominada apenas INTERVENIENTE;
+
+O(A) \IntervenienteBNome, com sede na \IntervenienteBEndereco, inscrito no CNPJ/MF sob o nº \IntervenienteBCNPJ, representada por \RepresentanteAIntervenienteB, portador da Carteira de Identidade nº \RepresentanteAIntervenienteBCI, e inscrito no CPF/MF sob o nº \RepresentanteAIntervenienteBCPF, e \RepresentanteBIntervenienteBCPF, portador da Carteira de Identidade nº \RepresentanteBIntervenienteBCI, e inscrito no CPF/MF sob o nº \RepresentanteBIntervenienteBCPF, doravante denominada apenas INTERVENIENTE;
+
+CONSIDERANDO a realização, pelo PODER CONCEDENTE, da Concorrência Pública nº \NumeroLicitacao/\AnoLicitacao que teve por objeto a delegação, por meio de concessão de serviços públicos na modalidade administrativa, da prestação de serviços de implantação e operação de solução tecnológica que abranja captura, transmissão, armazenamento e tratamento de dados de veículos e cargas que trafegam pelas malhas rodoviárias localizadas em Minas Gerais;
+
+E CONSIDERANDO o ato da autoridade competente, conforme publicação no Órgão de Imprensa Oficial do Estado de Minas Gerais do dia \DataHomologacao, segundo o qual o OBJETO da CONCORRÊNCIA, foi adjudicado à CONCESSIONÁRIA, que se constituiu em SOCIEDADE DE PROPÓSITO ESPECÍFICO – SPE, de acordo com as exigências contidas no instrumento convocatório, atendeu às exigências para a formalização deste instrumento;
+
+CONSIDERANDO as promessas mútuas firmadas neste CONTRATO de CONCESSÃO administrativa, doravante denominado CONTRATO, e outras considerações relevantes e pertinentes neste ato reconhecidas, as PARTES acordam e
+
+RESOLVEM celebrar o presente CONTRATO de CONCESSÃO, que se regerá pelas seguintes cláusulas e condições, mutuamente aceitas pelas PARTES:
+
+\chapter{DISPOSIÇÕES INICIAIS}
+\section{LEGISLAÇÃO APLICÁVEL E REGIME JURÍDICO DO CONTRATO}
+\label{sec:PAHT}
+
+\begin{enumerate}
+\item \label{itm:A5JT} A CONCESSÃO rege-se pelas normas abaixo, bem como pelos termos e condições deste CONTRATO, pelos dispositivos do EDITAL, de seus ANEXOS e pelas normas gerais de Direito Público, sendo-lhe aplicáveis, supletivamente, os princípios da Teoria Geral dos Contratos e as disposições de Direito Privado:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:3CK8} Constituição Federal de 1988, em especial o artigo 37, inciso XXI, e o artigo 175.
+\item \label{itm:6FZL} Lei Federal nº 11.079, de 30 de dezembro de 2004.
+\item \label{itm:3QJD} Subsidiariamente, a Lei Federal nº 8.987, de 13 de fevereiro de 1995, a Lei Federal nº 9.074, de 07 de julho de 1995, e a Lei Federal nº 8.666, de 21 de junho 1993.
+\item \label{itm:WHLA} Lei Federal nº 6.404, de 15 de dezembro de 1976.
+\item \label{itm:628W} Lei Federal nº 9.307, de 23 de setembro de 1996.
+\item \label{itm:9YPH} Lei Complementar nº 101, de 04 de maio de 2000.
+\item \label{itm:6WF3} Lei Estadual nº 22.606, de 2 de julho de 2017.
+\item \label{itm:EUAC} Lei Estadual nº 13.994, de 18 de setembro de 2001
+\item \label{itm:NFZG} Lei Estadual nº 19.477, de 12 de janeiro de 2011.
+\item \label{itm:E8WP} Decreto Estadual nº 47.229, de 04 de agosto de 2017.
+\item \label{itm:ZGSQ} Decreto Estadual nº 45.902 de 27 de janeiro de 2012.
+\item \label{itm:XVAC} Normas técnicas e instruções normativas pertinentes.
+\end{enumerate}
+
+
+\item \label{itm:DS3Z} As referências às normas aplicáveis à CONCESSÃO deverão também ser compreendidas como referências à legislação que as substituam ou modifiquem.
+        	
+\item \label{itm:N2VY} O regime jurídico deste CONTRATO confere ao PODER CONCEDENTE, dentre outras dispostas em lei, as prerrogativas de:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:Z4JK} Alterá-lo, unilateralmente, para melhor adequação às finalidades de interesse público, respeitados os direitos da CONCESSIONÁRIA.
+\item \label{itm:PK35} Rescindi-lo, unilateralmente, nos casos especificados na legislação, observado o procedimento previsto neste CONTRATO.
+\item \label{itm:CQ8W} Fiscalizar a execução.
+\item \label{itm:P344} Aplicar sanções, motivadas pela sua inexecução parcial ou total, nos parâmetros estabelecidos neste CONTRATO.
+\end{enumerate}
+
+\end{enumerate}
+
+\section{DEFINIÇÕES}
+\label{sec:Q7MS}
+
+\begin{enumerate}
+\item \label{itm:93HA} Para fins de interpretação do CONTRATO, os termos e expressões utilizados no CONTRATO terão os significados constantes no ANEXO II – DEFINIÇÕES DA CONCESSÃO
+
+\item \label{itm:P5EM} Exceto quando o contexto não permitir, aplicam-se as seguintes regras à interpretação do CONTRATO:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:6Z7C} As definições do CONTRATO serão igualmente aplicadas nas formas singular e plural.
+\item \label{itm:MML8} Referências ao CONTRATO ou a qualquer outro documento devem incluir eventuais alterações e aditivos que venham a ser celebrados entre as PARTES.
+\item \label{itm:KD3C} Referências a diplomas legais devem ser interpretados de acordo conforme a eventual legislação que substitua, complemente ou modifique. 
+\item \label{itm:AZGZ} As referências às normas aplicáveis no Brasil deverão também ser compreendidas como referência à eventual legislação que as substitua complemente ou modifique.
+\item \label{itm:5U2M} Os títulos dos capítulos e das cláusulas do CONTRATO e dos ANEXOS não devem ser usados na sua aplicação ou interpretação.
+\item \label{itm:EQ7R} No caso de divergência entre o CONTRATO e seus ANEXOS, prevalecerá o disposto no CONTRATO.
+\item \label{itm:BDN5} No caso de divergência entre os ANEXOS, prevalecerão aqueles emitidos pelo PODER CONCEDENTE.
+\item \label{itm:SFUZ} No caso de divergência entre os ANEXOS emitidos pelo PODER CONCEDENTE, prevalecerá aquele de data mais recente. 
+\item \label{itm:6Y8N} Em caso de extinção de qualquer dos índices de reajuste previstos neste CONTRATO, o índice a ser utilizado deverá ser aquele que o substituir.
+\item \label{itm:FPAR} Caso nenhum índice venha a substituir automaticamente o índice extinto, as PARTES deverão determinar, de comum acordo, o novo índice a ser utilizado.
+\item \label{itm:ES2L} Os termos que designem gênero masculino também designam o gênero feminino e vice-versa.
+\end{enumerate}
+
+\end{enumerate}
+
+\section{ANEXOS}
+\label{sec:RML7}
+\begin{enumerate}
+
+\item \label{itm:FAGK} Para todos os fins, integram o CONTRATO os seguintes ANEXOS:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:YJ3Y} ANEXO I - EDITAL DE CONCORRÊNCIA N.º \NumeroLicitacao/\AnoLicitacao. 
+\item \label{itm:DMBQ} ANEXO II – DEFINIÇÕES DA CONCESSÃO.
+\item \label{itm:3NLU} ANEXO III – MODELOS DO EDITAL.
+\item \label{itm:4K53} ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:AQMQ} ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 1 – OBRIGAÇÕES GERAIS E COMUNS.
+\item \label{itm:LSCC} ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 2 – OBRIGAÇÕES ESPECÍFICAS – CAPTURA.
+\item \label{itm:ELKY} ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 3 – OBRIGAÇÕES ESPECÍFICAS – TRANSMISSÃO.
+\item \label{itm:CKKV} ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 4 – OBRIGAÇÕES ESPECÍFICAS – ARMAZENAMENTO.
+\item \label{itm:3KD3} ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 5 – OBRIGAÇÕES ESPECÍFICAS – TRATAMENTO.
+\end{enumerate}
+
+\item \label{itm:57Z2} ANEXO V – RELAÇÃO DE LOCAIS PARA A IMPLANTAÇÃO DE PONTOS DE CAPTURA.
+\item \label{itm:BT27} ANEXO VI – CRONOGRAMA.
+\item \label{itm:2P3J} ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO.
+\item \label{itm:SXAQ} ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA.
+\item \label{itm:YTEB} ANEXO IX – ALOCAÇÃO DE RISCOS E SISTEMA DE REEQUILÍBRIO ECONÔMICO-FINANCEIRO.
+\item \label{itm:KGA3} ANEXO X – ESTRUTURA DE GOVERNANÇA.
+\item \label{itm:C8YR} ANEXO XI – MODELOS DO PLANO DE NEGÓCIOS.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:KBEF} ANEXO XI – MODELOS DO PLANO DE NEGÓCIOS – APÊNDICE 1 – QUADROS 
+\end{enumerate}
+
+\item \label{itm:J2UR} ANEXO XII – PLANO DE NEGÓCIO REFERÊNCIAL.
+
+\end{enumerate}
+\end{enumerate}
+
+\chapter{ELEMENTOS DA CONCESSÃO}
+
+\section{OBJETO DA CONCESSÃO}
+\label{sec:5MSZ}
+\begin{enumerate}
+
+\item \label{itm:9REB} O OBJETO do CONTRATO é a delegação, por meio de concessão de serviços públicos na modalidade administrativa, da prestação de serviços de implantação e operação de solução tecnológica que abranja captura, transmissão, armazenamento e tratamento de dados de veículos e cargas que trafegam pelas malhas rodoviárias localizadas em Minas Gerais, denominda PPP DIVISA SEGURA. 
+
+\item \label{itm:8EP5} Os SERVIÇOS da CONCESSÃO deverão ser executados de modo adequado, na forma das especificações mínimas constantes no ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS e seus apêndices, observados os parâmetros de desempenho previstos no ANEXO V – RELAÇÃO DE LOCAIS PARA A IMPLANTAÇÃO DE PONTOS DE CAPTURA, ANEXO VI – CRONOGRAMA e ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA.
+
+\end{enumerate}
+
+\section{PRAZO DA CONCESSÃO}
+\label{sec:HWPQ}
+\begin{enumerate}
+\item \label{itm:8UN6} A outorga da CONCESSÃO e a vigência do presente CONTRATO terão o prazo de 15 anos, contados a partir da DATA DE EFICÁCIA, prorrogáveis ao prazo total máximo de 35 (trinta e cinco) anos, contados da data de assinatura do CONTRATO, observados as exigências legais.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:HPK4} Considera-se DATA DE EFICÁCIA a data em que se der o atendimento cumulativo dos seguintes eventos: 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:FVZZ} Publicação deste CONTRATO.
+\item \label{itm:P4PQ} Comprovação pelo PODER CONCEDENTE à CONCESSIONÁRIA de constituição da Conta Vinculada de Pagamento, nos termos da cláusula \ref{itm:SUJU} deste CONTRATO.
+\item \label{itm:ESTL} Comprovação pelo PODER CONCEDENTE à CONCESSIONÁRIA de constituição das GARANTIAS DE ADIMPLEMENTO DO CONTRATO PELO PODER CONCEDENTE, nos termos da cláusula \ref{sec:CBKD} deste CONTRATO.
+\item \label{itm:6Z8J} Comprovação pela CONCESSIONÁRIA ao PODER CONCEDENTE de constituição das GARANTIAS DE EXECUÇÃO do CONTRATO, nos termos da cláusula 28 deste CONTRATO.
+\end{enumerate}
+
+\item \label{itm:ZSXX} Caso o PODER CONCEDENTE não cumpra as providências previstas nas alíneas \ref{itm:FVZZ}, \ref{itm:P4PQ} e \ref{itm:ESTL} do subitem \ref{itm:HPK4} em 180 (cento e oitenta) dias contados a partir da assinatura do CONTRATO, a critério da CONCESSIONÁRIA, o CONTRATO poderá ser extinto, não sendo admitida, nesta hipótese, a aplicação de qualquer sanção administrativa à CONCESSIONÁRIA.
+\item \label{itm:7CSU} As PARTES poderão acordar a prorrogação do prazo estabelecido na subcláusula \ref{itm:ZSXX}.
+
+\end{enumerate}
+\end{enumerate}
+
+\section{VALOR DO CONTRATO E DOTAÇÃO ORÇAMENTÁRIA}
+\label{sec:5GLW}
+
+\begin{enumerate}
+\item \label{itm:56UT} O valor do contrato, na DATA BASE, é de R\$\ValorContrato, correspondente ao somatório: 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:3887}	das receitas provenientes da CONTRAPRESTAÇÃO MÁXIMA MENSAL projetadas para todo o prazo da CONCESSÃO ADMINISTRATIVA, que totalizam R\$ \ValorTotalCP;
+\item \label{itm:9XEH}	do quantitativo total dimensionado, fixado em 2.000 (dois mil) de pontos de função a cada 5 (cinco) anos, para os Pontos de Função destinado para manutenção evolutiva da SOLUÇÃO DE TRATAMENTO DA INFORMAÇÃO, cujo valor unitário é fixado em R\$ 725,03 (setecentos e vinte e cinco reais, e três centavos), que totalizam R\$ 4.350.180,00 (quatro milhões, trezentos e cinquenta mil, cento e oitenta reais);
+\end{enumerate}
+
+\item \label{itm:7ARJ} O valor contemplado na subcláusula \ref{itm:56UT} tem efeito meramente indicativo, não podendo ser utilizado por nenhuma das PARTES para pleitear a recomposição do equilíbrio econômico-financeiro do CONTRATO.
+\item \label{itm:UMZE} Os recursos orçamentários destinados ao pagamento das despesas criadas nos termos deste CONTRATO correrão por conta da dotação orçamentária \DotacaoOrcamentaria, e seus correspondentes nos anos subsequentes e suas eventuais suplementações.
+\end{enumerate}
+
+\section{BENS REVERSÍVEIS}
+\label{sec:YY42}
+
+\begin{enumerate}
+\item \label{itm:P87W} São BENS REVERSÍVEIS aqueles que:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:R5CK}	Pertençam ao PODER CONCEDENTE e sejam cedidos para uso da CONCESSIONÁRIA.
+
+\item \label{itm:6KL4} Pertençam à CONCESSIONÁRIA ou sejam por ela adquiridos ou construídos com o objetivo de executar o presente CONTRATO, com exceção dos bens de uso administrativo e/ou não essenciais à prestação dos SERVIÇOS, instalados em escritórios da CONCESSIONÁRIA.
+
+\item \label{itm:SKHH} Pertençam ao PODER CONCEDENTE e sejam abrigados sob mera guarda da CONCESSIONÁRIA.
+\end{enumerate}
+
+\item \label{itm:5BHI} Pertencerão ao PODER CONCEDENTE todas as OBRAS, softwares, repositórios de banco de dados, melhorias e benfeitorias realizadas pela CONCESSIONÁRIA em relação aos bens indicados nas subcláusulas \ref{itm:R5CK} e \ref{itm:6KL4}.
+
+\item \label{itm:723N} A CONCESSIONÁRIA utilizará os BENS REVERSÍVEIS indicados nas subcláusulas \ref{itm:R5CK} e \ref{itm:6KL4} exclusivamente para executar o OBJETO do CONTRATO.
+
+\item \label{itm:7BBJ} A CONCESSIONÁRIA deve prover a segurança e efetuar a manutenção corretiva e preventiva dos BENS REVERSÍVEIS indicados nas subcláusulas \ref{itm:R5CK} e \ref{itm:6KL4}, conservando-os em condições adequadas de uso, respeitando as normas técnicas relativas à saúde, segurança, higiene, conforto, sustentabilidade ambiental, entre outros parâmetros essenciais à adequada execução dos SERVIÇOS previstos neste CONTRATO.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:628D} No caso de dano dos BENS REVERSÍVEIS referidos nas subcláusulas \ref{itm:R5CK} e \ref{itm:6KL4}, a CONCESSIONÁRIA deverá efetuar o conserto, a substituição ou a reposição do bem, de acordo com o estabelecido no ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS e seus apêndices.
+\end{enumerate}
+
+\item \label{itm:WB69} Os BENS REVERSÍVEIS indicados nas subcláusulas \ref{itm:R5CK} e \ref{itm:6KL4} deverão ser permanentemente inventariados pela CONCESSIONÁRIA.
+
+\item \label{itm:SJRY} Os BENS REVERSÍVEIS indicados na subcláusula \ref{itm:SKHH} serão utilizados e mantidos diretamente pelo PODER CONCEDENTE e pelos seus agentes, os quais responderão por eventual uso indevido.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:4JAZ} A CONCESSIONÁRIA fornecerá toda a infraestrutura necessária para a instalação e funcionamento adequado dos BENS REVERSÍVEIS indicados na subcláusula \ref{itm:SKHH} e zelará pela segurança patrimonial dos bens conforme o ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS.
+\end{enumerate}
+
+\item \label{itm:T8P9} Transcorrida a vida útil dos BENS REVERSÍVEIS referidos nas subcláusulas \ref{itm:R5CK} e \ref{itm:6KL4}, ou caso seja necessária a sua substituição, a CONCESSIONÁRIA deverá proceder a sua imediata substituição por bem de qualidade igual ou superior, observada a continuidade da prestação dos SERVIÇOS e a sua atualização tecnológica.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:MH6K} Caso o PODER CONCEDENTE solicite a substituição de qualquer BEM REVERSÍVEL em padrões superiores ao dever da CONCESSIONÁRIA de prestar os SERVIÇOS e tais alterações criem ônus adicionais à CONCESSIONÁRIA, esta última fara jus à recomposição do equilíbrio econômico-financeiro da CONCESSÃO, nos termos da cláusula 26 do CONTRATO.
+\end{enumerate}
+
+\item \label{itm:P87Z} Todos os negócios jurídicos da CONCESSIONÁRIA com terceiros que envolvam os BENS REVERSÍVEIS deverão mencionar expressamente sua vinculação.
+
+\item \label{item:R5CK} A CONCESSIONÁRIA somente poderá alienar os bens que integram a CONCESSÃO se proceder à sua imediata substituição por outros em condições de operacionalidade e funcionamento idênticas ou superiores aos substituídos. 
+
+\item \label{itm:6KL3} Qualquer alienação ou aquisição de bens que a CONCESSIONÁRIA pretenda realizar, nos últimos 2 (dois) anos do PRAZO DA CONCESSÃO, deverá ser prévia e expressamente autorizada pelo PODER CONCEDENTE. 
+
+\item \label{itm:SKHF} Os BENS REVERSÍVEIS, na forma dos subcláusulas \ref{itm:R5CK} e \ref{itm:6KL3}, serão integralmente amortizados ou depreciados no PRAZO DA CONCESSÃO.
+
+\end{enumerate}
+
+\chapter{DIREITOS E OBRIGAÇÕES DAS PARTES}
+\section{PROPRIEDADE INTELECTUAL}
+\label{sec:NSRM}
+
+\begin{enumerate}
+\item \label{itm:5BHL} A CONCESSIONÁRIA garante que os métodos e técnicas utilizados para a execução dos serviços não infringem qualquer marca, patente, direito autoral, segredo comercial ou quaisquer outros direitos de propriedade, ficando certo que a CONCESSIONÁRIA responsabilizar-se-á perante o PODER CONCEDENTE por qualquer ação, processo, notificação ou reclamação nesse sentido, arcando com eventuais indenizações, despesas judiciais, extrajudiciais, custas e honorários advocatícios.
+\item \label{itm:723E} Todos os direitos autorais dos sistemas, documentação, scripts, códigos-fonte, bases de dados e congêneres desenvolvidos durante a execução dos serviços serão cedidos e transferidos ao PODER CONCEDENTE, ficando proibida a sua utilização pela CONCESSIONÁRIA sem a autorização expressa do PODER CONCECENTE.
+\item \label{itm:7BBK} A CONCESSIONÁRIA não poderá repassar a terceiros, em nenhuma hipótese, os códigos-fontes, bem como qualquer informação sobre a arquitetura, documentação, assim como dados trafegados no sistema, dos produtos desenvolvidos e entregues, ficando responsável juntamente com o PODER CONCEDENTE por manter a integridade dos dados e códigos durante a execução das atividades e também em período posterior ao término da execução dos SERVIÇOS.
+\item \label{itm:628H} Mediante a extinção do CONTRATO, ou mesmo por solicitação do PODER CONCEDENTE, deverá a CONCESSIONÁRIA, por seus empregados, agentes e prepostos, devolver imediatamente ao PODER CONCEDENTE todos os documentos e/ou informações que tenham sido entregues para a realização dos serviços, bem como quaisquer cópias.
+\end{enumerate}
+
+\section{CONFIDENCIALIDADE}
+\label{sec:PLXA}
+
+\begin{enumerate}
+\item \label{itm:WB67} A CONCESSIONÁRIA concorda em manter o mais absoluto sigilo dos dados e informações advindas dos SERVIÇOS, que lhe sejam, voluntária ou involuntariamente, reveladas, fornecidas, comunicadas, adquiridas (seja verbalmente ou por escrito, em forma eletrônica, textos, desenhos, fotografias, gráficos, projetos, plantas ou qualquer outra forma), independentemente da classificação de sigilo conferida pelo PODER CONCEDENTE a tais documentos, se obrigando a abster-se de copiar, reproduzir, vender, ceder, licenciar, comercializar, transferir ou de qualquer outra forma alienar, divulgar ou dispor a terceiros as informações aqui referidas, tampouco utilizá-las para quaisquer outros fins não atinentes ao objeto do contrato, salvo se devidamente autorizado pelo PODER CONCEDENTE.  
+\item \label{itm:SJRF} A CONCESSIONÁRIA deverá indenizar, defender e assegurar ao PODER CONCEDENTE quaisquer perdas, danos, custos, despesas, responsabilidades, ações, reclamações e procedimentos decorrentes, direta ou indiretamente, do descumprimento da obrigação de sigilo estabelecida nesta cláusula, sem prejuízo das medidas liminares ou cautelares cabíveis em relação ao seu descumprimento efetivo ou potencial.
+\item \label{itm:4JAW}  O dever de sigilo aqui referido subsistirá à extinção do CONTRATO.
+\end{enumerate}
+
+\section{LIBERAÇÕES DE TERRENOS A SEREM UTILIZADOS PARA A INSTALAÇÃO DOS EQUIPAMENTOS}
+\label{sec:TXD9}
+
+\begin{enumerate}
+\item \label{itm:T8P0}	O PODER CONCEDENTE deverá indicar e liberar os TERRENOS, indicados conforme o ANEXO V – RELAÇÃO DE LOCAIS PARA A IMPLANTAÇÃO DE PONTOS DE CAPTURA nos quais serão instalados os equipamentos fixos indicados conforme o ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS e seus apêndices.
+\end{enumerate}
+
+\section{LICENÇAS E AUTORIZAÇÕES}
+\label{sec:F39J}
+
+\begin{enumerate}
+\item \label{itm:MH6O} Caberá à CONCESSIONÁRIA providenciar a obtenção, junto aos órgãos e entidades públicas municipais, estaduais e federais competentes, de todas as licenças e autorizações necessárias ao adequado desenvolvimento de suas atividades, incluindo as ambientais, devendo arcar com todas as despesas relacionadas à implementação das providências determinadas pelos referidos órgãos e entidades.
+\end{enumerate}
+
+\section{DOS SERVIÇOS}
+\label{sec:7TN8}
+
+\begin{enumerate}
+\item \label{itm:DQSD}	Para a prestação dos serviços deverão ser observadas as determinações contidas no CONTRATO, especificamente aquelas constantes do ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS. e seus apêndices.
+
+\item \label{itm:4HXB}	É obrigação da CONCESSIONÁRIA executar os SERVIÇOS na forma e nos prazos previstos no CRONOGRAMA DE IMPLANTAÇÃO E OPERAÇÃO, que será apresentado pela CONCESSIONÁRIA como parte integrante do PLANO DE NEGÓCIOS. O CRONOGRAMA DE IMPLANTAÇÃO E OPERAÇÃO deverá observar as datas-marco estipuladas no ANEXO VI – CRONOGRAMA. e será objeto de aprovação do PODER CONCEDENTE. 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:L34J}	Os prazos estabelecidos no CRONOGRAMA DE IMPLANTAÇÃO E OPERAÇÃO poderão ser alterados mediante acordo entre as PARTES.
+\item \label{itm:SVW2} O descumprimento das datas-marco, previstas no CRONOGRAMA do ANEXO VI – CRONOGRAMA., verificado com a emissão do respectivo “Termo de Recebimento Provisório” (TRP) ou “Termo de Recebimento Definitivo” (TRD) cujos modelos compõem o ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO.,  sujeitará a CONCESSIONÁRIA às sanções constantes na cláusula 31.5.5 e 31.5.6.
+\end{enumerate}
+
+\item \label{itm:TYUV}	O PODER CONCEDENTE acompanhará a execução dos SERVIÇOS e expedirá determinações à CONCESSIONÁRIA sempre que entender que as datas-marco de entrega possam vir a ser comprometidas ou ainda que a qualidade dos SERVIÇOS se encontra comprometida.
+
+\item \label{itm:2WHY}	O PODER CONCEDENTE exigirá da CONCESSIONÁRIA a elaboração de planos para a recuperação de atrasos na execução dos SERVIÇOS.
+
+\item \label{itm:HQSW}	 A CONCESSIONÁRIA deverá comunicar ao PODER CONCEDENTE a conclusão de determinado SERVIÇO.
+
+\item \label{itm:MRRW}	 O PODER CONCEDENTE, em até 30 dias da comunicação referida no subitem 12.5, deverá cumulativamente: (i) realizar vistoria e testes das instalações, equipamentos, soluções, sistemas e relação de funcionários designados pela CONCESSIONÁRIA, e (ii) emitir “Termo de Reprovação” (TR), “Termo de Recebimento Provisório” (TRP) ou “Termo De Recebimento Definitivo” (TRD), na forma do ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO., conforme a situação que se configurar.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:} Caso haja pontos a serem ajustados que correspondam a correções e/ou reparos que impeçam o recebimento, o PODER CONCEDENTE emitirá o “Termo de Reprovação” (TR), na forma do ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO., apontando a situação e as justificativas para a reprovação e deverá indicar as exigências a serem cumpridas e determinando o prazo para a realização das correções necessárias. Para todos os fins, o TR representará o descumprimento das obrigações da CONCESSIONÁRIA, não gerando quaisquer direitos à CONCESSIONÁRIA.
+\item \label{itm:ZVHJ} Caso haja pontos a serem ajustados que correspondam a correções e/ou reparos que não impeçam a funcionalidade ou o início da operação, o PODER CONCEDENTE emitirá o “Termo de Recebimento Provisório” (TRP) na forma do ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO., apontando a situação e as justificativas para a reprovação e deverá indicar as exigências a serem cumpridas e determinando o prazo para a realização das correções necessárias.
+\item \label{itm:9RH4} Caso inexistam quaisquer correções a serem ajustadas, o PODER CONCEDENTE emitirá o “Termo de Recebimento Definitivo” (TRD), na forma do ANEXO VII – MODELOS DOS TERMOS DE REJEIÇÃO DE RECEBIMENTO PROVISÓRIO E DEFINITIVO..
+\end{enumerate}
+
+\item \label{itm:E3YR}	No caso de emissão de “Termo de Recebimento Provisório” (TRP), a CONCESSIONÁRIA terá o prazo máximo de 90 (noventa) dias, contados da sua emissão, para realizar e comprovar os ajustes necessários indicados pelo PODER CONCEDENTE.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:PAUP} Assim que comprovada a regularização dos ajustes indicados no TRP, o PODER CONCEDENTE emitirá o respectivo “Termo de Recebimento Definitivo” (TRD), no prazo de até 10 (dez) dias contados da comprovação pela CONCESSIONÁRIA. 
+\end{enumerate}
+
+\item \label{itm:79FQ}	A emissão do “Termo de Recebimento Provisório” (TRP) ou do “Termo de Recebimento Definitivo” (TRD) autoriza o início do pagamento pelos SERVIÇOS indicados. 
+
+\item \label{itm:SYZE}	Para a emissão de “Termo de Recebimento Provisório” (TRP) ou “Termo de Recebimento Definitivo” (TRD) relativo a cada entrega, a CONCESSIONÁRIA deverá satisfazer todas as obrigações e ela relativas, previstas no ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 2 – OBRIGAÇÕES ESPECÍFICAS – CAPTURA, no ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 3 – OBRIGAÇÕES ESPECÍFICAS – TRANSMISSÃO, ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 4 – OBRIGAÇÕES ESPECÍFICAS – ARMAZENAMENTO e ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 5 – OBRIGAÇÕES ESPECÍFICAS – TRATAMENTO.  
+
+\item \label{itm:7AA8}	A emissão de “Termo de Reprovação” (TR) não permitirá a realização de pagamentos.
+\end{enumerate}
+
+\section{PRESTAÇÃO DE INFORMAÇÕES}
+\label{sec:D36G}
+
+\begin{enumerate}
+\item \label{itm:ZPKX} Sem prejuízo das demais obrigações estabelecidas no CONTRATO ou na legislação aplicável, a CONCESSIONÁRIA obriga-se a:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:F82B} Dar conhecimento imediato ao PODER CONCEDENTE de todo e qualquer fato que altere o normal desenvolvimento da CONCESSÃO, ou que, de algum modo, interrompa a correta execução das OBRAS ou prestação dos SERVIÇOS.
+
+\item \label{itm:YED7} Dar conhecimento ao PODER CONCEDENTE de todo e qualquer evento que possa vir a prejudicar ou impedir o pontual e tempestivo cumprimento das obrigações previstas no CONTRATO e que possa constituir causa de intervenção, caducidade da CONCESSÃO ou, ainda, rescisão do CONTRATO.
+
+\item \label{itm:N6YS} Dar conhecimento ao PODER CONCEDENTE de toda e qualquer situação que corresponda a fatos que alterem, de modo relevante, o normal desenvolvimento da execução do objeto do CONTRATO, apresentando, por escrito e no prazo necessário, relatório detalhado sobre tais fatos, incluindo, se for o caso, a contribuição de entidades especializadas, externas à CONCESSIONÁRIA, com as medidas tomadas ou em curso para superar ou sanar os fatos referidos.
+
+\item \label{itm:WXDH} Fornecer relatórios com informações detalhadas sobre os SERVIÇOS, e respectiva qualidade, na periodicidade estabelecida no ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS e em seus apêndices e ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA.
+
+\item \label{itm:F4PU} Apresentar ao PODER CONCEDENTE ou aos órgãos de controle da Administração, no prazo por estes estabelecido, informações adicionais ou complementares que venham a solicitar.
+
+\item \label{itm:9EP6} Apresentar quando solicitado pelo PODER CONCEDENTE, os contratos e as notas fiscais das atividades terceirizadas, os comprovantes de pagamentos de salários e demais obrigações trabalhistas, as apólices de seguro contra acidente de trabalho e os comprovantes de quitação das respectivas obrigações previdenciárias.
+\end{enumerate}
+
+\item \label{itm:JGBH} O conhecimento do PODER CONCEDENTE acerca de eventuais Contratos firmados com terceiros não exime a CONCESSIONÁRIA do cumprimento, total ou parcial, de suas obrigações decorrentes deste CONTRATO.
+
+\end{enumerate}
+
+\section{DECLARAÇÕES}
+\label{sec:ZJWC}
+
+\begin{enumerate}
+\item \label{itm:YDJ7} A CONCESSIONÁRIA declara que obteve, por si ou por terceiros, todas as informações necessárias para o cumprimento de suas obrigações contratuais e que realizou os levantamentos e estudos necessários para a elaboração de sua PROPOSTA COMERCIAL e para a execução do OBJETO do CONTRATO.
+
+\item \label{itm:DG64} A CONCESSIONÁRIA declara, ainda:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:JDDR} Ter pleno conhecimento da natureza e extensão dos riscos por ela assumidos no CONTRATO.
+
+\item \label{itm:J95Y} Ter levado tais riscos em consideração na formulação de sua PROPOSTA COMERCIAL.
+
+\item \label{itm:EV92} Que a PROPOSTA COMERCIAL é incondicional e levou em consideração todos os investimentos, tributos, custos e despesas (incluindo, mas não se limitando, às financeiras) necessários para a operação da CONCESSÃO, bem como os riscos a serem assumidos pela CONCESSIONÁRIA em virtude da operação da CONCESSÃO, e, também, o PRAZO DA CONCESSÃO.
+
+\item \label{itm:TU5G} Ter pleno conhecimento sobre a variação da remuneração em função dos FATORES DE DESEMPENHO, conforme ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA., reconhecendo ser um mecanismo pactuado entre as PARTES para manutenção da equivalência contratual entre a prestação dos SERVIÇOS e a sua remuneração, aplicado de forma imediata e automática pelo PODER CONCEDENTE, tendo em vista a desconformidade entre os SERVIÇOS prestados e as exigências do CONTRATO.
+
+\item \label{itm:52D9} Que o sistema de remuneração previsto neste CONTRATO representa o equilíbrio entre ônus e bônus da CONCESSÃO e que a CONTRAPRESTAÇÃO MENSAL e o pagamento de eventual demanda de Pontos de Função destinados para manutenção evolutiva da SOLUÇÃO DE TRATAMENTO DA INFORMAÇÃO são suficientes para remunerar todos os investimentos, custos operacionais, despesas, OBRAS e SERVIÇOS efetivamente realizados.
+\end{enumerate}
+
+\end{enumerate}
+
+\section{FISCALIZAÇ˜AO}
+\label{sec:Q67R}
+
+\begin{enumerate}
+\item \label{itm:PSQ2} A fiscalização do CONTRATO será feita pelo PODER CONCEDENTE, que terá, no exercício de suas atribuições, livre e incondicional acesso aos bancos de dados da CONCESSIONÁRIA, assim como às instalações da CONCESSIONÁRIA utilizadas na execução das suas obrigações contratuais.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:QU65} A CONCESSIONÁRIA deverá fornecer informações e documentos ao PODER CONCEDENTE, necessários à apuração de desempenho e o respectivo cálculo da CONTRAPRESTAÇÃO MENSAL.
+
+\item \label{itm:WPGV} O PODER CONCEDENTE poderá fazer-se auxiliar por terceiros em suas tarefas de fiscalização, observados os limites de delegabilidade da atividade de fiscalização.
+\end{enumerate}
+
+\item \label{itm:WE6D} A CONCESSIONÁRIA será obrigada a reparar, corrigir, interromper, suspender ou substituir, às suas expensas e no prazo fixado pelo PODER CONCEDENTE, as falhas ou defeitos comprovadamente verificados na execução das OBRAS ou na prestação dos SERVIÇOS.
+
+\item \label{itm:PX35} O PODER CONCEDENTE registrará e processará as ocorrências apuradas pela fiscalização, notificando a CONCESSIONÁRIA para regularização das falhas ou defeitos verificados, sem prejuízo da eventual aplicação de penalidades previstas neste CONTRATO.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:X2AA} Mesmo que as falhas e defeitos apurados pela fiscalização não ensejem à aplicação imediata de penalidades, o descumprimento dos prazos de regularização ou correção determinados pelo PODER CONCEDENTE, em conformidade com o ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS e com o ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA., ensejará a lavratura de auto de infração, sujeitando a CONCESSIONÁRIA à aplicação de penalidades previstas na cláusula 30 do CONTRATO.
+
+\item \label{itm:76GP} O PODER CONCEDENTE poderá exigir, nos prazos que vier a especificar, que a CONCESSIONÁRIA apresente plano de ação visando reparar, corrigir, interromper, suspender ou substituir qualquer atividade executada de maneira viciada, defeituosa ou incorreta.
+
+\item \label{itm:MLCT} Em caso de omissão da CONCESSIONÁRIA quanto à obrigação prevista nesta cláusula, sem prejuízo da hipótese de intervenção prevista na cláusula 32, o PODER CONCEDENTE poderá proceder à correção da situação, diretamente ou por intermédio de terceiro, inclusive com a possibilidade de ocupação provisória dos bens e instalações da CONCESSIONÁRIA.
+
+\item \label{itm:4U3S} Em cumprimento ao dever acima, o PODER CONCEDENTE poderá se valer da GARANTIA DE EXECUÇÃO DO CONTRATO para o ressarcimento dos custos e despesas envolvidos, bem como por eventuais indenizações devidas a terceiros e para remediar os vícios, defeitos ou incorreções identificadas.
+\end{enumerate}
+
+\item \label{itm:9EVZ} O VERIFICADOR INDEPENDENTE poderá ser contratado pelo PODER CONCEDENTE, na forma da Lei, em até 180 dias da DATA DE EFICÁCIA.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:SXBP} Em caso de fim da vigência ou interrupção de contrato firmado com o VERIFICADOR INDEPENDENTE, o PODER CONCEDENTE efetuará nova contratação em até 180 dias da cessação do vinculo contratual anterior.
+
+\item \label{itm:7GVD} Na hipótese de atraso nas contratações indicadas nas subcláusulas 15.4 e 15.4.1, por prazo inferior a 06 (seis) meses, o PODER CONCEDENTE ficará diretamente responsável pelo cálculo da CONTRAPRESTAÇÃO MENSAL. Caso o atraso seja superior a esse prazo, será aplicado o ÍNDICE DE DESEMPENHO equivalente a 100% (cem por cento) no cálculo da CONTRAPRESTAÇÃO MENSAL da CONCESSIONÁRIA, até a efetiva contratação do VERIFICADOR INDEPENDENTE, considerando o ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA.
+
+\item \label{itm:GWL2} O VERIFICADOR INDEPENDENTE deverá ser empresa independente e de renome no mercado por sua idoneidade, imparcialidade, ética e competência técnica.
+
+\item \label{itm:ZJ2F} O VERIFICADOR INDEPENDENTE não poderá manter qualquer tipo de relação comercial com a CONCESSIONÁRIA. 
+\end{enumerate}
+
+\item \label{itm:UX4C} O VERIFICADOR INDEPENDENTE será responsável pelas seguintes atividades: 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:5LSA} Acompanhar a execução do CONTRATO e verificar o cumprimento das obrigações contratuais sob responsabilidade da CONCESSIONÁRIA, informando ao PODER CONCEDENTE sobre o desempenho da CONCESSIONÁRIA, com base em relatório circunstanciado. 
+
+\item \label{itm:N5F7} Verificar, mensalmente, índices que compõem o ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA. 
+
+\item \label{itm:3KXB} Auditar os relatórios produzidos pela CONCESSIONÁRIA exigidos no ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA., a fim de atestar confiabilidade dos dados produzidos pela CONCESSIONÁRIA na mensuração do seu desempenho.
+
+\item \label{itm:YCDN} Emitir relatório mensal sobre o cumprimento das obrigações contratuais sob responsabilidade da CONCESSIONÁRIA.
+
+\item \label{itm:RUAX} Manter arquivo digitalizado dos relatórios emitidos.
+
+\item \label{itm:YGKL} Propor melhorias no sistema de mediação, buscando geração de eficiência ou economia financeira para as PARTES envolvidas no CONTRATO, incluindo desenvolvimento de desenho de processos, diagnóstico da execução do CONTRATO e proposição de soluções de tecnologia da informação para melhor gestão contratual. 
+
+\item \label{itm:XKF4} Desenvolver ou aprimorar sistema de tecnologia de informação para coleta, arquivo e disponibilização de dados e informações referentes aos índices, conformeANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA. 
+
+\item \label{itm:UXDZ} Apresentar informações ao PODER CONCEDENTE decorrente do processo de verificação para fins dos procedimentos de reequilíbrio econômico-financeiro, nos termos do CONTRATO e do ANEXO IX – ALOCAÇÃO DE RISCOS E SISTEMA DE REEQUILÍBRIO ECONÔMICO-FINANCEIRO. 
+
+\item \label{itm:2JJY} Propor mecanismos de aferição, quando solicitado pelo PODER CONCEDENTE, a fim de auxiliar na modelagem e aplicação de um novo indicador, cumprindo os critérios e objetivos definidos pelo PODER CONCEDENTE para aplicação do mesmo. 
+
+\item \label{itm:QTLK} Poderá realizar as diligências necessárias ao cumprimento de suas funções. 
+\end{enumerate}
+
+\item \label{itm:3K6G} Caso, no curso da execução do contrato, seja eventualmente comprovada circunstância que comprometa a situação de imparcialidade do VERIFICADOR INDEPENDENTE, em face do PODER CONCEDENTE ou da CONCESSIONÁRIA, no cumprimento de suas atribuições, ele será substituído, respondendo pelo fato na forma da lei e do respectivo contrato celebrado com o PODER CONCEDENTE.
+\end{enumerate}
+
+\section{SEGUROS}
+\label{sec:S9GS}
+
+\begin{enumerate}
+\item \label{itm:855U} A CONCESSIONÁRIA, além dos seguros exigíveis pela legislação aplicável, deverá contratar e manter em vigor, durante todo o prazo de vigência deste CONTRATO, os seguros indicados nas subcláusula 16.1.1 e 16.1.2 para garantir a efetiva e abrangente cobertura dos riscos relativos ao desenvolvimento das atividades contempladas na CONCESSÃO.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label {itm:P429} Seguro de Responsabilidade Civil Geral, a ser mantido durante todo o prazo de vigência do CONTRATO, com valor mínimo de cobertura correspondente a 20% (vinte por cento) do valor da Receita Bruta Anual do CONCESSIONÁRIA, na base de ocorrência, cobrindo a CONCESSIONÁRIA e o PODER CONCEDENTE pelos montantes com que possam ser responsabilizados a título de danos materiais, pessoais e morais, custas processuais, e quaisquer outros encargos relacionados a danos pessoais, morais ou materiais, decorrentes das atividades abrangidas pela CONCESSÃO.
+
+\item \label {itm:S28G} Seguro “All Risk” (todos os riscos), a ser mantido durante todo o prazo de vigência do CONTRATO, com valor mínimo de cobertura equivalente ao valor de R$\$90.000.000,00$ (noventa milhões de reais, devendo tal seguro contemplar todas as coberturas compreendidas de acordo com os padrões internacionais.
+\end{enumerate}
+
+\item \label{itm:CHTJ} Os valores fixados nesta cláusula serão reajustados pela mesma fórmula e nas mesmas datas aplicáveis ao reajuste da CONTRAPRESTAÇÃO MENSAL, previstas na subcláusula 25.3.
+
+\item \label{itm:JCKN} Os seguros deverão ser contratados periodicamente, a cada 12 (doze) meses contados a partir da contratação originária, de forma a incluir eventos ou sinistros que não eram cobertos pelas seguradoras em funcionamento no Brasil no momento de sua contratação originária. 
+
+\item \label{itm:V83V} Os seguros obrigatórios e eventuais resseguros, necessários para garantir a efetiva e abrangente cobertura de riscos inerentes ao desenvolvimento de todas as OBRAS, SERVIÇOS e atividades contempladas no presente CONTRATO, ademais dos seguros exigíveis pela legislação aplicável, deverão ser contratados em seguradoras devidamente autorizadas a funcionar e operar no Brasil e de porte compatível com o objeto segurado. 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:9DEA} Na hipótese de alguma seguradora ou resseguradora contratada demonstrar, a qualquer tempo, durante a vigência do respectivo seguro ou resseguro, deterioração significante de sua situação financeira, a CONCESSIONÁRIA deverá providenciar a substituição da referida seguradora ou resseguradora, em até 60 (sessenta) dias, a contar da data em que tal fato for constatado.
+
+\item \label{itm:82FD} O prazo indicado no item 16.4.1 poderá ser prorrogado por mais 30 (trinta) dias, caso se verifique, justificadamente, dificuldades na contratação da nova seguradora ou resseguradora, desde que os seguros anteriores, com a seguradora a que se refere o subcláusula 16.1 permaneçam vigentes.
+
+\item \label{itm:N692} Caso a CONCESSIONÁRIA não cumpra tempestivamente a obrigação ora estabelecida, o PODER CONCEDENTE poderá substituir a seguradora ou resseguradora, conforme o caso, por conta própria e às custas da CONCESSIONÁRIA, que deverá, em 5 (cinco) dias, reembolsar o PODER CONCEDENTE.
+
+\item \label{itm:QAX2} Caso o reembolso previsto no item 16.4.3 não ocorra no prazo e condições assinalados, poderá o PODER CONCEDENTE descontar a quantia devida da CONTRAPRESTAÇÃO MENSAL devida à CONCESSIONÁRIA ou da GARANTIA DE EXECUÇÃO DO CONTRATO.
+
+\item \label{itm:V2LL} A CONCESSIONÁRIA deverá fazer constar das apólices de seguro a obrigação da companhia seguradora em manter a cobertura pelo período de 120 (cento e vinte) dias a contar da data do vencimento da parcela do prêmio devida e não paga pela CONCESSIONÁRIA, para efeito do disposto no item 16.4.3.
+
+\item \label{itm:FAS4} Face ao descumprimento, pela CONCESSIONÁRIA, da obrigação de contratar e/ou manter em plena vigência as apólices de seguro, o PODER CONCEDENTE, independentemente da sua faculdade de decretar a intervenção ou a caducidade da CONCESSÃO, poderá proceder à contratação e/ou ao pagamento direto dos prêmios respectivos, correndo a totalidade dos custos a expensas da CONCESSIONÁRIA.
+\end{enumerate}
+
+\item \label{itm:GQ3E}  CONCESSIONÁRIA poderá optar por contratar quaisquer outros seguros desejados, contudo, fica entendido e acordado que a contratação das apólices de seguros obrigatórias, listadas no item 16.1, e de eventuais outros seguros contratados pela CONCESSIONÁRIA não afasta ou limita as obrigações e responsabilidades da CONCESSIONÁRIA assumidas neste CONTRATO.
+
+\item \label{itm:F7LX}  CONCESSIONÁRIA será individualmente responsável pelo pagamento de qualquer prejuízo, perdas e danos que exceder às coberturas das apólices de seguro, bem como pelos prejuízos, perdas e danos que a seguradora se recusar a cobrir no âmbito das apólices de seguro.
+
+\item \label{itm:V3FB}  existência de cobertura securitária não exime a responsabilidade da CONCESSIONÁRIA de substituir os BENS REVERSÍVEIS que tenham sido danificados ou inutilizados.
+
+\item \label{itm:B9E7} Mediante prévia autorização do PODER CONCEDENTE, a CONCESSIONÁRIA poderá alterar coberturas ou outras condições das apólices de seguro, visando a adequá-las às novas situações que ocorram durante a vigência do CONTRATO.
+
+\item \label{itm:XZVD} Os valores dos BENS REVERSÍVEIS segurados nas apólices de seguros “All Risk” contratadas deverão ser reajustados anualmente, de forma a garantirem sua indenização em caso de sinistro pelo seu valor de reposição na data de ocorrência do sinistro.
+
+\item \label{itm:UHXQ} O PODER CONCEDENTE deverá ser indicado como cossegurado nas apólices de seguros, de acordo com as características e finalidades, bem como com a titularidade dos bens envolvidos, cabendo-lhe autorizar previamente o cancelamento, suspensão, modificação ou substituição de quaisquer apólices contratadas pela CONCESSIONÁRIA.
+
+\item \label{itm:5HSF} As apólices de seguro deverão prever a indenização direta ao PODER CONCEDENTE nos casos em que, mesmo sendo a responsabilidade do sinistro da CONCESSIONÁRIA, for ele responsabilizado perante terceiros ou tiver que, às suas expensas, repor, consertar ou corrigir bem público.
+
+\item \label{itm:S2L6} Os financiadores poderão ser incluídos nas apólices de seguros, na condição de cossegurados.
+
+\item \label{itm:GH87} As apólices deverão conter cláusula expressa de renúncia ao eventual exercício de sub-rogação nos direitos que a(s) seguradora(s) tenha(m) ou venha(m) a ter frente ao PODER CONCEDENTE.
+
+\item \label{itm:TMZD} As apólices emitidas não poderão conter obrigações, restrições ou disposições que contrariem as disposições deste CONTRATO ou a regulação setorial, e deverão conter declaração expressa da companhia seguradora em que conste que a companhia conhece integralmente o CONTRATO, inclusive as disposições relativas aos limites dos direitos da CONCESSIONÁRIA.
+
+\item \label{itm:G7AK} Nenhuma obra, serviço ou atividade poderá ter início, ou prosseguir, sem que a CONCESSIONÁRIA apresente ao PODER CONCEDENTE comprovação de que as respectivas apólices de seguros estejam em vigor, consoante às condições determinadas neste CONTRATO.
+
+\item \label{itm:2R6E} A CONCESSIONÁRIA assume toda a responsabilidade pela abrangência ou omissões decorrentes da contratação dos seguros de que trata este CONTRATO.
+
+\item \label{itm:627L} A CONCESSIONÁRIA deverá fazer constar das apólices de seguro a obrigação da companhia seguradora informar, por escrito, com antecedência mínima de 2 (dois) dias, à própria CONCESSIONÁRIA e ao PODER CONCEDENTE, quaisquer fatos que possam implicar o cancelamento total ou parcial das apólices contratadas pela CONCESSIONÁRIA, redução de coberturas, aumento de franquias ou redução dos valores segurados.
+
+\item \label{itm:GUJ7} A CONCESSIONÁRIA deverá fazer constar das apólices de seguro a obrigação da companhia seguradora informar ao PODER CONCEDENTE, no prazo de 10 (dez) dias, todo e qualquer evento de falta de pagamento de parcelas do prêmio de seguro contratado.
+
+\item \label{itm:4A25} A CONCESSIONÁRIA é responsável pelo pagamento integral da franquia, em caso de utilização de qualquer apólice.
+
+\item \label{itm:9TKJ} Será de inteira responsabilidade da CONCESSIONÁRIA manter em vigor os seguros exigidos no CONTRATO, devendo para tanto promover as renovações, prorrogações e atualizações necessárias.
+
+\item \label{itm:4PT7} A CONCESSIONÁRIA deverá encaminhar anualmente ao PODER CONCEDENTE o original, a segunda via, ou a cópia digital, devidamente certificada, das apólices dos seguros contratados e renovados, em até 30 (trinta) dias da data de sua renovação e/ou prorrogação.
+
+\end{enumerate}
+
+\section{ATIVIDADES RELACIONADAS}
+\label{sec:9GLZ}
+
+\begin{enumerate}
+\item \label{itm:NHSJ} Nenhuma exploração de ATIVIDADE RELACIONADA pela CONCESSIONÁRIA – e a respectiva incorporação de RECEITAS ACESSÓRIAS – poderá ocorrer sem prévia autorização do PODER CONCEDENTE, condicionada à entrega, pela CONCESSIONÁRIA, de proposta de exploração de ATIVIDADES RELACIONADAS.
+
+\item \label{itm:G7AA} A proposta de exploração de ATIVIDADES RELACIONADAS deverá ser apresentada pela CONCESSIONÁRIA ao PODER CONCEDENTE, acompanhada de projeto de viabilidade jurídica, técnica e econômico-financeira, bem como da comprovação da compatibilidade da exploração comercial pretendida com as normas legais e regulamentares aplicáveis ao CONTRATO.
+
+\item \label{itm:9VGS} A exploração de ATIVIDADES RELACIONADAS deverá utilizar como insumo exclusivamente os dados e as informações advindas dos SERVIÇOS de captura de dados prestados pela CONCESSIONÁRIA, sendo vedado o uso de dados dos SISTEMAS LEGADOS, bem como deverá respeitar o sigilo pertinente.
+
+\item \label{itm:DETW} Uma vez aprovada pelo PODER CONCEDENTE, a CONCESSIONÁRIA deverá manter contabilidade específica de cada CONTRATO de ATIVIDADE RELACIONADA, em especial quanto às respectivas RECEITAS ACESSÓRIAS.
+
+\item \label{itm:6EBY} O CONTRATO relativo à exploração de quaisquer ATIVIDADES RELACIONADAS terá vigência limitada ao término deste CONTRATO e não poderá, em qualquer hipótese, prejudicar a CONCESSÃO.
+
+\item \label{itm:RFNL} As RECEITAS ACESSÓRIAS decorrentes da exploração de ATIVIDADE RELACIONADA, excepcionalmente autorizada pelo PODER CONCEDENTE, serão compartilhadas entre a CONCESSIONÁRIA e PODER CONCEDENTE na proporção respectiva de 80% (setenta por cento) e 20% (trinta por cento) da receita líquida de impostos apurado na exploração da ATIVIDADE RELACIONADA.
+
+\item \label{itm:PRG8} A parcela das RECEITAS ACESSÓRIAS apropriada pelo PODER CONCEDENTE deverá ser revertida à CONTRAPRESTAÇÃO MENSAL, no momento da revisão anual do VALOR MÁXIMO DA CONTRAPRESTAÇÃO MENSAL, na forma do subcláusula 27.1.
+
+\item \label{itm:APDW} A exploração de ATIVIDADES RELACIONADAS poderá ser realizada por uma subsidiária constituída pela CONCESSIONÁRIA.
+\end{enumerate}
+
+\section{DIREITOS E OBRIGAÇÕES DOS USUÁRIOS}
+\label{sec:C3PG}
+
+\begin{enumerate}
+\item \label{itm:FT82} Sem prejuízo de outros direitos e obrigações previstos em lei, são direitos dos usuários:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:JAXX} Receber informações do PODER CONCEDENTE e da CONCESSIONÁRIA referentes à prestação dos SERVIÇOS.
+
+\item \label{itm:MW7S} Levar ao conhecimento do PODER CONCEDENTE ou da CONCESSIONÁRIA as irregularidades de que tenham conhecimento, referentes ao SERVIÇO prestado.
+
+\item \label{itm:QDTB} Comunicar às autoridades competentes os atos ilícitos praticados pela CONCESSIONÁRIA na prestação do SERVIÇO.
+
+\item \label{itm:GJFV} Contar com a prestação de SERVIÇOS de qualidade, com base no disposto no ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS e ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA.
+\end{enumerate}
+
+\item \label{itm:5HKP} Os usuários deverão zelar pela conservação e pelo bom uso dos bens, equipamentos e instalações utilizados para a prestação dos SERVIÇOS.
+\end{enumerate}
+
+\chapter{ESTRUTURA JURÍDICA E OPERAÇÕES PROMOVIDAS PELA CONCESSIONÁRIA}
+\section{COMPOSIÇÃO SOCIETÁRIA}
+\label{sec:DVV7}
+
+\begin{enumerate}
+\item \label{itm:UHUT} A CONCESSIONÁRIA deverá indicar em seu ato constitutivo, como finalidade exclusiva, a exploração do OBJETO da CONCESSÃO.
+
+\item \label{itm:M4JM} A composição societária a ser apresentada nos atos constitutivos da concessionária para a assinatura do CONTRATO deverá ser aquela apresentada na LICITAÇÃO.
+
+\item \label{itm:X9WN} A CONCESSIONÁRIA deverá comunicar imediatamente ao PODER CONCEDENTE as alterações na sua composição societária existente à época de assinatura do CONTRATO, apresentando inclusive os documentos constitutivos e posteriores alterações, respeitadas as obrigações definidas no CONTRATO referentes à transferência do controle da CONCESSIONÁRIA.
+
+\item \label{itm:M8MD} Ressalvada a hipótese de assunção do controle pelos financiadores da CONCESSIONÁRIA, descrita na cláusula 22, qualquer transferência no controle da CONCESSIONÁRIA deverá ser previamente autorizada pelo PODER CONCEDENTE, nos termos da lei. 
+\end{enumerate}
+
+\section{CAPITAL SOCIAL}
+\label{sec:9BB2}
+
+\begin{enumerate}
+\item \label{itm:T56F} O capital inicial subscrito e integralizado da CONCESSIONÁRIA deverá ser igual ou superior a R$\$ 6.500.000$ (seis milhões e quinhentos mil reais) na data da assinatura do CONTRATO, devendo o referido valor passar a ser de R$\$ 10.000.000$ (dez milhões de reais) até o final do 13º (décimo terceiro) mês de vigência do CONTRATO e assim se mantendo até o fim do prazo da CONCESSÃO. 
+
+\item \label{itm:F9PT} O capital social da CONCESSIONÁRIA deverá ser integralizado nos termos estabelecidos no compromisso de integralização do capital social, firmado pelos acionistas ou sócios, a ser entregue ao PODER CONCEDENTE por ocasião da assinatura deste CONTRATO. 
+
+\item \label{itm:HYUD} A CONCESSIONÁRIA obriga-se a manter o PODER CONCEDENTE permanentemente informado sobre o cumprimento do compromisso de integralização do capital social, sendo facultado ao PODER CONCEDENTE solicitar informações, assim como realizar diligências e auditorias para a verificação da regularidade da situação. 
+
+\item \label{itm:N5YT} No caso de integralização em bens ou direitos, o processo avaliativo deverá observar as normas da Lei Federal n.º 6.404/1976. 
+\end{enumerate}
+
+\section{FINANCIAMENTO}
+\label{sec:GRNZ}
+
+\begin{enumerate}
+\item \label{itmHDYV:}	A CONCESSIONÁRIA é a única e exclusiva responsável pela obtenção dos financiamentos necessários à operação da CONCESSÃO, de modo a cumprir, cabal e tempestivamente, com todas as obrigações assumidas no CONTRATO.
+
+\item \label{itm:SP3U}	A CONCESSIONÁRIA deverá apresentar ao PODER CONCEDENTE cópia autenticada dos contratos de financiamento e de garantia que venha a celebrar, bem como de documentos representativos dos títulos e valores mobiliários que venha a emitir, e quaisquer alterações a esses instrumentos, no prazo de 10 (dez) dias úteis da data de sua assinatura e emissão, conforme o caso.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:YCT4}	A CONCESSIONÁRIA deverá, ainda, apresentar ao PODER CONCEDENTE os comprovantes dos pagamentos das parcelas de quitação dos financiamentos por ela contratados.
+\end{enumerate}
+
+\item \label{itm:LTYY}	Quando da contratação de financiamento, da emissão de títulos de dívida ou da realização de operação de dívida de qualquer outra natureza (inclusive, mas não se limitando, à emissão de debêntures, bonds ou à estruturação de FIDC), a CONCESSIONÁRIA deverá prever expressamente e garantir a efetividade, por meio contratual, da obrigação das INSTITUIÇÕES FINANCEIRAS comunicarem imediatamente ao PODER CONCEDENTE o descumprimento de qualquer obrigação da CONCESSIONÁRIA nos Contratos de financiamento, que possa ocasionar a execução de garantias ou a assunção do controle pelas INSTITUIÇÕES FINANCEIRAS.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:LZEN}	A CONCESSIONÁRIA deverá, ainda, apresentar ao PODER CONCEDENTE cópia de todo e qualquer comunicado, relatório ou notificação enviado às INSTITUIÇÕES FINANCEIRAS, que contenha informação relevante a respeito da situação financeira da CONCESSÃO ou da CONCESSIONÁRIA.
+\end{enumerate}
+
+\item \label{itm:TDGB}	Competirá ao PODER CONCEDENTE informar às INSTITUIÇÕES FINANCEIRAS e estruturadores das operações referidas na subcláusula 21.2, concomitantemente à comunicação para a própria CONCESSIONÁRIA, sobre quaisquer eventuais descumprimentos do CONTRATO pela CONCESSIONÁRIA.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:62R4}	Para atendimento desta cláusula, a CONCESSIONÁRIA deverá fornecer ao PODER CONCEDENTE os contatos de todas as INSTITUIÇÕES FINANCEIRAS e estruturadores de operações com quem tenha contratado operações de financiamento.
+
+\item \label{itm:X65A}	A CONCESSIONÁRIA não poderá invocar qualquer disposição, cláusula ou condição dos contratos de financiamento, ou qualquer atraso no desembolso dos respectivos recursos, para se eximir, total ou parcialmente, das obrigações assumidas no CONTRATO.
+\end{enumerate}
+
+\item \label{itm:6395}	A CONCESSIONÁRIA poderá empenhar, ceder ou de qualquer outra forma transferir diretamente à INSTITUIÇÃO FINANCEIRA, conforme os limites e os requisitos legais, os direitos à percepção (a) da CONTRAPRESTAÇÃO MENSAL, (b) das RECEITAS ACESSÓRIAS, e (c) das indenizações devidas à CONCESSIONÁRIA em virtude do CONTRATO.
+
+\item \label{itm:CDZH}	É vedado à CONCESSIONÁRIA:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:8SDB}	Prestar qualquer forma de GARANTIA em favor de terceiros, inclusive em favor de seu controlador, salvo em favor de seus financiadores.
+
+\item \label{itm:89E4}	Conceder empréstimos, financiamentos ou realizar quaisquer outras formas de transferência de recursos para seus acionistas, exceto:
+\end{enumerate}
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:BSB6}	Transferências de recursos a título de distribuição de dividendos.
+
+\item \label{itm:K5D9}	Redução do capital, respeitado os limites previstos na subcláusula 20.1.
+
+\item \label{itm:NTS9}	Pagamentos de juros sobre capital próprio.
+
+\item \label{itm:JUM6}	Pagamentos pela contratação de serviços celebrada em condições equitativas às de mercado.
+
+\item \label{itm:ST7S}	Quitação de operações de mútuo com empresas do mesmo grupo econômico.
+\end{enumerate}
+
+\item \label{itm:QFR6}	Nos termos do art. 5º, inciso IX, da Lei Federal nº 11.079/04, a CONCESSIONÁRIA deverá compartilhar com o PODER CONCEDENTE, na razão de 50$\%$ (cinquenta por cento), os ganhos econômicos que obtiver, em decorrência da redução do risco de crédito dos financiamentos eventualmente tomados, especialmente em virtude da renegociação das condições anteriormente contratadas ou da quitação antecipada das obrigações.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:M7CQ}	Caso a redução do risco de crédito não advenha da atuação concreta da CONCESSIONÁRIA, os ganhos econômicos obtidos serão apropriados integralmente pelo PODER CONCEDENTE mediante revisão do VALOR MÁXIMO DE CONTRAPRESTAÇÃO MENSAL.
+
+\item \label{itm:Q3AP}	A incorporação ao VALOR MÁXIMO DE CONTRAPRESTAÇÃO MENSAL dos ganhos econômicos referidos nesta cláusula deverá ocorrer na revisão anual do VALOR MÁXIMO DE CONTRAPRESTAÇÃO MENSAL prevista na subcláusula 27.1.1.
+\end{enumerate}
+\end{enumerate}
+
+\section{ASSUNÇÃO DO CONTROLE DA CONCESSIONÁRIA PELAS INSTITUIÇÕES FINANCEIRAS}
+\label{sec:6KH6}
+
+\begin{enumerate}
+\item \label{itm:72PY}	Para assegurar a continuidade da CONCESSÃO, é facultada às INSTITUIÇÕES FINANCEIRAS que financiarem a CONCESSIONÁRIA a assunção do controle da CONCESSIONÁRIA, em caso de inadimplemento contratual das obrigações por ela assumidas nos referidos contratos de financiamento.  
+
+\item \label{itm:NRVD}	Quando configurada inadimplência do financiamento ou da execução do CONTRATO por parte da CONCESSIONÁRIA, que possa dar ensejo à transferência de controle nesta cláusula, a INSTITUIÇÃO FINANCEIRA deverá notificar a CONCESSIONÁRIA e o PODER CONCEDENTE, informando-os sobre a inadimplência e abrindo à CONCESSIONÁRIA o prazo de 30 (trinta) dias para purgar o inadimplemento.
+
+\item \label{itm:6VEL}	Decorrido o prazo referido na subcláusula anterior, e mantida a situação de inadimplência, os financiadores poderão assumir a CONCESSÃO, comunicando formalmente sua decisão ao PODER CONCEDENTE com antecedência prévia de 30 (trinta) dias úteis, devendo ainda:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:J5CB}	Comprometer-se a cumprir todas as cláusulas do CONTRATO de CONCESSÃO, do EDITAL e seus ANEXOS.
+
+\item \label{itm:55F6}	Informar que atendem aos requisitos de regularidade jurídica e fiscal necessários à assunção dos SERVIÇOS.
+\end{enumerate}
+
+\item \label{itm:BAWY}	A transferência do controle da CONCESSIONÁRIA pelas INSTITUIÇÕES FINANCEIRAS a terceiros dependerá de autorização prévia do PODER CONCEDENTE, condicionada à demonstração de que o destinatário da transferência atende às exigências de capacidade técnica, idoneidade financeira e regularidade jurídica e fiscal exigidas pelo EDITAL.
+
+\item \label{itm:Y2AS}	A assunção do controle da CONCESSIONÁRIA, nos termos desta cláusula, não alterará as obrigações da CONCESSIONÁRIA e de seus controladores perante o PODER CONCEDENTE.
+
+\item \label{itm:83QD}	Os contratos de financiamento, encaminhados ao PODER CONCEDENTE, deverão indicar os dados de contato dos financiadores, com o intuito de viabilizar a comunicação de eventual instauração de processo administrativo pelo PODER CONCEDENTE para averiguar a ocorrência de inadimplemento contratual por parte da CONCESSIONÁRIA.
+\end{enumerate}
+
+\section{DA GOVERNANÇA CORPORATIVA E ESCRITURAÇÃO CONTÁBIL}
+\label{sec:UY7Z}
+
+\begin{enumerate}
+\item \label{itm:5GU4}	A CONCESSIONÁRIA deverá obedecer às boas práticas de governança corporativa, com a apresentação de contas e demonstrações contábeis padronizadas, conforme as regras contábeis brasileiras.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:SPKW}	A CONCESSIONÁRIA deverá apresentar ao PODER CONCEDENTE suas demonstrações contábeis e financeiras, acompanhadas do relatório de empresa de auditoria independente, obedecidas a Lei n.º 6.404/76, a Lei nº 11.638/07 e a Lei n.º 9.430/96, as deliberações da CVM aplicáveis, ou as normas que venham a suceder estes diplomas, em até 120 (cento e vinte) dias contados a partir do fim do exercício contábil, para o relatório anual.
+\end{enumerate}
+
+\item \label{itm:369A}	Para garantir a uniformidade e a transparência das informações contábeis fornecidas, o PODER CONCEDENTE poderá elaborar um plano de contas a ser cumprido pela CONCESSIONÁRIA.
+
+\item \label{itm:JJML}	As demonstrações financeiras anuais darão destaque para as seguintes informações:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:4H3U} Transações com o controlador ou com controladas.
+
+\item \label{itm:EP8R} Depreciação e amortização dos ativos da CONCESSIONÁRIA e dos BENS REVERSÍVEIS.
+
+\item \label{itm:YMWB} Provisão para contingências (cíveis, trabalhistas, fiscais, ambientais ou administrativas).
+
+\item \label{itm:PDJQ} Relatório da administração.
+
+\item \label{itm:8E9H} Parecer do conselho fiscal.
+
+\item \label{itm:SD6K} Declaração da CONCESSIONÁRIA contendo o valor do seu capital social integralizado e as alterações na sua composição societária.
+\end{enumerate}
+\end{enumerate}
+
+\chapter{PAGAMENTOS À CONCESSIONÁRIA}
+\section{REMUNERAÇÃO E RESSARCIMENTO DA CONCESSIONÁRIA}
+\label{sec:UJ97}
+
+\begin{enumerate}
+\item \label{itm:UYTP} A CONCESSIONÁRIA será remunerada mediante:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:KXEU} Recebimento da CONTRAPRESTAÇÃO MENSAL.
+
+\item \label{itm:YJ5E} Recebimento da remuneração devida pela eventual utilização de Pontos de Função destinado para manutenção evolutiva da SOLUÇÃO DE TRATAMENTO DA INFORMAÇÃO, cujo valor é fixado em R$\$ 725,03$ (setecentos e vinte e cinco reais, e três centavos); sendo que o quantitativo total dimensionado para cada 5 (cinco) anos, contados da data de assinatura do CONTRATO, é de 2.000 (dois mil) Pontos de Função, podendo tal quantidade ser integral ou parcialmente demandada dentro do período.
+
+\item \label{itm:F3F8} Outras fontes de receitas, nos termos deste CONTRATO.
+\end{enumerate}
+
+\item \label{itm:SUJU} Cada pagamento referente à CONTRAPRESTAÇÃO MENSAL ou à utilização de Pontos de Função destinado para manutenção evolutiva da SOLUÇÃO DE TRATAMENTO DA INFORMAÇÃO será adimplido pelo Fundo de Pagamento de Parcerias Público Privadas de Minas Gerais – FPP-MG, criado pela Lei Estadual n.22.606/2017. 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:UF2K} Os recursos, observada a movimentação regular de transferência dos recursos consoante legislação aplicável, serão depositados pelo FPP-MG em conta separada e vinculada, denominada Conta Vinculada de Pagamento, a ser gerenciada por Agente de Pagamento, destinada exclusivamente para o pagamento das obrigações indicadas na subcláusula 24.1.1 e 24.1.3, a ser gerenciada por BANCO (TRUSTEE) referido na subcláusula 24.2.4.
+
+\item \label{itm:RE9Y} O FPP-MG transferirá na data de constituição da Conta Vinculada de Pagamento e nela manterá, durante toda a vigência do CONTRATO, um saldo mínimo variável, correspondente a 03 (três) parcelas de CONTRAPRESTAÇÃO MENSAL, devidamente revistas e atualizadas, conforme regras de revisão ajustadas para estas parcelas.  
+
+\item \label{itm:M33U} A Conta Vinculada de Pagamento será também utilizada para fins de pagamentos das indenizações nas circunstâncias indicadas nas subcláusulas 36.4, 38.5 e 39.3.
+
+\item \label{itm:DPJV} Caberá ao FPP-MG a contratação e remuneração do BANCO (TRUSTEE), nomeando-o como depositária da Conta Vinculada de Pagamento, indicada neste CONTRATO, e dos ganhos e receitas financeiras dela decorrentes, autorizando-o, de forma irrevogável e irretratável, a movimentá-la nos estritos termos do presente CONTRATO.
+
+\item \label{itm:FUDD} Os montantes depositados na Conta Vinculada de Pagamento serão automaticamente processados pelo BANCO (TRUSTEE), sem necessidade de qualquer autorização ou notificação, da seguinte forma:
+
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:MY6H}  Até terceiro dia útil anterior às datas finais de pagamento, conforme subitem 4. do ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA., o FPP-MG informará, por escrito, ao BANCO (TRUSTEE) a data efetiva de pagamento bem como o valor total necessário a adimplir as obrigações de pagamento do PODER CONCEDENTE, correspondente ao valor a ser transferido à CONCESSIONÁRIA, seja ele devido em razão de CONTRAPRESTAÇÃO MENSAL ou da efetiva utilização de Pontos de Função destinado para manutenção evolutiva da SOLUÇÃO DE TRATAMENTO DA INFORMAÇÃO, observadas as demais condições deste CONTRATO. 
+
+\item \label{itm:SLTW} De posse das informações de pagamento prestadas pelo FPP-MG, o BANCO (TRUSTEE) transferirá, na data do pagamento, os recursos devidos, alocados na Conta Vinculada de Pagamento, diretamente à contracorrente de titularidade da CONCESSIONÁRIA.
+
+\item \label{itm:BJ4G} Ainda na data do pagamento, o BANCO (TRUSTEE) transferirá à contracorrente de titularidade do FPP-MG o excedente dos recursos não comprometidos com a transferência da alínea acima ou com o saldo mínimo indicado na subcláusula 24.2.2, incluídos eventuais rendimentos do montante.
+\end{enumerate}
+\end{enumerate}
+
+\item \label{itm:48WG} O FPP-MG poderá, ainda, vincular, para pagamento da CONTRAPRESTAÇÃO MENSAL, da utilização de Pontos de Função destinado para manutenção evolutiva da SOLUÇÃO DE TRATAMENTO DA INFORMAÇÃO e das indenizações referidas na subcláusula 24.2.3, quaisquer dos seus outros recursos próprios, tais como: 
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:ANMZ} As dotações consignadas no orçamento do Estado e os créditos adicionais.
+
+\item \label{itm:XB8K} As doações, os auxílios, as contribuições e os legados destinados ao Fundo.
+
+\item \label{itm:G7G7} Os provenientes de operações de crédito internas e externas.
+
+\item \label{itm:T7Z6} As cotas de fundos estaduais.
+
+\item \label{itm:ZRZ4} Os provenientes de taxas e multas, quando advindas de parcerias público-privadas destinadas à prestação de serviço público de natureza correspondente.
+\end{enumerate}
+
+\item \label{itm:265W} No caso de inadimplemento do pagamento previsto nas subcláusulas 24.2.2 e 24.2.3:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:2WMU} o débito será acrescido de multa de 2% (dois por cento), acrescido de juros de mora e atualização monetária, em conjunto, correspondentes à TLP – Taxa de Longo Prazo, correspondente à variação pro rata no período, a contar da data do respectivo vencimento até a data do efetivo pagamento e/ou liquidação do débito, observados os índices disponíveis na data de vencimento do documento de cobrança emitido pela CONCESSIONÁRIA e na data de quitação do débito.
+
+\item \label{itm:LSWR} No caso de atraso superior a 30 (trinta) dias, será conferida à CONCESSIONÁRIA a faculdade de executar a GARANTIA DE ADIMPLEMENTO DO CONTRATO PELO PODER CONCEDENTE de pagamento até o limite do débito, nos prazos e condições fixados na cláusula 29.
+\end{enumerate}
+
+\item \label{itm:PKGQ} O inadimplemento pecuniário superior a 90 (noventa) dias conferirá à CONCESSIONÁRIA a faculdade de suspensão dos investimentos em curso bem como a suspensão da atividade que não seja estritamente necessária à continuidade de SERVIÇOS públicos essenciais ou à utilização pública de infraestrutura existente, sem prejuízo do direito à rescisão por meio de decisão arbitral.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:AAR9} O inadimplemento referido na subcláusula 24.4 apenas será considerado suprido com o sucesso da renegociação ou a quitação integral dos débitos.
+\end{enumerate}
+\end{enumerate}
+
+\section{CONTRAPRESTAÇÃO MENSAL}
+\label{sec:H7QB}
+
+\section{SISTEMA DE REEQUILÍBRIO ECONÔMICO-FINANCEIRA}
+\label{sec:XH22}
+
+\begin{enumerate}
+\item \label{itm:Z768} Deverão ser observados a alocação de riscos e o sistema de reequilíbrio econômico-financeira dispostos do ANEXO IX – ALOCAÇÃO DE RISCOS E SISTEMA DE REEQUILÍBRIO ECONÔMICO-FINANCEIRO.
+\end{enumerate}
+
+\section{REVISÕES CONTRATUAIS}
+\label{sec:ZHJP}
+
+\begin{enumerate}
+\item \label{itm:ETQU} Revisões Ordinárias:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:MSYW} Revisão Anual para Compartilhamento de RECEITAS ACESSÓRIAS e Ganhos Econômicos:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:UBDR} A cada 12 (doze) meses, contados da DATA BASE, as PARTES promoverão a revisão do VALOR MÁXIMO DE CONTRAPRESTAÇÃO MENSAL com o intuito exclusivo de incorporar a este valor:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:6MLC} As RECEITAS ACESSÓRIAS decorrentes da eventual exploração de ATIVIDADES RELACIONADAS, conforme previsto na subcláusula 17.6; e
+\item \label{itm:6R8K} Os ganhos econômicos apurados na forma do subcláusula 21.7.
+\end{enumerate}
+
+\item \label{itm:8B2K} A CONCESSIONÁRIA deverá compartilhar com o PODER CONCEDENTE os ganhos econômicos que obtiver através das RECEITAS ACESSÓRIAS no curso da execução do CONTRATO. 
+
+\item \label{itm:N5P7} O compartilhamento seguirá a proporção do subcláusula 17.6. 
+
+\item \label{itm:7JYB} O compartilhamento será feito por meio da redução da VALOR MÁXIMO DE CONTRAPRESTAÇÃO MENSAL pelo valor dos ganhos auferidos no ano anterior divididos por 12 meses. 
+
+\item \label{itm:6FPS} É vedada a utilização da revisão ordinária anual do VALOR MÁXIMO DE CONTRAPRESTAÇÃO MENSAL para incorporação de quaisquer outros elementos que não aqueles previstos na subcláusula 27.1.1.
+\end{enumerate}
+\end{enumerate}
+
+\item \label{itm:XD5C} Revisão Quadrienal dos Parâmetros da CONCESSÃO:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:DK4D} Após 24 (vinte e quatro) meses, contados do início da prestação dos SERVIÇOS, as PARTES realizarão processo de revisão dos parâmetros da CONCESSÃO em relação aos aspectos previstos nesta cláusula, vedada a alteração da alocação de riscos.
+
+\item \label{itm:DAUH} As revisões ocorrerão a cada 3 (três) anos da primeira revisão.
+
+\item \label{itm:9RCV} O prazo máximo para a instauração do processo de revisão é de 60 (sessenta) dias contados dos marcos para revisão previstos nas subcláusulas 27.2.1 e 27.2.1.
+
+\item \label{itm:6JGB} Análise crítica e eventual alteração do sistema de mensuração do desempenho, levando em conta a busca da melhoria contínua da prestação dos SERVIÇOS concedidos, sem prejuízo das disposições contidas neste CONTRATO, em função de:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:Q4TY} Indicadores de Desempenho que se mostrarem ineficazes para proporcionar às atividades e SERVIÇOS em atendimento a qualidade exigida pelo PODER CONCEDENTE.
+
+\item \label{itm:V8QD} Exigência, pelo PODER CONCEDENTE, de novos padrões de desempenho, motivados pelo surgimento de inovações tecnológicas ou adequações a padrões nacionais ou internacionais.
+\end{enumerate}
+
+\item \label{itm:F88Z} O processo de revisão será instaurado pelo PODER CONCEDENTE de ofício ou a pedido da CONCESSIONÁRIA.
+
+\item \label{itm:C7FY} O processo de revisão deverá ser concluído no prazo máximo de 6 (seis) meses, após qualquer das PARTES que se sentir prejudicada poderá recorrer à resolução de controvérsias constante na cláusula 33 deste CONTRATO.
+
+\item \label{itm:SWFT} O processo de revisão será concluído mediante acordo das PARTES, e seus resultados serão devidamente documentados e, caso importem em alterações do CONTRATO, serão incorporados em aditivo contratual.
+
+\item \label{itm:PQAQ} As PARTES poderão ser assistidas por consultores técnicos de qualquer especialidade no curso do processo de revisão e os laudos, estudos, pareceres ou opiniões emitidas por estes deverão ser encartados ao processo de modo a explicitar as razões que levaram as PARTES ao acordo final ou à eventual divergência.
+
+\item \label{itm:F2XN} As reuniões, audiências ou negociações realizadas no curso do processo de revisão deverão ser devidamente registradas.
+\end{enumerate}
+\end{enumerate}
+
+\chapter{GARANTIAS}
+\section{GARANTIA DE EXECUÇÃO DO CONTRATO PELA CONCESSIONÁRIA}
+\label{sec:CBKD}
+
+\section{GARANTIA DE ADIMPLEMENTO DO CONTRATO PELO PODER CONCEDENTE}
+\label{sec:WYDY}
+
+\chapter{EXECUÇÃO ANÔMALA DO CONTRATO}
+\section{DISPOSIÇÕES GERAIS SOBRE AS SANÇÕES CONTRATUAIS}
+\label{sec:78Q7}
+
+\begin{enumerate}
+\item \label{itm:MYPW} O não cumprimento das cláusulas deste CONTRATO, de seus ANEXOS, do EDITAL, da legislação e regulamentação aplicáveis ensejará, sem prejuízo das responsabilidades civil e penal e de outras penalidades eventualmente previstas na legislação e na regulamentação, a aplicação das seguintes penalidades contratuais:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:YFC4} Advertência formal, por escrito e com referência às medidas necessárias à correção do descumprimento.
+
+\item \label{itm:HA9D} Multas, quantificadas e aplicadas na forma da cláusula 31.
+
+\item \label{itm:UDUR} Suspensão temporária de participação em licitação e impedimento de contratar com o PODER CONCEDENTE, por prazo não superior a 2 (dois) anos.
+
+\item \label{itm:RFL9} Declaração de inidoneidade para licitar ou contratar com a Administração Pública, enquanto perdurarem os motivos da punição do PODER CONCEDENTE.
+\end{enumerate}
+
+\item \label{itm:NAA8} A gradação das penalidades observará as seguintes escalas:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:4HRC} A infração será considerada leve, quando decorrer de condutas involuntárias ou escusáveis da CONCESSIONÁRIA e das quais ela não se beneficie.
+
+\item \label{itm:4XBG} A infração terá gravidade média, quando decorrer de conduta volitiva, mas efetuada pela primeira vez pela CONCESSIONÁRIA, sem a ela trazer qualquer benefício ou proveito, nem afetar a prestação dos SERVIÇOS.
+
+\item \label{itm:HSFP} A infração será considerada grave quando o PODER CONCEDENTE constatar presente um dos seguintes fatores:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:PBDV} Ter a CONCESSIONÁRIA agido com má-fé.
+
+\item \label{itm:9RTQ} Da infração decorrer benefício direto ou indireto para a CONCESSIONÁRIA.
+
+\item \label{itm:NYBC} A CONCESSIONÁRIA for reincidente na infração de gravidade média.
+
+\item \label{itm:Q2FG} Prejuízo econômico significativo para o PODER CONCEDENTE.
+\end{enumerate}
+
+\item \label{itm:EZQF} A infração será considerada gravíssima quando:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:PNVN} O PODER CONCEDENTE constatar, diante das circunstâncias do serviço e do ato praticado pela CONCESSIONÁRIA, que seu comportamento se reveste de grande lesividade ao interesse público, por prejudicar, efetiva ou potencialmente, a vida ou a incolumidade física dos USUÁRIOS, a saúde pública, o meio ambiente, o erário ou a continuidade dos SERVIÇOS.
+
+\item \label{itm:2DZM} A CONCESSIONÁRIA não contratar ou manter em vigor a GARANTIA DE EXECUÇÃO DO CONTRATO e os seguros exigidos no CONTRATO.
+\end{enumerate}
+\end{enumerate}
+
+\item \label{itm:C3RM} Sem prejuízo do disposto na cláusula 30.2, o PODER CONCEDENTE observará, na aplicação das sanções, as seguintes circunstâncias, com vistas a garantir a sua proporcionalidade:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:FQ3J} A natureza e a gravidade da infração.
+
+\item \label{itm:RMHT} Os danos dela resultantes para os usuários e para o PODER CONCEDENTE.
+
+\item \label{itm:X27X} As vantagens auferidas pela CONCESSIONÁRIA em decorrência da infração.
+
+\item \label{itm:JXV8} As circunstâncias atenuantes e agravantes.
+
+\item \label{itm:6LVU} A situação econômica e financeira da CONCESSIONÁRIA, em especial a sua capacidade de honrar compromissos financeiros, gerar receitas e manter a execução do CONTRATO.
+
+\item \label{itm:CPNZ} Os antecedentes da CONCESSIONÁRIA, inclusive eventuais reincidências.
+\end{enumerate}
+
+\item \label{itm:F7F3} A advertência somente poderá ser aplicada em resposta ao cometimento de infração leve ou de gravidade média, assim definidas nas subcláusulas 30.2.1 e 30.2.2.
+
+\item \label{itm:M4G4} A multa poderá ser aplicada em resposta ao cometimento de quaisquer infrações definidas na subcláusula 30.2 e nas hipóteses previstas na cláusula 31.
+
+\item \label{itm:PTRL} A aplicação das penalidades previstas neste CONTRATO e o seu cumprimento não prejudicam a cominação de outras sanções previstas para o mesmo fato pela legislação aplicável.
+
+\item \label{itm:AXZA} A suspensão temporária de participação em licitação e impedimento de contratar com o PODER CONCEDENTE, por prazo não superior a 2 (dois) anos, somente poderá ser aplicada em resposta ao cometimento de infração grave ou gravíssima, assim definidas nas subcláusulas 30.2.3 e 30.2.4.
+
+\item \label{itm:GFXR} A declaração de inidoneidade para licitar ou contratar com a Administração Pública, enquanto perdurarem os motivos da punição, somente poderá ser aplicada em resposta ao cometimento de infração gravíssima, assim definida na subcláusula 30.2.4.
+
+\item \label{itm:TGC2} As penalidades serão aplicadas de ofício pelo PODER CONCEDENTE, garantido o devido processo administrativo, especialmente o direito à ampla defesa e ao contraditório.
+
+\item \label{itm:WGQL} A aplicação de qualquer penalidade prevista nesta cláusula 30 não impede a declaração de caducidade da CONCESSÃO pelo PODER CONCEDENTE, nas hipóteses previstas no CONTRATO.
+\end{enumerate}
+
+\section{DAS MULTAS}
+\label{sec:FXH5}
+
+\begin{enumerate}
+\item \label{itm:JXXF} O não cumprimento das cláusulas deste CONTRATO, de seus ANEXOS, do EDITAL, ensejará a aplicação de multa à CONCESSIONÁRIA, nunca individualmente inferior a R$ 2.000,00 ou superior a R$ 10.000.000,00, sem prejuízo das responsabilidades civil e penal e de outras penalidades eventualmente previstas na legislação e neste CONTRATO. 
+
+\item \label{itm:FKHY} No caso de infrações continuadas, serão fixadas multas diárias enquanto perdurar o descumprimento.
+
+\item \label{itm:76MX} As multas não terão caráter compensatório ou indenizatório.
+
+\item \label{itm:7TQZ} As importâncias pecuniárias resultantes da aplicação das multas serão destinadas ao PODER CONCEDENTE. 
+
+\item \label{itm:M6RE} Sem excluir a possibilidade de aplicação de multa por outros comportamentos (31.1), a CONCESSIONÁRIA responderá por:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:PXN6} Multa mensal, no valor de R$\$ 200.000,00$ (duzentos mil reais), na hipótese de não contratação ou manutenção atualizada das apólices dos seguros exigidas no CONTRATO.
+
+\item \label{itm:YP63} Multa diária, no valor correspondente à 0,6% (seis décimos por cento) sobre o VALOR DA GARANTIA DE EXECUÇÃO DO CONTRATO exigível nos termos do subcláusula 28.3, na hipótese de não constituição, manutenção ou recomposição da GARANTIA DE EXECUÇÃO DO CONTRATO observados os prazos exigidos no CONTRATO.
+
+\item \label{itm:3F6F} Multa diária, no valor de R$\$ 2.000,00$ (dois mil reais), na hipótese de desrespeito ao dever de transparência na apresentação de informações econômicas, contábeis, técnicas, financeiras e outras relacionadas à execução do CONTRATO.
+
+\item \label{itm:8A3F} Multa diária, no valor de R$\$ 2.000,00$ (dois mil reais), na hipótese de desrespeito pela CONCESSIONÁRIA das solicitações, notificações e determinações do PODER CONCEDENTE.
+
+\item \label{itm:ESX7} Multa mensal de R$\$ 460.000,00$ (quatrocentos e sessenta mil reais), em função de descumprimento de cada marco-final previsto no CRONOGRAMA constante no ANEXO VI – CRONOGRAMA.
+
+\item \label{itm:NJDQ} Multa no valor de R$\$ 3.000.000,00$ (três milhões), no caso de obtenção, na forma do ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA., de “Índice de desempenho - ID” inferior à 50% (cinquenta por cento) por 2 (dois) quadrimestres consecutivos ou por 5 (cinco) quadrimestres não consecutivos.
+\end{enumerate}
+
+\item \label{itm:JWAB} Os valores das multas referidos nas cláusulas anteriores serão reajustados pelo IRC, anualmente, a partir da DATA BASE do CONTRATO.
+\item \label{itm:M7GT} As multas diárias poderão ser objeto de compensação com os futuros pagamentos da CONTRAPRESTAÇÃO MENSAL ou de execução da GARANTIA DE EXECUÇÃO DO CONTRATO, observado o item 31.8.
+
+\item \label{itm:Y8H2} A aplicação da penalidade de multa observará à seguinte sistemática:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:NRBL} Concretizada a aplicação da multa, o PODER CONCEDENTE emitirá o documento de cobrança correspondente contra a CONCESSIONÁRIA, que deverá pagar o valor devido em até 05 (cinco) dias úteis contados da data do recebimento da notificação.
+
+\item \label{itm:7DYT} Em caso de não pagamento da multa pela CONCESSIONÁRIA no prazo devido, o PODER CONCEDENTE poderá descontar o valor apurado do pagamento a que fizer jus a CONCESSIONÁRIA, ou ainda, executar a GARANTIA DE EXECUÇÃO DO CONTRATO.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:MM8G} Haverá incidência automática de multa de 2% (dois por cento), acrescido de juros de mora e atualização monetária, em conjunto, correspondentes à TLP – Taxa de Longo Prazo, correspondente à variação pro rata no período, a contar da data do respectivo vencimento até a data do efetivo pagamento e/ou liquidação do débito, observados os índices disponíveis na data de vencimento do documento de cobrança emitido pelo PODER CONCEDENTE e na data de quitação do débito.
+\end{enumerate}
+
+\item \label{itm:BK2P} A aplicação das multas contratuais não se confunde com a metodologia de avaliação de desempenho da CONCESSIONÁRIA e a respectiva nota e/ou descontos que lhe forem atribuídos em decorrência da sistemática de mensuração de desempenho, conforme ANEXO VIII – SISTEMA DE MENSURAÇÃO DE DESEMPENHO E CÁLCULO DO PAGAMENTO DA CONCESSIONÁRIA..
+\item \label{itm:T87R} As multas previstas serão aplicadas sem prejuízo da caracterização de hipótese de intervenção ou de decretação de caducidade, conforme disciplinado neste CONTRATO, ou, ainda, da aplicação de outras penalidades previstas na legislação pertinente.
+\end{enumerate}
+
+\item \label{itm:2Y2G} A aplicação das multas previstas neste CONTRATO não exclui a aplicação de sanções decorrentes de legislações ambientais vigentes.
+
+\end{enumerate}
+
+\section{DA INTERVENÇÃO}
+\label{sec:JT5A}
+
+\begin{enumerate}
+\item \label{itm:TBTD} O PODER CONCEDENTE poderá intervir na CONCESSÃO com o fim de assegurar a adequação na execução das OBRAS e na prestação dos SERVIÇOS, bem como o fiel cumprimento das normas contratuais, regulamentares e legais pertinentes, nas hipóteses seguintes:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:ZSZH} Cessação ou interrupção, total ou parcial, da execução das OBRAS ou da prestação dos SERVIÇOS.
+
+\item \label{itm:ZZJ6} Deficiências graves no desenvolvimento das atividades abrangidas pela CONCESSÃO.
+
+\item \label{itm:JEEN} Situações que ponham em risco o meio ambiente e a segurança de pessoas ou bens.
+
+\item \label{itm:EKSG} Descumprimento reiterado das obrigações contratuais.
+\end{enumerate}
+
+\item \label{itm:WKQ5} A intervenção far-se-á na forma estabelecida na lei, e será acompanhada da designação do interventor, especificando-se, ainda, o prazo e os limites da intervenção.
+
+\item \label{itm:AQ7C} Imediatamente após a decretação da intervenção, o PODER CONCEDENTE promoverá a ocupação e utilização das instalações, equipamentos, material e pessoal empregados na execução do CONTRATO, necessários à sua continuidade.
+\item \label{itm:QJ2B} Decretada a intervenção, o PODER CONCEDENTE, no prazo de 30 (trinta) dias, instaurará processo administrativo que deverá estar concluído no prazo máximo de 180 (cento e oitenta) dias, para comprovar as causas determinantes da intervenção e apurar as respectivas responsabilidades, assegurado à CONCESSIONÁRIA amplo direito de defesa.
+
+\item \label{itm:789U} Cessada a intervenção, se não for extinta a CONCESSÃO, as OBRAS e os SERVIÇOS objeto do CONTRATO voltarão à responsabilidade da CONCESSIONÁRIA.
+
+\item \label{itm:49DF} A ocorrência de intervenção pelo PODER CONCEDENTE não desonera as obrigações assumidas pela CONCESSIONÁRIA junto às INSTITUIÇÕES FINANCEIRAS e, por motivo justificado em prol do interesse público, o PODER CONCEDENTE poderá abdicar da intervenção em favor da assunção do controle da CONCESSIONÁRIA por essas INSTITUIÇÕES FINANCEIRAS, consoante a cláusula 22.
+
+\item \label{itm:G9VM} Durante o período em que durar a intervenção, o PODER CONCEDENTE poderá arcar diretamente com o pagamento dos funcionários, fornecedores e financiadores, desonerando-se do pagamento da CONTRAPRESTAÇÃO MENSAL, podendo, para fins de custeio ou reembolso das despesas havidas:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:VB4D} Se apropriar das RECEITAS ACESSÓRIAS eventualmente devidas à CONCESSIONÁRIA.
+
+\item \label{itm:G2P3} Se valer da GARANTIA DE EXECUÇÃO DO CONTRATO.
+
+\item \label{itm:KTAP} Reduzir as parcelas vincendas da CONTRAPRESTAÇÃO MENSAL a ser recebida pela CONCESSIONÁRIA, na proporção dos custos e despesas assumidas no período da intervenção.
+\end{enumerate}
+
+\item \label{itm:CMQE} O PODER CONCEDENTE poderá optar por dar regular continuidade aos pagamentos da CONTRAPRESTAÇÃO MENSAL, durante o período em que durar a intervenção.
+
+\end{enumerate}
+
+\section{RESOLUÇÃO DE CONTROVÉRSIAS}
+\label{sec:E4H4}
+
+\begin{enumerate}
+\item \label{itm:KG7D} Comissão Técnica:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:BNLJ} A Comissão Técnica é o órgão responsável por avaliar e recomendar ao PODER CONCEDENTE opções técnicas para a solução de eventuais divergências de qualquer natureza durante a execução do CONTRATO.
+
+\item \label{itm:WH62} A Comissão Técnica é a primeira instância possível na busca de solução de controvérsias entre as PARTES, buscando evitar, mas não prejudicando o direito das PARTES em acionar o mecanismo de arbitragem previsto na subcláusula 33.2 do CONTRATO.
+
+\item \label{itm:MC2Q} A Comissão Técnica deverá ser instituída em até 30 (trinta) dias após a apresentação, por uma das PARTES, de requisição de solução de divergência por meio da instauração de Comissão Técnica.
+
+\item \label{itm:2448} A Comissão Técnica será composta por 3 (três) membros, cada um com direito a 01 (um) voto nas deliberações, que serão designados da seguinte forma:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:3A26} Um membro indicado pelo PODER CONCEDENTE.
+
+\item \label{itm:5WR9} Um membro indicado pela CONCESSIONÁRIA.
+
+\item \label{itm:JQYB} Um membro indicado pelo VERIFICADOR INDEPENDENTE.
+
+\item \label{itm:6DL5} Caso não haja indicação pelo VERIFICADOR INDEPENDENTE, ou este não seja contratado, o terceiro membro, será escolhido de comum acordo entre membros indicados por cada uma das PARTES, no prazo de 15 (quinze) dias contados da designação dos demais membros.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:5TWV} Caso não haja acordo entre os membros indicados pelo PODER CONCEDENTE e pela CONCESSIONÁRIA na escolha do terceiro membro do Comitê Técnico, este será indicado pelo PODER CONCEDENTE.
+\end{enumerate}
+\end{enumerate}
+
+\item \label{itm:YCE4} A Comissão Técnica não terá reuniões ordinárias. 
+
+\item \label{itm:29RX} Qualquer uma das PARTES poderá solicitar reunião da Comissão Técnica, a partir de comunicado por escrito, incluindo (i) a descrição da situação de divergência para a qual deseja-se uma deliberação, (ii) suas alegações relativamente à questão formulada, (iii) cópia de todos os documentos necessários para a solução da demanda, bem como (iv) indicação da especialização necessária para indicação do membro eventual.
+
+\item \label{itm:DQPV} O procedimento para solução de divergências iniciar-se-á mediante a comunicação de solicitação de pronunciamento da Comissão Técnica à outra parte, e será processado da seguinte forma:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:T8DK} No prazo de 15 (quinze) dias, a contar do recebimento da comunicação referida na subcláusula 33.1.7, a parte reclamada apresentará as suas alegações relativamente à questão formulada;
+
+\item \label{itm:QWUD} O parecer da Comissão Técnica será emitido em um prazo máximo de 30 (trinta) dias, a contar da data do recebimento, pela Comissão Técnica, das alegações apresentadas pela parte reclamada; e
+
+\item \label{itm:Q7NU} Os pareceres da Comissão Técnica serão considerados aprovados se contarem com o voto favorável da maioria de seus membros.
+\end{enumerate}
+
+\item \label{itm:32GX} A Comissão Técnica, com base nos fundamentos, documentos e estudos apresentados pelas PARTES, apresentará a proposta de solução amigável, que deverá observar os princípios da Administração Pública.
+
+\item \label{itm:M3AL} A Comissão Técnica, após as devidas análises, apresentará sua recomendação ao PODER CONCEDENTE. Em caso de ratificação da decisão pelo PODER CONCEDENTE, a decisão da Comissão Técnica será vinculante para as PARTES, até que sobrevenha eventual decisão arbitral ou judiciária sobre a divergência.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:FZKZ} Caso a CONCESSIONÁRIA não aceite a decisão deverá instaurar procedimento arbitral no prazo máximo de 60 (sessenta) dias a contar da comunicação da decisão, sob pena de preclusão do direito de impugná-la.
+\end{enumerate}
+
+\item \label{itm:ZRHR} A submissão de qualquer questão à Comissão Técnica não exonera a CONCESSIONÁRIA de dar integral cumprimento às suas obrigações contratuais e às determinações do PODER CONCEDENTE.
+
+\item \label{itm:VAA7} Todas as despesas necessárias ao exame dos pleitos pela Comissão Técnica serão arcadas pela CONCESSIONÁRIA, com exceção da remuneração eventualmente devida aos membros indicados pelo PODER CONCEDENTE.
+
+\item \label{itm:HE22} A Comissão Técnica não poderá revisar as cláusulas do CONTRATO.
+\end{enumerate}
+
+\item \label{itm:9XAB} Arbitragem:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:477H} As PARTES concordam em, na forma disciplinada pela Lei Federal nº 9.307/96 e Lei Estadual 19.477/11, resolver por meio de arbitragem todo e qualquer conflito de interesses que decorra da execução do CONTRATO ou de quaisquer Contratos, documentos, anexos ou acordos a ele relacionados.
+
+\item \label{itm:TAS6} A submissão de qualquer questão à arbitragem não exonera as PARTES do pontual e tempestivo cumprimento das disposições deste CONTRATO, inclusive quanto à obrigação de continuidade na prestação do serviço, e das determinações do PODER CONCEDENTE que no seu âmbito sejam comunicadas e recebidas pela CONCESSIONÁRIA previamente à data da submissão da questão à arbitragem, até que uma decisão final seja obtida relativamente à matéria discutida.
+
+\item \label{itm:WPBH} A arbitragem será processada pela Câmara de Arbitragem Empresarial - Brasil (“CAMARB”), segundo as regras previstas no seu regulamento vigente na data em que a arbitragem for iniciada.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:ZB5E} Havendo acordo entre as PARTES ou em caso de extinção da CAMARB, será eleita outra câmara para o processamento da arbitragem.
+\end{enumerate}
+
+\item \label{itm:LY3J} A arbitragem será conduzida no Município de Belo Horizonte, utilizando-se a língua portuguesa como idioma oficial para a prática de todo e qualquer ato.
+
+\item \label{itm:LSUA} A legislação aplicável à arbitragem será a seguinte: Lei Federal nº 11.079, de 30 de dezembro de 2004; Lei Federal nº 8.987, de 13 de fevereiro de 1995; Lei Federal nº 9.074, de 7 de julho de 1995, Lei Federal nº 8.666, de 21 de junho de 1993; e a legislação de processo civil brasileira naquilo que não for conflitante com as normas do tribunal arbitral.
+
+\item \label{itm:3N3U} O tribunal arbitral será composto por 3 (três) árbitros de reconhecida idoneidade e conhecimento da matéria a ser decidida, cabendo a cada parte indicar um árbitro, sendo o terceiro árbitro escolhido de comum acordo pelos árbitros indicados pelas PARTES, cabendo-lhe a presidência do tribunal arbitral.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:6EU7} Não havendo consenso entre os árbitros escolhidos por cada parte, o terceiro árbitro será indicado pela CAMARB, observados os termos e condições aplicáveis previstos no seu regulamento de arbitragem.
+\end{enumerate}
+
+\item \label{itm:EPC7} Antes de instituída a arbitragem, as PARTES poderão recorrer ao Poder Judiciário para a concessão de medida cautelar ou de urgência.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:5Y7M} Caso as medidas referidas na subcláusula 33.2.7 se façam necessárias no curso do procedimento arbitral, deverão ser requeridas e apreciadas pelo tribunal arbitral que, por sua vez, poderá solicitá-las ao competente órgão do Poder Judiciário, se as entender necessárias.
+\end{enumerate}
+
+\item \label{itm:N8QM} As decisões e a sentença do tribunal arbitral serão definitivas e vincularão as PARTES e seus sucessores.
+\item \label{itm:UHYE} A responsabilidade pelos custos do procedimento arbitral será determinada da seguinte forma:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:NJGG} A parte que solicitar a arbitragem será responsável pelas custas para instauração do procedimento arbitral, incluindo o adiantamento de percentual dos honorários devidos aos árbitros.
+
+\item \label{itm:KM8X} Os custos e encargos referentes a eventuais providências tomadas no procedimento arbitral recairão sobre a parte que solicitou a referida providência, sendo compartilhados pelas PARTES quando a providência for requerida pelo próprio tribunal arbitral.
+
+\item \label{itm:D4E6} A parte vencida no procedimento arbitral assumirá todas as custas, devendo ressarcir a parte vencedora pelas custas que esta, porventura, já tenha assumido no aludido procedimento.
+
+\item \label{itm:DE8Q} No caso de procedência parcial do pleito levado ao tribunal arbitral, os custos serão divididos entre as PARTES, se assim entender o tribunal, na proporção da sucumbência de cada uma.
+\end{enumerate}
+\end{enumerate}
+\end{enumerate}
+
+\chapter{EXTINÇÃO DO CONTRATO}
+\section{DISPOSIÇÕES GERAIS SOBRE A EXTINÇÃO DO CONTRATO}
+\label{sec:8FA3}
+
+\begin{enumerate}
+\item \label{itm:7VMR} A CONCESSÃO extinguir-se-á por:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:X3UP} Advento do termo contratual.
+
+\item \label{itm:FXAZ} Encampação.
+
+\item \label{itm:9VRD} Caducidade.
+
+\item \label{itm:8MR2} Rescisão.
+
+\item \label{itm:4367} Anulação.
+
+\item \label{itm:Y6PV} Ocorrência de CASO FORTUITO ou de FORÇA MAIOR, regularmente comprovada, impeditiva da execução do CONTRATO.
+\end{enumerate}
+
+\item \label{itm:YH65} Extinta a CONCESSÃO, o PODER CONCEDENTE assumirá imediatamente a prestação dos SERVIÇOS, sendo-lhe revertidos gratuitamente todos os BENS REVERSÍVEIS, livres e desembaraçados de quaisquer ônus ou encargos.
+
+\item \label{itm:B653} No prazo de 6 (seis) meses anteriores à extinção da CONCESSÃO, o PODER CONCEDENTE elaborará o Relatório Provisório de Reversão.
+
+\item \label{itm:MQ8C} O Relatório Provisório de Reversão retratará a situação dos BENS REVERSÍVEIS e determinará a sua aceitação pelo PODER CONCEDENTE ou indicará a necessidade de intervenções ou substituições sob a responsabilidade da CONCESSIONÁRIA que assegurem a observância do dever de manutenção constante dos BENS REVERSÍVEIS.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:XEYD} O Relatório Provisório de Reversão fixará os prazos em que as eventuais intervenções ou substituições serão efetivadas.
+\end{enumerate}
+
+\item \label{itm:C7UN} Caso haja interesse do PODER CONCEDENTE em incluir no Relatório Provisório de Reversão BENS REVERSÍVEIS adquiridos por meio de CONTRATO de arrendamento mercantil, a CONCESSIONÁRIA deverá exercer a opção de compra em tais Contratos antes do Relatório Definitivo de Reversão.
+
+\item \label{itm:NLYW} As intervenções e substituições deverão ser devidamente justificadas, especialmente quanto a sua conveniência, necessidade e economicidade.
+
+\item \label{itm:7VLK} As intervenções e substituições realizadas com o objetivo de dar concretude ao dever de manutenção dos BENS REVERSÍVEIS pela CONCESSIONÁRIA não gerarão direito à indenização ou compensação em favor da CONCESSIONÁRIA.
+
+\item \label{itm:4H69} O Relatório Provisório de Reversão, no caso de verificação do descumprimento do dever de manutenção dos BENS REVERSÍVEIS, determinará a abertura do devido processo para eventual aplicação de penalidade contra a CONCESSIONÁRIA.
+
+\item \label{itm:5U6A} A CONCESSIONÁRIA promoverá a retirada de todos os bens não reversíveis.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:E7BZ} Retirados os bens não reversíveis e verificado o integral cumprimento das determinações do Relatório Provisório de Reversão, o PODER CONCEDENTE elaborará o Relatório Definitivo de Reversão, no prazo de 60 (sessenta) dias, com o objetivo de liberar a CONCESSIONÁRIA de todas as obrigações inerentes à reversão de bens.
+
+\item \label{itm:6XYG} Enquanto não expedido o Relatório Definitivo de Reversão, não será liberada a GARANTIA DE EXECUÇÃO DO CONTRATO.
+
+\item \label{itm:52YD} O PODER CONCEDENTE poderá, a seu exclusivo critério, suceder a CONCESSIONÁRIA nos Contratos de arrendamento ou locação de bens essenciais à prestação dos SERVIÇOS.
+\end{enumerate}
+\end{enumerate}
+
+\section{DO ADVENTO DO TERMO CONTRATUAL}
+\label{sec:DEZU}
+\begin{enumerate}
+\item \label{itm:UFFU} Encerrado o PRAZO DA CONCESSÃO, a CONCESSIONÁRIA será responsável pelo encerramento de quaisquer Contratos inerentes à CONCESSÃO celebrados com terceiros, assumindo todos os encargos, responsabilidades e ônus daí resultantes.
+
+\item \label{itm:8PMK} A CONCESSIONÁRIA deverá tomar todas as medidas razoáveis e cooperar plenamente com o PODER CONCEDENTE para que os SERVIÇOS objeto da CONCESSÃO continuem a ser prestados de acordo com o CONTRATO, de forma ininterrupta, bem como prevenir e mitigar qualquer inconveniência ou risco à saúde ou segurança dos usuários.
+
+\item \label{itm:JD97} Na hipótese de advento do termo contratual, a CONCESSIONÁRIA não fará jus a qualquer indenização relativa a investimentos relativos aos BENS REVERSÍVEIS em decorrência do término do PRAZO DA CONCESSÃO, tendo em vista o que dispõe a subcláusula 7.11.
+
+\item \label{itm:8978} Até 12 (doze) meses antes da data do término do prazo contratual, a CONCESSIONÁRIA apresentará ao PODER CONCEDENTE um programa de desmobilização operacional, a fim de se definirem, consensualmente, as regras e os procedimentos para a assunção da CONCESSÃO pelo PODER CONCEDENTE, ou por terceiro por esse autorizado.
+\end{enumerate}
+
+\section{DA ENCAMPAÇÃO}
+\label{sec:545J}
+
+\section{DA CADUCIDADE}
+\label{sec:GEEC}
+
+\section{RESCISÃO}
+\label{sec:4BRU}
+
+\begin{enumerate}
+\item \label{itm:35BR} O CONTRATO poderá ser rescindido por iniciativa da CONCESSIONÁRIA, mediante ação proposta perante o tribunal arbitral, no caso de descumprimento das normas contratuais pelo PODER CONCEDENTE, em especial:
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:AETL} Expropriação, sequestro ou requisição de uma parte substancial dos ativos ou participação societária da CONCESSIONÁRIA pelo PODER CONCEDENTE ou por qualquer outro órgão público.
+
+\item \label{itm:SMBZ} Inadimplemento por parte do PODER CONCEDENTE por período superior a 90 dias de qualquer parcela devida por parte do mesmo.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:77HD} Não será considerado inadimplemento para fins da subcláusula 38.1.2, o pagamento das parcelas da CONTRAPRESTAÇÃO MENSAL e regularizado pela execução das GARANTIAS previstas na cláusula 29, obedecido o prazo da subcláusula 38.1.2.
+\end{enumerate}
+
+\item \label{itm:NQT6} Descumprimento de obrigações pelo PODER CONCEDENTE que gere um desequilíbrio econômico-financeiro do CONTRATO cujo procedimento de recomposição não seja concluído nos prazos estabelecidos no CONTRATO por motivos imputáveis ao PODER CONCEDENTE.
+
+\item \label{itm:FCV3} A não constituição da GARANTIA DE ADIMPLEMENTO DO CONTRATO PELO PODER CONCEDENTE, prevista na Cláusula 29, no prazo de até 180 (cento e oitenta) dias da assinatura do CONTRATO.
+
+\item \label{itm:PKVW} A não reposição da GARANTIA DE ADIMPLEMENTO DO CONTRATO PELO PODER CONCEDENTE, ainda que parcial, no prazo mencionado na Cláusula 29. 
+\end{enumerate}
+
+\item \label{itm:7K7R} O inadimplemento referido nas subcláusulas 38.1.2 e 38.1.3 apenas será considerado suprido com o sucesso da renegociação ou a quitação integral dos débitos.
+
+\item \label{itm:JLSY} Não configurará hipótese de rescisão o descumprimento de obrigações pelo PODER CONCEDENTE que possa ser remediado, desde que não comprometa em definitivo a possibilidade de execução do OBJETO.
+
+\item \label{itm:KHR7} Os SERVIÇOS prestados pela CONCESSIONÁRIA não poderão ser interrompidos ou paralisados até o trânsito em julgado da sentença do tribunal arbitral que decretar a rescisão do CONTRATO ou até obtenção de autorização expressa e específica perante o tribunal arbitral ou o Poder Judiciário, nos termos da Lei n. 9.307/1996.
+
+\item \label{itm:NY8T} A indenização devida à CONCESSIONÁRIA, no caso de rescisão, será calculada de acordo com as subcláusulas 36.2, 36.3 e 36.4.
+
+\item \label{itm:82FJ} Para fins do cálculo da indenização referida nesta cláusula, considerar-se-ão os valores recebidos pela CONCESSIONÁRIA a título de cobertura de seguros relacionados aos eventos ou circunstâncias que ensejaram a rescisão.
+
+\item \label{itm:95YC} O CONTRATO também poderá ser rescindido por consenso entre as PARTES, que compartilharão os custos e as despesas decorrentes da rescisão.
+\end{enumerate}
+
+\section{ANULAÇÃO}
+\label{sec:P6WD}
+
+\section{EFEITOS DA EXTINÇÃO SOBRE OS BENS REVERSÍVEIS}
+\label{sec:MYB9}
+
+\begin{enumerate}
+\item \label{itm:9XEY} Extinta a CONCESSÃO, serão revertidos ao PODER CONCEDENTE todos os BENS REVERSÍVEIS, livres e desembaraçados de quaisquer ônus ou encargos, em condições adequadas de operação, com as características e requisitos técnicos mantidos, de modo a permitir a continuidade na prestação do serviço concedido, e cessarão, para a CONCESSIONÁRIA, todos os direitos emergentes do CONTRATO.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:TUCS} O valor de todos os BENS REVERSÍVEIS e investimentos realizados na CONCESSÃO deverá ser integralmente depreciado e amortizado pela CONCESSIONÁRIA no prazo da CONCESSÃO, nos termos da legislação vigente.
+
+\item \label{itm:H4VB} A reversão, nesse caso, será gratuita e automática, com os bens em perfeitas condições de operacionalidade, utilização e manutenção, e livres de quaisquer ônus ou encargos, sem prejuízo do desgaste normal resultante de seu uso.
+\end{enumerate}
+
+\item \label{itm:TKD8} Na extinção da CONCESSÃO, haverá imediata assunção dos direitos e obrigações da CONCESSIONÁRIA relativos à CONCESSÃO pelo PODER CONCEDENTE, ou outro ente por ele indicado.
+
+\item \label{itm:EH46} Dentre o antepenúltimo e o último mês de vigência do PRAZO DA CONCESSÃO, a CONCESSIONÁRIA deverá transmitir, para respositório indicado pelo PODER CONCENDENTE, todos os dados armazenados em decorrência dos SERVIÇOS, conforme ANEXO IV – OBRIGAÇÕES MÍNIMAS DA PRESTAÇÃO DOS SERVIÇOS – APÊNDICE 4 – OBRIGAÇÕES ESPECÍFICAS – ARMAZENAMENTO., sejam eles DADOS BRUTOS, DADOS PRÉ-PROCESSADOS ou DADOS TRATADOS.
+
+\item \label{itm:PUHE} O PODER CONCEDENTE poderá recusar receber BENS REVERSÍVEIS que considere inaproveitáveis, garantido o direito da CONCESSIONÁRIA ao contraditório, inclusive através da elaboração e apresentação, às suas expensas, de laudos ou estudos demonstrando a utilidade dos BENS REVERSÍVEIS recusados.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:95F7} Os BENS REVERSÍVEIS recusados pelo PODER CONCEDENTE não serão computados para fins de amortização dos investimentos realizados pela CONCESSIONÁRIA, o que não a exime da obrigação de mantê-los em perfeito funcionamento e bom estado de conservação.
+
+\item \label{itm:XLCM} Havendo discordância da CONCESSIONÁRIA quanto à decisão do PODER CONCEDENTE, admitir-se-á a utilização da resolução de controvérsias previstas neste CONTRATO.
+\end{enumerate}
+\end{enumerate}
+
+\chapter{DISPOSIÇÕES FINAIS}
+\section{DISPOSIÇÕES GERAIS}
+\label{sec:QFKF}
+
+\begin{enumerate}
+\item \label{itm:DGT8} O não exercício, ou o exercício tardio ou parcial, de qualquer direito que assista a qualquer das PARTES pelo CONTRATO, não importa em renúncia, nem impede o seu exercício posterior a qualquer tempo, nem constitui novação da respectiva obrigação ou precedente.
+
+\item \label{itm:87VP}Se qualquer disposição do CONTRATO for considerada ou declarada nula, inválida, ilegal ou inexequível em qualquer aspecto, a validade, a legalidade e a exequibilidade das demais disposições contidas no CONTRATO não serão, de qualquer forma, afetadas ou restringidas por tal fato.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:WUZS} As PARTES negociarão, de boa-fé, a substituição das disposições inválidas, ilegais ou inexequíveis por disposições válidas, legais e exequíveis, cujo efeito econômico seja o mais próximo possível ao efeito econômico das disposições consideradas inválidas, ilegais ou inexequíveis.
+\end{enumerate}
+
+\item \label{itm:A59K} Cada declaração e garantia feita pelas PARTES no presente CONTRATO deverá ser tratada como uma declaração e garantia independente, e a responsabilidade por qualquer falha será apenas daquele que a realizou e não será alterada ou modificada pelo seu conhecimento por qualquer das PARTES.
+
+\item \label{itm:242F} As comunicações e as notificações entre as PARTES serão efetuadas por escrito e remetidas: (a) em mãos, desde que comprovadas por protocolo, (b) por e-mail ou outro meio remoto, desde que comprovada a recepção, ou (c) por correio registrado, com aviso de recebimento.
+
+\item \label{itm:SX6J} Todos os documentos relacionados ao CONTRATO e à CONCESSÃO deverão ser redigidos em, ou oficialmente traduzidos para, a língua portuguesa. Em caso de qualquer conflito ou inconsistência, a versão em língua portuguesa deverá prevalecer.
+
+\item \label{itm:LYQH} Os prazos estabelecidos em dias, no CONTRATO, contar-se-ão em dias corridos, salvo se estiver expressamente feita referência a dias úteis.
+
+\begin{enumerate}[label*=\arabic*.]
+\item \label{itm:EH4M} Em todas as hipóteses, deve-se excluir o primeiro dia e contar-se o último dia do prazo.
+\item \label{itm:4URU} Só se iniciam e vencem os prazos em dias de expediente do PODER CONCEDENTE, prorrogando-se para o próximo dia útil o início ou vencimento de prazo que coincida com dia em que não houver expediente no PODER CONCEDENTE.
+\end{enumerate}
+
+\item \label{itm:N98N} Fica desde já eleito o Foro da Fazenda Pública da Comarca de Belo Horizonte/MG para dirimir quaisquer controvérsias oriundas do presente CONTRATO que não possam ser resolvidas pelas opções mencionadas na cláusula 33, nos termos do CONTRATO.
+
+\end{enumerate}
+
+E, por estarem justas e contratadas, as PARTES assinam o CONTRATO em 5 (cinco) vias de igual teor e forma, considerada cada uma delas um original.
+
+Belo Horizonte, \DataAssinatura.
+
+%----------------------------------------------------------
+
+\end{document}

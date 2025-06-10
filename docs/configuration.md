@@ -2,7 +2,7 @@
 
 ## Overview
 
-The AgentFlow configuration management system provides a flexible and secure way to manage settings across different environments. It supports multiple LLM providers and models through ell2a integration, combining configuration files, environment variables, and runtime settings in a unified interface.
+The AgentFlow configuration management system provides a flexible and secure way to manage settings across different environments. It supports multiple LLM providers and models through ell integration, combining configuration files, environment variables, and runtime settings in a unified interface.
 
 ## Directory Structure
 
@@ -230,7 +230,7 @@ export COHERE_API_KEY=your-cohere-key
 ```python
 from agentflow.config import config
 
-@ell2a.simple(
+@ell.simple(
     model=config.get_model_settings().get('default_model'),
     temperature=float(config.get_model_settings().get('temperature', 0.7))
 )
@@ -319,7 +319,7 @@ Solution: Check rate limit settings and implement backoff
 
 ## References
 
-- [ell2a Documentation](https://docs.ell2a.so/)
+- [ell Documentation](https://docs.ell.so/)
 - [OpenAI API](https://platform.openai.com/docs/api-reference)
 - [Anthropic API](https://docs.anthropic.com/claude/reference)
 - [Mistral AI](https://docs.mistral.ai/)

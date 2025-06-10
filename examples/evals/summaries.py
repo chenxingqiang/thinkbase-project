@@ -4,11 +4,11 @@ import random
 from typing import Any, Dict, Iterable, Optional, Protocol, List, Union, cast, Type
 import os
 import asyncio
-from agentflow import ell2a
-from agentflow.ell2a.evaluation import Evaluation
-from agentflow.ell2a.lmp.simple import simple
-from agentflow.ell2a.types.message import Message, MessageRole, ContentBlock
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow import ell
+from agentflow.ell.evaluation import Evaluation
+from agentflow.ell.lmp.simple import simple
+from agentflow.ell.types.message import Message, MessageRole, ContentBlock
+from agentflow.ell.integration import ELLIntegration
 import numpy as np
 import logging
 
@@ -16,9 +16,9 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Initialize ELL2A integration
-ell2a_integration = ELL2AIntegration()
-ell2a_integration.configure({"store": "./logdir", "verbose": True})
+# Initialize ELL integration
+ell_integration = ELLIntegration()
+ell_integration.configure({"store": "./logdir", "verbose": True})
 
 dataset = [
     {

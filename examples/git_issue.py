@@ -1,13 +1,13 @@
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 import os
 import platform
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Configure ELL2A
-ell2a.configure({
+# Configure ELL
+ell.configure({
     "simple": {
         "model": "gpt-4",
         "max_retries": 3,
@@ -25,7 +25,7 @@ ell2a.configure({
     }
 })
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def generate_description(about: str) -> str:
     """Generate a description for a git issue."""
     message = Message(
@@ -45,8 +45,8 @@ async def generate_description(about: str) -> str:
     )
     
     # Process messages
-    await ell2a.process_message(message)
-    response = await ell2a.process_message(user_message)
+    await ell.process_message(message)
+    response = await ell.process_message(user_message)
     
     return str(response.content) if response and response.content else ""
 
@@ -57,7 +57,7 @@ def get_system_info() -> dict:
         "Hardware": f"Machine: {platform.machine()}, Processor: {platform.processor()}"
     }
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def generate_issue(error: str) -> str:
     """Generate a complete git issue."""
     # Generate description
@@ -91,15 +91,15 @@ Please format this as a proper GitHub issue with appropriate markdown formatting
     )
     
     # Process messages
-    await ell2a.process_message(message)
-    response = await ell2a.process_message(user_message)
+    await ell.process_message(message)
+    response = await ell.process_message(user_message)
     
     return str(response.content) if response and response.content else ""
 
 async def main():
     # This is an example from ell's early day error
     error_console_output = """
-    (ell2a_lab) D:\\dev\\ell>D:/anaconda/envs/ell2a_lab/python.exe d:/dev/ell/examples/multilmp.py
+    (ell_lab) D:\\dev\\ell>D:/anaconda/envs/ell_lab/python.exe d:/dev/ell/examples/multilmp.py
     before ideas 1232131
     ╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
     ║ generate_story_ideas(a dog) # (notimple...)
@@ -129,7 +129,7 @@ async def main():
         ideas = generate_story_ideas(about, api_params=(dict(n=4)))
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     File "D:\\dev\\ell\\ell\\src\\ell\\decorators.py", line 216, in wrapper
-        fn_closure, _uses = ell2a.util.closure.lexically_closured_source(func_to_track)
+        fn_closure, _uses = ell.util.closure.lexically_closured_source(func_to_track)
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     File "D:\\dev\\ell\\ell\\src\\ell\\util\\closure.py", line 306, in lexically_closured_source
         _, fnclosure, uses = lexical_closure(func, initial_call=True)
@@ -143,16 +143,16 @@ async def main():
     File "D:\\dev\\ell\\ell\\src\\ell\\util\\closure.py", line 140, in lexical_closure
         source = getsource(func, lstrip=True)
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "D:\\anaconda\\envs\\ell2a_lab\\Lib\\site-packages\\dill\\source.py", line 374, in getsource
+    File "D:\\anaconda\\envs\\ell_lab\\Lib\\site-packages\\dill\\source.py", line 374, in getsource
         lines, lnum = getsourcelines(object, enclosing=enclosing)
                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "D:\\anaconda\\envs\\ell2a_lab\\Lib\\site-packages\\dill\\source.py", line 345, in getsourcelines
+    File "D:\\anaconda\\envs\\ell_lab\\Lib\\site-packages\\dill\\source.py", line 345, in getsourcelines
         code, n = getblocks(object, lstrip=lstrip, enclosing=enclosing, locate=True)
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "D:\\anaconda\\envs\\ell2a_lab\\Lib\\site-packages\\dill\\source.py", line 271, in getblocks
+    File "D:\\anaconda\\envs\\ell_lab\\Lib\\site-packages\\dill\\source.py", line 271, in getblocks
         lines, lnum = findsource(object)
                     ^^^^^^^^^^^^^^^^^^
-    File "D:\\anaconda\\envs\\ell2a_lab\\Lib\\site-packages\\dill\\source.py", line 215, in findsource
+    File "D:\\anaconda\\envs\\ell_lab\\Lib\\site-packages\\dill\\source.py", line 215, in findsource
         line = lines[lnum]
             ~~~~~^^^^^^
     IndexError: list index out of range

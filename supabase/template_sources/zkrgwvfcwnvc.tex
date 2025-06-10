@@ -1,0 +1,83 @@
+% Commander life sheet
+\documentclass[landscape]{article} 
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{fp}
+\usepackage{etoolbox}
+\usepackage{graphicx}
+\usepackage[landscape,letterpaper,margin=.25in]{geometry}
+\newcounter{playercounter}
+
+\def\getplayername#1{\csname #1\endcsname}
+\def\loadplayernames#1{%
+\setcounter{playercounter}{0}
+\renewcommand*{\do}[1]{%
+\expandafter\def\csname \theplayercounter\endcsname{##1}
+\stepcounter{playercounter}}
+\docsvlist{#1}
+\def\numplayers{\theplayercounter}
+\FPeval{\maxplayerindex}{\numplayers - 1}}
+
+\def\plrboxwidth{2}
+\def\oppboxwidth{1.3}
+\def\boxheight{1.2}
+\def\boxvskip{1.3}
+\def\boxhskip{1.4}
+
+%%
+%% This box is the players personal info
+%%
+\def\playerbox#1{%
+\draw[rounded corners,yshift=-\boxvskip*\y in] ($ \maxplayerindex*(0,\boxvskip in) $) rectangle ($ (\plrboxwidth in,0) + \maxplayerindex*(0,\boxvskip in) + (0,\boxheight in) $);%
+\draw[yshift=-\boxvskip*\y in] ($ \maxplayerindex*(0,\boxvskip in) + (0,\boxheight  in) - (0,.125 in) $) node[anchor=west] {#1};%
+\draw[yshift=-\boxvskip*\y in] ($ \maxplayerindex*(0,\boxvskip in) + (0,\boxheight  in) - (0,.45 in) $) node[anchor=west] {Commander};%
+\draw[yshift=-\boxvskip*\y in] ($ \maxplayerindex*(0,\boxvskip in) + (0,\boxheight  in) - (0,.9 in) $) node[anchor=west] {\#Times Cast};%
+\draw[yshift=-\boxvskip*\y in] ($ \maxplayerindex*(0,\boxvskip in) + (0,\boxheight in) + .75*(\plrboxwidth in,0) $) node[anchor=north]{Life};%
+\draw[yshift=-\boxvskip*\y in]($ \maxplayerindex*(0,\boxvskip in) + (0,\boxheight in) + .45*(\plrboxwidth in,0) $) -- ($ \maxplayerindex*(0,\boxvskip in) + (0,0 in) + .45*(\plrboxwidth in,0) $);}
+
+%%
+%% Life box for opponents
+%%
+
+\def\opponentbox{%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) + (.1 in,0) $) rectangle ($ (\plrboxwidth in,0) + (\oppboxwidth in,\boxheight in) + (.1 in,0) $);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) + (.1 in,0) + .2*(0,\boxheight in) $) -- ($ (\plrboxwidth in,0) + (\boxhskip in,0) + .2*(0,\boxheight in)$);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) + (.1 in,0) + .4*(0,\boxheight in) $) -- ($ (\plrboxwidth in,0) + (\boxhskip in,0) + .4*(0,\boxheight in)$);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) + (.1 in,0) + .6*(0,\boxheight in) $) -- ($ (\plrboxwidth in,0) + (\boxhskip in,0) + .6*(0,\boxheight in)$);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) + (.1 in,0) + .8*(0,\boxheight in) $) -- ($ (\plrboxwidth in,0) + (\boxhskip in,0) + .8*(0,\boxheight in)$);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.2*(\oppboxwidth in,0in) + (.1 in,.24 in) $) -- ($ (\plrboxwidth in,0) +.2*(\oppboxwidth in,0in) + (.1 in,1.2 in) $);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.4*(\oppboxwidth in,0in) + (.1 in,.24 in) $) -- ($ (\plrboxwidth in,0) +.4*(\oppboxwidth in,0in) + (.1 in,1.2 in) $);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.6*(\oppboxwidth in,0in) + (.1 in,.24 in) $) -- ($ (\plrboxwidth in,0) +.6*(\oppboxwidth in,0in) + (.1 in,1.2 in) $);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.8*(\oppboxwidth in,0in) + (.1 in,.24 in) $) -- ($ (\plrboxwidth in,0) +.8*(\oppboxwidth in,0in) + (.1 in,1.2 in) $);%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.9*(\oppboxwidth in,0in) + (.1 in,1.15 in) $) node [anchor=north] {5};%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.9*(\oppboxwidth in,0in) + (.1 in,.925 in) $) node [anchor=north] {10};%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.9*(\oppboxwidth in,0in) + (.1 in,.675 in) $) node [anchor=north] {15};%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.9*(\oppboxwidth in,0in) + (.1 in,.45 in) $) node [anchor=north] {20};%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +0*(\oppboxwidth in,0in) + (.1 in,.1 in) $) node [anchor=west,color=red] {\includegraphics[width=.15in]{skull-icon.png}};%
+\draw[yshift=\boxvskip*\y in,xshift=\boxhskip*\x in] ($ (\plrboxwidth in,0) +.5*(\oppboxwidth in,0in) +(.1 in,0) $) node [anchor=south,color=red]{DEAD};%
+}
+
+
+\newcommand{\makecommandersheet}[1]{
+\setlength\parindent{0cm}
+\loadplayernames{#1}
+\begin{tikzpicture}
+\foreach \y in {0,1,...,\maxplayerindex}
+{
+	\playerbox{\getplayername{\y}}
+	\foreach \x in {0,1,...,\maxplayerindex}
+	{
+		\opponentbox
+	}
+}
+\foreach \x in {0,1,...,\maxplayerindex}
+{
+	\draw[xshift=\boxhskip*\x in] ($ (\plrboxwidth in, .1 in) + (.1 in,\boxheight in) + \maxplayerindex*(0,\boxvskip in) $) node[anchor=west] {\includegraphics[width=.15in]{Ironsword.png}\getplayername{\x}};
+}
+\draw ($ (0in,\boxvskip in) + \maxplayerindex*(0,\boxvskip in) $) node[anchor=west] {Date:};
+\end{tikzpicture}}
+
+
+\begin{document}
+\makecommandersheet{Plr1: ,Plr2: ,Plr3: ,Plr4: ,Plr5: ,Plr6:}%.,r6: }
+\end{document}

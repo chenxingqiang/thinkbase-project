@@ -1,0 +1,812 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% \documentclass[english,landscape,xcolor=dvipsnames,aspectratio=169]{beamer}
+% aspectratio= Other possible values are: 1610, 149, 54, 43 and 32. Default is 43
+
+%\usepackage[brazil]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage{ragged2e} %justifying
+\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{spy,calc}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{tikzpagenodes}
+\usepackage{UERJpresentation}
+
+
+%New Commands
+\newcommand{\Bi}{\mathrm{Bi}}
+\newcommand{\nmax}{n_{\max}}
+\newcommand{\dd}{\mathrm{d}}
+
+
+
+\newcommand{\event}{COBEM}
+\newcommand{\eventdate}{December 2017}
+\newcommand{\mytitle}{Template Example: Solution of the Heat Conduction in Solid-State Electronics by Integral Transforms}
+
+
+
+\author[\scriptsize 
+Prof. Daniel J. N. M. Chalhub -- daniel.chalhub@uerj.br
+]
+{
+\textbf{Prof. Daniel J. N. M. Chalhub} (Presenter)
+\\ 	
+Lívia M. Corrêa
+}
+
+\institute[UERJ]{
+
+	\begin{minipage}{\textwidth}
+		\begin{columns}
+			\column{1\textwidth}
+			\centering
+			Dep. of Mech. Engineering -- PPG-EM,\\
+			Universidade do Estado do Rio de Janeiro, \\
+			Rio de Janeiro - RJ, Brazil
+		\end{columns}
+	\end{minipage}
+	
+	
+	\begin{minipage}{\textwidth}
+		\vspace{1em}
+		\begin{columns}
+		    \column{0.15\textwidth}
+			\column{0.15\textwidth}
+			\centering
+			\includegraphics[height=3.5em]{Logo-UERJ.png}
+			\column{0.2\textwidth}
+			\centering
+			\includegraphics[height=4em]{LogoPPGEM-color.png}
+			\column{0.2\textwidth}
+			\centering
+			\includegraphics[height=3.0em]{Logo-GESAR.png}
+			\column{0.1\textwidth}
+		\end{columns}
+	\end{minipage}
+	
+	\begin{minipage}{\textwidth}
+	\vspace{1em}
+		\begin{columns}
+			\column{1\textwidth}
+			\centering
+			\normalsize \emph{\event{} -- \eventdate}
+		\end{columns}
+	\end{minipage}
+			
+}
+
+
+
+
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+    \titlepage
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Introduction}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\begin{frame}{Introduction}\includelogo
+One of the biggest challenges on the design of modern electronic devices is the thermal control.
+		
+\vspace{1em}
+		
+In this work, it is proposed a solution by Classical Integral Transform Technique(CITT) to solve a heat conduction problem on Solid-State Electronics (SSE) considering heat generation and external convection.
+		
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Solid State Electronics (SSE)}\includelogo
+
+	
+Solid-state electronics (SSE) are those circuits or devices built entirely from solid materials and in which the electrons, or other charge carriers, are encapsulated within the solid material.
+\vspace{0.5em}	    
+	            
+Exemples: Transistors, Microprocessors, Random Access Memory (RAM), Itegrated Circuits (IC). 
+	        
+\begin{figure}
+	\centering
+	%\caption{Contour plot of the heat generation considered cases.} \label{heatgenimage}
+	\hspace*{-0.5cm}
+	\subfloat{%: $\xi_0=1/2$ and $\eta_0=1/2$]{%\label{centralheat}
+		\fbox{\includegraphics[width=0.2\hsize]{Figuras/ic.jpg}}}
+	\hspace*{0.2cm}
+	\subfloat{%  $\xi_0=1/4$ and $\eta_0=2/5$]{%\label{initialheat}
+		\fbox{\includegraphics[width=0.25\hsize]{Figuras/ram.jpg}}}
+	\hspace*{0.2cm}
+	\subfloat{%  $\xi_0=1/4$ and $\eta_0=2/5$]{%\label{initialheat}
+		\fbox{\includegraphics[width=0.25\hsize]{Figuras/processor.jpg}}}
+\end{figure}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Substrate}\includelogo
+
+
+Substrate is a solid substance and serve as the foundation upon which electronic devices such as transistors, diodes, and especially Integrated Circuits (ICs) are encapsulated.
+
+\vspace{0.5em}	
+
+Example of substrate's materials:
+
+\begin{itemize}
+\item silicon 
+\item silicon dioxide 
+\item aluminum oxide 
+\item sapphire 
+\end{itemize} 
+
+
+The advantage of this is the superior insulation between adjacent transistors.
+
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Exemple of SSE: Integrated Circuit}\includelogo
+\begin{figure}
+\centering
+\subfloat{
+	\fbox{\includegraphics[width=0.4\hsize]{Figuras/microchip.jpg}}}
+\hspace*{0.2cm}
+\subfloat{
+	\fbox{\includegraphics[width=0.3\hsize]{Figuras/microchip-microscopio.jpg}}}
+
+\end{figure}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Mathematical Formulation}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Problem Description}\includelogo
+\centering\includegraphics[width=0.8\textwidth]{Figuras/volcontrol}	
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+	
+	
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\begin{frame}{Problem Formulation}\includelogo
+The nondimensionalization of the problem leads to the following mathematical formulation:
+%
+\small
+\begin{gather*}\label{equation}
+\frac{\partial^2\Theta}{\partial \xi^2}+
+\beta^2 \frac{\partial^2\Theta}{\partial \eta^2}-(\Bi \gamma) \Theta  =-G(\xi,\eta)  \quad \text{for} \quad 0\leq \xi \leq 1 \quad \text{and} \quad  0\leq \eta \leq 1
+\\
+\left.\frac{\partial\Theta}{\partial \xi}\right|_{\xi=0}=0;	\qquad		\left.\frac{\partial\Theta}{\partial \eta}\right|_{\eta=0}=0; \\ \left.\frac{\partial\Theta}{\partial \xi}\right|_{\xi=1}=0;	\qquad \left.\frac{\partial\Theta}{\partial \eta}\right|_{\eta=1}=0;
+\end{gather*}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+	
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Methodology}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Classical Integral Transform Technique}\includelogo
+In order to solve the proposed problem, the Classical Integral Transform Technique (CITT) is applied, considering the appropriate Helmholtz Eigenvalue Problem in cartesian coordinates.
+\begin{gather*}
+\Psi_n''(\eta)+\lambda_n^2\Psi_n(\eta)=0 \\
+\Psi_n'(0)=0; \quad \Psi_n'(1)=0.
+\end{gather*}
+where $\Psi(\eta)$ are the eigenfunctions and $\lambda_n$ are the eigenvalues. For this particular problem, the case where $\lambda=0$ also exists.
+
+For $\lambda=0$, the solution of the eigenvalue problem is given by:
+\begin{gather*}
+\Psi_0(\eta)=1; \qquad \lambda_0=0;
+\end{gather*} 
+%
+And for $\lambda>0$:
+\begin{gather*}
+\Psi_n(\eta)=\cos(\lambda_n \eta); \qquad \lambda_n=n \pi, \quad \text{for} \quad n=1,2,3,\dots
+\end{gather*} 
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\begin{frame}{Classical Integral Transform Technique}\includelogo
+To apply the CITT, the transformation pair is defined.
+\begin{varblock}[10cm]{Transformation Pair}
+\begin{align*}
+%\label{transformada}\quad
+\text{Transformation} \quad &\Rightarrow \quad 
+\bar{\Theta}_n(\xi)=\int_{0}^{1}\Theta\Psi_n(\eta)\dd\eta\\
+%\qquad\label{eq:inversion}
+\text{Inversion} \quad & \Rightarrow \quad \Theta= \sum_{n=0}^{\infty} \frac{ \bar{\Theta}_n(\xi)\Psi_n(\eta)}{N_n} 
+\end{align*}
+\vspace{0em}
+\end{varblock}
+$N_n$ is the norm and is defined as:
+%
+\begin{gather*}
+N_n=\int_{0}^{1}\Psi_n^2 \dd \eta  
+\end{gather*}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+	
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Classical Integral Transform Technique}\includelogo
+The dimensionless diferential equation is written again, \\ 
+multiplied by $\Psi_n$ and integrated in the domain for $\eta$. 
+\begin{gather*}
+	\int_{0}^{1}\frac{\partial ^2 \Theta}{\partial\xi ^2} \Psi_n d\eta+\beta^2\int_{0}^{1}\frac{\partial ^2 \Theta}{\partial\eta ^2}\Psi_n d\eta - \Bi\gamma\int_{0}^{1}\Theta\Psi_n d\eta=- \int_{0}^{1}G\Psi_n d\eta
+\end{gather*}
+
+The transformed equation is obtained and admits an analytical solution.
+\begin{columns}[t]
+\begin{column}{5cm}
+	For $\lambda > 0$:
+	\small
+\begin{gather*}
+%\text{For}\quad\lambda > 0\rightarrow
+\bar{\Theta}_n''+(-\beta^2\lambda_n^2-\Bi\gamma)\bar{\Theta}_n=-\bar{G}_n(\xi)\\
+\bar{\Theta}_n'(0)=0; \quad \bar{\Theta}_n'(1)=0\\
+%\end{gather*}
+%\begin{gather*}
+\text{where} \\\bar{G}_n(\xi)= \int_{0}^{1}G(\xi,\eta)\Psi_n(\eta)\dd\eta
+\end{gather*}
+\end{column}
+\begin{column}{5cm}
+	 For $\lambda = 0$:
+	 \small
+	 \begin{gather*}
+	 \bar{\Theta}_0''-(\Bi\gamma)\bar{\Theta}_0=-\bar{G}_0(\xi)\\
+	 \bar{\Theta}_0'(0)=0; \quad \bar{\Theta}_0'(1)=0\\
+	 %\end{gather*}
+	 %\begin{gather*}
+	 \text{where}\\\bar{G}_0(\xi)= \int_{0}^{1}G(\xi,\eta)\dd\eta
+	 \end{gather*}
+\end{column}
+\end{columns}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+		 
+		 
+
+		 
+		 
+		 
+		 
+		 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\begin{frame}{Classical Integral Transform Technique}\includelogo
+			
+The transformed equations admit a analytical solutions. \\[1em]
+	
+In order to obtain the final temperature field, the inversion formula must be utilized and the summation must be truncated to a finite value ($\nmax$).
+		
+\begin{align*}
+\text{Inversion} \quad & \Rightarrow \quad \Theta= \sum_{n=0}^{\nmax} \frac{ \bar{\Theta}_n(\xi)\Psi_n(\eta)}{N_n} 
+\end{align*}		
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+		
+
+
+
+
+
+
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~		
+\section{Results}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Heat Generation}\includelogo
+\scriptsize{
+	\begin{gather*}\label{eq:heatgen}
+	%G(\xi,\eta)=\frac{Gen}{\sigma^2\pi}\exp\left[-\frac{{(\xi-0.25)^2+(\eta-0.4)^2}}{\sigma^2}\right]
+	G(\xi,\eta)=\frac{G_e}{\sigma^2\pi}\exp\left[-\frac{{(\xi-\xi_0)^2+(\eta-\eta_0)^2}}{\sigma^2}\right]
+	\end{gather*}
+For this current work, two cases are considered:
+\begin{itemize}
+	\item Centered HG where $\xi_0=1/2$ and $\eta_0=1/2$
+	\item Off-Centered HG where $\xi_0=1/4$ and $\eta_0=2/5$
+\end{itemize} 
+For both cases $G_e=1$ and $\sigma=0.1$. }
+\vspace*{-1.5em}
+\begin{figure}
+	\centering
+	%\caption{Contour plot of the heat generation considered cases.} \label{heatgenimage}
+	%\hspace*{-6cm}
+	\subfloat[][Centered HG]{%: $\xi_0=1/2$ and $\eta_0=1/2$]{%\label{centralheat}
+		\fbox{\includegraphics[width=0.25\hsize]{Figuras/contour-geracao-central.pdf}}}
+	\hspace*{1cm}
+	\subfloat[][ Off-Centered HG]{%  $\xi_0=1/4$ and $\eta_0=2/5$]{%\label{initialheat}
+		\fbox{\includegraphics[width=0.25\hsize]{Figuras/contour-geracao-assimetrica.pdf}}}
+	%\\
+	%\source{Citação da fonte ou `O autor'. (opcional)}
+\end{figure}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Results}\includelogo
+\tiny
+\begin{table}[h!]
+\caption{$\Theta(\xi,\eta)$ convergence solved for Centered HG by CITT}\vspace{-.7em} %\label{tab:geracaonomeio}
+\centering
+\setlength\tabcolsep{1.5pt}
+\renewcommand\arraystretch{1}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}%c|
+		\hline
+		&\multicolumn{4}{|c|}{$\Bi\gamma$=1 \& $\beta$=1}& \multicolumn{4}{c|}{$\Bi\gamma$=0.1 \& $\beta$=1} \\ \hline
+		$\nmax$ &$\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6, 0.8)& $\Theta$(0.9,0.9)&$\Theta$(0.2, 0.4)& $\Theta$(0.5, 0.5)&$\Theta$(0.6,0.8)& $\Theta$(0.9,0.9) \\\hline
+		1 &          0.981222 & 1.05643 & 1.03739 & 0.966733  & 9.98087 & 10.0575 & 10.0382 & 9.96593 \\
+		5 &          1.00221 & 1.18948 & 0.997708 & 0.954075  &  \bfseries 10.0025 & 10.1922 & 9.99803 &   \bfseries 9.95274 \\
+		10 & \bfseries 1.00213 & 1.20298 & 1.00209 &  \bfseries 0.954083  & 10.0025 & 10.2058 & 10.0024 & 9.95274 \\
+		%15 & 1.00213 & 1.20322 & 1.00213 & 0.954083 & 15 & 10.0025 & 10.2060 & 10.0025 & 9.95274 \\
+		20 & 1.00213 &  \bfseries 1.20323 &  \bfseries 1.00213 & 0.954083  & 10.0025 &  \bfseries 10.2060 &  \bfseries  10.0025 & 9.95274 \\
+		%25 & 1.00213 & 1.20323 & 1.00213 & 0.954083 & 25 & 10.0025 & 10.2060 & 10.0025 & 9.95274 \\
+		30 & 1.00213 & 1.20323 & 1.00213 & 0.954083  & 10.0026 & 10.2060 & 10.0025 & 9.95274 \\
+		\hline
+		&\multicolumn{4}{|c|}{$\Bi\gamma$=1 \& $\beta$=0.8} & \multicolumn{4}{c|}{$\Bi\gamma$=0.1 \& $\beta$=0.8} \\ \hline
+		$\nmax$ & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9) & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&$\Theta$(0.6,0.8)& $\Theta$(0.9,0.9)\\ \hline
+		1 & 0.981222 & 1.05643 & 1.03739 & 0.966733 & 9.98087 & 10.0575 & 10.0382 & 9.96593 \\
+		5 & 1.01980 & 1.23495 & 0.980675 & 0.940388 & 10.0212 & 10.2395 & 9.98041 & 9.93805 \\
+		10 & \bfseries  1.01957 & 1.25429 & 0.987398 & \bfseries  0.940418  &  \bfseries 10.0210 & 10.2589 & 9.98715 &  \bfseries 9.93808 \\
+		%15 & 1.01957 & 1.25466 & 0.987466 & 0.940418 & 15 & 10.0210 & 10.2593 & 9.98722 & 9.93808 \\
+		20 & 1.01957 &  \bfseries 1.25467 &  \bfseries 0.987461 & 0.940418 & 10.0210 &  \bfseries 10.2593 & \bfseries  9.98722 & 9.93808 \\
+		%25 & 1.01957 & 1.25467 & 0.987461 & 0.940418 & 25 & 10.0210 & 10.2593 & 9.98722 & 9.93808 \\
+		30 & 1.01957 & 1.25467 & 0.987461 & 0.940418 & 10.0210 & 10.2593 & 9.98722 & 9.93808 \\
+		\hline
+		&\multicolumn{4}{|c|}{$\Bi\gamma$=1 \& $\beta$=0.5} & \multicolumn{4}{c|}{$\Bi\gamma$=0.1 \& $\beta$=0.5}\\ \hline
+		$\nmax$ & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9)  & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9)\\\hline
+		1 & 0.981222 & 1.05643 & 1.03739 & 0.966733 & 9.98087 & 10.0575 & 10.0382 & 9.96593 \\
+		5 & 1.09885 & 1.38536 & 0.921228 & 0.874113  & 10.1105 & 10.4039 & 9.91626 & 9.86204 \\
+		10 & 1.09731 & 1.42441 & 0.936699 & 0.874431  &  \bfseries 10.1090 & 10.4432 & 9.93187 &  \bfseries 9.86236 \\
+		%15 & 1.09730 & 1.42523 & 0.936875 & 0.874429 & 15 & 10.1090 & 10.4440 & 9.93204 & 9.86236 \\
+		20 &  \bfseries 1.09730 &  \bfseries 1.42526 &  \bfseries 0.936864 &  \bfseries 0.874429 & 10.1090 &  \bfseries 10.4441 &  \bfseries 9.93203 & 9.86236 \\
+		%25 & 1.09730 & 1.42526 & 0.936864 & 0.874429 & 25 & 10.1090 & 10.4441 & 9.93203 & 9.86236 \\
+		30 & 1.09730 & 1.42526 & 0.936864 & 0.874429 & 10.1090 & 10.4441 & 9.93203 & 9.86236 \\
+		\hline
+	\end{tabular}
+\end{table} 
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Results}\includelogo
+\tiny
+\begin{table}[h!]
+	\caption{$\Theta(\xi,\eta)$ convergence solved for Off-Centered HG by CITT}\vspace{-.7em} %\label{tab:geracaodeslocada}
+	\centering
+	\setlength\tabcolsep{1.5pt}
+	\renewcommand\arraystretch{1}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}%c|
+		\hline
+		&\multicolumn{4}{|c|}{$\Bi\gamma$=1 \& $\beta$=1}& \multicolumn{4}{c|}{$\Bi\gamma$=0.1 \& $\beta$=1} \\ \hline
+		$\nmax$ & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9) & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9) \\\hline
+		1 & 1.14595 & 0.991937 & 0.920318 & 0.865087  & 10.1555 & 9.99006 & 9.91129 & 9.84928 \\
+		5 & 1.26434 & 1.02009 & 0.914914 &  \bfseries 0.863013 & 10.2754 & 10.0190 & 9.90570 &  \bfseries 9.84707  \\
+		10 & 1.27061 &  \bfseries 1.01987 &  \bfseries 0.91489 & 0.863013 & 10.2817 &  \bfseries 10.0188 &  \bfseries 9.90568 & 9.84707 \\
+		%15 &  1.27082 & 1.01987 & 0.91489 & 0.863013 & 15 & 10.2819 & 10.0188 & 9.90568 & 9.84707 \\
+		20 &  \bfseries 1.27083 & 1.01987 & 0.91489 & 0.863013 &  \bfseries 10.2819 & 10.0188 & 9.90568 & 9.84707 \\
+		%25 &  1.27083 & 1.01987 & 0.91489 & 0.863013 & 25 & 10.2819 & 10.0188 & 9.90568 & 9.84707 \\
+		30 & 1.27083 & 1.01987 & 0.91489 & 0.863013 & 10.2819 & 10.0188 & 9.90568 & 9.84707 \\
+		\hline
+		&\multicolumn{4}{|c|}{$\Bi\gamma$=1 \& $\beta$=0.8} & \multicolumn{4}{c|}{$\Bi\gamma$=0.1 \& $\beta$=0.8} \\ \hline
+		$\nmax$ & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9) & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9)\\ \hline
+		1 &  1.1564 & 0.991937 & 0.900772 & 0.846859 & 10.1682 & 9.99006 & 9.88666 & 9.82559 \\
+		5 & 1.32297 & 1.04002 & 0.890144 & \bfseries  0.840922 & 10.3380 & 10.0401 & 9.87552 &  \bfseries 9.81914 \\
+		10 & 1.33221 &  \bfseries 1.03950 &  \bfseries 0.890058 & 0.840922 & 10.3473 &  \bfseries 10.0396 &  \bfseries 9.87544 & 9.81914 \\
+		%15 & 1.33253 & 1.03950 & 0.890058 & 0.840922 & 15 & 10.3476 & 10.0396 & 9.87544 & 9.81914 \\
+		20 &  \bfseries 1.33253 & 1.03950 & 0.890058 & 0.840922 &  \bfseries 10.3476 & 10.0396 & 9.87544 & 9.81914 \\
+		%25 & 1.33253 & 1.03950 & 0.890058 & 0.840922 & 25 & 10.3476 & 10.0396 & 9.87544 & 9.81914 \\
+		30 & 1.33253 & 1.03950 & 0.890058 & 0.840922 & 10.3476 & 10.0396 & 9.87544 & 9.81914 \\
+		\hline
+		&\multicolumn{4}{|c|}{$\Bi\gamma$=1 \& $\beta$=0.5} & \multicolumn{4}{c|}{$\Bi\gamma$=0.1 \& $\beta$=0.5}\\ \hline
+		$\nmax$ & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9,0.9) & $\Theta$(0.2,0.4)& $\Theta$(0.5,0.5)&  $\Theta$(0.6,0.8)& $\Theta$(0.9, 0.9)\\\hline
+		1 & 1.18823 & 0.991937 & 0.830465 & 0.772371 & 10.2157 & 9.99006 & 9.77686 & 9.70579 \\
+		5 &  1.52152 & 1.12367 & 0.794684 & 0.738850 & 10.5654 & 10.1341 & 9.73726 & 9.66629 \\
+		10 &  1.54154 & 1.12104 & 0.793933 &  \bfseries 0.738828 & 10.5855 & 10.1315 & 9.73650 &  \bfseries 9.66627 \\
+		%15 & 1.54227 & 1.12102 & 0.793928 & 0.738828 & 15 & 10.5862 & 10.1314 & 9.73649 & 9.66627 \\
+		20 & 1.54228 &  \bfseries 1.12102 &  \bfseries 0.793928 & 0.738828 &  \bfseries 10.5862 &  \bfseries 10.1314 &  \bfseries 9.73649 & 9.66627 \\
+		%25 & 1.54229 & 1.12102 & 0.793928 & 0.738828 & 25 & 10.5862 & 10.1314 & 9.73649 & 9.66627  \\
+		30 &  \bfseries 1.54229 & 1.12102 & 0.793928 & 0.738828 & 10.5862 & 10.1314 & 9.73649 & 9.66627 \\
+		\hline
+	\end{tabular}
+\end{table} 
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Results}\includelogo
+\begin{figure}[!h]
+	\centering
+	\caption{Illustration of the solution by CITT with the different heat generation positions with the parameters of $\Bi\gamma$=1 and $\beta$=1.} 
+	\subfloat[][Off-Centered HG case ]{
+		\fbox{\includegraphics[width=0.30\hsize]{Figuras/contour-citt-assimetrico.pdf}}}
+	\hspace*{1cm} %\\
+	\subfloat[][Centered HG case]{
+		\fbox{\includegraphics[width=0.30\hsize]{Figuras/contour-citt-central.pdf}}}
+\end{figure}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^	
+
+
+
+
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+\section{Conclusions}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Conclusions}\includelogo
+\begin{itemize}
+	 \item The solution is fully analytical
+	 \vspace{2em}
+	 \item CITT had a great performance to obtain high accuracy with very few terms in the solution summation.
+	 \vspace{2em}
+	 \item This is a preliminary work and for near future works, one can propose: Use of the complete Heat Generation and variation of the heat conductivity. 
+ \end{itemize}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+	
+	
+
+	
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
+\begin{frame}{Acknowledgments}\includelogo
+	\begin{center}
+	\Huge   \textbf{Thank You}
+	\end{center}
+	
+	\vspace{3em}
+	\hrule
+	\vspace{2mm}
+	
+	\textbf{Acknowledgments:}
+	\vspace{2mm}
+	
+    \begin{center}
+	\includegraphics[height=2em]{Agencies/Capes.jpg}
+	\hspace{5mm}
+	\includegraphics[height=2em]{Agencies/Cnpq.png}
+	\hspace{5mm}
+	\includegraphics[height=2em]{Agencies/Faperj.jpg}
+	\hspace{5mm}\\[5mm] 
+		\includegraphics[height=4em]{LogoPPGEM-color.png}
+	\hspace{5mm}
+	\includegraphics[height=4em]{Logo-UERJ.png}
+	\hspace{0mm}
+
+    \end{center}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+	
+
+
+
+
+
+
+
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}\includelogo
+\begin{columns}
+\column{0.5\textwidth}
+\frametitle{Lists - Examples}
+\begin{itemize}
+\item Point A
+\item Point B
+\begin{itemize}
+\item part 1
+\item part 2
+\end{itemize}
+\item Point C
+\end{itemize}
+
+\begin{enumerate}[I]
+\item Point A
+\item Point B
+\begin{enumerate}[i]
+\item part 1
+\item part 2
+\end{enumerate}
+\item Point C
+\end{enumerate}
+\column{0.5\textwidth}
+\begin{description}
+\item[API] Application Programming Interface
+\item[LAN] Local Area Network
+\item[ASCII] American Standard Code for Information Interchange
+\end{description}
+
+\end{columns}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Block Texts  - Examples}\includelogo
+
+\begin{block}{Block Title}
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, 
+sed do eiusmod 
+\end{block}
+
+\begin{alertblock}{Block Title}
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, 
+sed do eiusmod tempor
+\end{alertblock}
+
+\begin{definition}
+A prime number is a number that...
+\end{definition}
+
+\begin{example}
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, 
+sed do eiusmod tempor incididunt ut labore et
+dolore magna aliqua.
+\end{example}
+    
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Including Code  - Examples}\includelogo
+\begin{lstlisting}
+\begin{gather}
+\frac{\partial^2 T}{\partial x^2} + 
+\frac{\partial^2 T}{\partial y^2} 
+ = 0
+\end{gather}
+\end{lstlisting}
+\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{plain}
+%	\begin{frame}{References}\includelogo
+%		\bibliography{livia}
+%	\end{frame}
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+%^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+\end{document}
+
+\end{document}

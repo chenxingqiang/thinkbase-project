@@ -1,0 +1,155 @@
+%!TEX TS-options = --shell-escape
+% Plantilla para tesis Universidad Autónoma Metropolitana
+% Adaptada por Iskar Waluyo de plantila de Matthew Townson y Andrew Reeves, 2016
+
+\documentclass[11pt, oneside, a4paper]{memoir}
+
+% Packages utilizados en la plantilla base
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% Ajustes de tipografía 
+% https://www.overleaf.com/learn/latex/Font_typefaces
+\usepackage{lmodern}[lmdh]
+% Configuración de márgenes
+\usepackage[a4paper,width=138mm,top=35mm,bottom=35mm,bindingoffset=10mm]{geometry}
+\usepackage{url}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{rotating}
+% \usepackage{gensymb}
+\usepackage{pdflscape}
+\usepackage{mathrsfs,amsmath}
+\usepackage{units}
+\usepackage{siunitx}
+\usepackage{acronym}
+\usepackage{booktabs}
+\usepackage[spanish]{babel}
+\usepackage{bibentry}
+\usepackage{subcaption}
+\usepackage{natbib}
+
+% Estilo de bibliografía
+\bibliographystyle{abbrvnat}
+\setcitestyle{authoryear,open={(},close={)}}
+\usepackage{perpage}
+\MakePerPage{footnote}
+% \usepackage{minted}
+
+\captionsetup[subfigure]{labelformat=simple}
+\renewcommand\thesubfigure{\alph{subfigure})}
+
+% Estilo de indentaciones
+\setlength{\parindent}{0pt}
+\nonzeroparskip
+
+\newsubfloat{figure}
+
+%Aliases de la tesis
+\newcommand{\titulo}{Título de la tesis}
+\newcommand{\subtitulo}{Subtitulo de la tesis}
+\newcommand{\grado}{maestría}
+\newcommand{\nombre}{Autor}
+\newcommand{\fecha}{\today}
+\newcommand{\director}{Director de tesis}
+\newcommand{\lectores}{Primer lector | Segundo lector | Tercer lector}
+\newcommand{\universidad}{\protect{Universidad Autónoma Metropolitana}}
+\newcommand{\division}{División}
+\newcommand{\departamento}{Departamento}
+\newcommand{\ciudad}{Azcapotzalco, CDMX}
+\newcommand{\direccionA}{Av. San Pablo}
+\newcommand{\direccionB}{C.P.}
+
+%Prefijos para el apéndice "Appendix"
+\renewcommand*{\cftappendixname}{Apéndice\space}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+% Estilo de capítulo (revisar documentación para plantilla Memoir)
+\chapterstyle{madsen}
+
+% Interlineado
+% \OnehalfSpacing % medio
+\DoubleSpacing % doble
+
+% Profundidad de la tabla de contenido
+\setsecnumdepth{subsection}
+
+\nobibliography*
+
+% Ajustes de encabezados
+\makepagestyle{myruled}
+\makeheadrule {myruled}{\textwidth}{\normalrulethickness}
+\makefootrule {myruled}{\textwidth}{\normalrulethickness}{\footruleskip}
+\makeevenhead {myruled}{}{\small\itshape\leftmark}{}
+\makeoddhead {myruled}{}{\small\itshape\rightmark}{}
+\makeevenfoot {myruled}{\small \thepage}{}{}
+\makeoddfoot {myruled}{}{}{\small \thepage}
+
+\makepsmarks {myruled}{
+\nouppercaseheads
+\createmark {chapter} {both} {shownumber}{}{. \ }
+\createmark {section} {both}{shownumber}{} {. \ }
+\createmark {subsection} {both}{shownumber}{} {. \ }
+\createmark {subsubsection}{both}{shownumber}{} {. \ }
+\createplainmark {toc} {both} {\contentsname}
+\createplainmark {lof} {both} {\listfigurename}
+\createplainmark {lot} {both} {\listtablename}
+\createplainmark {bib} {both} {\bibname}
+\createplainmark {index} {both} {\indexname}
+\createplainmark {glossary} {both} {\glossaryname}
+}
+
+\makepagestyle{plain}
+\makefootrule {plain}{\textwidth}{\normalrulethickness}{\footruleskip}
+\makeevenfoot {plain}{\small \thepage}{}{}
+\makeoddfoot {plain}{}{}{\small \thepage}
+
+\makepsmarks {plain}{
+\nouppercaseheads
+\createmark {chapter} {both} {shownumber}{}{. \ }
+\createmark {section} {both}{shownumber}{} {. \ }
+\createmark {subsection} {both}{shownumber}{} {. \ }
+\createmark {subsubsection}{both}{shownumber}{} {. \ }
+\createplainmark {toc} {both} {\contentsname}
+\createplainmark {lof} {both} {\listfigurename}
+\createplainmark {lot} {both} {\listtablename}
+\createplainmark {bib} {both} {\bibname}
+\createplainmark {index} {both} {\indexname}
+\createplainmark {glossary} {both} {\glossaryname}
+}
+
+
+\setsecnumdepth{subsubsection}
+\pagestyle{myruled}
+
+% Inicio del documento
+\begin{document}
+
+% Contenido antes del cuerpo de la tesis
+\frontmatter
+\include{contenido/front_matter}
+
+\newpage
+
+\include{contenido/glosario}
+
+\mainmatter
+
+\pagestyle{myruled}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Cuerpo de la tesis
+\include{./contenido/capitulo1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+
+% Bibliografía
+\bibliography{bibliografia}
+
+% Contenido después del cuerpo de la tesis 
+\input{contenido/back_matter}
+
+\end{document}

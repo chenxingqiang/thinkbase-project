@@ -1,0 +1,307 @@
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% Modelo UNIAVAN para Trabalhos Acadêmicos baseado em Modelo UFSC de 
+% Alisson Lopes Furlani utilizando a classe abntex2
+%
+% Autor: Luiz Fernando Marquez Arruda
+%
+% Olá caro autor, segue aqui algumas orientações a respeito de como utilizar este 
+% template.
+%
+% Todas as configurações a respeito de nome, curso, orientador e afins devem ser
+% feitas no arquivo information.tex que se encontra na pasta setup. Assim, de forma
+% automática, os nomes corretos irão aparecer em sua capa, contra-capa e afins.
+%
+% Todas as imagens devem submetidas para a pasta images.
+%
+% A lista de símbolos, siglas e acrônimos também está localizada na pasta setup e
+% consta com alguns exemplos para lhe orientar a respeito de como incluir novos
+% itens. Obs. os itens já listados podem ser apagados.
+%
+% De forma a não danificar a estruturação principal, as bibliotecas individuais
+% utilizadas podem ser adicionadas no arquivo my_packages.tex localizado na pasta
+% setup.
+%
+% Ao longo do documento você encontrará exemplos de como adicionar uma figura, uma
+% tabela, fazer uma citação direta (longa e curta) e indireta.
+%
+% As listas e sumário são atualizados automaticamente.
+% 
+% Suas referencias devem ser colocadas no formato bibtex no arquivo references.bib
+% na pasta raiz.
+%
+%                               Atualizações
+%
+%  04-03 - incorporada o pacote listings para inclusão
+%          de arquivos de programação código c ou outras
+%          linguagens no trabalho.
+%
+%  27-03 - ajuste do tamanho da fonte, alinhamento e 
+%          posicionamento do caption da imagem
+%
+%  21-06 - Impressão da lista de simbolos
+%
+% Atenciosamente 
+%
+% Luiz Fernando M. Arruda - 21/06/2022
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\documentclass[% -- opções da classe uniavan --
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,			% para impressão no anverso. Oposto a twoside
+	% -- opções da classe abntex2 --
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	%french,			% idioma adicional para hifenização
+	%spanish,			% idioma adicional para hifenização
+	brazil				% o último idioma é o principal do documento
+	]{setup/uniavan}
+
+\addbibresource{references.bib} % Seus arquivos de referências
+
+% -------------------------------------------------------------------------
+% Inclusão de novas bibliotecas
+% -------------------------------------------------------------------------
+% Inclusão de novas bibliotecas devem ser feitas arquivo setup/my_packages.tex
+% -----------------------------
+
+\input{setup/my_packages}
+
+% -------------------------------------------------------------------------
+% Dados gerais do documento
+% -------------------------------------------------------------------------
+% Inclusão do nome do autor, título, orientador, membros da banca, curso etc
+% Devem ser editados no arquivo setup/information.tex
+% -----------------------------
+
+\input{setup/information}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+% ---
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={ufsc, latex, abntex2}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=black,%blue,          	% color of internal links
+    	citecolor=black,%blue,        		% color of links to bibliography
+    	filecolor=black,%magenta,      		% color of file links
+		urlcolor=black,%blue,
+		bookmarksdepth=4
+}
+\makeatother
+% ---
+
+% ---
+% carregar e compilar a lista de abreviaturas e siglas e a lista de símbolos
+% ---
+
+% carrega a lista de abreviaturas e siglas e a lista de símbolos
+\input{setup/list_of_acron_symbols}
+
+% compila a lista de abreviaturas e siglas e a lista de símbolos
+\makenoidxglossaries 
+
+% ---
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% Espaçamento 1.5 entre linhas
+\OnehalfSpacing
+
+% Corrige justificação
+%\sloppy
+
+% -------------------------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% -------------------------------------------------------------------------
+% Capa, folha de rosto, ficha bibliográfica, errata, folha de aprovação
+% Dedicatória, agradecimentos, epígrafe, resumos, listas
+% -------------------------------------------------------------------------
+% Capa
+% -------------------------------------------------------------------------
+\imprimircapa
+% -------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% -------------------------------------------------------------------------
+\imprimirfolhaderosto
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Folha de aprovação
+% -------------------------------------------------------------------------
+% A folha de aprovação é feita em arquivo separado (para facilitar a impressão / eventual mudança de membro pelo suplente / inclusão da folha escaneada).
+% O arquivo de edição da folha de aprovação  está em beforetext/aprovacao.tex
+% -------------------------------------------------------------------------
+%\input{beforetext/aprovacao}
+%\includepdf{beforetext/aprovacao.pdf}
+% -------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------
+% Elementos pré-textuais não obrigatórios
+% -------------------------------------------------------------------------
+% Os elementos pré-textuais devem ser editados na pasta beforetext
+% -------------------------------------------------------------------------
+% Agradecimentos
+% -------------------------------------------------------------------------
+%\input{beforetext/agradecimentos}
+% -------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------
+% Epígrafe
+% -------------------------------------------------------------------------
+%\input{beforetext/epigrafe}
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Resumo
+% -------------------------------------------------------------------------
+\input{beforetext/resumo}
+% -------------------------------------------------------------------------
+
+
+% -------------------------------------------------------------------------
+% Abstract
+% -------------------------------------------------------------------------
+\input{beforetext/abstract}
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% LISTAS (não obrigatórias)
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Lista de figuras
+% -------------------------------------------------------------------------
+\imprimrilistadefiguras
+% -------------------------------------------------------------------------
+	
+% -------------------------------------------------------------------------
+% Lista de tabelas
+% -------------------------------------------------------------------------
+\imprimirlistadetabelas
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Lista de abreviaturas e siglas (devem ser declarados no preambulo)
+% -------------------------------------------------------------------------
+\imprimirlistadesiglas
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Lista de simbolos (devem ser declarados no preambulo)
+% -------------------------------------------------------------------------
+\imprimirlistadesimbolos
+% -------------------------------------------------------------------------
+
+% -------------------------------------------------------------------------
+% Sumário
+% -------------------------------------------------------------------------
+\imprimirsumario
+% -------------------------------------------------------------------------	
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+% ---
+
+% ---
+\input{chapters/01-chapter}
+\input{chapters/02-chapter}
+\input{chapters/03-chapter}
+\input{chapters/04-chapter}
+\input{chapters/05-chapter}
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\begingroup
+    \printbibliography[title=REFERÊNCIAS]
+\endgroup
+
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+\imprimirglossario
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+\begin{apendicesenv}
+	%\partapendices* 
+	\input{aftertext/apendice_a}
+	\input{aftertext/apendice_b}
+\end{apendicesenv}
+% ---
+
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+
+% ---
+% Inicia os anexos
+% ---
+\begin{anexosenv}
+	%\partanexos*
+	\input{aftertext/anexo_a}
+\end{anexosenv}
+
+%---------------------------------------------------------------------
+% INDICE REMISSIVO
+%---------------------------------------------------------------------
+% \phantompart
+% \printindex
+%---------------------------------------------------------------------
+
+\end{document}

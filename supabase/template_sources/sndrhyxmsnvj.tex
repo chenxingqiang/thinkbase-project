@@ -1,0 +1,177 @@
+\documentclass[a4paper, 12pt,oneside]{book} % Here you chose the paper size and font size. The command onside ensures that pages are not shifted left and right (as is common for printed books). 
+\usepackage[utf8]{inputenc} % Added to manage special characters, like Norwegian letters
+\usepackage[T1]{fontenc} % To manage special characters
+\usepackage{titlesec} % Used to change format for chapter titles
+\titleformat{\chapter}[display]
+  {\bfseries\Huge}  {\filright{\Large\chaptertitlename} \Huge\thechapter}
+  {1ex}
+  {}%}\vspace{1ex}\filleft}
+  [\vspace{1ex}\titlerule]
+%\usepackage[Bjarne]{fncychap} %fancy chapter style (many more available, like Sonny or Lenny etc.)
+\usepackage{fancyhdr} %to customize the headers
+\fancyhead{\nouppercase}
+%\usepackage[lmargin=1in, rmargin=1in, tmargin=1.5in, bmargin=1.3in]{geometry} %sets the margins for the pages
+\setcounter{tocdepth}{2} %table of contents number depth for subsections (2 = x.x.x)
+\setcounter{secnumdepth}{4} %numbering depth for headers for subsections in the text(4 = x.x.x.x)
+\usepackage{url} %to include urls
+\usepackage{listings} %include this if you want to include code in the thesis
+\usepackage{amsmath,amssymb} %mathematical package
+\usepackage[per-mode=symbol]{siunitx} %includes SI-units
+\usepackage[bf]{caption} %makes float captions bold
+\usepackage{array, booktabs} %to make better tables
+\usepackage{graphicx} %to include graphics
+\usepackage{float} %to include floats
+\usepackage[export]{adjustbox} %to adjust floats
+\usepackage{subfig} %to include subfigures
+\usepackage{chngcntr} %will make it possible to change the counter for tables, figures etc. such as below
+\counterwithin{figure}{section} %change counter for figures within sections (also possible to choose for each chapter
+\counterwithin{table}{section} %change counter for tables within sections
+\usepackage{color, xcolor} %edit e.g. text colors
+\usepackage{hyperref} %Adding internal links in you document
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+% Here you can customize the look of your
+% citations and bibliography
+\usepackage[backend = biber,
+            natbib = true, % Adding the natbib style
+            % This will enable the use of \citet and \citep
+            style = authoryear, % This can be changed to 
+            % numerical if you only want numbers
+            maxcitenames = 2,   % max number of 
+            % names to include before et. al.
+            ]{biblatex}
+% Declare the bibliography resource
+% (which you might want to connect to
+% for example Zotero)
+\addbibresource{bibliography.bib}
+\usepackage{comment} %to be able to comment out sections in the .tex files
+\usepackage{afterpage} %to customize page commands such as below
+\usepackage[version=4]{mhchem} %Package for chemical notation
+\newcommand\myemptypage{
+    \null
+    \thispagestyle{empty}
+    \addtocounter{page}{-1}
+    \newpage
+    } %sets new page command to insert an empty page without adding to the page counter or having a page number
+
+
+
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{comment}
+% The title page:
+% For NTNU students this page will be generated automatically when submitting your paper, and should not be included in the final file from Latex. Delete or comment out the title page setup. The final report should then start with the first page being the abstract. I have included a title page here so it is possible to see how it may look like, and for those who does not get an automatically generated title page. Of course you will need to change the names and titles etc. to your case.
+
+%the title page should be an odd page (right hand side)
+
+\begin{titlepage}
+\vspace*{1.5cm}
+
+\noindent  \textcolor{gray}{\large Ola Nordmann} \\
+\vspace{1cm}
+
+\noindent \textbf{\Large The title of your master's thesis should be written here} \\
+\vspace{0.5cm}
+
+\noindent {\large Any undertitle is written here} \\
+
+
+
+\vspace{7cm}
+\noindent Master's thesis in Geosciences \\
+Supervisor: Supervisor Name \\
+Co-supervisor: Co-supervisor Name \\
+June 2025 \\
+
+\vspace{0.2cm}
+\noindent Norwegian University of Science and Technology \\
+Faculty of Engineering \\
+Department of Geoscience \\
+
+\begin{figure}[h]
+    \includegraphics[width=0.28\textwidth]{Figures/ntnu_basic.png}
+\end{figure}
+\end{titlepage}
+
+
+{%
+  \sffamily
+    \vbox{}\vfill
+    {%
+      \raggedleft
+%     This template can be found at \\
+%     \url{https://???} \\
+%      \vspace{2cm}
+      This template is an updated \\ 
+      and expanded version of an \\
+      earlier template created by \\
+      Nina Salvesen. \\
+    }%
+    \vbox{}
+}%
+
+% The pre-chapters
+\chapter*{Abstract} %pre-chapters should not be numbered, hExploratoryence the "*"
+\pagenumbering{roman} %introductory pages should be roman
+\setcounter{page}{1}
+\addcontentsline{toc}{chapter}{\protect\numberline{}Abstract} %add the chapter to the table of contents, this is not automatically added when creating unnumbered chapters (*). Add it in a chapter style, and keep all chapters on the same numberline indent regardless of number or not on the chapter
+\input{Chapters/00Abstract} %insert the chapter text from the files
+
+\input{Chapters/01Preface}
+
+\tableofcontents
+\addcontentsline{toc}{chapter}{\protect\numberline{}Contents}
+
+%add to table of contents list of figures and tables, and insert list of figures and tables
+\addcontentsline{toc}{chapter}{\protect\numberline{}\listfigurename}
+\listoffigures
+\addcontentsline{toc}{chapter}{\protect\numberline{}\listtablename}
+\listoftables
+
+\input{Chapters/02Abbreviations}
+\newpage
+\myemptypage
+%add an empty non-counted page by the command below in order to get the first chapter on the left hand side, if needed (check your page number so that the first chapter is on an odd page)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Customize the layout of the main content of your thesis
+
+%\pagestyle{fancy} %set customized page style for header
+%\fancyhf{} %clear header and footer fields
+%\renewcommand{\headrulewidth}{0pt} %set to no rule
+%\fancyhead[LE, RO]{\thepage} %set the page number at left for even, right for odd pages
+%\fancyhead[RE, LO]{\leftmark} %set the chapter name at right for even, left for odd pages
+%is is possible to design the header with the chapter as you wish, e.q. only the chapter or only the name, all lowercase instead etc.
+%you could also design the footer if you wish, for example:
+%\fancyfoot[LE, RO]{\thepage}
+%\setlength{\headheight}{14.49998pt} %set the header height
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%main content 
+
+\pagenumbering{arabic}
+
+\input{Chapters/03Introduction}
+\input{Chapters/04Background}
+\input{Chapters/05Theory}
+\input{Chapters/06Method}
+\input{Chapters/07Results}
+\input{Chapters/08Discussion}
+\input{Chapters/09Conclusion}
+
+\addcontentsline{toc}{chapter}{\protect\numberline{}References}
+\printbibliography[title={References}] %you may change the title in the toc here if you want
+\cleardoublepage
+
+\input{Chapters/10Appendix}
+
+\end{document}

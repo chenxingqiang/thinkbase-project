@@ -1,0 +1,31 @@
+\frametitle{Optimizing Hyper-parameters}
+
+\begin{algorithm}[H]
+\algsetup{linenosize=\tiny}
+\scriptsize
+\BlankLine
+\ForEach{i in 1:t}
+    {
+     Randomly split the data into k folds of the same size \\
+    	\ForEach{j in 1:k}
+    	{
+    	Use $j$th fold as test set and the union of remaining folds as training set \\
+        \ForEach{p in 1:grid}
+        {
+                Fit model on training set using parameter set $p$ \\
+                Predict on test set and calculate RMSE
+        }
+    	}%end inner for
+        \ForEach{p in 1:grid}{
+                Calculate average RMSE over the $t \times k$-runs
+        }
+        choose $p$ with the lowest RMSE
+    }%end oute and r for
+\caption{t-time k-fold crossvalidation and gridSearch}
+\label{alg:seq}
+\end{algorithm}
+
+
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/xgbTuning/}{xgbTuning}
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/rfTuning/}{rfTuning}
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/svmTuning}{svmTuning}

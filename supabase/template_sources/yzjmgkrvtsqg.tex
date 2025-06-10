@@ -1,0 +1,167 @@
+\documentclass{cernatsnote}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{placeins}
+
+\title{CERN ATS Note title}
+\author{
+	Author Name \; \\		
+	CERN, CH-1211 Geneva, Switzerland
+}
+\email{author.email@cern.ch}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document shows how to calculate the path-length of rectangular bending magnets in a beam line. The path-length depends on the pole-face angles, i.e. how the magnet is positioned in the line. The majority of bending magnets are installed with identical pole-face angles at the start and the end, but in certain cases the pole-face angles are different e.g. in the CERN PS BOOSTER BTP and BTY extraction lines, the BHZ10 magnet have a special positioning in order not to perturb the optics of any of the lines unfavorably.
+ The path-length correspond to the s-parameter in MADX, and must be calculated precisely, in order to get a correct survey, which need to be correct to the 10 micron level.
+\end{abstract}
+\\ \\ \\ 
+
+\begingroup
+\color{black}
+\tableofcontents
+\endgroup
+
+\pagebreak
+
+\section{Introduction}
+This note will describe how to calculate the path length of a bending magnet. Throughout this note the bending magnet is defined according to the MADX sector magnet definition SBEND (See ref. \cite{MADX}). The reason is that a sector magnet definition can also model a rectangular magnet, so it is easier just to use the sector bending magnet definition. The sector magnet definition is characterized by it's arc length "$L$", it's bending angle "$\phi$" and it's pole-face angles "$e1$ and $e2$", (see Figure \ref{fig:StandardMagnetLayout}). \\
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{images/StandardMagnetLayout.png}
+\caption{\label{fig:StandardMagnetLayout} Standard magnet layout for a sector bending magnet}
+\end{figure}
+
+Looking at the definition of a sector magnet in MADX:
+\begin{align*} 
+label: &SBEND, L=real, ANGLE=real, TILT=real, \\
+&K0=real, K1=real, K2=real, K1S=real, \\
+&E1=real, E2=real,\\
+&FINT=real, FINTX=real, HGAP=real, H1=real, H2=real, THICK=logical;
+\end{align*}
+
+In the above formula "L" is the arc length, "ANGLE" is the bending angle "$\phi$" and "E1" \& "E2" are the pole face angles.
+
+\pagebreak
+
+\noindent
+\textit{NB! Please note that for Fig.\ref{fig:StandardMagnetLayout}, the definition of a positive bending angle as well as the pole face angles depends on the charge of the particle that moves through the bending magnet. If a positively charged particle is bent to the right, then the bending angle is positive. If a negatively charged particle is bent to the right, then the bending is negative.} \\ \\
+
+The arc length $L$ is extremely important for survey calculations and is equal to the increase in the s variable from the entry to the exit of the magnet. The entry and exit points of the magnet is called ENTRE and SORTIE, which are the names defined in the survey database (See ref. \cite{GEODE})
+
+For survey calculations, we use four different types of magnet length. These four different magnet lengths are used by other groups (see Figure \ref{fig:3Length}):
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\textwidth]{images/3Length.png}
+\caption{\label{fig:3Length} Definition of three different length for a bending magnet. \color{blue}The rectangular blue box is the bending magnet itself  \color{red}The Red circular line from point E to point S is the arc length. \color{brown} The straight brown line from point E to point S is the magnetic length. arc length. \color{green} The two angled green straight lines from point E to point S is the length via the deflection point.}
+\end{figure}
+
+\begin{enumerate}
+\item \textbf{The physical length}. This is length given in layout drawings. It is only used for survey calculations but never for optics calculations. But, as the survey group also accepts the magnetic length as a basis for survey calculations, then in the magnetic length is always used for all types of calculation and the physical length is basically never used.
+\item \textbf{The magnetic length}. This is used by the MADX program for optics calculations, but can also be accepted as a basis for survey calculations. The magnetic length, as a concept, is equivalent to the physical length. The magnetic length is calculated from magnet measurements, and the formula for the magnetic length is: $L_{Mag}=\frac {\int_{ }^{ } B dl}{B_{Max}}$, where $B_{Max}$ is the maximum B field in the center of the magnet.
+\item \textbf{The arc length}. This is used by the MADX program. It is the length of the beam trajectory and is the length given in the SBEND command. It is also called the path length.
+\item \textbf{The straight line length between the ENTRY and SORTIE points}. This was in the past used by the GEODE survey program. However, recently GEODE has converted to use the arc length, but there are still instances where the ENTRY/SORTIE length is still used. The survey program could in certain instances base this length on either the physical length or the magnetic length.
+\end{enumerate}
+
+\noindent \textit{NB! Please be very careful to check whether a physical length or a magnetic length is used. Check e.g. with the NORMA magnet database. See ref.\cite{NORMA} } 
+
+\section{How to position a straight vacuum chamber to maximize aperture for the beam}
+Looking at Figure \ref{fig:3Length}, we see a beam going from point E to point S, following the red circular line, and we imagine that it passes inside a straight vacuum pipe (this could be represented by the blue square rectangle). In order to maximize the aperture, then the middle of the vacuum chamber should be exactly between the maximum extended circular arc and the ES line. Seen from the center of circle with $ \rho$ as the bending radius, the middle of the vacuum chamber should then be the average between $ \rho $ and the ES line (= $ \rho *Cos(\frac {\alpha}{2} )$ ), i.e. equal to:
+$ \frac{\rho}{2} * (1 - Cos[\frac{\alpha}{2}])$ above the E-S line. \\
+
+This formula is independent of the how the layout of bending magnet is done (see the next section with the three layouts of a rectangular magnet). 
+
+\pagebreak
+
+\section{Three layouts for a rectangular magnet}
+
+\subsection{The standard magnet layout}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\textwidth]{images/StandarMagnet_DeflectionPoint.png}
+\caption{\label{fig:StandarMagnet_DeflectionPoint} 
+         Calculation of path length for standard magnet layout.}
+\end{figure}
+
+\FloatBarrier
+
+\begin{align*} 
+\begin{split}
+ L_{arc} & =\rho \cdot \phi \\
+ L_{Dfl} & =\frac{L}{Cos(\frac{\phi}{2})} = 2\cdot \rho \cdot Tan(\frac{\phi}{2}) = 2 \cdot L_{arc} \cdot \cfrac{Tan(\frac{\phi}{2})}{\phi} \\
+  L_{ES} & =L = \rho \cdot 2 \cdot Sin(\frac{\phi}{2})  \\ \\
+ where \\
+ L_{arc} & = path\ length\ i.e\ the\ length\ of \ the \ beam\ trajectory \\
+ L_{Dfl} & = Length\ via\ deflection\ point\ \\
+ \rho & = \frac{L}{2\cdot Sin(\frac{\phi}{2})} \\
+  & = bending\ radius\ of\ the\ rectangular\ bending\ magnet \\
+  \phi & = bending\ angle\ of\ the\ rectangular\ bending\ magnet \\
+ L & = magnetic\  length\ of\ the\ rectangular\ bending\ magnet \\
+\end{split}
+\end{align*}
+
+\pagebreak
+
+\subsection{Rectangular bending magnet with zero pole phase angle at ENTRE}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.7\textwidth]{images/BendingMagnet_Aligned_Entre.png}
+\caption{\label{fig:BendingMagnet_Aligned_Entre} 
+         Calculation of path length for magnet aligned with ENTRE.}
+\end{figure}
+\FloatBarrier
+
+\begin{align*} 
+\begin{split}
+ L_{arc} & =\rho \cdot \phi \\
+ L_{Dfl} & = 2\cdot \rho \cdot Tan(\frac{\phi}{2}) = \frac{L}{\ {Cos(\frac{\phi}{2})}^2}  \\
+  L_{ES} & = \rho \cdot 2 \cdot Sin(\frac{\phi}{2})  \\ \\
+ where \\
+ L_{arc} & = path\ length\ i.e\ the\ length\ of \ the \ beam\ trajectory \\
+ L_{Dfl} & = Length\ via\ deflection\ point\ \\
+ \rho & = \frac{L}{Sin(\phi)} \\
+  & = bending\ radius\ of\ the\ rectangular\ bending\ magnet \\
+  \phi & = bending\ angle\ of\ the\ rectangular\ bending\ magnet \\
+ L & = magnetic\  length\ of\ the\ rectangular\ bending\ magnet \\
+\end{split}
+\end{align*}
+
+\pagebreak
+
+\subsection{Rectangular bending magnet arbitrary pole phase angles}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.7\textwidth]{images/BendingMagnet_Arbitrary_Angles.png}
+\caption{\label{fig:BendingMagnet_Arbitrary_Angles} 
+Calculation of path length for magnet with arbitrary polephase angles. In the above Figure \ref{fig:BendingMagnet_Arbitrary_Angles} the poleface angle at the ENTRY equal -$\phi1$ ($E1=-\phi1$), while the poleface angle at SORTIE equals $\phi2$ ($E2=\phi2$). From geometric considerations it can be seen that the sum of the poleface angles $E1+E2=\phi$  }
+\end{figure}
+\FloatBarrier
+
+\begin{align*} 
+\begin{split}
+ L_{arc} & =\rho \cdot \phi \\
+ L_{Dfl} & = 2\cdot \rho \cdot Tan(\frac{\phi}{2})   \\
+  L_{ES} & = \rho \cdot 2 \cdot Sin(\frac{\phi}{2})  \\ \\
+ where \\
+ L_{arc} & = path\ length\ i.e\ the\ length\ of \ the \ beam\ trajectory \\
+ L_{Dfl} & = Length\ via\ deflection\ point\ \\
+ \rho & = \frac{L}{Sin(E1)+Sin(E2)} \\
+  & = bending\ radius\ of\ the\ rectangular\ bending\ magnet \\
+  \phi & = bending\ angle\ of\ the\ rectangular\ bending\ magnet \\
+ L & = magnetic\  length\ of\ the\ rectangular\ bending\ magnet \\
+\end{split}
+\end{align*}
+
+\subsection{Some concluding comments about survey}
+Because it is very costly to do drawings, it has been decided to base all surveys on drawings. However, since the drawings calculate the length of a bending magnet as the length of the deflection point, while MADX calculates the length via the arc length, one will have to modify all positions of the elements downstream a bending magnet - basically subtracting the difference between the length via the deflection point and the arc length from all these elements. One will therefore not find identical values of the positions in the drawings and the MADX file, even though the the two sources describe the exact same information.
+
+\bibliography{references}
+\bibliographystyle{plain}
+
+\end{document}

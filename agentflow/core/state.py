@@ -3,7 +3,7 @@
 from typing import Dict, Any, List, Optional
 from .base import BaseWorkflow
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class StateManager:
     """Manages workflow state."""
@@ -58,6 +58,8 @@ class AgentStatus(str, Enum):
 
 class AgentState(BaseModel):
     """Agent state."""
+
+    model_config = ConfigDict(use_enum_values=True, from_attributes=True)
 
     status: AgentStatus = AgentStatus.IDLE
     error: Optional[str] = None

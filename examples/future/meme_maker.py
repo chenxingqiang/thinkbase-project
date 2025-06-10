@@ -4,14 +4,14 @@ import cv2
 import os
 import json
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -36,7 +36,7 @@ def image_to_ascii(image: Image.Image) -> str:
     ascii_art = '\n'.join(''.join(ascii_chars[int(pixel)] for pixel in row) for row in normalized)
     return ascii_art
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def make_a_joke_about_the_image(image: Image.Image) -> Message:
     """Generate a joke about the given image."""
     # Convert image to ASCII art for text-based processing

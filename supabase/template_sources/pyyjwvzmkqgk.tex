@@ -1,0 +1,170 @@
+% **************************************************************************************************************
+% A Classic Thesis Style
+% An Homage to The Elements of Typographic Style
+%
+% Copyright (C) 2012 Andr\'e Miede http://www.miede.de
+%
+% If you like the style then I would appreciate a postcard. My address 
+% can be found in the file ClassicThesis.pdf. A collection of the 
+% postcards I received so far is available online at 
+% http://postcards.miede.de
+%
+% License:
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; see the file COPYING.  If not, write to
+% the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+% Boston, MA 02111-1307, USA.
+%
+% **************************************************************************************************************
+% Note:
+%    * You must not use "u etc. in strings/commands that will be spaced out (use \"u or real umlauts instead)
+%    * New enumeration (small caps): \begin{aenumerate} \end{aenumerate}
+%    * For margin notes: \marginpar or \graffito{}
+%    * Do not use bold fonts in this style, it is designed around them
+%    * Use tables as in the examples
+%    * See classicthesis-preamble.sty for useful commands
+% **************************************************************************************************************
+% To Do:
+%   * [high] Check this out: http://www.golatex.de/koma-script-warnung-in-verbindung-mit-listings-package-t2058.html
+%   * [medium] mathbb in section-titles/chapter-titles => disappears somehow in headlines!!!
+% **************************************************************************************************************
+\documentclass[ twoside,openright,titlepage,numbers=noenddot,headinclude,%1headlines,% letterpaper a4paper
+                footinclude=true,cleardoublepage=plain,abstractoff, % <--- obsolete, remove (todo)
+                BCOR=5mm,paper=a4,fontsize=11pt,%11pt,a4paper,%
+                portuguese,
+                dottedtoc, % adicionar pontinhos na lista de conteúdos
+                ]{scrreprt}
+
+
+% UTF-8 support with latin9 (ISO-8859-9) = latin1+"Euro sign"
+\PassOptionsToPackage{utf8}{inputenc}   
+\usepackage{inputenc}  
+ 
+% ****************************************************************************************************
+% Personal data and user ad-hoc commands
+% ****************************************************************************************************
+\newcommand{\myTitle}{Análise de ciber segurança ao Chromecast\xspace}
+\newcommand{\myDegree}{Mestrado em Eng.ª Informática -- Computação Móvel\xspace}
+\newcommand{\myNameOne}{Estudante xxxxxx xxxxxx xxxxxx\xspace}
+\newcommand{\myNumber}{yyyyyyyy}
+
+
+\newcommand{\myProfOne}{Professor Doutor XXXX XXXXX XXXXX  \href{mailto:xxxxxx@ipleiria.pt}{(xxxxxx@ipleiria.pt)}\xspace}
+% \newcommand{\myProfTwo}{Professor Doutor XXXX XXXXX XXXXX \href{mailto:xxxxxx@ipleiria.pt}{(xxxxxx@ipleiria.pt)}\xspace}
+
+\newcommand{\myFaculty}{Politécnico de Leiria\xspace}
+\newcommand{\mySchool}{Escola Superior de Tecnologia e Gestão\xspace}
+\newcommand{\myDepartment}{Departamento de Engenharia Informática\xspace}
+\newcommand{\myLocation}{Leiria\xspace}
+
+\newcommand{\myTime}{Fevereiro de 2022\xspace}
+\newcommand{\mySchoolYear}{2021 -- 2022\xspace}
+\newcommand{\myVersion}{versão 0.1\xspace}            
+                
+                
+%*******************************************************
+% Note: Make all your adjustments in here
+%*******************************************************
+\input{config}
+
+\usepackage{lipsum}
+
+%*******************************************************
+% Bibliography
+%*******************************************************
+%   Ficheiro com a base de dados da bibliografia
+\addbibresource{References.bib}
+%   para o kile dar as sugestões das chaves da bibliografia
+%   se der erro a queixar-se do bibtex, basta repetir a compilação
+\iffalse
+    \bibliography{References.bib}  % só para o kile
+\fi
+
+
+%*******************************************************
+% Lista de acrónimos
+%*******************************************************
+% \loadglsentries{Covers/Acronyms-list}
+\makeglossaries
+
+
+%*******************************************************
+% Hyphenation
+%*******************************************************
+%\hyphenation{put special hyphenation here}
+
+
+% ******************************************************
+% GO!GO!GO! MOVE IT!
+%*******************************************************
+\begin{document}
+\frenchspacing
+\raggedbottom
+\selectlanguage{portuguese}
+
+\pagestyle{plain}
+
+% use \cleardoublepage here to avoid problems with pdfbookmark
+
+%*******************************************************
+% Frontmatter
+%*******************************************************
+\include{Covers/Titlepage}
+\cleardoublepage\include{Covers/Titleback}
+
+\pagenumbering{roman}
+\cleardoublepage\include{Covers/Acknowledgments}
+\cleardoublepage\include{Covers/Abstract}
+
+\pagestyle{scrheadings}
+
+\cleardoublepage\include{Covers/Contents}
+\cleardoublepage\include{Covers/Acronyms}
+
+
+%********************************************************************
+% Mainmatter
+%*******************************************************
+\pagenumbering{arabic}
+
+% \phantomsection 
+% \part*{Relatório}
+
+
+\cleardoublepage\include{Chapters/Intro}
+\cleardoublepage\include{Chapters/Background}
+\cleardoublepage\include{Chapters/Development}
+\cleardoublepage\include{Chapters/Conclusion} 
+
+\cleardoublepage\include{Covers/Bibliography}
+
+
+%********************************************************************
+% Backmatter
+%*******************************************************
+\appendix
+
+\cleardoublepage
+\phantomsection 
+\part*{Apêndices}
+
+\cleardoublepage\include{Chapters/ApendixA}
+
+\cleardoublepage\include{Chapters/ApendixB}
+
+\cleardoublepage\include{Covers/Declaration}
+%********************************************************************
+% Game Over: Restore, Restart, or Quit?
+%*******************************************************
+\end{document}
+%********************************************************************

@@ -1,0 +1,250 @@
+ \documentclass{article}
+
+\usepackage[active,tightpage]{preview}
+\usepackage{varwidth}
+\usepackage[dvipsnames,x11names,svgnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,backgrounds,chains,shapes}
+
+% \PreviewEnvironment{tikzpicture}
+
+\usepackage{fontspec}
+\setmainfont{Noto Serif}
+\setsansfont{Noto Sans}
+
+\usepackage{polyglossia}
+\usepackage{xeCJK}
+\setCJKsansfont{Noto Sans CJK SC}
+
+\setotherlanguages{arabic,hindi,tamil,greek,thai,tibetan,russian,turkish}
+
+
+\newcommand{\tqLemma}[4][]{\node[lemma] (#2) [draw=#3,fill=#3!30,
+%label={[draw=#3!50,fill=#3!10]above:#2},
+#1] {#4} ;}
+\tikzset{every node/.append style={draw}}
+\tikzset{lemma/.append style={rectangle, rounded corners, on chain}}
+\tikzset{every label/.append style={semicircle, font={\tiny},label distance=-.5pt,inner sep=1pt}}
+
+
+\begin{document}
+
+% Serifs!
+\begin{preview}
+\begin{varwidth}{\linewidth}
+\begin{tikzpicture}
+\node (axis) [circle,inner sep=.3em,draw=gray,fill=gray!30] {};
+
+% First layer (inner) circle
+\begin{scope}[start chain=inner circle placed {at=(\tikzchaincount*32.72:6em)}] 
+\tqLemma{tlh}{Orchid}{qatlho'}
+
+\tqLemma{deu}{Teal}{Danke}
+
+\tqLemma{zho}{Salmon}{谢谢}
+
+\tqLemma{ita}{CornflowerBlue}{Grazie}
+
+\tqLemma{rus}{Peach}{\textrussian{Спасибо}}
+
+\newfontfamily\thaifont[Script=Thai]{Noto Serif Thai} % Is already the main font
+\tqLemma{tha}{SteelBlue}{\textthai{ขอบคุณ}}
+
+\newfontfamily\tengwarfont[Scale=1.5]{TengwarFormal12.ttf}
+\tqLemma[font=\tengwarfont]{qya}{Goldenrod}{9C\kern1pt 4\#5\$\char0204};
+%% Commands that I'd use if only tengwarscript worked with xelatex
+% \Thyarmen\TTthreedots\Tanto\TTthreedots
+%\Tnuumen\TTtwodotsbelow\TTacute
+% };
+
+\newfontfamily\arabicfont[Script=Arabic]{Noto Naskh Arabic}
+\tqLemma{ara}{SeaGreen}{\textarabic{شكرا}}
+
+\tqLemma{fra}{Rhodamine}{Merci}
+
+\tqLemma{spa}{Maroon}{Gracias}
+
+\newfontfamily\tamilfont[Script=Tamil]{Noto Serif Tamil}
+\tqLemma{tam}{Crimson}{\texttamil{நன்றி}}
+\end{scope}
+
+%% 2nd layer
+\begin{scope}[start chain=outer circle placed {at=(\tikzchaincount*32.72-16.36:10.8em)}] 
+\tqLemma{por}{Periwinkle}{Obrigado}
+
+\tqLemma{ell}{BurntOrange}{Εὐχαριστῶ}
+
+\newCJKfontfamily\kofont{cwTeXMing}
+\tqLemma[font=\kofont]{kor}{MidnightBlue}{감사합니다}
+
+\newfontfamily\hindifont[Script=Devanagari]{Noto Serif Devanagari}
+\tqLemma{hin}{Apricot}{\texthindi{धन्यवाद}}
+
+\tqLemma{msa}{ForestGreen}{Terima kasih}
+
+\tqLemma{eng}{Tomato}{Thank you}
+
+\newCJKfontfamily\jpfont{IPAPMincho}
+\tqLemma[font=\jpfont]{jpn}{Violet}{ありがとう}
+
+\tqLemma{gla}{Chocolate}{Tapadh leibh}
+
+\newfontfamily\tibetanfont[Scale=1.2]{Jomolhari}
+\tqLemma{bod}{Gold}{\texttibetan{ཐུགས་རྗེ་ཆེ་།}}
+
+\tqLemma{gle}{Tan}{Go raibh maith agaibh}
+
+\tqLemma{vie}{LawnGreen}{Xin cảm ơn}
+\end{scope}
+
+%% 3rd layer now...
+\begin{scope}[start chain=inner circle placed {at=(\tikzchaincount*32.72-32.72:13em)}] 
+\tqLemma{tur}{Chocolate}{Teşekkür ederim}
+
+\tqLemma[yshift=-12pt]{hun}{SteelBlue}{Köszönöm}
+\end{scope}
+
+\begin{pgfonlayer}{background}
+\path[draw=gray,thick,shorten >=-2pt] (axis) 
+edge (eng) 
+edge (msa) 
+edge (kor) 
+edge (ell) 
+edge (hin) 
+edge (vie) 
+edge (gle) 
+edge (bod) 
+edge (gla) 
+edge (jpn) 
+edge (tha) 
+edge (por) 
+edge (deu) 
+edge (zho) 
+edge (ita) 
+edge (tam) 
+edge (rus) 
+edge (fra) 
+edge (ara) 
+edge (spa) 
+edge (qya) 
+edge (tlh)
+edge (tur)
+edge (hun);
+\end{pgfonlayer}
+\end{tikzpicture}
+\end{varwidth}
+\end{preview}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Sans serif! (e.g. for presentations)
+\begin{preview}
+\begin{varwidth}{\linewidth}
+\begin{tikzpicture}[lemma/.append style={font=\sffamily}]
+
+\node (axis) [circle,inner sep=.3em,draw=gray,fill=gray!30] {};
+
+% First layer (inner) circle
+\begin{scope}[start chain=inner circle placed {at=(\tikzchaincount*32.72:6em)}] 
+\tqLemma{tlh}{Orchid}{qatlho'}
+
+\tqLemma{deu}{Teal}{Danke}
+
+\tqLemma{zho}{Salmon}{谢谢}
+
+\tqLemma{ita}{CornflowerBlue}{Grazie}
+
+\tqLemma{rus}{Peach}{\textrussian{Спасибо}}
+
+\newfontfamily\thaifont[Script=Thai]{Noto Sans Thai}
+\tqLemma{tha}{SteelBlue}{\textthai{ขอบคุณ}}
+
+% I don't think I've seen a nice "sans serif"
+% Tengwar font anywhere, so reusing the same.
+\newfontfamily\tengwarfont[Scale=1.5]{TengwarFormal12.ttf}
+\tqLemma[font=\tengwarfont]{qya}{Goldenrod}{9C\kern1pt 4\#5\$\char0204};
+%% Commands that I'd use if only tengwarscript worked with xelatex
+% \Thyarmen\TTthreedots\Tanto\TTthreedots
+%\Tnuumen\TTtwodotsbelow\TTacute
+% };
+
+\newfontfamily\arabicfont[Script=Arabic]{Noto Kufi Arabic}
+\tqLemma{ara}{SeaGreen}{\textarabic{شكرا}}
+
+\tqLemma{fra}{Rhodamine}{Merci}
+
+\tqLemma{spa}{Maroon}{Gracias}
+
+\newfontfamily\tamilfont[Script=Tamil]{Noto Sans Tamil}
+\tqLemma{tam}{Crimson}{\texttamil{நன்றி}}
+\end{scope}
+
+%% 2nd layer
+\begin{scope}[start chain=outer circle placed {at=(\tikzchaincount*32.72-16.36:10.57em)}] 
+\tqLemma{por}{Periwinkle}{Obrigado}
+
+\tqLemma{ell}{BurntOrange}{Εὐχαριστῶ}
+
+\newCJKfontfamily\kofontsf{Noto Sans CJK KR}
+\tqLemma[font=\kofontsf]{kor}{MidnightBlue}{감사합니다}
+
+\newfontfamily\hindifont[Script=Devanagari]{Noto Sans Devanagari}
+\tqLemma{hin}{Apricot}{\texthindi{धन्यवाद}}
+
+\tqLemma{msa}{ForestGreen}{Terima kasih}
+
+\tqLemma{eng}{Tomato}{Thank you}
+
+\newCJKfontfamily\jpfontsf{Noto Sans CJK JP}
+\tqLemma[font=\jpfontsf]{jpn}{Violet}{ありがとう}
+
+\tqLemma{gla}{Chocolate}{Tapadh leibh}
+
+\newfontfamily\tibetanfont{Noto Sans Tibetan}
+\tqLemma{bod}{Gold}{\texttibetan{ཐུགས་རྗེ་ཆེ་།}}
+
+\tqLemma{gle}{Tan}{Go raibh maith agaibh}
+
+\tqLemma{vie}{LawnGreen}{Xin cảm ơn}
+\end{scope}
+
+%% 3rd layer now...
+\begin{scope}[start chain=inner circle placed {at=(\tikzchaincount*32.72-32.72:13em)}] 
+\tqLemma{tur}{Chocolate}{Teşekkür ederim}
+
+\tqLemma[yshift=-12pt]{hun}{SteelBlue}{Köszönöm}
+\end{scope}
+
+\begin{pgfonlayer}{background}
+\path[draw=gray,thick,shorten >=-2pt] (axis) 
+edge (eng) 
+edge (msa) 
+edge (kor) 
+edge (ell) 
+edge (hin) 
+edge (vie) 
+edge (gle) 
+edge (bod) 
+edge (gla) 
+edge (jpn) 
+edge (tha) 
+edge (por) 
+edge (deu) 
+edge (zho) 
+edge (ita) 
+edge (tam) 
+edge (rus) 
+edge (fra) 
+edge (ara) 
+edge (spa) 
+edge (qya) 
+edge (tlh)
+edge (tur)
+edge (hun);
+\end{pgfonlayer}
+\end{tikzpicture}
+\end{varwidth}
+\end{preview}
+
+\end{document}

@@ -9,11 +9,11 @@ from PIL import Image
 from pydantic import BaseModel, Field
 from duckduckgo_search import DDGS
 
-from agentflow.ell2a_integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell_integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 
-# Get ELL2A integration instance
-ell2a = ELL2AIntegration()
+# Get ELL integration instance
+ell = ELLIntegration()
 # Initialize ELL with API key and versioning
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
@@ -23,10 +23,10 @@ if not api_key:
 os.environ["OPENAI_API_KEY"] = api_key
 
 # Initialize ELL with configuration
-ell2a.configure({
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
-    "store": "./ell2a_logs",
+    "store": "./ell_logs",
     "verbose": True,
     "autocommit": True,
     "model": "gpt-4",
@@ -44,7 +44,7 @@ class SearchResult(BaseModel):
     query: str
     results: List[Dict[str, str]]
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def web_search(query: str) -> SearchResult:
     """Real web search using DuckDuckGo"""
     try:
@@ -83,13 +83,13 @@ async def web_search(query: str) -> SearchResult:
         )
 
 # Simple prompt example
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def summarize(text: str) -> str:
     """You are a helpful assistant that summarizes text concisely."""
     return f"Please summarize this text in one sentence: {text}"
 
 # Complex prompt example with tool usage
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def research_topic(topic: str) -> List[Message]:
     """Research a given topic using web search."""
     # First, search for information
@@ -114,7 +114,7 @@ async def research_topic(topic: str) -> List[Message]:
     return messages
 
 # Multimodal example
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def analyze_image(image: Image.Image) -> List[Message]:
     """Analyze the given image."""
     messages = [

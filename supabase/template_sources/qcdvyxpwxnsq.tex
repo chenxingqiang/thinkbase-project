@@ -1,0 +1,417 @@
+% compile with XeLaTeX
+\documentclass[dvipsnames,mathserif]{beamer}
+\setbeamertemplate{footline}[frame number]
+\setbeamercolor{footline}{fg=black}
+\setbeamerfont{footline}{series=\bfseries}
+\usepackage{tikz}
+\usepackage{polyglossia}
+\setdefaultlanguage[numerals=maghrib,locale=algeria]{arabic} % \setotherlanguage{english}
+\newfontfamily\arabicfont[Script=Arabic]{Amiri}
+\newfontfamily\arabicfontsf[Script=Arabic]{Amiri}
+
+%\usetheme{Frankfurt}%1
+\usetheme{Darmstadt}%1
+
+% for RTL liste
+\makeatletter
+\newcommand{\RTListe}{\raggedleft\rightskip\leftm}
+\newcommand{\leftm}{\@totalleftmargin}
+\makeatother
+
+% RTL frame title
+\setbeamertemplate{frametitle}
+{\vspace*{-1mm}
+  \nointerlineskip
+    \begin{beamercolorbox}[sep=0.3cm,ht=2.2em,wd=\paperwidth]{frametitle}
+        \vbox{}\vskip-2ex%
+        \strut\hskip1ex\insertframetitle\strut
+        \vskip-0.8ex%
+    \end{beamercolorbox}
+}
+
+% align subsection in toc
+\makeatletter
+\setbeamertemplate{subsection in toc}
+{\leavevmode\rightskip=5ex%
+  \llap{\raise0.1ex\beamer@usesphere{subsection number projected}{bigsphere}\kern1ex}%
+  \inserttocsubsection\par%
+}
+\makeatother
+
+% RTL triangle for itemize
+\setbeamertemplate{itemize item}{\scriptsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleleft$}} 
+
+%\setbeamertemplate{itemize item}{\rule{4pt}{4pt}}
+
+\defbeamertemplate{enumerate item}{square2}
+{\LR{
+    %
+    \hbox{%
+    \usebeamerfont*{item projected}%
+    \usebeamercolor[bg]{item projected}%
+    \vrule width2.25ex height1.85ex depth.4ex%
+    \hskip-2.25ex%
+    \hbox to2.25ex{%
+      \hfil%
+      {\color{fg}\insertenumlabel}%
+      \hfil}%
+  }%
+}}
+
+\setbeamertemplate{enumerate item}[square2]
+\setbeamertemplate{navigation symbols}{}
+
+
+\titlegraphic { 
+\begin{tikzpicture}[overlay,remember picture, opacity=0.1,]
+\node[] at (0, 2.9){
+    \includegraphics[width=0.63\textwidth]{Logo_uzad.png}
+};\end{tikzpicture}}
+\setbeamertemplate{caption}[numbered]
+\begin{document}
+
+\rightskip\rightmargin
+\title{التحكم في استقرارية الأنظمة ذات التأخر  }
+\author{ \Large \textbf{نهار محمد الأمين} }
+\institute{\large\textbf{ماستر آلية وأنظمة}\\
+---------\\
+كلية العلوم والتكنولوجيا\\
+---------\\
+جامعة الجلفة}
+\footnotesize{\date{\today }
+
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}{ المحتويات}
+\footnotesize \tableofcontents
+\end{frame}
+
+\section{مقدمة}
+\begin{frame}
+\large الاشكالية:
+\begin{itemize}
+    \item معظم الأنظمة غير خطية
+    
+    \item التأخر في الاستجابة يزيد في تعقيد مهمة المتحكم
+   
+    \item التأخر قد يكون سبب في عدم استقرار النظام
+    
+    \item الاستقرار أهم و أعقد مهمة للمتحكم
+    
+    \item كفاءة المتحكم تتعلق بدقة النموذج الرياضي للنظام
+   
+    \item التناسب الطردي بين دقة النموذج الرياضي و تعقيده
+    
+\end{itemize}
+\end{frame}
+\section{نمذجة النظام}
+\begin{frame}
+\footnotesize
+النمذجة برتبة كسرية و بنموذج ضبابي من نوع تاكاجي سوجينو يفرضه:
+\begin{itemize}
+    \item النموذج برتبة كسرية أدق وصفا لأداء النظام
+    \item وجود الارتيابات والتأخرات إما في الأجهزة المستعملة أو في وصف النظام
+    \item البساطة النسبية للنمذجة بطريقة تاكاجي سوجينو
+    \item الدقة المقبولة لهذا النوع من النمذجة
+\end{itemize}
+  \pause
+\quad \\
+ النظام موضوع الدراسة غير الخطي ذو الرتبة الكسرية المقترن بتأخر: 
+\begin{equation*}
+\left\{\begin{array}{l}
+{ }^C D^\alpha x(t)=f(x(t),x(t-\tau(t)),u(t)),\, t \geq 0, \\
+x(s)=\varphi(s),\, s \in[-\tau, 0]
+\end{array}\right.
+\end{equation*}
+$x(t) \in \Re ^{n}$  شعاع الحالة\\
+$u(t) \in \Re ^{m}$  يمثل شعاع التحكم \\
+$\tau$ زمن التأخر : $ 0 \leq  \tau(t) \leq \tau$
+\end{frame}
+\begin{frame}
+\footnotesize
+ النموذج الضبابي  للنظام:
+\begin{equation*}
+\left\{\begin{array}{l}
+{ }^C D^\alpha x(t)=\sum_{i=1}^{r} h_{i}(\theta(t))[A_{i}x(t)+A_{di}x(t-\tau(t))+B_{i}u(t))],\ t \geq 0, \\
+x(s)=\varphi(s), \ s \in[-\tau, 0]
+\end{array}\right.
+\end{equation*}
+ \pause
+حيث أن دالة الأوزان معرفة بالشكل التالي: 
+\begin{equation*}
+ h_{i}(\theta(t))=\frac{ \prod_{l=1}^{p} M_{il}(\theta_{l}(t)) }{ \sum_{i=1}^{r} \prod_{l=1}^{p} M_{il}(\theta_{l}(t)) }  
+\end{equation*}
+ومن أجل $ t\geq 0$ الشروط التالية محققة: \\
+\begin{equation*}
+\begin{array}{l}
+\sum_{i=1}^{r} h_{i}(\theta(t))=1, \quad  
+h_{i}(\theta(t)) \geq 0 \\
+\end{array}.
+\end{equation*}
+\qquad\\ \qquad\\ \qquad\\
+------------------------\\ 
+
+\textcolor{red}{الهدف: التحكم في استقرارية الأنظمة غير الخطية ذات الرتب الكسرية المنمذجة بطريقة تاكاجي سوجينو.}
+\end{frame}
+\section{مأخوذات}
+    \begin{frame}
+    \footnotesize
+       \begin{block}{المأخوذة الأولى}
+         من أجل أي دالة متعددة المتغيرات  \ $I$ معرفة بالشكل التالي: 
+        \begin{equation*}
+           I(x,t)=\int_{a(t)}^{b(t)} f(x,t) \,dx \  \ ,  \ a(t) \And b(t)<\infty
+         \end{equation*}
+              حيث 
+              $a(t)$ و $b(t)$ قابلتان للاشتقاق 
+                والدالة 
+               $f(x,t)$
+                 مستمرة بدلالة $x$ وقابلة للاشتقاق بدلالة  $t$
+                 فان المساواة التالية صحيحة
+         \begin{equation*}
+   \frac{d(I(x,t))}{dt}=\frac{db(t)}{dt}f(b(t),t)-\frac{da(t)}{dt}f(a(t),t)+\int_{a(t)}^{b(t)} \frac{\partial f(x,t)}{\partial t} \,dx  
+   \end{equation*}
+       \end{block}
+\begin{block}{المأخوذة الثانية}
+وهي تعميم لمتباينة شوارتز
+من أجل أي مصفوفة معرفة موجبة  $M \in R^{n \times n}$ومن أجل أي مقدار قياسي 
+$\gamma>0$، إذا كان هناك دالة شعاعية $w$ معرفة بالشكل التالي: $w:[0,\gamma]\to R^n$    بحيث أن التكاملين :\\ $\int_{0}^{\gamma} w^T(s)Mw(s)ds$ و  
+$\int_{0}^{\gamma}w^T(s)ds$
+معرفين بشكل جيد فإن المتباينة التالية محققة:
+\begin{equation*}
+\left(\int_{0}^{\gamma}w^T(s)ds\right)M\left(\int_{0}^{\gamma}w(s) ds\right)\leq\gamma\int_{0}^{\gamma} w^T(s)Mw(s)ds 
+\end{equation*} \\
+   \end{block}
+\end{frame}    %.............................................................
+
+\begin{frame}
+\footnotesize
+\begin{block}{المأخوذة الثالثة}
+ ليكن $x(t)\in R^n$ شعاعا لدالة قابلة للاشتقاق،
+إذن من أجل أي $t_0 < t$ المتراجحة التالية محققة:
+\begin{equation*}
+    \frac{1}{2}{ }_{t_0}^C D_t^\alpha (x^T(t)Px(t))\leq x^T(t)P{ }_{t_0}^C D_t^\alpha x(t) 
+\end{equation*}
+ حيث أن $P \in R^{n \times n}$ مصفوفة مربعة معرفة موجبة كل عناصرها أعداد قياسية
+ و 
+ $\alpha \in ]0,1[$.
+\end{block}
+\begin{block}{المأخوذة الرابعة}
+من أجل مشتق كابوتو، المساواة التالية محققة:
+\begin{equation*}
+  \frac{d}{dt}(I^{1-\alpha}f(t))={D}^{\alpha}f(t),\  \alpha \in ]0,1[ 
+\end{equation*}
+\end{block}
+\end{frame}
+\section{الاستقرارية بمتحكم غيرذي تأخر}
+\begin{frame}
+\footnotesize
+لنعتبر أن شعاع التحكم للنظام يكتب من الشكل التالي:    $u(t)=\sum_{i=1}^{r} h_{i}(\theta(t))K_{i}x(t)$
+\begin{block}{نظرية ١}
+من أجل مصفوفة كسب التحكم الخاصة بالتغذية الراجعة  $K_{j}(j=1,2ة...r)$ و
+من أجل قيم $\mu$ و $\tau$ الخاصة بالنظام  ، نقول عن النموذج  الضبابي بأنه مستقر بشكل مقارب  إذا وجدت مصفوفات ثابتة متناظرة و موجبة $P,Q,R$ وأي مصفوفة $N$ تحقق الأبعاد المطلوبة بحيث أن الشروط التالية محققة :
+\begin{equation*}
+\left\{\begin{array}{l}
+{\Omega_{ii}}< 0,\   (i=1,2,...r) , \\
+{\Omega_{ij}}+{\Omega_{ji}}<0,\ i<j ,\ i,j=1,2,...r
+\end{array}\right.
+\end{equation*}
+\end{block}
+حيث أن:
+\tiny
+\begin{equation*}
+\Omega_{ij}= \left[\begin{array}{cccc}
+PA_i+A_i^TP^T+PB_iK_j+K_j^TB_i^TP^T+Q& PA_{di}& A_i^TN^T+K_j^TB_i^TN^T & 0 \\ *& -(1-\mu)Q& A_{di}^TN^T & 0\\ *&*&\tau^2R-N-N^T & 0\\ * &* &* &-R 
+   \end{array}\right]
+\end{equation*}
+\end{frame}
+\begin{frame}
+\footnotesize
+بما أن المتراجحة السابقة ليست مكتوبة على شكل $LMI$
+فلا بد لنا من استنباط النظرية الثانية 
+\begin{block}{نظرية ٢}
+من أجل قيم $\mu$ و $\tau$ الخاصة بالنظام ، نقول عن النظام  الضبابي  بأنه مستقر بشكل مقارب  إذا وجدت مصفوفات متناظرة وموجبة $X,\Bar{Q},\Bar{R}$ وأي مصفوفة $Y_j(j=1,2,...r)$ تحقق الأبعاد المطلوبة بحيث أن شروط $LMI$ التالية محققة :
+\begin{equation*}
+\left\{\begin{array}{l}
+\Bar{\Omega_{ii}}< 0,\ i=1,2,...r \\
+\Bar{\Omega_{ij}}+\Bar{\Omega_{ji}}<0,\ i<j , \ i,j=1,2,...r
+\end{array}\right.
+\end{equation*}
+\end{block}
+حيث أن:\\
+$ \Bar{\Omega_{ij}}=\left[\begin{array}{cccc}
+A_iX+X^TA_i^T+B_iY_j+Y_j^TB_i^T+\Bar{Q}& A_{di}X& \epsilon X^T A_i^T+\epsilon Y_j^TB_i^T & 0 \\ *& _(1-\mu)\Bar{Q}& \epsilon X^T A_{di}^T & 0\\ *&*&\tau^2\Bar{R}-\epsilon X-\epsilon X^T & 0\\ *&*&*&-\Bar{R}
+   \end{array}\right]$
+   و
+   \\
+   $K_j=Y_jX^{-1}$
+\end{frame}
+   
+\section{الاستقرارية بمتحكم ذو تأخر}
+\begin{frame}   
+\footnotesize
+لنعتبر أن شعاع التحكم يكتب من الشكل التالي:
+$u(t)=\sum_{i=1}^{r} h_{i}(\theta(t))[K_{di}x(t-\tau(t)]$  
+\begin{block}{نظرية ٣}
+من أجل قيم $\mu$ و $\tau$ الخاصة بالنظام، نقول عن النظام  الضبابي بأنه مستقر بشكل مقارب  إذا وجدت مصفوفات موجبة $X,\Bar{Q},\Bar{R}$ وأي مصفوفة $Y_{dj}(j=1,2,...r)$ تحقق الأبعاد المطلوبة بحيث أن شروط $LMI$ التالية محققة:
+\begin{equation*}
+\left\{\begin{array}{l}
+  \Bar{\Omega_{ii}}< 0,\ i=1,2,...r \\
+    \Bar{\Omega_{ij}}+\Bar{\Omega_{ji}}<0,\ i<j ,\ i,j=1,2,...r
+\end{array}\right.
+\end{equation*}
+\end{block}
+حيث أن:\\
+$ \Bar{\Omega_{ij}}=\left[\begin{array}{cccc}
+A_iX+X^TA_i^T+\Bar{Q}& A_{di}X+B_iY_{dj}& \epsilon X^T A_i^T & 0 \\ *& _(1-\mu)\Bar{Q}& \epsilon X^T A_{di}^T+\epsilon Y_{di}^TB_i^T & 0\\ *&*&\tau^2\Bar{R}-\epsilon X-\epsilon X^T & 0\\ *&*&*&-\Bar{R}
+\end{array}\right]$  \\ و
+  $K_{dj}=Y_{dj}X^{-1}(j=1,....r)$
+\end{frame}
+\section{الاستقرارية بالمتحكم المقترح}
+\footnotesize
+\begin{frame}
+ليكن:
+$u(t)=\sum_{i=1}^{r} h_{i}(\theta(t))[K_{i}x(t)+K_{di}x(t-\tau(t)]$ 
+\begin{block}{نظرية ٤  }
+من أجل قيم $\mu$ و $\tau$ الخاصة بالنظام  نقول عن النموذج الضبابي بأنه مستقر بشكل مقارب  إذا وجدت مصفوفات موجبة $X,\Bar{Q},\Bar{R}$ وأي مصفوفتين $Y_j(j=1,2,...r),Y_{dj}(j=1,2,...r)$ تحققان الأبعاد المطلوبة بحيث أن شروط $LMI$ التالية محققة:\\
+\begin{equation*}
+\left\{\begin{array}{l}
+  \Bar{\Omega_{ii}}< 0,\ i=1,2,...r \\
+    \Bar{\Omega_{ij}}+\Bar{\Omega_{ji}}<0,\ i<j ,\ i,j=1,2,...r
+\end{array}\right.
+\end{equation*}
+\end{block}
+حيث أن:\\
+$ \Bar{\Omega_{ij}}=\left[\begin{array}{cccc}
+A_iX+X^TA_i^T+B_iY_j+Y_j^TB_i^T+\Bar{Q}& A_{di}X+B_iY_{dj}& \epsilon X^T A_i^T+\epsilon Y_j^TB_i^T & 0 \\ *& _(1-\mu)\Bar{Q}& \epsilon X^T A_{di}^T+\epsilon Y_{di}^TB_i^T & 0\\ *&*&\tau^2\Bar{R}-\epsilon X-\epsilon X^T & 0\\ *&*&*&-\Bar{R}
+   \end{array}\right]$
+ $K_j=Y_jX^{-1}$ و $K_{dj}=Y_{dj}X^{-1}(j=1,2,...r)$
+\end{frame}  
+
+\section{نتائج المحاكاة}
+
+\begin{frame}
+\footnotesize
+أداء النظام بدون متحكم
+   \begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{x_1.eps}
+  \caption{حالات النظام بدون متحكم}
+  \end{figure}
+ نلاحظ أن النظام  غير مستقر بانعدام المتحكم. لذلك من الضروري استخدام متحكم.
+\end{frame}
+
+\begin{frame}
+ أداء النظام بمتحكم غير ذي تأخر
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{kuc.eps}
+    \caption{إشارة المتحكم غير ذي تأخر } 
+    \label{fig3.3}
+\end{figure}
+\end{frame}
+\begin{frame}
+ أداء النظام بمتحكم غير ذي تأخر
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{kstates.eps}
+    \caption{حالات النظام باستخدام متحكم غير ذي تأخر} 
+    \label{fig3.4}
+\end{figure} 
+
+ المتحكم غير ذي تأخر يضمن استقرار النظام لكن \textcolor{red}{أداء النظام يحتاج إلى  تحسين}
+    
+\end{frame}
+
+
+\begin{frame}       
+ أداء النظام بالمتحكم المقترح
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{2uc.eps}
+    \caption{إشارة  المتحكم المقترح } 
+    \label{fig3.5}
+\end{figure}
+\end{frame}
+\begin{frame}
+ أداء النظام بالمتحكم المقترح
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{2states.eps}
+    \caption{حالات النظام باستخدام المتحكم المقترح } 
+    \label{fig3.6}
+\end{figure} 
+التركيبة المقترحة 
+\textcolor{blue}{  أعطت أداء أفضل  من المتحكم الأول و حافظت على استقرار النظام
+}
+ 
+\end{frame}
+
+\begin{frame}
+\footnotesize
+نتائج الدراسة المقارنة  بين المتحكم غير ذي تأخر و التركيبة المقترحة معطاة في الجدول التالي:
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|*{4}{c|}}
+\hline 
+المتحكم & غير ذي تأخر&  المتحكمين معا& نسبة التحسين  \\
+\hline زمن الاستقرار & $26$  &  $20$& 23 \% \\
+\hline  قيمة   $x_3$من الذروة الى الذروة &$1.36$ & $1.16 $ &15 \% \\
+\hline
+$\int\limits_0^{ts}(x_3^2)dt $
+ & $2.5540$ & $0.7771$& 70 \% \\
+\hline
+$ \int\limits_0^{ts}(u^2)dt$ & $12.8476$ & $7.1868$& 40 \% \\
+\hline
+\end{tabular}
+    \caption{تكميم نتائج الدراسة المقارنة}
+\end{table}
+
+من خلال جدول النتائج يظهر جليا أن استخدام المتحكمين معا أعطى
+نتائج أحسن بكثير حيث: 
+\begin{itemize}
+    \item \textcolor{blue}{\textbf{حسن في زمن الاستقرار بنسبة $23\%$}}
+    \item \textcolor{blue}{\textbf{ قلل الطاقة المستهلكة بنسبة $40\%$}}
+    \item \textcolor{blue}{\textbf{ حسن الأداء ككل بنسبة  $70\%$ }}
+    \item \textcolor{blue}{\textbf{ قلل من الارتفاع من الذروة للذروة    بنسبة  $15\%$}}
+\end{itemize}
+\end{frame}
+\section{خلاصة و مقترحات للتكملة}
+\begin{frame}
+\footnotesize
+من دراستنا نخلص إلى أن:
+\begin{block}{الخلاصة}
+\begin{itemize}
+    \item  \textcolor{blue}{\textbf{استعمال نهج ليابونوف في دراسة الاستقرارية يعد طريقة فعالة وذات نتائج حسنة.}}
+        \item \textcolor{blue}{\textbf{استخدام متحكم غير ذي تأخر كان كافيا  لضمان الاستقرارية ولكن بأداء متواضع.}}
+        \item \textcolor{blue}{\textbf{استخدام متحكم ذي تأخر سمح بتحسين أداء النظام.}}
+    \item \textcolor{blue}{\textbf{استخدام المتحكم المقترح كان كافيا لضمان الاستقرارية بأداء أفضل بكثير وباستهلاك أقل للطاقة. }}
+\end{itemize}
+\end{block}
+كتكملة لهاته الدراسة نقترح:
+\begin{block}{التكملة}
+\begin{itemize}
+    \item القيام بدراسة مستقلة حول صلابة هذا النوع من الأنظمة
+    \item إيجاد صيغ جديدة خاصة بدالة ليابونوف
+    \item دراسة تأثير استخدام متحكم تكاملي صرف على الاستقرارية والأداء
+\end{itemize}
+\end{block}
+\end{frame}
+\begin{frame}
+\centering
+    \includegraphics[scale=0.4]{chokre.jpg}
+\end{frame}
+
+\end{document}
+
+
+
+
+
+
+
+
+

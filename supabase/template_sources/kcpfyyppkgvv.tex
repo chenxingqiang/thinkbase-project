@@ -1,0 +1,148 @@
+% Allar línur sem byrja á prósentumerki (%) eru athugasemdir og eru ekki lesnar þegar kóðinn er keyrður
+% Þessi fyrsti hluti heitir preamble og kemur áður en skjalið sjálft byrjar.
+% Það skilgreinir útlit skjalsins og hleður inn nytsamlegum pökkum.
+% Til að búa til ykkar eigið skjal getið þið afritað þetta preamble inn í tómt overleaf-skjal.
+
+% stærð á blaði
+\documentclass[a4paper, 12pt]{article}
+% hér er hægt að stilla spássíur
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+% til þess að íslenska virki vel 
+\usepackage[icelandic]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+% fyrir myndir
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{wrapfig}
+% til að setja hlekki (linka)
+\usepackage[colorlinks=False]{hyperref}
+
+\usepackage{amsmath, amsfonts, amssymb}  % stærðfræðitákn
+\usepackage{color} % til að geta litað texta
+\usepackage{enumitem} % fyrir lista og upptalningar
+\usepackage{minted} % til að geta sett in kóða
+
+\author{Fyrir nýgræðinga} %
+\title{Inngangur að \LaTeX }
+\date{\today} % líka hægt að setja tiltekna dagsetningu: \date{24. október 2018}
+
+%%%%%%%%% HÉR BYRJAR SKJALIÐ SJÁLFT %%%%%%%%%%%%
+\begin{document} 
+\maketitle % býr til haus með titli, höfundi og dagsetningu
+\section{Inngangur}
+Það er ekkert mál að gera \LaTeX{}skjal í Overleaf! 
+
+\href{https://www.overleaf.com/read/dcbdzkztqyqj}{Hér} er hlekkur á tóm heimadæmi sem þið getið nýtt ykkur. 
+
+\LaTeX{} virkar með því að keyra skrá sem verður að skjalinu sem við erum að búa til. Þá þarf sérstakar skipanir eins og t.d. \verb|\textbf{}| til að \textbf{feitletra} eða \verb|\textcolor{red/blue/green/...}{}| til að lita texta \textcolor{red}{rauðan} eða \textcolor{green}{grænan}. Fyrir flóknari skipanir þarf stundum að lesa inn \textit{pakka} með \verb|\usepackage{}| efst í skjalinu. Skráin er keyrð með Cmd+Enter // Ctrl+Enter eða með því að ýta á Recompile.
+
+Nýja línu gerum við með \verb|\\| eða með því að skilja eftir auða línu. Ný lína er sjálfkrafa inndregin, en það er hægt að komast hjá því með \verb|\noindent|.
+
+\noindent Hér á eftir koma helstu skipanirnar sem þið þurfið til að gera næstum hvað sem er!
+
+\section{Nokkur dæmi}
+\LaTeX{} er sérstaklega þróað með það í huga að það sé auðvelt að halda utan um talningar á köflum, töflum og myndum. Við notum \verb|\section{}| og \verb|\subsection{}| til þess að byrja nýja kafla og undirkafla og \LaTeX{} sér um að númera allt rétt. 
+
+Til að sleppa við númerin þá er hægt að setja stjörnu \verb|\section*{}| eða \verb|\subsection*{}| og \LaTeX{} tekur kaflann ekki með í talninguna. 
+
+\subsection{Myndir}
+
+\begin{wrapfigure}{r}{5cm} %setur myndina hægra megin (r) og tekur frá 5 cm
+\includegraphics[width=4.5cm]{leidbein.png}
+\end{wrapfigure}
+
+Þegar við setjum inn myndir vill \LaTeX{} setja hana þar sem hentar best í skjalinu, yfirleitt efst eða neðst á síðu, eins og merki Háskólans. Ef við viljum að textinn flæði utan um myndina er hægt að nota pakkann \verb|\usepackage{wrapfig}| og skipanirnar \verb|\begin{wrapfigure}| og \verb|\end{wrapfigure}|.
+
+Til að bæta við myndum í skjöl á Overleaf þarf að hlaða þeim upp með því að ýta á new file efst til vinstri.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.3\textwidth]{HIlogo.pdf}
+\caption{\label{mynd:HIlogo}Þetta er merki Háskóla Íslands}
+\end{figure}
+
+Það er hægt að þvinga myndina til að vera einmitt þar sem hún kemur fyrir í \TeX -inu, eins og gert verður við töflu hér á eftir.
+
+
+\subsection{Stærðfræðitákn}
+Að setja upp skjöl í \LaTeX{} getur virst flókið til að byrja með, en kostirnir fram yfir aðra ritla koma ljóst fram þegar setja á upp formúlur eða nota önnur tákn. Það er bæði hægt að setja formúlur inn í miðja línu: $2x^2-x+\frac{1}{16}=0$, eða í sér línu, ef stæðurnar eru fyrirferðarmeiri: $$ x = \frac{-b\pm\sqrt{b^2-4ac}}{2a} $$ 
+Það er líka hægt að bæta við númerum á jöfnur með \verb|\begin{equation}| og \verb|\end{equation}|. \verb|\\| er notað til að skipta útreikningunum í línur og \verb|&| til að raða línunum eins og við viljum:
+
+\begin{equation}
+\label{jafna:launsnarjafna} % merkimiði til þess að hægt sé að vísa í jöfnuna síðar.
+\begin{aligned}
+x&=  \frac{-b\pm\sqrt{b^2-4ac}}{2a} \\
+&= \frac{-(-1)\pm \sqrt{(-1)^2-4\cdot 2 \cdot \frac{1}{16}}}{2\cdot 2} \\
+&= \frac{1\pm\sqrt{\frac{8}{16}}}{4} \\
+&= \frac{1\pm \sqrt{\frac{1}{2}}}{4} \\
+&= 
+\begin{cases}
+0.42677 \\
+0.07322
+\end{cases}
+\end{aligned}
+\end{equation}
+
+Það er fljótlegt að skrifa önnur tákn, t.d. gríska stafi og örvar: $\alpha$, $\beta$, $\rightarrow$ og $\leftarrow$.
+
+$$ \frac{1}{2}\int_\alpha^\beta (\sqrt{x}+\cos(x))^2dx $$
+
+$$\vec{\nabla}\cdot \vec{F}= \frac{\partial F_1}{\partial x}+\frac{\partial F_2}{\partial y}+\frac{\partial F_3}{\partial z}$$
+
+\subsection{Töflur}
+Töflur geta virst mikið maus. 
+\begin{table}[H] % H-ið þvingar töfluna til vera þar sem við skrifum hana inn í \TeX-ið
+\centering
+\begin{tabular}{c|r} % c lætur orðin í dálknum vera miðjusett (centered), r til hægri og l til vinstri
+Ár & Fjöldi nýnema \\ \hline
+2016 & 3.158 \\
+2017 & 2.934
+\end{tabular}
+\caption{\label{tafla:nynemar}Dæmigerð tafla.} % takið eftir merkimiðanum \label{}
+\end{table}
+
+Það er hægt að nota síðuna \href{https://www.tablesgenerator.com}{tablesgenerator.com}, sem smíðar töflur eins og við viljum hafa þær.
+
+\subsection{Listar og upptalningar}
+Listar eru settir upp svona: 
+\begin{enumerate}
+\item atriði 1
+\begin{enumerate}
+\item nánar um atriði 1
+\item og enn meira
+\end{enumerate}
+\item atriði 2
+\item atriði 3
+\end{enumerate}
+
+Upptalningar eru settar upp svona:
+
+\begin{itemize}
+\item atriði
+\item atriði
+\begin{itemize}
+\item meira
+\item enn meira
+\end{itemize}
+\item atriði
+\end{itemize}
+
+Það er líka hægt að fikta með að blanda saman \verb|itemize| og \verb|enumerate|. 
+%Með einföldu gúggli er hægt að finna hvernig er hægt að stilla smáatriðin í upptalningum eða listum.
+
+\subsection{Tilvísanir}
+Það er hægt að vísa í jöfnu \ref{jafna:launsnarjafna} og upp kemur númer jöfnunnar í skjalinu. Það þarf því ekki að hafa áhyggjur af því þó við bætum við fleiri og fleiri jöfnum í skjalið, \LaTeX veit alltaf við hvaða jöfnu við eigum.
+
+Það er líka hægt að vísa í myndir \ref{mynd:HIlogo} eða töflur \ref{tafla:nynemar}.
+
+Að setja inn hlekk er álíka lítið mál: \href{http://edbook.hi.is/undirbuningur_stae/}{sjá rafbók}
+
+\section*{Fleira}
+Ef það er eitthvað sem ykkur langar að gera í \LaTeX{} sem ekki er talið upp hér þá er langfljótlegast að gúggla það. Síður eins og \href{https://www.sharelatex.com/learn}{ShareLaTeX} og \href{https://tex.stackexchange.com}{Stackexchange} eru bestu vinir allra sem vinna í \LaTeX{}, en þar er að finna ótalmörg svör við allskonar spurningum.
+
+Þið eruð ábyggilega ekki þau fyrstu sem lenda í þeim vandræðunum sem þið eruð í!
+
+\end{document}
+%%%%%%%%% hér endar skjalið %%%%%%%%%%%%

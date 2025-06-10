@@ -1,0 +1,73 @@
+\documentclass[final]{beamer}
+\usepackage[utf8]{inputenc}
+
+\usepackage{utopia} %font utopia imported
+
+\usetheme{imsa}
+\usecolortheme{imsa}
+
+%------------------------------------------------------------
+%This block of code defines the information to appear in the
+%Title page
+\title[IMSAloquium Presentation Template] %optional
+{IMSAloquium Presentation Template}
+
+\subtitle{An IMSA-branded Beamer template for SIR presentations}
+
+\author[IMSA Student] % (optional)
+{IMSA Student \newline Advisors: A.~B.~Arthur\inst{1} \and J.~Doe\inst{2}}
+
+\institute[] % (optional)
+{
+  \inst{1}%
+  Professor of Computer Science\\
+  Very Famous University
+  \and
+  \inst{2}%
+  Professor of Computer Science\\
+  Very Famous University
+}
+
+\date[IMSAloquium 2021] % (optional)
+{IMSAloquium, April 2021}
+
+%End of title page configuration block
+%------------------------------------------------------------
+% Patch to move title block down
+\usepackage{etoolbox}% http://ctan.org/pkg/etoolbox
+\makeatletter
+\expandafter\patchcmd\csname beamer@@tmpl@title page\endcsname% <cmd>
+  {\vfill}% <search>
+  {\vspace*{0.8in}}% <replace>
+  {}{}% <success><failure>
+\makeatother
+
+
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%------------------------------------------------------------
+
+
+\begin{document}
+
+% Title Page
+\usebackgroundtemplate{\includegraphics[width=\paperwidth]{titlebackground.png}}
+\frame{
+\titlepage
+}
+% use points template from now on
+\usebackgroundtemplate{\includegraphics[width=\paperwidth]{pointbackground.png}}
+
+\input{content.tex}
+
+
+\end{document}

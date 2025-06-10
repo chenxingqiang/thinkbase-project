@@ -1,0 +1,258 @@
+\documentclass[12pt,titlepage,table]{article}
+
+% language-packages
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Times New Roman
+\usepackage{mathptmx}
+    
+% line-spacing
+\usepackage{setspace}
+    
+% figures
+\usepackage{geometry}
+
+% adjustbox
+\usepackage{adjustbox}
+    
+% headers and footers
+\usepackage{fancyhdr}
+    
+% links in the table of contents
+\usepackage[hidelinks]{hyperref}
+
+% section headings
+\usepackage{titlesec}
+    
+% bibtex apa citation style
+\usepackage{apacite}
+    
+% list of abbreviations
+\usepackage{acronym}
+    
+% center captions
+\usepackage[hypcap,justification=centering]{caption}
+\usepackage[inkscapepath=svgsubdir]{svg}
+\svgpath{{./resources/svg/}{Thesis/resources/svg/}}
+    
+% more functionalities in enumerations
+\usepackage{enumitem}
+
+% footnotes
+\usepackage{tablefootnote}
+
+% graphics
+\usepackage{graphicx}
+
+% tikz
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes, shadows, backgrounds, fit}
+\usepackage{fontawesome}
+
+% algorithm
+\usepackage{algorithmic}
+\usepackage{algorithm}
+    
+% tables
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{makecell}
+% \usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{ltablex}
+\renewcommand{\arraystretch}{1.5}
+\usepackage{afterpage}
+
+\usepackage{xcolor}
+\usepackage{etoolbox}
+
+% left fixed width:
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+% center fixed width:
+\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
+
+% flush right fixed width:
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+% ensuring that floats are placed within their section
+\usepackage[section]{placeins}
+
+% list of figures/tables
+\usepackage{tocloft}
+
+% subfigures with individual captions
+\usepackage{subcaption}
+
+% additional symbols
+\usepackage{textcomp}
+\usepackage{gensymb}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+% date
+\usepackage[iso,german]{isodate}
+
+% parameters
+\newcommand{\thesistitle}{Wordy Title}
+\newcommand{\thesisauthorfirstname}{Max}  % first name
+\newcommand{\thesisauthorlastname}{Mustermann}  % last name
+\newcommand{\studentID}{1234567}  % matriculation number
+\newcommand{\thesistype}{Bachelorarbeit / Masterarbeit / Seminararbeit}  % choose the correct one
+\newcommand{\supervisor}{Prof. Dr. Detlef Schoder}
+
+% source code
+\usepackage{listings}
+\usepackage{courier}
+\lstset{
+    basicstyle=\footnotesize\ttfamily, % Default font
+    % numbers=left,              % Location of line numbers
+    numberstyle=\tiny,          % Style of line numbers
+    % stepnumber=2,              % Margin between line numbers
+    numbersep=5pt,              % Margin between line numbers and text
+    tabsize=2,                  % Size of tabs
+    extendedchars=true,
+    breaklines=true,            % Lines will be wrapped
+    % keywordstyle=\color{red},
+    frame=single,
+    % keywordstyle=[1]\textbf,
+    % keywordstyle=[2]\textbf,
+    % keywordstyle=[3]\textbf,
+    % keywordstyle=[4]\textbf,   \sqrt{\sqrt{}}
+    stringstyle=\color{white}\ttfamily, % Color of strings
+    showspaces=false,
+    showtabs=false,
+    xleftmargin=17pt,
+    framexleftmargin=17pt,
+    framexrightmargin=5pt,
+    framextopmargin=3pt,
+    framexbottommargin=4pt,
+    % backgroundcolor=\color{lightgray},
+    showstringspaces=false
+}
+
+% mathematical symbols
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% first line indentation
+\usepackage{indentfirst}
+    
+% WIM-specific settings
+\geometry{a4paper, twoside=false, left=4cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0em}{10pt}{0em}
+\titleformat{\paragraph}[runin]{\normalsize\itshape}{\theparagraph}{0}{}
+\titlespacing*{\paragraph}{\parindent}{0cm}{1em}
+    
+% header and footer
+\pagestyle{fancy}
+\setlength{\headheight}{14.5pt}
+\lhead{}
+\chead{}
+\rhead{\nouppercase{\textmd \rightmark}}
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+\fancypagestyle{plain}{}
+
+% remove section number from header
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+
+% remove \subsection from header
+\renewcommand{\subsectionmark}[1]{}
+    
+\begin{document}
+    
+  % on the titlepage, left and right margins are the same
+  \newgeometry{twoside=false, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm, includeheadfoot}
+  \pagenumbering{gobble}
+  \include{preliminaries/titlepage}
+  \maketitle
+  % go back to the old geometry
+  \restoregeometry
+    
+  \newpage
+  \pagenumbering{Roman}
+  \setcounter{secnumdepth}{0}
+    
+  \tableofcontents
+  \thispagestyle{fancy}
+    
+  % list of figures
+  \newpage
+  \phantomsection
+  \addcontentsline{toc}{section}{\listfigurename}
+  \renewcommand\cftfigindent{0pt}  % no indentation
+  \renewcommand\cftfignumwidth{2cm}  % no indentation
+  \renewcommand\cftfigpresnum{Figure }   % prefix before figure number
+  \renewcommand\cftfigaftersnum{:} % suffix after figure number
+  \listoffigures
+  \thispagestyle{fancy}
+    
+  % list of tables
+  \newpage
+  \phantomsection
+  \addcontentsline{toc}{section}{\listtablename}
+  \renewcommand\cfttabindent{0pt}  % no indentation
+  \renewcommand\cfttabnumwidth{2cm}  % no indentation
+  \renewcommand\cfttabpresnum{Table }   % prefix before table number
+  \renewcommand\cfttabaftersnum{:} % suffix after table number
+  \listoftables
+  \thispagestyle{fancy}
+  
+  \newpage
+  \include{preliminaries/acronyms}
+
+  \newpage
+  \pagenumbering{arabic}
+  \include{main-body/00_abstract}
+    
+  % depth of the table of contents
+  \setcounter{secnumdepth}{3}
+
+  \newpage
+  \include{main-body/01_introduction}
+
+  \newpage
+  \include{main-body/02_theoretical_background}
+
+  \newpage
+  \include{main-body/03_research_approach}
+
+  \newpage
+  \include{main-body/04_results}
+
+  \newpage
+  \include{main-body/05_discussion}
+
+  \newpage
+  \include{main-body/06_conclusion}
+
+  % disable section numbering
+  \setcounter{secnumdepth}{0}
+
+  % list of references
+  \newpage
+  \interlinepenalty=10000
+  \bibliography{resources/library}
+  \bibliographystyle{apacite}
+    
+  \newpage
+  \appendix
+  \include{appendix/appendix}
+    
+  \newpage
+  \include{appendix/formal_appendix}
+    
+\end{document}
+    

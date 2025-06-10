@@ -1,0 +1,234 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[utf8]{inputenc} % pentru suport diacritice
+% \usepackage[romanian]{babel} % setări pentru limba română
+\renewcommand\familydefault{\sfdefault} % sans serif
+
+\usepackage[margin=2.54cm]{geometry} % dimensiuni pagină și margini
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% formatting sections and subsections
+\usepackage{textcase}
+\usepackage[titletoc, title]{appendix}
+\usepackage{titlesec}
+\titleformat{\chapter}{\large\bfseries\MakeUppercase}{\thechapter}{2ex}{}[\vspace*{-1.5cm}]
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\large\bfseries}
+\titleformat*{\subsubsection}{\large\bfseries}
+
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter} % no chapter number in figure labels
+\counterwithout{table}{chapter} % no chapter number in table labels
+\counterwithout{equation}{chapter} % no chapter number in equation labels
+
+\usepackage{booktabs} % for much better looking tables
+\usepackage{url} % Useful for inserting web links nicely
+\usepackage[bookmarks,unicode,hidelinks]{hyperref}
+
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{enumitem}
+\setlist{noitemsep}
+
+% packages used for citations
+\usepackage{apacite}
+\usepackage{natbib}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{language=Python,basicstyle={\bfseries \color{black}},keywordstyle={\bfseries \color{blue}}}
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr}
+\pagestyle{empty}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+\newcommand{\HeaderLineSpace}{-0.25cm}
+
+\newcommand{\UniTextEN}{National University of Science and Technology\\ POLITEHNICA Bucharest\\
+Faculty of Automatic Control and Computers\\
+Computer Science and Engineering Department\\}
+\newcommand{\DiplomaEN}{DIPLOMA PROJECT}
+\newcommand{\AdvisorEN}{Thesis advisors:}
+\newcommand{\BucEN}{BUCHAREST}
+
+\newcommand{\frontPage}[6]{
+\begin{titlepage}
+\begin{center}
+{\Large #1}  % header (university, faculty, department)
+\vspace{50pt}
+\begin{tabular}{ccc}
+\includegraphics[height=3cm]{pics/UNST Poli.png} & 
+\includegraphics[height=3cm]{pics/A&C.png} & 
+\includegraphics[height=3cm]{pics/UPB NLP.png}
+\end{tabular}
+
+\vspace{105pt}
+{\Huge #2}\\                             % diploma project text
+\vspace{40pt}
+{\Large #3}\\ \vspace{0pt}               % project title
+\vspace{40pt}
+{\LARGE \Name}\\                         % student name
+\end{center}
+\vspace{60pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}p{6cm}r}
+&{\large\textbf{#5}}\vspace{10pt}\\      % scientific advisor
+&{\large \AdvisorA}\\                    % advisor name A
+&{\large \AdvisorB}                      % advisor name B
+\end{tabular*}
+\vspace{20pt}
+\begin{center}
+{\large\textbf{#6}}\\
+\vspace{0pt}
+{\normalsize \Year}
+\end{center}
+\end{titlepage}
+}
+
+\newcommand{\frontPageEN}{\frontPage{\UniTextEN}{\DiplomaEN}{\ProjectTitleEN}{\ProjectSubtitleEN}{\AdvisorEN}{\BucEN}}
+
+\linespread{1.15}
+\setlength\parindent{0pt}
+\setlength\parskip{.28cm}
+
+%% Abstract macro
+\newcommand{\AbstractPage}{
+\begin{titlepage}
+
+\thispagestyle{fancy}\setcounter{page}{5}
+\clearpage\phantomsection\addcontentsline{toc}{chapter}{Abstract}
+
+\textbf{\large ABSTRACT}\par
+\AbstractEN \vfill
+\textbf{\large REZUMAT}\par
+\AbstractRO\par\vfill
+\end{titlepage}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%          End of template definitions
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ProjectTitleEN}{Awesome Title}
+\newcommand{\Name}{Your name}
+\newcommand{\AdvisorA}{Prof./Conf./S.l./As. dr./drd. ing. X}
+\newcommand{\AdvisorB}{Prof./Conf./S.l./As. dr./drd. ing. Y}
+\newcommand{\Year}{202x}
+
+% Setări document
+\title{Proiect de diplomă}
+\author{\Name}
+\date{\Year}
+
+%%
+%%   Câmpurile aferente rezumatului
+%%
+\newcommand{\AbstractEN}{
+The abstract should contain the following information (1/2 sentences per item):
+\begin{itemize}
+    \item Problem statement / context
+    \item Aim of the thesis/research objective(s)
+    \item Brief method details
+    \item Main results
+    \item Concluding remarks
+\end{itemize}
+}
+
+\newcommand{\AbstractRO}{Translation to be made at the end
+
+\vspace{3\baselineskip}
+\textbf{Keywords}: max 5, e.g., Language Models, Natural Language Processing
+}
+
+
+\begin{document}
+\pagenumbering{roman}
+\frontPageEN
+\begingroup
+\linespread{1}
+\tableofcontents
+\endgroup
+
+% Keep the list of figures and the list of tables on the same page.
+\pagestyle{fancy}
+\listoffigures\addcontentsline{toc}{chapter}{List of figures}
+\begingroup
+\let\clearpage\relax
+\listoftables\addcontentsline{toc}{chapter}{List of tables}
+\endgroup
+
+% Include the abstract page. See this definition if page numbers are wrong.
+\AbstractPage
+
+% poate fi comentata sau stearsa
+% \ThanksPage
+
+% Start the normal page numbering.
+\pagenumbering{arabic}
+
+% Textul licentei incepe de aici
+\chapter{Introduction}\pagestyle{fancy}
+
+Google Scholar and Mendeley are your friends for generating references. You can also export them directly from DBLP and other websites.
+
+Please use $citet$ - e.g., \citet{NIPS2017_3f5ee243} - for contextual references to the authors and $citep$ - e.g., \citep{HochSchm97} - in usual citations. \textbf{Never} include paper titles, only formulations that relate to the authors and are automatically generated (e.g., The study by ..., or X (year) have ...). Examples of BibTex entries are included in the "bibliography.bib" file.
+
+Also, Grammarly is extremely useful for grammatical corrections. Please use the Chrome plugin integrated with Overleaf.
+
+\section{Context}
+
+\section{Problem Statement}
+
+\section{Objectives}
+
+\section{Thesis Structure}
+
+
+%---------------------------
+\chapter{State of the art}
+
+
+
+%---------------------------
+\chapter{Method}
+
+\section{Corpus}
+
+\subsection{Descriptives}
+
+\section{(Neural) Architecture}
+
+\section{Performance Metrics}
+
+
+%---------------------------
+\chapter{Results}
+
+
+%---------------------------
+\chapter{Discussion}
+
+\section{Performance Comparison}
+
+\section{Limitations}
+
+
+%---------------------------
+\chapter{Conclusions and Future Work}
+
+
+% Bibliography / References.
+\renewcommand\bibname{References}
+\clearpage\phantomsection\addcontentsline{toc}{chapter}{\bibname}
+\bibliographystyle{apacite}
+\bibliography{bibliography}
+
+\end{document}

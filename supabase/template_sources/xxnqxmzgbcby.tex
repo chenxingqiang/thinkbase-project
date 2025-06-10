@@ -1,0 +1,308 @@
+
+% ----------------------------------------------------------------------
+%
+%  Modelo de dissertação/tese do PPGEO (FURG) para LaTeX
+%
+%  Este modelo consiste dos seguintes arquivos:
+%   - template.tex    > Este arquivo
+%   - template.pdf    > PDF compilado do template.tex
+%   - eotex.cls       > Definição da classe de documento
+%   - references.bib  > Referências de exemplo
+%  E do manual do EoTeX:
+%   - eotex.pdf
+%
+%  Este documento pode ser usado como base para escrever seu
+%  trabalho. Ele está comentado para auxiliar o autor.
+%
+%  Bugs podem ser relatados por e-mail:
+%    phelype.oleinik@latex-project.org
+%
+% ----------------------------------------------------------------------
+%
+%  Nota sobre a organização do trabalho:  sugiro, devido ao tamanho
+%    usual do texto de uma dissertação, criar junto com o arquivo .tex
+%    principal (este arquivo), uma pasta de textos e outra de imagens,
+%    conforme o esquema simplificado abaixo.  Na pasta de textos, crie
+%    um arquivo .tex para cada seção do documento, de forma que os
+%    arquivos não fiquem muito longos.  Isso facilita muito o
+%    gerenciamento do documento.  Para montar a estrutura do seu
+%    trabalho basta usar o comando \input para incluir o arquivo; por
+%    exemplo \input{texto/introducao.tex} (não esqueça de indicar o nome
+%    da pasta).  Quanto às imagens, coloque-as em uma pasta separada,
+%    e indique essa pasta no comando \includegraphics;  por exemplo
+%    \includegraphics{{./imagens/}}.
+%  
+%    Exemplo de estrutura:
+%  
+%    pasta_principal/
+%    ├ template.tex (este arquivo)
+%    ├ eotex.cls [obrigatório]
+%    ├ texto/
+%    │ ├ resumo.tex
+%    │ ├ abstract.tex
+%    │ ├ introducao.tex
+%    │ └ ...
+%    └ imagens/
+%      ├ local-de-estudo.png
+%      ├ foto-do-equipamento.jpg
+%      ├ fluxograma.png
+%      └ ...
+%
+% ----------------------------------------------------------------------
+
+% Use as opções globais da classe (separadas por vírgula) para mudar o
+% tipo de documento:
+% -  master: Utilize se o documento for uma dissertação de mestrado
+% -  doctor: Utilize se o documento for uma tese de doutorado
+% - project: Utilize se o documento for de qualificação
+\documentclass[master]{eotex}
+
+% DADOS DA DISSERTAÇÃO E DO AUTOR
+% ------------- ------------- ------------- ------------- -------------
+% Insira o título com \title:
+\title{Modelo de Dissertação do PPGEO}
+% e insira o título em inglês com \othertitle:
+\othertitle{Dissertation Template for PPGEO}
+
+% Insira o seu nome usando \author:
+\author{Nome do Aluno}
+% Nota: se seu sobrenome tiver prefixo, como em "da Silva", ou
+%   "dos Santos", utilize chaves em torno do sobrenome:
+\author{Nome {do Aluno}}
+
+% Insira a data no formato dd-mm-aaaa com \date:
+\date{20-03-2021}
+
+% Insira o grau a ser obtido com \thedegree:
+\thedegree{Mestre em Engenharia Oceânica}
+
+% ORIENTADORES E AVALIADORES
+% ------------- ------------- ------------- ------------- -------------
+% Insira o nome do orientador com \advisor:
+\advisor{Prof. Dr.}{Nome do Orientador}
+% e imediatamente a seguir indique que o orientador também é membro da
+% banca com \alsoexaminer:
+\alsoexaminer{PPGEO/FURG}
+
+% Da mesma forma para o coorientador, se houver, usando \coadvisor:
+\coadvisor[Coorientadora]{Prof\a.~Dr\a.}{Nome da Coorientadora}
+\alsoexaminer{UFRGS}%
+
+% Insira os demais membros da banca com \examiner:
+\examiner{Prof. Dr.}{Nome do Avaliador 1}{PPGEO/FURG}
+\examiner{Prof\a. Dr\a.}{Nome da Avaliadora 2}{PPGEO/FURG}
+
+% Indique avaliadores externos com colchetes:
+\examiner[Membro Externo]{Prof. Dr.}{Nome do Avaliador Externo}{UFRGS}
+
+% Indique também o nome do coordenador do PPGEO:
+\coordinator{Prof. Dr. Coordenador do PPGEO}
+
+% DADOS DA VERSÃO FINAL
+% ------------- ------------- ------------- ------------- -------------
+% Folha de rosto
+% -------------
+% Na versão final (após a defesa e as correções), o aluno solicita a
+% ficha catalográfica à biblioteca, e a folha de rosto assinada à
+% coordenação do programa.
+%
+% A folha de rosto pode ser inserida usando o comando \signaturepage,
+% indicando o arquivo .pdf contendo as assinaturas:
+% \signaturepage{../texbook.pdf}
+
+% Ficha catalográfica
+% -------------
+% A ficha catalográfica é feita automaticamente pelo EoTeX, desde que o
+% autor forneça:
+%  - o código de Cutter-Sanborn do trabalho (código à esquerda do nome
+%    do autor na ficha fornecida pela biblioteca):
+\cuttercode{N471m}
+%  - o código CDU (Classificação Decimal Universal---código na parte
+%    inferior direita da ficha):
+\CDUcode{620.91}
+%  - e o nome do bibliotecário responsável pela catalogação:
+\librarian{Bibliotecário João da Silva CRB 12/3456}
+%
+% Alternativamente, o autor também pode inserir a ficha catalográfica
+% fornecida pela biblioteca usando o comando \catalogpage:
+% \catalogpage{../texbook.pdf}
+
+% ELEMENTOS PRÉ-TEXTUAIS
+% ------------- ------------- ------------- ------------- -------------
+% Epígrafe (opcional)
+% -------------
+% Adicione uma epígrafe usando o ambiente 'epigraph':
+\begin{epigraph}{Autor da Citação}
+A epígrafe é um espaço opcional onde o autor pode inserir uma citação
+de sua escolha, relacionada ou não com o tema da dissertação.
+\end{epigraph}
+
+% Prefácio (opcional)
+% -------------
+% Indique o arquivo que contém o prefácio com \preface ou usando o
+% ambiente 'preface':
+% \preface{texto/resumo.tex}
+% ou:
+\begin{preface}
+O prefácio é opcional, e serve como \textbf{uma introdução do autor ao
+trabalho}. O estilo de escrita é livre, no entanto, deve aderir à norma
+culta da língua portuguesa. No prefácio o autor pode falar da sua
+motivação para realizar o trabalho, experiências pessoais durante a pós
+graduação, ou qualquer assunto que o autor julgue pertinente à
+dissertação.
+\end{preface}
+% Tanto o prefácio, os agradecimentos, o resumo e o abstract podem ser
+% inseridos usando a forma de comando:
+%     \comando{arquivo}
+% ou a forma de ambiente:
+%     \begin{ambiente}
+%       texto
+%     \end{ambiente}
+
+% Agradecimentos (opcional)
+% -------------
+% Indique o arquivo que contém os agradecimentos com \acknowledgement
+% ou com o ambiente de mesmo nome:
+\begin{acknowledgement}
+A seção de agradecimentos é opcional, onde o autor faz
+\textbf{agradecimentos dirigidos a pessoas ou instituições que
+contribuiram para a elaboração do trabalho de alguma forma}.
+
+Para bolsistas, no entanto, o capítulo de agradecimentos é obrigatório e
+deve conter também agradecimento à agência de fomento que financiou a
+bolsa (CAPES, CNPq), e à Universidade Federal do Rio Grande (FURG).
+
+\addsymbol{sigla}{FURG}{Universidade Federal do Rio Grande}
+\addsymbol{sigla}{CAPES}{Coordenação de Aperfeiçoamento de
+  Pessoal de Nível Superior}
+\addsymbol{sigla}{CNPq}{Conselho Nacional de Desenvolvimento
+  Científico e Tecnológico}
+\end{acknowledgement}
+
+% Resumo
+% -------------
+% Indique o arquivo que contém o resumo usando \abstract ou
+% o ambiente de mesmo nome:
+\abstract{texto/resumo.tex}
+% e insira as palavras-chave, separadas por vírgula, usando \keywords:
+\keywords{de 3 a 5 palavras-chave: modelo,dissertação,PPGEO}
+
+% Abstract
+% -------------
+% Indique o arquivo que contém o abstract usando \otherabstract ou
+% o ambiente de mesmo nome:
+\otherabstract{texto/abstract.tex}
+% e as palavras-chave em inglês usando \otherkeywords:
+\otherkeywords{from 3 to 5 keywords: model,dissertation,PPGEO}
+
+% LISTA DE SÍMBOLOS
+% ------------- ------------- ------------- ------------- -------------
+% As listas de símbolos e de siglas são possivelmente a parte mais
+% complicada da configuração do documento, pois cada documento precisa
+% de um conjunto diferente de listas, então a generalização vem ao custo
+% de certa dificuldade pra configurar.  Se seu trabalho não tiver uma
+% lista assim, apenas exclua essa parte.
+
+% Primeiro você deve declarar o layout das listas usando o comando
+% \ListsLayout.  Um documento pode ter várias listas, e cada uma pode
+% ser subdividida.  As listas aparecerão no documento na ordem que forem
+% declaradas aqui.  Considere o exemplo a seguir:
+\ListsLayout{
+  simbolo      = Lista de Símbolos,
+      / romano = Símbolos Romanos,
+      / grego  = Símbolos Gregos,
+      / subsup = Subscritos e Superscritos,
+  sigla        = Lista de Siglas,
+}
+% Nesse exemplo haverão duas listas:
+%  - "Lista de Símbolos" com identificador "simbolo"
+%  - "Lista de Siglas" com identificador "sigla"
+% e a "Lista de Símbolos" ainda é subdividida em três listas:
+%  - "Símbolos Romanos" com identificador "romano"
+%  - "Símbolos Gregos" com identificador "grego"
+%  - "Outros Símbolos" com identificador "outro"
+
+% Então, no documento (geralmente próximo de onde o símbolo/sigla é
+% definido, para ficar fácil localizar), você adiciona itens às listas
+% usando seus respectivos identificadores no comando \addsymbol:
+%
+%    \addsymbol{identificador}{símbolo}{descrição}
+%
+% por exemplo:
+%
+%    \addsymbol{romano}{$A_s$}{Área de seção \Unit{m^2}}
+%
+%
+% No exemplo, "A_s" seria usado para organizar alfabeticamente.  Para
+% manipular essa ordem, utilize o argumento opcional, por exemplo:
+%
+%    \addsymbol{romano}[As]{$A_s$}{Área de seção \Unit{m^2}}
+%
+% nesse caso, "As" seria utilizado para organizar.  Os $ são removidos
+% para a organização alfabética, mas devem ser utilizados se for um
+% símbolo matemático.
+
+% BIBLIOGRAFIA
+% ------------- ------------- ------------- ------------- -------------
+% Para incluir bibliografia no trabalho, você precisa de um arquivo de
+% referências no formato BibTeX (veja o arquivo exemplo 'references.bib'
+% que acompanha esse template).  Você pode escrever os itens manualmente
+% ou pode usar uma ferramenta como o doi2bib.org para gerar o item de
+% bibliografia a partir do DOI.  Inclua esse arquivo no documento com:
+\bibsource{references.bib}
+%
+% Você precisa também configurar seu editor para executar o 'biber' para
+% processar a lista de referências (NÃO o BibTeX!).
+
+% LISTAS DE FIGURAS E TABELAS E SUMÁRIO
+% ------------- ------------- ------------- ------------- -------------
+% São gerados automaticamente.
+
+% PACOTES RECOMENDADOS
+% ------------- ------------- ------------- ------------- -------------
+% Se seu trabalho tem qualquer matemática, use o pacote 'amsmath':
+\usepackage{amsmath}
+
+% Se seu trabalho tiver gráficos, use 'graphicx':
+\usepackage{graphicx}
+% se você tiver uma pasta com figuras, você pode usar \graphicspath:
+\graphicspath{{./imagens/}}
+% se houver mais de uma pasta, adicine-as assim:
+% \graphicspath{{./imagens/}{./figuras/}}
+
+% Recomendo o 'subcaption' para fazer subfiguras e subtabelas
+% (numeradas a, b, c, etc.):
+\usepackage{subcaption}
+
+% Recomendo o 'booktabs' para usar os comandos \toprule, \midrule e
+% \bottomrule para fazer tabelas melhores:
+\usepackage{booktabs}
+
+% Recomendo o 'siunitx' para padronizar a escita de unidades do SI:
+\usepackage{siunitx}
+% (exemplos: \SI{3.2}{m/s}, \num{1234567}, \ang{26.5}, \ang{32;10;25})
+
+% Recomendo o 'microtype' para melhorar a aparência do texto em geral:
+\usepackage{microtype}
+
+% Se quiser que referências cruzadas e citações sejam links no PDF, use
+% o 'hyperref' e o 'bookmark':
+\usepackage[bookmarks,colorlinks]{hyperref}
+\usepackage{bookmark}
+% (exceto algumas exceções, como o 'bookmark' e o 'cleveref', o
+% 'hyperref' deve ser o último pacote a ser carregado).
+
+% Para padronizar referências cruzadas a figuras, tabelas e equações com
+% facilidade, recomendo o 'cleveref':
+\usepackage[brazilian,noabbrev]{cleveref}
+
+% To print a command name
+\DeclareRobustCommand\cmd[1]{\texttt{\textbackslash#1}}
+
+\begin{document}
+
+\input{texto/introducao.tex}
+\input{texto/secionamento.tex}
+\input{texto/instrucoes.tex}
+
+\end{document}

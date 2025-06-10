@@ -1,0 +1,1178 @@
+\ProvidesFile{thesis.tex}[2025-01-15 PurdueThesis thesis.tex file]
+
+%  The home page for the PurdueThesis software is
+%      https://engineering.purdue.edu/~mark/PurdueThesis/
+%
+%  Be sure to sign up for the PurdueThesis mailing list at
+%      https://engineering.purdue.edu/ECN/mailman/listinfo/purduethesis-list
+%  so you learn of new versions of this software.  You must be on that
+%  mailing list to receive help with this software.
+%
+%  This is the template root file for an example thesis (for master's
+%  degree) or dissertation (for a Ph.D.).  From now on "thesis" will
+%  refer to both of these unless stated otherwise.
+%
+%  LaTeX systems include auxiliary programs to do bibliographies,
+%  indexes, etc.  The latexmk program runs the fewest programs needed
+%  to update your thesis.
+%
+%  On Overleaf (run LaTeX on the web) clicking 'Recompile' will recompile
+%  your thesis.
+%
+%  Use this command on Linux to do all the steps needed to compile your thesis.
+%    For Mark Senn:
+%      Use
+%          latexmk -e '$biber="biber --output-safechars"' -f -g -lualatex --shell-escape thesis
+%      to get extra debugging information printed.  Sometimes the `-f -g' can 
+%      be deleted to run faster.
+%    For everyone else:
+%      Use
+%          latexmk -e '$biber="biber --output-safechars"' -f -g -lualatex thesis
+%      Sometimes the `-f -g' can be deleted to run faster.
+%  Here is how that command works:
+%      latexmk
+%          The latexmk program figures out how to compile
+%          your thesis in the quickest way.
+%      -e '$biber="biber --output-safechars"'
+%          Add the '--output-safechars' option to biber,
+%          the command that makes your references.  This
+%          command makes accented characters in your references
+%          work ok.
+%      -f
+%          Force latexmk to process your entire thesis, even
+%          if it contains errors.
+%      -g
+%          Force latexmk to process document fully, even under situations
+%          where latexmk would normally decide that no changes in the
+%          source files have occurred since the previous run.  This  option
+%          is  useful, for example, if you change some options and wish to
+%          reprocess the files.
+%      -lualatex
+%          The -lualatex option process your thesis using the LuaLaTeX
+%          version of LaTeX.  LuaLaTeX has the Lua programmng language
+%          added to make programming LaTeX easier.  You won't need to
+%          learn Lua or do any LaTeX programming for your thesis.
+%      --shell-escape
+%          The --shell-escape option allows you to run external programs
+%          from inside your thesis.
+%      thesis
+%          Process your thesis.tex file.
+%
+%
+%  NOTE TO SELF
+%      To count the number of references see
+%          https://tex.stackexchange.com/questions/66829/count-number-of-references-using-biblate
+%      See set the \labelnumberwidth see page 316 of
+%          https://ctan.math.illinois.edu/macros/latex/contrib/biblatex/doc/biblatex.pdf
+%      
+%
+%  PROGRAM                                       BIBLIOGRAPHY    PurdueThesis.cls    thesis.tex   WORKS
+%                                                STYLE           RCS rev             RCS rev
+%  Mathematics                                   apa             1.249               1.58         yes
+%  Mathematics                                   ieee            1.250               1.59         yes
+%  Electrical and Computer Engineering           ieee            1.250               1.60         yes
+%  Earth, Atmospheric, and Planetary Sciences    apa             1.251               1.61         yes
+%  Mathematics                                   apa             1.252               1.62         yes
+%  Technology Leadership and Innovation          apa             1.253               1.63         yes
+%  Mathematics                                   numeric         ????                ????         ????
+%  Earth, Atmospheric, and Planetary Sciences    apa             ????                ????         ????
+%
+
+%
+%  References cited below:
+%
+%  TM2017 is short for Thesis Manual 2017:
+%    A Manual for the Preparation of Graduate Theses,
+%    eighth revised edition,
+%    Thesis and Dissertation Office,
+%    Purdue University,
+%    2017,
+%    revised August 30, 2017,
+%    http://www.purdue.edu/gradschool/documents/thesis/graduate-thesis-manual.pdf,
+%    last retrieved on May, 8, 2021.
+%
+%  In this file, change the example information to your information.
+%
+
+
+% author
+% Put your name here.
+\newcommand{\ZZauthor}{Ima Author}
+
+
+% campus
+% Choose a campus from the following list:
+%     VALUE               COMMENT
+%     Bloomington
+%     Fort Wayne
+%     Hammond
+%     Indianapolis
+%     Manoa               don't include the macron character here,
+%                         it will get printed automatically
+%     Reno
+%     Westville
+%     West Lafayette
+\newcommand{\ZZcampus}{West Lafayette}
+% \newcommand{\ZZcampus}{Fort Wayne}
+
+
+% degree
+% If you are in `Motorsports Engineering'
+% use `Master of Science in Mechanical Engineering'.
+% Choose a degree from the following list:
+%     Doctor of Audiology
+%     Doctor of Nursing Practice
+%     Doctor of Philosophy
+%     Doctor of Technology
+%     Master of Arts
+%     Master of Fine Arts
+%     Master of Library Science
+%     Master of Science
+%     Master of Science in Agriculture
+%     Master of Science in Aviation and Aerospace Management
+%     Master of Science in Aeronautics and Astronautics
+%     Master of Science in Agricultural and Biological Engineering
+%     Master of Science in Building Construction Management
+%     Master of Science in Biomedical Engineering
+%     Master of Science in Chemical Engineering
+%     Master of Science in Civil Engineering
+%     Master of Science in Education
+%     Master of Science in Electrical and Computer Engineering
+%     Master of Science in Engineering
+%     Master of Science in Engineering Technology
+%     Master of Science in Human Resources Management
+%     Master of Science in Industrial Engineering
+%     Master of Science in Industrial Technology
+%     Master of Science in Mechanical Engineering
+%     Master of Science in Materials Engineering
+%     Master of Science in Nuclear Engineering
+\newcommand{\ZZdegree}{Doctor of Philosophy}
+% \newcommand{\ZZdegree}{Master of Science}
+
+
+% document
+% Choose a document from the following list:
+%     A Dissertation
+%     A Master's Bypass Report
+%     A Preliminary Report
+%     A Thesis
+% \newcommand{\ZZdocument}{A Dissertation}
+\newcommand{\ZZdocument}{A Thesis}
+
+% graduation
+% Chose a month from
+%     May
+%     August
+%     December
+% followed by a space
+% then choose a year from 2020 to 2030.
+\newcommand{\ZZgraduation}{May 2025}
+
+
+% institution
+% Choose an institution name from the following list:
+%     VALUE                   COMMENT
+%     Purdue University
+%     University of Hawaii    don't include the 'okina character here,
+%                             it will get printed automatically
+\newcommand{\ZZinstitution}{Purdue University}
+
+
+% program
+% Choose a program from the following list:
+% If you are in `Motorsports Engineering' use `Mechanical Engineering'.
+%     VALUE
+%     Aeronautics and Astronautics
+%     Agricultural and Biological Engineering
+%     Agricultural Economics
+%     Agronomy
+%     American Studies
+%     Animal Sciences
+%     Anthropology
+%     Applied Physics
+%     Art and Design
+%     Aviation and Transportation Technology
+%     Basic Medical Sciences
+%     Biochemistry
+%     Biological Sciences
+%     Biology
+%     Biomedical Engineering
+%     Botany and Plant Pathology
+%     Chemical Engineering
+%     Chemistry
+%     Chemistry and Chemical Biology
+%     Child Development and Family Studies
+%     Civil and Construction Engineering
+%     Civil and Mechanical Engineering
+%     Communication
+%     Communications
+%     Comparitive Pathobiology
+%     Computer and Information Science
+%     Computer and Information Technology
+%     Computer Graphics Technology
+%     Computer Science
+%     Construction Management Technology
+%     Consumer Science
+%     Curriculum and Instruction
+%     Earth, Atmospheric, and Planetary Sciences
+%     Economics
+%     Educational Studies
+%     Electrical and Computer Engineering
+%     Engineering Education
+%     Engineering Technology
+%     English
+%     Entomology
+%     Food Science
+%     Forensic and Investigative Sciences
+%     Forestry and Natural Resources
+%     Health and Kinesiology
+%     Health Sciences
+%     History
+%     History and Philosophy
+%     Horticulture
+%     Hospitality and Tourism Management
+%     Human Development and Family Studies
+%     Industrial and Physical Pharmacy
+%     Industrial Engineering
+%     Interdisciplinary Biomedical Studies Program
+%     Interdisciplinary Studies (Comparitive Literature)
+%     Languages and Cultures
+%     Linguistics
+%     Management
+%     Materials Engineering
+%     Mathematical Sciences
+%     Mathematics
+%     Mechanical and Energy Engineering
+%     Mechanical Engineering
+%     Mechnical and Civil Engineering
+%     Medicinal Chemistry and Molecular Pharmacology
+%     Nuclear Engineering
+%     Nursing
+%     Nutrition Science
+%     Organizational Behavior and Human Resource Management
+%     Pharmacy Practice
+%     Philosophy
+%     Philosophy and Literature
+%     Physics
+%     Physics and Astronomy
+%     Political Science
+%     Psychological Sciences
+%     Sociology
+%     Speech, Language, and Hearing Sciences
+%     Statistics
+%     Technology
+%     Technology Leadership and Innovation
+%     Theatre
+%     Veterinary Clinical Sciences
+%     Youth Development and Agricultural Education
+\newcommand{\ZZprogram}{Electrical and Computer Engineering}
+% \newcommand{\ZZprogram}{Applied Physics}
+
+
+% title
+% If you need to manually split the title,
+% over several lines do, for example,
+%     \newcommand{\ZZtitle}{%
+%       This is the First Line\\[-6pt]
+%       and this is the Second Line%
+%     }
+\newcommand{\ZZtitle}{This is the Title}
+
+
+% showcolophon
+% Print the ap-colophon.tex file at the end of the document?
+% THE SUBMITTED COPY OF YOUR THESIS MUST BE RUN WITH ZZshowcolophon SET TO false.
+\newcommand{\ZZshowcolophon}{false}
+
+% showdiagonalline
+% Show a diagonal line from lower left to center
+% of main printed part of page?
+% THE SUBMITTED COPY OF YOUR THESIS MUST BE RUN WITH ZZshowdiagonalline SET TO false.
+\newcommand{\ZZshowdiagonalline}{false}
+
+% showgridlines
+% Show grid lines on main printed part of page
+% Vertical and horizontal grid lines are put
+% in the normal printed part of the page---this
+% includes lines where the margins are.
+% THE SUBMITTED COPY OF YOUR THESIS MUST BE RUN WITH ZZshowgridlines SET TO false.
+\newcommand{\ZZshowgridlines}{false}
+
+% showmarginlines
+% Show margin lines on the edge of the normal printed part of the page?
+% Margin lines show where the margins are.
+% THE SUBMITTED COPY OF YOUR THESIS MUST BE RUN WITH ZZshowmarginlines SET TO false.
+%     VALUE    MEANING
+%     false    don't show marginlines
+%     true     show marginlines
+\newcommand{\ZZshowmarginlines}{false}
+
+% showtimestamp
+% Show, for example, a "compiled on  2021-03-02  Tuesday  17:16:24"
+% timestamp in the upper right corner of page?
+%     VALUE    MEANING
+%     false    don't show timestamp
+%     true     show timestamp
+% THE SUBMITTED COPY OF YOUR THESIS MUST BE RUN WITH ZZshowtimestamp SET TO false.
+\newcommand{\ZZshowtimestamp}{false}
+
+% showtodonotes
+% Set things up for todonotes.
+%     VALUE    MEANING
+%     false    don't put todo notes in PDF file
+%     true     put 0.8 inch wide todo notes in PDF file
+%     wide     put 3.8 inch wide todo notes in PDF file, do not send
+%              todonotes = wide output to a printer
+% THE SUBMITTED COPY OF YOUR THESIS MUST BE RUN WITH ZZshowtodonotes SET TO false.
+\newcommand{\ZZshowtodonotes}{false}
+
+% Mark Senn uses an "optional-debugging-code.tex file" but does not
+% distribute it.  The following line won't do anything if you don't
+% have an optional-debugging-code.tex file so you can leave it the
+% way it is.
+\InputIfFileExists{optional-debugging-code.tex}{}{}
+
+% The \includeonly command can be used to only include some
+% files that have \include commands below.  This is handy
+% to only include some files so your document will LaTeX
+% faster or if you're trying to narrow down where an error
+% occurs.  You can use
+%   \includeonly{ch-introduction}
+% to only include ch-introduction.tex, or
+%   \includeonly{ch-introduction,ap-about-appendices}
+% to include ch-introduction.tex and ap-about-appendices.tex.
+% More files can be added---just put ',' between the names.
+% Comment out the following line before submitting the
+% final copy of your thesis.
+%\includeonly{ch-introduction,ap-about-appendices}
+
+
+\documentclass{PurdueThesis}
+
+% I'm not using the silence package to not print LaTeX errors
+% and warnings because
+%     \usepackage{silence}
+% caused
+%     [89] [90] [91] (./z.out) (./z.out^C 
+%     ! Interruption.
+%     \sl@StoreMessage ...oveGobbletwo #1\sl@Terminator 
+%                                                       \@gobbletwo \sl@Terminator...
+%     
+%     l.2 \subsection{Sum of 1 to \(n\) example}
+%                                             
+%     ? 
+% where ^C indicates I typed a Control-C because LaTeX was 'stuck'.
+%
+% I do the following when using Overleaf.  Check the icon just to the
+% right of the 'Recompile' button to see how many errors/warnings there
+% are.  If that number goes up I look for the details of what has
+% changed.
+% \usepackage{silence}
+
+%%%% \ExplSyntaxOn                         %%%% changed 2021-07-27 by mark
+%%%% \bool_set_true:N \ZZCenterCaptionB    %%%% changed 2021-07-27 by mark
+%%%% \ExplSyntaxOff                        %%%% changed 2021-07-27 by mark
+
+\newcommand{\ZZatinformation}{}
+% If you are at the Hammond or Westville campus
+% remove the "%" from the begining of the next line.
+%\newcommand\ZZatinformation{~at~Purdue~Northwest}
+
+
+% PurdueThesis.cls loads the rotating package which loads the graphicx
+% package.  From page 12 of "Packages in the `graphics' bundle", 2021-03-05,
+% retrieved 2021-06-16, at https://texdoc.org/serve/grfguide.pdf/0
+%     \graphicspath{<dir-list>}
+%
+%         This optional declaration may be used to specify a list of
+%         directories in which to search for graphics files.  The
+%         format is the same as for the LaTeX 2e primitive \input@path.
+%         A list of directories, each in a {} group (even if there is
+%         only one in the list).  For example:
+%             \graphicspath{{eps/}{tiff/}}
+%         would cause the system to look in the subdirectories eps and
+%         tiff of the current directory.  (All modern TeX systems use /
+%         as the directory separator, even on Windows.)
+%
+%         The default setting of this path is \input@path that is:
+%         graphics files will be found whereever TeX files are found.
+%
+% Look in the "graphics" subfolder for graphics files.
+% This is done to reduce the number of files in the main thesis folder
+% so the ones in there are easier to find.
+\graphicspath{{graphics/}}
+
+% Look in the `misc' subfolder for miscellaneous files
+% PurdueThesis.cls and thesis.tex need.  Look in the `packages'
+% subfolder for packages.  This is done to reduce the number of files
+% in the main thesis folder so the ones in there are easier to find.
+%%%%\ExplSyntaxOn
+%%%%  \seq_set_from_clist:Nn \l_file_search_path_seq {misc,packages}
+%%%%\ExplSyntaxOff
+\makeatletter
+  \def\input@path{{misc}{packages}}
+\makeatother
+
+% The BibLaTeX bibstyle and citestyle are chosen automatically based
+% on your program (e.g., `Mathematics').  For example, if you are in
+% the Mathematics program normally you are using the `numeric'
+% bibstyle and citestyle.
+% the `numeric-comp' (numeric compressed---instead of '[1,2,3]' use
+% '[1--3]') citestyle.
+% To override the bibstyle and citestyle to `apa' use
+%     \ZZoverridebibstyle{apa}
+% To override the bibstyle to `apa'and the citestyle to `numeric-comp'
+% use
+%     \ZZoverridebibstyle{apa}
+%     \ZZoverridecitestyle{numeric-comp}
+% Any overrides must go before the \ConfigureBibliography.
+%%%\ZZoverridebibstyle{apa}
+
+\ConfigureBibliography
+
+% \DeclareSourcemap
+%   {
+%     \maps[datatype=bibtex]
+%     {
+%       % Ignore "urldate = {...}" in .bib files.
+%       % See the first complete example on page 201 of
+%       %     https://mirrors.rit.edu/CTAN/macros/latex/contrib/biblatex/doc/biblatex.pdf
+%       \map
+%         {
+%           \step[fieldset=urldate, null]
+%         }
+%       % Enter approximate (circa) dates using, for example,
+%       % "year = c2020"  See
+%       %     https://tex.stackexchange.com/questions/224617/what-is-the-correct-way-to-handle-approximate-dates-in-biblatex
+%       \map[overwrite=false]
+%         {
+%           \step[fieldsource=year]
+%           \step[fieldset=sortyear, origfieldval, final]
+%           \step[fieldsource=sortyear, match={c}, replace={}]
+%         }
+%     }
+%   }
+
+% For \bm.
+% The bm package was last updated on 2022-01-05.
+\usepackage{bm}
+
+% To let {\bfseries\scshape text} work as expected.
+% See
+%     https://tex.stackexchange.com/questions/27411/small-caps-and-bold-face
+\usepackage{bold-extra}
+
+% For chemical figures.
+\usepackage{chemfig}
+
+% For typesetting cryptography pseudocode, algorithms, and protocols.
+% See
+%     https://mirror.las.iastate.edu/tex-archive/macros/latex/contrib/cryptocode/cryptocode.pdf
+\usepackage
+[
+  n,            % or lambda
+  advantage,
+  operators,
+  sets,
+  adversary,
+  landau,
+  probability,
+  notions,
+  logic,
+  ff,
+  mm,
+  primitives,
+  events,
+  complexity,
+  oracles,
+  asymptotics,
+  keys,
+]
+{cryptocode}
+
+% Define
+%    \VerbatimInput[options]{filename}
+%    \begin{VerbatimOut}{filename} ... \end{VerbatimOut}.
+\usepackage{fancyvrb}
+  % So '|verbatim|' will print 'verbatim' in a typewriter font.
+  % If you don't want this, put a '%' before the next line.
+  \DefineShortVerb{\|}
+
+% For \InpuutIfFileExists.
+\usepackage{filehook}
+
+% Use OpenType fonts in LuaLaTeX.
+\usepackage{fontspec}
+
+% For nlui testing.
+\usepackage{listings}
+
+% For chemical equations.
+% See
+%     https://ctan.org/pkg/mhchem?lang=en
+% From the "Package documentation" linked-to document
+%     mhchem needs a couple of other packages.
+%     For instance, expl3, amsmath and calc.
+\usepackage[version=4]{mhchem}
+  % If I'm loading the package to just define a few new commands I'll indent
+  % two spaces right after loading the package and define the few new
+  % commands here.  If I'm defining more than a few commands I usually do it
+  % after loading all the packages.
+  % Define "\nitrate" to be the chemical symbol for nitrate.
+  \newcommand{\nitrate}{\ce{NO3{-}}}
+  % Define "\pnitrate" (short for "parenthesized nitrate") to be the chemical
+  % symbol for nitrate surrounded by parentheses.
+  \newcommand{\pnitrate}{(\nitrate)}
+  % "Define \vpnitrate" (short for "verbose parenthesized nitrate") to be
+  % the word "nitrate" followed by a space followed by the chemical symbol
+  % for nitrate with parentheses around it.
+  \newcommand{\vpnitrate}{nitrate (\nitrate)}
+
+% For
+%     \cancel
+%     \highlight
+% See
+%     http://ftp.math.purdue.edu/mirrors/ctan.org/macros/latex/contrib/siunitx/siunitx.pdf
+% pages 11--12.
+\usepackage{cancel}
+
+
+% Redefine description, enumerate, and itemize lists.
+% See
+%     https://mirrors.concertpass.com/tex-archive/macros/latex/contrib/enumitem/enumitem.pdf
+% \usepackage{enumitem}
+% \setlist[itemize]{leftmargin=7pt,rightmargin=24pt}
+
+
+
+% This gets rid of
+%     [5] (./thesis.toc
+%     ! Undefined control sequence.
+%     \vbox_set:Nn ...box:D {\color_group_begin: #2\par
+%                                                       \color_group_end: }
+%     l.32 ...}Basic Circuit Components}{31}{section.67}
+%                                                       %
+%     ?
+% and
+%     [6]
+%     ! Undefined control sequence.
+%     \vbox_set:Nn ...box:D {\color_group_begin: #2\par
+%                                                       \color_group_end: }
+%     l.61 ...rline {P.1}Frenchspacing}{67}{section.445}
+%                                                       %
+%     ?
+% errors.
+% See
+%     https://github.com/latex3/latex2e/issues/73
+\usepackage{etoc}
+
+% Define \setmaxprintline{number_of_columns}.
+% \usepackage{hardwrap}
+
+% Include XMP data in a PDF document.
+% See
+%   http://mirrors.ibiblio.org/CTAN/macros/latex/contrib/hyperxmp/hyperxmp.pdf
+% for more information including all the possible fields that can be set.
+\usepackage{hyperxmp}
+  \hypersetup{
+    pdfauthor    = {Mark Senn},
+    pdfcopyright = {Copyright \copyright\ 2024 by Mark Senn.  All rights reserved.},
+    % Use `yyyy-mm' format where `yyyy' is year and `mm' is month.
+    pdfdate      = {2025-05},
+    pdfkeywords  = {LaTeX; Purdue University; PurdueThesis},
+    pdflang      = {en},
+    pdfpublisher = {Purdue University},
+    pdfsubject   = {%
+                     PurdueThesis is a LaTeX document class used for
+                     master's bypass reports,
+                     master's theses,
+                     PhD dissertations,
+                     and PhD preliminary reports.
+                     This template demonstrates how to use PurdueThesis.%
+                   },
+    pdftitle     = {This is the Title},
+  }
+
+
+% For `\Box'.
+\usepackage{latexsym}
+
+% Used in ap-colophon.tex.
+\usepackage{luacode}
+
+% For indexing.  Making an index is optional.
+% Make these commands available:
+%     COMMAND           DESCRIPTION
+%     \index{string}    put "string" in index information
+%     \makeindex        save information to make the index
+%     \printindex       print the index
+% See
+%     https://ctan.org/pkg/makeidx?lang=en
+% for more information.
+\usepackage{makeidx}
+  % By default \index ignores its argument.
+  % This activates indexing.
+  \makeindex
+  % The "chapter name" for the index.
+  \renewcommand{\indexname}{INDEX}
+
+% The mathtools package
+% (see http://mirror.utexas.edu/ctan/macros/latex/required/amsmath/amsmath.pdf)
+% loads the amsmath package which defines the
+%     align
+%     align*
+%     alignat
+%     alignat*
+%     equation
+%     equation*
+%     flalign
+%     flalign*
+%     gather
+%     gather*
+%     multitaper
+%     multitaper*
+%     split
+% environments and extends amsmath by defining many other commands.
+% See
+%     https://ctan.org/pkg/amsmath
+% for information about amsmath and
+%     http://ctan.math.washington.edu/tex-archive/macros/latex/contrib/mathtools/mathtools.pdf
+% for information about mathtools.
+\usepackage{mathtools}
+
+% Define \includemedia.
+\usepackage{media9}
+
+% Define \begin{multicols}{number_of_columns} ... \end{multicolumns}.
+% Used in ap-text.tex.
+\usepackage{multicol}
+
+% Define \ditto.
+\usepackage{pa-ditto}
+
+% Define \FigureDash.
+% \FigureDash is a dash the width of a digit in the current font.
+\usepackage{pa-figure-dash}
+
+% For PurdueThesis, PuTh, TeX, LaTeX, METAFONT, METAPOST, ... logos.
+\usepackage{pa-logos}
+
+\usepackage{pdfpages}
+
+% Follow ISO 80000-2:2019:
+%   o  The e, i, j, and pi constants should be in an upright font.
+%   o  The ordinary derivative operator d should be in an upright font.
+\usepackage{pa-mismath}
+  % For letter in ('e', 'i', 'j'):
+  %     o  \MathUp{letter} typesets letter in an upright font from now on.
+  %        Use \mathit{letter} to get a math italic letter
+  %        when Mathup{letter} is active.
+  %     o  \MathIt{letter} typesets letter in a math italic font from now on.
+  %        Use \mathup{letter} to get an upright letter
+  %        when MathIt{letter} is active.
+  %
+  % \pinumber typesets pi in an upright font from now on.
+  %  Use \itpi to get a math italic pi when \pinumber is active.
+  %  
+  % \pinormal typesets pi in a math italic font from now on.
+  % Use \text{\pi} to get an upright pi when \pinormal is active.
+  %
+  % Adjust these are needed for your document.
+  \MathUp{e}  \MathUp{i}  \MathUp{j}  \pinumber
+  %
+  % Use \di for ordinary derivative operator.
+  
+% This does not depend on the pa-mismath package.
+% Do more ISO 80000-2:2019 stuff.
+% Follow ISO 80000-2:2019:
+%   o  The partial derivative operator should be in an upright font.
+% The pa-mismath package defines "\di" as the ordinary differential operator.
+% Define "\pa" as the partial derivative operator.
+\def\pa{\rotatebox[origin=c]{14}{\partial}}
+
+% This does not depend on the pa-mismath package.
+% Do more ISO 80000-2:2019 stuff.
+% Follow ISO 80000-2:2019:
+%   o  Use \mathcal{F} for the Fourier transform.
+\def\Fourier{\mathcal{F}}
+
+% This does not depend on the pa-mismath package.
+% Do more ISO 80000-2:2019 stuff.
+% Follow ISO 80000-2:2019:
+%   o  Use \mathcal{L} for the Laplace transform.
+\def\Laplace{\mathcal{L}}
+
+% Define \MyRepeat{what}{repeat}.
+% Do "what" "repeat" number of times.
+\usepackage{pa-repeat}
+
+% Define \FloatBarrier.
+% \FloatBarrier process all unproccesed floats (tables, figures, etc.).
+\usepackage{placeins}
+
+% Define \hl.
+% Undefine \st so soul will load without an error.
+% I hope \st wasn't used for something important!
+\let\st\relax
+\usepackage{soul}
+
+% Define \textcent.
+\usepackage{textcomp}
+
+% !!! This doesn't work yet, figure it out later.
+% For \textprimstress.
+% \usepackage{tipa}
+
+% Needed for chapter "Graphics", section "TikZ and PGF".
+\usepackage{tikz}
+  % Needed to customize arrows.
+  \usetikzlibrary{arrows.meta}
+  % For electrical diagrams.
+  % Uses the TikZ package.
+  % The circuitikz name is short for "circuit TikZ".
+  \usepackage{circuitikz}
+  %
+  \usepackage{menukeys}
+  %
+  % Needed for 3D TikZ stuff.
+  \usetikzlibrary{3d}
+  %
+  % Needed for pa-typographic-conventions package.
+  \usetikzlibrary{calc,shadows,shapes.misc,shapes.symbols}
+  %
+  % Needed for putting text along a path.
+  \usetikzlibrary{decorations.text}
+  %
+  % Draw TikZ decorations.
+  % Needed for at least the Kalman filter system model graphic.
+  \usetikzlibrary{decorations.pathmorphing} % noisy shapes
+  %
+  % Fit shapes to coordinates.
+  % Needed for at least the Kalman filter system model graphic.
+  \usetikzlibrary{fit}
+  %
+  % Draw the background after the foreground.
+  \usetikzlibrary{backgrounds}	% drawing the background after the foreground
+
+% Needed for the Feynman diagram in ap-physics.tex.  Tikz-feynman
+% requires LuaLaTeX instead of pdflatex be run.  LuaLaTeX screws up
+% the horizontal position of the list of figures---this is a known bug.
+% The Thesis Office accepts theses with this problem.
+\usepackage[compat=1.1.0]{tikz-feynman}
+
+% The vertical space between a table heading and the table contents
+% in a tabular environment.
+\newcommand{\tabularspace}{\noalign{\vspace*{2pt}}}
+
+% For \sfrac, used to do slanted fractions, similar to, e.g., 1/2,
+% but 1 is small and high and 2 is small and low.
+\usepackage{xfrac}
+
+
+% Define \I.
+% \I1 does \indent once, \I2 does \indent twice, etc.
+\newcommand{\I}[1]{\MyRepeat{\indent}{#1}}
+
+% Define \MyI.
+% Typeset my input.
+\long\def\MyI#1%
+  {%
+    {%
+      \fontsize{8}{10}\tt
+      \VerbatimInput
+        [
+          firstnumber = 1,
+          numbers     = left,
+          xleftmargin = 0.33in,
+        ]%
+        {#1}
+    }%
+  }
+
+% Define \MyIO.
+% Typeset my input and output.
+% The input will all be on the same page.
+% The output may be split over multiple pages.
+\newcommand{\MyIO}
+  {%
+    \input{z.out}
+
+    {%
+      \fontsize{8}{10}\tt
+      \VerbatimInput
+        [
+          firstnumber = 1,
+          numbers     = left,
+          xleftmargin = 0.33in,
+        ]
+        {z.out}
+    }
+    \FloatBarrier
+  }
+
+% Define \MyIOS.
+% Typeset my input and output.
+% The input may be split over multiple pages.
+% The output may be split over multiple pages.
+% This doesn't work right:
+%     o  Putting a \vbox around the input and output
+%        does not allow todoindex entries to be listed.
+%     o  Using \vfilneg at beginning and end of definition
+%        screws up vertical spacing.
+% \newcommand{\MyIOS}
+% {%
+%   \input{z.out}
+%
+%   {%
+%     \fontsize{8}{10}\tt
+%     \VerbatimInput
+%     [
+%       firstnumber = 1,
+%       numbers     = left,
+%       xleftmargin = 0.33in,
+%     ]{z.out}%
+%   }
+% }
+
+% Define \MyIOT.
+% Typset my input and output together on the same page.
+% This doesn't work right:
+%     o  Putting a \vbox around the input and output
+%        does not allow todoindex entries to be listed.
+%     o  Using \vfilneg at beginning and end of definition
+%        screws up vertical spacing.
+% \def\MyIOT
+% {%
+%   \vfilneg
+%   % \vbox
+%   {%
+%     \input{z.out}%
+%     \fontsize{8}{10}\tt
+%     \VerbatimInput[
+%       firstnumber = 1,
+%       numbers     = left,
+%       xleftmargin = 0.33in,
+%     ]{z.out}%
+%   }%
+%   \FloatBarrier
+%   \vfilneg
+% }
+
+% Define \NL (newline) so LaTeX goes to the next output line.
+% Just doing \\ complains
+%     ! LaTeX Error: There's no line here to end.
+% \mbox{} is an empty math box.
+\newcommand{\NL}{\mbox{}\\}
+
+% In this document I use in-line tables a lot.
+% These are tables that are put in the document
+% where I want them to appear and they don't
+% use \begin{table} ... \end{table}
+\newenvironment{inlinetable}
+  {%
+    \begingroup
+      \singlespace
+      \mbox{}\\[-9pt]%
+      \noindent
+      \hspace*{2\parindent}%
+      \ignorespaces
+  }
+  {%
+      \mbox{}\\
+    \endgroup
+  }
+
+
+% Print a list of files used and their version numbers in the log file.
+\listfiles
+
+
+% \def\bibindent{0em}
+% Customize the bibliography.
+% \DefineBibliographyStrings{english}{
+%   urlfrom = {URLFROM},
+%   urlseen = {URLSEEN}
+% }
+
+% For typographical conventions stuff including
+%     \Emph{...}
+%     \FirstUsed{...}
+%     \Keys{...}
+%     \Literal{...}
+%     \Menu{...}
+%     \Place{...}
+%     \Shell{...}
+% This must be after
+%     \usepackage{tikz}
+\usepackage{pa-typographic-conventions}
+
+
+% For the \begin{example} ... \end{example} environment
+% used in ap-linguistics.tex.
+\usepackage{covington}
+\usepackage{slgloss}
+
+% "CTAN---Comprehensive" did not get hyphenated and extended
+% into the right margin when using BibLaTeX and the apa style.
+% These did not change it:
+%     \hyphenation{Com-pre-hen-sive}
+%     \hyphenation{CTAN---Com-pre-hen-sive}
+% I changed    publisher = {CTAN---Comprehensive TeX Archive Network},
+% to           publisher = {CTAN---Com\-pre\-hen\-sive TeX Archive Network},
+% in my all-biblatex.bib file and it worked as expeceted.
+% If you need to change the hyphenation points of a word in the text
+% you can do, for example,
+%     \hyphenation{ve-ry-od-dly-hy-phen-at-ed}
+
+% \renewbibmacro*{date}
+% {%
+%   \iffieldundef{year}
+% %   {\DeclareFieldFormat{date}{...}}
+% %   {\printtext{xxx}}
+% %   {\DeclareFieldFormat{date}{\printtext{zzz}}}
+% %   {}
+%     {xxx \printdate yyy}
+%     {xxx \printdate yyy}
+% }
+
+
+%          AtEveryBibitem{% Clean up the bibtex rather than editing it
+%            \ifentrytype{software}
+%              {}
+%              {\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}}%
+
+\begin{document}
+
+\makeatletter
+\renewcommand{\ZZAppendixName}{APPENDIX}
+%%%% \renewcommand{\chaptername}{CHAPTER}
+\def\@@makechapterhead#1{\uppercase{\@chapapp~\thechapter. #1}}
+
+\setcounter{tocdepth}{3}
+
+\maketitle
+
+% Define front matter
+%     dedication
+%     acknowledgments
+%     preface
+%     table of contents
+%     list of tables
+%     list of figures
+%     list of symbols
+%     abbreviations
+%     nomenclature
+%     glossary
+%     abstract
+\include{ch-front}
+
+%
+% Put chapter \include commands here.
+%
+
+% 'Important---Read This First' chapter.
+\include{ch-important}
+
+% Introductions may precede the first chapters or major divisions of theses.
+% Reference: TM2017, page 31.
+\include{ch-introduction}
+
+% Summary and/or conclusions are optional but often used.
+% The summary and/or conclusions often are the last
+% the last major division(s) of the text.
+% Reference: TM2017 page 32.
+\include{ch-summary}
+
+% Recommendations are optional.
+% You may include recommendations as a major division if your
+% subject matter and research dictate.
+% Reference: TM2017 page 32.
+\include{ch-recommendations}
+
+% Test \begin{chapteracknowledgement}...\end{chapteracknowledgement}, etc.
+%%%% \include{ch-test-miscellaneous}
+
+% Test per-chapter references.
+%%%% \include{ch-test-per-chapter-references}
+
+\makeatletter  % commented out on 2022-01-26
+  \defbibenvironment{bibliography}
+    {%
+      \list
+        {%
+          \printtext[labelnumberwidth]%
+          {%
+            \printfield{prefixnumber}%
+            \printfield{labelnumber}%
+          }%
+        }%
+        {%
+          \setlength{\bibhang}{1in} %%%%% was 0pt
+          \setlength{\itemindent}{1in}%  -\leftmargin} %%%%% was 0pt
+          \setlength{\itemsep}{\bibitemsep}%
+          \setlength{\leftmargin}{0pt}%  .22in} % 0.42in}
+          \setlength{\parsep}{\bibparsep}%
+          \setlength{\rightmargin}{0.33in}%
+        }%
+    }
+    {\endlist}
+    {\item}
+\makeatother  % commented out on 2022-01-26
+
+% \immediate\setlength{\labelnumberwidth}{1.5in} %%%%% was commented out
+\setlength{\labelwidth}{1.5in}
+
+{%
+  % Make _ in URLs visible.
+  % \def\t{\char'137}%
+  \catcode`*=\active
+  \def*{\char'137}%  \char'137 is _
+  \PrintBibliography
+}
+
+% Appendices are optional.  Not all theses contain appendices.
+% An appendix is used for supplementary illustrative material,
+% original data, computer programs, and other material that is not
+% necessarily appropriate for inclusion within the text of your
+% thesis.
+% Reference: TM2017 page 33.
+%
+% Use ``\appendix'' for one appendix or ``\appendices'' for more than
+% one appendix.
+\appendices
+
+% My filename conventions:
+%     FILE THAT START WITH    ARE
+%     ap-                     appendices
+%     ch-                     chapters
+%     gr-                     graphics
+%     pa-                     packages
+%     z                       temporary files
+
+  % "About Appendices" appendix.
+  \include{ap-about-appendices}
+
+  % Accessibility.
+  \include{ap-accessibility}
+  
+  % "Bugs" appendix.
+  \include{ap-bugs}
+
+  % Check margins.
+  \include{ap-check-margins}
+
+  % Demonstrate how to do separate appendices per chapter.
+  \include{ap-chapter-appendices}
+
+  % Citations and references.
+  \include{ap-citations-references}
+
+  % Common mistakes.
+  \include{ap-common-mistakes}
+
+  % Defining commands.
+  \include{ap-defining-commands}
+
+  % Deprecated software.
+  \include{ap-deprecated-software}
+
+  % Figures.
+  \include{ap-figures}
+
+  % Frequently Asked Questions.
+  \include{ap-frequently-asked-questions}
+
+  % Graphics.
+  \include{ap-graphics}
+
+  % How to debug LaTeX Problems.
+  \include{ap-how-to-debug-latex-problems}
+
+  % Ignore these references.
+  \include{ap-ignore-these-references}
+
+  % Logos.
+  \include{ap-logos}
+
+  % Numbers and Units.
+  \include{ap-numbers-and-units}
+
+  % Resources.
+  \include{ap-resources}
+
+  % Tables.
+  \include{ap-tables}
+
+  % Special characters.
+  \include{ap-special-characters}
+
+  % Testing.
+  \include{ap-testing}
+
+  % Text.
+  \include{ap-text}
+
+  % Video.
+  % \include{ap-video}
+
+  % Astronomy.
+  \include{ap-astronomy}
+
+  % Biology.
+  \include{ap-biology}
+
+  % Chemistry.
+  \include{ap-chemistry}
+
+  % Computer Science.
+  \include{ap-computer-science}
+
+  % Electrical Engineering.
+  \include{ap-electrical-engineering}
+
+  % Linguistics.
+  \include{ap-linguistics}
+
+  % Mathematics.
+  \include{ap-mathematics}
+
+  % Music.
+  \include{ap-music}
+
+  % Physics.
+  \include{ap-physics}
+
+  % Notes and footnotes are optional.
+  % Reference: TM2017 page 34.
+  % I have not implemented this yet.  Mark Senn 2002-06-03
+
+  % A vita is optional for masters theses
+  % and required for doctoral dissertations.
+  % Reference: TM2017 page 13.
+  \include{ap-vita}
+
+  % Listing or including publications(s) is optional.
+% \include{ap-publications}
+% \includepdf[scale=0.9, pages=1]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.25truein, scale=0.9, pages=1]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.2truein,  scale=0.9, pages=2]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.2truein,  scale=0.9, pages=3]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.2truein,  scale=0.9, pages=4]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.2truein,  scale=0.9, pages=5]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.2truein,  scale=0.9, pages=6]{ztemp-sgopalsa-paper.pdf}
+% \includepdf[offset=-1.5truein 0.2truein,  scale=0.9, pages=7]{ztemp-sgopalsa-paper.pdf}
+
+  % Print the index.
+  % The index is optional.
+  \pdfbookmark{INDEX}{index}
+  \printindex
+
+  % If \ZZshowcolophon is true, print the colophon.
+  \pdfbookmark{COLOPHON}{colophon}
+  \ifthen{\equal{true}{\ZZshowcolophon}}
+    {\include{ap-colophon}}
+
+% LaTeX won't read after the \end{document} command.
+% You can put notes to yourself or LaTeX input not
+% ready for use after "\end{document}" if you'd like.
+\end{document}

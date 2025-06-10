@@ -1,0 +1,489 @@
+\documentclass{beamer}
+\usetheme{uic}
+\usepackage{amsfonts,amsmath,oldgerm,algorithm,algpseudocode}
+\usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
+
+\newcommand{\hrefcol}[2]{\textcolor{uihteal}{\href{#1}{#2}}}
+\newcommand{\testcolor}[1]{\colorbox{#1}{\textcolor{#1}{test}}~\texttt{#1}}
+
+% Please see Section 18.1 of Beamer User Guide for all the options \usefonttheme provides
+\usefonttheme[onlymath]{serif}
+% \usefonttheme{serif} % use this if you would like Serif font throughout (and not just for math)
+
+
+\titlebackground*{assets/uic_lockup_blue.pdf}
+
+% NOTE 1: The asterisk splits the background image. This option is good
+% for logo-based backgrounds. If you use an image based background
+% it's recommended to not split it:
+
+% \titlebackground{assets/uic_seo.jpg}
+
+% NOTE 2: If you use a title background that does not have a logo, you might
+% want to enable logo in the top left.
+% To do that, simply comment out this line
+\themecolor{lightnologo}
+
+\title{Get started with the UIC Beamer Theme}
+\subtitle{Using \LaTeX\ to prepare slides}
+% This can be adjusted accordingly for longer titles
+\setlength{\titleboxwidth}{0.45\textwidth}
+
+\author{\href{mailto:umunee2@uic.edu}{Usama Muneeb}}
+\date{\today}
+
+\begin{document}
+\maketitle
+\themecolor{light} % reverts to a logo based theme (if you disabled it for title page)
+
+% enabled after title page creation (i.e. after \maketitle)
+\footlinecolor{uicblue}
+
+
+\begin{frame}[fragile]{Beamer for UIC presentations}
+\framesubtitle{A quick start}
+If you would like \LaTeX\ in your presentation, Beamer is a great way to go!
+\begin{itemize}
+\item Beamer has a detailed
+\hrefcol{https://www.ctan.org/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf}{user
+ manual}, but we will go over the most common features.
+\item This template is designed for a 16:9 aspect ratio, which is the default in PowerPoint and the most common amongst projectors.
+\item The most common of all slide types involve bulleted points, like these. \pause
+\begin{itemize}
+\item Placing \verb|\pause| after items will allow you to sequentially unroll points.
+\item Changing \verb|\begin{itemize}| to \verb|\begin{itemize}[<+->]| achieves a similar effect, although \verb|\pause| gives finer control on the unrolling.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{chapter}[assets/uic_seo.jpg]{uicblue}{Slide Layouts}
+\textit{Some standard slide layouts}
+\end{chapter}
+
+
+
+\begin{frame}[fragile]{Images, columns and tips for good slides}
+\framesubtitle{\textbf{Do use} this optional subtitle where appropriate}
+\begin{columns}
+\begin{column}{0.7\textwidth}
+\begin{itemize}
+    \item \textbf{Do keep} a good balance between text and figures.
+    \begin{itemize}
+        \item \textbf{Do use} nested lists wherever appropriate.
+    \end{itemize}
+    \item \textbf{Do use} the \verb|\underbrace| and \verb|\overbrace| commands to help explain your equations:
+\begin{equation*}
+\begin{aligned}
+\max_{\lambda, \nu}. \quad & \underbrace{\inf_x \overbrace{L(x, \lambda, \nu)}^\text{Lagrangian}}_\text{Lagrange Dual Function}\\
+\textrm{s.t.} \quad & \lambda \geq 0
+\end{aligned}
+% \max_{\lambda, \nu}. \underbrace{\inf_x \overbrace{L(x, \lambda, \nu)}^\text{Lagrangian}}_\text{Lagrange Dual Function, $g(\lambda, \nu)$}, \quad \textrm{s.t.} \quad \lambda \geq 0
+\end{equation*}
+\end{itemize}
+
+
+\end{column}
+\begin{column}{0.3\textwidth}
+\includegraphics[width=\textwidth]{plots/min_fuel.png}
+\captionof{figure}{Minimum fuel trajectory}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]{More with bullet points}
+\framesubtitle{Alerts and repeats}
+Sections 12.1 through 12.3 of the \hrefcol{https://www.ctan.org/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf}{Beamer user
+manual} demonstrate many more features, like alerts and repeats.
+\begin{itemize}
+\item The \verb|\alert{}| feature can be particularly useful.
+\item Like \alert<2>{this}.
+\item The highlighting may span multiple slides in a frame.
+    \begin{itemize}
+    \item Previous one did not, but \alert<3->{this one} will.
+    \end{itemize}
+\item This is accomplished by the \alert<4>{hyphen} (i.e. \texttt{-}) in the \verb|\alert<3->| command.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Another images/columns example}
+\begin{columns}
+\begin{column}{0.35\textwidth}
+\includegraphics[width=\textwidth]{plots/min_fuel.png}
+\captionof{figure}{Minimum fuel trajectory}
+\end{column}
+\begin{column}{0.3\textwidth}
+\textbf{Left:} Solving for optimal fuel consumption \textbf{Right:} Solving for optimal time taken
+\end{column}
+\begin{column}{0.35\textwidth}
+\includegraphics[width=\textwidth]{plots/min_time.png}
+\captionof{figure}{Minimum time trajectory}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Blocks}
+Some content will just look better in blocks.
+\begin{columns}
+\begin{column}{0.4\textwidth}
+\begin{block}{Block title}
+This is a \texttt{block}. Its color will match the color of the footline. The \texttt{block} environment is native to Beamer.
+\end{block}
+\end{column}
+\begin{column}{0.6\textwidth}
+\begin{colorblock}[black]{chicagoblue}{Block title}
+This Beamer theme also provides a \texttt{colorblock} environment which is a wrapper on top of the usual \texttt{block} environment in Beamer. It allows you to specify a custom background and font color.
+\end{colorblock}
+\end{column}
+\end{columns}
+
+\vspace{3ex}
+Here's an example usage:
+
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{block}{The discrete case}
+...
+\end{block}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{colorblock}[black]{chicagoblue}{The continuous case}
+...
+\end{colorblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Blocks for theorems}
+Beamer also uses blocks by default to wrap theorems.
+\begin{theorem} This is a theorem. \end{theorem}
+\end{frame}
+
+
+\begin{sidepic}{assets/uic_quad.pdf}{Side-Picture Slides}
+This Beamer theme also provides a \texttt{sidepic} environment which is a wrapper on top of the \texttt{frame} environment.
+\begin{itemize}
+\item It has an optional \texttt{image} argument which will help you achieve a layout of this type.
+\end{itemize}
+\end{sidepic}
+
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\footlinecolor{}
+
+\begin{frame}{Pseudocode Example}
+\begin{algorithm}[H]
+\fontsize{8}{1}\selectfont
+\caption{Bellman-Kalaba (adapted from \hrefcol{https://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/algorithmicx.pdf}{algorithmicx documentation}).}
+\begin{algorithmic}
+\Require $G$, $u$, $l$, $p$
+% \ENSURE optional output
+\ForAll {$v \in V(G)$}
+    \State $l(v) \leftarrow \infty$
+\EndFor
+\State $l(u) \leftarrow 0$
+\Repeat
+    \For {$i \leftarrow 1, n$}
+        \State $min \leftarrow l(v_i)$
+        \For {$j \leftarrow 1, n$}
+            \If {$min > \Call{Edge}{v_i, v_j} + l(v_j)$}
+                \State $min \leftarrow \Call{Edge}{v_i, v_j} + l(v_j)$ \Comment{Example comment}
+                \State $p(i) \leftarrow v_j$
+            \EndIf
+        \EndFor
+        \State $l’(i) \leftarrow min$
+    \EndFor
+    \State $changed \leftarrow l \not= l’$
+    \State $l \leftarrow l’$
+\Until{$\neg changed$}
+% \RETURN optional return
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
+
+\footlinecolor{uicblue}
+
+\begin{frame}[fragile]{Typesetting Algorithms}
+\framesubtitle{Common Issues}
+\begin{itemize}
+    \item There are \hrefcol{https://tex.stackexchange.com/questions/229355}{multiple environments} for typesetting algorithms.
+    \begin{itemize}
+        \item This template uses \texttt{algorithmicx} via \texttt{algpseudocode}.
+        \begin{itemize}
+            \item \texttt{algpseudocode} is (one of the) layouts for \texttt{algorithmicx}.
+            \item Others exist, as mentioned in the \hrefcol{https://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/algorithmicx.pdf}{documentation, section 2.1}.
+        \end{itemize}
+        \item \texttt{algorithmic} is also widely used, which is an alternative to using \texttt{algorithmicx} (via a layout package).
+    \end{itemize}
+    \item While \texttt{algpseudocode} tries to be close to \texttt{algorithmic}, they use different capitalization schemes
+    \begin{itemize}
+        \item \texttt{algorithmic} commands are fully capitalized (e.g. \verb|\STATE|, \verb|\FORALL|)
+        \item \texttt{algpseudocode} commands are not (e.g. \verb|\State|, \verb|\ForAll|).
+        \item \textbf{If moving an algorithm from one to the other, you will need to fix the capitalization, or the compiler will run into problems.}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Typesetting Algorithms}
+\framesubtitle{More control}
+\begin{itemize}
+    \item If you must use \texttt{algorithmic} instead of \texttt{algpseudocode}, some commands will need to be manually defined
+    \begin{itemize}
+        \item For example the function \verb|\Call| (or rather, the \verb|\CALL|) command.
+        \begin{itemize}
+            \item Do it as \verb|\newcommand*\CALL[2]{\textsc{#1}(#2)}|
+            \item Remember that not all fonts have a small caps variant needed by \verb|\textsc|
+            \item You can look at \texttt{uicfont.sty} to see how we augment our font with another small caps font (i.e. \textbf{PlayFair Display SC})
+        \end{itemize}
+        \item Additionally, the \verb|\Comment| of \texttt{algpseudocode} might look better than the \verb|\COMMENT| of \texttt{algorithmic}
+        \begin{itemize}
+            \item You can define a custom one to mimic \verb|\Comment|
+            \item Do it as \verb|\newcommand*\ANNOTATE[1]{\hfill\(\triangleright\) #1}|
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+% \setlength{\titlemanualoffset}{-0.6ex}
+\begin{frame}[fragile]{Common issues (this is $\hat P$ laceholder math)}
+\begin{itemize}
+\item Math in title will cause its height to be inconsistent with that of other frames (try viewing these example slides in a full screen mode)
+\begin{itemize}
+\item This theme provides a \verb|\titlemanualoffset| register which can be used to manually adjust this offset.
+\begin{itemize}
+\item Putting \verb|\setlength{\titlemanualoffset}{<some calibrated offset>}| before \verb|\begin{frame}| for this frame will fix this issue.
+\item \textbf{Make sure to zero it out after} \verb|\end{frame}|
+\end{itemize}
+\end{itemize}
+\item If you use \verb|\verb| command (or \verb|\begin{verbatim}| environment) in a frame, make sure to specify the \texttt{[fragile]} option in \verb|\begin{frame}| otherwise the compiler will run into problems.
+\begin{itemize}
+\item In most cases, \verb|\texttt| can be used instead of \verb|\verb|, and it does not require the \texttt{[fragile]} option.
+\end{itemize}
+\end{itemize}
+\end{frame}
+\setlength{\titlemanualoffset}{0.0ex}
+
+
+
+\begin{frame}{Avoid duplicate logos}
+If using a logo based background, you can disable the logo in the top left by temporarily switching to a color scheme that does not use a logo. The next slide is such an example.
+\end{frame}
+
+
+
+\themecolor{lightnologo} % since we are using a logo based background, disable the (duplicate) logo in top left
+\begin{chapter}[assets/uic_lockup_white.pdf]{uicblue}{Personalization}
+\textit{Fonts and color schemes}
+\end{chapter}
+\themecolor{light} % restore the logo in top left
+
+
+\begin{frame}[fragile]{If you need more space in slides}
+If you would like more space, you can control the font size by specifying an option in the \verb|\documentclass| command at the beginning of this file.
+\begin{itemize}
+    \item Use \verb|\documentclass[smaller]{beamer}| to reduce font size.
+    \item For all options, refer to Section 18.2.1 of the \hrefcol{https://www.ctan.org/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf}{Beamer user manual}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Color schemes}
+Three fundamental features greatly affect the look and feel of your slides. Two of them can be controlled with the \verb|\themecolor| command (provided by this theme).
+\begin{itemize}
+\item The background color.
+\begin{itemize}
+    \item The default is \verb|light| theme, which has a light background, which we are currently using.
+\end{itemize}
+\item The foreground color.
+\begin{itemize}
+    \item The \verb|light| theme has a \verb|dark| foreground (i.e. text color) and vice versa.
+\end{itemize}
+\item The third, the footer color can be set using \verb|\footlinecolor| command.
+\begin{itemize}
+    \item We are currently using \testcolor{uicblue} color for our footer.
+    \item The default is no footline, but I believe page numbers are incredibly helpful for your audience to ask questions later.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\themecolor{dark}
+\footlinecolor{uicred}
+\begin{frame}[fragile]{Color schemes}
+\begin{itemize}
+\item I just called \verb|\themecolor{dark}| before \verb|\begin{frame}| for this slide.
+\begin{itemize}
+    \item Ideally you should set the theme globally in the preamble (i.e. before \verb|\begin{document}|). Default is light.
+\end{itemize}
+\item You can also change the footer color with \verb|\footlinecolor{color}|, as we did for this slide.
+\item All the changes we talked about here happen for the current \textbf{as well as subsequent} frames.
+\begin{itemize}
+    \item I will manually revert all the changes for the next slide.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\themecolor{light}
+\footlinecolor{uicblue}
+
+\begin{frame}[fragile]{UIC Colors}
+\begin{itemize}
+\item Font color can be set with the \verb|\textcolor{<color name>}{text}| command.
+\item The colors are defined in the \texttt{uiccolor} package, in accordance with the \hrefcol{https://marketing.uic.edu/marketing-toolbox/university-style-guide/visual-elements/}{UIC Visual Elements guide}:
+\begin{itemize}
+\item UIC's primary colors are Navy Pier Blue (\testcolor{uicblue}) and Fire Engine Red (\testcolor{uicred}).
+\item UIC's secondary colors are Chicago Blue (\testcolor{chicagoblue}), UI Health Teal (\testcolor{uihteal}) and Champions Gold (\testcolor{championsgold}).
+\item UIC's neutral colors are Expo White (\testcolor{expowhite}) and Steel Gray (\testcolor{steelgray} or \testcolor{steelgrey}).
+\end{itemize}
+\item A \emph{simpler alternative} to font colors is often just \verb|\emph{}|.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Fonts}
+Fonts are categorized as \textrm{Serif} and \textsf{Sans-Serif} (see \hrefcol{https://www.adobe.com/creativecloud/design/discover/serif-vs-sans-serif.html}{this link} for when to use which).
+
+\begin{itemize}
+    \item \textbf{\textsf{Open Sans}} and \textbf{\textrm{IBM Plex Serif}} have been provided with this template.
+    \item Beamer uses \textsf{Sans-Serif} mode by default.
+    \begin{itemize}
+        \item To switch to Serif mode, please change \verb|\usefonttheme[onlymath]{serif}| to \verb|\usefonttheme{serif}| in the preamble.
+    \end{itemize}
+    \item If you want to mix and match Serif and Sans-Serif
+    \begin{itemize}
+        \item You can still typeset in Serif font in Sans-Serif mode (and vice versa) using \verb|\textrm| and \verb|\textsf| commands.
+    \end{itemize}
+\end{itemize}
+For more options with fonts, you need to modify the self explanatory \verb|uicfont.sty| file. Next few slides will be helpful in this regard.
+\end{frame}
+
+
+\begin{frame}{Font formats over time}
+Here are the \textbf{old} formats (still used in the LaTeX ecosystem):
+
+\begin{itemize}
+\item \emph{PostScript Type 1} format developed by Adobe in the 1980s
+\begin{itemize}
+    \item Authoring support \hrefcol{https://helpx.adobe.com/fonts/kb/postscript-type-1-fonts-end-of-support.html}{officially ended by Adobe in January 2023}
+\end{itemize}
+\item \emph{TrueType format} (\texttt{.ttf}) developed by Apple, also in 1980s, licensed to Microsoft
+\end{itemize}
+
+The \textbf{new} font formats are \emph{OpenType}, developed jointly by Microsoft and Adobe in the 1990s as an extension of Apple's TrueType font format. \emph{OpenType} fonts are either
+
+\begin{itemize}
+\item \emph{PostScript flavor OpenType} (\texttt{.otf}) that supercedes Adobe's PostScript Type 1
+\item \emph{TrueType flavor OpenType} (also \texttt{.ttf}!) that supercedes Apple's TrueType
+    \begin{itemize}
+    \item Distinguishing them from the old TrueType format is non trivial, since they have the same file extension.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Font formats compatibility}
+The new \emph{OpenType} fonts have several new features over the old formats. They are however, supported natively only by XeLaTeX and LuaLaTeX compilers. The most popular pdfLaTeX compiler has limited support for them:
+\begin{itemize}
+\item \emph{OpenType} fonts are not pdfLaTeX-ready by default.
+\item They require the production of TeX font metrics and other ancillary files in order to be used with LaTeX.
+\item The production of these files is not easy for the average user.
+\end{itemize}
+Consequently, if using pdfLaTeX, the most convenient option is to restrict yourself to the pdfLaTeX-ready font packages in your TeX distribution (exhaustive list provided in the \hrefcol{https://tug.org/FontCatalogue/}{LaTeX Font Catalog}).
+\end{frame}
+
+
+\begin{frame}{Font formats compatibility}
+If you want to use fonts beyond those in the \hrefcol{https://tug.org/FontCatalogue/}{LaTeX Font Catalog} (for example, fonts from Google Fonts), the recommended approach is to use XeLaTeX.
+\begin{itemize}
+\item XeLaTeX is set as the default compiler on the Overleaf version of this template.
+\item The fonts included in the \texttt{fonts} folder are \emph{TrueType flavor OpenType} fonts.
+\item If pdfLaTeX is used, font packages from your TeX distribution will be used instead.
+\end{itemize}
+UIC signature font is \textbf{Theinhardt}, which is a proprietary font.
+\begin{itemize}
+\item UIC \hrefcol{https://marketing.uic.edu/marketing-toolbox/uic-fonts/}{provides Theinhardt}, but proprietary fonts sometimes do not permit PDF embedding which might cause substitutions or compatibility issues.
+\begin{itemize}
+    \item This template uses \textbf{Open Sans} which has wider spacing and offers more clarity in a scientific setting than Theinhardt. Additionally, it's OFL licensed.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Chapter slides}
+\begin{itemize}
+\item Allow you to partition your presentation into multiple chapters
+\item Also \texttt{frame}s, but with a few more options
+\item Created with \verb|\begin{chapter}[<image>]{<color>}{<title>}|
+  \begin{itemize}
+  \item Image is optional, color and title are mandatory.
+  \end{itemize}
+\item Multiple background images have been provided in this template which may be used for chapter slides:
+  \begin{itemize}
+  \item Some campus photos that I have taken over the years and;
+  \item some departmental logos.
+  \item Let's look at a few examples!
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{chapter}[assets/uic_seo.jpg]{uicblue}{Title goes here}
+\textit{Subtitle goes here}
+\end{chapter}
+
+\themecolor{lightnologo}
+% these backgrounds already have the UIC circular logo, so we temporarily change the theme to lightnologo
+\begin{chapter}[assets/ece_blue.pdf]{uicblue}{Title goes here}
+\textit{Subtitle goes here}
+\end{chapter}
+
+\begin{chapter}[assets/cs_white.pdf]{uicblue}{Title goes here}
+\textit{Subtitle goes here}
+\end{chapter}
+
+\begin{chapter}[assets/mscs_blue.pdf]{expowhite}{Title goes here}
+\textit{Subtitle goes here}
+\end{chapter}
+\themecolor{light}
+
+\begin{frame}[fragile]{Other departments}
+\begin{itemize}
+\item You can use the generic \texttt{uic\_lockup.png} background, or
+\item Download your logo from \hrefcol{https://marketing.uic.edu/marketing-toolbox/university-style-guide/university-marks-logos/}{here}.
+    \begin{itemize}
+    \item What you need is ``departmental lockup in EPS format and RGB/inverted RGB color".
+    \end{itemize}
+\item Overlay it on a static background
+    \begin{itemize}
+    \item Upload your EPS logo to this Overleaf and use the \texttt{overlay\_eps.tex} file to superimpose it onto a static background.
+    \begin{itemize}
+    \item Copy over the resulting PDF to the \texttt{assets} folder.
+    \end{itemize}
+    \item If EPS logo is not available, download an SVG version and use the \texttt{overlay\_svg.py} Python script provided in the GitHub repository of this template (link on next slide).
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Good luck with your presentation!}
+\begin{itemize}
+\item This template is hosted on GitHub
+    \begin{itemize}
+    \item  \texttt{https://github.com/usamamuneeb/uic-beamer-template}
+    \end{itemize}
+\item  I would appreciate contributions of all sorts (pull requests, identifying issues, etc).
+\item  If you have any suggestions,
+\hrefcol{mailto:umunee2@uic.edu}{send them to me!}
+\end{itemize}
+\end{frame}
+
+
+\backmatter
+\end{document}

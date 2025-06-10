@@ -1,0 +1,277 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Structured General Purpose Assignment
+% LaTeX Template
+%
+% This template has been downloaded from:
+% http://www.latextemplates.com
+%
+% Original author:
+%  Ted Pavlic (http://www.tedpavlic.com)
+% Modified by:
+%  Joe Del Rocco (https://joe.delrocco.org)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%  PACKAGES AND CONFIGURATION
+%----------------------------------------------------------------------------------------
+
+\documentclass[fleqn]{article}
+\usepackage{geometry}
+\usepackage{fancyhdr} % For custom headers
+\usepackage{lastpage} % To determine the last page for the footer
+\usepackage{extramarks} % For headers and footers
+\usepackage[most]{tcolorbox} % For problem answer sections
+\usepackage{graphicx} % For inserting images
+\usepackage{xcolor} % For link coloring
+\usepackage[hidelinks]{hyperref} % For URL links (no box or color name)
+
+% Margins
+\geometry{
+a4paper,
+tmargin=1in,
+bmargin=1in,
+lmargin=1in,
+rmargin=1in,
+textwidth=6.5in,
+textheight=9.0in,
+headsep=0.25in
+}
+
+% Header and footer
+\pagestyle{fancy}
+\lhead{\myName} % Top left header
+\chead{\myCourse: \myAssignment} % Top center header
+\rhead{\firstxmark} % Top right header
+\lfoot{\lastxmark} % Bottom left footer
+\cfoot{} % Bottom center footer
+\rfoot{Page\ \thepage\ of\ \pageref{LastPage}} % Bottom right footer
+\renewcommand\headrulewidth{0.4pt} % Size of the header rule
+\renewcommand\footrulewidth{0.4pt} % Size of the footer rule
+
+% Other configurations
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+\setlength\parskip{1pt} % Ensures paragraphs are still recognizable as such
+\setcounter{secnumdepth}{0} % Removes default section numbers
+\setcounter{tocdepth}{3} % Sets depth of table of contents
+\linespread{1.1}
+
+% Template values
+\newcommand{\myLogo}{starfleet.jpg}
+\newcommand{\myName}{Jean-Luc Picard}
+\newcommand{\myJobTitle}{Cadet, First Class}
+\newcommand{\myCompany}{Starfleet Academy}
+\newcommand{\myLocation}{1701 Lincoln Blvd, San Francisco, CA}
+\newcommand{\myURL}{www.starfleet.edu}
+\newcommand{\myEmail}{jpicard@student.starfleet.edu}
+\newcommand{\myCourse}{COT\ 6410}
+\newcommand{\mySection}{Spring 2325}
+\newcommand{\myTeacher}{Dr. Vassbinder}
+\newcommand{\myAssignment}{Assignment~1}
+\newcommand{\myDueDate}{Thursday,\ February\ 26,\ 2325}
+
+%----------------------------------------------------------------------------------------
+%  DOCUMENT STRUCTURE (MACROS & ENVIRONMENTS)
+%----------------------------------------------------------------------------------------
+
+% Colored links macro
+\newcommand{\hrefcol}[3] {\href{#1}{\textcolor{#3}{#2}}}
+
+% Creates a counter to keep track of the number of problems
+\newcounter{homeworkProblemCounter}
+
+% Macro for custom title page signature header
+\newsavebox{\myTitleSignature}
+\sbox{\myTitleSignature}{%
+\begin{tabular*}{\textwidth}{@{}l@{}|@{\extracolsep{0.125in}}l@{}}%
+\parbox{4.25in}{\raggedright{\includegraphics{\myLogo}}} &
+\parbox[c][]{2.5in}{{\textbf{\myName} \par}
+                    {\small \myJobTitle \par}
+                    {\small \myCompany \par}
+                    {\small \myLocation \par}
+                    {\small \hrefcol{https://\myURL}{\myURL}{blue} \par}
+                    {\small \hrefcol{mailto:\myEmail}{\myEmail}{blue}} \par}
+\end{tabular*}}
+
+% Header and footer for when a page split occurs within a problem environment
+\newcommand{\enterProblemHeader}[1]{%
+\nobreak\extramarks{#1}{#1 continued on next page\ldots}\nobreak%
+\nobreak\extramarks{#1 (continued)}{#1 continued on next page\ldots}\nobreak%
+}
+
+% Header and footer for when a page split occurs between problem environments
+\newcommand{\exitProblemHeader}[1]{%
+\nobreak\extramarks{#1 (continued)}{#1 continued on next page\ldots}\nobreak%
+\nobreak\extramarks{#1}{}\nobreak%
+}
+
+\newcommand{\homeworkProblemName}{} % Argument = name of problem; default = "Problem #"
+\newenvironment{homeworkProblem}[1][Problem \arabic{homeworkProblemCounter}]{%
+\stepcounter{homeworkProblemCounter}% % Increase counter for number of problems
+\renewcommand{\homeworkProblemName}{#1}% % Assign \homeworkProblemName the argument
+\section{\homeworkProblemName}% % Make a section in the document with the custom problem count
+\enterProblemHeader{\homeworkProblemName}% % Header and footer within environment
+}{%
+\exitProblemHeader{\homeworkProblemName}% % Header and footer after environment
+}
+
+\newcommand{\problemAnswer}[1]{ % Defines the problem answer command with the content as the only argument
+\begin{tcolorbox}[breakable,enhanced,colback=gray!5!white,title=Answer]%
+#1
+\end{tcolorbox}%
+% Alternative - Makes the box around the problem answer and puts the content inside
+%\noindent\framebox[\columnwidth][c]{\begin{minipage}{0.98\columnwidth}#1\end{minipage}}
+}
+
+\newcommand{\homeworkSectionName}{}
+\newenvironment{homeworkSection}[1]{% % For sections w/in problems; Argument = name of section (no default)
+\renewcommand{\homeworkSectionName}{#1}% % Assign \homeworkSectionName the argument
+\subsection{\homeworkSectionName}% % Make a subsection with the name of the subsection
+\enterProblemHeader{\homeworkProblemName\ [\homeworkSectionName]}% % Header and footer within environment
+}{%
+\enterProblemHeader{\homeworkProblemName}% % Header and footer after environment
+}
+
+%----------------------------------------------------------------------------------------
+%   TITLE PAGE
+%----------------------------------------------------------------------------------------
+\begin{document}
+
+% Blank out the traditional title page
+\title{\vspace{-1in}} % no title name
+\author{} % no author name
+\date{} % no date listed
+\maketitle % makes this a title page
+
+% Use custom title macro instead
+\usebox{\myTitleSignature}
+\vspace{1in} % spacing below title header
+
+% Assignment title
+{\centering \huge \myAssignment \par}
+{\centering \noindent\rule{4in}{0.1pt} \par}
+\vspace{0.05in}
+{\centering \myCourse~: \mySection~: \myTeacher \par}
+{\centering Due \myDueDate \par}
+%{\centering Prepared w/ \LaTeX \par}
+\vspace{1in}
+
+% Table of Contents
+\tableofcontents
+\newpage
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+%\begin{homeworkProblem}[Exercise \#\arabic{homeworkProblemCounter}] % Use for custom section title
+\begin{homeworkProblem}
+Define $ND$ or $NotDominating = \{~f \mid \text{for some } x, f(x) < x~\}$.
+
+%-----------------------------------------------
+
+%\begin{homeworkSection}{\homeworkProblemName:~(a)} % Use for repeating problem name
+\begin{homeworkSection}{(a)}
+Show some minimal quantification of some known primitive recursive predicate that provides an upper bound for the complexity of $ND$.\par
+
+\problemAnswer{
+We can quantify with primitive recursive predicates like so:\par
+$\exists\langle x,t\rangle[STP(f,x,t) ~\&\&~ VALUE(f,x,t) < x]$\par
+\vspace{5pt}
+Because of the quantifier $\exists$, the problem is no harder than a problem in the RE (or Recursively Enumerable) problem class.
+}
+\end{homeworkSection}
+
+%-----------------------------------------------
+
+\begin{homeworkSection}{(b)}
+Show that $K \leq_m ND$, where $K = \{~ f \mid f(f) \text{ converges} ~\} = \{~ f \mid \varphi_f(f)\downarrow ~\}$.\par
+
+\problemAnswer{
+Let $f$ be an arbitrary index of function.\par
+Define $g_f(z) = \varphi_f(f) - \varphi_f(f) + z$\par
+$f \in K \implies \forall z ~g_f(z) = z \implies g_f(z)\downarrow \implies g_f \in ND$\par
+$f \notin K \implies \forall z ~g_f(z)\uparrow \implies g_f \notin ND$\par
+Thus, $f \in K \iff g_f \in ND$\par
+And so, $K \leq_m ND$
+}
+\end{homeworkSection}
+\end{homeworkProblem}
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 2
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+Consider the languages: \par
+\hspace{0.5in} $ L = \{~ a^mb^nc^t \mid t=min(m,n) ~\} $ \par
+
+%-----------------------------------------------
+
+\begin{homeworkSection}{(a)}
+Use the \textbf{Myhill-Nerode Theorem} to show that $L$ \textbf{is not} a \underline{Regular Language}.
+\vspace{10pt}
+
+\problemAnswer{
+\textbf{\small Proof Idea} \par
+We need to find the equivalence classes of the language $L$, and show that you would need an infinite number of states to implement them. As an FSA cannot have infinite states, $L$ cannot be regular. \par
+\vspace{3pt}
+\textbf{\small Proof} \par
+$a^ib^jc^j \notin L$, where $j > i$ \par
+$a^ib^jc^j \in L$, where $i \geq j$ \par
+Because there are no limits on $i$, there are a countably infinite number of these classes. Because a FSA must have a finite number of states, you cannot construct one to recognize $L$. Therefore $L$ is not a Regular Language.
+}
+\end{homeworkSection}
+
+%-----------------------------------------------
+
+\begin{homeworkSection}{(b)}
+Use the \textbf{Pumping Lemma for CFLs} to show that $L$ \textbf{is not} a \underline{Context Free Language}.
+\vspace{10pt}
+
+\problemAnswer{
+This is a proof by contradiction. \par
+Assume $L$ is a Context Free Language. \par
+And the \underline{Pumping Lemma for CFL} states that any string $s \in L = uvxyz$, where: \par
+1. $\forall i \geq 0,~ uv^ixy^iz \in L$ \par
+2. $\mid vy \mid > 0$ \par
+3. $\mid vxy \mid \leq p$ \par
+There are 2 cases to consider: (1) $t = n$, and (2) $t = m$. \par
+\vspace{3pt}
+\textbf{\small Case 1} \par
+Choose string $s = a^mb^nc^t$, where $t=n$. \par
+Then there are more $a$ than $b$, for example $a^3b^2c^2=aaabbcc$. \par
+Let $i$ be $0$. \par
+If $vxy$ contains both $a$ and $c$, then with $i=0$, the number of $c$ are not equal to either $a$ or $b$. \par
+(for example $a^3b^2c^2=aaabbcc=aaa^0bbc^0c=aabbc~\notin~L$) \par
+Thus we have a contradiction. \par
+\vspace{3pt}
+\textbf{\small Case 2} \par
+Choose string $s = a^mb^nc^t$, where $t=m$. \par
+Then there are less $a$ than $b$, for example $a^2b^3c^2=aabbbcc$. \par
+Let $i$ be $0$. \par
+If $vxy$ contains $a$ and $b$ but no $c$, then with $i=0$, $t \ne m$ and the number of $c \ne \min(m,n)$. \par
+(for example $a^2b^3c^2=aabbbcc=aa^0bbb^0cc=abbcc~\notin~L$) \par
+Thus we have a contradiction. \par
+\vspace{3pt}
+Therefore $L$ cannot be a Context Free Language.
+}
+\end{homeworkSection}
+\end{homeworkProblem}
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 3
+%----------------------------------------------------------------------------------------
+
+\begin{homeworkProblem}
+Explain what a \underline{tachyon} is.\par
+\vspace{10pt}
+
+\problemAnswer{
+A tachyon is a subatomic particle that naturally exists at faster-than-light velocities. They can often be associated with time travel or produced as a byproduct of temporal distortions. Tachyons can exist both naturally, as in the tachyon eddies in the Bajoran system, and as the byproducts of certain technologies, such as cloaking devices and transporters. The detection of tachyons may lead to clues about recent temporal or spactial anomalous.
+}
+\end{homeworkProblem}
+
+\end{document}
+%----------------------------------------------------------------------------------------
+%	DONE
+%----------------------------------------------------------------------------------------

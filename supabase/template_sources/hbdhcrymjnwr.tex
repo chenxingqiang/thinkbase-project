@@ -1,0 +1,275 @@
+\documentclass[10pt,a4paper,twoside,dutch,english]{book}                % options used for 'Hoofdstuk' or 'Chapter'
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PACKAGE LOADING TIME %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage{lscape}
+\usepackage{pseudocode}
+\usepackage{times}      % use Times New Roman Type 1 fonts  (redefines sfdefault,rmdefault,ttdefault)
+%\usepackage[T1]{fontenc}
+%\usepackage{pslatex}
+\usepackage[times]{quotchap}   % fancy chapter beginning
+\usepackage{fancyhdr}
+\usepackage[sectionbib]{chapterbib2} % bibliography per chapter
+%\usepackage[sectionbib]{chapterbib2} % bibliography per chapter
+% (sectionbib -> bibliography is \section* instead of \chapter*), should come before babel chapterbib2 
+%because local version is 1.9 and solves bug that header was 'References' instead of Chaptername
+\usepackage[dutch,english]{babel}
+%\usepackage[sectionbib,numbers,sort&compress]{natbib}  %for citations a la 'Vermeulen et al.' instead of [1]
+%\usepackage{tocbibind} % automatically add bibliography, list of figures, ... to table of contents
+\usepackage[a4paper,verbose, asymmetric, centering]{geometry}  % better control over margins
+%\usepackage[hang]{caption}     %better control over captions (sideways, font, ...)  hang -> 2nd line of caption is indented (caption2 is deprecated and beta)
+\usepackage[justification=centering]{caption}     %better control over captions (sideways, font, ...)  
+\usepackage{subfigure}  % with scriptsize or so, one can adapt the size
+\usepackage{cite}
+
+\usepackage{enumerate}  % to make it possible to define the numbers (A,a, ...)
+\usepackage{verbatim}   % extra support for verbatim environments
+\usepackage{float}      % you can define 'H' so that floats are forced to be putted 'here'
+\usepackage{multirow}   % multirow{nrows}[bigstruts]{width}[fixup]{text} multirow cells
+\ifx\pdftexversion\undefined
+\usepackage[dvips]{graphicx}
+\else
+\usepackage[pdftex]{graphicx}
+\fi
+%\usepackage{psfrag}
+\usepackage{chappg}     % page numbering (chapno-pageno), for ToC
+\usepackage{url}        % for better url typesetting
+\usepackage{expdlist}   % Expanded description (e.g. better alignement) -> needed for acronym_expdlist package
+\usepackage{acronym_expdlist}   % for list of acronyms
+\usepackage{hhline}     % generates nicer table lines (without missing pixels) + more flexible
+%\usepackage{colortbl}  % for coloured columns
+%\usepackage{threeparttable}     % adds the possibility to add footnotes in tables
+\usepackage{afterpage}  % adds \afterpage command, which makes it possible to issue \afterpage{\clearpage} which flushes all floats after this page
+%\usepackage{amsmath}    % adds extra commands, ao. \text within math environment
+\usepackage{amsmath,amsfonts,amsthm}
+\usepackage{marvosym}   % for Euro symbol
+\usepackage{ifthen}     % ifthenelse command
+%\usepackage{mathenv}	% better eqnarray
+\usepackage{listings}
+
+
+%%%%%%%%%%%%%%%%%
+%% PAGE LAYOUT %%
+%%%%%%%%%%%%%%%%%
+
+\input{page_layout_definition.tex}
+
+%%%%%%%%%%%%%%%%%
+%% HYPHENATION %%
+%%%%%%%%%%%%%%%%%
+
+\input{hyphenation.tex} % to have a separate file with hyphenations
+
+%%%%%%%%%%%%%%%%%%%%
+%%  START BOOK    %%
+%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\graphicspath{{fig/}}
+\restylefloat{figure}
+\restylefloat{table}
+\newfloat{algorithm}{ht}{alg}
+
+%%   FRONT PAGE       %%
+%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+ \thispagestyle{empty}   % no headings for this page
+% 
+% % Header
+ \noindent
+ \begin{minipage}{3cm}%
+   \includegraphics*[width=2cm]{UGentlogo}% logo ugent
+ \end{minipage}\hfill
+ \begin{minipage}{8cm}
+ \raggedleft
+ \textsf{Universiteit Gent\\
+ Faculteit Ingenieurswetenschappen\\
+ Vakgroep Informatietechnologie}
+ \end{minipage}
+% 
+% % Title
+\bigskip
+   \begin{flushleft}
+     \Large \textsf{Architecturen en algoritmen voor netwerk- en dienstbewust Grid-resourcebeheer}\\
+     \vspace{0.1in}\large{\textsf{Architectures and Algorithms for Network and Service Aware Grid Resource Management}}%\noindent
+   \end{flushleft}
+ \hrule
+% 
+ \bigskip
+   \LARGE\noindent \textsf{Bruno Volckaert} \hfill
+ \bigskip
+% 
+% % Front Figure
+% %\bigskip
+% %\begin{figure}[htb]%
+% %  \centering%
+% %  \includegraphics*[width=\textwidth]{figFront}%
+% %\end{figure}%
+% %\normalsize
+% 
+% \bigskip
+% \begin{figure}[h!]%
+%   \centering%
+%   \includegraphics*[height=10cm, keepaspectratio, clip]{figFront}%
+% \end{figure}%
+ \normalsize
+% 
+% % Footer
+ \vfill
+ \begin{minipage}{2.0cm}%
+     \includegraphics*[width=2.0cm]{intec}%       % intec logo
+ \end{minipage}\hfill
+ \begin{minipage}{9cm}
+ \raggedleft
+ \textsf{Proefschrift tot het bekomen van de graad van \\
+ Doctor in de Ingenieurswetenschappen: \\
+ Computerwetenschappen \\
+ Academiejaar 2005-2006}
+ \end{minipage}
+
+
+%% INFORMATION PAGE     %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\thispagestyle{empty}
+
+\normalsize
+
+% Header
+\noindent
+\begin{minipage}{3cm}%
+  \includegraphics*[width=2cm]{UGentlogo}% logo ugent
+\end{minipage}\hfill
+\begin{minipage}{8cm}
+\raggedleft
+\textsf{Universiteit Gent\\
+Faculteit Ingenieurswetenschappen\\
+Vakgroep Informatietechnologie}
+\end{minipage}
+\\[2cm]
+
+\noindent \begin{tabular}{ @{} l l}
+Promotoren: & Prof.\ Dr.\ Ir.\ Bart Dhoedt \\
+ & Prof.\ Dr.\ Ir.\ Filip De Turck \\
+\end{tabular}
+\\[2cm]
+
+%\noindent Promotor: Prof.\ Dr.\ Ir.\ P.\ Demeester \\
+\noindent Universiteit Gent \\
+\noindent Faculteit Ingenieurswetenschappen
+\\[0.3cm]
+\noindent Vakgroep Informatietechnologie \\
+\noindent Gaston Crommenlaan 8 bus 201,
+\noindent B-9050 Gent, Belgi\"e 
+\\[0.3cm]
+\noindent Tel.: +32-9-331.49.00\\
+\noindent Fax.: +32-9-331.48.99
+\\[4cm]
+\noindent Dit werk kwam tot stand in het kader van een specialisatiebeurs van het IWT-Vlaanderen (Instituut voor de aanmoediging van Innovatie door Wetenschap en Technologie in Vlaanderen).
+
+\vfill
+
+\begin{minipage}{2.0cm}%
+    \includegraphics*[width=2.0cm]{intec}%       % intec logo
+\end{minipage}\hfill
+\begin{minipage}{9cm}
+\raggedleft
+\textsf{Proefschrift tot het behalen van de graad van \\
+Doctor in de Ingenieurswetenschappen: \\
+Computerwetenschappen \\
+Academiejaar 2005-2006}
+\end{minipage}
+\clearpage{\pagestyle{empty}\cleardoublepage}
+
+
+%% ACKNOWLEDGMENT   %%
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\selectlanguage{dutch}
+\hyphenation{bu-reau-ge-no-ten}
+\frontmatter
+\chapter{Dankwoord}
+\vspace{0.35in}
+
+dankwoord...
+
+\begin{flushright}{\emph{Gent, maart 2006\\
+Bruno Volckaert}}
+\end{flushright}
+\selectlanguage{english}
+
+\clearpage{\pagestyle{empty}\cleardoublepage}
+
+%%   TOC, LIST OF FIGURES, LIST OF TABLES, ACRONYMS     %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\contentsname}{Table of Contents} % original name = Contents
+
+\tableofcontents
+\clearpage{\pagestyle{empty}\cleardoublepage}
+
+\listoffigures
+\clearpage{\pagestyle{empty}\cleardoublepage}
+
+\listoftables
+\clearpage{\pagestyle{empty}\cleardoublepage}
+
+\include{phdacronyms}
+
+\clearpage      % clear the current page
+\thispagestyle{empty}   % prevent header on this (empty -> next line) page
+\mbox{}         % to insert a not empty page, so that there is min. 1 blank page before next chapter
+\clearpage{\pagestyle{empty}\cleardoublepage}   % clear the current page and start on the right side
+
+%\renewcommand{\tablename}{Table}
+
+\renewcommand{\bibname}{References}     % instead of Bibliography
+%\renewcommand\citeform{\thechapter.}
+%\addcontentsline{toc}{section}{\listfigurename}   % not really sure
+
+	%% SUMMARY IN DUTCH       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\selectlanguage{dutch}
+\include{chapt_dutch/chapt_dutch}
+\selectlanguage{english}
+\include{chapt_english/chapt_english}
+
+%% THE BOOK ITSELF   %%
+%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter     % related to chappg numbering
+\selectlanguage{english}
+\renewcommand*{\thesection}{\thechapter.\arabic{section}}
+
+\newcommand\fdtsvrightmarktmp{{\scshape\small Chapter }}
+\renewcommand\evenpagerightmark{{\scshape\small\chaptername\ \thechapter}}
+\renewcommand\oddpageleftmark{{\scshape\small\leftmark}}
+
+%\addtolength{\headwidth}{\marginparsep}
+%\addtolength{\headwidth}{\marginparwidth}
+
+%\newcommand{\tm}[1]{$\mbox{#1}^{\mbox{\emph{\scriptsize TM}}}$}
+
+\baselineskip 13.0pt
+
+\include{intro/intro}
+\include{chapt2/chapt2}
+\include{chapt3/chapt3}
+\include{chapt4/chapt4}
+\include{chapt5/chapt5}
+\include{chapt6/chapt6}
+
+%\addcontentsline{toc}{section}{}
+
+\appendix
+\include{app1/app1}
+\include{app2/app2}
+\include{app3/app3}
+
+%\renewcommand\fdtsvrightmarktmp{{\scshape\small Appendix }}
+\renewcommand\evenpagerightmark{{\scshape\small Appendix \thechapter}}
+\renewcommand\oddpageleftmark{{\scshape\small\leftmark}}
+
+\end{document}

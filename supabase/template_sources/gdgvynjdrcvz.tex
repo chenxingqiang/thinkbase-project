@@ -1,0 +1,166 @@
+\documentclass[umonspaper,hyperpdf,twoside,bind,sftitles]{hepthesis}
+
+% Added by Noé Tits, from : https://tug.org/pipermail/tex-live/2016-July/038985.html
+
+\DeclareOldFontCommand{\rm}{\normalfont\rmfamily}{\mathrm}
+\DeclareOldFontCommand{\sf}{\normalfont\sffamily}{\mathsf}
+\DeclareOldFontCommand{\tt}{\normalfont\ttfamily}{\mathtt}
+\DeclareOldFontCommand{\bf}{\normalfont\bfseries}{\mathbf}
+\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+\DeclareOldFontCommand{\sl}{\normalfont\slshape}{\@nomath\sl}
+\DeclareOldFontCommand{\sc}{\normalfont\scshape}{\@nomath\sc}
+
+
+\usepackage[table]{xcolor}
+
+
+\usepackage{cite}
+\usepackage{morefloats}
+\usepackage{mathrsfs}
+\usepackage{afterpage}
+\usepackage[english]{babel}
+%\usepackage{subfig}
+%\usepackage{color}
+\usepackage{multirow}
+\usepackage{tipa}
+\usepackage{lettrine}[2012/07/20]
+\usepackage{type1cm}
+\usepackage{datetime}
+\usepackage{nameref}[2012/07/31]
+\usepackage{lipsum}
+\usepackage{units}
+\usepackage{geometry}
+
+%%% Added by Hus 
+
+\usepackage{minitoc}
+\setcounter{minitocdepth}{2}
+
+\usepackage[printonlyused,withpage]{acronym}
+
+
+
+
+
+\usepackage{lscape} % or {pdflscape}
+\usepackage{longtable}
+\usepackage{epstopdf}
+\usepackage{subfigure}
+\usepackage{url}
+
+\usepackage{lscape}
+
+\usepackage{tikz}
+\usetikzlibrary{fit}
+
+
+\definecolor{azur_}{rgb}{0.1,0.8,0.8}
+\definecolor{azur}{rgb}{0,0.5,0.5}
+
+%\usepackage{titlesec}
+\usepackage{eclbkbox}
+\usepackage{fancybox}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage{rotating}
+
+\usepackage{arabtex}
+\usepackage{utf8}
+
+\newcommand{\flag}{\cleardoublepage \begin{center} { \color{red}{============================================} \newline  \hfill YOU ARE HERE ! \hfill \newline \color{red}{============================================}}\end{center}}
+
+
+%%%
+
+\selectlanguage{english}
+\setspacing{onehalf}
+\setlength{\parindent}{0cm}
+% \settimeformat{oclock} % funny hours
+
+
+
+
+\definecolor{linkcolor}{rgb}{0,0.5,0.5}
+
+
+
+%% PDF metadata
+\makeatletter
+\@ifpackageloaded{hyperref}{%
+\hypersetup{%
+pdftitle = {Answer to the Ultimate Question of Life, the Universe, and Everything},
+pdfsubject = {John Smith's PhD thesis},
+pdfkeywords = {meaning, life},
+pdfauthor = {\textcopyright\ John Smith},
+hypertexnames=false,
+colorlinks=true,
+urlcolor=linkcolor,
+linkcolor=linkcolor,
+citecolor=linkcolor,
+}
+}{}
+\makeatother
+
+\newcommand{\argmin}{\mathop{\rm argmin}}
+% TODO debug this for out-of-limit rand+#1
+% e.g. #1 > 150 and #1 < 0 are bugs
+\newcounter{parastart}
+\newcounter{parastop}
+\newcounter{limit}
+
+\newcommand{\ripsum}[1][1]{
+\setcounter{limit}{150}
+\addtocounter{limit}{-#1}
+\setcounter{parastart}{\pdfuniformdeviate\value{limit}}
+\setcounter{parastop}{\value{parastart}}
+\addtocounter{parastop}{#1}
+\addtocounter{parastop}{-1}
+\lipsum[\value{parastart}-\value{parastop}]
+}
+
+
+\geometry{reset,paperwidth=175mm,paperheight=245mm,inner=25mm,top=15mm,total={130mm,215mm},includeheadfoot}
+
+\graphicspath{
+{images/}
+%{images_old/}
+{}
+}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.eps}
+
+\newdate{public}{42}{01}{2042}
+
+% === TITLE OF THESIS ===
+\title{Answer to the Ultimate Question of Life, the Universe, and Everything}
+\author{John Smith \\ {\small\texttt{john.smith@umons.ac.be}} \\[4em]  \displaydate{public}}
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+
+\begin{document}
+\dominitoc
+
+\begin{frontmatter}	
+ \input{front}
+\end{frontmatter}
+
+
+\begin{mainmatter}
+ \input{main}
+\end{mainmatter}
+
+\begin{appendix}
+\renewcommand\chaptername{Appendix}
+\input{append.tex}
+\end{appendix}
+
+\begin{backmatter}
+ \input{back}
+\end{backmatter}
+
+\end{document}

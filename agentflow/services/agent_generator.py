@@ -134,7 +134,7 @@ class AgentGenerator:
         agent_config = AgentConfig(**config)
         return Agent(agent_config)
         
-    async def run_agent(self, name: str, input_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def run_agent(self, name: str, input_data: Dict[str, Any]) -> Any:
         """Run agent with input data.
         
         Args:
@@ -151,7 +151,7 @@ class AgentGenerator:
         agent = await self.create_agent(config)
         
         # Run agent
-        return await agent.process(input_data)
+        return await agent.execute(input_data)
         
     def list_agents(self) -> list:
         """List available agent configurations.

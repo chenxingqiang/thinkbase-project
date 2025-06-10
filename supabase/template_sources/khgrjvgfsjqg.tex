@@ -1,0 +1,306 @@
+\documentclass[11pt,oneside,a4paper]{book}
+\usepackage[%
+  a4paper,%
+  left = 20mm,%
+  right = 20mm,%
+  textwidth = 178mm,%
+  top = 40mm,%
+  bottom = 30mm,%
+  %heightrounded,%
+  headheight=70pt,%
+  headsep=25pt,%
+]{geometry}
+\usepackage{graphicx}
+\usepackage[sfdefault,light]{FiraSans}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    allcolors  = link-blue, 
+}
+\usepackage{lastpage}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xspace}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{color,colortbl}
+
+\definecolor{link-blue}{RGB}{6,69,173}
+\definecolor{dark-green}{RGB}{52,133,62}
+\definecolor{light-blue}{RGB}{127,180,240}
+\definecolor{dark-blue}{RGB}{72,120,224}
+\definecolor{heading-grey}{RGB}{128,128,128}
+\definecolor{heading2-grey}{RGB}{200,200,200}
+\definecolor{Critical}{RGB}{192,0,0}
+\definecolor{High}{RGB}{255,0,0}
+\definecolor{Medium}{RGB}{255,192,0}
+\definecolor{Low}{RGB}{255,255,0}
+\definecolor{Informational}{RGB}{94,185,255}
+
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{array,booktabs}
+\usepackage{fancyhdr}
+\renewcommand{\footrulewidth}{0.2pt}
+\renewcommand{\headrulewidth}{0.2pt}
+\fancyfoot{}
+\fancyhead{}
+\fancyfoot[C]{Confidential}
+\fancypagestyle{plain}{
+    \fancyfoot[R]{\\ \textcolor{heading-grey}{\newline Page \thepage\ of \pageref{LastPage}}}
+    \fancyfoot[C]{\textcolor{heading-grey}{\textbf{Demo Company -- \projectno} \\ Confidential \\ Copyright \copyright\ TCM Security (\href{https://tcm-sec.com}{tcm-sec.com})}}
+    \fancyhead[R]{\includegraphics[width=5cm]{img/tcms_logo_faded.jpg}}
+}
+\fancypagestyle{fancy}{
+    \fancyfoot[R]{\\ \textcolor{heading-grey}{\newline Page \thepage\ of \pageref{LastPage}}}
+    \fancyfoot[C]{\textcolor{heading-grey}{\textbf{Demo Company -- \projectno} \\ Confidential \\ Copyright \copyright\ TCM Security (\hyperlink{https://tcm-sec.com}{tcm-sec.com})}}
+    \fancyhead{}
+}
+\thispagestyle{fancy}\pagestyle{plain}
+
+\newcommand{\email}[1]{\href{mailto://#1}{#1}}
+\newcommand{\newchapter}[1]{{\section*{#1}
+\addcontentsline{toc}{chapter}{#1}}}
+\newcommand{\newsection}[1]{{\subsection*{#1}
+\addcontentsline{toc}{section}{#1}}}
+\newcommand{\newsubsection}[1]{{\subsubsection*{#1}
+\addcontentsline{toc}{subsection}{#1}}}
+\usepackage[skip=10pt plus1pt, indent=0pt]{parskip}
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+\makeatother
+\makeatletter
+\renewcommand\tableofcontents{%
+    \if@twocolumn
+      \@restonecoltrue\onecolumn
+    \else
+      \@restonecolfalse
+    \fi
+    \section*{\contentsname
+        \@mkboth{%
+           \MakeUppercase\contentsname}{\MakeUppercase\contentsname}}%
+    \@starttoc{toc}%
+    \if@restonecol\twocolumn\fi
+    }
+\makeatother
+
+\usepackage{titlesec}
+
+\titleformat{\section}
+{\normalfont\huge\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\normalfont\Large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+{\normalfont\large\bfseries}{\thesubsubsection}{1em}{}
+
+% \titleformat{command}[shape]{format}{label}{sep}{before}[after]
+% \titlespacing{command}{left spacing}{before spacing}{after spacing}[right]
+
+\titlespacing{\section}{0pt}{1em}{0.5em}
+\titlespacing{\subsection}{0pt}{0em}{0.25em}
+
+\usepackage[T1]{fontenc}
+\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+
+\def\projectno{897-19}
+
+\begin{document}
+
+\renewcommand{\headrulewidth}{0pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%          Begin title page           %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+   \thispagestyle{fancy}
+   \begin{center}
+        \vspace*{8em}
+   
+        \centering\includegraphics[width=13cm]{img/tcms_logo.jpg}
+
+        \vspace{3em}
+
+        \huge{\textbf{Demo Company \\
+        Security Assessment Findings Report}}
+
+        \vspace{10em}
+
+        \Large{Business Confidential}
+   \end{center}
+
+    \normalsize{Date: \today \\
+    Project: \projectno \\
+    Version 1.0}
+\end{titlepage}
+
+\renewcommand{\headrulewidth}{0.2pt}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%           Begin contents            %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newchapter{Confidentiality statement}
+
+This document is the exclusive property of Demo Company (DC) and TCM Security (TCMS). This document contains proprietary and confidential information. Duplication, redistribution, or use, in whole or in part, in any form, requires consent of both DC and TCMS.
+
+TCMS may share this document with auditors under non-disclosure agreements to demonstrate penetration test requirement compliance.
+
+\newchapter{Disclaimer}
+
+A penetration test is considered a snapshot in time. The findings and recommendations reflect the information gathered during the assessment and not any changes or modifications made outside of that period.
+
+Time-limited engagements do not allow for a full evaluation of all security controls. TCMS prioritized the assessment to identify the weakest security controls an attacker would exploit. TCMS recommends conducting similar assessments on an annual basis by internal or third-party assessors to ensure the continued success of the controls.
+
+\newchapter{Contact information}
+
+\begin{table}[h]
+\begin{center}
+    \begin{tabular}{|m{3cm}|m{5.5cm}|m{7cm}|}
+        \hline
+        \rowcolor{heading-grey}\multicolumn{1}{|>{\centering\arraybackslash}m{30mm}|}{\textcolor{white}{\textbf{Name}}} & 
+        \multicolumn{1}{>{\centering\arraybackslash}m{55mm}|}{\textcolor{white}{\textbf{Title}}} & 
+        \multicolumn{1}{>{\centering\arraybackslash}m{70mm}|}{\textcolor{white}{\textbf{Contact information}}} \\ \hline
+        \multicolumn{3}{|l|}{\cellcolor{heading2-grey} \textbf{Demo Company}} \\ \hline
+        John Smith & VP, Information Security (CISO) & Office: (555) 555-5555 \newline Email: \email{john.smith@demo.com} \\ \hline
+        Jim Smith & IT Manager & Office: (555) 555-5555 \newline Email: \email{jim.smith@demo.com} \\ \hline
+        Joe Smith & Network Engineer & Office: (555) 555-5555 \newline \email{Email: joe.smith@demo.com} \\ \hline
+        \multicolumn{3}{|l|}{\cellcolor{heading2-grey} \textbf{TCM Security}} \\ \hline
+        Heath Adams & Lead Penetration Tester & Office: (555) 555-5555 \newline Email: \email{hadams@tcm-sec.com} \\ \hline
+        Bob Adams & Penetration Tester & Office: (555) 555-5555 \newline Email: \email{badams@tcm-sec.com} \\ \hline
+        Rob Adams & Account Manager & Office: (555) 555-5555 \newline Email: \email{radams@tcm-sec.com} \\ \hline
+    \end{tabular}
+\end{center}
+\end{table}
+
+\newpage
+
+\newchapter{Assessment overview}
+
+From May 20th, 2019 to May 29th, 2019, DC engaged TCMS to evaluate the security posture of its infrastructure compared to current industry best practices that included an external penetration test. All testing performed is based on the NIST SP 800-115 Technical Guide to Information Security Testing and Assessment, OWASP Testing Guide (v4), and customized testing frameworks.
+
+Phases of penetration testing activities include the following:
+
+\begin{itemize}
+    \item Planning -- Customer goals are gathered and rules of engagement obtained.
+    \item Discovery -- Perform scanning and enumeration to identify potential vulnerabilities, weak areas, and exploits.
+    \item Attack -- Confirm potential vulnerabilities through exploitation and perform additional discovery upon new access.
+    \item Reporting -- Document all found vulnerabilities and exploits, failed attempts, and company strengths and weaknesses.
+\end{itemize}
+
+\newchapter{Assessment components}
+
+\newsection{External penetration test}
+
+An external penetration test emulates the role of an attacker attempting to gain access to an internal network without internal resources or inside knowledge. A TCMS engineer attempts to gather sensitive information through open-source intelligence (OSINT), including employee information, historical breached passwords, and more that can be leveraged against external systems to gain internal network access. The engineer also performs scanning and enumeration to identify potential vulnerabilities in hopes of exploitation.
+
+\newpage
+
+\newchapter{Finding severity ratings}
+
+The following table defines levels of severity and corresponding CVSS score range that are used throughout the document to assess vulnerability and risk impact.
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|m{3cm}|m{2.5cm}|m{10cm}|}
+        \hline
+        \rowcolor{heading-grey}\multicolumn{1}{|>{\centering\arraybackslash}m{30mm}|}{\textcolor{white}{\textbf{Severity}}} & 
+        \multicolumn{1}{>{\centering\arraybackslash}m{25mm}|}{\textcolor{white}{\textbf{CVSS V3 score range}}} & 
+        \multicolumn{1}{>{\centering\arraybackslash}m{100mm}|}{\textcolor{white}{\textbf{Definition}}} \\ \hline
+        % Begin security ratings %
+        \cellcolor{Critical}\textbf{\textcolor{white}{Critical}} & \centering 9.0 -- 10.0 & Exploitation is straightforward and usually results in system-level compromise. It is advised to form a plan of action and patch immediately. \\ \hline
+        \cellcolor{High}\textbf{High} & \centering 7.0 -- 8.9 & Exploitation is more difficult but could cause elevated privileges and potentially a loss of data or downtime. It is advised to form a plan of action and patch as soon as possible.  \\ \hline
+        \cellcolor{Medium}\textbf{Moderate} & \centering 4.0 -- 6.9 & Vulnerabilities exist but are not exploitable or require extra steps such as social engineering. It is advised to form a plan of action and patch after high-priority issues have been resolved. \\ \hline
+        \cellcolor{Low}\textbf{Low} & \centering 0.1 -- 3.9 & Vulnerabilities are non-exploitable but increase an organisation’s attack surface. It is advised to form a plan of action and patch during the next maintenance window. \\ \hline
+        \cellcolor{Informational}\textbf{Informational} & \centering N/A & No known vulnerability exists. Additional information is provided regarding items noticed during testing, strong controls, and additional documentation. \\ \hline
+\end{tabular}
+    \end{center}
+\end{table}
+
+
+\newchapter{Scope}
+
+\newsection{Scope exclusions}
+
+Per client request, TCMS did not perform any Denial of Service attacks during testing.
+
+\newsection{Client allowances}
+
+DC did not provide any allowances to assist the testing.
+
+\newpage
+
+\newchapter{Executive summary}
+
+TCMS evaluated DC's external security posture through an external network penetration test from 20 May 2019 to 29 May 2019. By leveraging a series of attacks, TCMS found critical vulnerabilities that allowed full internal network access to the DC headquarter office. It is highly recommended that DC address these vulnerabilities as soon as possible as the vulnerabilities are easily found through basic reconnaissance and can be exploited without much effort.
+
+\newsection{Attack summary}
+
+The following table describes how TCMS gained internal network access, step by step: [INSERT TABLE HERE]
+
+\newpage
+
+\newchapter{Security strengths}
+
+\newsection{SIEM alerts of vulnerability scans}
+
+During the assessment, the DC security team alerted TCMS engineers of detected vulnerability scanning against their systems. The team was successfully able to identify the TCMS engineer’s attacker IP address within minutes of scanning and was capable of blacklisting TCMS from further scanning actions.
+
+\newchapter{Security weaknesses}
+
+\newsection{Missing multi-factor authentication}
+
+TCMS leveraged multiple attacks against DC login forms using valid credentials harvested through open-source intelligence. Successful logins included employee e-mail accounts through Outlook Web Access and internal access via Active Directory login on the VPN. The use of multi-factor authentication would have prevented full access and required TCMS to utilize additional attack methods to gain internal network access.
+
+\newsection{Weak password policy}
+
+TCMS successfully performed password-guessing attacks against DC login forms, providing internal network access. A predictable password format of Summer2018! (season + year + special character) was attempted and successful.
+
+\newsection{Unrestricted login attempts}
+
+During the assessment, TCMS performed multiple brute-force attacks against login forms found on the external network. For all logins, unlimited attempts were allowed, which permitted a successful login on the Outlook Web Access application.
+
+\newchapter{Vulnerabilities by impact}
+
+The following chart illustrates the vulnerabilities found by impact: [INSERT TABLE HERE]
+
+\newchapter{External penetration test findings}
+
+\newsection{Insufficient Lockout Policy -- Outlook Web App (Critical)}
+
+\newsection{Exploitation proof of concept}
+
+TCMS gathered historical breached data found in credentials dumps. The data amounted to 868 total account credentials (Note: A full list of compromised accounts can be found in ``Demo Company-867-19 Full Findings.xslx''.).
+
+\newsection{Remediation}
+
+Item 1: VPN and OWA login with valid credentials did not require Multi-Factor Authentication (MFA). TCMS recommends DC implement and enforce MFA across all external-facing login services.
+
+Item 2: OWA permitted unlimited login attempts. TCMS recommends DC restrict logon attempts against their service.
+
+Item 3: DC permitted a successful login via a password spraying attack, signifying a weak password policy. TCMS recommends the following password policy, per the Center for Internet Security (CIS):
+
+\begin{itemize}
+    \item 14 characters or longer
+    \item Use different passwords for each account accessed
+    \item Do not use words and proper names in passwords, regardless of language
+\end{itemize}
+
+Item 4: OWA permitted user enumeration. TCMS recommends DC synchronize valid and invalid account messages.
+
+Additionally, TCMS recommends that DC: 
+\begin{itemize}
+    \item Train employees on how to create strong passwords
+    \item Check employee credentials against known breached passwords
+    \item Discourage employees from using work e-mails and usernames as login credentials to other services unless absolutely necessary
+\end{itemize}
+
+\end{document}

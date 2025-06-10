@@ -1,0 +1,157 @@
+%=======================================================================
+%
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Trabalho Academico  em conformidade com 
+% ABNT NBR 14724:2011: Informacao e documentacao - Trabalhos academicos
+% ------------------------------------------------------------------------
+%Customização Dept. Engenharia Civil UFF
+% ------------------------------------------------------------------------
+% Autor:  Malú Grave (adaptado de Jonas Alessi (alessi.jonas@gmail.com) - UNOESC, 2013)
+% Versão: 2 de Abril 2023.
+% Edição: TexStudio
+% Codificação: UTF-8
+% LaTeX:  abnTeX2
+%
+%=======================================================================
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte	
+	oneside,          % não imprimir em verso e anverso, oposto do twoside 
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	brazil			% o último idioma é o principal do documento
+	,sumario=tradicional
+	]{abntex2-uff}
+
+
+\include{config_inicial}
+
+%----Include da capa é fora do documento 
+\include{pretextuais/capa}
+%---
+
+\begin{document}
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+
+%--- CAPA ----
+\imprimircapa
+
+% --- FOLHA DE ROSTO
+\imprimirfolhaderosto
+
+% Inserir ficha catalográfica
+\includepdf[pages=-]{pretextuais/ficha.pdf}
+%Ficha Catalográfica elaborada pelo Aluno, acesse o site: https://bibliotecas.uff.br/bcg/fichacatalografica/
+
+%Gere o pdf da ficha e substitua o arquivo ficha.pdf com a sua ficha.
+
+% Inserir FOLHA DE APROVAÇÃO
+\include{pretextuais/folhadeaprovacao}
+
+% DEDICATÓRIA
+\include{pretextuais/dedicatoria}
+
+% AGRADECIMENTO
+\include{pretextuais/agradecimentos}
+
+%EPÍGRAFE
+%\include{pretextuais/epigrafe}
+
+% RESUMO
+\include{pretextuais/resumos}
+
+% lista de ilustrações
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+% ---
+
+
+% LISTA DE TABELAS
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage  %-- força proxima pagina
+
+% ---
+% inserir lista de abreviaturas e siglas
+% ---
+\begin{siglas}
+  \item[ABNT] Associação Brasileira de Normas Técnicas
+  \item[Bras.] Brasileiro
+  \item[CNPq] Conselho Nacional de Desenvolvimento Científico e Tecnológico
+  \item[IBGE] Instituto Brasileiro de Geografia e Estatística
+  \item[LCD] \textit{Liquid Crystal Dysplay}
+\end{siglas}
+% ---
+
+% ---
+% inserir lista de símbolos
+% ---
+\begin{simbolos}
+  \item[$ \Gamma $] Letra grega Gama
+  \item[$ \Lambda $] Lambda
+  \item[$ \zeta $] Letra grega minúscula zeta
+  \item[$ \in $] Pertence
+\end{simbolos}
+% ---
+
+% SUMARIO
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+% ------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ------------------------------------------------------
+\textual
+% INTRODUÇÃO
+\include{conteudo/introducao}
+
+%FUNDAMENTAÇÃO TEÓRICA
+\include{conteudo/fundamentacao}
+
+%DESENVOLVIMENTO
+\include{conteudo/desenvolvimento}
+
+%RESULTADOS
+\include{conteudo/resultados}
+
+%CONCLUSÃO
+\include{conteudo/conclusao}
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+
+\bibliography{referencias}
+
+%Apêndices
+\include{postextuais/apendice}
+
+%Anexos
+\include{postextuais/anexo}
+
+%---------------------------------------------------------------------
+% INDICE REMISSIVO
+%---------------------------------------------------------------------
+
+\printindex
+\end{document}

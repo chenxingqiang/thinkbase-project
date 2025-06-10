@@ -1,0 +1,251 @@
+%% This template is borrowed nearly verbatim from https://www.overleaf.com/latex/templates/report-template/bdbvpdswhjcg
+%% Changes include some minor simplification and the addition of the Yale SEAS logo.
+
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{svg}
+\usepackage[bottom]{footmisc}
+\usepackage{tikz}
+\usepackage[section]{placeins}
+
+% This style is used to create block diagrams, you'll find it useful since many of your figures would be of that form, I'll try add more styles in the future :)
+\usetikzlibrary{trees,positioning,fit,calc}
+\tikzset{block/.style = {draw, fill=blue!20, rectangle,
+                         minimum height=3em, minimum width=4em},
+        input/.style = {coordinate},
+        output/.style = {coordinate}
+}
+
+\usepackage[section]{minted}
+\usepackage{xcolor}
+\usemintedstyle{porland}
+
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+
+\renewcommand{\arraystretch}{1.5}
+
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+    linktoc=all
+}
+
+\renewcommand\listingscaption{Listing}
+\renewcommand\listoflistingscaption{List of Listings}
+
+\usepackage{scrhack}
+\usepackage{tocbasic}
+\setuptoc{lol}{levelup}
+
+\usepackage{indentfirst}
+\geometry{a4paper, margin=1in}
+
+%----------EDIT COVER INFO HERE -----------------%
+
+\def \LOGOPATH {assets/SEAS-logo.svg}
+\def \DEPARTEMENT {Department of Mechanical Engineering \& Materials Science}
+\def \COURSENUM {MENG 472}
+\def \REPORTTITLE {Report Title}
+\def \STUDENTNAME {Student's Name}
+\def \INSTRUCTOR {Advisor's Name}
+
+%------------------------------------------------%
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0em}
+
+\begin{document}
+
+\pagenumbering{Roman}
+
+\begin{titlepage}
+    \vfill
+    \begin{center}
+        \includesvg[width=0.25\textwidth]{\LOGOPATH} \\
+        \hfill \\
+        \Large{\DEPARTEMENT} \\
+        \Large{\COURSENUM\;} \\
+        \vfill
+        \textbf{\LARGE{\REPORTTITLE}}
+    \end{center}
+    \vfill
+    \begin{flushleft}
+        \Large{\textbf{Prepared by:} \STUDENTNAME} \\
+        \Large{\textbf{Instructor:} \INSTRUCTOR} \\
+        \Large{\textbf{Date:} \today}
+    \end{flushleft}
+    \vfill
+\end{titlepage}
+
+%--------------ABSTRACT ------------------------%
+{
+\centering
+\section*{Abstract}
+You can check the \mintinline{text}{cites.bib} in order to add references (it would be automatically added to the report once you cite it \cite{rfc3447} with \mintinline{tex}{\cite{tag}}). For the figures I do not prefer static figures, I like to generate them with TikZ, but in case you've needed some static figures you can add them to the \mintinline{text}{assets} directory to keep your files organized.
+\clearpage
+}
+
+%-----------------------------------------------%
+
+\tableofcontents
+\clearpage
+
+\setlength{\parskip}{\baselineskip}%
+
+\pagenumbering{arabic}
+
+%--------------INTRODUCTION ---------------------%
+
+\section{Section}
+
+\subsection{Tables}
+Tables can be built and labeled like this, adding a new row requires adding new line of entries, separated by \mintinline{tex}{&} and ends with \mintinline{tex}{\\}. Due to some formatting errors that I don't want to track down, the remainder of this explainer is in the .tex as a comment. %Adding new column requires adding \mintinline{tex}{l} in the \mintinline{tex}{\begin{tabular}{llll}} part.
+\begin{table}[H]
+    \centering
+    \caption{Table Caption}
+    \begin{tabular}{llll}
+    \toprule
+         \textbf{Title 1} & \textbf{Title 2} & \textbf{Title 3} & \textbf{Title 4} \\
+    \midrule
+         Entry 1 & Entry 2 & Entry 3 & Entry 4 \\
+         Entry 5 & Entry 6 & Entry 7 & Entry 8 \\
+    \bottomrule
+    \end{tabular} 
+    \label{tab:table_label}
+\end{table}
+
+\subsection{Figures}
+you can add figures with captions, also you may label them and reference them again with \mintinline{tex}{\ref{fig:fig1}}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/SEAS-logo.png}
+    \caption{SEAS Logo (PNG)}
+    \label{fig:logo}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=0.5\textwidth]{assets/SEAS-logo.svg}
+    \caption{SEAS Logo (SVG)}
+\end{figure}
+
+Or you can generate figures using TikZ, I've provided some styles to generate block diagrams as in Figure \ref{fig:arch_comp}, but I won't be able to explain TikZ syntax for you so please try figure it out by yourself (it isn't hard to understand).
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=3in]{assets/SEAS-logo.png}
+    \caption{A Logo is born}
+    \label{fig:arch_comp}
+\end{figure}
+
+\subsection{Equations}
+you can use \mintinline{tex}{\begin{align} \end{align}} to insert aligned equations like this
+\begin{align}
+    & \tau = 28\;s \\
+    & \omega = 2 \pi \frac{2}{60} = 0.209\;rad/s \\
+    & \begin{aligned}[t]
+                lag &= \frac{\theta (\omega)}{\omega} = \frac{\arctan (\omega \tau)}{\omega} \\
+                &= \frac{\arctan (0.209 \cdot 28)}{0.209} \\ 
+                &= 6.69\;s
+       \end{aligned}
+\end{align}
+
+or you can insert \mintinline{tex}{\notag} at the end of each line to prevent it from being enumerated.
+
+\begin{align}
+    & \tau = 28\;s \notag\\
+    & \omega = 2 \pi \frac{2}{60} = 0.209\;rad/s \notag\\
+    & \begin{aligned}[t]
+                lag &= \frac{\theta (\omega)}{\omega} = \frac{\arctan (\omega \tau)}{\omega} \\
+                &= \frac{\arctan (0.209 \cdot 28)}{0.209} \\ 
+                &= 6.69\;s
+       \end{aligned} \notag
+\end{align}
+
+And you can insert one line equation with \mintinline{tex}{\begin{equation} \end{equation}}
+\begin{equation}
+    A = 15 \cdot B
+\end{equation}
+
+and \mintinline{tex}{\begin{equation*} \end{equation*}} to prevent the equation from being enumerated.
+
+\begin{equation*}
+    A = 15 \cdot B
+\end{equation*}
+
+And inline math if you want with \mintinline{tex}{$Expression$} like this $A = 15$.
+
+\subsection{Listings}
+Listing \ref{lst:sample_C} shows a sample listing for C++ code.
+\begin{listing}[H]
+\begin{minted}[frame=single,framesep=10pt,breaklines,breakanywhere]{C++}
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    int a[n];
+    for (int i = 0; i < n; ++i)
+        cin >> a[i];
+    sort(a, a + n);
+    for (int i = 0; i < n; ++i)
+        cout << a[i];
+    return 0;
+}
+\end{minted}
+\caption{Sample Code}
+\label{lst:sample_C}
+\end{listing}
+
+Listing \ref{lst:sample_plain} shows a sample listing for shell session.
+
+\begin{listing}[H]
+\begin{minted}[frame=single,framesep=10pt,breaklines,breakanywhere]{shell}
+$ g++ main.cpp
+
+$ ./a.out
+4
+3 2 4 1
+1 2 3 4
+
+\end{minted}
+\caption{Sample Output}
+\label{lst:sample_plain}
+\end{listing}
+
+\clearpage
+
+\section{Conclusion}
+Feel free to use this template for your reports.
+
+\clearpage
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,cites}
+
+\clearpage
+
+\listoffigures
+
+\clearpage
+
+\listoftables
+
+\clearpage
+
+\listoflistings
+
+\end{document}

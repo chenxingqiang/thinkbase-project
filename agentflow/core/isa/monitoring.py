@@ -56,44 +56,42 @@ class PerformanceMonitor:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.metrics_history: Dict[str, List[Tuple[float, float]]] = {}
-        self.thresholds: Dict[str, MetricThreshold] = {}
+        self.thresholds: Dict[str, float] = {}
         self.alerts = []
-        self.anomaly_detector = AnomalyDetector(config)
         
-    def record_metric(self, 
-                     metric_name: str,
-                     value: float,
-                     metadata: Dict[str, Any] = None):
-        """Record a metric value."""
+    def collect_metrics(self, metrics: Dict[str, Any]) -> None:
+        """Record metrics.
+        
+        Args:
+            metrics: Metrics to record
+        """
         timestamp = time.time()
-        if metric_name not in self.metrics_history:
-            self.metrics_history[metric_name] = []
+        for name, value in metrics.items():
+            if name not in self.metrics_history:
+                self.metrics_history[name] = []
+            self.metrics_history[name].append((timestamp, float(value)))
             
-        self.metrics_history[metric_name].append((timestamp, value))
-        
-        # Check thresholds
-        if metric_name in self.thresholds:
-            self._check_thresholds(metric_name, value, metadata)
-            
-        # Check for anomalies
-        if self.anomaly_detector.check_anomaly(metric_name, value):
-            self._create_alert(
-                metric_name,
-                "Anomaly detected",
-                AlertSeverity.WARNING,
-                metadata
-            )
-    
-    def set_threshold(self,
-                     metric_name: str,
-                     threshold: MetricThreshold):
-        """Set threshold for metric."""
-        self.thresholds[metric_name] = threshold
+            # Check thresholds
+            if name in self.thresholds and value > self.thresholds[name]:
+                self.alerts.append({
+                    "metric": name,
+                    "value": value,
+                    "threshold": self.thresholds[name],
+                    "timestamp": timestamp
+                })
     
     def get_metrics(self,
                    metric_names: Optional[List[str]] = None,
                    window: Optional[int] = None) -> Dict[str, Any]:
-        """Get metrics within specified window."""
+        """Get metrics within specified window.
+        
+        Args:
+            metric_names: Optional list of metric names to retrieve
+            window: Optional time window in seconds
+            
+        Returns:
+            Dictionary of metrics
+        """
         current_time = time.time()
         metrics = {}
         
@@ -114,49 +112,27 @@ class PerformanceMonitor:
                 }
         return metrics
     
-    def _check_thresholds(self,
-                         metric_name: str,
-                         value: float,
-                         metadata: Optional[Dict[str, Any]] = None):
-        """Check value against thresholds."""
-        threshold = self.thresholds[metric_name]
+    def set_threshold(self, metric_name: str, threshold: float) -> None:
+        """Set threshold for metric.
         
-        if value >= threshold.critical:
-            self._create_alert(
-                metric_name,
-                "Critical threshold exceeded",
-                AlertSeverity.CRITICAL,
-                metadata
-            )
-        elif value >= threshold.error:
-            self._create_alert(
-                metric_name,
-                "Error threshold exceeded",
-                AlertSeverity.ERROR,
-                metadata
-            )
-        elif value >= threshold.warning:
-            self._create_alert(
-                metric_name,
-                "Warning threshold exceeded",
-                AlertSeverity.WARNING,
-                metadata
-            )
+        Args:
+            metric_name: Metric name
+            threshold: Threshold value
+        """
+        self.thresholds[metric_name] = threshold
     
-    def _create_alert(self,
-                     metric_name: str,
-                     message: str,
-                     severity: AlertSeverity,
-                     metadata: Optional[Dict[str, Any]] = None):
-        """Create and record alert."""
-        alert = {
-            "metric": metric_name,
-            "message": message,
-            "severity": severity,
-            "timestamp": time.time(),
-            "metadata": metadata or {}
-        }
-        self.alerts.append(alert)
+    def get_alerts(self) -> List[Dict[str, Any]]:
+        """Get recorded alerts.
+        
+        Returns:
+            List of alerts
+        """
+        return self.alerts.copy()
+    
+    def clear_metrics(self) -> None:
+        """Clear all recorded metrics."""
+        self.metrics_history.clear()
+        self.alerts.clear()
 
 class AnomalyDetector:
     """Anomaly detection system."""

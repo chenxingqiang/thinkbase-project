@@ -1,0 +1,353 @@
+% Template Oficial da Revista Physicae Organum
+%   Equipe Physicae Organum
+%-----------------------------
+
+% Vá até a linha com o texto "EDITE A PARTIR DAQUI".
+% Você terá que inserir título, autores, instituição, notas, resumo, palavras-chave, textos das seções e bibliografia.
+% Para facilitar, colocamos o comentário "[EDITAR]" nas linhas que terão que ser alteradas.
+% Indicamos alguns tutorias LaTeX ao final desta página.
+
+% Definição do documento e pacotes utilizados. 
+
+\documentclass[12pt,a4paper,twoside]{article}
+
+% Configurações:
+
+\input{conf/texto.tex}
+\input{conf/matematica.tex}
+\input{conf/ciencia.tex}
+\input{conf/ambientes.tex}
+
+% Para citações:
+
+\usepackage[brazilian,hyperpageref]{backref}
+\usepackage[alf,abnt-etal-list=0,abnt-etal-cite=0]{abntex2cite}
+
+% EDITE A PARTIR DAQUI:
+
+\def \tituloportugues {GUIA DE USO DO MODELO DE ARTIGO DA REVISTA PHYSICAE ORGANUM}  % Título. [EDITAR]
+\def \tituloingles {USAGE GUIDE OF THE PHYSICAE ORGANUM JOURNAL TEMPLATE}  % Título em inglês. [EDITAR]
+
+% As configurações de layout estão no arquivo mostrado abaixo:
+\input{conf/layout.tex} % Não mexa nesta linha!
+
+% Coloque abaixo os nomes dos autores e o número de suas instituições:
+
+\author[1]{Leonardo Luiz e Castro\thanks{llcastro@unb.br}}
+%\author[2]{Coloque aqui outro autor}
+%\author[1]{Coloque aqui outro autor}
+%\author[2]{Coloque aqui outro autor}
+%\author[1]{Coloque aqui outro autor}
+
+% Coloque abaixo os números e nomes das instituições:
+
+\affil[1]{Instituto de Física -- Universidade de Brasília}
+%\affil[2]{Coloque aqui outra instituição}
+%\affil[3]{Coloque aqui outra instituição}
+
+% Ajustes diversos antes de começar o documento (últimos preparativos),
+% tais como atribuição da variável "title", configurações para resolver erros de compilação etc.
+
+\input{conf/ultimos-preparativos.tex}
+
+%-----------------------------
+
+% Aqui damos início ao documento.
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{capa}
+
+% Resumo e palavras-chave. 
+
+\hrule
+
+\selectlanguage{portuges}
+\begin{abstract}
+\noindent
+A revista Physicae Organum apresenta um novo modelo para o leiaute de seus artigos, disponível em \LaTeX na Galeria Overleaf.
+Explicamos aqui a estrutura básica dos artigos do projeto e os procedimentos para inserção de texto, figuras, tabelas, ambientes diversos (teoremas, axiomas, notas etc.) e referências bibliográficas.
+\vspace{\baselineskip} \\
+\palavraschave{Física. Modelo de artigo. Editoração. Template. Guia.}
+\end{abstract}
+\vspace{5mm}
+
+\hrule
+
+\selectlanguage{english}
+\begin{abstract}
+\noindent
+The Physicae Organum journal introduces a new template for its articles, available in \LaTeX in the Overleaf Gallery. 
+We explain here the basic structure of the articles of the project and the procedures for insertion of text, figures, tables and diverse environments (theorems, axioms, notes, etc.) and bibliographical references.
+\vspace{\baselineskip} \\
+\keywords{Physics. History. University. Models of university.}
+\end{abstract}
+\vspace{5mm}
+
+\hrule
+
+\selectlanguage{portuges}
+
+
+\section{Introdução}
+
+Physicae Organum é uma revista do Instituto de Física da Universidade de Brasília \cite{physicaeorganum}. Para facilitar a escrita de seu trabalho na Physicae Organum, apresentamos o novo modelo para editoração e diagramação para a revista. Embora a revista aceite submissão de artigos em outros formatos, a diagramação será feita em \LaTeX.
+
+O pessoal das ciências naturais gosta de usar \LaTeX porque essa ferramenta possibilita escrever facilmente equações como
+\begin{equation}
+ p+\frac{1}{2}{\rho}v^2+{\rho}gh = \text{constante}
+ \label{eq:Bernoulli}
+\end{equation}
+na qual $p$ é a pressão, $v$ é a velocidade e $h$ é a elevação, ou seja, a “altura do tubo”. Essa equação pode ser deduzida a partir do \textit{Teorema Trabalho-Energia}.
+
+\section{Estrutura dos arquivos}
+
+Um projeto \LaTeX consiste de um arquivo principal de extensão \verb|tex| com outros arquivos e (talvez) pastas auxiliares. Esses arquivos e pastas devem estar no mesmo projeto do Overleaf (ou outra plataforma online). Em caso de edição em computador pessoal, os arquivos e pastas do projeto devem estar na mesma localização do sistema de arquivos de seu computador e devem ser compilados com algum programa específico, como o Texmaker ou MikTeX. Ao editar diretamente no sistema Overleaf, todos os pacotes adicionais estarão instalados previamente. No entanto, ao compilar localmente, eles terão que ser instalados no computador. Em Ubuntu Linux, por exemplo, o pacote \verb|texlive-full| instala todos os pacotes necessários (e vários outros). No Windows, pode-se usar o instalador de pacotes adicionais do próprio MikTeX.
+
+O projeto do novo modelo \LaTeX é organizado da seguinte forma:
+
+\begin{itemize}
+    \item \verb|main.tex|: arquivo principal com o código \LaTeX;
+    \item \verb|main.bib|: arquivo com referências bibliográficas no formato BibTeX;
+    \item \verb|logo-physicae-organum.png|: imagem com a logomarca da revista;
+    \item \verb|conf|: pasta com código adicional de configuração, sobretudo chamada e configuração de pacotes.
+\end{itemize}
+
+
+\section{Inserindo seu texto}
+
+O primeiro passo é colocar o título de seu artigo, em português e em inglês, substituindo o trecho em maiúsculas na parte do código que aparece assim:
+
+\begin{verbatim}
+\def \tituloportugues {COLOQUE SEU TÍTULO EM PORTUGUÊS AQUI}  % Título. [EDITAR]
+\def \tituloingles {COLOQUE O TÍTULO EM INGLÊS AQUI}  % Título em inglês. [EDITAR]
+\end{verbatim}
+
+Em seguida, você substituirá o texto ``Coloque aqui o texto do seu resumo'' por, adivinhe, pelo texto do resumo de seu artigo! Substitua também as palavras que estão dentro das chaves do comando \verb|\palavraschave{...}| pelas palavras chaves do seu artigo.
+\begin{verbatim}
+\selectlanguage{portuges}
+\begin{abstract}
+\noindent
+Coloque aqui o texto do seu resumo. % [EDITAR] %
+\vspace{\baselineskip} \\
+\palavraschave{física, história, universidade, modelos de universidade.}
+\end{abstract}
+\end{verbatim}
+Logo abaixo desse código, há outro semelhante para inserir o resumo e as palavras-chave (\textit{keywords}) em inglês.
+
+Em seguida, inclua os nomes das seções dos seus artigos nos comandos \verb|\section{...}|.
+
+\section{Inserindo figuras e tabelas}
+
+Figuras podem ser inseridas normalmente através do comando \verb|includegraphics|, após serem enviadas ao seu projeto (para edição online) ou guardadas na mesma pasta que o seu arquivo \verb|main.tex|. Por uma questão de organização, você também pode guardar todas as figuras de seu projeto numa subpasta. Por exemplo, para inserir a figura \verb|logo-physicae-organum.png| da pasta \verb|figs|, você pode usar o seguinte código:
+\begin{verbatim}
+\begin{figure}
+    \begin{minipage}{0.5\hsize}
+        \centering
+        \caption{Logotipo da revista Physicae Organum.}
+        \label{fig:logo}
+        \includegraphics[width=\linewidth]{figs/logo-physicae-organum.png}
+        \source{criação de Olavo Leopoldino da Silva Filho.}
+    \end{minipage}
+\end{figure}
+\end{verbatim}
+
+O comando \verb|\centering| centraliza a figura, o ambiente \verb|minipage| serve para definir a largura (\verb|0.5\hsize| significa metade da linha) e fazer com que figura e legenda fiquem alinhadas, \verb|\caption{...}| insere uma legenda, \verb|\label{...}| (que deve vir depois da linha de ``caption'') insere um rótulo para citar a figura no texto com \verb|\ref{...}|, e \verb|\source{...}| informa a fonte da figura. A figura~\ref{fig:logo} mostra o resultado.
+\begin{figure}
+    \centering
+    \begin{minipage}{0.5\hsize}
+        \caption{Logotipo da revista Physicae Organum.}
+        \label{fig:logo}
+        \includegraphics[width=\linewidth]{figs/logo-physicae-organum.png}
+        \source{criação de Olavo Leopoldino da Silva Filho.}
+    \end{minipage}
+\end{figure}
+
+
+Tabelas podem ser inseridas de forma semelhante:
+\begin{verbatim}
+\begin{table}
+\begin{minipage}{\hsize}
+\begin{center}
+	\caption{Algumas unidades básicas do SI.}
+	\label{tab:SI-basicas}
+	\begin{tabular}{P{0.40\hsize}|P{0.5\hsize}}
+		\hline
+		\textbf{Grandeza} & \textbf{Unidade} \\
+		\hline
+		comprimento & metro (\si{\meter}) \\
+		\hline
+		massa & quilograma (\si{\kilo\gram}) \\
+		\hline
+		tempo & segundo (\si{\second}) \\
+		\hline
+		corrente elétrica & ampère (\si{\ampere}) \\
+		\hline
+		temperatura & kelvin (\si{\kelvin}) \\
+		\hline
+		quantidade de matéria & mol (\si{\mol}) \\
+		\hline
+		intensidade luminosa & candela (\si{\candela}) \\
+		\hline
+	\end{tabular}
+	\source{adaptado do livro Física para Ciências Agrárias e Ambientais,
+	de Leonardo Luiz e Castro e Olavo Leopoldino da Silva Filho \cite{Castro-2019}.}
+\end{center}
+\end{minipage}
+\end{table}
+\end{verbatim}
+A tabela~\ref{tab:SI-basicas} mostra o resultado.
+
+\clearpage % Este comando descarrega todos os comandos acima e passa para a próxima página.
+
+\begin{table}
+    \centering
+    \begin{minipage}{0.5\hsize}
+    	\caption{Algumas unidades básicas do SI.}
+	    \label{tab:SI-basicas}
+	    \begin{tabular}{c|c}
+		    \hline
+		    \textbf{Grandeza} & \textbf{Unidade} \\
+		    \hline
+		    comprimento & metro (\si{\meter}) \\
+		    \hline
+		    massa & quilograma (\si{\kilo\gram}) \\
+		    \hline
+		    tempo & segundo (\si{\second}) \\
+		    \hline
+		    corrente elétrica & ampère (\si{\ampere}) \\
+		    \hline
+		    temperatura & kelvin (\si{\kelvin}) \\
+		    \hline
+		    quantidade de matéria & mol (\si{\mol}) \\
+		    \hline
+		    intensidade luminosa & candela (\si{\candela}) \\
+		    \hline
+	    \end{tabular}
+	    \source{adaptado do livro Física para Ciências Agrárias e Ambientais, de Leonardo Luiz e Castro e Olavo Leopoldino da Silva Filho.}
+    \end{minipage}
+\end{table}
+
+\section{Ambientes e bibliografia}
+
+No arquivo \verb|ambientes.tex|, que está na pasta \verb|conf|, encontram-se definições de ambientes (tipos de caixas de texto) que são numeradas automaticamente. Por exemplo, o código abaixo gera uma caixa ``Definição 1''.
+\begin{verbatim}
+\begin{definicao}
+    Physicae Organum: revista do Instituto de Física.
+\end{definicao}
+\end{verbatim}
+Fica assim:
+\begin{definicao}
+    Physicae Organum: revista do Instituto de Física.
+\end{definicao}
+Uma outra definição receberá o número seguinte:
+\begin{definicao}
+    Instituto de Física: instituto da Universidade de Brasília no qual se estuda física.
+\end{definicao}
+
+De forma análoga, você pode criar os ambientes ``teorema'', ``demonstração'', ``axioma'', ``lema'', ``nota'', ``argumento'', ``definição'' e ``exemplo''. Nos comandos, não use acentuação; uma demonstração, por exemplo, deve ser definida assim:
+\begin{verbatim}
+\begin{demonstracao}
+    Isto deveria ser uma demonstração.
+\end{demonstracao}
+\end{verbatim}
+O resultado é este:
+\begin{demonstracao}
+    Isto deveria ser uma demonstração.
+\end{demonstracao}
+
+Para a bibliografia, recomendamos usar \verb|BibTeX|. Para isso, insira suas referências no formato adequado no arquivo \verb|main.bib|, que já contém vários exemplos de diversos tipos de entrada. A entrada mostrada abaixo insere na base de referências um artigo que chama de \verb|greenwade93|. Esse rótulo é de livre escolha e deve ser usado para citar a referência do texto com o comando \verb|\cite{greenwade93}|. Ao usar esse comando, a citação aparecerá como \cite{greenwade93} e será listada na parte das referências automaticamente.
+\begin{verbatim}
+@article{greenwade93,
+    author  = "George D. Greenwade",
+    title   = "The {C}omprehensive {T}ex {A}rchive {N}etwork ({CTAN})",
+    year    = "1993",
+    journal = "TUGBoat",
+    volume  = "14",
+    number  = "3",
+    pages   = "342--351"
+}
+\end{verbatim}
+Os campos podem vir entre aspas ou entre chaves. Múltiplos autores sempre devem estar separados por \verb|AND| e não por vírgula (o compilador \LaTeX ajustará as referências ao padrão). As vírgulas, por outro lado, podem ser usadas para separar mais claramente a parte do nome completo que deve aparecer como sobrenome. Por exemplo, suponha que você queira citar um artigo escrito por (nomes fictícios) Luís Carlos Costa e Silva, Maria Joaquina da Silva,  Cléber Azevedo Júnior, e José Marcelo de Sousa Carneiro. Poderia entrar com essa referência no arquivo \verb|main.bib| desta forma:
+\begin{verbatim}
+@article{costaesilva-2017,
+    author  = {Costa e Silva, Luís Carlos AND da Silva, Maria Joaquina
+                AND Azevedo J\'unior, Cléber AND Carneiro, José Marcelo de Sousa},
+    title   = {Este é o nome do nosso artigo!},
+    year    = {2017},
+    journal = {Revista de Algum Tema Qualquer},
+    volume  = {1},
+    number  = {3},
+    pages   = {42--51}
+}
+\end{verbatim}
+Ao citá-la com \verb|\cite{costaesilva-2017}|, a citação apareceria assim: \cite{costaesilva-2017} (veja como sai na lista de referências).
+No início do código, você pode encontrar a linha \verb|\usepackage[alf,abnt-etal-list=0,abnt-etal-cite=3]{abntex2cite}|.
+O valor de \verb|abnt-etal-cite| está definido como $3$, o que significa que uma citação será abreviada se tiver três ou mais autores.
+O valor de \verb|abnt-etal-list| está definido como $0$, o que significa que a lista de autores nunca será abreviada na lista de referências.
+
+Citações diretas podem ser feitas com o ambiente \verb|citacao|. Veja o exemplo a seguir:
+\begin{verbatim}
+\begin{citacao}{Carl Sagan}
+    Alegações extraordinárias exigem evidências extraordinárias.
+\end{citacao}
+\end{verbatim}
+Esse código gera uma citação assim:
+\begin{citacao}{Carl Sagan}
+    Alegações extraordinárias exigem evidências extraordinárias.
+\end{citacao}
+O comando \verb|\cite{...}| pode ser usado como indicação do autor:
+\begin{verbatim}
+\begin{citacao}{\cite{greenwade93}}
+TEX is a typesetting program designed for high-quality composition of material that contains a lot of mathematical and technical expressions. It has been adopted by many authors and publishers who generate technical books and papers. It was created by Professor Donald E. Knuth of Stanford University, originally for preparation of his book series ``The Art of Computer Programming''. TEX has been made freely available by Knuth.
+\end{citacao}
+\end{verbatim}
+Naturalmente, a referência \verb|grennwade93| deve estar definida no arquivo BibTeX (aqui, \verb|main.bib|). Confira o resultado:
+\begin{citacao}{\cite{greenwade93}}
+TEX is a typesetting program designed for high-quality composition of material that contains a lot of mathematical and technical expressions. It has been adopted by many authors and publishers who generate technical books and papers. It was created by Professor Donald E. Knuth of Stanford University, originally for preparation of his book series ``The Art of Computer Programming''. TEX has been made freely available by Knuth.
+\end{citacao}
+
+\section{Pacotes científicos}
+
+Existem muitos pacotes \LaTeX voltados à ciência. Recomendamos fortemente que você aprenda a usar \textit{SIunits} para escrever grandezas no sistema SI com formatação que se ajusta aos padrões do idioma do documento, como \SI{1.23e-4}{\meter\per\second}.
+Você também pode usar pacotes como o \verb|mhchem| para escrever fórmulas químicas como \ce{H2O}, \ce{^{227}_{90}Th+} ou \cite{moodle-mhchem}
+\begin{equation}
+    K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}.
+    \label{eq:chem}
+\end{equation}
+Você pode até mesmo fazer gráficos e figuras científicas diretamente no código \LaTeX, usando pacotes como \textit{PGFPlots}, \textit{PSTricks}, \textit{Metapost} e \textit{Tikz}. Pesquise galerias de imagens feitas com esses pacotes!
+
+\section{Agradecimentos}
+
+A Olavo Leopoldino da Silva Filho, Marcello Ferreira e Fábio Luís de Oliveira Paula, pela ajuada no desenvolvimento do template original, a partir do qual este guia foi feito.
+
+\bibliography{main}
+
+\end{document}
+
+% Tutoriais LaTeX:
+
+% <http://www.mat.ufmg.br/~regi/topicos/intlat.pdf>
+% <http://ece.uprm.edu/~caceros/latex/introduction.pdf>
+
+%-----------------------------
+
+% LaTeX Online (free account):
+
+% <https://www.overleaf.com/>
+
+%-----------------------------
+
+% Códigos matemáticos LaTeX:
+
+% <http://www.codecogs.com/latex/eqneditor.php>
+
+%-----------------------------
+
+% Construir tabelas no LaTeX:
+
+% <http://www.tablesgenerator.com/#>
+
+%-----------------------------

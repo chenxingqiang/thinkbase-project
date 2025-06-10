@@ -1,0 +1,1076 @@
+\documentclass[a4paper,12pt]{report}%Classe tese(report)
+\usepackage[brazil]{babel}
+\usepackage[latin1,utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{color}
+\usepackage{setspace}
+
+% Margens do documento
+\usepackage[bottom=2cm,top=3cm,left=3cm,right=2cm]{geometry}
+
+% Permite "quebrar" uma equação de várias linhas em duas páginas
+\usepackage{kantlipsum}
+\allowdisplaybreaks
+
+% Para figuras dispostas lado a lado
+\usepackage[position=top]{subfig}
+\graphicspath{{figuras/}{fig_site/}}
+
+% Permite a criação de duas listas de tabelas (uma para tabelas, uma para quadros)
+\usepackage{caption}
+\DeclareCaptionType{Ttable}[T table][Lista de Tabelas]
+
+% Ajuste de formatação - Títulos de Capítulo, Seção e Subseção
+\newcommand{\chapfnt}{\fontsize{12}{12}}
+\newcommand{\secfnt}{\fontsize{12}{12}}
+\makeatletter
+\def\@makechapterhead#1{%
+  %\vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \chapfnt\bfseries %\@chapapp\space 
+        \thechapter \hskip 10\p@ %\par\nobreak %\vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \chapfnt \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\renewcommand\section{\@startsection {section}{1}{\z@}%
+                  {-3.5ex \@plus -1ex \@minus -.2ex}%
+                  {2.3ex \@plus.2ex}%
+                  {\normalfont\secfnt}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                {-3.25ex\@plus -1ex \@minus -.2ex}%
+                {1.5ex \@plus.2ex}%
+                {\normalfont\secfnt}}
+
+% Ajuste no Sumário: inicia no topo da página
+\renewcommand{\tableofcontents}{%
+	\vspace*{-03mm}% espaço antes do título "Sumário"
+	\noindent{\Huge\contentsname\par}%
+	\vspace{8mm}% espaço entre o título "Sumário" e as linhas
+	\@starttoc{toc}}
+\makeatother
+
+% Ajuste no Sumário: pontilhado em todas as linhas
+\usepackage{titletoc}
+\dottedcontents{chapter}[0em]{}{2.0em}{1pc}
+\dottedcontents{section}[2.3em]{}{2.0em}{1pc}
+\dottedcontents{subsection}[2.8em]{}{2.5em}{1pc}
+
+% Ajuste no Sumário: alinhamento à esquerda em todas as linhas
+\usepackage{tocbasic}
+\DeclareTOCStyleEntry[
+linefill=\bfseries\TOCLineLeaderFill,beforeskip=2pt,entrynumberformat=\chapterprefixintoc,dynnumwidth
+]{tocline}{chapter}
+\newcommand\chapterprefixintoc[1]{\MakeUppercase{}~#1~}
+
+% Ajuste no Sumário - Insere nome "Sumário" no título do Sumário
+\addto\captionsbrazil{
+\renewcommand\contentsname{ \centering {\normalsize \bf SUMÁRIO}  }
+ }
+
+% Ajuste em Figuras - troca nome "Figure" para "Figura" no corpo do texto
+\addto\captionsbrazil{
+\renewcommand{\figurename}{Figura}
+}
+
+% Ajuste em Lista de Figuras - insere "Lista de Figuras" no título da Lista de Figuras e posiciona o título no topo da página
+\addto\captionsbrazil{ 
+\renewcommand{\listfigurename}{
+        \vspace*{-31mm}% reduz o espaço antes
+        \centering {\normalsize \bf LISTA DE ILUSTRAÇÕES} 
+        \vspace{-5mm}% espaço entre o título e as demais linhas
+        }
+}
+
+% Ajuste em Tabelas e Quadros - troca nome "Tabela" para "Quadro" no corpo do texto, quando se deseja um quadro; e usa o nome "Tabela" quando se deseja uma tabela, mas usando a nomenclatura alterada Ttable em vez de table
+\addto\captionsbrazil{
+\renewcommand{\tablename}{Quadro}
+\renewcommand{\Ttablename}{Tabela}
+}
+
+% Ajuste em Lista de Quadros - insere "Lista de Quadros" no título da Lista de Quadros e posiciona o título no topo da página
+\addto\captionsbrazil{ 
+\renewcommand{\listtablename}{
+        \vspace*{-31mm}% reduz o espaço antes
+        \centering {\normalsize \bf LISTA DE QUADROS} 
+        \vspace{-5mm}% espaço entre o título e as demais linhas
+        }
+}
+
+% Ajuste em Lista de Tabelas - insere "Lista de Tabelas" no título da Lista de Tabelas e posiciona o título no topo da página 
+\addto\captionsbrazil{ 
+\renewcommand{\listTtablename}{
+        \vspace*{-31mm}% reduz o espaço antes
+        \centering {\normalsize \bf LISTA DE TABELAS} 
+        \vspace{-5mm}% espaço entre o título e as demais linhas
+        }
+}
+
+% Ajuste no Sumário: insere "Referências" no lugar de "Referências Bibliográficas"
+\addto\captionsbrazil{
+\renewcommand{\bibname}{
+        \vspace*{-24mm}% reduz o espaço antes
+        \normalsize REFERÊNCIAS
+        \vspace{3mm}% espaço entre o título e as demais linhas
+        }
+}
+
+% Facilita o uso de símbolos para conjuntos de números 
+\newcommand {\R}{\mathbb{R}}
+\newcommand {\N}{\mathbb{N}}
+\newcommand {\Z}{\mathbb{Z}}
+\newcommand {\Q}{\mathbb{Q}}
+
+% Permite ordenar automaticamente a numeração de teoremas, lemas, etc.
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{lema}{Lema}[chapter]
+\newtheorem{exemplo}{Exemplo}[chapter]
+\newtheorem{prop}{Proposi\c{c}\~ao}[chapter]
+\newtheorem{defi}{Defini\c{c}\~ao}[chapter]
+\newenvironment{dem}{\noindent{\bf Demonstra\c{c}\~{a}o:}}{$\hfill$ $\Box$\\ }
+
+
+\begin{document}
+
+\onehalfspace
+\pagestyle{plain}
+
+%
+% ------------------ CAPA ----------------
+%
+\pagenumbering{roman} 
+\thispagestyle{empty}
+
+\begin{center}
+\textbf{{\normalsize UNIVERSIDADE ESTADUAL DE PONTA GROSSA}} \\
+\textbf{{\normalsize SETOR DE CIÊNCIAS EXATAS E NATURAIS}} \\
+\textbf{{\normalsize DEPARTAMENTO DE MATEMÁTICA E ESTATÍSTICA}}\\
+\textbf{{\normalsize PROGRAMA DE MESTRADO PROFISSIONAL EM MATEMÁTICA \\ EM REDE NACIONAL - PROFMAT \\}}
+%\vfill
+\vspace{4.5cm}
+\textbf{{\normalsize NOME DO(A) ALUNO(A) \\}}
+%\vfill
+\vspace{4.5cm}
+\textbf{\textsf{\normalsize TÍTULO DA DISSERTAÇÃO}}
+%{\setcounter{footnote}{1}\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+%\footnote{ \textsf{O presente trabalho foi realizado com apoio da CAPES,
+%CoordenaÃ§Ã£o de AperfeiÃ§oamento de Pessoal de NÃ­vel Superior.}}}
+\vfill
+\textbf{{\normalsize PONTA GROSSA}} \\
+\textbf{{\normalsize ANO}}
+\end{center}
+
+\newpage
+
+%
+% ------------------ FOLHA DE ROSTO ----------------
+%
+
+\pagenumbering{roman}
+\thispagestyle{empty}
+
+\begin{center}
+\textbf{{\normalsize NOME DO(A) ALUNO(A)}}
+%{\setcounter{footnote}{1}\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+%\footnote{ }}
+
+\vfill
+\textbf{\textsf{\normalsize TÍTULO DA DISSERTAÇÃO}}
+
+\vspace{0.75cm}
+\begin{flushright}
+\begin{minipage}[t]{9cm}
+{\small
+Dissertação apresentada 
+%, como requisito parcial 
+para a obtenção do título de Mestre em Matemática
+na Universidade Estadual de Ponta Grossa.
+Programa de Mestrado Profissional em Matemática em Rede Nacional.
+
+\vspace{0.2cm}
+Orientador(a): Prof.($^{\text a}$) Dr.($^{\text a}$) nome orientador(a)
+}
+\end{minipage}
+\end{flushright}
+
+\vfill
+\textbf{{\normalsize PONTA GROSSA}} \\
+\textbf{{\normalsize ANO}}
+\end{center}
+
+\newpage
+
+%
+% ------------------ FICHA CATALOGRÁFICA ----------------
+
+\pagenumbering{arabic}
+\thispagestyle{empty}
+
+\mbox{}
+
+\vspace{14.5cm}
+
+\begin{center}
+  {\Large \textnormal{\textbf{FOLHA DESTINADA À FICHA CATALOGRÁFICA}} }
+\end{center}
+
+% Para inserir a ficha catalográfica, 
+% apague as linhas acima (apenas a parte centralizada)
+% e insira a ficha catalográfica na figura a seguir
+
+%\begin{figure}[!h]
+% \centering
+% \includegraphics[width=15cm]{Ficha_Catalografica.png}
+%\end{figure}
+
+\newpage
+
+%
+% ------------ FOLHA DE APROVAÇÃO ----------------
+%
+
+%\pagenumbering{arabic}
+\thispagestyle{empty}
+
+\begin{center}
+	{\Large \textnormal{\textbf{FOLHA DESTINADA AO TERMO DE APROVA\c{C}\~AO}} }
+\end{center}
+
+% Para inserir o Termo de Aprovaçãoa ficha catalográfica, 
+% apague as linhas acima (apenas a parte centralizada)
+% e insira a ficha catalográfica na figura a seguir
+
+%\begin{figure}[!htb]
+%	\centering
+%	\includegraphics[width=14.0cm]{TermoAprov.pdf}
+%\end{figure}
+
+\newpage
+
+
+%
+% ------------ DEDICATÓRIA ----------------
+% -------------------------- (opcional) ---
+%
+\thispagestyle{empty}
+
+\mbox{ } 
+
+\vspace{20cm} % Ajuste este espaçamento conforme necessário
+
+\begin{flushright}
+ \hspace{6cm}
+ \begin{minipage}[t]{12cm}
+  {\normalsize
+   \begin{singlespace}
+    \hspace{0.5cm} 
+     {\it 
+     Aqui vai o texto da dedicatória. Aqui vai o texto da dedicatória. Aqui vai o texto da dedicatória. Aqui vai o texto da dedicatória. Aqui vaio o texto da dedicatória. 
+     }
+   \end{singlespace}
+  }
+ \end{minipage}
+\end{flushright}
+
+\addcontentsline{}{}{}
+
+\newpage
+
+%
+% ------------------ AGRADECIMENTO ----------------
+% -------------------------------- (opcional) -----
+%
+
+\thispagestyle{empty}
+
+\begin{center}
+  {\normalsize \textnormal{\textbf{AGRADECIMENTOS}} }
+\end{center}
+
+\hbox{ }
+
+Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento.
+
+Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento.
+
+Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento. Insira aqui o texto de seu agradecimento.
+
+% Se seu agradecimento ocupar mais de uma folha, faça uma "quebra de página" manual ao final de cada folha do texto do agradecimento usando os comandos a seguir: 
+
+%\newpage 
+%\thispagestyle{empty}
+%\noindent
+
+%Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. 
+
+%Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. Insira aqui o texto DA SEGUNDA FOLHA de seu agradecimento. 
+
+
+\addcontentsline{}{}{}
+
+\newpage
+
+%
+% ------------------ RESUMO ----------------
+%
+
+\thispagestyle{empty}
+
+\begin{center}
+  {\normalsize \textnormal{\textbf{RESUMO}} }
+\end{center}
+
+Insira aqui o texto com o resumo de sua dissertação. Insira aqui o texto com o resumo de sua dissertação. Insira aqui o texto com o resumo de sua dissertação. Insira aqui o texto com o resumo de sua dissertação. 
+
+\vspace{1.5cm} \noindent
+{\bf Palavras-chave:} Palavra-chave 1. Palavra-chave 2. $\cdots$. Última palavra-chave.
+
+\newpage
+
+%
+% ------------------ ABSTRACT ----------------
+%
+
+\thispagestyle{empty}
+
+\begin{center}
+  {\normalsize \textnormal{\textbf{ABSTRACT}} }
+\end{center}
+
+Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation. Insert here the text with the abstract of your dissertation.
+
+\vspace{1.5cm} \noindent
+{\bf Keywords:} Keyword 1. Keyword 2. $\cdots$. Last Keyword.
+
+\newpage
+
+%
+% ---- PARA DEIXAR FOLHAS EM BRANCO (VERSO) ------
+% ----------- (opcional, para versão impressa) ---
+% ----------- (com capítulos em paginas ímpares) -
+%
+
+% \thispagestyle{empty}
+% \mbox{}
+% \newpage
+
+%
+% ------------ LISTA DE FIGURAS --------------
+% ---------------------------- (opcional) ----
+%
+
+\listoffigures\thispagestyle{empty}
+
+\newpage 
+
+%
+% ------------ LISTA DE QUADROS --------------
+% ---------------------------- (opcional) ----
+%
+
+\listoftables\thispagestyle{empty}
+
+\newpage 
+
+%
+% ------------ LISTA DE TABELAS --------------
+% ---------------------------- (opcional) ----
+%
+
+\listofTtables\thispagestyle{empty}
+
+\newpage 
+
+%
+% ------------ LISTA DE ABREVIATURAS --------------
+% -------------------------------- (opcional) -----
+%
+
+\thispagestyle{empty}
+
+\begin{center}
+  {\normalsize \textnormal{\textbf{LISTA DE ABREVIATURAS}} }
+\end{center}
+
+\vspace{0.3cm}
+
+\begin{center}
+ \begin{tabular}{p{2.5cm}p{11.5cm}}
+  PROFMAT & Mestrado Profissional em Matemática em Rede Nacional \\ 
+  SBM  & Sociedade Brasileira de Matemática \\ 
+  SBEM & Sociedade Brasileira de Educação Matemática \\ 
+  SBMAC & Sociedade Brasileira de Matemática Aplicada e Computacional \\
+  DEMAT & Departamento de Matemática e Estatística \\
+  UEPG & Universidade Estadual de Ponta Grossa 
+ \end{tabular}
+\end{center}
+
+\addcontentsline{}{}{}
+
+\newpage
+
+%
+% ------------ LISTA DE SÍMBOLOS ----------------
+% ------------------------------ (opcional) -----
+%
+
+\thispagestyle{empty}
+
+\begin{center}
+  {\normalsize \textnormal{\textbf{LISTA DE SÍMBOLOS}} }
+\end{center}
+
+\vspace{0.3cm}
+
+\begin{center}
+ \begin{tabular}{p{1.5cm}p{12.5cm}}
+  $\alpha$ & Letra grega ``alfa'' minúscula. \\ 
+  $\beta$ & Letra grega ``beta'' minúscula. \\ 
+  $\varepsilon$ & Letra grega ``epsilon'' minúscula. \\ 
+  $\Omega$ & Letra grega ``ômega'' \ maiúscula. 
+ \end{tabular}
+\end{center}
+
+\addcontentsline{}{}{}
+
+\newpage
+
+%
+% ------------------ SUMÁRIO ----------------
+%
+
+\tableofcontents\thispagestyle{empty}
+
+\newpage 
+
+%
+% ------------ FOLHA EM BRANCO (VERSO) ------------
+%
+
+%\thispagestyle{empty}
+%\mbox{}
+%\newpage
+
+%
+% -------- CAPÍTULO 1 - INTRODUÇÃO --------------
+%
+\pagestyle{myheadings}
+     % altera a numeração para o topo da página, à direita
+
+\chapter{INTRODUÇÃO}\label{Cap1}
+     % Início do Capítulo 1
+
+\thispagestyle{myheadings}
+     % insere numeração na página inicial do capítulo
+
+%
+% - - - AMBIENTE minipage - - -
+% - - - (para citação) - - - - - -
+%
+\vspace{-1.2cm}
+\begin{flushright}
+ \hspace{6cm}
+ \begin{minipage}[t]{12cm}
+  {\small
+   \begin{singlespace}
+    \begin{flushright}
+     ``{\it Read Euler, read Euler, he is the master of us all.}'' \\ 
+     Pierre-Simon Laplace
+    \end{flushright}
+   \end{singlespace}
+  }
+ \end{minipage}
+\end{flushright}
+
+% \hspace{0.5cm} % Este espaçador deve ser usado para o recuo no primeiro parágrafo
+Insira aqui o texto do primeiro Capítulo de sua dissertação (de acordo com \cite{UEPG}, primeira Seção - pois a dissertação é estruturada em seções).
+
+\section{EXPRESSÕES E EQUAÇÕES CENTRALIZADAS}\label{Sec1.1}
+
+Para expressões e equações centralizadas, você pode usar o ambiente matemático usando apenas \verb|$$ $$|, como em
+\begin{verbatim} 
+$$
+ \sum_{k=1}^n f(k) 
+$$
+\end{verbatim}
+para gerar 
+$$
+\displaystyle \sum_{k=1}^n f(k), 
+$$
+ou escolher usar o ambiente \verb|equation|, como em
+\begin{verbatim} 
+\begin{equation}\label{Eq01}
+ \sum_{k=1}^n f(k) 
+\end{equation}
+\end{verbatim}
+para gerar
+\begin{equation}\label{Eq01}
+ \sum_{k=1}^n f(k) 
+\end{equation}
+com o marcador (\ref{Eq01}), que pode ser usado para referenciar esta equação/expressão mais à frente em seu texto. O marcador (\ref{Eq01}) referente a esta equação/expressão pode ser recuperado a qualquer momento em seu texto usando os comandos \verb|(\ref{Eq01})|, onde \verb|Eq01| estava no {\it label} do código que gerou a equação/expressão (\ref{Eq01}).
+
+Se não for necessário referenciar uma equação/expressão em seu texto, você também pode optar por utilizar o ambiente \verb|equation*|, como em
+\begin{verbatim} 
+\begin{equation*}
+ \sum_{k=1}^n f(k) 
+\end{equation*}
+\end{verbatim}
+para gerar
+\begin{equation*}
+ \sum_{k=1}^n f(k) 
+\end{equation*}
+(desta vez sem o marcador (\ref{Eq01})). 
+
+Outra opção para produzir equações/expressões centralizadas é usar o ambiente \verb|align|, que pode ser usado com ou sem marcador (usando ou não o \verb|*| junto com o nome \verb|align|, como em 
+\begin{verbatim} 
+\begin{align}\label{Eq02}
+ \sum_{k=1}^n g(k) 
+\end{align}
+\end{verbatim}
+ou em 
+\begin{verbatim} 
+\begin{align*}
+ \sum_{k=1}^n fgk) 
+\end{align*}
+\end{verbatim}
+para produzir, respectivamente, 
+\begin{align}\label{Eq02}
+ \sum_{k=1}^n g(k) 
+\end{align}
+e 
+\begin{align*}
+ \sum_{k=1}^n g(k). 
+\end{align*}
+
+Tanto o ambiente \verb|equation| quanto o ambiente \verb|align| podem ser usados para escrever uma equação com mais que uma linha, como em 
+\begin{equation*}
+ \begin{array}{rcl}
+  \displaystyle \int_{a}^{b} f(x) \ dx & = & F(x) {\Bigl|}_{a}^{b} \\
+  & = & F(b) - F(a) \, ,
+ \end{array}
+\end{equation*}
+ou 
+\begin{align*}
+  & \displaystyle \int_{a}^{b} f(x) \ dx \ = \ F(x) {\Bigl|}_{a}^{b} \\
+  & \qquad \qquad \quad \
+  = F(b) - F(a) \, ,
+\end{align*}
+que foram gerados, respectivamente, usando  
+\begin{verbatim}
+\begin{equation*}
+ \begin{array}{rcl}
+  \displaystyle \int_{a}^{b} f(x) \ dx & = & F(x) {\Bigl|}_{a}^{b} \\
+  & = & F(b) - F(a) \, ,
+ \end{array}
+\end{equation*}
+\end{verbatim}
+e
+\begin{verbatim}
+\begin{align*}
+  & \displaystyle \int_{a}^{b} f(x) \ dx \ = \ F(x) {\Bigl|}_{a}^{b} \\
+  & \qquad \qquad \quad \
+  = F(b) - F(a) \, ,
+\end{align*}
+\end{verbatim}
+
+\subsection{UMA VANTAGEM A MAIS}\label{Subsec1.1.1}
+
+O ambiente \verb|align| apresenta uma vantagem sobre o ambiente \verb|equation|: com ele, podemos escrever contas com várias linhas com "quebra de página" \ dentro da equação.  
+Por exemplo, os comandos 
+\begin{verbatim}
+\begin{equation*}
+ \begin{array}{rcl}
+  \displaystyle \int_{a}^{b} f(x) \ dx & = & F(x) {\Bigl|}_{a}^{b} \\
+  & = & F(b) - F(a) \\
+  & = & \displaystyle F(b) \Bigl( 1 - \frac{F(a)}{F(b)} \Bigr) \, ,
+ \end{array}
+\end{equation*}
+\end{verbatim}
+geram
+\begin{equation*}
+ \begin{array}{rcl}
+  \displaystyle \int_{a}^{b} f(x) \ dx & = & F(x) {\Bigl|}_{a}^{b} \\
+  & = & F(b) - F(a) \\
+  & = & \displaystyle F(b) \Bigl( 1 - \frac{F(a)}{F(b)} \Bigr) \, ,
+ \end{array}
+\end{equation*}
+(expressão que sempre terá todas suas linhas na mesma página, podendo ocasionar uma margem enorme no final de uma folha), com os comandos 
+\begin{verbatim}
+\begin{align*}
+  & \displaystyle \int_{a}^{b} f(x) \ dx \ = \ F(x) {\Bigl|}_{a}^{b} \\
+  & \qquad \qquad \quad \
+  = F(b) - F(a) \\
+  & \qquad \qquad \quad \
+  & F(b) \Bigl( 1 - \frac{F(a)}{F(b)} \Bigr) \, ,
+\end{align*}
+\end{verbatim}
+geram 
+\begin{align*}
+  & \displaystyle \int_{a}^{b} f(x) \ dx \ = \ F(x) {\Bigl|}_{a}^{b} \\
+  & \qquad \qquad \quad \
+  = F(b) - F(a) \\
+  & \qquad \qquad \quad \
+  = F(b) \Bigl( 1 - \frac{F(a)}{F(b)} \Bigr) \, ,
+\end{align*}
+onde as duas últimas linhas do cálculo apresentado foram para a próxima folha, com a primeira linha ficando na folha anterior, mantendo a margem inferior em um tamanho adequado. 
+
+%
+% ------------------ CAPÍTULO 2 ---------------------
+%
+
+\chapter{TÍTULO DO SEGUNDO CAPÍTULO}\label{Cap2}
+
+\thispagestyle{myheadings}
+
+\hspace{0.5cm}
+Insira aqui o texto do segundo capítulo de sua dissertação.
+
+\vspace{0.3cm}
+Apresentamos, a seguir, algumas dicas para citações, quadros e tabelas.
+
+\section{CITAÇÕES DIRETAS}\label{Sec2.1}
+
+\hspace{0.5cm}
+Se em seu texto forem necessárias citações diretas, de acordo com \cite{UEPG} há dois tipos, que diferem entre si basicamente pelo tamanho. 
+
+Para citações de menos de três linhas usa-se a citação no próprio texto do parágrafo, como em 
+``é possível que Widmann tenha colhido as ideias de $+$ e $-$ 
+dos homens que trabalhavam no comércio, pois  o fato de ter usado esses símbolos como se fossem amplamente conhecidos aponta para a possibilidade''
+(TAHAN, \cite{TAHAN}). Se este tipo de citação for usada, em um texto com bastante escrita matemática onde se usa, tipicamente, o sistema de chamada numérico para citação das referências, não se deve colocar página, apenas número (como em \cite{TAHAN}, logo atrás). A referência \cite{TAHAN} foi obtida ao usar \verb|\cite{TAHAN}|, onde \verb|TAHAN| é o identificador usado nas referências para tal livro.
+
+Para citações longas (mais que três linhas em seu parágrafo), usamos o ambiente \verb|minipage|, como o exemplo a seguir. Note que é adequado fazer a referência ao autor {\it antes} de usar o ambiente \verb|minipage|, como segue: ...melhor explanado por Cajori \cite{CAJORI}:
+\vspace{-1.2cm}
+\begin{flushright}
+	\hspace{6cm}
+	\begin{minipage}[t]{12cm}
+		{\small
+			\begin{singlespace}
+			    %\vspace{-0.5cm}
+				O sinal de somatório é devido a Euler (1755), que diz: ``{\it summam indicabimus signo }$\Sigma$'', ou seja, $\Sigma$ indica o sinal de soma. Este símbolo foi utilizado por Lagrange, mas, de resto, recebeu pouca atenção durante o século décimo oitavo. O $\Sigma$ para expressar a soma ocorre novamente em 1829 na Teoria do Calor de Fourier, publicada em 1822, e em funções elípticas de Jacobi de 1829. Cauchy utilizou três índices $m, n, r$, como em $\displaystyle \sum_m^n \!\! r fr$. Alfred Pringsheim denota por $\displaystyle \sum_0^{\infty} \!\!\! r \, a_{\nu}$ a soma de uma série infinita. 
+				%Jahnke adota no lugar, em substituição de $\sum a_i$, o símbolo $\widetilde{a}$, que pede emprestado aos geodésicos, para designar a soma $a_1+a_2+a_3+ \cdots$.}
+			\end{singlespace}
+		}
+	\end{minipage}
+\end{flushright}
+
+\section{QUADROS E TABELAS}\label{Sec2.2}
+
+\hspace{0.5cm}
+Segundo \cite{UEPG}, o uso de quadros ou tabelas é determinado pela característica das informações que trazem. 
+
+\subsection{QUADROS}\label{Subsec2.2.1}
+
+\hspace{0.5cm} 
+Nos quadros, inserimos informações textuais. Caractarizam-se por sua disposição em linhas e colunas, com traços horizontais e verticais fechados nos quatro lados. O título do quadro deve vir acima, e a fonte abaixo do quadro (nota, quando couber, fica também abaixo do quadro).
+
+Um exemplo de quadro é dado a seguir. Note que um quadro deve ser referenciado no corpo do texto (antes ou depois do local onde o quadro está). Para referenciar um quadro, assim como uma equação, usamos o comando \verb|\ref{}|, como em \verb|Quadro \ref{Quadro2.1}|, que usamos para citar o Quadro~\ref{Quadro2.1}.
+
+\begin{table}[!ht]
+\begin{center}
+\caption{\small Título do Quadro 1} \label{Quadro2.1}
+\vspace{-0.2cm}
+ \begin{tabular}{|p{3.8cm}|p{4.4cm}|p{6.0cm}|}
+  \hline
+  CONTEÚDOS & CONTEÚDOS \newline BÁSICOS & AVALIAÇÃO  \\ \hline
+  Funções  & Progressão Aritmética; \newline Progressão Geométrica. 
+  & Reconheça, nas sequências numéricas, particularidades que remetam ao conceito das progressões aritméticas e geométricas; 
+  \newline Generalize cálculos para a determinação de termos de uma sequência numérica. \\ \hline 
+  Tratamento da Informação & Estatística & Realize estimativas, conjecturas a respeito de dados e informações estatísticas; média aritmética. \\ \hline
+  Tratamento da Informação & Binômio de Newton & Realize cálculos utilizando Binômio de Newton.
+  \\ \hline
+ \end{tabular}
+\end{center}
+{\small Fonte: Adaptado de: PARANÁ, Secretaria de Estado da Educação. {\bf Diretrizes Curriculares da Educação Básica} Matemática, 2008.}
+\end{table}
+
+Este exemplo de quadro será repetido a seguir (mudando a numeração) apenas para que a Lista de Quadros, nos elementos pré-textuais, contenha dois quadros.
+
+\begin{table}[!ht]
+\begin{center}
+\caption{\small Título do Quadro 2} \label{Quadro2.2}
+\vspace{-0.2cm}
+ \begin{tabular}{|p{3.8cm}|p{4.4cm}|p{6.0cm}|}
+  \hline
+  CONTEÚDOS & CONTEÚDOS \newline BÁSICOS & AVALIAÇÃO  \\ \hline
+  Funções  & Progressão Aritmética; \newline Progressão Geométrica. 
+  & Reconheça, nas sequências numéricas, particularidades que remetam ao conceito das progressões aritméticas e geométricas; 
+  \newline Generalize cálculos para a determinação de termos de uma sequência numérica. \\ \hline 
+  Tratamento da Informação & Estatística & Realize estimativas, conjecturas a respeito de dados e informações estatísticas; média aritmética. \\ \hline
+  Tratamento da Informação & Binômio de Newton & Realize cálculos utilizando Binômio de Newton.
+  \\ \hline
+ \end{tabular}
+\end{center}
+{\small Fonte: Adaptado de: PARANÁ, Secretaria de Estado da Educação. {\bf Diretrizes Curriculares da Educação Básica} Matemática, 2008.}
+\end{table}
+
+\subsection{TABELAS}\label{Subsec2.2.2}
+
+\hspace{0.5cm} 
+Nas tabelas, inserimos informações e dados numéricos, que são tratados estatisticamente. As laterais são abertas.
+
+Como um exemplo de Tabela, apresentamos a Tabela~\ref{Tabela2.1}, disposta a seguir.
+
+\begin{Ttable}[!ht]
+\begin{center}
+\caption{\small Título da Tabela 1} 
+\label{Tabela2.1}
+\vspace{-0.2cm}
+ \begin{tabular}{p{3.8cm}|p{3.8cm}|p{6.6cm}}
+    \hline
+    TÍTULO 1 & TÍTULO 2 & TÍTULO 3 
+    \\ \hline
+    Informações & Dados numéricos & Dados numéricos 
+    \\  
+    Informações & Dados numéricos & Dados numéricos 
+    \\ 
+    Informações & Dados numéricos & Dados numéricos.
+    \\ \hline
+ \end{tabular}
+\end{center}
+{\small Fonte: Insira aqui a fonte da tabela.}
+\end{Ttable}
+
+Assim como o quadro, a tabela anterior será repetida (com numeração alterada) para que a Lista de Tabelas, nos elementos pré-textuais, apresente duas tabelas.
+
+\begin{Ttable}[!ht]
+\begin{center}
+\caption{\small Título da Tabela 2} 
+\label{Tabela2.2}
+\vspace{-0.2cm}
+ \begin{tabular}{p{3.8cm}|p{3.8cm}|p{6.6cm}}
+    \hline
+    TÍTULO 1 & TÍTULO 2 & TÍTULO 3 
+    \\ \hline
+    Informações & Dados numéricos & Dados numéricos 
+    \\  
+    Informações & Dados numéricos & Dados numéricos 
+    \\ 
+    Informações & Dados numéricos & Dados numéricos.
+    \\ \hline
+ \end{tabular}
+\end{center}
+{\small Fonte: Insira aqui a fonte da tabela.}
+\end{Ttable}
+
+%
+% ------------------ CAPÍTULO 3 ---------------------
+%
+
+\chapter{CAPÍTULO COM FIGURAS}\label{Cap3}
+
+\thispagestyle{myheadings}
+
+\hspace{0.5cm}
+Para inserir figuras, podemos usar o ambiente \verb|figure|, como nos exemplos a seguir. 
+
+\section{FIGURAS SIMPLES}
+
+Para inserir uma figura única, é possível usar os comandos 
+\begin{verbatim}
+\begin{figure}[!htb]
+  \centering
+  \caption{{\small Logotipo do PROFMAT.}}
+  \includegraphics[width=8.0cm]{Logo_PROFMAT.png}
+  \label{Fig01_Cap3}
+\end{figure}
+\begin{center}
+  \vspace{-0.5cm} {\small Fonte: site do PROFMAT}
+\end{center}
+\end{verbatim}
+para gerar a Figura\ref{Fig01_Cap3}: 
+
+\begin{figure}[!htb]
+	\centering
+	\caption{{\small Logotipo do PROFMAT.}}
+	\includegraphics[width=10.0cm]{Logo_PROFMAT.png}
+	\label{Fig01_Cap3}
+\end{figure}
+\begin{center}
+    \vspace{-0.5cm} {\small Fonte: site do PROFMAT}
+\end{center}
+
+\section{FIGURAS EM COLUNAS}\label{Sec3.2}
+
+\hspace{0.5cm}
+Para inserir duas figuras lado a lado (ou quatro, ou seis, etc. - em duas colunas), é possível usar o pacote \verb|subfig|, com os comandos 
+\begin{verbatim}
+\begin{figure}[!htb]
+  \centering
+    \caption{{\small Dois logotipos do PROFMAT, dispostos lado a lado}}
+    \subfloat[{\small Logotipo do PROFMAT}]{
+    \includegraphics[height=6.0cm]{Logo_PROFMAT.png}
+    \label{Fig02a_Cap3}
+    }
+  \qquad
+    \subfloat[{\small Logotipo do PROFMAT}]{
+    \includegraphics[height=6.0cm]{Logo_PROFMAT.png}
+    \label{Fig02b_Cap3}
+    }
+  \label{Fig02_Cap3}
+\end{figure}
+\begin{center}
+  \vspace{-1.0cm} {\small Fonte: site do PROFMAT}
+\end{center}
+\end{verbatim}
+para gerar as Figuras~\ref{Fig02a_Cap3} e \ref{Fig02b_Cap3} (que juntas formam a Figura~\ref{Fig02_Cap3}) e estão dispostas a seguir. Lembre-se de referenciar no texto de sua dissertação todas as figuras que você inserir.
+
+\begin{figure}[!htb]
+\centering
+\caption{{\small Dois logotipos do PROFMAT, dispostos lado a lado}}
+\subfloat[{\small Logotipo do PROFMAT}]{
+\includegraphics[height=6.0cm]{Logo_PROFMAT.png}
+\label{Fig02a_Cap3}
+}
+\qquad %espaco separador
+\subfloat[{\small Logotipo do PROFMAT}]{
+\includegraphics[height=6.0cm]{Logo_PROFMAT.png}
+\label{Fig02b_Cap3}
+}
+\label{Fig02_Cap3}
+\end{figure}
+\begin{center}
+    \vspace{-1.0cm} {\small Fonte: site do PROFMAT}
+\end{center}
+
+Se for necessário, é possível criar uma figura com mais subfiguras, utilizando os mesmos comandos descritos acima. 
+
+Como exemplo, criamos a Figura~\ref{Fig03_Cap3}.
+
+\begin{figure}[!h]%tb]
+\centering
+\caption{{\small Quatro logotipos do PROFMAT, dispostos lado a lado em duas colunas}}
+\subfloat[{\small Logotipo do PROFMAT}]{
+\includegraphics[height=4.0cm]{Logo_PROFMAT.png}
+\label{Fig03a_Cap3}
+}
+\qquad %espaco separador
+\subfloat[{\small Logotipo do PROFMAT}]{
+\includegraphics[height=4.0cm]{Logo_PROFMAT.png}
+\label{Fig03b_Cap3}
+}
+\\
+\subfloat[{\small Logotipo do PROFMAT}]{
+\includegraphics[height=4.0cm]{Logo_PROFMAT.png}
+\label{Fig03c_Cap3}
+}
+\qquad %espaco separador
+\subfloat[{\small Logotipo do PROFMAT}]{
+\includegraphics[height=4.0cm]{Logo_PROFMAT.png}
+\label{Fig03d_Cap3}
+}
+\label{Fig03_Cap3}
+\end{figure}
+\begin{center}
+    \vspace{-1.0cm} {\small Fonte: site do PROFMAT}
+\end{center}
+
+
+\newpage 
+
+%
+% ----------------- FOLHA EM BRANCO (VERSO) -------------------
+%
+
+%\thispagestyle{empty}
+%\mbox{}
+%\newpage
+
+%
+% --------------- CAPÍTULO 4 -----------------
+%
+
+\chapter{DEMAIS CAPÍTULOS}\label{Cap4}
+%  - Abordagem no Ensino Superior
+
+\thispagestyle{myheadings}
+
+\hspace{0.5cm}
+Insira em seu trabalho quantos capítulos forem necessários.
+
+\vspace{0.3cm} 
+Para inserir um Teorema, use o padrão a seguir: 
+
+\begin{teorema}\label{Teo4.01}
+Digite aqui o enunciado do Teorema. Se for necessário, use os símbolos \verb|{\R}| para facilitar a escrita do conjunto dos números reais ${\R}$ (conforme o novo comando inserido no preâmbulo.
+\end{teorema}
+
+\begin{dem} 
+Faça aqui a demonstração do Teorema.
+\end{dem}
+
+\vspace{0.3cm} 
+Para inserir um Lema, use o padrão a seguir: 
+
+\begin{lema}\label{Lema4.01}
+Digite aqui o enunciado do Lema.
+\end{lema}
+
+\begin{dem} 
+Faça aqui a demonstração do Lema.
+\end{dem}
+
+\vspace{0.3cm} 
+Para inserir uma Proposição, use o padrão a seguir: 
+
+\begin{prop}\label{Prop4.01}
+Digite aqui o enunciado da Proposição.
+\end{prop}
+
+\begin{dem} 
+Faça aqui a demonstração da Proposição.
+\end{dem}
+
+Para inserir uma Definição, você pode usar o padrão a seguir:
+
+\begin{defi}\label{Defi4.01}
+Escreva aqui a definição.
+\end{defi}
+
+Para inserir um Exemplo, você pode usar o padrão a seguir:
+\begin{exemplo}\label{Exemplo4.01}
+Insira aqui o exemplo.
+\end{exemplo}
+
+\newpage
+        
+%
+% -------------- CAPÍTULO FINAL ----------------
+%
+
+\chapter{CONSIDERAÇÕES FINAIS}\label{CapConc}
+
+\thispagestyle{myheadings}
+
+\hspace{0.5cm}
+Lembre-se de escrever um capítulo com suas conclusões finais.
+
+\vspace{0.3cm} 
+Na sequência, devem vir as {\bf REFERÊNCIAS}. Como regra geral, o Manual de Normalização \cite{UEPG} deve ser consultado, mas inserimos neste tempalte alguns exemplos de referências onde a formatação pode ser considerada. 
+
+A obra \cite{STEWART} é um livro escrito por um autor (se o livro fizer parte de uma coleção, o nome da coleção pode ser colocada ao final, entre parêntesis, como em \cite{BOTELHO}); \cite{UEPG} é um livro atribuído a uma instituição; \cite{TAHAN} é um livro assinado com pseudônimo; \cite{EULERE212} é um livro antigo disponível na internet;  \cite{CAJORI} é um livro publicado em inglês, assim como \cite{GRAHAM} (note a edição, 2nd. ed., disposta na língua deste livro); \cite{KOBUCHEI} é um livro com organizadores/editores responsáveis; \cite{BRASIL1996} é uma lei; \cite{GALVAO} é uma dissertação do PROFMAT; \cite{MACHADO} é um artigo em revista científica; \cite{EULERE637} é um artigo antigo disponível na internet; \cite{PARANA} são diretrizes educacionais. 
+
+\vspace{0.3cm}
+Este template destina-se às dissertações do PROFMAT/UEPG, e considera as especificações de normalização dispostas em \cite{UEPG}. 
+
+Elaborado em julho/2020 por Jocemar de Quadros Chagas, e aprovado pelo Colegiado do PROFMAT/UEPG. 
+
+\newpage
+
+%
+% ----------------------- REFERÊNCIAS -----------------------
+%
+
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{REFERÊNCIAS}
+\thispagestyle{myheadings}
+
+\bibitem{BOTELHO} BOTELHO, G. M. A.; PELLEGRINO, D. M.; TEIXEIRA, E. V. {\bf Fundamentos de Análise Funcional}. 2. ed.. Rio de Janeiro: Editora SBM, 2015. (Textos Universitários).
+	
+\bibitem{BRASIL1996} BRASIL, Ministério da Educação. {\bf Lei nº 9.394, de 20 de dezembro de 1996}. Lei de Diretrizes e Bases. Brasília, 1996.
+% Disponível em: <http://www2.camara.leg.br/legin/fed/lei/1996/lei-9394-20-dezembro-1996-362578-publicacaooriginal-1-pl.html>. Acesso em:  15 nov. 2019
+
+\bibitem{CAJORI} CAJORI, F. {\bf A History of Mathematical Notations} Two Volumes Bound As One. New York: Dover Publications, 1993.
+
+\bibitem{EULERE212} EULER, L. {\bf Institutiones Calculi Differentialis} cum eius usu in Analysi Finitorum ac Doctrina Serierum [E212]. Petropolitanae Academiae Sumptibus, 1755; Republicado em Opera Omnia, series 1, v. 10; 
+Disponível em http://eulerarchive.maa.org/backup/E212.html. Acesso em: 18 abr. 2020.
+
+\bibitem{EULERE637} EULER, L. {\bf Nova demonstratio qvod potestatvm Binomii Newtoniana etiam pro exponentibus fractis valeat} [E637]. Nova Acta Academiae Scientiarvm Imperialis Petropolitanae, Tomvs V, p. 52-58 (Mathematica), 1787. 
+Disponível em http://eulerarchive.maa.org/docs/originals/E637.pdf. Acesso em: 01 mai. 2020.
+
+\bibitem{GALVAO} GALVÃO, A. T. {\bf Somas, somatórios e termos não inteiros}. 2020. Dissertação (Mestrado Profissional em Matemática em Rede Nacional - PROFMAT) - Universidade Estadual de Ponta Grossa, Ponta Grossa, 2020.
+
+\bibitem{GRAHAM} GRAHAM, R. L.; KNUTH, D. E.; PATASHNIK, O. {\bf Concrete mathematics}: a foundation for computer science. 2nd. ed.. New York: Addison-Wesley Publishing, 1994. 
+
+\bibitem{KOBUCHEI} KOBUCHEI, A.; LUCHKO, Y. (Eds.) {\bf Handbook of Fractional Calculus with Applications}, vol. 1: Basic Theory. Berlin: De Gruyter, 2019.
+
+\bibitem{MACHADO} TENREIRO MACHADO, J.; LOPES, A. M.; DUARTE, F. B.; ORTIGUEIRA, M. D.; RATO, R. T. Rhapsody in Fractional. {\bf An International Journal for Theory and Applications}, V. 17, n. 4, p. 1188-1214, 2014.
+
+\bibitem{PARANA} PARANÁ, Secretaria de Estado da Educação. {\bf Diretrizes Curriculares da Educação Básica} Matemática. Curitiba, 2008.
+
+\bibitem{STEWART} STEWART, J. {\bf Cálculo}. V. 1. São Paulo: Cengage Learning, 2013.
+
+\bibitem{TAHAN} TAHAN, M. {\bf As Maravilhas da Matemática}. Rio de Janeiro: Edições Bloch, 1973.
+
+\bibitem{UEPG} UEPG, Universidade Estadual de Ponta Grossa, Biblioteca Central Professor Faris Michaele. {\bf Manual de normalização bibliográfica} para trabalhos científicos. 4. ed.. Ponta Grossa: Editora UEPG, 2019. 
+	
+\end{thebibliography}
+
+\newpage
+
+%
+% ------------------- APÊNDICES ----------------
+%
+
+%
+% ------------------  APÊNDICE A ---------------
+%
+
+\addcontentsline{toc}{chapter}{APÊNDICE A - TÍTULO DO APÊNDICE A} % Usado para incluir o apêndice no sumário
+
+\begin{center}
+	{\bf {\normalsize APÊNDICE A} }
+	\rule{14.75cm}{0.02cm} 
+\end{center}
+\vspace{0.3cm}
+\begin{center}
+	\textbf{\normalsize TÍTULO DO APÊNDICE A}
+\end{center}
+
+\vspace{0.5cm}
+Os apêndices são materiais produzidos pelo próprio autor do trabalho, mas que por algum motivo não foram incorporados ao corpo do texto. Devem vir após as referências, ser identificados por "Apêndice A", "Apêndice B", etc. Note que a inscrição {\bf APÊNDICE A} deve vir centralizada no topo da página, da mesma forma que os títulos dos elementos pré-textuais. 
+
+
+\newpage 
+
+%
+% ---------------  APÊNDICE B -------------------
+%
+
+\addcontentsline{toc}{chapter}{APÊNDICE B - TÍTULO DO APÊNDICE B} % Usado para incluir o apêndice no sumário
+
+\begin{center}
+	{\bf {\normalsize APÊNDICE B} }
+	\rule{14.75cm}{0.02cm}
+\end{center}
+\vspace{0.3cm}
+\begin{center}
+	\textbf{\normalsize TÍTULO DO APÊNDICE B}
+\end{center}
+
+\hspace{0.5cm} 
+Insira aqui o texto de seu Apêndice B.
+
+\newpage 
+
+%
+% ------------------  ANEXO A ---------------
+%
+
+\addcontentsline{toc}{chapter}{ANEXO A - TÍTULO DO ANEXO A} % Usado para incluir o apêndice no sumário
+
+\begin{center}
+	{\bf {\normalsize ANEXO A} }
+	\rule{14.75cm}{0.02cm} 
+\end{center}
+\vspace{0.3cm}
+\begin{center}
+	\textbf{\normalsize TÍTULO DO ANEXO A}
+\end{center}
+
+\vspace{0.5cm}
+Insira aqui seu Anexo A.
+
+\vspace{0.3cm}
+Os anexos são materiais pertinentes ao trabalho, mas que não foram produzidos pelo autor. Como exemplo de anexos, citamos uma norma ABNT ou um laudo técnico de um material utilizado.
+
+
+\newpage 
+
+
+\end{document} 

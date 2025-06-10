@@ -1,0 +1,184 @@
+%!TEX program = xelatex
+\documentclass[12pt, a4paper, twoside]{scrartcl}
+
+% Die Standardschrift Computer Modern hat keine Umlaute
+\usepackage{fontspec}
+\setmainfont{Adobe_Caslon_Pro.otf}
+%\setmainfont{Theano Didot}
+
+% Polyglossia ist die XeTeX-Alternative zu Babel
+\usepackage{polyglossia}
+\setdefaultlanguage{german}
+
+% Für den Zeilenabstand
+\usepackage{setspace}
+\onehalfspacing
+
+% Mathe-Umgebungen
+\usepackage{amsmath}
+
+% Absätze werden durch Einrückung der ersten Zeile gekennzeichnet. Die Größe der Einrückung sollte 
+% dabei mindestens der Punktgröße der Schrift entsprechen, das vierfache dieser Größe jedoch nicht
+% überschreiten. Da wir unser Dokument mit einer Schriftgröße von 12pt setzen, ergibt sich also eine
+% Spanne von 12-48pt. Da der Text über die gesamte Breite der A4-Seite gesetzt ist, wählen wir einen
+% Wert am oberen Ende der Skala.
+%\usepackage{setlength}
+\setlength{\parindent}{20pt}
+
+% Mikrotypographische Verfeinerungen des Textsatzes aktivieren.
+%\usepackage{microtype}
+
+% Tabularx hat bessere Funktionen für Tabellen als die tabular-Umgebung
+\usepackage{tabularx}
+\usepackage{array}
+
+% Die Symbole brauchen wir für die Ankreuzkästen bei den Items im Anhang
+\usepackage{latexsym} 
+
+% Hier komme die Pakete für die Bibliographie. Als Backend wird biber verwendet. Daher nach dem Compilen
+% der TeX-Datei einmal biber auf die .bcf-Datei aufrufen und dann nochmal compieln. Dann sollte alles 
+% klappen. 
+\usepackage[autostyle]{csquotes}
+
+% Für Tabellen die länger als eine Seite sind
+\usepackage{longtable}
+
+\setlength{\headheight}{30pt}
+
+% Kopfzeilen und Fußzeilen
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\nouppercase \leftmark}
+\fancyhead[RE,LO]{\rightmark}
+\fancyfoot[CE,CO]{}
+\fancyfoot[LE,RO]{\thepage}
+
+\usepackage[
+    backend=biber,
+    bibencoding=utf8,
+    %style=numeric-verb,
+    %style=authoryear-ibid,
+    %style=chicago-authordate,
+    %style=apa,
+    style=authoryear,
+    sortlocale=de_DE,
+    maxcitenames=2,
+    maxbibnames=99
+]{biblatex}
+
+\addbibresource{sample.bib}
+\setlength{\bibitemsep}{12pt}
+\renewcommand{\labelnamepunct}{:\space}
+
+% Hier wird u.a. durch et al. ersetzt, sowie "und" bei zwei Autoren durch "&"
+\DefineBibliographyStrings{german}{
+	andothers = {{et\,al\adddot}},
+	and = \&,
+}
+
+\renewcommand*{\postnotedelim}{\addcolon\space}
+
+% Das entfernt die Anführungszeichen um den Titel in der Bibliographie
+\DeclareFieldFormat[inproceedings]{title}{#1} 
+\DeclareFieldFormat[incollection]{title}{#1} 
+\DeclareFieldFormat[misc]{title}{#1} 
+\DeclareFieldFormat[article]{title}{#1} 
+\DeclareFieldFormat[book]{title}{#1} 
+\DeclareFieldFormat[phdthesis]{title}{#1} 
+
+% Normalerweise schreibt es bei den Namen im Literaturverzeichnis Nachname, Vorname, Vorname, Nachname, Vorname, Nachname.
+% Das ist natüröich quatsch
+\DeclareNameAlias{sortname}{last-first}
+
+% Das Paket brauchen wir um die Titelseite einzufügen
+\usepackage{pdfpages}
+
+\begin{document}
+
+%
+% Titelseite in Latex
+%
+\iffalse
+\subject{\vspace{5cm} Seminararbeit}
+\title{Masterarbeit Vorlage}
+\author{Lieschen Müller}
+\date{}
+\maketitle
+\thispagestyle{empty}
+\newpage
+\fi
+
+
+%
+% Abstract
+%
+%\vspace*{\fill}
+%\begin{center}
+%	{\Large \bfseries \sffamily Abstract} \\
+%	\input{Text/Abstract}
+%\end{center}
+%\vspace*{\fill}
+%\thispagestyle{empty}
+%\newpage
+
+%
+% Inhaltsverzeichnis
+%
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+%
+% Der Text. Hier werden die Dateien aus dem Verzeichnis ./Text eingebunden.
+%
+\input{Text/Kapitel1}
+
+\newpage
+
+%
+% Bibliographie
+%
+\newpage
+
+% Normalerweise würde das Literaturverzeichnis nicht im Inhaltsverzeichnis auftauchen, das 
+% wird mit dieser Zeile behoben.
+\addcontentsline{toc}{section}{Literaturverzeichnis}
+
+% Zum Test: Nocite zeigt alle Einträge an, auch wenn sie im Text nicht referenziert werden.
+\nocite{*}
+\printbibliography
+\newpage
+
+\addcontentsline{toc}{section}{Erklärung zur Eigenständigkeit}
+\includegraphics[width=\textwidth]{Abbildungen/home-cat.jpg}
+\newpage
+
+
+\addcontentsline{toc}{section}{Anhang}
+% Der Anhang
+\appendix
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\fancyhead[L]{\nouppercase{\rightmark}}
+
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+    
+    {\Huge \sffamily \bfseries Anhang}
+
+\end{center}
+\vspace*{\fill}
+\newpage
+
+\section{Anhangskapitel}
+TestTestttst
+%\renewcommand{\thepage}{\arabic{page}}
+%\renewcommand{\thepage}{A-\arabic{page}}
+
+
+\end{document}

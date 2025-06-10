@@ -1,0 +1,142 @@
+%=======================================================================
+
+% Template for Thesis at Computer Sciencte at
+% Ostfalia University of Applied Science
+% Edit: Dirk J. Lehmann, Kai Michael Blum
+
+%=======================================================================
+\documentclass[
+		11pt,
+		a4paper, 
+		oneside, % twoside use two sided for book layout
+		% openany,
+		toc=listofnumbered,
+		toc=bibliography, 
+		toftofoc,
+		headings=small,
+		headings=twolineappendix
+]{scrbook}
+\usepackage[utf8]{inputenc}
+
+%=======================================================================
+
+\newif\ifdraft
+\draftfalse % Sagt aus, dass dieses Dokument ein Entwurf ist. Somit wird todonotes aktiviert. Zum deaktivieren diese Zeile auskommentieren oder auf \draftfalse setzen.
+
+%=======================================================================
+
+\input{Meta/praeampel}
+
+%=======================================================================
+
+\newcommand{\documenttitle}{TITLE OF THE THESIS}
+\newcommand{\documentname}{NAME OF AUTHOR}
+\newcommand{\documentmanr}{MATRIKELNUMMER}
+\newcommand{\documentmodul}{}
+\newcommand{\documentstudiengang}{STUDIENGANG}
+\newcommand{\documentachievement}{zur Erlangung des akademischen Grades:\\Master of Science\\}
+
+
+
+
+\newcommand{\documentbetreuer}{Prof. Dr.-Ing. habil. Dirk Joachim Lehmann}
+\newcommand{\documentbetreuerzwei}{HIER ZWEITGUTACHTER (FALLS VORHANDEN)}
+\newcommand{\documentsemester}{2022}
+
+\newcounter{documentfakultaet}
+\setcounter{documentfakultaet}{1} % 0 = Bau Wasser Boden, 1 = Informatik
+
+%=======================================================================
+
+
+\begin{document}	
+
+    % = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	\input{Kapitel/0_0_Deckblatt}
+    
+    % = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =	
+	
+	\frontmatter
+	\pagenumbering{Roman}
+	\ifnum\value{documentfakultaet}=1
+		\input{Kapitel/0_erklaerung}
+		\markboth{Erklärung}{}
+	\fi
+    
+    % = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	\input{Kapitel/0_Abstract}
+    
+    % = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =	
+	
+	% disable header
+	\fancyhead[L]{\chaptermark}  % L -> Left part
+	\fancyhead[RO]{\chaptermark} % RO -> Right part on Odd pages
+	
+	\tableofcontents % Inhaltsverzeichnis
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	\input{Kapitel/0_Abkuerzungsverzeichnis}
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	\mainmatter
+	
+	% reanable header
+	\fancyhf{}
+	\rhead{\nouppercase\rightmark}
+	\lhead{\nouppercase\leftmark}
+	
+	\fancypagestyle{plain}{}
+	%\fancyhead[LE]{\chaptermark} % Chapter in header Left
+	%\fancyhead[RE]{\chaptermark} % Page number in header Right
+	%\fancyfoot[LE]{\thepage}     % LE -> Left part on Even pages
+	\fancyfoot[RO]{\thepage}     % RO -> Right part on Odd pages
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	% reset list of used acronyms
+	\acresetall
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	% Kapitel einfügen
+	\input{Kapitel/1_Introduction}
+	\input{Kapitel/2_Related_work}
+	\input{Kapitel/3_Background}
+	\input{Kapitel/4_Approach}
+	\input{Kapitel/5_Implementation}
+	\input{Kapitel/6_Evaluation}
+	\input{Kapitel/7_Discussion}
+	\input{Kapitel/8_Future_work}
+
+    % = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+
+    % Bilbliography
+	\bibliographystyle{dinat} 
+	\bibliography{literatur}
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+	\ifnum\value{documentfakultaet}=0
+		\input{erklaerung}
+		\markboth{Erklärung}{}
+	\fi
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+    %\addtocontents{toc}{\cftpagenumbersoff{chapter}} % Keine Seitenzahl im Inhaltsverzeichnis
+	\begin{appendices}              % Anhang Titel-Seite
+	\end{appendices}
+	
+	\fancyfoot[R] {\thepage}        % Seitenzahl Right
+	
+	\appendix
+	\input{Kapitel/100_Anhang}
+	%\postappendix
+	
+	% = = = = =	= = = = = = = = = = = = = = = = = = = = = = = =
+	
+\end{document}

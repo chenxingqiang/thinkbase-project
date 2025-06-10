@@ -1,8 +1,8 @@
-from agentflow import ell2a
-from agentflow.ell2a.evaluation.evaluation import Evaluation
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, ContentBlock, MessageType
-from agentflow.ell2a.lmp.simple import simple
+from agentflow import ell
+from agentflow.ell.evaluation.evaluation import Evaluation
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, ContentBlock, MessageType
+from agentflow.ell.lmp.simple import simple
 import asyncio
 import logging
 from typing import Dict, Any, cast, Type
@@ -11,9 +11,9 @@ import random
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Initialize ELL2A integration
-ell2a_integration = ELL2AIntegration()
-ell2a_integration.configure({"store": "./logdir", "verbose": True})
+# Initialize ELL integration
+ell_integration = ELLIntegration()
+ell_integration.configure({"store": "./logdir", "verbose": True})
 
 @simple(model="deepseek-coder-33b-instruct", temperature=0.7)
 async def solve_problem(problem: str) -> Message:

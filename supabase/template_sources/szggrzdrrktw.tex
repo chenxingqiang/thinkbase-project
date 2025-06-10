@@ -1,0 +1,153 @@
+\documentclass[10pt, t, fleqn, aspectratio=43, %handout
+]{beamer} %aspectratio can be 43 or 169
+%\usepackage[english]{babel}
+%\documentclass[10pt, t, fleqn, aspectratio=169]{beamer}
+\usepackage[43]{SUslide}
+\usepackage{graphicx}
+\usepackage[skins,theorems]{tcolorbox}
+\usepackage{tikz}
+\usepackage{venndiagram}
+\usepackage{ifthen}
+\usepackage[all]{xy}
+%\usetikzlibrary{positioning,shadows,backgrounds}
+%\usepackage{empheq}
+%\usepackage{animate}
+%\usepackage{table}
+%-------------------------------------------------------
+% INFORMATION IN THE TITLE PAGE
+%-------------------------------------------------------
+
+\title[Short title] % [] is optional - is placed on the bottom of the sidebar on every slide
+{ % is placed on the title page
+      \textbf{Title}
+}
+
+\subtitle[]
+{
+      \textbf{Extra info}
+}
+
+\author[Short Author]
+{      Author \\
+      \alert{\ttfamily xxx@math.su.se}
+}
+
+\institute[]
+{
+10
+
+      Department of Mathematics, Faculty of Science\\
+      Stockholm University\\
+  
+  %there must be an empty line above this line - otherwise some unwanted space is added between the university and the country (I do not know why;( )
+}
+
+\date{\today}
+\setbeamertemplate{caption}{\insertcaption}
+%-------------------------------------------------------
+% THE BODY OF THE PRESENTATION
+%-------------------------------------------------------
+\makeatletter
+\newcommand\binomialCoefficient[2]{%
+    % Store values 
+    \c@pgf@counta=#1% n
+    \c@pgf@countb=#2% k
+    %
+    % Take advantage of symmetry if k > n - k
+    \c@pgf@countc=\c@pgf@counta%
+    \advance\c@pgf@countc by-\c@pgf@countb%
+    \ifnum\c@pgf@countb>\c@pgf@countc%
+        \c@pgf@countb=\c@pgf@countc%
+    \fi%
+    %
+    % Recursively compute the coefficients
+    \c@pgf@countc=1% will hold the result
+    \c@pgf@countd=0% counter
+    \pgfmathloop% c -> c*(n-i)/(i+1) for i=0,...,k-1
+        \ifnum\c@pgf@countd<\c@pgf@countb%
+        \multiply\c@pgf@countc by\c@pgf@counta%
+        \advance\c@pgf@counta by-1%
+        \advance\c@pgf@countd by1%
+        \divide\c@pgf@countc by\c@pgf@countd%
+    \repeatpgfmathloop%
+    \the\c@pgf@countc%
+}
+\makeatother
+\newcommand\Stirling[2]{%
+    % Store values 
+    \c@pgf@counta=#1% n
+    \c@pgf@countb=#2% k
+    %
+    
+    % Recursively compute the coefficients
+    \c@pgf@countc=1% will hold the result
+    \c@pgf@countd=0% counter
+    \pgfmathloop% c -> c*(n-i)/(i+1) for i=0,...,k-1
+        \ifnum\c@pgf@countd<\c@pgf@countb%
+        \multiply\c@pgf@countc by\c@pgf@counta%
+        \advance\c@pgf@counta by-1%
+        \advance\c@pgf@countd by1%
+        \divide\c@pgf@countc by\c@pgf@countd%
+    \repeatpgfmathloop%
+    \the\c@pgf@countc%
+}
+\makeatother
+\begin{document}
+
+
+
+%\begin{frame}{Content}{}
+%\tableofcontents
+%\end{frame}
+
+%-------------------------------------------------------
+\section{A section}
+%-------------------------------------------------------
+
+\begin{frame}{A Slide}
+%-------------------------------------------------------
+
+  \begin{itemize}
+    \item<1-> \textbf{Bok:} \emph{Discrete Mathematics, second edition} av Norman L. Biggs. Oxford University Press.
+    \item<2-> \textbf{Tid och Plats:} Tisdagar och fredagar kl 12:45-14:30 Sal 15 Hus 5. Det ska ocks\aa\; vara \textbf{\"ovningar} p\aa\; tisdagar och fredagar kl 14:45-16:30.
+    \item<3-> Det finns 2 stycken problemsamlingar (Webwork), med vardera 14 uppgifter. Avklaras alla uppgifter inom en problemsamling  ges 1,5 bonuspo\"ang p\aa\; tentamen.
+  \end{itemize}
+\end{frame}
+\begin{frame}{Another slide}
+%-------------------------------------------------------
+\begin{definition}
+A definition
+\end{definition}
+\begin{block}
+{A block}
+\end{block}
+\begin{exampleblock}
+{An example block}example
+\end{exampleblock}
+\begin{alertblock}
+{An alert block}
+\end{alertblock}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Talsystem, \"Andliga och O\"andliga M\"angder}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Talsystem}
+    An box\\
+    \hfill\\
+    \begin{tcolorbox}[colback=migrey!50,colframe=miblue]
+     \hfill\\
+ $$a_n\ldots a_1a_0\quad\text{betyder}\quad a_n\cdot 10^n+\cdots+a_1\cdot 10+a_0\cdot 10^0$$
+\end{tcolorbox}
+
+ 
+\end{frame}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

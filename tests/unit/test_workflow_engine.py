@@ -12,7 +12,7 @@ from agentflow.core.model_config import ModelConfig
 from agentflow.core.config import WorkflowConfig as ConfigWorkflowConfig
 from agentflow.agents.agent_types import AgentType, AgentMode
 from agentflow.agents.agent import Agent
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 from agentflow.core.isa.isa_manager import ISAManager, Instruction, InstructionType
 from agentflow.core.instruction_selector import InstructionSelector
 from agentflow.core.isa.result import InstructionResult, InstructionStatus
@@ -51,7 +51,7 @@ def valid_workflow_def():
     }
 
 @pytest.fixture
-def workflow_config(mock_ell2a):
+def workflow_config(mock_ell):
     """Create a workflow configuration."""
     async def mock_transform_execute(step: WorkflowStep, context: Dict[str, Any]):
         """Mock transform execution function."""
@@ -112,26 +112,26 @@ def mock_instruction_selector():
     return selector
 
 @pytest.fixture
-def mock_ell2a():
-    """Create a mock ELL2A integration."""
-    ell2a = MagicMock(spec=ELL2AIntegration)
+def mock_ell():
+    """Create a mock ELL integration."""
+    ell = MagicMock(spec=ELLIntegration)
     
     async def process_message(message: str) -> Dict[str, Any]:
         return {"result": "test_result"}
     
-    ell2a.process_message = AsyncMock(side_effect=process_message)
-    return ell2a
+    ell.process_message = AsyncMock(side_effect=process_message)
+    return ell
 
 @pytest.fixture(autouse=True)
-async def cleanup_mocks(mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def cleanup_mocks(mock_ell, mock_isa_manager, mock_instruction_selector):
     """Clean up mocks after each test."""
     yield
-    mock_ell2a.reset_mock()
+    mock_ell.reset_mock()
     mock_isa_manager.reset_mock()
     mock_instruction_selector.reset_mock()
 
 @pytest.fixture
-async def workflow_engine(valid_workflow_def, workflow_config, mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def workflow_engine(valid_workflow_def, workflow_config, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Create a workflow engine instance."""
     engine = WorkflowEngine()
     await engine.initialize(workflow_def=valid_workflow_def)
@@ -167,7 +167,7 @@ async def test_invalid_workflow_config(workflow_engine):
         await engine.register_workflow(Agent(config=AgentConfig(name="test", type="research", model=ModelConfig(name="gpt-4", provider="openai"))), None)
 
 @pytest.mark.asyncio
-async def test_workflow_execution(workflow_engine, mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def test_workflow_execution(workflow_engine, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test workflow execution."""
     engine = await workflow_engine
     result = await engine.execute_workflow(engine.default_agent_id, {"data": "test_input"})

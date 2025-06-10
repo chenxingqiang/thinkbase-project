@@ -1,5 +1,5 @@
 from flask import Flask
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import os
 import openai
 import asyncio
@@ -15,10 +15,10 @@ if not api_key:
 client = openai.OpenAI(api_key=api_key)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -42,7 +42,7 @@ def async_route(f):
         return async_to_sync(f)(*args, **kwargs)
     return wrapped
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def generate_welcome(name: str) -> str:
     """Generate a welcome message for the given name."""
     try:

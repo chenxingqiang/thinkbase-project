@@ -1,0 +1,138 @@
+% Authors of the template: Mert NAKIP, Alper SAYLAM, and Alperen HELVA
+% Created on 18.04.2020
+% Updated on 01.06.2022
+
+
+%This template is not an official template, it is created for personal usage purposes. Yasar University is not responsible or copyright holder on any part of this template. The template is provided "AS IS": This template is provided "as is" and "as available", at your own risk. We disclaim any warranty of fitness for a particular purpose and freedom from errors.
+
+
+% documentclass options:
+% if you'd rather have a one sided thesis, add `onside' to the documentclass
+\documentclass[12pt, a4paper, english, chapterprefix=on, openany]{scrbook}
+
+\input{settings/setup}
+%HIGHLIGHTS
+\usepackage{color,soul}
+\usepackage{afterpage}
+\usepackage{apacite}
+
+\usepackage[english]{babel}
+\addto{\captionsenglish}{%
+    \renewcommand{\refname}{~}%
+    \renewcommand{\contentsname}{Table of Contents}}
+ 
+\include{Shortcuts}
+
+%\usepackage{fancyhdr}
+
+\begin{document}
+	
+% ======== ADJUST THE NAME OF THE TOC - LOF - LOT =================
+% Do not change the position of this code block. 
+\renewcommand{\contentsname}{TABLE OF CONTENTS}
+\renewcommand{\listfigurename}{LIST OF FIGURES}
+\renewcommand{\listtablename}{LIST OF TABLES}
+% =================================================================
+
+
+    %\pagestyle{empty} % no header and no page number
+% disable hyper links to remove warning "destination with same identifier"
+% this means within this section nothing can be referenced with a hyperlink
+
+\hypersetup{pageanchor=false}
+
+\afterpage{%
+	\newgeometry{top=0.49in, bottom=0.49in, left=1.58in, right=0.98in}
+\include{chapters/TitlePage/TitlePage}
+\clearpage
+\restoregeometry
+}
+%\pagestyle{plain} % remove chapter name from top, page number at the bottom
+\frontmatter  % roman page numbers
+% YOU SHOULD ADD CENTERING TO NAME OF EACH CHAPTER THAT HAS NO CHAPTER NUMBER 
+% YOU SHOULD ADD REFERENCE TO EACH CHAPTER THAT HAS NO CHAPTER NUMBER.
+
+%\chapter*{Abstract Title Page}
+%\chapter*{Abstract}
+%\include{chapters/0_1-declaration}
+
+
+
+\setboolean{@twoside}{false} 
+\include{chapters/Jury/Jury}
+
+
+\hypersetup{pageanchor=true}
+
+\newpage
+\phantomsection
+
+\addcontentsline{toc}{chapter}{ABSTRACT} % KEEP THIS REFERENCE LINE BELOW THE INCLUDE OF CHAPTER 
+
+\include{chapters/Abstract/Abstract}
+
+
+
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{chapter}{ÖZ}
+\include{chapters/Abstract_Turkish/Abstract_Turkish}
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{chapter}{ACKNOWLEDGEMENTS}
+\include{chapters/Acknowledgements/Acknowledgements}
+
+\newpage
+\phantomsection
+\addcontentsline{toc}{chapter}{TEXT OF OATH}
+\include{chapters/TextOath/TextOath}
+
+\newpage
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{TABLE OF CONTENTS}
+\tableofcontents
+
+\newpage
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+
+\newpage
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+
+%\listofalgorithms
+
+\newpage
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{SYMBOLS AND ABBREVIATIONS}
+\include{chapters/ListSymbols/ListSymbols}
+\clearpage
+\restoregeometry
+
+\mainmatter  % Arabic page numbers
+\setboolean{@twoside}{true} 
+\include{chapters/introduction/introduction}
+\include{chapters/main/main}
+\include{chapters/conclusions/conclusions}
+
+% bibliography is not in the table of contents per default, add it manually
+\newpage
+\clearpage
+\phantomsection% Mark a hyperref link location
+\addcontentsline{toc}{chapter}{REFERENCES}
+\include{References/References}
+
+%\newpage
+%\thispagestyle{empty}
+%\mbox{}
+
+
+\end{document}

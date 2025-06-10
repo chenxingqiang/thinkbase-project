@@ -1,21 +1,21 @@
-"""Tests for ELL2A integration functionality."""
+"""Tests for ELL integration functionality."""
 
 import pytest
 import asyncio
 from typing import Dict, Any
-from agentflow.core.ell2a_integration import ell2a_integration
+from agentflow.core.ell_integration import ell_integration
 from agentflow.core.workflow_types import WorkflowConfig, ErrorPolicy, WorkflowStep, StepConfig, WorkflowStepType
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
-from agentflow.ell2a.lmp import LMPType
-from agentflow.ell2a.workflow import ELL2AWorkflow
+from agentflow.ell.types.message import Message, MessageRole, MessageType
+from agentflow.ell.lmp import LMPType
+from agentflow.ell.workflow import ELLWorkflow
 import uuid
 
 @pytest.fixture(autouse=True)
-def cleanup_ell2a():
-    """Clean up ELL2A integration state before each test."""
-    ell2a_integration.cleanup()
+def cleanup_ell():
+    """Clean up ELL integration state before each test."""
+    ell_integration.cleanup()
     yield
-    ell2a_integration.cleanup()
+    ell_integration.cleanup()
 
 @pytest.fixture
 def sample_workflow_config():
@@ -40,7 +40,7 @@ def sample_workflow_config():
         ],
         distributed=False,
         metadata={
-            "ell2a_config": {
+            "ell_config": {
                 "simple": {
                     "model": "test-model",
                     "max_retries": 3,
@@ -61,8 +61,8 @@ def sample_workflow_config():
     )
 
 @pytest.mark.asyncio
-async def test_ell2a_message_handling():
-    """Test ELL2A message creation and handling."""
+async def test_ell_message_handling():
+    """Test ELL message creation and handling."""
     # Create a message
     message = Message(
         role=MessageRole.USER,
@@ -77,30 +77,30 @@ async def test_ell2a_message_handling():
     assert message.metadata["type"] == MessageType.TEXT
 
 @pytest.mark.asyncio
-async def test_ell2a_workflow_registration():
-    """Test ELL2A workflow registration and management."""
-    workflow = ELL2AWorkflow(
+async def test_ell_workflow_registration():
+    """Test ELL workflow registration and management."""
+    workflow = ELLWorkflow(
         name="test-workflow",
         description="Test workflow"
     )
     
     # Register workflow
-    ell2a_integration.register_workflow(workflow.id, workflow)
+    ell_integration.register_workflow(workflow.id, workflow)
     
     # Verify registration
-    workflows = ell2a_integration.list_workflows()
+    workflows = ell_integration.list_workflows()
     assert workflow.id in workflows
     
     # Unregister workflow
-    ell2a_integration.unregister_workflow(workflow.id)
-    workflows = ell2a_integration.list_workflows()
+    ell_integration.unregister_workflow(workflow.id)
+    workflows = ell_integration.list_workflows()
     assert workflow.id not in workflows
 
 @pytest.mark.asyncio
-async def test_ell2a_function_decoration():
-    """Test ELL2A function decoration."""
+async def test_ell_function_decoration():
+    """Test ELL function decoration."""
     
-    @ell2a_integration.with_ell2a(mode="simple")
+    @ell_integration.with_ell(mode="simple")
     async def test_function():
         return Message(
             role=MessageRole.ASSISTANT,
@@ -111,7 +111,7 @@ async def test_ell2a_function_decoration():
     result = await test_function()
     assert result.content == "success"
     
-    @ell2a_integration.with_ell2a(mode="complex")
+    @ell_integration.with_ell(mode="complex")
     async def test_complex_function():
         return Message(
             role=MessageRole.ASSISTANT,
@@ -123,10 +123,10 @@ async def test_ell2a_function_decoration():
     assert result.content == "complex success"
 
 @pytest.mark.asyncio
-async def test_ell2a_performance_tracking():
-    """Test ELL2A performance tracking."""
+async def test_ell_performance_tracking():
+    """Test ELL performance tracking."""
     
-    @ell2a_integration.track_function()
+    @ell_integration.track_function()
     async def tracked_function():
         await asyncio.sleep(0.1)  # Simulate work
         return Message(
@@ -136,17 +136,17 @@ async def test_ell2a_performance_tracking():
         )
     
     result = await tracked_function()
-    metrics = ell2a_integration.get_metrics()
+    metrics = ell_integration.get_metrics()
     
     assert "tracked_function" in metrics
     assert metrics["tracked_function"]["calls"] > 0
     assert metrics["tracked_function"]["total_time"] > 0
 
 @pytest.mark.asyncio
-async def test_ell2a_mode_configuration(sample_workflow_config):
-    """Test ELL2A mode configuration."""
-    # Configure ELL2A
-    ell2a_config = {
+async def test_ell_mode_configuration(sample_workflow_config):
+    """Test ELL mode configuration."""
+    # Configure ELL
+    ell_config = {
         "simple": {
             "model": "test-model",
             "max_retries": 3,
@@ -163,34 +163,34 @@ async def test_ell2a_mode_configuration(sample_workflow_config):
             "stream": True
         }
     }
-    ell2a_integration.configure(ell2a_config)
+    ell_integration.configure(ell_config)
     
     # Get mode config
-    simple_config = ell2a_integration.get_mode_config("simple")
-    complex_config = ell2a_integration.get_mode_config("complex")
+    simple_config = ell_integration.get_mode_config("simple")
+    complex_config = ell_integration.get_mode_config("complex")
     
     assert simple_config["model"] == "test-model"
     assert complex_config["track_performance"] == True
     assert complex_config["track_memory"] == True
 
 @pytest.mark.asyncio
-async def test_ell2a_error_handling():
-    """Test ELL2A error handling."""
+async def test_ell_error_handling():
+    """Test ELL error handling."""
     
-    @ell2a_integration.with_ell2a(mode="simple")
+    @ell_integration.with_ell(mode="simple")
     async def failing_function():
         raise ValueError("Test error")
     
     with pytest.raises(ValueError):
         await failing_function()
     
-    metrics = ell2a_integration.get_metrics()
+    metrics = ell_integration.get_metrics()
     assert "failing_function" in metrics
     assert metrics["failing_function"]["errors"] > 0
 
 @pytest.mark.asyncio
-async def test_ell2a_context_management():
-    """Test ELL2A context management."""
+async def test_ell_context_management():
+    """Test ELL context management."""
     # Create test messages
     messages = [
         Message(
@@ -206,16 +206,16 @@ async def test_ell2a_context_management():
     
     # Process messages
     for msg in messages:
-        await ell2a_integration.process_message(msg)
+        await ell_integration.process_message(msg)
     
     # Get messages
-    processed_messages = ell2a_integration.get_messages()
+    processed_messages = ell_integration.get_messages()
     assert len(processed_messages) == 3
     assert all(isinstance(msg, Message) for msg in processed_messages)
 
 @pytest.mark.asyncio
-async def test_ell2a_workflow_execution(sample_workflow_config):
-    """Test ELL2A workflow execution."""
+async def test_ell_workflow_execution(sample_workflow_config):
+    """Test ELL workflow execution."""
     # Create a message
     message = Message(
         role=MessageRole.USER,
@@ -228,7 +228,7 @@ async def test_ell2a_workflow_execution(sample_workflow_config):
     )
     
     # Process message
-    result = await ell2a_integration.process_message(message)
+    result = await ell_integration.process_message(message)
     assert result is not None
     assert isinstance(result, Message)
     assert result.type == MessageType.RESULT

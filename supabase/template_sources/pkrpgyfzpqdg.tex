@@ -1,0 +1,361 @@
+% !TEX program = xelatex
+% !TEX builder = latexmk
+% !Mode:: "TeX:UTF-8:Hard"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Scientific Article / Thesis template
+%%
+%% Andreas Landgraf (2016)
+%%     andreas dot landgraf at edu dot campus02 dot at
+%%
+%% see "How to Write a Thesis in LaTeX"
+%%     https://www.sharelatex.com/blog/2013/08/02/thesis-series-pt1.html
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\campusSubject{BACHELOR THESIS}
+\def\campusTitle{\LaTeX{} Scientific Document Template}
+\def\campusAuthor{Lorem Ipsum}
+\def\campusPersKnz{123456789}
+\def\campusCity{Graz}
+\def\campusDate{\today}
+\def\campusKeywords{Campus02, Graz, Thesis}
+
+\documentclass[
+  headexclude,
+  footexclude,
+  10pt,
+  a4paper,
+  oneside,
+  captions=tableheading,
+  bibliography=totoc,
+  listof=totoc
+]{scrbook}
+
+\RequirePackage[
+  automark,
+  headsepline
+]{scrlayer-scrpage}
+
+\RequirePackage{geometry}
+\RequirePackage{layouts}
+\RequirePackage{calc}
+\RequirePackage{setspace}
+\RequirePackage{titlesec}
+\RequirePackage[austrian,american]{babel}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{fontspec}
+\RequirePackage[hyphens]{url}
+\RequirePackage{csquotes}
+\RequirePackage{amsmath,amsthm,amssymb}
+\RequirePackage{color}
+\RequirePackage[dvipsnames,svgnames,table]{xcolor}
+\RequirePackage{booktabs}
+\RequirePackage{textcomp}
+\RequirePackage{graphicx}
+\RequirePackage{tabularx}
+\RequirePackage{multirow}
+\RequirePackage[font=small,format=hang,labelfont=bf]{caption}
+\RequirePackage{subcaption}
+\RequirePackage[colorinlistoftodos,obeyDraft]{todonotes}
+\RequirePackage[toc,acronym,style=long,nonumberlist]{glossaries}
+
+\RequirePackage[
+  backend=biber,
+  style=campus02,
+  natbib=true,
+  sorting=nty,
+  sortlocale=en_US,
+  autocite=footnote,
+  related=true,
+  backref=false,
+  hyperref=auto,
+  isbn=false,
+  url=false,
+  citereset=none,
+  maxcitenames=3,
+  maxbibnames=100,
+  block=none,
+  citecounter=true,
+]{biblatex}
+
+\RequirePackage{enumitem}
+
+\RequirePackage{footnote}
+\RequirePackage[multiple]{footmisc}
+\RequirePackage{chngcntr}
+
+\RequirePackage[
+  pdffitwindow=true,
+  pdfpagelayout={OneColumn},
+  bookmarks=true,
+  bookmarksnumbered=true,
+  bookmarksopen=true,
+  hyperindex=true,
+  colorlinks=false,
+  linkcolor=black,
+  urlcolor=black,
+  citecolor=black,
+  unicode=true,
+  hidelinks,
+  hyperfootnotes=false
+]{hyperref}
+\RequirePackage{nameref}
+\RequirePackage{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliographies
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\counterwithout{footnote}{chapter}
+
+\DeclareLanguageMapping{american}{american-apa}
+\NewBibliographyString{retrieved}
+\NewBibliographyString{from}
+\DefineBibliographyStrings{american}{
+  retrieved = {},
+  from = {},
+}
+
+\addbibresource{literature/mendeley.bib}
+\addbibresource{literature/internet.bib}
+
+\defbibfilter{printed}{
+  \type{book} \or
+  \type{phdthesis} \or
+  \type{article} \or
+  \type{incollection} \or
+  \( \type{techreport} \and \not \keyword{RFC4944} \) \or
+  \type{inproceedings}
+}
+
+\defbibfilter{online}{
+  \type{online} \or
+  \( \type{techreport} \and \keyword{RFC4944} \)
+}
+
+\newenvironment{bibhyphenation}
+{\hyphenpenalty=20
+  \tolerance=9999
+  \exhyphenpenalty=0
+  \linepenalty=0
+  \setlength{\emergencystretch}{3em}}
+{}
+
+\crefname{table}{table}{tables}
+\Crefname{table}{Table}{Tables}
+\crefname{figure}{figure}{figures}
+\Crefname{figure}{Figure}{Figures}
+\crefname{section}{section}{sections}
+\Crefname{section}{Section}{Sections}
+\crefname{chapter}{chapter}{chapters}
+\Crefname{chapter}{Chapter}{Chapters}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\geometry{
+  left=2.5cm,
+  right=2cm,
+  top=2.5cm,
+  bottom=2.2cm,
+}
+
+\graphicspath{{images/}}
+\setmainfont{Arial}
+
+\makeglossaries
+
+\input{acronyms}
+
+\renewcommand*{\glspostdescription}{}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\clubpenalty = 10000
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+
+\frenchspacing
+\renewcommand{\singlespacing}{\setstretch{1.09}}
+\renewcommand{\onehalfspacing}{\setstretch{1.45}}
+\singlespacing
+\newlength{\singlebaselineskip}
+\setlength{\singlebaselineskip}{\baselineskip}
+\onehalfspacing
+\renewcommand{\arraystretch}{1.09}
+\addtokomafont{sectioning}{\setstretch{1}\selectfont}
+
+\renewcommand*{\chapterheadstartvskip}{\vspace*{4mm}}
+\renewcommand*{\chapterheadendvskip}{\vspace*{0mm}}
+
+\titlespacing*{\section}{0mm}{4mm}{0mm}
+\titlespacing*{\subsection}{0mm}{4mm}{0mm}
+
+\setlength{\parskip}{3mm}
+\setlength{\itemsep}{1em}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+% clear header and footer
+\clearscrheadfoot
+\ihead[]{\leftmark}
+\chead[]{}
+\ohead[]{}
+\ifoot[]{}
+\cfoot[]{}
+\ofoot[]{\thepage}
+
+\setkomafont{title}{\fontspec{Arial}\Large\bfseries}
+\setkomafont{pageheadfoot}{\fontspec{Arial}\normalsize}
+\setkomafont{chapter}{\fontspec{Arial}\Large\bfseries}
+\setkomafont{section}{\fontspec{Arial}\Large\bfseries}
+\setkomafont{subsection}{\fontspec{Arial}\large\bfseries}
+\setkomafont{chapterentry}{\fontspec{Arial}\bfseries}
+
+% Make chapter titles uppercase is a pain.
+\titleformat{\chapter}[hang]
+  {\fontspec{Arial}\Large\bfseries}
+  {\thechapter}
+  {.5em}
+  {\MakeUppercase}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand*{\maketitle}{
+  \clearpage
+  \thispagestyle{empty}
+  \null
+  \begin{center}
+    {\textbf{\campusSubject} \par}
+    \vskip 2.5em
+    {\hrule\vskip 2em \titlefont\huge\campusTitle\vspace*{1em}\hrule\vspace*{1.5em}\par}
+    {accomplished at \par}
+    \vskip .6em
+    {\parbox[c]{6.6cm}{\includegraphics[width=6.6cm]{images/Campus02_Logo.pdf}} \par}
+    \vskip .1em
+    {FACHHOCHSCHULE DER WIRTSCHAFT \par}
+    \vskip 2em
+    {Bachelor Degree Programme \\ Innovation Management \par}
+    \vskip 2em
+    {by \\ {\Large \textbf{\campusAuthor}} \\ \campusPersKnz \par}
+    \vskip 2em
+    {supervised and reviewed by \par}
+    {\normalsize Dipl.-Ing. Johann Johannes \\ FH-Prof. Dipl.-Ing. Dr.techn. Michael Terler \par}
+    \vfill
+    {
+      \begin{flushleft}
+        \hfill\parbox[c]{7.3cm}{\includegraphics[width=5cm]{images/Placeholder}}
+        \begin{tabular}{lclcl}
+          {\campusCity, \campusDate} & ~\hfill & \hspace*{3cm} & ~\hfill &  \underline{\hspace*{5cm}} \\
+          ~\hfill & ~ &   & ~ &  \multicolumn{1}{c}{Signature}   \\
+        \end{tabular}
+      \end{flushleft}
+    }
+  \end{center}
+  \par
+}
+
+
+\begin{document}
+
+\frontmatter
+
+\renewcommand*{\chapterpagestyle}{scrplain}
+\pagestyle{scrplain}
+
+% allow more flexible whitespaces to avoid hyphenation and overfull hboxes
+\sloppy
+
+\begin{titlepage}
+
+\subject{\campusSubject}
+\title{\campusTitle}
+
+\author{\bfseries \campusAuthor}
+\date{\campusCity, \campusDate}
+
+\maketitle
+
+\end{titlepage}
+\newpage
+
+\chapter*{Ehrenwörtliche Erklärung}
+
+\begin{otherlanguage}{austrian}
+Ich erkläre ehrenwörtlich, dass ich die vorliegende Arbeit selbstständig und ohne fremde Hilfe verfasst, andere als die angegebenen Quellen nicht benützt und die benutzten Quellen wörtlich zitiert sowie inhaltlich entnommene Stellen als solche kenntlich gemacht habe.
+\end{otherlanguage}
+
+{
+  \begin{flushleft}
+    \vskip 2em
+    \hfill\parbox[c]{7.3cm}{\includegraphics[width=5cm]{images/Placeholder}}
+    \begin{tabular}{lclcl}
+      {\campusCity, \campusDate} & ~\hfill & \hspace*{3cm} & ~\hfill &  \underline{\hspace*{5cm}} \\
+      ~\hfill & ~ &   & ~ &  \multicolumn{1}{c}{Signature}   \\
+    \end{tabular}
+  \end{flushleft}
+}
+
+%\chapter*{Acknowledgement}
+
+%Firstly, I would like to express my sincere gratitude to ...
+
+\chapter*{Abstract}
+
+This work deals with the introduction of the subject 'Wissenschaftliches Arbeiten' at ...
+
+\vspace{2cm}
+
+\textbf{Keywords:} \campusKeywords
+
+\chapter*{Zusammenfassung}
+
+\begin{otherlanguage}{austrian}
+Die vorliegende Arbeit befasst sich mit der Einführung des Kurses 'Wissenschaftliches Arbeiten' an der ...
+\end{otherlanguage}
+
+\vspace{2cm}
+
+\textbf{Keywords:} \campusKeywords
+
+\mainmatter
+
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\pagestyle{scrheadings}
+\setlength{\parindent}{0em}
+\renewcommand*{\chapterpagestyle}{scrheadings}
+
+\tableofcontents
+
+\clearpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/introduction}
+\input{chapters/chapter02}
+\input{chapters/chapter03}
+\input{chapters/chapter04}
+\input{chapters/conclusion}
+
+% include all literature sources (for testing only)
+\nocite{*}
+
+\clearpage
+
+\ihead[]{References}
+\printbibheading[heading=bibintoc, title=References]
+\begin{bibhyphenation}
+  \printbibliography[heading=subbibintoc, title=Bibliography, filter={printed}]
+  \printbibliography[heading=subbibintoc, title=Webography, filter={online}]
+\end{bibhyphenation}
+
+\clearpage
+
+\ihead[]{\leftmark}
+\listoffigures
+\listoftables
+\printglossary[type=\acronymtype]
+
+\end{document}

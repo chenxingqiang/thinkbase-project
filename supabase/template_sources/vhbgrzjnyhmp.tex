@@ -1,0 +1,164 @@
+%Questo è il preambolo, dove si inseriscono i pacchetti e le impostazioni che servono per compilare il documento. Quanto scritto dopo il simbolo '%' è solo un commento e serve a fini dimostrativi.
+\documentclass[a4paper, 13pt, oneside]{report}
+\linespread{1.5} %interlinea
+\pagestyle{plain}
+\usepackage{geometry} %margini
+\geometry{a4paper, top=3cm, bottom=3cm, left=3cm, right=3cm, bindingoffset=5mm}
+\usepackage{graphicx}
+\graphicspath{immagini/}
+\usepackage{multicol} %più colonne
+\usepackage{ragged2e} %allineamento testo
+
+
+\usepackage[italian]{babel} %lingua principale
+
+\usepackage{minitoc} %mini sommario a inizio capitolo
+\nomtcrule 
+\addto{\captionsitalian}{% Making babel aware of special titles
+  \renewcommand{\mtctitle}{Sommario}
+}
+
+
+
+
+\usepackage[sorting=none,backend=biber,refsection=chapter]{biblatex} %bibliografia
+\defbibheading{bibbysubsect}{\section*{Capitolo \ref{blx:refsection\therefsection}}}
+\addbibresource{bibliografia.bib}
+
+
+
+
+
+\usepackage{comment}
+
+
+
+
+
+
+
+
+\usepackage{xpatch}
+\usepackage{blindtext}
+
+
+\makeatletter
+
+\xpatchcmd{\@makeschapterhead}{%
+  \Huge \bfseries  #1\par\nobreak%
+}{%
+  \Huge \bfseries\centering #1\par\nobreak%
+}{\typeout{Patched makeschapterhead}}{\typeout{patching of @makeschapterhead failed}}
+
+
+\xpatchcmd{\@makechapterhead}{%
+  \huge\bfseries \@chapapp\space \thechapter
+}{%
+  \huge\bfseries\centering \@chapapp\space \thechapter
+}{\typeout{Patched @makechapterhead}}{\typeout{Patching of @makechapterhead failed}}
+
+\makeatother
+
+\usepackage{fancyhdr}
+\usepackage[export]{adjustbox}
+
+
+
+\usepackage{hyperref} %hyperlink
+\hypersetup{
+    colorlinks=true,
+    citecolor=cyan,
+    linkcolor=black,
+    urlcolor=black,
+    pdftitle=Una buona tesi,
+    pdfauthor=Un povero studente di medicina,
+    }
+
+\usepackage{booktabs} %per le tabelle
+\usepackage{multirow}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{graphicx}
+
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{wrapfig}
+
+%Da qui in poi inizia il documento.
+\begin{document}
+\begin{titlepage} %Cambia i valori in \vspace{} per ottenere un risultato perfetto
+
+\begin{center}
+	{\scshape\Large\bfseries UNIVERSITÀ DEGLI STUDI DI NAPOLI\\ FEDERICO II \par}
+	\vspace{1cm}
+	\includegraphics{immagini/logo.jpg}\par
+	\vspace{0,7cm}
+	{\scshape\Large\bfseries SCUOLA DI MEDICINA E CHIRURGIA \par}
+	\vspace{0,5cm}
+	{\scshape\normalsize Corso di Laurea Magistrale in Medicina e Chirurgia\par}
+	\vspace{0.3cm}
+	{\scshape\small Dipartimento di Neuroscienze e Scienze riproduttive\\ ed odontostomatologiche\par}
+	\vspace{0.3cm}
+	{\scshape\normalsize Tesi di Laurea Sperimentale in\\
+    PSICHIATRIA\par}
+	\vspace{0.3cm}
+	{\scshape\normalsize\bfseries INSERISCI QUI IL TITOLO DELLA TUA TESI\par}
+	\vspace{0,5cm}
+	{\schape\normalsize\bfseries ADD HERE YOUR TESIS TITLE, THIS TIME IN ENGLISH\par}
+	\vspace{1,2cm}
+	\end{center}
+	
+	\begin{multicols}{2}
+	\begin{center}
+	 	{
+		\schape\normalsize\textbf{Relatore:\\Ch.mo.}\\ Giovanni Rossi \par}
+	\vfill
+	\schape\normalsize\textbf{Candidato:}\\Giuseeppe Esposito\\M39000000 \par 
+	\end{center}
+	\end{multicols}
+	
+	\vfill
+
+% Bottom of the page
+	{\begin{center}
+	     \schape\large ANNO ACCADEMICO 2019/2020
+	\end{center}}
+
+\end{titlepage}
+
+\dominitoc
+\tableofcontents
+
+\begin{center}
+\vfill
+    \chapter{Piccoli suggerimenti}
+    \label{blx:refsection\therefsection}
+\vfill
+\minitoc
+\newpage
+\end{center}
+\justify
+
+\section{Introduzione}
+Ottima scelta! \LaTeX è di gran lunga meglio di MS Word e programmi affini. Per qualsiasi cosa, fai riferimento alla documentazione di Overleaf o cerca con il tuo motore di ricerca preferito (in inglese) quello che ti serve. Qui ti lascio solo qualche consiglio.
+
+\section{Tabelle}
+Usa questo sito https://www.tablesgenerator.com/.
+
+\section{Bibliografia}
+Ecco una dimostrazione di come fare una citazione \cite{lysaker2010metacognition}. Ricorda che ci sono gli hyperlink, quindi prova a cliccare sulla citazione sul documento compilato. \\
+Il modo più semplice per aggiungere articolari da citare al file 'bibliografia.bib' è andare su google scholar, cercare l'articolo che ti interessa, cliccare sul simbolo ' " ' ed infine selezionare BibTex e fare copia-incolla.
+
+\section{Presentazione}
+Prova ad usare \LaTeX anche per la presentazione della tua tesi, non te ne pentirai!
+
+\medskip
+
+
+\printbibheading[
+heading=bibintoc,
+title={Bibliografia}
+]
+\bibbysection[heading=bibbysubsect]
+
+
+\end{document}

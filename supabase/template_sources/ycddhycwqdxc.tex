@@ -1,0 +1,120 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NEM HIVATALOS Óbudai Egyetem Diplomamunka/Szakdolgozat sablon 
+% A sablon garancia nélkül kerül szolgáltatásra.
+% A sablon használatából eredő problémákért semmilyen 
+% felelőséget nem vállalnak a készítők.
+% A sablon a teljesség igénye nélkül készült, 
+% tartalmaz hiányosságokat melyeket a dolgozat 
+% szerzőjének kell korrigálnia!
+% A létrehozás során kizárólag a 
+% Kandó Kálmán Villamosmérnöki Kar 
+% igényeit vettem figyelembe.
+% A sablon bővíthető, javítható és újra osztható igény szerint.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NON-OFFICIAL Óbuda University Thesis Template
+% The template is provided without warranty of any kind.
+% In no event shall the authors be liable for any claim.
+% The template was created without claiming completeness 
+% and contains deficiencies that the author 
+% of the final thesis document must correct.
+% During creation, only the requirements 
+% for Kandó Kálmán Electrical Engineering Faculty 
+% were taken into account.
+% Feel free to extend, correct and re-share this template.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%két oldalas dolgozat megfelelő nyomtatáshoz
+%two side for printing
+\documentclass[twoside,a4paper,12pt]{report}
+
+\usepackage[english, magyar]{babel}
+\usepackage{biblatex}
+
+%a dolgozat alap adatai
+%base data for the thesis
+\input{data}
+\input{style-thesis}
+%rövidítések egy külön fileban tárolva
+%acronyms and glossary in a separate file
+\input{content/0-Acronyms}
+
+
+%Fejlesztés és kutatás során jól jöhet a Zotero nevű böngésző kiegészítő használata.
+%Mellyel könnyen lehet hivatkozásokat gyűjteni és exportálni.
+%During development Zotero could be useful to handle and export references
+\addbibresource{references.bib}
+%rövidítés és szójegyzék készítése content/0-Acronyms alapján
+%make glossary based on content/0-Acronyms
+\makeglossaries
+
+% a dokumentum fő 
+\begin{document}
+\titleformatting
+
+
+
+%helyettesítheti a kapott fedolapot és aláírt dokumentumokat csak tesztelés céljából! Az dolgozat írója biztosítja majd.
+%only for testing switch this with the original ones must be provided by the author of this thesis!
+
+\cimlap
+% kötési minta a szakdolgozat nyomtatásához
+%front page binding pattern
+%\include{appendixes/templates/0AKotesiMinta}
+%hallgatói nyilatkozat, a kész dolgozatnál az aláírtat kell csatolni
+%student plagiarism statement should be signed before submission
+\include{appendixes/templates/0CHallgatoiNyilatkozat}
+
+%pages lehet "-", ha minden oldalt szeretnénk hozzáadni
+%vagy {N} ahol N az oldal száma
+%attach your own signed documents "-" means every page in the pdf
+%and {N} will only attach the nth one
+%\includepdf[pages={1}]{appendixes/signed_documents/title.pdf}
+%\includepdf[pages=-]{appendixes/signed_documents/signed.pdf}
+
+
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyhead[C]{\thepage}
+    \renewcommand{\headrulewidth}{0.0pt}
+}
+
+\pagestyle{plain}
+
+%számozás újrakezdése
+\clearpage
+\setcounter{page}{1}
+
+%tartalomjegyzék
+\tableofcontents
+%saját szekciók hozzáadása
+\include{content/1-Bevezetés}
+\include{content/2-Probléma}
+\include{content/3-Megoldás}
+\include{content/4-Tervezés_folyamata}
+\include{content/5-Megvalósítás}
+\include{content/6-Eredmények}
+\include{content/7-Összegzés}
+
+%irodalomjegyzék
+%bibliography
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Irodalomjegyzék}
+\printbibliography
+
+%szó és rövidítés jegyzék
+%acronym and glossary
+\clearpage
+\printglossary[type=\acronymtype]
+\printglossary
+
+%ábrajegyzék
+\clearpage
+\listoffigures
+
+%függelékek
+%appendixes
+\clearpage
+\include{content/0-Függelékek}
+
+\end{document}

@@ -5,7 +5,7 @@ from typing import Dict, Any, List, Optional, Union, Callable
 from pydantic import BaseModel, Field
 from uuid import uuid4
 from datetime import datetime
-from agentflow.core import ValidationContext, ValidationViolation, ViolationType, Severity
+from agentflow.core.instructions.base_validation import ValidationContext, ValidationViolation, ViolationType, Severity
 
 class InstructionType(str, Enum):
     """Instruction type enum."""

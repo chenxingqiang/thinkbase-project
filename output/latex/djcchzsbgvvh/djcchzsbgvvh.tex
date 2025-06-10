@@ -1,0 +1,411 @@
+\documentclass{scrbook}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% \documentclass[a4paper,12pt,oneside]{scrbook}
+\KOMAoptions{
+    chapterprefix=true,
+    parskip=half,
+    captions=tableheading,
+    draft=false
+}
+
+% Activar números de línea
+% \usepackage{lineno}
+% \linenumbers
+% \setlength\linenumbersep{5pt}
+% \renewcommand\linenumberfont{\normalfont\tiny\sffamily\color{gray}}
+
+\usepackage[spanish,es-nolists,es-tabla,es-noindentfirst]{babel}
+\usepackage[hidelinks]{hyperref}
+
+\renewcommand{\listtablename}{Índice de tablas}    
+\renewcommand{\listfigurename}{Índice de figuras}
+\newcommand*{\listofloaname}{Índice de algoritmos}
+
+\addto\extrasspanish{
+    \renewcommand{\sectionautorefname}{Apartado}
+    \renewcommand{\subsectionautorefname}{Apartado}
+    \renewcommand{\subsubsectionautorefname}{Apartado}
+}
+
+% Márgenes del documento
+\usepackage{geometry}
+\geometry{left=2cm, right=2cm, top=2cm, bottom=3.3cm}
+
+% Interlineado 1.5
+% \onehalfspacing
+
+% Sangría 
+% Ojo, la guía de KOMA-Script sugiere usar espaciado o sangría para delimitar los párrafos,
+% pero no ambas cosas porque es redundante. Descomentando la siguiente línea se activa la sangría.
+% \setlength{\parindent}{0.5cm}
+
+% Configuración de fuentes
+\usepackage{fontspec}
+\usepackage{amsmath}
+\usepackage{unicode-math}   % Incluye Latin Modern Math
+
+\setmainfont{Latin Modern Sans}[
+    Ligatures=TeX,
+    % Necesario porque Latin Modern Sans no incluye estilo small caps
+    SmallCapsFont=Latin Modern Roman Caps
+]
+\setsansfont{Latin Modern Sans}[Ligatures=TeX]
+\setmonofont{Source Code Pro}[Scale=MatchLowercase]
+% \setmonofont[Scale=MatchLowercase]{Fira Mono}
+\newfontfamily{\lmromanfont}{Latin Modern Roman}
+
+% Configuración de listas no numeradas
+\setkomafont{itemizelabel}{\lmromanfont}
+\renewcommand{\labelitemii}{$\circ$}
+\renewcommand{\labelitemiii}{$\diamond$}
+\renewcommand{\labelitemiv}{$\triangleright$}
+
+% Citas
+\usepackage{csquotes}
+\renewcommand{\mkbegdispquote}[2]{«}
+\renewcommand{\mkenddispquote}[2]{#1»#2}
+
+%% Bibliografía
+% Numérica (ordenada por orden de aparación)
+\usepackage[style=numeric-comp,sorting=none,backend=biber]{biblatex}
+\defbibnote{note}{Las siguientes referencias bibliográficas se presentan en orden de aparición en el texto.\par\bigskip}
+% APA (ordenada por autor, año y título)
+% \usepackage[style=apa,sorting=nyt,backend=biber]{biblatex}
+% \defbibnote{note}{Las siguientes referencias bibliográficas se presentan en orden alfabético por autor. Las referencias con más de un autor aparecen ordenadas en base al primero de los mismos.\par\bigskip}
+
+\addbibresource{referencias.bib}
+
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage{microtype}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{subcaption}
+\usepackage[table]{xcolor}
+
+\usepackage{siunitx}
+\newcommand{\perthousand}{‰}
+
+% Tablas
+\usepackage{array} 
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{tabularx}
+% Definir columnas para alineación a la derecha o centro y ajuste automático
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+% Definir tipos de columnas en modo matemático
+% Ver pag. 3 en la documentación del paquete array:
+\newcolumntype{M}{>{$}c<{$}}
+\newcolumntype{L}{>{$}l<{$}}
+\newcolumntype{N}{>{$}r<{$}}
+% Distancia entre filas
+\renewcommand*{\arraystretch}{1.5}
+
+% Código con coloreado de sintaxis
+\usepackage{scrhack}            % Para evitar un warning sobre \float@addtolist
+\usepackage{listings}
+\input{settings/listings}       % Estilo y definiciones para lenguajes adicionales
+
+% Descripción de algoritmos en pseudocódigo
+\usepackage[chapter]{algorithm}
+\usepackage{algpseudocodex}
+\floatname{algorithm}{Algoritmo}
+\captionsetup[algorithm]{labelfont=bf, labelsep=default}
+
+\newenvironment{abstract}[1][\abstractname]{
+    \cleardoublepageusingstyle{empty}
+    \thispagestyle{empty}
+    \begin{center}\textbf{#1}\end{center}
+    \begin{itshape}\par\noindent%
+}
+{\end{itshape}}
+
+\newenvironment{keywords}[1][Keywords]
+{\vspace{7pt}\par\noindent\textup{\textbf{#1: }}\begin{upshape}}
+{\end{upshape}}
+
+\newcommand{\license}[2]{%
+\begin{center}
+    \begin{minipage}{0.8\textwidth}   
+        \begin{center}
+            \includegraphics[width=4.66cm]{#1}\\[12pt]
+            {\Large #2}
+        \end{center}
+    \end{minipage}
+\end{center}
+}
+
+% Formato de capítulos
+% Eliminar el punto y reducir el espacio entre el prefijo y el nombre del capítulo 
+\renewcommand*{\chapterformat}{%
+    \mbox{\chapappifchapterprefix{\nobreakspace}\thechapter
+    \IfUsePrefixLine{}{\enskip}}}
+\renewcommand{\chapterheadmidvskip}{\vskip 0pt}
+
+% Formato de los títulos en figuras y tablas
+\renewcommand*{\figureformat}{\figurename~\thefigure}
+\renewcommand*{\tableformat}{\tablename~\thetable}
+
+% Redefinición de las entradas de los capítulos en la tabla de contenidos
+% para que aparezca el prefijo.
+\let\originaladdchaptertocentry\addchaptertocentry
+\renewcommand*{\addchaptertocentry}[2]{%
+  \IfArgIsEmpty{#1}{% Entrada sin número
+    \originaladdchaptertocentry{#1}{#2}%
+  }{% Entrada con número
+    % Eliminar el número y poner el prefijo directamente en el título del capítulo
+    \originaladdchaptertocentry{}{\chapapp~#1\autodot\space#2}%
+  }%
+}
+
+\begin{document}   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Portada y metadatos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Metadatos del PDF
+\hypersetup{
+    pdftitle='Título del trabajo',
+    pdfauthor='Nombre y Apellidos',
+    pdfsubject={Trabajo de Fin de Grado},
+}
+
+\pagestyle{empty}
+\newcommand{\HRule}{\rule{\linewidth}{0.3mm}}
+{
+    \setlength{\parindent}{0mm}
+    \setlength{\parskip}{0mm}
+    
+    \vspace*{1.20cm}
+    \includegraphics[width=9.81cm]{images/logos/escuela-ingenieria-tecnologia-original}
+    \vspace*{\stretch{0.9}}
+    
+    {\centering
+    \fontsize{32pt}{32pt}\selectfont Trabajo de Fin de Grado\\[10pt]
+    \fontsize{20pt}{20pt}\selectfont Grado en Ingeniería Informática\par}
+    \HRule\vspace*{-2mm}
+    \begin{flushright}
+        {\fontsize{32pt}{32pt}\selectfont Título del trabajo\par
+        \vspace*{3mm}
+        \fontsize{18pt}{18pt}\selectfont \textit{Title in English}\par
+        \vspace*{11mm}
+        \fontsize{16pt}{16pt}\selectfont Nombre y Apellidos
+        }\vspace*{12mm}
+    \end{flushright}
+    \HRule
+    
+    \vspace*{\stretch{1}}
+    \begin{center}
+        \fontsize{18pt}{18pt}\selectfont La Laguna, \today
+    \end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Certificado
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frontmatter
+\cleardoublepageusingstyle{empty}
+\thispagestyle{empty}
+
+{
+\setlength\parindent{0pt}
+    D./Dña \textbf{Nombre Apellido1 Apellido2}, profesor/a Titular de Universidad adscrito al Departamento de Nombre del Departamento de la Universidad de La Laguna, como tutor
+    
+    \bigskip
+    D./Dña \textbf{Nombre Apellido1 Apellido2}, profesor/a Titular de Universidad adscrito al Departamento de Nombre del Departamento de la Universidad de La Laguna, como cotutor.
+    
+    \bigskip
+    \bigskip
+    \textbf{C E R T I F I C A \textcolor{red}{(N)}}
+
+    \bigskip
+    Que la presente memoria titulada:
+    
+    \bigskip
+    \begin{quote}
+    \textit{``Título del Trabajo''}
+    \end{quote}
+    
+    \bigskip
+    \noindent ha sido realizada bajo su dirección por D./Dña \textbf{Nombre Apellido1 Apellido2}.
+    
+    \bigskip
+    Y para que así conste, en cumplimiento de la legislación vigente y a los efectos
+    oportunos, firman la presente en La Laguna a \today
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Agradecimientos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepageusingstyle{empty}
+\thispagestyle{empty}
+
+\begin{flushright}
+    \setlength{\parindent}{0mm}
+
+    {\LARGE Agradecimientos}
+    \vspace{15mm}
+    
+    \begin{large}
+        \begin{minipage}{0.3\textwidth}
+            \begin{flushright}
+            XXX
+            
+            XXX
+            
+            XXX
+            
+            XXX
+            \end{flushright}
+        \end{minipage}
+    \end{large}
+\end{flushright}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Licencia
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepageusingstyle{empty}
+\thispagestyle{empty}
+
+{\noindent\LARGE Licencia}
+\vspace{15mm}
+
+\textcolor{red}{Elige una licencia y elimina el testo de opciones.}
+\bigskip
+
+\textcolor{red}{• Si NO quiere permitir que se compartan las adaptaciones de tu obra y NO quieres permitir usos comerciales de tu obra, indica:}
+
+\license{images/licenses/by-nc-nd.eu}{© Esta obra está bajo una licencia de Creative Commons Reconocimiento-NoComercial-SinObraDerivada 4.0 Internacional.}
+
+\bigskip
+\textcolor{red}{• Si quiere permitir que se compartan las adaptaciones de tu obra mientras se comparta de la misma manera y NO quieres permitir usos comerciales de tu obra, indica:}
+
+\license{images/licenses/by-nc-sa.eu}{© Esta obra está bajo una licencia de Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0 Internacional.}
+        
+\bigskip
+\textcolor{red}{• Si quiere permitir que se compartan las adaptaciones de tu obra y NO quieres permitir usos comerciales de tu obra, indica:}
+
+\license{images/licenses/by-nc.eu}{© Esta obra está bajo una licencia de Creative Commons Reconocimiento-NoComercial 4.0 Internacional.}
+    
+\bigskip
+\textcolor{red}{• Si NO quiere permitir que se compartan las adaptaciones de tu obra y quieres permitir usos comerciales de tu obra, indica:}
+
+\license{images/licenses/by-nd}{© Esta obra está bajo una licencia de Creative Commons Reconocimiento-SinObraDerivada 4.0 Internacional.}
+
+\bigskip
+\textcolor{red}{• Si quiere permitir que se compartan las adaptaciones de tu obra mientras se comparta de la misma manera y quieres permitir usos comerciales de tu obra (licencia de Cultura Libre) indica:}
+
+\license{images/licenses/by-sa}{© Esta obra está bajo una licencia de Creative Commons Reconocimiento-CompartirIgual 4.0 Internacional.}  
+
+\bigskip
+\textcolor{red}{• Si quiere permitir que se compartan las adaptaciones de tu obra y quieres permitir usos comerciales de tu obra (licencia de Cultura Libre) indica:}
+
+\license{images/licenses/by}{© Esta obra está bajo una licencia de Creative Commons Reconocimiento 4.0 Internacional.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Resumen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+El objetivo de este trabajo ha sido... bla, bla, bla, bla, bla, bla, bla, bla, bla...
+
+La competencia [E6], que figura en la guía docente, indica que en la memoria del trabajo se ha de incluir: antecedentes, problemática o estado del arte, objetivos, fases y desarrollo del proyecto, conclusiones, y líneas futuras.
+
+Se ha incluido el apartado de 'Licencia' con todas las posibles licencias abiertas (Creative Commons). En el caso en que se decida hacer público el contenido de la memoria, habrá que elegir una de ellas (y borrar las demás). La decisión de hacer pública o no la memoria se indica en el momento de subir la memoria a la Sede Electrónica de la ULL, paso necesario en el proceso de presentación del TFG.
+
+El documento de memoria debe tener un máximo de 50 páginas.
+
+No se deben dejar páginas en blanco al comenzar un capítulo, ya que el documento no está pensado para ser impreso sino visionado con un lector de PDF.
+
+También es recomendable usar márgenes pequeños, ya que, al firmar digitalmente por la Sede Electrónica, se coloca un marco alrededor del texto original.
+
+El tipo de letra base ha de ser de 12 pt.
+
+\begin{keywords}[Palabras clave]
+Palabra reservada1, Palabra reservada2,...
+\end{keywords}
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepageusingstyle{empty}
+\thispagestyle{empty}
+
+\begin{abstract}[Abstract]
+Here should be the abstract in a foreing language...
+
+\begin {keywords}
+Keyword1, Keyword2, Keyword3,...
+\end{keywords}
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{plain}
+\cleardoublepage
+\setcounter{page}{1} 
+
+\tableofcontents
+\listoffigures
+\listoftables
+%\listofalgorithms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Contenidos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+
+\input{01-introducción}
+\input{02-capítulo2}
+\input{03-capítulo3}
+\input{04-capítulo4}
+\input{05-conclusiones}
+\input{06-conclusions}
+\input{07-presupuesto}
+
+\appendix
+
+\input{0A-apéndice1}
+\input{0B-apéndice2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliografía
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backmatter
+
+\printbibliography[prenote=note]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+
+
+\end{document}

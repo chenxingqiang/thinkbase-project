@@ -1,0 +1,111 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Template LaTeX
+%  classe: classe_PFC_IFBA_VDC.cls
+%  compilador: pdfLaTeX ou XeLaTeX 
+%
+%  PFC - Projeto de Final de Curso Engenharia Elétrica (COEEL) - IFBA campus Vitória da Conquista e Modelo de Relatório
+%
+%  Este é um template (modelo) LaTeX que NÃO possui a intenção de seguir a norma ABNT-NBR14724 - Trabalhos Acadêmicos, porém estaremos seguindo as definições da norma ABNT-NBR6023 - Referências
+%
+%  Template criado para atender às demandas de Projeto Final de Curso (PFC) e Relatórios Técnicos de Engenharia Elétrica do IFBA campus Vitória da Conquista
+%
+%  versão 2023.08.07
+%  Criado por: prof. Elvio Prado da Silva
+%  elvio@ieee.org
+%  https://github.com/prof-elvio
+%
+%  distribuição e modificação autorizada desde que mantenha os créditos das pessoas que trabalharam neste template
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter % permitir que o símbolo @ seja usado em comandos de macro 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% DOCUMENTCLASS %%%%%%%%%
+%
+% [pfc] caso seja PFC - Projeto Final de Curso
+% [relatorio] caso seja RELATÓRIO de disciplina
+% [preprojeto] caso seja Pré-Projeto de PFC
+%
+%
+\documentclass[pfc]{./classe/cls-PFC-COEEL}
+% \documentclass[relatorio]{./classe/cls-PFC-COEEL}
+% \documentclass[preprojeto]{./classe/cls-PFC-COEEL}
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABNT-NBR6023 norma para citações bibliográficas
+\usepackage[alf]{abntex2cite} 
+%
+% adicione aqui seus pacotes adicionais
+% \usepackage{}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Documento que cria a Capa e a folha de Rosto
+\input{b_Capa}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% CONFIGURA O ÍNDICE REMISSIVO
+% configuração das letras em ./classe/estiloindice.ist
+\makeindex[columns=3, title=ÍNDICE REMISSIVO, 
+           options= -s ./classe/estiloindice.ist] 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% INICIA O PACOTE PARA GLOSSÁRIO
+\loadglsentries{GLOSSARIO.tex}
+% se é PFC 
+\ifpfc 
+    \makeglossaries
+\fi 
+% se é Pré-Projeto de PFC
+\ifpreprojeto 
+    \makeglossaries
+\fi 
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% BEGIN DOCUMENT %%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+\begin{document}
+
+%%% 
+\input{./classe/inicio}
+%%%
+
+% comentar esta linha para seu trabalho
+\include{Template} % utilizando o Template
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifpfc % se é PFC
+   \include{./PFC_Especificos/g_Introd_Objetivos} 
+   \include{./PFC_Especificos/h_Referencial_Teorico}
+   \include{./PFC_Especificos/i_Metodologia}
+\fi 
+\ifpreprojeto % se é Pré-Projeto
+   \include{./PFC_Especificos/g_Introd_Objetivos} 
+\fi 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%  AQUI VÃO OS SEUS CAPÍTULOS 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% adicione aqui seus capítulos adicionais, adicione quantos forem necessários
+% \include{}
+% \include{}
+\include{Seu_Trabalho}
+% \include{Outro_Capitulo}
+% \include{Mais_um_Capitulo}
+% \include{Mais_outro_Capitulo}
+% \include{}
+% \include{}
+%
+%%% não altere este documento 
+\input{./classe/fim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\end{document}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%  FIM  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%

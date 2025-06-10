@@ -1,8 +1,8 @@
 from typing import List
 import numpy as np
 from pydantic import BaseModel, Field
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 import os
 import logging
 
@@ -11,11 +11,11 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-logger.debug("Configuring ELL2A integration...")
-ell2a.configure({
+# Initialize ELL
+logger.debug("Configuring ELL integration...")
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -48,7 +48,7 @@ class Action(BaseModel):
     reasoning: str = Field(description="The reasoning for the action to take")
     action: int = Field(description="The action to take, must be 0 ( go down ), 1, 2 (left) (go up), or 3 (right)")
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def control_game(prev_renders: List[dict], current_state: np.ndarray) -> Action:
     logger.debug("Entering control_game function")
     # Convert numpy arrays to string representations
@@ -89,7 +89,7 @@ Available actions:
 
 Choose an action (0-3) based on the current state to safely land the spacecraft. Only return the action number."""
 
-    logger.debug(f"Sending message to ELL2A: {message[:200]}...")
+    logger.debug(f"Sending message to ELL: {message[:200]}...")
 
     # Create a message object with minimal metadata
     msg = Message(
@@ -100,13 +100,13 @@ Choose an action (0-3) based on the current state to safely land the spacecraft.
 
     # Process the message
     try:
-        logger.debug("Processing message through ELL2A...")
-        result = await ell2a.process_message(msg)
-        logger.debug(f"Got result from ELL2A: {result}")
+        logger.debug("Processing message through ELL...")
+        result = await ell.process_message(msg)
+        logger.debug(f"Got result from ELL: {result}")
         
         if result is None:
-            logger.error("ELL2A returned None result")
-            return Action(reasoning="ELL2A returned None result", action=0)
+            logger.error("ELL returned None result")
+            return Action(reasoning="ELL returned None result", action=0)
             
         content_str = str(result.content[0] if isinstance(result.content, list) else result.content)
         logger.debug(f"Parsed content string: {content_str}")

@@ -1,0 +1,66 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8 Unicode
+% !BIB program = biber
+
+% essa classe aceita as seguintes opções:
+% abnd ou ieee pra estilo de citaçõ
+% english ou french pra língua dos slides (não passar nada é português)
+\documentclass[abnt]{slides}
+
+\title{Template de Slides}
+\subtitle{Exemplo de uso}
+
+% Todo comando \add trabalha com uma lista e todo comando \set trabalha com um
+% único elemento, ou seja, pode haver apenas um \setorientador mas vários
+% \addauthor ou \addcoorientador. Todo comando \add e \set tem um \get
+% correspondente (por exemplo, \getauthors, \getcoorientadores, \getorientador,
+% \getmembrobanca). Esses comandos são definidos na classe slides.cls. No caso
+% dos \set, os \get são implicitos, e não você não vai encontrá-los na classe.
+
+\addauthor{Álan Crístoffer e Sousa}{acristoffers@gmail.com}
+\setorientador{Prof.\ Dr.\ Valter Júnior de Souza Leite}
+\addcoorientador{Prof.\ Dr.\ Ignacio Rubio Scola}
+
+\setdepartamento{Engenharia Mecatrônica}
+\setlocal{Divinópolis}
+\setano{2020}
+
+\preamble{}
+
+% Essa classe usa o biblatex com backend biber ao invés do bibtex.
+\addbibresource{bibliothek.bib}
+
+% Controla o texto das captions das figuras. Neste caso, centraliza.
+\captionsetup{justification=centering}
+
+\begin{document}
+\maketitle{}
+
+% Use o ambiente slide ao invés do ambiente frame. Ele coloca a figura e
+% nome dos autores no rodapé, além de centralizar verticalmente o conteúdo.
+\begin{slide}{Sumário}
+  % Para dividir um slide em colunas, use os ambientes columns e column.
+  \begin{columns}[T] % T: top, c: center: B: bottom | alinhamento VERTICAL
+    \begin{column}{0.48\textwidth} % coluna ocupando 48% da largura do texto
+      \tableofcontents[sections={1-2}] % cria o índice apenas pras seções 1 a 2.
+    \end{column}%
+    \hfill%
+    \begin{column}{0.48\textwidth}
+      \tableofcontents[sections={3-}] % cria o índice da seção 3 até o final
+    \end{column}%
+  \end{columns}
+\end{slide}
+
+% Eu gosto de separar meus documentos \latex em vários arquivos, para manter
+% organizado.
+\input{section1}
+\input{section2}
+\input{section3}
+
+% A referência vai ser quebrada em quantos slides forem necessários.
+\begin{frame}[allowframebreaks]{Referências}
+  % Marca todas as referências do .bib como citadas, assim todas aparecem.
+  \nocite{*}
+  \printbibliography{}
+\end{frame}
+\end{document}

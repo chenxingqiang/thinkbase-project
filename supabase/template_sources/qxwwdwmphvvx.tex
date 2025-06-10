@@ -1,0 +1,185 @@
+\documentclass[
+    %aspectratio=169,
+]{beamer}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{csquotes}
+\usepackage{expl3,biblatex}
+
+\addbibresource{bibliography.bib}
+
+\usepackage{booktabs}
+\usetheme{Madrid}
+\usecolortheme{crane}
+\usepackage{svg}
+\usepackage{graphicx,caption}
+
+% set font
+\usefonttheme{serif}
+
+% to prevent the boxes from overlapping the logo at the lower right corner
+\addtobeamertemplate{block begin}{%
+  \setlength{\textwidth}{0.9\textwidth}%
+}{}
+
+\addtobeamertemplate{block alerted begin}{%
+  \setlength{\textwidth}{0.9\textwidth}%
+}{}
+
+\addtobeamertemplate{block example begin}{%
+  \setlength{\textwidth}{0.9\textwidth}%
+}{}
+
+
+% usage: \hl{text to emphasis as yellow background}
+\usepackage{soul}
+\makeatletter
+\let\HL\hl
+\renewcommand\hl{%
+  \let\set@color\beamerorig@set@color
+  \let\reset@color\beamerorig@reset@color
+  \HL}
+\makeatother
+
+
+% usage: create outline pages before each section
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Title page information
+\title[Short Presentation Title]{Full Presentation Title}
+\subtitle[Short Subtitle]{Full Subtitle}
+\author[Short Name or Initials]{Full Author Name\texorpdfstring{\\}{, }Author1234@vandals.uidaho.edu}
+\institute[U of I]{University of Idaho}
+\date{\today}
+\logo{\includesvg[height=1cm]{./uibeamer/logo/ui-stacked-gold-black.svg}}
+\subject{Presentation Subject}
+\keywords{the, presentation, keywords}
+
+\begin{document}
+
+% make the title page
+\begin{frame}%[plain]
+\maketitle
+\end{frame}
+
+% make the outline page/table of contents
+\begin{frame}
+\frametitle{Table of Contents}
+\tableofcontents
+\end{frame}
+\section[Short Section 1 Name]{Full Section 1 Name}
+\subsection[Short Subsection 1 Name]{Full Subsection 1 Name}
+
+\begin{frame}{Frame Title}{Frame Subtitle}
+plain text, \structure{page structure}, \alert{emphasis}, \hl{high light emphasis}
+\begin{itemize}
+  \item a single-line bullet list item
+  \item a bullet list item that is quite long (in order to force a line break),
+    which also contains \alert{emphasized text}
+  \begin{itemize}
+    \item a second-level list item
+    \begin{itemize}
+      \item a third-level list item
+    \end{itemize}
+    \item \alert{an emphasized second-level list item}
+  \end{itemize}
+\end{itemize}
+\begin{enumerate}
+  \item a numbered list item
+  \begin{enumerate}
+    \item a second-level list item containing a math expression
+      \[ E = mc^2 \]
+      and a citation \cite{einstein1905tragheit}
+  \end{enumerate}
+\end{enumerate}
+\end{frame}
+
+
+\subsection[Short Subsection 2 Name]{Full Subsection 2 Name}
+
+\begin{frame}{Text Blocks}
+text above a block\footnote{a footnote with an \url{https://address.edu}}
+\begin{block}{Block}
+  text in a block
+\end{block}
+\begin{exampleblock}{Example Block}
+  text in a block
+\end{exampleblock}
+\begin{alertblock}{Emphasized Block}
+  text in a block
+\end{alertblock}
+\end{frame}
+
+
+\begin{frame}{Figures}{"Potatoes."}
+
+\begin{figure}
+    \includegraphics[width=.5\textwidth,height=.5\textheight,keepaspectratio]{./figures/a-sketch-of-a-dish-of-potato-from-Idaho-state.jpg}
+      \caption{a sketch of a dish of potato from Idaho state%
+        \footnote{%
+          Do you like famous potatoes?
+          They do.
+          \cite{evelyn1984potatoes}
+        }%
+      }
+
+\end{figure}
+\end{frame}
+
+
+\subsection[Short Subsection 3 Name]{Full Subsection 3 Name}
+
+
+\begin{frame}{Sample Data}
+\begin{table}
+  \begin{tabular}{llc}
+    Category & Item & Quantity \\ \midrule
+    A & Item A1 & 15 \\
+    A & Item A2 & 20 \\
+    B & Item B1 & 25 \\
+    B & Item B2 & 30 \\
+    C & Item C1 & 10 \\
+  \end{tabular}
+  \caption{Example data for demonstration purposes}
+\end{table}
+\end{frame}
+
+
+\section[Equation]{Equation and Explanations}
+
+\begin{frame}{Equation and Explanations}{sample equation}
+\textbf{Functionality Representation Model (FRM)} is an abstract method that aims to analyze the significance of various components in a complex system.
+
+$$f(z) = \alpha + \sum^{N}_{i=1}\beta_iz_i$$
+
+In this equation, $z$ symbolizes a data point, $z_i$ denotes the $i^{th}$ component of $z$, and $\beta_i$ represents the influence of component $z_i$ on the system's behavior.
+    
+\end{frame}
+
+\section{\bibname}
+\begin{frame}[t, allowframebreaks]{\bibname}
+\printbibliography[heading=none]
+\end{frame}
+
+
+%\miniframesoff
+
+
+\begin{frame}%[plain]
+\vfill
+\centerline{Thank You for Your Attention!}
+\vfill\vfill
+\end{frame}
+%\input{sample}
+
+\end{document}
+
+

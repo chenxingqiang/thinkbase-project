@@ -1,0 +1,142 @@
+\documentclass[a4paper,10pt,twocolumn,english]{article}
+%---------------------------------------------------------
+\usepackage{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{bm}
+%---------------------------------------------------------
+% Equation reference, e.g. (1)
+\newcommand{\eref}[1]{(\ref{#1})}
+%---------------------------------------------------------
+\title{Template for Operating Systems: Design and Security}
+
+\author{
+    First Last, 
+    First Last,
+    First Last\\
+	\footnotesize Computer Science Department, University of Bucharest, Romania
+}
+
+\date{\empty} % no need for a date
+
+\begin{document}
+\maketitle
+%---------------------------------------------------------
+\begin{abstract} 
+Write here one or two paragraphs about what you will treat in the current paper:
+topic,
+methods,
+solutions,
+comparison results etc.
+\end{abstract}
+%---------------------------------------------------------
+\section{Introduction}
+
+In this section you introduce the problem and existing research or similar results in the field.
+
+When citing remember you can use the quotes button from \url{https://scholar.google.com} to get the bibtex entry.
+
+In this article we are going to investigate side-channel attacks~\cite{kocher96_timing}
+with focus on cache implementations~\cite{lipp18_meltdown}.
+
+%---------------------------------------------------------
+\section{Technical description of the problem}
+
+In this section you describe the technical details of the articles you surveyed.
+
+Here is Algorithm~\ref{alg:attack}
+%---------------
+\begin{algorithm}[t]
+	\caption{Attack Algorithm}
+	\label{alg:attack} 	
+	\DontPrintSemicolon
+	\medskip
+	\KwData {samples, $Y \in \mathcal{R}^{m \times N}$
+		\newline number of iterations $I$}
+	\KwResult{secret, $S$}
+
+	\medskip
+
+	Initialize: $D = \emptyset $, $S = 0$ \;
+	\For {$i = 1:I$}{
+		Initialize iteration dictionary $D_{i}$ \;
+		Compose $D = D \cup D_{i}$ \;
+		Compute $X$ \;
+		\If {$i = 1$ } {
+			Compute error threshold  $ e_{mean} = \frac{1}{N} \sum_{i = 1}^{N} e_i$\;		
+		}
+		Update $\mathcal{A} = \{y_i \mid e_i > e_{mean}\}$  \;
+	}
+	Secret estimates $l_i = 1$ if $y_i  \in \mathcal{A}$
+\end{algorithm}
+%---------------
+
+%---------------------------------------------------------
+\section{Possible solution}
+
+Here you describe possible solutions or workarounds to the problems described in the former section.
+
+Here is Equation~\eref{eq:solution}
+%-------------------
+\begin{equation}
+D \leftarrow D + \alpha ru^T
+\label{eq:solution}
+\end{equation}
+%-------------------
+
+%---------------------------------------------------------
+\section{Experiments and Results}
+
+In this section you depict the manifestation of the vulnerabilities and the effect of the proposed solutions on dampening the attack effect.
+
+Look at our experiments in 
+Figure~\ref{fig:experiment1}
+and
+Table~\ref{tab:experiment2}
+%---------------
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\linewidth]{experiment1}
+\caption{Unsupervised DL with error threshold}
+\label{fig:experiment1}
+\end{figure}
+%---------------
+
+%------------
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{r l l}
+
+% Table head
+Method & Dictionary & Representations \\
+\hline
+% Contents
+MOD & $O(m^3N+m^6)$ & $O(m^5N)$ \\
+TMOD & $O(mN^2 + m^3)$ & $O(m^4N)$ \\
+SuKro & $O(m^3N+m^6)$ & $O(m^5N)$ \\
+\end{tabular}
+\end{center}
+\caption{Total number of instructions for various methods.}
+\label{tab:experiment2}
+\end{table}
+%------------
+
+%---------------------------------------------------------
+\section{Conclusion}
+In this section sum-up what you presented
+and talk a bit about what you found in the results section.
+
+This differs from the abstract because now you can assume that the reader has processed the entire paper,
+whereas in the abstract you were only baiting him into reading it. 
+In the abstract he does not posses the knowledge that he has now.
+
+Otherwise abstract and conclusions are pretty similar in length and description.
+
+%---------------------------------------------------------
+\bibliography{mybib}
+\bibliographystyle{plain}
+
+\end{document}

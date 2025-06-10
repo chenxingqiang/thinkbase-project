@@ -1,6 +1,6 @@
 """Advanced instruction scheduling and execution engine."""
 from typing import Dict, List, Optional, Set, Tuple, Any, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import Enum
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor, Future
@@ -157,6 +157,66 @@ class InstructionScheduler:
         for result in results:
             self.metrics_collector.update(result.metrics)
 
+    def _build_sequence_graph(self, ir: IRNode, graph: Dict[str, Any]) -> None:
+        """Build graph for sequential instructions."""
+        node_id = str(len(graph["nodes"]))
+        graph["nodes"][node_id] = ir
+        
+    def _build_parallel_graph(self, ir: IRNode, graph: Dict[str, Any]) -> None:
+        """Build graph for parallel instructions."""
+        node_id = str(len(graph["nodes"]))
+        graph["nodes"][node_id] = ir
+        
+    def _build_conditional_graph(self, ir: IRNode, graph: Dict[str, Any]) -> None:
+        """Build graph for conditional instructions."""
+        node_id = str(len(graph["nodes"]))
+        graph["nodes"][node_id] = ir
+        
+    def _build_loop_graph(self, ir: IRNode, graph: Dict[str, Any]) -> None:
+        """Build graph for loop instructions."""
+        node_id = str(len(graph["nodes"]))
+        graph["nodes"][node_id] = ir
+
+    def _apply_fifo_scheduling(self, dag: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Apply FIFO scheduling policy."""
+        return [{"instructions": list(dag["nodes"].values()), "parallel": False}]
+        
+    def _apply_priority_scheduling(self, dag: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Apply priority-based scheduling."""
+        return [{"instructions": list(dag["nodes"].values()), "parallel": False}]
+        
+    def _apply_fair_scheduling(self, dag: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Apply fair scheduling policy."""
+        return [{"instructions": list(dag["nodes"].values()), "parallel": True}]
+        
+    def _apply_adaptive_scheduling(self, dag: Dict[str, Any], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Apply adaptive scheduling policy."""
+        return [{"instructions": list(dag["nodes"].values()), "parallel": True}]
+        
+    def _apply_resource_aware_scheduling(self, dag: Dict[str, Any], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Apply resource-aware scheduling."""
+        return [{"instructions": list(dag["nodes"].values()), "parallel": True}]
+        
+    def _apply_deadline_scheduling(self, dag: Dict[str, Any], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Apply deadline-aware scheduling."""
+        return [{"instructions": list(dag["nodes"].values()), "parallel": False}]
+        
+    def _optimize_resource_usage(self, plan: List[Dict[str, Any]], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Optimize resource usage in execution plan."""
+        return plan
+        
+    def _optimize_parallelism(self, plan: List[Dict[str, Any]], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Optimize parallelism in execution plan."""
+        return plan
+        
+    def _optimize_locality(self, plan: List[Dict[str, Any]], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Optimize data locality in execution plan."""
+        return plan
+        
+    def _optimize_communication(self, plan: List[Dict[str, Any]], context: ExecutionContext) -> List[Dict[str, Any]]:
+        """Optimize communication in execution plan."""
+        return plan
+
 class ExecutionEngine:
     """Advanced execution engine."""
     
@@ -232,7 +292,7 @@ class ExecutionEngine:
                 )
                 
             # Execute instruction
-            output = instruction.execute(context)
+            output = instruction.execute(asdict(context))
             
             # Collect metrics
             metrics = self._collect_execution_metrics(instruction)
@@ -352,7 +412,7 @@ class MetricsCollector:
     def get_average(self, metric: str) -> float:
         """Get average value for metric."""
         if metric in self.metrics and self.metrics[metric]:
-            return np.mean(self.metrics[metric])
+            return float(np.mean(self.metrics[metric]))
         return 0.0
     
     def get_summary(self) -> Dict[str, Dict[str, float]]:

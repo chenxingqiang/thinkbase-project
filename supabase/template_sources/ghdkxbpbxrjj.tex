@@ -1,0 +1,130 @@
+\documentclass[11pt,twoside]{book}
+
+\usepackage[paperheight=297mm,paperwidth=210mm,width=150mm,top=30mm,bottom=30mm,bindingoffset=10mm, inner=30mm, outer=25mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[nottoc]{tocbibind}
+\usepackage{datetime}
+\usepackage[colorlinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{kotex}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage[acronym,nomain,nonumberlist]{glossaries}
+\usepackage[table]{xcolor}
+\usepackage[toc,page]{appendix}
+\usepackage{pdfpages}
+\usepackage{svg}
+\usepackage{longtable}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+
+%Add acronyms if necessary
+\makeglossaries
+\newacronym{usj}{USJ}{University of Sri Jayewardenepura}
+\newacronym{foe}{FOE}{Faculty of Engineering}
+
+\setcounter{secnumdepth}{4}
+
+%Copy all the images to images folder
+\graphicspath{ {images/} }
+
+%for print
+%\hypersetup{citecolor=black, filecolor=black, linkcolor=black, urlcolor=black}
+%for electronic
+\hypersetup{citecolor=green, filecolor=black, linkcolor=blue, urlcolor=blue}
+
+\newdateformat{monthyeardate}{\monthname[\THEMONTH] \THEYEAR}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[RO,LE]{\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\renewcommand{\cftfigpresnum}{Figure\ }
+\renewcommand{\cfttabpresnum}{Table\ }
+\newlength{\mylenf}
+\settowidth{\mylenf}{\cftfigpresnum}
+\setlength{\cftfignumwidth}{\dimexpr\mylenf+2.5em}
+\setlength{\cfttabnumwidth}{\dimexpr\mylenf+1.8em}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Document begins here %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\pagenumbering{gobble}
+\input{titlepage} %\pagenumbering{gobble} if we need to remove page numbering
+
+\setstretch{1.0}
+\chapter*{Acknowledgements}
+\pagenumbering{roman} %Start Roman page numbering
+\setstretch{1.5}
+\input{acknowledgements}
+\setstretch{1.0}
+
+\clearpage
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\glsaddall
+\printglossary[type=\acronymtype,title=List of Acronyms]
+\addcontentsline{toc}{chapter}{List of Acronyms}
+
+\setstretch{1.0}
+\chapter{Introduction}
+\pagenumbering{arabic} %Start Arabic page numbering
+\setstretch{1.5}
+\input{chapters/01_Introduction}
+
+\setstretch{1.0}
+\chapter{Literature Review}
+\setstretch{1.5}
+\input{chapters/02_LiteratureReview}
+
+\setstretch{1.0}
+\chapter{Methodology}
+\setstretch{1.5}
+\input{chapters/03_Methodology}
+
+\setstretch{1.0}
+\chapter{Experiments and Results}
+\setstretch{1.5}
+\input{chapters/04_Experiments}
+
+\setstretch{1.0}
+\chapter{Discussion} %Should include recommendations and future works
+\setstretch{1.5}
+\input{chapters/05_Discussion}
+
+\setstretch{1.0}
+\chapter{Conclusions}
+\setstretch{1.5}
+\input{chapters/06_Conclusions}
+
+\setstretch{1.0}
+\bibliographystyle{ieeetrans}
+\bibliography{references} %copy all references to references.bib file
+
+%remove if not needed
+\begin{appendices}
+\setstretch{1.0}
+
+\chapter{Appendix Title}
+\setstretch{1.5}
+\input{appendices/Appendix_1}
+
+\end{appendices}
+
+\end{document}

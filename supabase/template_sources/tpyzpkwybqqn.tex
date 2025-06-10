@@ -1,0 +1,151 @@
+% **************************************************
+% Document Class Definition
+% **************************************************
+\documentclass[%
+    paper=B5, % A4, B5,     % paper size --> B5 relates to thesis dimensions (170x240mm)
+    twoside=true,           % onesite or twoside printing
+    openright,              % doublepage cleaning ends up right side
+    %parskip=half,          % spacing value / method for paragraphs
+    chapterprefix=true,     % prefix for chapter marks
+    10pt,                   % font size, 10pt is standard with B5 thesis format
+    headings=normal,        % size of headings
+    bibliography=totoc,     % include bib in toc
+    listof=totoc,           % include listof entries in toc
+    titlepage=on,           % own page for each title page
+    captions=tableabove,    % display table captions above the float env
+    chapterprefix=false,    % do not display a prefix for chapters
+    appendixprefix=false,   % but display a prefix for appendix chapter
+    draft=false,            % value for draft version
+]{scrreprt}%
+
+
+% **************************************************
+% Setup YOUR thesis document in this file !
+% **************************************************
+\input{package-setup}
+
+% **************************************************
+% Document CONTENT
+% **************************************************
+\begin{document}
+
+% uncomment the following command to fill up pages at the bottom
+% with whitespace instead of aligning the first and last lines
+% of a page (see \raggedbottom vs. \flushbottom)
+% \raggedbottom
+
+% --------------------------
+% rename document parts
+% --------------------------
+%\renewcaptionname{ngerman}{\figurename}{Abb.}
+%\renewcaptionname{ngerman}{\tablename}{Tab.}
+\renewcaptionname{english}{\figurename}{Figure}
+\renewcaptionname{english}{\tablename}{Table}
+
+% --------------------------
+% Front matter
+% --------------------------
+\pagenumbering{roman}			% roman page numbing (invisible for empty page style)
+\pagestyle{empty}				% no header or footers
+\input{chapters/0.0 titlepages}	% INCLUDE: all titlepages
+\cleardoublepage
+
+\currentpdfbookmark{\contentsname}{toc}
+\setcounter{tocdepth}{1}		% define depth of toc (0 = chapters only, 1 = chapters & sections, 2 = also subsections)
+\tableofcontents				% display table of contents
+\cleardoublepage
+%
+\input{chapters/0.1 preface}    % INCLUDE: acknowledgment
+\cleardoublepage
+%
+\pagestyle{plain}				% display just page numbers
+
+% --------------------------
+% Body matter
+% --------------------------
+\pagenumbering{arabic}			% arabic page numbering
+\setcounter{page}{1}			% set page counter
+\pagestyle{scrheadings}			% header and footer style
+
+% INTRODUCTION PART
+\part{Introduction}                 % Parts are optionally, will be included in toc and as extra pages between chapters
+\input{chapters/1. introduction}   % INCLUDE: introduction
+%\input{chapters/2. literature}    % INCLUDE: literature
+
+% PART I: The first part
+\part{Title of the first part}
+\label{part:first}
+\input{chapters/3. chapter Model}       % INCLUDE: chapter 3
+%\input{chapters/4. chapter 4}      % INCLUDE: chapter 4
+%\input{chapters/5. chapter 5}      % INCLUDE: chapter 5
+
+% PART II: The Second part
+\part{Title of the second part}
+\label{part:second}
+\input{chapters/6. chapter Example}      % INCLUDE: chapter 6
+%\input{chapters/7. chapter 7}      % INCLUDE: chapter 7
+%\input{chapters/8. chapter 8}      % INCLUDE: chapter 8
+
+% Discussion and conclusions part
+\part{Conclusions}
+\input{chapters/9. conclusions}     % INCLUDE: conclusion
+
+
+% --------------------------
+% Back matter
+% --------------------------
+%
+\addtocontents{toc}{\protect\setlength{\cftbeforechapskip}{2em}} % Additional space between conclusions and backmatter in ToC
+{%
+\setstretch{1.1}
+\renewcommand{\bibfont}{\normalfont\small}
+\setlength{\biblabelsep}{0pt}
+\setlength{\bibitemsep}{0.5\baselineskip plus 0.5\baselineskip}
+\printbibliography[nottype=online]
+\newrefcontext[labelprefix={@}]
+\printbibliography[heading=subbibliography,title={Webpages},type=online]
+}
+\cleardoublepage
+
+\addtocontents{toc}{\protect\setlength{\cftbeforechapskip}{1em}} % Reset spacing for additional parts in ToC
+
+% Possible list of abbreviations
+% List of abbreviations
+%
+%\cleardoublepage
+
+% List of figures
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+\cleardoublepage
+
+% List of tables
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+\cleardoublepage
+
+% List of algorithms
+\listofalgorithms
+\cleardoublepage
+
+% Summaries (English and Dutch)
+\input{chapters/99.0 abstract}
+\cleardoublepage
+
+% About the author
+\input{chapters/99.1 author}
+\cleardoublepage
+
+% List of publications
+\input{chapters/99.2 publications}
+\cleardoublepage
+
+\clearpage
+
+\newpage
+\mbox{}
+
+% **************************************************
+% End of Document CONTENT
+% **************************************************
+\end{document}

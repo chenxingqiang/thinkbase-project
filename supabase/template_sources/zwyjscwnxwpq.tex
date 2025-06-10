@@ -1,0 +1,189 @@
+% msuthesis.tex
+%10/1/14 Edited fronmatter names, dates. Clarified document overall.
+
+\documentclass{msuthesis}
+%\usepackage[light,first]{draftcopy} %remove for final version
+
+% book design declarations------------
+\usepackage{times}
+
+% graphics format declarations------------
+%
+%%%% Use one of the following two lines and comment out the other %%%%%%
+%%%% according to the types of graphics files you will use in figures.%%
+%
+\usepackage[pdftex]{graphicx}    %MSU%%%for *.jpg, *.png, *.pdf
+%\usepackage[dvips]{graphicx}    %MSU%%%for *.eps only
+
+%default SubSubSection is lowest section level \setcounter{tocdepth}{3}
+\settowidth{\maxchapwidth}{\normalfont 00000.} %period should align under P in CHAPTER
+\settowidth{\maxsectwidth}{\normalfont 00.00} 
+\settowidth{\maxsubsectwidth}{\normalfont 00.00.00} 
+\settowidth{\maxsubsubsectwidth}{\normalfont 00.00.00.00} 
+\settowidth{\maxtabnowidth}{00.00}
+\settowidth{\maxfignowidth}{00.00}
+
+%%% bibliography definitions %%%%
+\newcommand{\biblist}{ieeecsexamples} 
+
+%%% local definitions %%%
+\newcommand{\MSU}{\textsc{msu}\xspace}
+\newcommand{\Msu}{\textsc{Msu}\xspace}
+\newcommand{\BibTeX}{\textsc{Bib}\TeX\xspace}
+\newcommand{\MiKTeX}{MiK\TeX\xspace}
+\newcommand{\TeXworks}{{\TeX}works\xspace}
+\newcommand{\ASCII}{\textsc{ascii}\xspace}
+\newcommand{\URL}{\textsc{url}\xspace}
+
+%%% Front matter info %%%
+%maximum 3 title lines on title page
+% The first line of your title must be in booktitle. The other lines are optional.
+\renewcommand{\booktitle}{Guidelines for dissertations, theses, and project reports in}
+\renewcommand{\booktitletwo}{the Department of Computer Science and Engineering:}
+\renewcommand{\booktitlethree}{Typesetting using LaTeX}
+%default abstracttitle is all booktitle lines on one line
+\renewcommand{\authorname}{Edward B. Allen}
+\renewcommand{\doctype}{Thesis} %Dissertation, project, whatever you like
+%default university is Mississippi State University
+%default city is Mississippi State
+%default state is Mississippi
+\renewcommand{\department}{Department of Computer Science and Engineering}
+\renewcommand{\major}{Computer Science}
+\renewcommand{\majorprofessor}{Dr. Donna S. Reese}
+\renewcommand{\thesisdirector}{} %default thesisdirector is same as major professor
+\renewcommand{\degree}{Master of Science}
+\renewcommand{\degreemonth}{May}
+\renewcommand{\degreeday}{15}
+\renewcommand{\degreeyear}{2015}
+\renewcommand{\kwlist}{%    
+thesis, 
+dissertation, 
+LaTeX, 
+book design, 
+format, 
+template
+}
+
+%%% other definitions %%%%%
+\renewcommand{\listofsymbolsname}{List of Symbols, Abbreviations, and Nomenclature}
+
+\begin{document}  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frontmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\maketitlepage
+\copyrightpage    %MSU recommended
+
+%default \setlength{\sigwidth}{2.8in}
+%default \setlength{\sigheight}{0.5in}
+
+\approvals
+\begin{center}
+\signature{%
+Donna S. Reese
+}{(Major Professor)
+}{}{}
+\\
+\signature{%
+Edward Allen Luke
+}{(Committee Member)
+}{}{}
+\\
+\signature{%
+J. Edward Swan II
+}{(Committee Member)
+}{}{}
+\\
+\signature{%
+T. J. Jankun-Kelly
+}{(Graduate Coordinator)
+}{}{}
+\\
+\signature{%
+Jason M. Keith
+}{Interim Dean 
+}{Bagley College of Engineering
+}{
+}
+%%%% MSU 4/23/08 Dean's name even though associate dean signs
+\end{center}
+
+\abstractpage
+\input{exabstract}
+% %%%MSU the following logic is for optional key words
+%        If kwlist is empty, then keywords line is not printed.
+\settowidth{\tmplen}{\kwlist}
+\ifthenelse{%
+\lengthtest{\tmplen > 0pt}%
+}{%
+\par\newspacing{\singlespacing}
+\vspace{2\baselineskip}
+\noindent Key words: \kwlist
+}{}%
+%%%end MSU
+
+
+%Correct page numbering requires 
+%either \dedication or \acknowledgments\setcounter{page}{2}
+%default is to make Dedication page ii
+
+\dedication       %MSU%%%required here for correct page numbering. Guidelines says optional
+To Angie.
+
+\acknowledgments  %MSU optional but not optional for this template
+%Uncomment this \setcounter if there is no dedication
+%\setcounter{page}{2} %MSU%%%title page is page 1, other pages not counted
+
+\input{exack}
+
+\tableofcontents
+\listoftables
+\listoffigures 
+
+\listofsymbols %MSU optional%%% list of symbols, abbreviations, and special nomenclature 
+\input{exlos}
+
+%%%preface not implemented%%%
+
+\mainmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Introduction}
+\input{exchapintroduction}
+
+\chapter{Getting Started}
+\input{exchapstart}
+
+\chapter{Preparing References}
+\input{exchaprefs}
+
+\chapter{Typesetting the Body of Your Thesis}
+\input{exchapbody}
+
+\chapter{Typesetting Tables and Figures}
+\input{exchapfigsandtabs}
+
+\chapter{Typesetting Mathematics}
+\input{exchapmath}
+
+\chapter{Frequently Asked Questions}
+\input{exfaq}
+
+\chapter{Conclusions}
+\input{exchapconclusions}
+
+
+\backmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\msubibliography{\biblist}
+
+\appendix %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%MSU library requires title page for each appendix
+\renewcommand{\appendixname}{\vspace*{3.25in}Appendix} %for appendix title page.  title centered vertically
+\chapter{An Appendix Title}
+
+\newpage %end of appendix title page
+\input{exappendix} %content of appendix
+
+\end{document}
+
+%end msuthesis.tex

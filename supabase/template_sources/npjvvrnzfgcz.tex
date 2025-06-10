@@ -1,0 +1,174 @@
+% Template made by Elias Saerens
+
+\documentclass[english,BCOR=5mm,DIV=12,fontsize=10pt]{book}
+%\renewcommand{\familydefault}{\rmdefault} %Sans fonts
+%\renewcommand{\familydefault}{\rmdefault} %Roman fonts
+
+\usepackage{xcolor,colortbl}
+\usepackage [english]{babel}
+
+\definecolor{VUB_blauw}{rgb}{0.1529, 0.2667, 0.5529}
+\definecolor{vuboranje}{cmyk}{0,.78,1.,0}
+\definecolor{vubbleu}{cmyk}{1,.8,.16,.03}
+
+%\usepackage[Bjornstrup]{fncychap}
+\usepackage[Lenny]{fncychap}
+\ChNameVar{\Huge\selectfont\color{black}}%  Chapter text
+\ChNumVar{\fontsize{60}{62}\usefont{OT1}{pzc}{m}{n}\selectfont\color{vuboranje}}% Chapter Number
+\ChTitleVar{\Huge\bfseries\selectfont\color{vubbleu}}% Chapter Title
+
+
+% On local engines (so not on overleaf) it can be that the document doesn't compile, to solve this, comment the following lines (the ones of xpatch) 
+\usepackage{xpatch}  %This makes the right side of the chapter square also black
+\xpatchcmd\DOCH
+  {\mghrulefill}{\color{black}\mghrulefill}
+  {}{\PatchFailed}
+
+\usepackage[T1]{fontenc}
+%\usepackage[paperwidth=17cm,paperheight=24cm]{geometry}
+\usepackage{graphicx}
+
+\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{epsfig} % for postscript graphics files
+\usepackage{mathptmx} % assumes new font selection scheme installed
+\usepackage{times} % assumes new font selection scheme installed
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{color}
+\usepackage{todonotes}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{subfig}
+\usepackage{vub}
+\usepackage[noadjust]{cite}
+\usepackage{filecontents}
+\renewcommand{\citedash}{--}
+
+\usepackage [autostyle, english = british]{csquotes}
+\MakeOuterQuote{"}
+
+\usepackage[justification=justified,format=plain]{caption} %For left alignment
+%\usepackage[justification=centering]{caption} %For centered alignment
+
+\usepackage[document]{ragged2e} %voor de justification
+
+\usepackage{booktabs}
+\usepackage{array} 
+\usepackage{tabularx}
+\usepackage{dblfloatfix}
+
+\newcolumntype{+}{>{\global\let\currentrowstyle\relax}}
+\newcolumntype{^}{>{\currentrowstyle}}
+\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+	#1\ignorespaces
+}
+
+\newcommand{\myfootnote}[1]{
+    \renewcommand{\thefootnote}{}
+    \footnotetext{\hspace{-16.5pt}\scriptsize#1}
+    \renewcommand{\thefootnote}{\arabic{footnote}}
+}
+\newcommand\alternativefootnote[1]{%
+  \tikz[remember picture,overlay]
+  \draw (current page.south west) +(1in + \oddsidemargin,6.5em)
+  node[anchor=south west,inner sep=0pt]{\parbox{\textwidth}{%
+      \rlap{\rule{18.2em}{1.0pt}}\raggedright\scriptsize#1}};}
+
+\title{Title of PhD}
+\author{\textbf{Your Name}}
+\faculty{Faculty of ...\\
+Department of ...}
+\promotors{Prof. Dr. ir. ?}
+\copromotors{Prof. Dr. ir ?}
+\chairman{Prof. Dr. ir. ?}
+\vicechairman{Prof. Dr. ir. ?}
+\secretary{Dr. ir. ?}
+\jury{Random dude (university somewhere)}
+\pretitle{Thesis submitted in fulfilment of the requirements for the award of the degree of Doctor of ... (Doctor in de ...)}
+\usepackage{pgfplots}
+
+\def\triangleH{27.7mm}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{empty}
+
+\pagenumbering{roman}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACKNOWLEDGEMENT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{Extra/acknowledgement}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ABSTRACT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{Extra/abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LIST OF ABBREVIATIONS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{Extra/abbreviations}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LIST OF SYMBOLS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{Extra/nomenclaturechapter}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TABLE OF CONTENTS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  INTRODUCTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+
+\justifying
+
+\pagenumbering{arabic} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%  INTRODUCTION    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+\label{ch:introduction}
+    \input{Introduction/Overview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+ 
+
+%1111111111111111111111111111111111111111111111111111111111111111
+\part{First Part}
+\label{part:first}
+
+%%%%%%%%%%%%%  CH1: FIRST CHAPTER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{First real chapter}
+\label{ch:1}
+    \input{First_part/Chapter_1/overview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+
+%22222222222222222222222222222222222222222222222222222222222222222
+\part{Part two}
+\label{part:2}
+
+%%%%%%%%%%%%%%%%%%  CH2: SECOND CHAPTER   %%%%%%%%%%%%%%%%%%%%%%
+\chapter{Second chapter}
+\label{ch:2}
+    \input{First_part/Chapter_2/overview}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%5555555555555555555555555555555555555555555555555555555555555555555555
+\part{Conclusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%  CH3: CONCLUSION   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{Conclusion.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%  APPENDIX    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\input{Appendix/Publications.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%  BIBLIOGRAPHY    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\nocite{*} %shows all sources without having to use \cite{}
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

@@ -1,0 +1,172 @@
+% Documentation:
+%
+% The UoK class file extends the standard report style to follow the Registry
+% guidelines for laying out a thesis. It sets the margins, interline spacing,
+% the page, figure and table numbering style, and disallows page breaks at
+% hyphens. The class file consists of setting one and an half line spacing text
+% with a 4cm left margin, at least a 2.5cm right margin, approximately 2cm top
+% and bottom margin, on A4 paper.
+% 
+% The class the following options, in addition to those of the standard report
+% class.
+%     mini - Toggles the thesis in to mini-thesis mode. This adds "mini" to the
+%            title and appends a nocite(*) at the end for an automatic output of
+%            your complete bibliography.
+%     draftmark - Puts a DRAFT' watermark on every page of the document along
+%                 with the draft statement on the title page. Additionaly, it
+%                 is used as a switch for the UoKExtentions package.
+%     draft - Puts the entire document into draft mode. Applies all the effect
+%             of draftmark above, but also propergates to other packages used.
+%     copyright - Adds a copyright page between the title page and the preface.
+%     nofig - Disables output of the list of figures in the preface.
+%     notab - Disables output of the list of tables in the preface.
+%     noalgo- Disables output of the list of algorithms in the preface.
+% All options passed to UoKthesis will be passed along to included packages:
+%    natbib, draftwatermark, setspace, hyperref, lmodern
+%
+% The cover page and optional copyright page are implicitly added before the
+% start of the preface section. Use the following commands to populate the 
+% cover page/copyright page information:
+%     \title{thesis title}
+%     \author{author's name} 
+%     \degree{Master of Science, Doctor of Philosophy, etc.} 
+%     \subject{author's department}
+%          - Computer Science if omitted 
+%     \submitdate{month year in which submitted}
+%          - dated by LaTeX if omitted 
+%     \copyrightyear{year degree conferred (next year if submitted in Dec.)}
+%          - assumes current year (or next year, in December) if omitted 
+% 
+% The preface environment allows for the use of sections that precede the main
+% document; such as Abstract and  Acknowlegements. These sections should be
+% defined using \section{Preface Section Title}. The contents page (and list of
+% figures and tables if in use) will be automatically inserted at the end of the
+% preface environment.
+%
+% The thesis style invokes the setspace package to set the commands:
+%     \doublespace
+%     \onehalfspace
+%     \singlespace
+% for spacing. By default one and an half spacing is used which resembles the
+% UKC Typewriter requirement. Singlespace can be used for letterpress
+% appearance. If you want to use true double space, for some reason, place the
+% \doublespace command where you want to start using double spacing. Just call
+% the appropriate spacing command at where you want to use them.
+% 
+% In the figure and table environments, single spacing is used. If you want to
+% use any other size rather than one and an half spacing, then do:
+% 	\renewcommand{\baselinestretch}{1.6} (or whatever you want instead of 1.6)
+% This command won't take effect unless it comes before the \begin{document} or
+% is triggered by a font change (after something like \small \normalsize).
+%
+% The example below shows the 12pt thesis style being used. This seems to give
+% acceptable looking results, but it may be omitted to get 10pt. Alternatively,
+% the 11pt option can be used.
+%
+% This version differs from old_ukcthesis.sty in the following ways:
+% 1. Removed the doublespace package (now uses setspace).
+% 2. Merged the phantom section for correct PDF links into the bibliography
+%    generating function. 
+% 3. Added thesis type options (mini, draft).
+% 4. Kent Harvard is used for referencing and citation, this is supported by the
+%    natbib package.
+% 5. PsFig macro removed.
+% 6. Now comes as two files, UoKthesis.cls, which defines purely stylistic layout,
+%    and UoKextentions.sty, that provideds some additional functionality.
+
+\documentclass[12pt,mini]{UoKthesis}
+
+% Note: The UoKextentions package includes the xcolor package with the [usenames]
+% options. If you need to add further options, these can be given to UoKextentions
+% to be propogated through.
+\usepackage{UoKextentions}
+
+% Used to generate some sample text.
+\usepackage{lipsum}
+
+% Used to configure the algorithm enviroment
+\usepackage[ruled,vlined,linesnumbered,commentsnumbered,resetcount]{algorithm2e}
+
+% Used to generate sample image.
+\let\oldincludegraphics\includegraphics\renewcommand{\includegraphics}[1]{\IfFileExists{#1}{\oldincludegraphics{#1}}{\fbox{\phantom{\rule{150pt}{100pt}}}}}
+
+% Used in sample table.
+\usepackage{multirow}
+
+\begin{document}
+\normalsize
+%Cover page information
+\title{University of Kent\\Thesis Template} 
+\author{James F. Smith} 
+\subject{computer science} 
+\degree{PhD} 
+
+%thesis preface
+\begin{preface}
+\section{Abstract}
+This mini-thesis tells you all you need to know about...
+\section{Acknowledgements}
+I would like to thank...
+\end{preface}
+
+%main content
+\chapter{Introduction}
+
+\lipsum[1]
+
+\begin{figure}
+\centering
+\includegraphics{sample}
+\caption{An example figure.}
+\end{figure}
+
+\begin{algorithm}
+	\SetAlgoLined
+	\DontPrintSemicolon	
+	\While{Not Terminated}{
+		DoSomeWork() \;
+		SomeMoreWork() \tcp{A Comment}
+	}	
+	\Return{TheSolution} \;
+	
+	\caption{An Example algorithm.}
+\end{algorithm}
+
+\lipsum[2-5]
+
+\chapter{The Method}
+
+\lipsum[6-8]
+
+\section{Section A}
+
+\lipsum[9]
+
+\section{Section B}
+
+\lipsum[10-11]
+
+\chapter{Conclusions}
+
+\begin{table}
+\centering
+\caption{Example table}
+\begin{tabular}{ll|c|c|c}
+\cline{3-4}
+                                              &       & \multicolumn{2}{c|}{Prediction} &                         \\ \cline{3-4}
+                                              &       & True           & False          &                         \\ \hline
+\multicolumn{1}{|c|}{\multirow{2}{*}{Actual}} & True  & 20             & 30             & \multicolumn{1}{l|}{50} \\ \cline{2-5} 
+\multicolumn{1}{|c|}{}                        & False & 45             & 5              & \multicolumn{1}{l|}{50} \\ \hline
+                                              &       & 65             & 35             &                         \\ \cline{3-4}
+\end{tabular}
+\end{table}
+
+\lipsum[12-14]
+
+%Sample bibliography
+\bibliography{biblio}
+
+\appendix 
+\chapter{Long Proof}
+\lipsum[15-24]
+\end{document}

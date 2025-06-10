@@ -1,0 +1,50 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{fontspec}
+\usepackage{times}
+\usepackage{xeCJK}
+
+\setCJKmainfont{FandolSong}
+\setCJKsansfont{AR PL UMing HK}
+\setCJKmonofont{AR PL UKai HK}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+
+\title{Writing Cantonese with XeLaTeX on Overleaf}
+\author{LO, Chi-kiu (Jackie) {\tt 羅致翹}\\ Multilingual Text Processing \\ Digital Technologies Research Center \\National Research Council Canada (NRC-CNRC) \\ 1200 Montreal Road, Ottawa, ON K1A 0R6, Canada\\ {\tt chikiu.lo@nrc-cnrc.gc.ca } }
+\date{June 2020}
+
+\begin{document}
+\maketitle
+This article demonstrates how to write Cantonese characters in documents using XeLaTeX on Overleaf.
+
+\section{Introduction}
+The Hong Kong Supplementary Character Set (latest version HKSCS-2016 \citep{HKSCS2016}) is a set of specific Cantonese characters that is not included in common traditional Chinese character set for various reasons \citep{LuCheungXiongYuXu2014}. Without appropriate settings in the LaTeX document, these Cantonese characters may not be rendered properly. In this article, we show a working example on writing these characters with XeLaTex on Overleaf. 
+
+\section{XeLaTeX and xeCJK}
+To setup an Overleaf project for Chinese document using xeCJK with XeLaTeX, we follow the example in \url{https://www.overleaf.com/learn/latex/Chinese}. Essentially, it includes the following two steps:
+\begin{enumerate}
+\item Click on ``Menu'' at the top left corner and choose ``XeLaTeX'' as compiler in settings.
+\item Add ``{\tt \textbackslash usepackage\{xeCJK\}}'' at the beginning of the document source.
+\end{enumerate}
+
+\section{Fonts}
+The default xeCJK font on Overleaf is \emph{FandolSong}, which covers both Simplified Chinese and Traditional Chinese glyphs but not the characters in HKSCS-2016. For example, using \emph{FandolSong} as the CJK font, the second, fourth and the fifth character of 【石硤尾邨嘅居民】 cannot be rendered.
+
+\citet{Lim2020} listed all the OTF/TTF fonts installed on Overleaf that can be used with fontspec in XeLaTeX. A general principle for selecting font when writing Cantonese is to use fonts specified with "HK" locality, such as \emph{AR PL UMing HK} and \emph{AR PL UKai HK}. As we can see below, using the two mentioned fonts, all the characters in previous example can be rendered properly. 
+
+\begin{itemize}
+    \item[] \emph{AR PL UMing HK}: {\sf【石硤尾邨嘅居民】} 
+    \item[] \emph{AR PL UKai HK}:{\tt【石硤尾邨嘅居民】} 
+\end{itemize}
+
+To use the selected font, add ``{\tt \textbackslash setCJKmainfont\{<fontname>\}}'' at the beginning of the document source.
+
+\bibliography{reference}
+\bibliographystyle{acl_natbib}
+\end{document}

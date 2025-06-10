@@ -1,0 +1,112 @@
+\PassOptionsToPackage{table, dvipsnames}{xcolor}
+\documentclass[a4paper,twoside,12pt]{toptesi}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{pgfplots}
+\usepackage[newfloat]{minted}
+\usepackage[font=small,skip=1pt]{caption}
+\usepackage{minted}
+\captionsetup[listing]{position=top}
+\usepackage{subcaption}
+\pgfplotsset{compat=1.18}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    allcolors=black
+}
+%This equals 1.5 linespacing in Word
+\linespread{1.25}
+
+\let\savedlisting\listing
+\AtBeginDocument{\let\listing\savedlisting}
+
+
+\def\dept{DIPARTIMENTO DI INFORMATICA}
+\def\course{CORSO DI LAUREA IN INFORMATICA}
+%\def\course{CORSO DI LAUREA IN INFORMATICA E \\ TECNOLOGIE PER LA PRODUZIONE DEL SOFTWARE}
+%\def\course{CORSO DI LAUREA MAGISTRALE IN INFORMATICA}
+%\def\course{CORSO DI LAUREA MAGISTRALE IN SICUREZZA INFORMATICA}
+\def\title{Titolo della Tesi}
+\def\author{Mario Rossi}
+\def\relatoreone{Prof. Nome Cognome}
+\def\relatoretwo{Prof.ssa Nome Cognome}
+\def\correlatoreone{Dott.ssa Nome Cognome}
+\def\correlatoretwo{Dott. Nome Cognome}
+\def\subject{INGEGNERIA DEL SOFTWARE}
+\def\annoacc{2023 - 2024}
+\def\beforecandidate{LAUREANDO:}
+\def\beforetitle{TESI DI LAUREA \\ IN \\}
+\def\beforeprof{RELATORI:}
+\def\beforecorrelatore{CORRELATORI:}
+\def\beforeannoacc{ANNO ACCADEMICO}
+
+\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
+    \hbox{}
+    \vspace*{\fill}
+    \vspace{\fill}
+    \thispagestyle{empty}
+    \newpage
+    \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother
+
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{tikzpicture}[remember picture,overlay]
+		\centering
+		\node[yshift=-6 cm] (logo) at (current page.north) {\includegraphics[width=0.75\linewidth]{images/uniba.jpg}};
+			\node[text width=50em,yshift=0.25cm, align = center, below = of logo](dipartimento){\normalsize \dept};
+			\node[text width=40em, align = center, yshift=.55cm,below = of dipartimento](course){\normalsize \course};
+		\node[text width=35em,align = center,  yshift=1.2cm,below = of course](line){\par\noindent\rule{\textwidth}{0.4pt}};
+		\node[text width=40em, align = center, yshift=.55cm,below = of line](lia){\normalsize \beforetitle \xspace \subject };
+		
+  \node[text width=40em, align = center, yshift=-0.5cm,below = of lia](title){\bfseries \parbox{12cm}{\fontsize{21pt}{20pt}\selectfont \centering \title\par}};
+  
+	\node[text width=35em, align = left, yshift=-1cm,below = of title](relatoretit){\normalsize \textbf{\beforeprof} };
+ 	\node[text width=35em, align = left, yshift=1cm,below = of relatoretit](relatore){\large \relatoreone \\ \relatoretwo};
+
+  	\node[text width=35em, align = left, yshift=0.5cm,below = of relatore](correlatoretit){\normalsize \textbf{\beforecorrelatore}  };
+     \node[text width=35em, align = left, yshift=1cm,below = of correlatoretit](correlatore){\large \correlatoreone \\ \correlatoretwo};
+      
+		\node[text width=35em, align = right, yshift=-1cm,below = of title](candidatetit){\normalsize \textbf{\beforecandidate}};
+		 \node[text width=35em, align = right, yshift=1cm,below = of candidatetit](candidate){\large \author};
+
+  \node[text width=35em,align = center,  yshift= -3cm,below = of candidate](line2){\par\noindent\rule{\textwidth}{0.4pt}};
+	
+  
+  \node[text width=50em, align = center, yshift=0.5cm,below = of line2](year){\large \beforeannoacc\xspace \annoacc};
+	\end{tikzpicture}
+\end{titlepage}
+
+
+\cleardoublepage
+
+\include{dedica}
+\cleardoublepage
+\pagenumbering{roman}
+
+\tableofcontents
+
+\cleardoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\include{note}
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Introduzione}
+\include{introduzione}
+\include{capitolo1}
+\include{capitolo2}
+\include{capitolo3}
+\include{capitolo4}
+\include{conclusioni}
+\bibliographystyle{plain}  
+\bibliography{bibliografia}
+\include{ringraziamenti}
+\end{document}

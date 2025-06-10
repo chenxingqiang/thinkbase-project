@@ -6,7 +6,7 @@ from agentflow.agents.agent import Agent, AgentState, RemoteAgent
 from agentflow.core.base_types import AgentStatus
 from agentflow.core.agent_config import AgentConfig
 from agentflow.core.model_config import ModelConfig
-from agentflow.ell2a.types.message import (
+from agentflow.ell.types.message import (
     Message, 
     MessageRole, 
     ContentBlock, 
@@ -28,11 +28,11 @@ async def test_agent_status_transitions():
     agent = Agent(config=AgentConfig(name="test_agent", type="generic"))
     await agent.initialize()
     
-    # Mock ELL2A integration
-    class MockELL2A:
+    # Mock ELL integration
+    class MockELL:
         async def process_message(self, message):
             return Message(content="test response", role=MessageRole.ASSISTANT)
-    agent._ell2a = MockELL2A()
+    agent._ell = MockELL()
     
     # Process a message
     message = "test message"
@@ -46,11 +46,11 @@ async def test_agent_error_status():
     agent = Agent(config=AgentConfig(name="test_agent", type="generic"))
     await agent.initialize()
     
-    # Mock ELL2A integration to raise an error
-    class MockELL2A:
+    # Mock ELL integration to raise an error
+    class MockELL:
         async def process_message(self, message):
             raise ValueError("Test error")
-    agent._ell2a = MockELL2A()
+    agent._ell = MockELL()
     
     # Process a message that will fail
     message = "test message"

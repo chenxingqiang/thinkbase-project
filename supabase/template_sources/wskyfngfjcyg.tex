@@ -1,0 +1,49 @@
+\documentclass[svgnames]{standalone}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{pgfplots, helvet, verbatim}
+\renewcommand{\familydefault}{\sfdefault}
+\pgfplotsset{width=10cm, compat=newest}
+\usetikzlibrary{backgrounds}
+
+\begin{comment}
+Esta gráfica es la segunda versión del ejemplo titulado "Espectro de Banda Base OFDM Multiportadora"  https://www.overleaf.com/latex/examples/espectro-de-banda-base-ofdm-multiportadora/xhbwfnpmmhpy. A diferencia del ejemplo previamente publicado por mí, en este caso se usó la opción gnuplot [raw gnuplot] de la orden \addplot. Al comparar ambos ejemplos, se observan algunas diferencias, probablemente por la forma en que se calculan las coordenadas en el paquete PGFPLOTS y la opción GNUPLOT que usa órdenes del paquete homónimo.
+
+Para el trazado de las 3 curvas se usa la orden \foreach y dentro del bucle, la orden \addplot+ con las opciones adecuadas para que las curvas aparezcan en colores diferentes. Otras opciones usadas se explican por sí mismas en los comentarios.
+\end{comment}
+% Lista de colores en ciclo
+\pgfplotscreateplotcyclelist{croma}{Goldenrod, Blue, Red}
+
+% Sección colores de etiquetas
+\newcommand{\titulo}{RoyalBlue} % Variable del color de la etiqueta del título.
+\newcommand{\etiq}{VioletRed} % Variable del color de las etiquetas de los ejes.
+\newcommand{\fondo}{LightGrey!15} % Variable del color del fondo del gráfico.
+
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    legend style={fill=\fondo, font=\scriptsize,anchor=north east}, % Dibuja la caja de leyendas y aplica fondo
+	axis background/.style={fill=\fondo},
+	title style={text width=10cm},
+	title=\centering \textbf{\color{\titulo} Espectro de Banda Base OFDM\\ Multiportadora 2\\},
+	cycle list name = croma,
+	xlabel=\color{\etiq} $\frac{f}{N*Rs}$,
+	ylabel=\color{\etiq} $S(f)$,
+	minor tick num=9,
+	grid=major,
+	]
+	\foreach \i in {1, ...,3}
+	\addplot +[no marks, line width = 1, samples=100, smooth] gnuplot [raw gnuplot]{
+	set xr[-0.1:2]; % Fija el rango de x. No es necesario para el eje y.
+	f(x) = (sin(pi*x)/(pi*x))^2;
+	g1(x) = sum[n=0:3] f(4*x-n);
+    g2(x) = sum[n=0:15] f(16*x-n);
+    g3(x) = sum[n=0:63] f(64*x-n);
+    plot g\i(x);
+    };
+	% Leyenda
+	\legend{$N=4$, $N=16$, $N=64$}
+\end{axis}
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,218 @@
+%% PhD thesis template
+%% School of Computing and Communications, Lancaster University, 
+
+%% Copyright 2020 Andrew Moore and Alistair Baron
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is Alistair Baron
+%
+% This work consists of the files main.tex, and the other example tex files referenced within.
+
+
+%
+% Heavily based on the formatting and content of Alistair Baron's thesis (https://eprints.lancs.ac.uk/id/eprint/84887/1/2011Baronphd.pdf), Kelly Widdicks's thesis (https://doi.org/10.17635/lancaster/thesis/951), and Andrew Moore's thesis (https://doi.org/10.17635/lancaster/thesis/1408). The thesis is also somewhat based on the Cambridge thesis template: https://github.com/kks32/phd-thesis-template
+%
+% This was created by Andrew Moore and Alistair Baron with help from Paul Rayson, and Edward Dearden.
+%
+% Conforms with Lancaster University MANUAL OF ACADEMIC REGULATIONS AND PROCEDURES (MARP) for POSTGRADUATE RESEARCH. This can be found here: https://www.lancaster.ac.uk/media/lancaster-university/content-assets/documents/student-based-services/asq/marp/PGR-Regs.pdf
+% For layout information the most relevant pages of that document are Appendix 2.
+
+% This template was updated in November 2022, to apply changes to the regulations made in July 2021.
+
+% Please check that your thesis complies with the current regulations.
+
+% If you have any useful updates for this template, which you think will benefit others, please make these available via github (https://github.com/InfoLab21/scc-thesis-template).
+
+
+\documentclass[twoside,12pt, a4paper]{report}
+
+% The following sets the whole document to 1.5 line spacing. The line spacing should be 1.5 according to the MARP regulations (Appendix 2), for the purpose of examiner annotation. However, some have a preference for different line spacing (e.g. single). Comment this line out for single line spacing.
+\linespread{1.5}
+
+\usepackage[paper=a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=false,
+    breaklinks=true
+}
+% All sections and sub sections have to be labelled in the table of contents and thesis. This does this down to the level of subsubsection.
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+%discourages hyphenated words at end of lines
+\hyphenpenalty=5000
+\tolerance=1000
+
+
+% biblography formatting
+% NOTE: At the moment both URL and DOI will be displayed, if you have a bib entry that has both URL and DOI please remove the URL so that only one link is displayed, in this case to the DOI. 
+\usepackage[style=authoryear,backend=biber,url=true, doi=true, sorting=nyt, natbib=true]{biblatex}
+\usepackage{bibentry}
+\addbibresource{ref.bib}
+
+% Appendix formatting
+\usepackage[title, titletoc]{appendix}
+\renewcommand{\appendixpagename}{Appendix}
+
+
+% for the title page
+\usepackage{datetime}
+\newdateformat{monthyeardate}{%
+  \monthname[\THEMONTH], \THEYEAR}
+% For the declaration
+% NOTE IF NOT USING OVERLEAF PLEASE REMOVE THIS AND ADD THE WORD COUNT MANUALLY. The software overleaf uses is this: https://app.uio.no/ifi/texcount/
+% This has come from overleaf and has been slightly adapted. This counts everything including footnotes and captions I believe and the appendix, but not bibliography.
+% https://www.overleaf.com/learn/how-to/Is_there_a_way_to_run_a_word_count_that_doesn%27t_include_LaTeX_commands%3F
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -0 -sum -merge  #1.tex > #1-words.sum }%
+  \input{#1-words.sum}%
+}
+%
+% TO BE FILLED IN
+%
+\newcommand\thesistitle{Title of your thesis}
+\newcommand\authorname{First (Middle) Last name} % Full name
+\newcommand\authordegrees{BSc (Hons), MRes} % This does not have to be filled in, but the regulations state that you should include any degrees you have.
+
+\newgeometry{left=35mm, right=25mm, top=25mm, bottom=25mm, asymmetric, includeheadfoot} % This has to come before the header and footer information
+
+% HEADER AND FOOTER STYLE
+% https://en.wikibooks.org/wiki/LaTeX/Customizing_Page_Headers_and_Footers
+\usepackage{fancyhdr}
+% This needs to be smaller or larger depending on your largest header, at the moment we have set it to 15
+% even though it states a warning in the latex, as your largest header is most likely 
+% not to be a multiline header, but remember this may changed so checks the latex 
+% warning for:
+% (fancyhdr)                \setlength{\headheight}
+% Where it will tell you what to change this too.
+\setlength{\headheight}{15pt} 
+% For preamble
+\fancypagestyle{preamble}{ %
+  \fancyhf{} % remove everything
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt} % remove lines as well
+  \renewcommand{\footrulewidth}{0pt}
+}
+\pagestyle{preamble}
+
+% For the main pages
+\fancypagestyle{main}{
+  \fancyhf{}
+  %\fancyhead[R]{\thepage}
+  \fancyfoot[C]{\thepage}
+  \fancyhead[LE]{\textit{ \nouppercase{\leftmark}} }
+  \fancyhead[RO]{\textit{ \nouppercase{\rightmark}} }
+  \renewcommand{\headrulewidth}{1pt} % remove lines as well
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% For title and chapter pages
+\fancypagestyle{plain}{ %
+  \fancyhf{} % remove everything
+  \fancyfoot[C]{\thepage} %should keep page number
+  \renewcommand{\headrulewidth}{0pt} % remove lines as well
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% Highlighting your own name in the publication.tex section
+\usepackage{xpatch}% or use http://tex.stackexchange.com/a/40705
+\makeatletter
+\newbibmacro*{name:bold}[2]{%
+  \edef\blx@tmp@name{\expandonce#1, \expandonce#2}%
+  \def\do##1{\ifdefstring{\blx@tmp@name}{##1}{\bfseries\listbreak}{}}%
+  \dolistloop{\boldnames}}
+\newcommand*{\boldnames}{}
+\makeatother
+\xpretobibmacro{name:family}{\begingroup\usebibmacro{name:bold}{#1}{#2}}{}{}
+\xpretobibmacro{name:given-family}{\begingroup\usebibmacro{name:bold}{#1}{#2}}{}{}
+\xpretobibmacro{name:family-given}{\begingroup\usebibmacro{name:bold}{#1}{#2}}{}{}
+\xpretobibmacro{name:delim}{\begingroup\normalfont}{}{}
+
+\xapptobibmacro{name:family}{\endgroup}{}{}
+\xapptobibmacro{name:given-family}{\endgroup}{}{}
+\xapptobibmacro{name:family-given}{\endgroup}{}{}
+\xapptobibmacro{name:delim}{\endgroup}{}{}
+
+\usepackage{lipsum} % just to add random text as an example
+
+%
+%
+
+
+\begin{document}
+\pagenumbering{roman}
+
+\input{title_page}
+
+%I dedicate this thesis to someone. \textbf{(this is not required when submitting your thesis before your viva and you can add a dedication in your final thesis after your viva if you wish.)}
+
+\clearpage
+
+\input{abstract}
+
+\clearpage
+
+\input{acknowledgements}
+
+\clearpage
+
+\input{declaration}
+
+\clearpage
+
+\input{publications}
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+\listoftables
+
+\clearpage
+
+\listoffigures
+
+\clearpage
+
+
+\pagestyle{main}
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+\input{chapters/introduction}
+
+
+
+\chapter{Middle chapters}
+\input{chapters/middle}
+
+\chapter{Conclusions}
+\input{chapters/conclusion}
+
+\begin{appendices}
+
+\chapter{Introduction}
+\label{appendix_introduction}
+\input{appendix/introduction}
+
+\end{appendices}
+
+\clearpage % Required to make sure the references table of contents page number is correct.
+\printbibliography[heading=bibintoc,title=References]
+
+\end{document}
+

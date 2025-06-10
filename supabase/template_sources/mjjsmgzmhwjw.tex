@@ -1,0 +1,146 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%               Template                %
+%          kindly provided by           %
+%             Daniel Regado             %                 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, a4paper]{report} % Page and font size
+
+% Packages
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{fontspec}
+\usepackage{multirow}
+\usepackage{afterpage}
+\usepackage{layout}
+\usepackage{xcolor}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{fix-cm}
+\usepackage{float}
+\usepackage{makecell}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{pdfpages}
+\usepackage{longtable}
+\usepackage[english]{babel}
+\usepackage{setspace}
+\usepackage[square, numbers]{natbib}
+\bibliographystyle{abbrvnat}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage[acronym, shortcuts, style=index]{glossaries}
+\makeglossaries
+\usepackage{subcaption}
+\usepackage[title]{appendix}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{fancyhdr}
+
+% Global counters (don't reset on chapter)
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\counterwithout{equation}{chapter}
+
+% Colors
+\definecolor{darkBlue}{cmyk}{1.0, 1.0, 0.0, 0.1}
+\definecolor{darkGreen}{cmyk}{1.0, 0.0, 1.0, 0.4}
+\definecolor{navyBlue}{cmyk}{1.0, 1.0, 0.0, 0.1}
+
+\hypersetup{
+    bookmarksnumbered=true,
+    plainpages=false,
+    pdffitwindow=true,
+    pdfauthor={Daniel Regado},
+    pdfcreator={Daniel Regado},
+    pdfproducer={Daniel Regado},
+    colorlinks=true,
+    linkcolor=darkBlue,
+    citecolor=darkGreen,
+    filecolor=magenta,
+    urlcolor=navyBlue
+}
+
+% UMinho formatting
+\onehalfspacing % 1.5 spacing
+\geometry{ % Page borders
+    a4paper,
+    right=25mm,
+    rmargin=0mm,
+    outer=25mm,
+    left=0mm,
+    lmargin=0mm,
+    inner=25mm,
+    top=0mm,
+    tmargin=25mm,
+    bottom=0mm,
+    bmargin=25mm
+}
+\setmainfont[Ligatures=TeX, AutoFakeSlant=0.20, BoldFont=NewsGotTBold.ttf]{NewsGotT.ttf} % NewsGotT font
+
+% Titles formatting
+\titleformat{\chapter}[display]{\normalfont\bfseries\color{darkgray}}{\chaptertitlename\ \thechapter}{0pt}{\Large}
+\titleformat*{\section}{\color{darkgray}\Large\bfseries}
+\titleformat*{\subsection}{\color{darkgray}\Large\bfseries\color{darkgray}}
+\titleformat*{\subsubsection}{\color{darkgray}\Large\bfseries}
+\setcounter{secnumdepth}{3}
+\renewcommand{\thesubsubsection}{\alph{subsubsection})}
+\titlespacing{\chapter}{0pt}{-40pt}{20pt}
+
+% Settings for headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+\renewcommand{\headrulewidth}{0.0pt}
+
+% Header for Abstract and Resumo
+\fancypagestyle{title_on_header}{
+    \fancyhead[C]{\textit{Your Title Goes Here}}
+    \fancyfoot[C]{\thepage}
+}
+
+%*******************************************************************
+\begin{document}
+\include{acronyms} % Import acronyms
+
+% Title and Cover Page
+% The files need to be changed and exported from Adobe Illustrator
+% Adobe Illustrator files are in front/cover/illustrator
+\begin{titlepage}
+    \includepdf[pages={1,2}, fitpaper]{front/cover/title.pdf}
+    \includepdf{front/cover/cover.pdf}
+\end{titlepage}
+
+% Front matter
+\pagenumbering{roman}
+\setcounter{page}{2} % Cover page is the first page, but not numbered
+\include{front/copyright}\clearpage
+\include{front/acknowledgments}\clearpage
+\include{front/integrity}\clearpage
+\input{front/resumo}\clearpage
+\input{front/abstract}\clearpage
+\input{front/quote}\clearpage
+\setcounter{tocdepth}{1} % Only go down to section level on ToC
+\tableofcontents\fancyhead[R]{\textit{Contents}}
+\listoffigures\fancyhead[R]{\textit{List of Figures}}
+\listoftables\fancyhead[R]{\textit{List of Tables}}
+\printglossaries\fancyhead[R]{\textit{Acronyms}}
+
+% Header with section number and name
+\fancyhead[R]{\rightmark}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ \textit{#1}}}
+
+% Thesis content
+\pagenumbering{arabic} % Reset page counter
+\input{chapters/introduction}
+
+% Include your chapters here
+\input{chapters/example/example}
+
+\input{chapters/conclusions}
+\input{chapters/appendix/appendix}
+\fancyhead[R]{\textit{Bibliography}}\bibliography{dissertation}
+
+\end{document}

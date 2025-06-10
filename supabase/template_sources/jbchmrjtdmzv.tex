@@ -1,0 +1,256 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella} % set the font-family to `TeX Gyre Pagella`
+\usepackage{geometry}
+\usepackage{sectsty} % change the appearance of \section
+\usepackage{fontawesome5}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xstring}
+\usepackage{tcolorbox}
+\usepackage{lipsum}
+
+\geometry{ % set the document layout
+  a4paper,
+  left=20mm,
+  right=20mm,
+  bottom=10mm,
+  top=15mm
+}
+  
+\pagestyle{empty} % remove header, footer, pagenumbers, etc.
+
+\sectionfont{
+    \fontfamily{qag}\selectfont % change font-family to `TeX Gyre Adventor` with font-code `qag`
+    \sectionrule{0pt}{0pt}{-8pt}{1.5pt} % insert an horizontal rule -8pt below the title, with a thickness of 1pt
+}
+
+%%%%%%%%%%%%% Macros %%%%%%%%%%%%%
+
+%%%%%%%%%%%%% Colors %%%%%%%%%%%%%
+
+\definecolor{blueSky}{RGB}{49, 120, 198}
+\definecolor{orangeFruit}{RGB}{224, 128, 44}
+\definecolor{redBlood}{RGB}{188, 20, 20}
+\definecolor{grayShy}{RGB}{153, 150, 142}
+
+\newcommand{\mainColor}{redBlood} % pick a color above, or add a custom one
+
+%%%%%%%%%%%%% Spaces %%%%%%%%%%%%%
+
+% Horizontal %
+
+\newlength{\spacebox}
+\settowidth{\spacebox}{123456789} % set \spacebox length to be equal to the width of the box formed by `123456789`
+
+\newcommand{\xhspace}{\hspace*{0.1em}}
+\newcommand{\shspace}{\hspace*{0.5em}}
+\newcommand{\mhspace}{\hspace*{1em}}
+
+\newcommand{\negxhspace}{\hspace*{-0.2em}}
+\newcommand{\negshspace}{\hspace*{-0.5em}}
+\newcommand{\negmhspace}{\hspace*{-1em}}
+\newcommand{\neghhspace}{\hspace*{-1.5em}}
+
+% Vertical %
+
+\newcommand{\negxvspace}{\vspace*{-0.2em}}
+\newcommand{\negsvspace}{\vspace*{-0.5em}}
+\newcommand{\negmvspace}{\vspace*{-1em}}
+\newcommand{\neghvspace}{\vspace*{-1.5em}}
+
+\newcommand{\svspace}{\vspace*{0.5em}}
+\newcommand{\mvspace}{\vspace*{1em}}
+
+%%% boxAwesome Macro %%%
+
+\newcommand{\boxAwesome}[1]{
+   \makebox[1.50em][c]{
+      #1
+   }
+}
+
+%%% Job Macro %%%
+
+\newcommand{\job}[1]{ % `1` indicate the number of parameters given to the \name macro
+  \large % font size
+  \color{grayShy} % change the color to gray
+  \begin{center} \textsc{\MakeLowercase{#1}} \end{center}\par \mvspace % prints #1 (the title) centered and scripted
+}
+
+%%% Name Macro %%%
+
+\newcommand{\name}[3]{
+    \begin{center}
+        \begin{tikzpicture}
+            \clip (0,0)  circle (2cm) ;
+            \node[anchor=center] at (0, 0) {
+                \includegraphics[scale=0.3]{img/avatar-cv.png}
+            };
+        \end{tikzpicture}
+    \end{center}
+    \hfill
+    \Huge % font size
+    \fontfamily{phv}\selectfont % change font-family to `Helvetica` with font-code `phv`
+    \begin{center} \color{\mainColor} \textbf{\MakeUppercase{#1}} \color{black} \textbf{#2} \end{center}\par % \par create a new paragraph
+    \negxvspace
+    \job{#3}
+    \normalsize\normalfont % change the size and font back to normal
+    \color{black} % change the color back to normal (black)
+}
+
+%%% Section Macro %%%
+
+\newcommand{\cvsection}[2]{
+    \section*{
+        \color{\mainColor} \boxAwesome{#1} \negshspace \StrSplit{#2}{3}{\csA}{\csB} \csA\color{black}\csB
+    }
+}
+
+%%% Subsection Macro %%%
+
+\newcommand{\cvsubsection}[2]{
+    \subsection*{
+        \boxAwesome{#1} #2
+    }
+}
+
+%%% Personal Details Macro %%%
+
+\newcommand{\info}[2]{
+  \noindent\hangindent=2em\hangafter=0 % \noindent delete default indentation ; \hangindent set custom indentation ; \hangafter indicate for how many lines we want this indentation (0 means for all lines)
+  \boxAwesome{#1}
+  #2 \par
+  \svspace
+}
+
+%%% Skills Macro %%%
+
+\newcommand{\simpleSkill}[1]{
+    \noindent\hangindent=1.5em\hangafter=0
+    \faAngleRight
+    \shspace
+    #1
+    \svspace
+    \par
+}
+
+\newcommand{\doubleSkill}[3]{
+    \noindent\hangindent=1.5em\hangafter=0
+    \parbox{30\spacebox} {
+        \faAngleRight
+        \boxAwesome{#1} \textbf{#2}
+        \svspace
+    } \svspace \texttt{#3} \par
+}
+
+%%% Work Experience Macro %%%
+
+\newcommand{\work}[6]{
+    \noindent \textbf{#1}
+    \hfill % the following is written at the right of the document on the same line
+    \framebox{
+      \parbox{8em}{
+      \centering\textbf{#2}
+    }} \par
+    \noindent \color{grayShy} \textsc{\MakeLowercase{#3}} \color{black} \par
+    \begin{itemize}
+          \item[\faAngleRight] #4
+          \negxvspace
+          \item[\faAngleRight] #5
+          \negxvspace
+          \item[\faAngleRight] #6
+    \end{itemize}
+    \normalsize \par
+}
+
+%%% Education Macro %%%
+
+\newcommand{\education}[3]{
+   \noindent \textbf{#1}
+   \hfill
+   \framebox{
+      \parbox{8em}{
+      \centering\textbf{#2}
+    }} \par
+    \noindent \color{grayShy} \textsc{\MakeLowercase{#3}} \color{black} \par
+    \mvspace
+    \normalsize \par
+}
+
+%%% Hobbies Macro %%%
+
+\newcommand{\hobby}[2]{
+    \noindent\hangindent=1.5em\hangafter=0
+    \faAngleRight
+    \shspace
+    \boxAwesome{#1} #2
+    \svspace
+    \par
+}
+
+%%%%%%%%%%%%% Your CV below %%%%%%%%%%%%%
+
+\begin{document}
+    \name{Your Name}{Here}{Web and Mobile Developer}
+
+    \info{\faEnvelopeOpen}{\texttt{your.name@gmail.com}}
+    \info{\faPhone}{(000) 000-0000}
+    \info{\faMap}{2708 N University Dr - 33322 Sunrise, Florida}
+    \info{\faGithub}{\texttt{Your GitHub ID}}
+    \info{\faLink}{\texttt{www.myBlog.com}}
+    
+    \negsvspace
+    \cvsection{\faDna}{Skills}
+    \svspace
+    \cvsubsection{\faLaptopCode}{Technical skills}
+    \svspace
+    
+    \doubleSkill{\faCogs}{Back-end}{Symfony \textbullet{} CakePHP}
+    \doubleSkill{\faDatabase}{Databases}{PostgreSQL \textbullet{} MongoDB \textbullet{} Redis}
+    \doubleSkill{\faPaintBrush}{Front-end}{Svelte \textbullet{} React \textbullet{} MaterialUI}
+    \doubleSkill{\faCode}{Integration}{Sass \textbullet{} TailwindCSS \textbullet{} Bulma}
+    \doubleSkill{\faTools}{Tools}{Git \textbullet{} Docker  \textbullet{} NeoVim \textbullet{} Fish Shell \textbullet{} \LaTeX{}}
+    \doubleSkill{\faLinux}{OS}{Fedora \textbullet{} NixOS \textbullet{} XMonad}
+
+    \negsvspace
+    \cvsubsection{\faHandsHelping}{Soft skills}
+    \svspace
+
+    \simpleSkill{Problem-solving and critical thinking}
+    \simpleSkill{Communication}
+    \simpleSkill{Self-awareness}
+    \simpleSkill{Self-learning}
+    \simpleSkill{Time management}
+    \simpleSkill{Accountability}
+
+    \cvsection{\faBriefcase}{Work Experience}
+    \svspace
+    
+    \work{Senior Full Stack Engineer - R\&D Team}{2019-now}{Walter Group - 71342 Jena, Louisiana}{\lipsum[1][1]}{\lipsum[1][1]}{\lipsum[1][1]}
+    \work{Software Engineer Intern - OS Team}{2015-2019}{Fahey Inc - 77450 Katy, Texas}{\lipsum[1][1]}{\lipsum[1][1]}{\lipsum[1][1]}
+    \work{Front-End Engineer - UX Team}{2013-2015}{Schinner-Corwin - 45241 Cincinnati, Ohio}{\lipsum[1][1]}{\lipsum[1][1]}{\lipsum[1][1]}
+    
+    \cvsection{\faGraduationCap}{Education}
+    \svspace
+    
+    \education{Bachelor of Computer Science}{2010-2013}{Laguna Bay University - 92503 Riverside, California}
+    \education{Bachelor of Science in Information Technology}{2007-2010}{Summit University - 94080 South San Francisco, California}
+    \education{Bachelor of Computer Application}{2004-2007}{Pine Hill Institute - 60501 Summit, Indiana}
+    \education{Bachelor of Marketing and Communication}{2001-2004}{Winters Institute - 8837 Belair Rd, Maryland}
+    
+    \neghvspace
+    \cvsection{\faPuzzlePiece}{Hobbies \& Interests}
+    \svspace
+
+    \hobby{\faCoffee}{Coffee}
+    \hobby{\faGamepad}{Video games}
+    \hobby{\faTwitch}{Streaming}
+    \hobby{\faShoppingCart}{Shopping}
+    \hobby{\faPaw}{Pets}
+    \hobby{\faChess}{Chess}
+    \hobby{\faSmoking}{Smoking}
+    \hobby{\faBed}{Sleeping}
+\end{document}

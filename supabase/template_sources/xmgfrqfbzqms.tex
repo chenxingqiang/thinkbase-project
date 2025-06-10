@@ -1,0 +1,169 @@
+%!TEX program = xelatex
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools,stmaryrd}
+\usepackage{booktabs,fancyhdr}
+\usepackage[shortlabels]{enumitem}
+\usepackage[%
+%margin=1in,
+top=0.65in,bottom=0.75in,left=0.5in,right=0.5in,landscape
+]{geometry}
+\setlength{\columnsep}{0.5in}
+
+
+\usepackage[no-math]{fontspec}
+\setmainfont{TeX Gyre Pagella}
+
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}% new checkmark
+\newcommand{\xmark}{\ding{55}}% new x-mark
+
+\newtheorem*{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem*{definition}{Definition}
+
+\usepackage[%
+natbib=true,backend=biber,sorting=nymdt,%
+maxbibnames=10,%
+citestyle=authoryear,bibstyle=authoryear,%
+url=false,doi=false,isbn=false%
+]{biblatex}
+\input{tools/jbib_links.tex}
+\addbibresource{test.bib}
+\input{tools/jformat.tex} % note: imports hyperref
+\usepackage{cleveref}
+
+% warning character
+\usepackage{newunicodechar}
+\newcommand{\Warning}{%
+  \makebox[1.4em][c]{%
+    \makebox[0pt][c]{\raisebox{.15em}{\small!}}%
+\makebox[0pt][c]{\color{red}\Large$\triangle$}}}%
+
+\newcommand\hlbox[2][]{%
+  \tikz[overlay]\node[%
+  fill=yellow!20,inner sep=0pt,
+  anchor=text,rectangle,rounded corners=1mm,#1]%
+{#2\strut};\phantom{#2}}
+\newcommand\hlA[1]{\hlbox[fill=blue!10]{#1}}
+\newcommand\hlB[1]{\hlbox[fill=red!10]{#1}}
+\usepackage{soul}
+
+\usepackage[linguistics]{forest}
+% For putting parens around a subtree
+\usetikzlibrary{calc}
+\tikzset{
+  ncbar angle/.initial=90,
+  ncbar/.style={%
+    to path= (\tikztostart)
+    -- ($ (\tikztostart)!#1!\pgfkeysvalueof{/tikz/ncbar angle}: (\tikztotarget)$)
+    -- ($ (\tikztotarget)! ($(\tikztostart)!#1!\pgfkeysvalueof{/tikz/ncbar angle}: (\tikztotarget)$)!\pgfkeysvalueof{/tikz/ncbar angle}: (\tikztostart)$)
+    -- (\tikztotarget)
+  },
+  ncbar/.default=0.5cm,
+}
+\tikzset{left brace/.style={ncbar=-0.5mm}}
+\tikzset{right brace/.style={ncbar=0.5mm}}
+\tikzset{left paren/.style={ncbar=0.5mm,out=-110,in=110}}
+\tikzset{right paren/.style={ncbar=0.5mm,out=-70,in=70}}
+
+\input{tools/forest-trees.tex}
+\input{tools/kast.tex} % for a nice box
+\input{tools/gb4e-examples.tex} % import gb4e, tweak
+\setlength{\intextsep}{0ex}
+
+%%%%  Author name
+\def\FNAME{Jacob L}
+\def\LNAME{Hover}
+
+\pagestyle{fancy}
+\fancyhead[L]{\thetitle}
+\fancyhead[R]{\LNAME}
+
+\begin{document}
+\title{Linguistics handout template}
+\author{\FNAME\ \LNAME}
+\date{Spring 2021}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}%
+\label{sec:introduction}
+
+Lorem ipsum here's a citation \citep{bombar}. \Citet{nymous} says something. \textbf{Note automatic hyperlinks in the references.}
+Use \texttt{mdframed} for a simple box. 
+
+\begin{mdframed}[style=rounded]
+Here's a description:
+  \begin{description}
+    \item[Generalization] Yup.
+    \item[Reported exceptions] A \hlbox{highlighted} thing.
+  \end{description}
+\end{mdframed}
+
+\begin{exe}
+  \ex\tree[for tree={l sep=1.5ex, l=1.5ex, inner sep=0}]{%
+    [\textit{v}P 
+    [{\textit{v}\\\textit{-ya}\\([\textsc{instr}])}] 
+  [VP [V] [DP]]]}
+\end{exe}
+
+The \texttt{kast} environment gives a box with a title.
+
+\begin{kast}{Proposal for X}
+
+  \emph{kast} is Estonian for `box'.
+
+  Include a graphic
+
+  \noindent\includegraphics[width=.95\textwidth]{example.png}
+\end{kast}
+
+% NOTE: If you want to put a graphic inside an itemize environment like this, you may want to `clip' it like this:
+% \begin{itemize}
+%   \item Here's an item
+%   %\includegraphics[width=.85\textwidth/2,trim={15mm 0 0 0},clip]{example.png}
+% \end{itemize}
+
+
+\subsection{A subsection}
+Here's a tree with some Ti\textit{k}Z annotation.
+\begin{exe}
+  \ex Another tree\\
+  \tree{%
+    [Voice$_\textsc{pass}$P, for tree={s sep=15pt}
+    [Voice$_\textsc{pass}$P
+    [Voice$^0_\textsc{pass}$\\$\theta$]
+    [VP, for tree={s sep=15pt}]]
+    [PP,edge=dashed, tikz={
+      \node(x) [inner sep=0pt,fit to=tree] {};
+      \draw[] (x.north west) to [left brace] (x.south west);
+      \draw[] (x.north east) to [right brace] (x.south east);
+    }
+  [P] [DP\\\textit{agent}]]]}
+\end{exe}
+%%%%%%%%%%%%%% REFERENCES %%%%%%%%%%%%%%%%%%%%%%%
+
+\defbibnote{note:complete}{\it See bibliography in \cite{nymous} for further references.}
+%\AtNextBibliography{\footnotesize}% For resizing the bibliography
+\printbibliography[%
+title=Selected References,%
+prenote=note:complete% define a bibnote to print before the bibliography
+]{}
+
+%\noindent\hrulefill%
+
+%%%%%%%%%%%%%  APPENDIX   %%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+
+\section{Afterthoughts}
+
+\begin{kast}{Good questions}
+  \begin{description}
+    \item[Jiminy asks]  This is a question?
+  \end{description}
+\end{kast}
+
+\end{document}

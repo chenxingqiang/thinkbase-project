@@ -1,0 +1,293 @@
+% Questo template è fatto da uno scappato di casa proprio come te.
+% Se ti piace bene, se lo trovi utile ancora meglio.
+% Ho scritto come eseguire alcune delle principali azioni in Latex. 
+% Dall'indice puoi vedere cosa ho ritenuto necessario spiegare. 
+% Sono consapevole che mancano moltissime cose ma insomma non potevo riportare tutta una tesi di formule e operazioni per mostrarvi come fare e che cazzo.
+% Vabbè dai, ti auguro un buon lavoro!
+% P.S. Ricordati di cambiare facoltà, anno accademico, etc.
+
+\documentclass[12pt]{book}
+
+% Page geometry
+\usepackage[a4paper,top=3cm,bottom=3cm,left=3.25cm,right=3.25cm]{geometry}
+
+% Fonts and Language
+\usepackage[T1]{fontenc}
+\usepackage{libertine}
+\usepackage[english]{babel}
+
+% Mathematics
+\usepackage{amsfonts,amssymb,amsmath}
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usepackage{pdfpages} % For including cover page
+\usepackage{float}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+
+% References and Citations
+\usepackage{hyperref}
+\hypersetup{hidelinks} % Hide hyperreferences
+
+% Miscellaneous
+\usepackage{emptypage} % For non-numbered pages
+\usepackage{fancyhdr} % For custom headers and footers
+\usepackage{makeidx} % For creating an index
+\usepackage{tocbibind} % To include bibliography in the Table of Contents
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{lmodern}
+
+% Custom commands
+\newcommand{\moviecite}[2]{%
+    \begin{flushright}
+    \small #1\\
+    \textit{#2}
+    \end{flushright}
+}
+
+% Header and Footer settings
+\lhead{}
+\fancyhead[R]{\empty} % Clear the right header
+\renewcommand{\headrulewidth}{0pt} % Remove header line
+
+% Figure and Table numbering by section
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\renewcommand{\thetable}{\thesection.\arabic{table}}
+
+% Paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Clear page style for empty pages
+\let\cleardoublepage\clearpage
+
+%%%%% COVER PAGE %%%%%
+\usetikzlibrary{calc}
+
+%% Eliminate page number on the current page:
+\thispagestyle{empty}
+
+%% Set current page to be counted as page 0, so the next page starts from 1.
+\setcounter{page}{0}
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[remember picture,overlay]
+\node[anchor=center, inner sep= 0pt] 
+{\includegraphics[width=.5\textwidth]
+{logo_centenario-eps-converted-to.pdf}};
+\centering
+\end{tikzpicture}
+\vfill
+\LARGE
+\textsc{Università degli Studi di Trieste}\\
+\rule{\textwidth}{0.1mm}\\
+\large
+\textsc{Dipartimento di Scienze Economiche, Aziendali, Matematiche e Statistiche - DEAMS}\\ 
+\bigskip
+Corso di Laurea in Quello Che Vi Pare a Voi \\
+\vfill %%\vspace{3cm}
+\textsc{Tesi di laurea triennale}\\
+\vfill %%\vspace{3cm}
+\LARGE
+\textbf{\textsc{Derivatives Pricing and Strategies:\\A Focus On Agricultural Commodities}}\\
+\end{center}
+\vfill
+%%%%%%
+%%%%%% Qui va inserito il nome del laureando
+\begin{tabular}[t]{l}
+Laureando:\\
+\textbf{Pietro Bettini}\\
+\textsc{Matricola: EC12062002}
+\end{tabular}
+%%%%%%
+\hfill 
+%%%%%% Qui va inserito il nome del relatore
+\begin{tabular}[t]{l}
+Relatore: \\
+\textbf{Prof. Nico Zanusso} \\
+\\
+Correlatore: \\
+\textbf{Prof. Fabrizio Riccio}
+\end{tabular}
+%%%%%%
+\vfill
+\begin{center}
+\normalsize
+\rule{8cm}{0.1mm}\\
+\bigskip
+ANNO ACCADEMICO 2023--2024
+\end{center}
+
+\large
+
+
+
+%%%%% DEDICATION %%%%%
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \textit{A Francesca}
+\end{center}
+\newpage
+
+
+
+%%%%% INDEX AND LIST OF FIGURES %%%%%
+\pagestyle{plain} 
+\pagenumbering{roman}
+\tableofcontents
+\listoffigures
+\listoftables
+
+
+
+
+%%%%% 
+\newpage
+\pagestyle{fancy}
+\pagenumbering{arabic}
+ 
+ 
+%%%%% Examples of chapters
+ 
+ 
+\chapter{Introduction}
+This chapter is on how to upload an image and refer to it. See figure \ref{fig:GBM}. Of course you gotta add some text otherwise the page will be empty and the figure will be automatically placed at the top or at the bottom of the page.
+% This is how to upload an image
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.65]{GBM comparison.pdf}
+    \caption{Comparison between low variance (left) and high variance (right) Geometric Brownian Motion.}
+    \label{fig:GBM}
+\end{figure}
+
+\section{This is how to upload a figure}
+\subsection{And refer to a figure}
+
+
+
+\chapter{How to create a table}
+\section{How to cite a table}
+This is how to create a table, and cite a table. See table \ref{tab:table3}. 
+
+\begin{table}
+\centering
+\scriptsize % remove this if you want a larger table
+    \begin{tabular}{@{}lllll@{}}
+\hline
+Commodity & Product Code & Price Quotation & Contract size &  \\ \hline
+Class III Milk & DC/DA & U.S. dollars and cents per cwt & 2,000 cwt &  \\
+Class IV Milk & GDK/DK & U.S. dollars and cents per cwt & 2,000 cwt & \\
+Non-fat Dry Milk & GNF & U.S. cents per pound & 44,000 lb &  \\ 
+Dry Whey & DY & U.S. cents per pound & 44,000 lb & \\
+Cash-settled Butter & CB & U.S. cents per pound & 20,000 lb & \\
+Cash-Settled Cheese & CSC & U.S. dollars and cents per pound & 20,000 lb & \\ 
+\hline
+\end{tabular}
+\caption {Dairy. \\
+Author’s elaborations based on data from CME group.}
+\label{tab:table3}
+\end{table}
+
+\section{Now that you see the table}
+\subsection{You can copy it}
+Of course you gotta add some text otherwise the page will be empty and the table will be automatically placed at the top or at the bottom of the page.
+
+\chapter{I sette nani}
+
+This chapter is completely useless.
+\section{Mammolo Eolo}
+\subsection{Pisolo}
+\subsubsection{Non me li ricordo}
+\subsection{Brontolo}
+\section{Stronzolo}
+\section{Jeremy Clarkson}
+\section{James May}
+\section{Richard Hammond}
+
+\chapter{Other Stuff}
+
+\section{How to draw a binomial tree.}
+This chapter shows how you can create a recombiant binomial tree. 
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[>=stealth,sloped]
+        \matrix (tree) [%
+          matrix of nodes,
+          minimum size=0.3cm,
+          column sep=0.3cm,
+          row sep=0.3cm,
+        ]
+        {
+              &    &          &          & $\empty$ &\\
+              &    &          & $Su^{3}$ & $\empty$ &\\
+              &    & $Su^{2}$ &          & $\empty$ &\\
+              & $Su$ &          & $Su^{2}d$& $\empty$ &\\    
+          S   &    & $Sud$      &          & $\empty$ &...&\\ 
+              & $Sd$ &          & $Sud^{2}$& $\empty$ &\\     
+              &    & $Sd^{2}$ &          & $\empty$ &\\
+              &    &          & $Sd^{3}$ & $\empty$ &\\
+              &    &          &          & $\empty$ &\\
+        };
+        \draw[->] (tree-5-1) -- (tree-4-2) node [midway,above] {\empty};
+        \draw[->] (tree-5-1) -- (tree-6-2) node [midway,below] {\empty};
+        \draw[->] (tree-4-2) -- (tree-3-3) node [midway,above] {\empty};
+        \draw[->] (tree-4-2) -- (tree-5-3) node [midway,below] {\empty};
+        \draw[->] (tree-6-2) -- (tree-5-3) node [midway,above] {\empty};
+        \draw[->] (tree-6-2) -- (tree-7-3) node [midway,below] {\empty};
+        \draw[->] (tree-3-3) -- (tree-2-4) node [midway,above] {\empty};
+        \draw[->] (tree-3-3) -- (tree-4-4) node [midway,below] {\empty};
+        \draw[->] (tree-5-3) -- (tree-4-4) node [midway,above] {\empty};
+        \draw[->] (tree-5-3) -- (tree-6-4) node [midway,below] {\empty};
+        \draw[->] (tree-7-3) -- (tree-6-4) node [midway,above] {\empty};
+        \draw[->] (tree-7-3) -- (tree-8-4) node [midway,below] {\empty};
+        \draw[->] (tree-2-4) -- (tree-1-5) node [midway,above] {\empty};
+        \draw[->] (tree-2-4) -- (tree-3-5) node [midway,below] {\empty};
+        \draw[->] (tree-4-4) -- (tree-3-5) node [midway,above] {\empty};
+        \draw[->] (tree-4-4) -- (tree-5-5) node [midway,below] {\empty};
+        \draw[->] (tree-6-4) -- (tree-5-5) node [midway,above] {\empty};
+        \draw[->] (tree-6-4) -- (tree-7-5) node [midway,below] {\empty};
+        \draw[->] (tree-8-4) -- (tree-7-5) node [midway,above] {\empty};
+        \draw[->] (tree-8-4) -- (tree-9-5) node [midway,below] {\empty};
+    \end{tikzpicture} 
+    \caption{Markov process evolution}
+    \label{fig:stochasticprocessevolution}
+\end{figure}
+
+
+
+\section{How to make a bullet list.}
+To better understand the pricing models let's first introduce some statistical concepts. Brownian motion $W_t$ is a stochastic process with four main features: 
+\begin{itemize}
+    \item Starts at time $t$: $W_0 = 0$;
+    \item $W_t$ is continuous in time;
+    \item $W_t$ increments (the differences $X(t)-X(s)$ between two intervals in time $t$ and $s$) are independent;
+    \item $W_t - W_s \sim \mathcal{N}(0, s-u), (\forall 0 < s < t) $
+\end{itemize}
+
+
+
+\appendix 
+%%%%% aggiungi lessico
+\chapter{Glossary}
+Here you can write your glossary.
+
+
+\chapter{Ringraziamenti}
+
+Un grazie che non può essere taciuto va a Luigi Magliocchi, faro nel buio di UniTs.
+
+
+
+\end{document}
+
+

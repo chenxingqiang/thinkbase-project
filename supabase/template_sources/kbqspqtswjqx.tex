@@ -1,0 +1,154 @@
+\documentclass{book}
+\usepackage[subpreambles=false]{standalone}
+\usepackage{import}
+\usepackage{minitoc}
+\usepackage{breakcites}
+\usepackage[a4paper, total={6in, 8.75in}, hmarginratio={3:2}]{geometry}
+\usepackage{emptypage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+
+% fancy heading settings for chapter contents
+\renewcommand{\chaptermark}[1]{\markboth{{\thechapter.\ #1}}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{{\rightmark}}
+\fancyhead[RE]{{\leftmark}}
+\fancyfoot{}
+
+% packages first used in Chapter:intro
+\usepackage[nobreak]{mdframed} % do not break example across pages
+\usepackage{lipsum}
+
+
+
+% packages first used in Chapter:1
+% set color for links, urls and cites
+\usepackage[table]{xcolor}
+\usepackage[breaklinks,colorlinks=true,linkcolor=.,urlcolor=.,citecolor=teal]{hyperref}
+
+%% Additional packages for specific utility %%
+% % for subfigures
+% \usepackage{caption}
+% \usepackage{subcaption}
+% % for text highlight
+% \usepackage{color,soul}
+% % for multirow tables
+% \usepackage{array}
+% \usepackage{enumitem}
+% % for text inside math mode
+% \usepackage{amssymb}
+% % for scaling wide tables to textwidth
+% \usepackage{adjustbox}
+% % for pseudocodes
+% \usepackage{algorithm}
+% \usepackage{algpseudocodex}
+% %cmark and xmark
+% \usepackage{pifont}
+% % package for multiline cell
+% \usepackage{makecell}
+% % for adjusting whitespaces after text variables
+% \usepackage{xspace}
+
+
+% for title page
+\usepackage{eso-pic}
+\usepackage{transparent}
+
+% Setting the depth for section numbering
+\setcounter{secnumdepth}{3}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%% thesis-wide common styles 
+\mdfdefinestyle{theoremstyle}{%
+linecolor=black!50,
+linewidth=1pt,%
+shadow=true,
+shadowsize=2pt,
+shadowcolor=black!20,
+innertopmargin=\topskip,
+}
+\mdtheorem[style=theoremstyle]{example}{Example}[chapter]
+
+\mdtheorem[style=theoremstyle]{prblm}{Problem}[chapter]
+\mdtheorem[style=theoremstyle]{definition}{Definition}
+%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%% 
+\frontmatter
+%%%%%%%%%%%%%%%%%%%% Title page
+\import{frontmatter}{titlepage}
+
+\cleardoublepage
+\import{frontmatter}{committee}
+
+
+\linespread{1.2}\selectfont
+
+\chapter*{Abstract}
+\import{frontmatter}{abstract}
+
+\chapter*{Kurzfassung}
+\import{frontmatter}{kurzfassung}
+
+\chapter*{Acknowledgements}
+\import{frontmatter}{acknowledgements}
+
+%%%%%%%%%%%%%%%%%%%% TOC
+\dominitoc
+\tableofcontents
+
+
+%%%%%%%%%%%%%%%%%%%%
+\mainmatter
+%%%%%%%%%%%%%%%%%%%% Main matter
+
+\chapter{Introduction}\label{chap:intro}
+\minitoc
+\import{introduction}{intro}
+
+\chapter{Background}\label{chap:background}
+\minitoc
+\import{background}{background}
+
+\chapter{Method A}\label{chap:1}
+\minitoc
+\import{chap1}{chap1}
+
+
+
+\chapter{Conclusion}\label{chap:conclusion}
+\minitoc
+\import{conclusion}{conclusion}
+
+%%%%%%%%%%%%%%%%%%%%
+\backmatter
+%%%%%%%%%%%%%%%%%%%% List References
+
+% \cleardoublepage
+% \phantomsection
+% \addcontentsline{toc}{chapter}{List of Figures}
+% \listoffigures
+
+% \cleardoublepage
+% \phantomsection
+% \addcontentsline{toc}{chapter}{List of Tables}
+% \listoftables
+
+% \cleardoublepage
+% \phantomsection
+% \addcontentsline{toc}{chapter}{List of Algorithms}
+% \listofalgorithms
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+
+
+%%%%%%%%%%%%%%%%%%%%  Main bib used when main.tex is compiled.
+\bibliographystyle{ACM-Reference-Format} 
+\bibliography{main}
+
+\end{document}

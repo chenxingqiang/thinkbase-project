@@ -1,0 +1,114 @@
+% -*- program: xelatex -*-
+ 
+% Dr Driver's standard reading quiz
+% Source: https://gist.github.com/danieldriver/90a73c4d3c72dd837e39#file-quiz-tex 
+\documentclass[%
+% 11pt,
+% answers,
+addpoints]{exam}
+ 
+\pagestyle{head}
+\firstpageheader{% left
+	BSTH \liningnums{314}: Psalms --- Reading Quiz 5 \\
+	Dr. Daniel R. Driver, 19 August 2014
+}{% center - blank
+}{% right
+	\ifprintanswers \textbf{Answer Key}
+	\else Full name:\enspace\makebox[2in]{\hrulefill} \fi \\
+	This quiz is worth a total of \textbf{\numpoints\ points}.
+}
+\runningheader{}{}{}
+% For double-sided quizzes
+% \pagestyle{headandfoot}
+% \footer{}{\thepage}{}
+ 
+% Typography and layout
+\usepackage{fontspec,realscripts}
+\defaultfontfeatures{Ligatures=TeX}
+%\setmainfont{Meta Serif Pro}
+%\setsansfont{Meta Pro}
+\frenchspacing
+% - print solutions in sans serif
+\unframedsolutions
+\SolutionEmphasis{\sffamily}
+\renewcommand{\solutiontitle}{}
+% - box points & center in the right margin w/ custom setup@point@toks
+\boxedpoints
+\pointsinrightmargin
+\marginbonuspointname{\textsc{up}}
+\makeatletter% rewrite setup@point@toks assuming right margins
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}% define \clap as per https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
+\def\setup@point@toks{%
+	\point@toks={%
+		\rlap{\hskip-\@totalleftmargin
+			  \hskip\textwidth
+			  \hskip\@rightmargin
+			  \hskip-\rightpointsmargin
+			  \clap{\padded@point@block}% change \llap to \clap
+		}%
+		\global \point@toks={}%
+	}%
+}% end setup@point@toks
+\setlength{\rightpointsmargin}{.5in}% assuming the default 1" margins
+\makeatother
+% - adjust the top and bottom margins
+\extraheadheight{.25in}
+\extrafootheight{-.5in}
+\setlength{\marginparwidth}{1.5in}
+% NB: remember to use \newpage after the last question
+ 
+\begin{document}
+ 
+	% Quiz instructions
+	\begin{center}
+	\parbox{5.5in}{\centering\itshape Answer each of the following questions in one or two complete sentences.}
+	\end{center}
+ 
+	% Quiz questions
+	\begin{questions}
+ 
+	\question[2]
+		Question
+ 
+		\begin{solution}[\stretch{1}]
+			Answer
+		\end{solution}
+ 
+	\question[2]
+		Question
+ 
+		\begin{solution}[\stretch{1}]
+			Answer
+		\end{solution}
+ 
+	\question[2]
+		Question
+ 
+		\begin{solution}[\stretch{1}]
+			Answer
+		\end{solution}
+ 
+	\question[2]
+		Question
+ 
+		\begin{solution}[\stretch{1}]
+			Answer
+		\end{solution}
+ 
+	\question[2]
+		Question
+ 
+		\begin{solution}[\stretch{1}]
+			Answer
+		\end{solution}
+ 
+	\bonusquestion[2]
+		Question
+ 
+		\begin{solution}[\stretch{1}]
+			Answer
+		\end{solution}
+ 
+	\newpage
+	\end{questions}
+\end{document}

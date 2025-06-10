@@ -1,0 +1,88 @@
+%% Sarah Djaafari  
+%% e-mail: s.djaafari.inf@lagh-univ.dz
+%% djasara00@gmail.com 
+\immediate\write18{makeindex \jobname.nlo -s nomencl.ist -o \jobname.nls} % Use this line to generate auto Nomenclature
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\input{Preamble/preamble}
+\begin{document}
+
+	%% frontmatter
+	\pagenumbering{gobble}
+    \include{0-TitlepageEnglish/titlepage}
+	\include{0-TitlePage/TitlePage}
+    \include{0-Basmallah/basmallah}
+    \pagenumbering{roman}
+    %add dedication to table of contents
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Dedications}
+	\include{1-Dedication/dedication}
+	%add acknowledgements to table of contents
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Acknowledgments}
+	\include{2-Acknowledgement/acknowledgement}
+    %add abstract to table of contents
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Abstract}
+    \include{3-Abstract/abstract}
+    
+	\phantomsection
+    \addcontentsline{toc}{chapter}{Contents}
+    %\renewcommand{\contentsname}{Table of Contents}
+    \dominitoc
+	\tableofcontents
+	\clearpage
+	\newpage
+	
+	\cleardoublepage
+    \renewcommand{\listfigurename}{List of Figures}
+	\listoffigures
+	\cleardoublepage
+    \renewcommand{\listtablename}{List of Tables}
+	\listoftables
+	\cleardoublepage
+    \renewcommand{\listalgorithmcfname}{List of Algorithms}
+	\listofalgorithms
+	\cleardoublepage  
+	\glossarystyle{list}
+    \printglossary[type=\acronymtype, title=List of Acronyms, toctitle=List of Acronyms]
+	\clearpage
+	\newpage
+	
+	%% mainmatter
+	\pagenumbering{arabic}	
+    \renewcommand{\chaptername}{Chapter}
+	\setcounter{mtc}{8}
+    \include{4-Chapters/ChapterIntroduction/introduction}
+    \include{4-Chapters/Chapter2/Chapter2}
+	\include{4-Chapters/Chapter3/Chapter3}
+    \include{4-Chapters/Chapter4/Chapter4}
+	\include{4-Chapters/ChapterConclution/conclusion}
+    \renewcommand{\bibname}{Bibliography}
+	\bibliographystyle{unsrt}
+	\bibliography{Mabib}
+	\clearpage
+	\newpage
+	
+	%% backmatter	
+	\pagenumbering{Alph}
+    \renewcommand\appendixname{Appendix}    %change annexe to appendix
+	\begin{appendices}
+	%% Appendix Configuration
+	\renewcommand{\thechapter}{\Alph{chapter}}
+	\renewcommand{\thesection}{\thechapter.\arabic{section}}
+	\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+	\renewcommand\thefigure{\thechapter.\arabic{figure}} 
+	\renewcommand\thetable{\thechapter.\arabic{table}}	
+	%% Add Appendix
+    \setcounter{mtc}{15}
+	\include{5-Appendix/Appendix1/appendix1}
+    \include{5-Appendix/Appendix2/appendix2}
+	\end{appendices}
+\end{document}

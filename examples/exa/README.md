@@ -1,4 +1,4 @@
-# Exa and ell2a Integration: Article Review Generator
+# Exa and ell Integration: Article Review Generator
 
 This guide demonstrates how to integrate Exa's powerful search capabilities with ell's language model programming to create an article review generator focused on climate change.
 
@@ -15,7 +15,7 @@ Before you begin, make sure you have the following:
 Install the required packages:
 
 ```
-pip install exa_py ell2a openai python-dotenv pydantic
+pip install exa_py ell openai python-dotenv pydantic
 
 ```
 ## Setup
@@ -61,10 +61,10 @@ class ArticleReview(BaseModel):
 
 ## Creating the Article Review Generator
 
-Use ell2a to create a language model program for generating article reviews:
+Use ell to create a language model program for generating article reviews:
 
 ```python
-@ell2a.complex(model="gpt-4o", client=openai, response_format=ArticleReview)
+@ell.complex(model="gpt-4o", client=openai, response_format=ArticleReview)
 def generate_article_review(article: str, content: str) -> ArticleReview:
     """You are a article review generator. Given the name of an article, some content,
     you need to return a structured review"""
@@ -118,4 +118,4 @@ This integration demonstrates how to combine Exa's powerful search capabilities 
 
 For more information on Exa and ell, refer to their respective documentation:
 - [Exa Documentation](https://docs.exa.ai/)
-- [ell2a Documentation](https://docs.ell2a.so/)
+- [ell Documentation](https://docs.ell.so/)

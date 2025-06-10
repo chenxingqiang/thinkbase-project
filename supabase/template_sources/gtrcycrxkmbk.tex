@@ -1,0 +1,323 @@
+% Howard University PhD thesis style -- modifications to the report style
+% This is unofficial so you should always double check against the Graduate School https://gs.howard.edu/resources/thesis-and-dissertation-manual
+%
+% People are free to borrow as long as they change the name and date in the \typeout lines, the name of the file, and acknowledge the work that has been done by previous people.  Ideally they should comment their changes below.
+
+% Original version by Arielle Miller in 2021
+
+% Revision 1 - made subsection titles bold and underlined per style guide; revised dedication page and acknowledgement page to match style guide requirements; put chapter titles on same line as Chapter # and added a period separator.  Fixed TOC to include "." separators and remove "Chapter" word. - By Arielle Miller March 14, 2021
+
+% Revision 2 - added the \repeatcaption command.  Added the [normalem] option to the \usepackage{ulem} to ensure that \emph was not redefined and the bibliography didn't have journals underlined when they should be italicized.  Updated the template to include Dissertation Committee and Dedication to the table of contents
+
+\documentclass[12pt]{report}%creates the styling as a report and sets the font as 12 pt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%formatting packages
+\usepackage{times}%sets Times New Roman as font
+\usepackage[letterpaper, left=1in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{setspace}%allows you to control the line spacing
+\usepackage{draftwatermark}%allows you to add a DRAFT watermark
+%%%Draft watermark
+\SetWatermarkText{DRAFT}
+\SetWatermarkScale{1.5}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%front matter packages for title, toc, and appendices and bibliography in the back
+\usepackage[explicit]{titlesec} %title control and formatting
+\usepackage[titles]{tocloft} %table of contents control and formatting
+\usepackage[backend=bibtex, style=numeric-comp, bibstyle=ieee]{biblatex}%sets the way your references come in and what citation style you are using
+\usepackage[bookmarks=true,hidelinks]{hyperref}%for hyperlinking your toc and referenced figs and tabs
+\usepackage[page]{appendix}%allows you to create appendices and properly style them
+\usepackage[normalem]{ulem}% used to underline the subsection titles in the body of the document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%inserting images, tables and formatting them
+\usepackage{graphicx}
+\graphicspath{{figures/}} %Setting the graphicspath so when you includegraphics you only need to put in the filename not the whole path.  This assumes you will put all your figures in the "figures" folder in this project.
+\usepackage[justification=centering]{caption}%allows for figures and tables to have captions
+\usepackage{subcaption}%allows for subfigures and subtables to have captions
+\captionsetup[table]{labelsep=space}
+\DeclareCaptionLabelSeparator{period}{.\hspace*{0.5em}}%defines what a period after the Figure label prior to the caption
+\captionsetup[figure]{labelsep=period,name=Figure}%places that period after the Figure label prior to the caption
+\usepackage{rotating}%for rotating images
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{array}
+
+\newcommand{\repeatcaption}[2]{%
+  \renewcommand{\thefigure}{\ref{#1}}%
+  \captionsetup{list=no}%
+  \caption{#2 (repeated from page \pageref{#1})}%
+  \addtocounter{figure}{-1}% So that next figure after the repeat gets the right number.
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%packages for math, symbols, equations, etc
+\usepackage{float}
+\usepackage[euler]{textgreek}
+\usepackage{gensymb}
+\usepackage{textcomp}
+\usepackage[fleqn]{amsmath}
+\usepackage{hyphenat}
+\usepackage[dvipsnames]{xcolor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Table of Acronyms Required Packages
+\usepackage{longtable}
+\usepackage[xindy,acronyms,symbols,nonumberlist]{glossaries}%if you want the page where the acronym, symbol, etc is first used, remove "nonumberlist" from the options section
+\usepackage{listings}
+\makeglossaries
+\setglossarystyle{indexhypergroup}
+\setacronymstyle{long-sc-short}
+\loadglsentries{acronyms}%file name for acronyms
+\loadglsentries{symbols}%file name for symbols
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Add your bibliography file here
+\bibliography{references.bib}
+
+% prevent certain fields in references from printing in bibliography
+\AtEveryBibitem{\clearfield{issn}}
+\AtEveryBibitem{\clearlist{issn}}
+
+\AtEveryBibitem{\clearfield{isbn}}
+\AtEveryBibitem{\clearlist{isbn}}
+
+\AtEveryBibitem{\clearfield{language}}
+\AtEveryBibitem{\clearlist{language}}
+
+\AtEveryBibitem{\clearfield{doi}}
+\AtEveryBibitem{\clearlist{doi}}
+
+\AtEveryBibitem{\clearfield{note}}
+\AtEveryBibitem{\clearlist{note}}
+
+\AtEveryBibitem{\clearfield{url}}
+\AtEveryBibitem{\clearlist{url}}
+
+\AtEveryBibitem{%
+  \ifentrytype{online}
+    {}
+    {\clearfield{urlyear}\clearfield{urlmonth}\clearfield{urlday}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%
+% Start of Document
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\doublespacing %set line spacing for entire document
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title Page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{titlePage.tex}
+\currentpdfbookmark{Title Page}{titlePage}  %add PDF bookmark for this page, "titlePage" is the filename of your title page
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Approval Page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{roman} 
+\phantomsection
+\addcontentsline{toc}{chapter}{Dissertation Committee}
+\setcounter{page}{2}
+\input{approvalPage.tex}
+%\currentpdfbookmark{Approval Page}{approvalPage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dedication
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\phantomsection
+\addcontentsline{toc}{chapter}{Dedication}
+\setcounter{page}{3}
+\input{dedication.tex}
+%\currentpdfbookmark{Dedication}{dedication}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{roman}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+\setcounter{page}{4} % set the page number appropriately based on the number of intro pages
+\input{acknowledgements.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{roman}
+\addcontentsline{toc}{chapter}{Abstract}
+\setcounter{page}{5}
+\input{abstract.tex}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of Contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Format for Table of Contents
+\renewcommand{\cftchapdotsep}{\cftdotsep}  %add dot separators
+\renewcommand{\cftchapfont}{\bfseries}  %set title font weight
+\renewcommand{\cftchappagefont}{}  %set page number font weight
+%\renewcommand{\cftchappresnum}{Chapter }
+\renewcommand{\cftchapaftersnum}{.}
+%\renewcommand{\cftchapnumwidth}{5em}
+\renewcommand{\cftchapafterpnum}{\vskip\baselineskip} %set correct spacing for entries in single space environment
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsecafterpnum}{\vskip\baselineskip}  %set correct spacing for entries in single space environment
+\renewcommand{\cftsubsecaftersnum}{.}
+\renewcommand{\cftsubsecafterpnum}{\vskip\baselineskip} %set correct spacing for entries in single space environment
+\renewcommand{\cftsubsubsecafterpnum}{\vskip\baselineskip} %set correct spacing for entries in single space environment
+
+%format title font size and position (this also applies to list of figures and list of tables)
+\titleformat{\chapter}[display]
+{\normalfont\bfseries\filcenter}{\chaptertitlename\ \thechapter}{0pt}{\MakeUppercase{#1}}
+
+\renewcommand\contentsname{Table of Contents}
+
+\begin{singlespace}
+\tableofcontents
+\end{singlespace}
+
+\currentpdfbookmark{Table of Contents}{TOC}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% List of figures and tables and acronyms and symbols
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\addcontentsline{toc}{chapter}{List of Tables}
+\begin{singlespace}
+	\setlength\cftbeforetabskip{\baselineskip}  %manually set spacing between entries
+	\listoftables
+\end{singlespace}
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\begin{singlespace}
+\setlength\cftbeforefigskip{\baselineskip}  %manually set spacing between entries
+\listoffigures
+\end{singlespace}
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\begin{singlespace}
+\setlength\cftbeforefigskip{\baselineskip}  %manually set spacing between entries
+\printglossary[type=\acronymtype,title=List of Abbreviations]
+\end{singlespace}
+
+\clearpage
+
+\addcontentsline{toc}{chapter}{List of Symbols}
+\begin{singlespace}
+\setlength\cftbeforefigskip{\baselineskip}  %manually set spacing between entries
+\printglossary[title=List of Symbols]
+\end{singlespace}
+
+\clearpage
+%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Chapters
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%
+% formatting
+%%%%%%%%%%%%%%%%%%%%%%
+
+% resume page numbering for rest of document
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1} % set the page number appropriately
+
+% Adjust chapter title formatting
+\titleformat{\chapter}{\normalfont\bfseries\filcenter}{\MakeUppercase\chaptertitlename\ \thechapter.}{1em}{\MakeUppercase{#1}}  %spacing between titles
+\titlespacing*{\chapter}
+  {0pt}{0pt}{30pt}	%controls vertical margins on title
+  
+% Adjust section title formatting
+\titleformat{\section}{\normalfont\bfseries}{\thesection}{1em}{#1}
+
+% Adjust subsection title formatting
+\titleformat{\subsection}{\normalfont}{\thesubsection}{1em}{\uline{#1}}
+
+% Adjust subsubsection title formatting
+\titleformat{\subsubsection}{\normalfont\itshape}{\thesubsection}{1em}{#1}
+
+%here you can add chapters, comment/remove chapters, or rearrange their order
+
+%%%%%%%%%%%%%%%%
+% Chapter 1  
+%%%%%%%%%%%%%%%%
+
+\input{chapter1.tex}
+
+%%%%%%%%%%%%%%%%
+% Chapter 2 
+%%%%%%%%%%%%%%%%
+
+\input{chapter2.tex}
+
+%%%%%%%%%%%%%%%%
+% Chapter 3 
+%%%%%%%%%%%%%%%%
+\input{chapter3.tex}
+
+%%%%%%%%%%%%%%%%
+% Chapter 4 
+%%%%%%%%%%%%%%%%
+
+\input{chapter4.tex}
+
+%%%%%%%%%%%%%%%%
+% Chapter 5 
+%%%%%%%%%%%%%%%%
+
+\input{chapter5.tex}
+
+%%%%%%%%%%%%%%%%
+% Chapter 6 
+%%%%%%%%%%%%%%%%
+
+\input{chapter6.tex}
+
+%%%%%%%%%%%%%%%%
+% Chapter 7 
+%%%%%%%%%%%%%%%%
+
+\input{chapter7}
+
+%%%%%%%%%%%%%%%%
+% Appendices
+%%%%%%%%%%%%%%%%
+
+\input{appendix.tex}
+
+%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%
+
+\begin{singlespace}  % use single-line spacing for multi-line text within a single reference
+	\setlength\bibitemsep{\baselineskip}  %manually set separation between items in bibliography to double space
+	\printbibliography[title={References}]
+
+\end{singlespace}
+
+\addcontentsline{toc}{chapter}{References}  %add References section to Table of Contents
+
+\end{document}//

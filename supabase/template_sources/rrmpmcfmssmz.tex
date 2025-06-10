@@ -1,0 +1,222 @@
+%% Final edits by Jussi Kangasharju and Pirjo Moen
+%% This file is modified by Veli Mäkinen from HY_fysiikka_LuKtemplate.tex authored by Roope Halonen ja Tomi Vainio.
+%% Some text is also inherited from engl_malli.tex by Kutvonen, Erkiö, Mäkelä, Verkamo, Kurhila, and Nykänen.
+
+
+% STEP 1: Choose oneside or twoside
+\documentclass[english,twoside,openright]{UH_DS_MSc}
+%finnish,swedish
+
+%\usepackage[utf8]{inputenc} % For UTF8 support. Use UTF8 when saving your file.
+\usepackage{lmodern} % Font package
+\usepackage{textcomp} % Package for special symbols
+\usepackage[pdftex]{color, graphicx} % For pdf output and jpg/png graphics
+\usepackage[pdftex, plainpages=false]{hyperref} % For hyperlinks and pdf metadata
+\usepackage{fancyhdr} % For nicer page headers
+\usepackage{tikz} % For making vector graphics (hard to learn but powerful)
+%\usepackage{wrapfig} % For nice text-wrapping figures (use at own discretion)
+\usepackage{amsmath, amssymb} % For better math
+%\usepackage[square]{natbib} % For bibliography
+\usepackage[footnotesize,bf]{caption} % For more control over figure captions
+\usepackage{blindtext}
+\usepackage{titlesec}
+\usepackage[titletoc]{appendix}
+
+\onehalfspacing %line spacing
+%\singlespacing
+%\doublespacing
+
+%\fussy 
+\sloppy % sloppy and fussy commands can be used to avoid overlong text lines
+
+% STEP 2:
+% Set up all the information for the title page and the abstract form.
+% Replace parameters with your information.
+\title{Template for Master's thesis}
+\author{Firstname Lastname}
+\date{\today}
+\prof{Professor X or Dr. Y}
+\censors{Professor A}{Dr. B}{}
+\keywords{layout, summary, list of references}
+\depositeplace{}
+\additionalinformation{}
+
+
+\classification{\protect{\ \\
+\  General and reference $\rightarrow$ Document types  $\rightarrow$ Surveys and overviews\  \\
+\  Applied computing  $\rightarrow$ Document management and text processing  $\rightarrow$ Document management $\rightarrow$ Text editing\\
+}}
+
+% if you want to quote someone special. You can comment this line and there will be nothing on the document.
+%\quoting{Bachelor's degrees make pretty good placemats if you get them laminated.}{Jeph Jacques} 
+
+
+% OPTIONAL STEP: Set up properties and metadata for the pdf file that pdfLaTeX makes.
+% But you don't really need to do this unless you want to.
+\hypersetup{
+    %bookmarks=true,         % show bookmarks bar first?
+    unicode=true,           % to show non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={},            % title
+    pdfauthor={},           % author
+    pdfsubject={},          % subject of the document
+    pdfcreator={},          % creator of the document
+    pdfproducer={pdfLaTeX}, % producer of the document
+    pdfkeywords={something} {something else}, % list of keywords for
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=black,        % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+\begin{document}
+
+% Generate title page.
+\maketitle
+
+% STEP 3:
+% Write your abstract (of course you really do this last).
+% You can make several abstract pages (if you want it in different languages),
+% but you should also then redefine some of the above parameters in the proper
+% language as well, in between the abstract definitions.
+
+\begin{abstract}
+Summary of the main contents of the work: topic, methodology and results.
+
+Topics are classified according to the ACM Computing Classification System
+(CCS): check command \verb+\classification{}+. A small set of paths (1-3) should be used, starting from any top nodes
+referred to bu the root term CCS leading to the leaf nodes. The elements
+in the path are separated by right arrow, and emphasis of each element individually can be indicated
+by the use of bold face for high importance or italics for intermediate
+level. The combination of individual boldface terms may give the reader
+additional insight. 
+\end{abstract}
+
+% Place ToC
+\mytableofcontents
+
+\mynomenclature
+
+% -----------------------------------------------------------------------------------
+% STEP 4: Write the thesis.
+% Your actual text starts here. You shouldn't mess with the code above the line except
+% to change the parameters. Removing the abstract and ToC commands will mess up stuff.
+\chapter{Introduction}
+
+The thesis should have an introduction chapter. Other chapters can be named according to the topic. In the end, some summary chapter is needed; see Chapter~\ref{chapter:conclusions} for an example.
+
+\chapter{Figures and Tables}
+
+\section{Figures}
+Figure~\ref{fig:logo} gives an example how to add figures to the document. Remember always to cite the figure in the main text. There are many ways to cite, for example: University of Helsinki has a nice logo (see Fig.~\ref{fig:logo}).
+\begin{figure}[h!] 
+\centering 
+\includegraphics[width=0.3\textwidth]{UH-logo.png}
+\caption{University of Helsinki flame-logo for Faculty of Science.\label{fig:logo}}
+\end{figure}
+
+\section{Tables}
+
+Table~\ref{table:results} gives an example how to report experimental results. Remember always to cite the table in the main text. There are many ways to cite, for example: The results are as expected (see Table~\ref{table:results}).
+
+\begin{table}
+\centering
+\caption{Experimental results.\label{table:results}}
+\begin{tabular}{l||l c r} 
+Koe & 1 & 2 & 3 \\ 
+\hline \hline 
+$A$ & 2.5 & 4.7 & -11 \\
+$B$ & 8.0 & -3.7 & 12.6 \\
+$A+B$ & 10.5 & 1.0 & 1.6 \\
+\hline
+%
+\end{tabular}
+\end{table}
+
+\chapter{Citations}
+
+\section{Citations to literature}
+
+References are listed in a separate .bib-file. In this case it is named \texttt{bibliography.bib} with the following content:
+\begin{verbatim}
+@article{einstein,
+    author =       "Albert Einstein",
+    title =        "{Zur Elektrodynamik bewegter K{\"o}rper}. ({German})
+        [{On} the electrodynamics of moving bodies]",
+    journal =      "Annalen der Physik",
+    volume =       "322",
+    number =       "10",
+    pages =        "891--921",
+    year =         "1905",
+    DOI =          "http://dx.doi.org/10.1002/andp.19053221004"
+}
+ 
+@book{latexcompanion,
+    author    = "Michel Goossens and Frank Mittelbach and Alexander Samarin",
+    title     = "The \LaTeX\ Companion",
+    year      = "1993",
+    publisher = "Addison-Wesley",
+    address   = "Reading, Massachusetts"
+}
+ 
+@misc{knuthwebsite,
+    author    = "Donald Knuth",
+    title     = "Knuth: Computers and Typesetting",
+    url       = "http://www-cs-faculty.stanford.edu/%7Eknuth/abcde.html"
+}
+\end{verbatim}
+
+In the last reference url field the code \verb+%7E+ will translate into \verb+~+ once clicked in the final pdf.
+
+References are created using command \texttt{\textbackslash cite\{einstein\}}, showing as \cite{einstein}. Other examples: \cite{latexcompanion,knuthwebsite}.
+
+Citations should be arranged in alphabetical order by author, using the default style \texttt{abbrv}.
+
+
+
+\section{Crossreferences}
+
+Appendix~\ref{appendix:code} on page~\pageref{appendix:code} contains a code example.
+
+\chapter{From tex to pdf}
+
+In Linux, run \texttt{pdflatex filename.tex} and \texttt{bibtex
+  filename} repeatedly until no more warnings are shown. You should
+use \texttt{pdflatex} when compiling your document.
+ 
+\chapter{Conclusions\label{chapter:conclusions}}
+
+It is good to conclude with some insightful discussion. 
+
+% STEP 5:
+% Uncomment the following lines and set your .bib file and desired bibliography style
+% to make a bibliography with BibTeX.
+% Alternatively you can use the thebibliography environment if you want to add all
+% references by hand.
+
+\cleardoublepage %fixes the position of bibliography in bookmarks
+\phantomsection
+
+\addcontentsline{toc}{chapter}{\bibname} % This lines adds the bibliography to the ToC
+\bibliographystyle{abbrv} % numbering alphabetic order
+\bibliography{bibliography}
+
+\begin{appendices}
+\myappendixtitle
+
+\chapter{Code example\label{appendix:code}}
+Program code can be added as appendix:
+\begin{verbatim}
+#!/bin/bash          
+text="Hello World!"
+echo $text
+\end{verbatim}
+
+\end{appendices}
+
+\end{document}

@@ -1,0 +1,238 @@
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{scribe}
+\usepackage{listings}
+
+\Scribe{Your Name}
+\Lecturer{Alexandre Street}
+\LectureNumber{N}
+\LectureDate{DATE}
+\LectureTitle{A title for the lecture}
+
+\lstset{style=mystyle}
+
+\begin{document}
+	\MakeScribeTop
+
+%#############################################################
+%#############################################################
+%#############################################################
+%#############################################################
+
+This is some warmup discussion before the first section.
+
+\section{Here's a section header}
+
+Here's some more text.
+% Here's a citation~\cite{Kar84a}.
+
+\subsection{Here's a subsection}
+
+You might like to put use subsectioning these too.  An alternate way to put in a small subheading for a paragraph is to use the \begin{verbatim} \paragraph \end{verbatim} command.  For example:
+
+\paragraph{A remembrance by Dantzig.}  The early days were full of intense excitement. Scientists, free at last from war-time pressures, entered the post-war period hungry for new areas of research. The computer came on the scene at just the right time. Economists and mathematicians were intrigued with the possibility that the fundamental problem of optimal allocation of scarce resources could be numerically solved. Not too long after my first meeting with Tucker there was a meeting of the Econometric Society in Wisconsin attended by well-known statisticians and mathematicians like Hotelling and von Neumann, and economists like Koopmans. I was a young unknown and I remember how frightened I was at the idea of presenting for the first time to such a distinguished audience, the concept of linear programming.
+
+
+
+\section{Math stuff}
+
+Please make an effort to typeset things nicely.  There are quite a few macros in the lpsdp.sty file.  Below are illustrated how to do some basic things; please study the \LaTeX\ carefully.
+
+Here's a typical LP in standard/equational form, with an equation number on one of the constraints.
+\begin{gather}
+    \min \quad c^\top x                       \nonumber\\
+    \begin{aligned}
+        \text{s.t.} \quad   Ax &= b           \nonumber\\
+                             x &\geq 0       \label{eqn:nonnegative}
+    \end{aligned}
+\end{gather}
+
+\noindent Here's a reference to the~\eqref{eqn:nonnegative} nonnegativity constraint.  Some more LPs:
+
+\begin{gather*}
+    \min \quad 3x_1 - 5x_2 \\
+    \begin{aligned}
+        \text{s.t.} \quad   x_1 + 2x_2 &\leq 6\\
+                            2x_1 + x_2 &\leq 6\\
+                            2x_1 + 2x_2 &\geq 7\\
+                            x_1,x_2 &\geq 0
+    \end{aligned}
+\end{gather*}
+
+\begin{alignat*}{3}
+    \text{minimize}&   \quad & 3x_1 - 5x_2 + 2x_3 - x_4&       & &\\
+    \text{subject to}& \quad & x_1 + 2x_2 - 4x_3 + x_4 &\leq 6 & &\\
+                           & & -x_1 + 3x_2 - x_3 - x_4 &\geq 7 & &\\
+                           & & x_i &\geq 0  & &\quad \forall i = 1\dots 4
+\end{alignat*}
+
+\begin{align}
+    & \min_{\varepsilon^{up}, \varepsilon^{dw}, \beta}  &&  \sum_{i \in Observations} {\varepsilon^{up}}_i + {\varepsilon^{dw}}_i  && \notag \\
+    & \text{subject to}     &&  {\varepsilon^{up}}_i \geq + y_i - \sum_{j \in Candidates} \beta_j x_{i,j} && \forall i \in Observations \notag \\
+    &                       &&  {\varepsilon^{dw}}_i \geq - y_i + \sum_{j \in Candidates} \beta_j x_{i,j} && \forall i \in Observations \notag \\
+    &                       &&  {\varepsilon^{up}}_i, {\varepsilon^{dw}}_i \geq 0 && \forall i \in Observations \notag \\
+\end{align}
+
+\begin{alignat*}{4}
+z_k(x) \ = \ & \min_{y_k}        &       &  f_k^T y_k &&                  \notag \\
+             & \text{subject to} & \quad &  D_k y_k   &&  = d_k - B_k x  \notag \\
+             &                   &       &  y_k       && \geq 0          \notag \\
+\end{alignat*}
+
+Huge LP's:
+
+\begin{align}
+    & \min_{x, y_k}     &&  c^T x && + f_1^T y_1 && + \dots && + f_n^T y_n  &&  \notag \\
+    & \text{subject to} &&  Ax    &&             &&         &&              && = b \notag \\
+    &                   &&  B_1 x && + D_1 y_1   &&         &&              && = d_1 \notag \\
+    &                   &&  \dots &&             &&  \dots  &&              &&       \notag \\
+    &                   &&  B_n x &&             &&         && + D_n y_n    && = d_n \notag \\
+    &                   &&   x,   &&     y_1,    &&         &&       y_n    && \geq 0 \notag \\
+\end{align}
+
+
+Let's do some matrices:
+\[
+\begin{pmatrix}
+    1 & \rho & \rho\\
+    \rho & 1 & \rho\\
+    \rho & \rho & 1\\
+\end{pmatrix},
+\quad \text{or alternately,} \quad
+\begin{bmatrix}
+    1 & 2 \\
+    3 & 4 \\
+\end{bmatrix}.
+\]
+More generically:
+\[
+    A = \begin{bmatrix}
+            \vrule & \vrule & & \vrule\\
+            A_{1} & A_{2} & \cdots & A_{n} \\
+            \vrule & \vrule & & \vrule
+        \end{bmatrix}
+      = \begin{bmatrix}
+            \text{---} & a_1 & \text{---} \\
+            \text{---} & a_1 & \text{---} \\
+                       & \vdots &  \\
+            \text{---} & a_n & \text{---} 
+        \end{bmatrix}
+\]
+
+
+Here's some more random typesetting: 
+\begin{itemize}
+\item ``PTIME vs. NP, where the former means time $\poly(n)$'';
+\item $\wt{O}(f(x)) \text{ is } f(x) \cdot \polylog(f(x))$;
+\item $\displaystyle 
+        g(x) = \begin{cases}
+                   \sin(2\theta) & \text{if $\theta \leq \pi$,}\\
+                   \max\{\cos^2\theta, \tfrac13\} & \text{if $\theta > \pi$.}
+               \end{cases}
+      $
+\end{itemize}
+Please don't write $max(A)$ when you mean $\max(A)$, or $log(n)$ when you mean $\log(n)$, or "quotes" when you mean ``quotes''.
+
+\
+
+More equations:
+
+$\max \Big\{ \sum_{i \in Observations} \Big( y_i - \sum_{j \in Candidates} \beta_j x_{i,j} \Big) ^2 \Big\}$
+
+$\max\Bigg\{ \sum_{i \in Observations} \Big| y_i - \sum_{j \in Candidates} \beta_j x_{i,j} \Big| \Bigg\}$
+
+A theorem and a proof:
+\begin{theorem} $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{theorem}
+\begin{proof}
+Let for the reader.
+\end{proof}
+
+\bigskip
+
+Here's what to do if your proof ends on an equation:
+\begin{proof}
+It's easy:
+\[
+    (a+b)^2 = (a+b)(a+b) = (a+b)a + (a+b)b = a^2 + ba + ab + b^2 = a^2 + 2ab + b^2 \qedhere
+\]
+\end{proof}
+
+And a lemma without proof:
+\begin{lemma}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{lemma}
+
+You can do a few others:
+\begin{example}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{example}
+\begin{conjecture}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{conjecture}
+\begin{definition}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{definition}
+\begin{observation}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{observation}
+\begin{remark}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{remark}
+\begin{claim}
+Suppose numbers exist, then $(a+b)^2 = a^2 + 2ab + b^2$.
+\end{claim}
+
+
+
+Please insert figures liberally.  It's probably best if ``vector graphics'' are in pdf or png format, and ``bitmap graphics'' are in jpg format, but lots formats are supported.  There's a macro defined to make things easy.  Inkscape is a pretty reasonable, free program in which to draw figures.
+ 
+%%%%%%%% FIGURES
+% first parameter is a real number which is the scale factor; 
+% second is the file name; 
+% third is caption; 
+% fourth gives the LaTeX label for future \ref
+\myfig{.375}{example-figure.pdf}{The region $g_1 > 0, g_2 > -\tfrac{\rho}{\sqrt{1-\rho^2}}g_1$.}{fig:my-example}
+
+Once you've inserted it, you can refer to it as Figure~\ref{fig:my-example}.\\
+
+Here there is an example of some code
+\begin{lstlisting}[language=Julia]
+using JuMP, GLPK
+
+function production_model()
+    # Define an optimization model
+    m = Model(with_optimizer(GLPK.Optimizer))
+    
+    # Variables
+    @variable(m, x[i in 1:2] >= 0)
+    
+    # Constraints
+    @constraint(m, 2*x[1] + x[2] <= 4)
+    @constraint(m, x[1] + 2*x[2] <= 4)
+    
+    # Objective function
+    @objective(m, Max, 4*x[1] + 3*x[3])
+    
+    # Solve the model
+    optimize!(m)
+    
+    return objective_value(m)
+end
+\end{lstlisting}
+Finally, if you have citations, see the commented-out stuff in the \LaTeX~here.
+
+\
+
+My farourive Optimization books are \cite{bertsimas1997introduction} \cite{boyd2004convex} \cite{wolsey2014integer}. You should add bibliographical notes in the \textbf{BibTex}: \textit{mybib.bib} file. Its good to grab these notes from Google scholar citations.
+
+%%%%%%%%%%% If you don't have citations then comment the lines below:
+%
+\bibliographystyle{abbrv}           % if you need a bibliography
+\bibliography{mybib}                % assuming yours is named mybib.bib
+
+
+%%%%%%%%%%% end of doc
+\end{document}

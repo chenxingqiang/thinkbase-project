@@ -1,0 +1,652 @@
+%ESCREVA SEU TEXTO NA LINHA 450
+
+\documentclass[12pt, openright,	oneside, a4paper, english, french, spanish, brazil]{abntex2}
+
+% ---
+% Pacotes
+% ---
+\usepackage{lmodern}			% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+\usepackage{lipsum}     %Gerador de texto aleatorio em Latim
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+
+% ----------------------------------
+% --- Configurações da capa do IFPR
+% ----------------------------------
+\renewcommand{\imprimircapa}{%
+    \begin{capa}%
+        \center
+        \begin{figure*}
+            \centering
+            \includegraphics[height=2.5cm]{figuras/logo-ifpr.png}
+        \end{figure*}
+        \vspace*{\fill}
+        {\ABNTEXchapterfont\large\imprimirautor}\\
+        \vspace*{\fill}
+        \vspace{2.5cm}{\ABNTEXchapterfont\bfseries\LARGE\imprimirtitulo}\\
+        \vspace*{\fill}
+        \vspace*{\fill}
+        \vspace{2.5cm}
+        {\large\imprimirlocal}\\
+        \par
+        {\large\imprimirdata}\\
+        \vspace*{1cm}
+    \end{capa}
+}
+
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Carlos Drummond de Andrade}    %Título
+
+\autor{Fulano de Tal\\Beltrano de Tal}  %Autores
+\local{Assis Chateaubriand}
+\data{2023}
+% \orientador{Prof. Fulano de Tal}
+% \coorientador{Prof. Deltrano de Tal}
+\instituicao{%
+  Instituto Federal do Paraná -- IFPR
+  \par
+  Campus Assis Chateaubriand
+  \par
+  Curso Técnico Integrado de Alguma Coisa}
+\tipotrabalho{Trabalho de Conclusão de Curso}       % Tipo de trabalho Monografia de Conclusão de Curso, Tese de Doutorado, Dissertação de Mestrado etc.
+
+
+% O preambulo deve conter o tipo do trabalho, o objetivo, o nome da instituição e a área de concentração. Preambulo aparece na folha de Rosto
+\preambulo{Trabalho apresentado como requisito parcial para .}
+% ---
+
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{black}{RGB}{0,0,0}
+
+
+
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=black,          	% color of internal links
+    	citecolor=black,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=black,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% ---
+% Posiciona figuras e tabelas no topo da página quando adicionadas sozinhas
+% em um página em branco. Ver https://github.com/abntex/abntex2/issues/170
+\makeatletter
+\setlength{\@fptop}{5pt} % Set distance from top of page to first float
+\makeatother
+% ---
+
+% ---
+% Possibilita criação de Quadros e Lista de quadros.
+% Ver https://github.com/abntex/abntex2/issues/176
+%
+\newcommand{\quadroname}{Quadro}
+\newcommand{\listofquadrosname}{Lista de quadros}
+
+\newfloat[chapter]{quadro}{loq}{\quadroname}
+\newlistof{listofquadros}{loq}{\listofquadrosname}
+\newlistentry{quadro}{loq}{0}
+
+% configurações para atender às regras da ABNT
+\setfloatadjustment{quadro}{\centering}
+\counterwithout{quadro}{chapter}
+\renewcommand{\cftquadroname}{\quadroname\space} 
+\renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
+
+\setfloatlocations{quadro}{hbtp} % Ver https://github.com/abntex/abntex2/issues/176
+% ---
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual
+
+% ---
+% Capa OBRIGATÓRIO
+% ---
+\imprimircapa
+% ---
+
+% ---
+% Folha de rosto OBRIGATÓRIO
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+\imprimirfolhaderosto*
+% ---
+
+% ---
+% Inserir a ficha bibliografica OPCIONAL
+% ---
+
+% Isto é um exemplo de Ficha Catalográfica, ou ``Dados internacionais de
+% catalogação-na-publicação''. Você pode utilizar este modelo como referência. 
+% Porém, provavelmente a biblioteca da sua universidade lhe fornecerá um PDF
+% com a ficha catalográfica definitiva após a defesa do trabalho. Quando estiver
+% com o documento, salve-o como PDF no diretório do seu projeto e substitua todo
+% o conteúdo de implementação deste arquivo pelo comando abaixo:
+
+
+\begin{fichacatalografica}
+	\sffamily
+	\vspace*{\fill}					% Posição vertical
+	\begin{center}					% Minipage Centralizado
+	\fbox{\begin{minipage}[c][8cm]{13.5cm}		% Largura
+	\small
+	\imprimirautor
+	%Sobrenome, Nome do autor
+	
+	\hspace{0.5cm} \imprimirtitulo  / \imprimirautor. --
+	\imprimirlocal, \imprimirdata-
+	
+	\hspace{0.5cm} \thelastpage p. : il. (algumas color.) ; 30 cm.\\
+	
+	\hspace{0.5cm} \imprimirorientadorRotulo~\imprimirorientador\\
+	
+	\hspace{0.5cm}
+	\parbox[t]{\textwidth}{\imprimirtipotrabalho~--~\imprimirinstituicao,
+	\imprimirdata.}\\
+	
+	\hspace{0.5cm}
+		1. Palavra-chave1.
+		2. Palavra-chave2.
+		2. Palavra-chave3.
+		I. Orientador.
+		II. Universidade xxx.
+		III. Faculdade de xxx.
+		IV. Título 			
+	\end{minipage}}
+	\end{center}
+\end{fichacatalografica}
+% ---
+
+% ---
+% Inserir errata OPCIONAL
+% ---
+\begin{errata}
+Elemento opcional da \citeonline[4.2.1.2]{NBR14724:2011}. Exemplo:
+
+\vspace{\onelineskip}
+
+FERRIGNO, C. R. A. \textbf{Tratamento de neoplasias ósseas apendiculares com
+reimplantação de enxerto ósseo autólogo autoclavado associado ao plasma
+rico em plaquetas}: estudo crítico na cirurgia de preservação de membro em
+cães. 2011. 128 f. Tese (Livre-Docência) - Faculdade de Medicina Veterinária e
+Zootecnia, Universidade de São Paulo, São Paulo, 2011.
+
+\begin{table}[htb]
+\center
+\footnotesize
+\begin{tabular}{|p{1.4cm}|p{1cm}|p{3cm}|p{3cm}|}
+  \hline
+   \textbf{Folha} & \textbf{Linha}  & \textbf{Onde se lê}  & \textbf{Leia-se}  \\
+    \hline
+    1 & 10 & auto-conclavo & autoconclavo\\
+   \hline
+\end{tabular}
+\end{table}
+
+\end{errata}
+% ---
+
+% ---
+% Folha de aprovação. OBRIGATÓRIO em trabalhos de conclusão de curso. OPCIONAL nos demais trabalhos acadêmicos.
+% ---
+
+% Isto é um exemplo de Folha de aprovação, elemento obrigatório da NBR
+% 14724/2011 (seção 4.2.1.3). Você pode utilizar este modelo até a aprovação
+% do trabalho. Após isso, substitua todo o conteúdo deste arquivo por uma
+% imagem da página assinada pela banca com o comando abaixo:
+%
+% \begin{folhadeaprovacao}
+% \includepdf{folhadeaprovacao_final.pdf}
+% \end{folhadeaprovacao}
+%
+\begin{folhadeaprovacao}
+
+  \begin{center}
+    {\ABNTEXchapterfont\large\imprimirautor}
+
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+    \end{minipage}%
+    \vspace*{\fill}
+   \end{center}
+        
+   Trabalho aprovado. \imprimirlocal, 24 de novembro de 2012:
+
+   \assinatura{\textbf{\imprimirorientador} \\ Orientador} 
+   \assinatura{\textbf{Professor} \\ Convidado 1}
+   \assinatura{\textbf{Professor} \\ Convidado 2}
+   %\assinatura{\textbf{Professor} \\ Convidado 3}
+   %\assinatura{\textbf{Professor} \\ Convidado 4}
+      
+   \begin{center}
+    \vspace*{0.5cm}
+    {\large\imprimirlocal}
+    \par
+    {\large\imprimirdata}
+    \vspace*{1cm}
+  \end{center}
+  
+\end{folhadeaprovacao}
+% ---
+
+% ---
+% Dedicatória OPCIONAL
+% ---
+\begin{dedicatoria}
+   \vspace*{\fill}
+   \centering
+   \noindent
+   \textit{Elemento Opcional. Este trabalho é dedicado às crianças adultas que,\\
+   quando pequenas, sonharam em se tornar cientistas.} \vspace*{\fill}
+\end{dedicatoria}
+% ---
+
+% ---
+% Agradecimentos OPCIONAL
+% ---
+\begin{agradecimentos}
+Os agradecimentos principais são direcionados à Gerald Weber, Miguel Frasson,
+Leslie H. Watter, Bruno Parente Lima, Flávio de Vasconcellos Corrêa, Otavio Real
+Salvador, Renato Machnievscz\footnote{Os nomes dos integrantes do primeiro
+projeto abn\TeX\ foram extraídos de
+\url{http://codigolivre.org.br/projects/abntex/}} e todos aqueles que
+contribuíram para que a produção de trabalhos acadêmicos conforme
+as normas ABNT com \LaTeX\ fosse possível.
+
+Agradecimentos especiais são direcionados ao Centro de Pesquisa em Arquitetura
+da Informação\footnote{\url{http://www.cpai.unb.br/}} da Universidade de
+Brasília (CPAI), ao grupo de usuários
+\emph{latex-br}\footnote{\url{http://groups.google.com/group/latex-br}} e aos
+novos voluntários do grupo
+\emph{\abnTeX}\footnote{\url{http://groups.google.com/group/abntex2} e
+\url{http://www.abntex.net.br/}}~que contribuíram e que ainda
+contribuirão para a evolução do \abnTeX.
+
+\end{agradecimentos}
+% ---
+
+% ---
+% Epígrafe OPCIONAL
+% ---
+\begin{epigrafe}
+    \vspace*{\fill}
+	\begin{flushright}
+		\textit{``Não vos amoldeis às estruturas deste mundo, \\
+		mas transformai-vos pela renovação da mente, \\
+		a fim de distinguir qual é a vontade de Deus: \\
+		o que é bom, o que Lhe é agradável, o que é perfeito.\\
+		(Bíblia Sagrada, Romanos 12, 2)}
+	\end{flushright}
+\end{epigrafe}
+% ---
+
+% ---
+% RESUMOS
+% ---
+
+% resumo em português OBRIGATÓRIO
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+ Carlos Drummond de Andrade foi um poeta brasileiro nascido em Itabira, Minas Gerais, em 1902. Ele é considerado um dos maiores poetas do século XX no Brasil, com uma obra que aborda temas como a vida urbana, a condição humana e a existência. Além de poesia, Drummond também escreveu prosa, crônicas e contos, sempre mantendo uma voz única e reconhecível em cada um de seus trabalhos.  Além de sua produção literária, Drummond também se envolveu em atividades políticas e culturais. Neste trabalho, apresenta-se a vida e as principais obras do poeta.
+ 
+ \textbf{Palavras-chave}: Carlos Drummond de Andrade. poeta. Literatura Brasileira.
+\end{resumo}
+
+% resumo em inglês OBRIGATÓRIO
+\begin{resumo}[Abstract]
+ \begin{otherlanguage*}{english}
+   Carlos Drummond de Andrade was a Brazilian poet born in Itabira, Minas Gerais, in 1902. He is considered one of the greatest poets of the 20th century in Brazil, with a body of work that addresses themes such as urban life, the human condition, and existence. In addition to poetry, Drummond also wrote prose, chronicles, and short stories, always maintaining a unique and recognizable voice in each of his works. Besides his literary production, Drummond also got involved in political and cultural activities. This work presents the life and main works of the poet.
+
+   \vspace{\onelineskip}
+ 
+   \noindent 
+   \textbf{Keywords}: Carlos Drummond de Andrade. poet. Brazilian Literature.
+ \end{otherlanguage*}
+\end{resumo}
+
+% resumo em francês OPCIONAL
+\begin{resumo}[Résumé]
+ \begin{otherlanguage*}{french}
+    Il s'agit d'un résumé en français.
+ 
+   \textbf{Mots-clés}: latex. abntex. publication de textes.
+ \end{otherlanguage*}
+\end{resumo}
+
+% resumo em espanhol OPCIONAL
+\begin{resumo}[Resumen]
+ \begin{otherlanguage*}{spanish}
+   Este es el resumen en español.
+  
+   \textbf{Palabras clave}: latex. abntex. publicación de textos.
+ \end{otherlanguage*}
+\end{resumo}
+% ---
+
+% ---
+% inserir lista de ilustrações OPCIONAL
+% ---
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de quadros OPCIONAL
+% ---
+\pdfbookmark[0]{\listofquadrosname}{loq}
+\listofquadros*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de tabelas OPCIONAL
+% ---
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de abreviaturas e siglas OPCIONAL
+% ---
+\begin{siglas}
+  \item[ABNT] Associação Brasileira de Normas Técnicas
+  \item[abnTeX] ABsurdas Normas para TeX
+\end{siglas}
+% ---
+
+% ---
+% inserir lista de símbolos OPCIONAL
+% ---
+\begin{simbolos}
+  \item[$ \Gamma $] Letra grega Gama
+  \item[$ \Lambda $] Lambda
+  \item[$ \zeta $] Letra grega minúscula zeta
+  \item[$ \in $] Pertence
+\end{simbolos}
+% ---
+
+% ---
+% inserir o sumario OBRIGATÓRIO
+% ---
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TEXTO AQUI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introdução}
+\label{capitulo-introducao}
+Carlos Drummond de Andrade foi um dos maiores poetas brasileiros do século XX, conhecido por sua habilidade em transformar as experiências cotidianas em poesia. Nascido em Itabira, Minas Gerais, em 1902, Drummond viveu em diversas cidades brasileiras, como Belo Horizonte e Rio de Janeiro, onde se tornou uma figura importante da cena literária.
+
+Sua obra é caracterizada pela simplicidade e profundidade, com temas que vão desde a vida urbana até a condição humana e a existência. Drummond escreveu poesia, prosa, crônicas e contos, sempre mantendo uma voz única e reconhecível em cada um de seus trabalhos.
+
+Entre seus livros mais famosos estão ``Alguma Poesia’’ (1930), ``Sentimento do Mundo’’ (1940) e ``A Rosa do Povo’’ (1945), que abordam questões sociais, políticas e existenciais, sempre com uma linguagem direta e precisa.
+
+Além de sua produção literária, Drummond também se envolveu em atividades políticas e culturais. Ele participou da Semana de Arte Moderna de 1922, em São Paulo, e foi um dos fundadores da revista ``A Revista’’, que teve papel importante na renovação da poesia brasileira na década de 1940.
+
+Drummond faleceu em 1987, aos 84 anos, deixando um legado literário que influenciou gerações de poetas brasileiros. Sua obra é um retrato vivo do Brasil e de suas contradições, revelando as angústias e desafios da vida contemporânea de forma sensível e profunda.
+
+O restante deste documento está organizado em outros dois capítulos. O Capítulo~\ref{capitulo-vida} fala sobre a vida de Carlos Drummond e Andrade. As principais obras do poeta são apresentados no Capítulo Y.
+
+
+\chapter{Vida}
+\label{capitulo-vida}
+
+Drummond nasceu em Itabira, Minas Gerais, e essa cidade influenciou sua obra. Sua ascendência é de famílias de origem escoto-madeirense estabelecidas há muito tempo no Brasil, tanto do lado materno como paterno. Ele estudou no Colégio Arnaldo em Belo Horizonte e no Colégio Anchieta em Nova Friburgo. Drummond se formou em farmácia na Universidade Federal de Minas Gerais e, junto com Emílio Moura e outros colegas, fundou ``A Revista’’ para promover o modernismo no Brasil.
+
+Em 1925, ele se casou com Dolores Dutra de Morais e teve dois filhos, Carlos Flávio, que viveu apenas meia hora, e Maria Julieta Drummond de Andrade. No mesmo ano em que publicou sua primeira obra poética, ``Alguma poesia’’ (1930), seu poema ``Sentimental’’ foi recitado na conferência ``Poesia Moderníssima do Brasil’’ durante o curso de férias da Faculdade de Letras da Universidade de Coimbra, pelo professor da Cadeira de Estudos Brasileiros, Dr. Manoel de Souza Pinto. Isso fazia parte da política de difusão da literatura brasileira nas universidades portuguesas.
+
+Durante os anos 1940, Drummond se juntou ao Partido Comunista Brasileiro (PCB) e dirigiu um jornal do partido no Rio de Janeiro. Ele realizou uma entrevista com o líder do partido, Luis Carlos Prestes, enquanto esteve na prisão. Drummond colaborou com artigos no semanário ``Mundo Literário’’ (1946-1948) e na revista luso-brasileira ``Atlântico’’. Em 5 de abril de 1975, ele recebeu o grau de Grande-Oficial da Ordem Militar de Sant'Iago da Espada, de Portugal.
+
+Drummond trabalhou como funcionário público durante a maior parte de sua vida, D, mas também escreveu poesia, livros infantis, contos e crônicas. Ele continuou escrevendo até sua morte, em 1987, no Rio de Janeiro, doze dias após a morte de sua filha. Ele morreu de infarto do miocárdio e insuficiência respiratória. Em 1987, pouco antes de sua morte, a escola de samba Mangueira homenageou Drummond no Carnaval com o enredo ``O Reino das Palavras’’, sendo campeã do Carnaval Carioca naquele ano.
+
+\begin{figure}[htp]
+    \centering
+    \caption{Foto de Carlos Drummond de Andrade}
+    \label{figura-foto-carlo}
+    \includegraphics[height=5cm]{figuras/Foto de Carlos Drummond de Andrade.png}
+    \legend{Fonte: }
+\end{figure}
+
+\chapter{Obras}
+\label{capitulo-obras}
+
+\section{Livros e Coletâneas}
+\label{secao-livros-e-coletaneas}
+Carlos Drummond de Andrade deixou um legado literário vasto e diversificado, incluindo poesia, prosa, crônicas e contos~\cite{tavares2020inteligencia}. Algumas de suas principais obras são:
+
+\begin{itemize}
+    \item Alguma Poesia (1930).
+    \item Brejo das almas (1934).
+    \item A rosa do povo (1945).
+    \item Claro enigma (1951).
+    \item Contos de aprendiz (1951). 
+    \item Fazendeiro do ar (1954). 
+\end{itemize}
+
+Essas obras, entre outras, consolidaram a importância de Carlos Drummond de Andrade na literatura
+brasileira e o consagraram como um dos maiores poetas do século XX.
+
+\section{Poemas}
+\label{secao-poemas}
+Carlos Drummond de Andrade escreveu inúmeras poesias que se tornaram famosas no Brasil e no
+mundo. Aqui estão algumas das suas mais conhecidas:
+\begin{itemize}
+    \item No meio do caminho.
+    \item Poema de Sete Faces.
+    \item A Rosa do Povo.
+    \item Mãos Dadas.
+    \item Quadrilha.
+    \item Canção AMiga.
+    \item O Elefante.
+\end{itemize}
+
+\subsection{Poema no ``No meio do caminho’’}
+Carlos Drummond de Andrade é um poeta consagrado no Brasil e sua obra é vasta, por isso, é difícil
+apontar um único poema como o mais conhecido. No entanto, há um poema que se tornou muito popular
+e que é considerado por muitos como um dos mais emblemáticos do autor: ``No Meio do Caminho’’
+O poema é curto e marcante, e começa com a famosa frase `No meio do caminho tinha uma pedra’’. Ele
+trata de uma situação aparentemente banal, mas que é explorada pelo autor de uma maneira inusitada,
+levando o leitor a refletir sobre a existência humana e as surpresas que podem surgir em nosso caminho.
+``No Meio do Caminho’’ é um exemplo da capacidade de Drummond de transformar situações cotidianas
+em poesia, e por isso se tornou uma das obras mais lembradas e estudadas da literatura brasileira.
+
+Carlos Drummond de Andrade possui uma grande quantidade de poemas conhecidos. É difícil apontar
+qual é o poema mais conhecido do autor. Entretanto, o poema ``No meio do caminho’’ é considerado um
+dos mais emblemáticos.
+
+A seguir o poema ``No meio do caminho’’ de Carlos Drummond de Andrade:
+\begin{citacao}
+No meio do caminho tinha uma pedra
+tinha uma pedra no meio do caminho
+tinha uma pedra
+no meio do caminho tinha uma pedra.
+
+Nunca me esquecerei desse acontecimento
+na vida de minhas retinas tão fatigadas.
+Nunca me esquecerei que no meio do caminho
+tinha uma pedra
+tinha uma pedra no meio do caminho
+no meio do caminho tinha uma pedra.~\cite{foto-carlos-drummond}
+\end{citacao}
+
+\subsection{Exemplo de citação}
+Segundo~\citeonline{tavares2020inteligencia}, blablabla...
+
+
+% ----------------------------
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Referências bibliográficas OBRIGATORIO
+% ----------------------------------------------------------
+\bibliography{referencias/referencias}
+
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+%
+% Consulte o manual da classe abntex2 para orientações sobre o glossário.
+%
+%\glossary
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices OPCIONAL
+% ---
+\begin{apendicesenv}
+
+% Imprime uma página indicando o início dos apêndices
+\partapendices
+
+% ----------------------------------------------------------
+\chapter{Quisque libero justo}
+% ----------------------------------------------------------
+
+\lipsum[50]
+
+% ----------------------------------------------------------
+\chapter{Nullam elementum urna vel imperdiet sodales elit ipsum pharetra ligula
+ac pretium ante justo a nulla curabitur tristique arcu eu metus}
+% ----------------------------------------------------------
+\lipsum[55-57]
+
+\end{apendicesenv}
+% ---
+
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+
+% ---
+% Inicia os anexos OPCIONAL
+% ---
+\begin{anexosenv}
+
+% Imprime uma página indicando o início dos anexos
+\partanexos
+
+% ---
+\chapter{Morbi ultrices rutrum lorem.}
+% ---
+\lipsum[30]
+
+% ---
+\chapter{Cras non urna sed feugiat cum sociis natoque penatibus et magnis dis
+parturient montes nascetur ridiculus mus}
+% ---
+
+\lipsum[31]
+
+% ---
+\chapter{Fusce facilisis lacinia dui}
+% ---
+
+\lipsum[32]
+
+\end{anexosenv}
+
+
+
+\end{document}

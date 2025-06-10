@@ -1,9 +1,9 @@
 import numpy as np
-from agentflow.ell2a_integration import ELL2AIntegration
-from agentflow.ell2a.stores.sql import PostgresStore
+from agentflow.ell_integration import ELLIntegration
+from agentflow.ell.stores.sql import PostgresStore
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
 class MyPrompt:
     x : int
@@ -11,7 +11,7 @@ class MyPrompt:
 def get_random_length():
     return int(np.random.beta(2, 6) * 1500)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def hello(world: str) -> str:
     """Your goal is to be really mean to the other guy while saying hello"""
     name = world.capitalize()
@@ -20,8 +20,8 @@ async def hello(world: str) -> str:
     return f"Say hello to {name} in {number_of_chars_in_name} characters or more!"
 
 if __name__ == "__main__":
-    # Initialize ELL2A with PostgreSQL store
-    ell2a.configure({
+    # Initialize ELL with PostgreSQL store
+    ell.configure({
         "enabled": True,
         "tracking_enabled": True,
         "store": PostgresStore('postgresql://postgres:postgres@localhost:5432/ell'),

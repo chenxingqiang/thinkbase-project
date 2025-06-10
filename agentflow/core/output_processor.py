@@ -3,6 +3,8 @@ from typing import Dict, Any, List, Optional, Callable
 from enum import Enum
 from dataclasses import dataclass
 
+from litellm import Field
+
 class OutputMode(Enum):
     RETURN = "RETURN"
     FORWARD = "FORWARD"
@@ -12,7 +14,7 @@ class OutputMode(Enum):
 @dataclass
 class TransformationConfig:
     enabled: bool = False
-    methods: List[str] = None
+    methods: List[str] = Field(default_factory=list)
 
 class OutputProcessor:
     """处理Agent输出的核心组件"""
@@ -53,15 +55,17 @@ class OutputProcessor:
         processor = self._get_processor(mode)
         return processor(output_data)
 
-    def _get_processor(self, mode: OutputMode) -> Callable:
-        """获取对应模式的处理器"""
+    def _get_processor(self, mode: OutputMode) -> Callable[[Any], Dict[str, Any]]:
+        """Get corresponding mode processor."""
         processors = {
             OutputMode.RETURN: self._process_return,
             OutputMode.FORWARD: self._process_forward,
             OutputMode.STORE: self._process_store,
             OutputMode.TRIGGER: self._process_trigger
         }
-        return processors.get(mode)
+        if processor := processors.get(mode):
+            return processor
+        raise ValueError(f"No processor found for mode: {mode}")
 
     def _process_return(self, output_data: Any) -> Dict[str, Any]:
         """处理返回输出"""

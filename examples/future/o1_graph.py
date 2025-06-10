@@ -8,14 +8,14 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import json
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -72,7 +72,7 @@ class KnowledgeGraph(BaseModel):
         dot.render(prefix, format="png", view=True)
 
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def update_knowledge_graph(cur_state: KnowledgeGraph, inp: str, i: int, num_iterations: int) -> KnowledgeGraph:
     """Update the knowledge graph based on new input."""
     # Create an initial graph for the first iteration

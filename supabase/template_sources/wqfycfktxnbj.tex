@@ -1,0 +1,359 @@
+
+%----------  MAIN SOURCE FOR ALL SECTIONS AND THESIS  --------------%
+
+\documentclass [12pt, a4paper] {article}
+%% In a “book”, chapters are used, and a header is automatically added and is always 2-sided whereas in a “report” or “article” you have to specify it by using the “two-side” option. 
+\usepackage[a4paper, left = 3.5cm , right = 2.5 cm, top = 2.5cm, bottom = 2cm]{geometry} % Margin Guidelines
+
+% ------------  REQUIRED PACKAGES (PREAMBLE)  ----------- %
+
+% PACKAGES FOR TITLES
+\usepackage{titlesec}
+\usepackage{color}
+
+% PACKAGES FOR LANGUAGE AND FONT
+\usepackage[utf8]{inputenc} % Input encoding (Standard utf8 rather than ISO), allows accented words directly
+\usepackage[english]{babel} % allows the use of characters from a range of languages
+\usepackage[T1]{fontenc} % 8-bit font encoding (Use t2a for Cyrillic font encoding
+% To use Times New Roman, we change the compiler to XeLaTex from Menu and execute commands \usepackage{fontspec} and then \setmainfont{Times New Roman}, and if times font is needed with pdflatex compiler- \usepackage[T1]{fontenc} then \usepackage{mathptmx}
+
+% PACKAGES FOR SPACING - 1.5 between lines
+\usepackage[onehalfspacing]{setspace}
+
+% COMMANDS TO CHANGE DEFAULT TITLE NAMES  
+\addto\captionsenglish{\renewcommand{\contentsname}{Table of Contents}} %change "contents" title
+\addto\captionsenglish{\renewcommand{\refname}{Bibliography and References}} %change "references" title
+
+% PACKAGES FOR IMAGES
+\usepackage [] {graphicx} % Required for inserting images
+\graphicspath{{Images/}} % Path for images' folder
+\usepackage{eso-pic} % For the background picture on the title page
+\usepackage{caption} % Coloured captions
+\usepackage{subcaption} % Numbered and caption subfigures using \subfloat - 2 figures on same place 
+% subfig was the old package before subcaption
+\usepackage[export]{adjustbox}
+\usepackage{wrapfig}
+
+% STANDARD MATH PACKAGES
+\usepackage{amsmath} % to reference equations using \eqref{}
+\usepackage{amsthm,thmtools,xcolor} % Coloured "Theorem"
+\usepackage{bm}
+\usepackage[overload]{empheq}  % For braced-style systems of equations
+
+% PACKAGES FOR TABLES
+\usepackage{tabularx} % tabularx modifies the widths of the columns, whereas tabular modifies widths of the inter-column spaces
+\usepackage{multirow} % to have rows or columns combined
+\usepackage{longtable} % tables that can span several pages
+\usepackage{float} % Corrects position of the tables - H
+% CODE FOR TABLE COUNTER ZERO
+\makeatletter
+\renewcommand{\thetable}{\@arabic\c@table}
+\@addtoreset{table}{section}
+\makeatother
+
+% PACKAGES FOR ALGORITHMS (PSEUDO-CODE)
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% PACKAGES FOR REFERENCES & BIBLIOGRAPHY
+\usepackage[sort&compress,square,comma,numbers]{natbib} % omit 'round' option if you prefer square brackets
+\DeclareRobustCommand{\citeext}[1]{\citeauthor{#1}~\cite{#1}} % To have author and Number
+\bibliographystyle{plainnat} % this must be set to use natbib (citep, citet) but requires BibTeX
+% Now simply use \citet not \cite for the combo command to work
+
+% PACKAGE FOR COLORED LINKS 
+%(Use hidelinks for final pdf instead of colorlinks to avoid nasty color frame)
+\usepackage [colorlinks=false]{hyperref} %colorlinks =T/F - colorframes(false)/colors text of links (true)
+
+% PACKAGE FOR GLOSSARIES (LIST OF ACRONYMS AND SYMBOLS) 
+%%% CLEAR CACHE WHEN NEW SYMBOL OR ACR ADDED %%%%%
+\usepackage[sort=use, acronym, symbols, nogroupskip, automake]{glossaries-extra}
+\makeglossaries
+\glstocfalse % to remove the glossaries - symbols and acronyms from contents
+% SYMBOLS
+\glsxtrnewsymbol[description={position}]{x}{\ensuremath{x}}
+\glsxtrnewsymbol[description={velocity}]{v}{\ensuremath{v}}
+\glsxtrnewsymbol[description={acceleration}]{a}{\ensuremath{a}}
+\glsxtrnewsymbol[description={time}]{t}{\ensuremath{t}}
+\glsxtrnewsymbol[description={force}]{F}{\ensuremath{F}}
+% ACRONYMS
+\newacronym{gcd}{GCD}{Greatest Common Divisor}
+\newacronym{lcm}{LCM}{Least Common Multiple}
+
+% PACKAGES FOR THE APPENDIX
+\usepackage[toc, page]{appendix}
+
+% PACKAGES FOR ITEMIZE & ENUMERATES 
+\usepackage{enumitem}
+
+% OTHER PACKAGES
+\usepackage{ragged2e} % For alignment of texts
+\usepackage{multicol} % For multiple columns
+\usepackage{blindtext} % To insert dummy texts
+\usepackage{lipsum} % for some dummy text
+\usepackage{comment} % Comment part of code
+\usepackage{fancyhdr} % To structure Fancy headers and footers
+\usepackage{tcolorbox} % Create coloured boxes (e.g. the one for the key-words)
+\usepackage{nomencl}
+\usepackage{parskip}
+\makenomenclature
+
+% DECLARATIONS
+\title{Masters Thesis}
+\author{Zelieus Namirian}
+\date{March 2023}
+
+% FOR HEADERS %
+\usepackage{fancyhdr}
+\newcommand{\changefont}{\fontsize{8}{11}\selectfont}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[R]{\changefont{Testing Fama French Models : An empirical research}}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{11pt}
+\setlength{\parindent}{0pt}
+\interfootnotelinepenalty = 10000
+
+% -------------------------- DOCUMENT START ------------------------------  % 
+
+\begin{document}
+
+% ----------------  TITLE PAGE ------------------- %
+% no need of \maketitle, as title-page is added
+\noindent 
+\include{Sections/titlepage} %for Image to work, changed the compiler to pdfLatex
+\newpage
+
+% ---------------- CONTENT PAGES ----------------- %
+\pagenumbering{Roman}
+% TOC
+\tableofcontents
+% Use "\addcontentsline{toc}{section}{name}" before name to put in toc
+\newpage
+
+% List of tables
+\addcontentsline{toc}{section}{List of Tables} %to add to table of contents
+\listoftables
+% If not automatically added -- \addcontentsline{lot}{section}{Table 1}
+\newpage
+
+% List of Figures
+\addcontentsline{toc}{section}{List of Figures}
+\listoffigures
+% If not automatically added -- \addcontentsline{lof}{section}{Fig 1}
+\newpage
+
+% List of acronyms 
+\addcontentsline{toc}{section}{Acronyms}
+\printglossary[type=\acronymtype]
+
+% List of Symbols 
+\addcontentsline{toc}{section}{List of Symbols}
+\printglossary[type=symbols,style=long,title={List of Symbols}]
+
+\newpage
+
+% ------------------  ABSTRACT ---------------------- %
+\pagenumbering{arabic}
+\addcontentsline{toc}{section}{Abstract}
+\section*{Abstract} 
+This report aims to evaluate xx. The abstract should be double-spaced and not more than 100 words
+
+% -------------------------------- MAIN PART ----------------------------- %
+
+% ------------------ INTRODUCTION ------------------- %
+\include{Sections/Introduction}
+
+% --------------------  BODY  ----------------------- %
+\include{Sections/Body}
+
+% -----------------  CONCLUSION  --------------------- %
+\include{Sections/Conclusion}
+
+
+\section{ALL SAMPLE DATA AND EGS}
+\subsection{subsec 0}
+This is some text for the section.
+
+I can reference now otherwise use (\citet{dirac}). Now trying the footnotes. 
+It is pretty simple \footnote{Some UTF-8 support via \LaTeX{} kernel commands.}
+
+\subsection{subsec 1}
+An analysis of the effect of the revised recruitment policies on staff turnover at divisional headquarters (\citet{einstein})
+
+The equation given by einstein - 
+\begin{equation}\label{Emc2}
+E=mc^2
+\end{equation}
+
+Einstein wrote his famous equation \eqref{Emc2}, blah blah blah ....
+
+Integrals
+\begin{align*}
+  f(x) &= x^2\\
+  g(x) &= \frac{1}{x}\\
+  F(x) &= \int^a_b \frac{1}{3}x^3
+\end{align*}
+
+\subsection{This is an example of subsection Title}
+Reference symbols: $\gls{x}$, $\gls{v}$, $\gls{a}$, $\gls{t}$, $\gls{F}$.
+Given a set of numbers, there are elementary methods to compute its \glsxtrlong{gcd}, which is abbreviated \glsxtrshort{gcd}. This process is similar to that used for the \glsxtrfull{lcm}.
+
+Using another footnote here \footnote{some data}
+
+\subsubsection{subsubsec1:(\texttt{ragged2e})}
+
+\begin{Center}
+\blindtext[1]
+\end{Center}
+
+\subsubsection{subsubsec 2}
+\Centering
+\blindtext[1]
+
+\vspace{5mm}
+\justifying
+
+\blindtext[1]
+\lipsum[2]
+
+% TO SET PARAGRAPH INDENTING AND SPACING
+\setlength{\parindent}{15pt} % for indenting the paras
+\setlength{\parskip}{0.5em} % for spacing between paras % em being a different unit
+
+\subsection*{subsec 3}
+\textbf{First paragraph} of a section which, as you can see, is not indented. This is more text in the paragraph. This is more text in the paragraph.
+
+\textbf{Second paragraph}. As you can see it is indented. This is more text in the paragraph. This is more text in the paragraph. 
+
+\noindent\textbf{Third paragraph}. This too is not indented due to use of \texttt{\string\noindent}. This is more text in the paragraph. This is more text in the paragraph.  The current value of \verb|\parindent\raggedright| is \the\parindent. This is more text in the paragraph.
+
+\subsection*{subsec 4}
+\textbf{First paragraph} of a section which, as you can see, is not indented. This is more text in the paragraph. This is more text in the paragraph.
+\lipsum[]
+
+\subsection{subsec 5}
+
+Tables:
+
+In text, I can reference the Table \ref{tab:my_label1} like this.
+
+%\setcounter{table}{0} % sets table counter to zero 
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c||c|c|c|}
+    \hline
+    $x$     & 1  & 2  & 3  \\ 
+    \hline
+    $f(x)$  & 10 & 12 & 14 \\ 
+    \hline
+    \end{tabular}
+    \caption{e.g. Table 1}
+    \label{tab:my_label1}
+\end{table}
+
+Rows and columns can be merged to create larger table cells. 
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{ |c|c|c|c| } 
+\hline
+col1 & col2 & col3 \\
+\hline
+\multirow{3}{4em}{Multiple row} & cell2 & cell3 \\ 
+& cell5 & cell6 \\ 
+& cell8 & cell9 \\ 
+\hline
+\end{tabular}
+\end{center}
+\caption{e.g. Table 2}
+\label{tab:my_label2}
+\end{table}
+
+The table \ref{table:3} and \ref{table:4} are an examples of referenced \LaTeX{} elements.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{||c c c c||} 
+ \hline
+ Col1 & Col2 & Col2 & Col3 \\ [0.5ex] 
+ \hline\hline
+ 1 & 6 & 87837 & 787 \\ 
+ 2 & 7 & 78 & 5415 \\
+ 3 & 545 & 778 & 7507 \\
+ 4 & 545 & 18744 & 7560 \\
+ 5 & 88 & 788 & 6344 \\ [1ex] 
+ \hline
+\end{tabular}
+\caption{This is the caption for the third table.}
+\label{table:3}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{||c c c c||} 
+ \hline
+ Col1 & Col2 & Col2 & Col3 \\ [0.5ex] 
+ \hline\hline
+  4 & 545 & 18744 & 7560 \\
+ 5 & 88 & 788 & 6344 \\ [1ex] 
+ \hline
+\end{tabular}
+\caption{This is the caption for the fourth table.}
+\label{table:4}
+\end{table}
+
+Images
+\begin{figure}[ht]
+\centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=0.9\linewidth, height=6cm]{overleaf-logo} 
+        \caption{img 1}
+        \label{fig:subim1}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}
+        \includegraphics[width=0.9\linewidth, height=6cm]{mesh}
+        \caption{img 2}
+        \label{fig:subim2}
+    \end{subfigure}
+\caption{Figure with two images}
+\label{fig:fig1}
+\end{figure}
+
+I can reference images such as \ref{fig:fig1} containing \ref{fig:subim1} and \ref{fig:subim2}
+
+%Floatting text around a figure
+Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat.
+
+\begin{wrapfigure}{l}{0.25\textwidth}
+\includegraphics[width=0.9\linewidth]{overleaf-logo} 
+\caption{img3}
+\label{fig:fig2}
+\end{wrapfigure}
+
+Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. (See figure \ref{fig:fig2} )
+
+Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin.Praesent in sapien. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis fringilla tristique neque. Sed interdum libero ut metus. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin. Pellentesque placerat. Nam rutrum augue a leo. Morbi sed elit sit amet ante lobortis sollicitudin.
+
+% ------------ APPENDIX ------------------ %
+\appendix
+\appendixpage
+
+\section{App / Anx 1 - Formula XXX}
+Text and images for Ap A.
+The appendix is an optional part of the thesis, which might include: tables with additional data, additional figures, mathematical proofs and derivations, etc. The different parts of the appendix should be lettered (e.g. Appendix A") and might be subdivided (e.g. A.1"). The appendices are listed in the table of contents
+(see example documents). You have to refer to each appendix at least once in the main part, otherwise this appendix serves no purpose.
+
+\section{App / Anx 2 - Report XXX}
+Report data and lab results or prog methods for Ap B
+
+% ------------ Bibliography ------------------ %
+\addcontentsline{toc}{section}{Bibliography and references}
+\bibliography{bibliography.bib}
+
+% ------------ Author Declaration ------------ %
+\addcontentsline{toc}{section}{Declaration of Author}
+\include{Sections/AuthorsDeclaration}
+
+\end{document}

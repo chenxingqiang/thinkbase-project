@@ -1,0 +1,159 @@
+\documentclass{report} % Este comando define a classe do documento
+
+% IMPORTAÇÕES DE PACOTES
+\usepackage{fancyhdr} % Cabeçalhos e rodapés personalizados.
+\usepackage{tocloft} % Formatação personalizada para listas (índice, listas de figuras/tabelas).
+\usepackage{titletoc} % Personalização do layout de títulos em índices.
+\usepackage{textcase} % Manipulação de caixa (maiúsculas/minúsculas).
+\usepackage{tikz} % Desenhos e diagramas precisos.
+\usepackage{array} % Aprimoramento de formatação e alinhamento em tabelas.
+\usepackage{verbatim} % Ambientes de verbatim para código e texto não formatado.
+\usepackage{graphicx} % Inclusão e manipulação de imagens.
+\usepackage{polyglossia} % Suporte multilíngue para o XeLaTeX e o LuaLaTeX.
+\usepackage{enumitem} % Personalização de listas (índice, itemize, enumerate).
+\usepackage{fontspec} % Manipulação avançada de fontes com XeLaTeX e LuaLaTeX.
+\usepackage{geometry} % Controle das configurações de margens e layout do documento.
+\usepackage{setspace} % Ajuste do espaçamento entre linhas.
+\usepackage{titlesec} % Personalização dos formatos de títulos de seções e capítulos.
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[alf]{abntex2cite}  % Para citações no estilo autor-data (como "NBR 10520")
+\usepackage{etoolbox}
+
+
+\input{ElementosPré-textuais/Capitulo00/Configuracoes} % Importa os dados do aquivo de  variaveis
+
+\setmainfont{Arial}
+\setsansfont{Arial}
+\setmainfont[Ligatures=TeX]{Arial}
+
+%-----------------------------CONFIGURAÇÕES DE AJUSTE DA ABNT--------------------------------------
+
+\makeatletter
+\renewenvironment{thebibliography}[1]
+     {\chapter*{\bibname}%
+      \addcontentsline{toc}{chapter}{\bibname}%
+      \list{\@biblabel{\@arabic\c@enumiv}}%
+           {\settowidth\labelwidth{\@biblabel{#1}}%
+            \leftmargin\labelwidth
+            \advance\leftmargin\labelsep
+            \@openbib@code
+            \usecounter{enumiv}%
+            \let\p@enumiv\@empty
+            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+      \sloppy
+      \clubpenalty4000
+      \@clubpenalty \clubpenalty
+      \widowpenalty4000%
+      \sfcode`\.\@m}
+     {\def\@noitemerr
+       {\@latex@warning{Empty `thebibliography' environment}}%
+      \endlist}
+\makeatother
+
+\setlength{\cftbeforetabskip}{8pt}
+
+% Oculta o título do sumário que vem por padrao pelo comando
+\renewcommand{\cfttoctitlefont}{\normalfont\large\bfseries\hide}
+\newcommand{\hide}[1]{}
+
+% Configuração para o título da lista de figuras
+\renewcommand{\cftloftitlefont}{\vspace{-2.1cm}\hfill\large\bfseries\MakeUppercase}
+\renewcommand{\cftafterloftitle}{\hfill}
+
+% Configuração para o título da lista de tabelas
+\renewcommand{\cftlottitlefont}{\vspace{-2.1cm}\hfill\large\bfseries\MakeUppercase}
+\renewcommand{\cftafterlottitle}{\hfill}
+
+
+% Definindo a lingua portuguesa como a padrão do documento
+\setmainlanguage{portuguese}
+
+% Personalize o formato do título do capítulo
+\titleformat{\chapter}
+  {\normalfont\fontsize{12}{1.5}\bfseries}{\thechapter}{8pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{18pt}
+
+% Personalize o formato do título da seção
+\titleformat{\section}
+  {\normalfont\fontsize{12}{1.5}}{\thesection}{8pt}{}
+\titlespacing*{\section}{0pt}{18pt}{18pt}
+
+% Personalize o formato do título da subseção
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{1.5}}{\thesubsection}{8pt}{}
+\titlespacing*{\subsection}{0pt}{18pt}{18pt}
+
+% Espaçamento de 3cm antes de todos os paragrafos do documento
+\makeatletter
+% Adiciona espaço à esquerda após seção ou subseção
+\def\@afterheading{%
+  \@nobreaktrue
+  \everypar{%
+    \if@nobreak
+      \@nobreakfalse
+      \clubpenalty \@M
+      \global\parindent=3cm% Ajusta o parindent para 3cm
+      \else
+      \clubpenalty \@clubpenalty
+      \everypar{}%
+    \fi}%
+}
+\makeatother
+
+\geometry{
+    a4paper, % Tamanho da folha A4
+    top=3cm, % Margem superior de 3cm
+    left=3cm, % Margem esquerda de 3cm
+    bottom=2cm, % Margem inferior de 2cm
+    right=2cm, % Margem direita de 2cm
+} % Modela as magens e define o modelo da folha
+
+
+
+\fontsize{12pt}{15pt}\selectfont % Defina o tamanho da fonte padrão para o documento
+
+%  INICIO DO DOCUMENTO
+
+\begin{document} 
+
+\include{./ElementosPré-textuais/Capa/Capa.tex}
+
+\include{./ElementosPré-textuais/ContraCapa/ContraCapa.tex}
+
+\include{./ElementosPré-textuais/Dedicatoria/Dedicatoria.tex}
+
+\include{./ElementosPré-textuais/Agradecimentos/Agradecimentos.tex}
+
+\include{./ElementosPré-textuais/Epigrafe/Epigrafe.tex}
+
+\include{./ElementosPré-textuais/Resumo/Resumo.tex}
+
+\include{./ElementosPré-textuais/ListaFigura/ListaFigura.tex}
+
+\include{./ElementosPré-textuais/ListaTabela/ListaTabela.tex}
+
+\include{./ElementosPré-textuais/ListaSigla/ListaSigla.tex}
+
+\include{./ElementosPré-textuais/Sumario/Sumario.tex}
+
+\include{ElementosTextuais/Capitulo01/Capitulo01.tex}
+
+\include{ElementosTextuais/Capitulo02/Capitulo02.tex}
+
+\include{ElementosTextuais/Capitulo03/Capitulo03.tex}
+
+\include{ElementosTextuais/Capitulo04/Capitulo04.tex}
+
+\include{ElementosTextuais/Capitulo05/Capitulo05.tex}
+
+\include{ElementosTextuais/Capitulo06/Capitulo06.tex}
+
+\input{ElementosPós-textuais/Referencias/Referencias}
+
+\include{ElementosPós-textuais/Apêndices/Apêndices.tex}
+
+\include{ElementosPós-textuais/Anexos/Anexos.tex}
+
+\end{document}

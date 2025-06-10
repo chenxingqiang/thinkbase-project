@@ -1,0 +1,1062 @@
+\documentclass[12pt,a4paper]{mathbook_arabic}
+ 
+ %\newfontfamily\arabicfont[Script=Arabic]{Arial}
+%   \addto\captionsarabic{\renewcommand{\contentsname}{المحتويات}}
+  
+  % \newfontfamily\arabicfonttt[Script=Arabic]{Arial}
+ 
+\usepackage{listings}
+ \usepackage{mathrsfs}
+ 
+ 
+ 
+ 
+% 	\begin{flushleft}\begin{tikzpicture}	\node[fill=indextitle@bg@color,text=indextitle@color, xslant=0.2,rounded corners=2pt,inner xsep=1em,inner ysep=1ex] {\Large\contentsname};
+%	\end{tikzpicture}\end{flushleft} 
+  \newcommand\ee{\textenglish}
+  
+%  \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+\definecolor{bleu}{cmyk}{0.59,0.11,0,0.59}
+\definecolor{vert}{cmyk}{0.78,0,0.74,0.45}
+  
+  \lstset{
+ 	numbers=left, 	
+ 	language=[LaTeX]TeX, 
+ 	numberstyle=\tiny, 
+ 	stepnumber=1, 
+ 	numbersep=3pt,  
+ 	backgroundcolor=\color{bleu!20},
+ 	frame=shadowbox,
+ 	rulesepcolor=\color{bleu},
+ 	rulecolor=\color{bleu},
+ 	framexleftmargin=10pt,
+ 	keywordstyle=\color{vert}\bfseries,
+ 	 basicstyle=\ttfamily,
+     columns=flexible,
+     keepspaces=true,
+     upquote=true,
+   commentstyle=\color{gray},
+  morekeywords={redefineColor,dfrac,setlength,cellspacetoplimit, cellspacebottomlimit,firstline,text,intro,introauthor,chapter, itemclass,exostart,corrstart,AfficheCorriges,columnbreak,titlepic, nbcolindex,indexname,printindex,makeindex,activites,DefineNewBoxLikeRem}
+ }
+ 
+ 
+ 
+% \lstdefinestyle{MyXML}{
+%      language=XML,
+%      escapeinside={\%*}{*)},
+%      morekeywords={encoding,
+%        xs:schema,xs:element,xs:complexType,xs:sequence,xs:attribute}
+%}
+ 
+ 
+ 
+  
+
+
+\title{\begin{center}
+\vspace{1.6cm}
+دليل
+\\
+$\color{white}\text{mathbook{\textunderscore}arabic.cls~Class}$
+\\
+بالعربي
+\end{center}}
+
+ 
+
+\author{ Stéphane PASQUET
+\\[2cm]
+تعريب
+\\[3mm]
+$\bf moh.bitar11@gmail.com$}
+
+
+  \titlepic[0.5]{fractal.jpg}
+
+  \makeindex
+\begin{document}
+
+ 
+\maketitle
+
+  \tableofcontents
+
+ 
+\chapter{إضافة الملحقات}
+
+\section{استدعاء class}
+
+
+
+
+\LR{\begin{lstlisting} 
+\documentclass[<options>]{mathbook_arabic}
+\end{lstlisting}}
+
+
+
+
+\subsection{الخيارات}\index{خيارات}
+ \begin{itemize}
+ \item
+ حجم الخط
+  10pt, 11pt, 12pt,
+ \end{itemize}
+
+\LR{\begin{lstlisting} 
+%Example
+\documentclass[a4paper,12pt]{mathbook_arabic}
+\end{lstlisting}}
+ 
+ 
+\chapter{الألوان والخطوط والأطوال}
+ 
+
+  \section{الألوان المستخدمة}\index{ألوان}
+
+ تم تعريف الألون  في الملف
+\ee{colors\textunderscore2.tex}
+ باستخدام تعليمة
+ 
+\LR{\begin{lstlisting} 
+\definecolor{<name color>}{cmyk}{<num>,<num>,<num>}
+%Example
+\definecolor{chapter@bg@color}{cmyk}{1,0.2,0.3,0.1}
+\end{lstlisting}}
+ 
+ 
+\subsection{تغيير الألوان}\index{تعريف الألوان}
+\LR{\begin{lstlisting}
+\redefineColor{<nom de la couleur>}{<nouvelle valeur CMYK}
+% Exemple :
+\makeatletter
+\redefineColor{arrayrule@color}{0,0,0,1} % for "black"
+\makeatother
+\end{lstlisting}}
+
+
+
+
+\section{الخطوط}\index{خطوط}
+
+
+
+
+\subsection{الخطوط المتسخدمة}
+تم استخدام الخط Amiri
+للغة العربية بشكل افتراضي 
+بإضافة :
+\LR{\begin{lstlisting}
+\newfontfamily\arabicfont[Script=Arabic]{Amiri}
+\end{lstlisting}}
+
+
+
+
+\vspace*{2cm}
+\subsection{تغيير الخطوط}
+يمكنك تغيير الخط الافتراضي بإضافة اسم الخط المفضل لك 
+
+
+
+\LR{\begin{lstlisting}
+%defult
+\newfontfamily\arabicfont[Script=Arabic]{Amiri}
+%Use other arabic fonts
+\newfontfamily\aria[Script=Arabic]{Arial}
+\newfontfamily\hor[Script=Arabic]{AlHor}
+\end{lstlisting}}
+
+ومن ثم استخدامها في جمل خاصة مثل:
+ \LR{\begin{lstlisting}
+{\aria <text arabic>}
+{\hor  <text arabic>}
+\end{lstlisting}}
+
+ تم تعريف    الخطوط المستخدمة في الأرقام  في  الملف
+\ee{fonts\textunderscore2.tex}
+
+
+
+
+
+
+\section{الأطوال}\index{أطوال}
+تم تعريف أطوال خاص في الملف
+\ee{lengths\textunderscore2.tex}
+ 
+\chapter{الاستخدام الجيد لهذا class}
+ 
+
+
+
+
+\section{الغلاف}\index{غلاف}
+العنوان، المؤلف (المؤلفين)، التاريخ باستخدام الأوامر التالية:
+ 
+\LR{\begin{lstlisting}
+%For example
+\title{Physics}
+\author{M.bitar \and Khaled}
+\date{\today}
+\end{lstlisting}}
+
+يمكنك إضافة صورة إلى غلافك بالأوامر التالية:
+
+\LR{\begin{lstlisting}
+\titlepic[<scale>]{<name of image>}
+% For exemple :
+\titlepic[0.5]{fractale.jpg}
+\end{lstlisting}}
+
+\section{الجداول}
+\subsection{فواصل بين الخلايا}
+إن أردت يمكنك إضافة معادلات رياضية ضمن جدول بسيط، الأوامر التالية تبين كيفية عمل ذلك:
+
+
+ 
+ \begin{minipage}{.4\textwidth}
+\ee{
+\begin{tabular}{|c|c|}
+\hline
+ Sum & Value\\
+ \hline
+$1+\dfrac{1}{2^2}+\cdots+\dfrac{1}{n^2}+\cdots$
+&
+$\dfrac{\pi^2}{6}$\\
+\hline
+\end{tabular}
+}
+\end{minipage}
+  \begin{minipage}{.6\textwidth}
+\LR{\begin{lstlisting}
+\begin{tabular}{|c|c|}
+\hline
+Sum & Value\\
+\hline
+$1+\dfrac{1}{2^2}+\cdots+\dfrac{1}{n^2}+\cdots$
+&
+$\dfrac{\pi^2}{6}$\\
+\hline
+\end{tabular}
+\end{lstlisting}}
+\end{minipage}
+
+
+يمكن إضافة توسيع الخلايا قليلا بيحث يصبح الجدول اكثر ملائمة كما يتضح هنا:
+
+
+
+
+\begin{minipage}{.4\textwidth}
+\ee{
+\begin{tabular}{|Sc|Sc|}
+\hline
+ Sum & Value\\
+ \hline
+$1+\dfrac{1}{2^2}+\cdots+\dfrac{1}{n^2}+\cdots$
+&
+$\dfrac{\pi^2}{6}$\\
+\hline
+\end{tabular}
+}
+\end{minipage}
+  \begin{minipage}{.6\textwidth}
+\LR{\begin{lstlisting}
+\begin{tabular}{|Sc|Sc|}
+\hline
+Sum & Value\\
+\hline
+$1+\dfrac{1}{2^2}+\cdots+\dfrac{1}{n^2}+\cdots$
+&
+$\dfrac{\pi^2}{6}$\\
+\hline
+\end{tabular}
+ \end{lstlisting}}
+\end{minipage}
+
+
+
+تم تعيين هامش الخلايا بشكل افتراضي من خلال الأوامر:
+ 
+
+
+\LR{\begin{lstlisting}
+\setlength{\cellspacetoplimit}{3pt}
+\setlength{\cellspacebottomlimit}{3pt}
+\end{lstlisting}}
+يمكنك تغيير هامش الخلية عن القيمة "3pt" حسب اختيارك.
+
+
+يمكنك استخدام "S" مع الخيارات
+"m","p","c","l","r"
+ولكن عليك وضع الأقواس في خيارت 
+"m","p"
+كما يوضح المثال التالي:
+
+\begin{minipage}{.4\textwidth}
+\ee{
+\begin{tabular}{|S{m{2cm}}|S{p{3cm}}|}
+\hline
+Column 1& Column 2\\
+\hline
+\end{tabular}
+}
+\end{minipage}
+  \begin{minipage}{.58\textwidth}
+\LR{\begin{lstlisting}
+\begin{tabular}{|S{m{2cm}}|S{p{3cm}}|}
+\hline
+Column 1 & Column 2 \\
+\hline
+\end{tabular}
+\end{lstlisting}}
+\end{minipage}
+
+
+\subsection{تلوين سطر}
+يمكنك إضافة سطر بالألوان باستخدام الأمر 
+\ee{\textbackslash{firstline}}:
+
+
+
+
+\begin{minipage}{.4\textwidth}
+\ee{
+\begin{tabular}{|Sc|Sc|}
+\hline\firstline
+ Sum & Value\\
+ \hline
+$1+\dfrac{1}{2^2}+\cdots+\dfrac{1}{n^2}+\cdots$
+&
+$\dfrac{\pi^2}{6}$\\
+\hline
+\end{tabular}
+}
+\end{minipage}
+  \begin{minipage}{.6\textwidth}
+\LR{\begin{lstlisting}
+\begin{tabular}{|Sc|Sc|}
+\hline\firstline
+Sum & Value\\
+\hline
+$1+\dfrac{1}{2^2}+\cdots+\dfrac{1}{n^2}+\cdots$
+&
+$\dfrac{\pi^2}{6}$\\
+\hline
+\end{tabular}
+\end{lstlisting}}
+\end{minipage}
+
+
+\begin{remarque}
+يمكننا استخدام هذا الأمر في أي مكان آخر غير السطر الأول
+ \end{remarque}
+
+ 
+\section{البيئات}\index{بيئات متنوعة (box)}
+
+\subsection{الملاحظات \ee{"remarque"}}\index{مستطيل الملاحظة}
+
+\begin{minipage}{.4\textwidth}
+\begin{remarque}
+هذه ملاحظة
+\end{remarque}
+ 
+ 
+
+\begin{remarque}
+عدة ملاحظات :\par
+\begin{itemize}
+\item ملاحظة 1
+\item ملاحظة 2
+\end{itemize}
+\end{remarque}
+
+\end{minipage}\qquad
+\begin{minipage}{.4\textwidth}
+\LR{\begin{lstlisting}
+\begin{remarque}
+<arabic text>
+\end{remarque}
+
+\begin{remarque}
+<text arabic> :\par
+\begin{itemize}
+\item note 1
+\item note 2
+\end{itemize}
+\end{remarque}
+\end{lstlisting}}
+\end{minipage}
+
+
+ \subsection{الطرائق \ee{"methode"}}\index{مستطيل الطرائق}
+
+\begin{minipage}{.4\textwidth}
+\begin{methode}
+هذه طريقة
+\end{methode}
+
+\begin{methode} 
+عدة طرائق :\par
+\begin{itemize}
+\item طريقة 1
+\item طريقة 2
+\end{itemize}
+\end{methode}
+\end{minipage}
+\qquad
+\begin{minipage}{.4\textwidth}
+\LR{\begin{lstlisting}
+\begin{methode}
+ <text arabic>
+\end{methode}
+
+\begin{methode}
+<text arabic> :\par
+\begin{itemize}
+\item method 1
+\item method 2
+\end{itemize}
+\end{methode}
+\end{lstlisting}}
+\end{minipage}
+
+
+
+\subsection{التعريفات \ee{"definition"}}\index{مستطيل التعريفات}
+
+\LR{\begin{lstlisting}
+\begin{definition}[]
+<text arabic>
+\end{definition}
+\end{lstlisting}}
+
+
+\begin{definition}
+هذا تعريف
+\end{definition}
+
+
+أو بوضع [ات] بعد 
+\LR{\begin{lstlisting}
+\begin{definition}[]
+\end{lstlisting}}
+
+\begin{definition}[ات]
+\begin{itemize}
+\item[] تعريف 1
+\item[] تعريف 2
+\end{itemize}
+
+\end{definition}
+
+\subsection{الخاصيات \ee{"propriete"}\index{مستطيل الخاصيات}}
+\LR{\begin{lstlisting}
+\begin{propriete} 
+<text arabic>\par
+<text arabic>
+\end{propriete}
+\end{lstlisting}}
+
+
+\begin{propriete}
+هذه خاصية .\par
+هذه خاصية أخرى.
+\end{propriete}
+
+\subsection{النظريات \ee{"theoreme"}}\index{مستطيل النظريات}
+\LR{\begin{lstlisting}
+\begin{theoreme} 
+<text arabic>
+\end{theoreme}
+\end{lstlisting}}
+
+\begin{theoreme} 
+هذه نظرية رياضية \par $\sin^2\theta+\cos^2\theta=1$
+\end{theoreme}
+
+\subsection{الأمثلة \ee{"exemple"}}\index{مستطيل الأمثلة}
+\LR{\begin{lstlisting}
+\begin{exemple}
+<text arabic>\par
+<text arabic>
+\end{exemple}
+\end{lstlisting}}
+
+
+\begin{exemple}
+هذا مثال .\par
+ هذا مثال آخر.
+\end{exemple}
+
+
+\subsection{البراهين \ee{"demonstration"}}\index{مستطيل البراهين}
+\LR{\begin{lstlisting}
+\begin{demonstration}
+<text arabic>
+\end{demonstration}
+\end{lstlisting}}
+
+\begin{demonstration}
+ البنية الميكروية لمادة في المستوى الميكروي حيث مقاس الطول أكبر من 
+، الميزات التي تؤلف constitute البنية الميكروية تتضمن المسامية, غلاف السطح، و التصدعات الميكروية الداخلية والخارجية.
+
+سنضمن الفصل بدراسة شيء من أشكال     
+الكربون، سنرى  أن بالرغم من أن كلاً من الماس والغرافيت يتألفان من الكربون النقي، لهما خصائص مواد مختلفة، إن مفتاح فهم تلك الاختلافات هو لفهم كيفية  
+\end{demonstration}
+
+\subsubsection{الخيار \ee{"0"}}
+
+\LR{\begin{lstlisting}
+\makeatletter
+\redefineColor{dem@bg@color}{0.02,0.02,0,0.11}
+\makeatother
+\begin{demonstration}[0]
+<text arabic>
+\end{demonstration}
+\end{lstlisting}}
+
+
+{\makeatletter
+\redefineColor{dem@bg@color}{0.02,0.02,0,0.11}
+\makeatother
+\begin{demonstration}[0]
+  لماذا يكون الكربون في الماس واحد من أقسى المواد المعروفة، لكن في الغرافيت لين جداً ويمكن استخدامه كزالق صلب.
+     كيف تكون السيليكا، ما الأشكال الكيمائية الرئيسة في رمل الشاطئ، هل تُستخدم 
+     بشكلها فائق النقاوة لصناعة الألياف البصرية؟
+\end{demonstration}}
+
+
+\subsubsection{الخيار \ee{"2"}}
+
+
+
+\LR{\begin{lstlisting}
+\begin{demonstration}[2]
+<text arabic>
+\end{demonstration}
+\end{lstlisting}}
+
+\begin{demonstration}[2]
+  لماذا يكون الكربون في الماس واحد من أقسى المواد المعروفة، لكن في الغرافيت لين جداً ويمكن استخدامه كزالق صلب.
+     كيف تكون السيليكا، ما الأشكال الكيمائية الرئيسة في رمل الشاطئ، هل تُستخدم 
+     بشكلها فائق النقاوة لصناعة الألياف البصرية؟
+\end{demonstration}
+
+
+
+
+\subsubsection{الخيار \ee{"3"}}
+
+ 
+
+
+
+\LR{\begin{lstlisting}
+\begin{demonstration}[3]
+<text arabic>
+\end{demonstration}
+\end{lstlisting}}
+
+\begin{demonstration}[3]
+  لماذا يكون الكربون في الماس واحد من أقسى المواد المعروفة، لكن في الغرافيت لين جداً ويمكن استخدامه كزالق صلب.
+     كيف تكون السيليكا، ما الأشكال الكيمائية الرئيسة في رمل الشاطئ، هل تُستخدم 
+     بشكلها فائق النقاوة لصناعة الألياف البصرية؟
+\end{demonstration}
+
+ 
+\subsubsection{الخيار \ee{"4"}}
+
+
+\LR{\begin{lstlisting}
+\begin{demonstration}[4]
+<text arabic>
+\end{demonstration}
+\end{lstlisting}}
+
+\begin{demonstration}[4]
+  لماذا يكون الكربون في الماس واحد من أقسى المواد المعروفة، لكن في الغرافيت لين جداً ويمكن استخدامه كزالق صلب.
+     كيف تكون السيليكا، ما الأشكال الكيمائية الرئيسة في رمل الشاطئ، هل تُستخدم 
+     بشكلها فائق النقاوة لصناعة الألياف البصرية؟
+\end{demonstration}
+
+
+
+ 
+\subsubsection{الخيار \ee{"5"}}
+
+ 
+
+
+
+\LR{\begin{lstlisting}
+\begin{demonstration}[5]
+<text arabic>
+\end{demonstration}
+\end{lstlisting}}
+
+\begin{demonstration}[5]
+  لماذا يكون الكربون في الماس واحد من أقسى المواد المعروفة، لكن في الغرافيت لين جداً ويمكن استخدامه كزالق صلب.
+     كيف تكون السيليكا، ما الأشكال الكيمائية الرئيسة في رمل الشاطئ، هل تُستخدم 
+     بشكلها فائق النقاوة لصناعة الألياف البصرية؟
+\end{demonstration}
+
+
+
+\subsection{ قطع بيئة: بأمر  \ee{ \textbackslash{breakbox}}}\index{قطع المستطيل}
+
+ في كانت بئية كبيرة جدا أكبر من طول الصفحة من الممكن قطعها بواسطة الأمر
+    \ee{\bf \textbackslash{breakbox}} كما في الكود التالي
+
+\LR{\begin{lstlisting}
+\begin{propriete}
+<text arabic>
+\begin{itemize}
+\item $\ln(e)=1$
+\item $\ln(1)=0$
+\item <text arabic>
+\end{itemize}
+\breakbox
+<text arabic>
+\[
+\rm M\in\mathscr{C}\coord{\Omega}{r} \Longleftrightarrow (x-a)^2+(y-b)^2=r^2
+\]
+ <text arabic>
+\end{propriete}
+\end{lstlisting}}
+
+ \begin{propriete}
+لنتعرف على بعض خواص اللوغاريتم
+\begin{itemize}
+\item $\ln(e)=1$
+\item $\ln(1)=0$
+\item لا يوجد لوغاريتم للأعداد السالبة أو الصفر
+\end{itemize}
+\breakbox
+
+$M\in\mathscr{C},{\Omega},{r} \Longleftrightarrow (x-a)^2+(y-b)^2=r^2
+$\par
+تستخدم هذه المعادلة في دراسة......
+\end{propriete}
+
+
+%\coord
+
+
+
+\subsection{ إضافة بيئات جديدة تشبه بيئة  \ee{"remarque"}}\index{إعادة تعريف مستطيل}
+
+\LR{\begin{lstlisting}
+\DefineNewBoxLikeRem{name}{title}{color principal }{color text}
+% Exemple :
+\DefineNewBoxLikeRem{mabox}{<text arabic>}{yellow}{red}
+\begin{mabox}
+<text arabic>
+\end{mabox}
+\end{lstlisting}}
+ 
+ 
+\DefineNewBoxLikeRem{mabox}{الانغستروم}{yellow}{red} 
+\begin{mabox}
+ قطر الذرات يقاس بشكل معياري باستخدام واحدة الانغستروم
+$\text{\AA }  \  or, \ 10^{-10}\mathrm{m}$.
+\end{mabox}
+
+\subsection{ إضافة بيئات جديدة مثل بيئة \ee{"definition"}}
+
+\LR{\begin{lstlisting}
+\DefineNewBoxLikeDef{name}{title}{color principal }{color text}
+% Exemple :
+\DefineNewBoxLikeDef{mybox}{<text arabic>}{yellow}{red}
+\begin{mybox}
+<text arabic>
+<text arabic>
+\end{mybox}
+\end{lstlisting}}
+
+ 
+\DefineNewBoxLikeDef{mybox}{توطئة}{magenta}{white}
+
+\begin{mybox}
+اعتماداً على سبين الاكترون المُفرد , نتوقع كل ذرة حديد أن تعطي أربعة إلكترونات تمثل ثنائيات قطب مغنطيسية. عدد الذرات في
+\ee{m$^3$}
+ في الحديد مكعب مركزي الجسم يكون
+ \end{mybox}
+
+ 
+\section{الأوامر}\index{أوامر}
+\subsection{ الاقتباسات في بداية كل الفصل}
+هذه الإقتباسات اختيارية ومع ذلك لو وضعت واحدة في الفصل ثم أردت ازالتها بعد ذلك سيكون من الضروري تحديد اقتباس فارغ في الفصل التالي.
+
+ لتعريف اقتباس؛ أدرج الأمر التالي قبل أمر 
+ \ee{\textbackslash{chapter}}:
+
+\LR{\begin{lstlisting}
+\intro{<Quote>}
+\introauthor{<Author of quote>}
+\chapter{<title of chapter>}
+\end{lstlisting}}
+
+\subsection{القوائم}
+ بالشكل الافتراضي تم تعديل القوائم  قليلا  
+ 
+\LR{\begin{lstlisting}
+ \begin{itemize}
+\item Item 1
+\begin{itemize}
+\item Sub-item 1
+\item Sub-item 2
+\end{itemize}
+\item Item 2
+\end{itemize}
+\end{lstlisting}}
+
+ 
+ \begin{itemize}
+\item بند أساسي 1
+\begin{itemize}
+\item بند جزئي 1
+\item بند جزئي 2
+\end{itemize}
+\item بند أساسي 2
+\end{itemize}
+
+\DefineNewBoxLikeRem{mabox2}{\bf\Large
+اعلم أن
+}{magenta}{yellow} 
+
+
+\begin{mabox2}
+  تم تلقائيًا ضبط نمط البنود بالإضافة إلى نمط الترقيم إلى البيئة التي 
+أنت فيها مثل بيئات "الملاحظة" و "الطريقة" ، النقاط و
+  الأرقام ستكون هي  بنفس
+ اللون الرئيسي وسيكون هو نفسه في بيئات "التدريبات" و "التصحيح".
+\end{mabox2}
+
+
+إذا لم تحب اللون يمكنك تغييره بالأمر التالي:
+
+
+\LR{\begin{lstlisting}
+ \itemclass{<name of color>}{<used font>}
+% Exemple 1 :  the chips will be red and the font unchanged
+\itemclass{red}{}
+% Exemple 2 :  the chips will be blue and the font will be "helvetica"
+\itemclass{blue}{\fontfamily{phv}\selectfont}
+\end{lstlisting}}
+
+
+\subsection{الأنشطة}\index{عنوان الأنشطة}
+
+\LR{\begin{lstlisting}
+\activite{Une application du théorème de Pythagore}
+\begin{enumerate}
+\item
+\begin{enumerate}
+\item <text arabic>
+\item  <text arabic>
+\end{enumerate}
+\item
+\begin{enumerate}
+\item  <text arabic>
+\item  <text arabic>
+\end{enumerate}
+\end{enumerate}
+\end{lstlisting}}
+
+
+ \activite{أجب عن الأسئلة التالية}
+\begin{enumerate}
+\item
+\begin{enumerate}
+\item  قم بإشاء المثلت $DEF$ بحيث يكون
+$DE=7.2\ \text{cm},EF=4\ \text{cm},FD=6\ \text{cm}$
+\item   أي أضلاع المثلث أكبر
+\end{enumerate}
+\item
+\begin{enumerate}
+\item   أحسب $DE^2$ 
+و
+$EF^2+FD^2$ 
+\item   اشرح لماذا المثلث $DEF$ ليس قائم
+\end{enumerate}
+\end{enumerate}
+
+
+\section{التدريبات}\index{ التدريبات: إدراج عبارات التدريبات}
+\subsection{إضافة قسم "التدريبات"}
+إذا كنت ترغب بإضافة قسم "التمارين" إلى وثيقتك فسيتم ذلك باستخدام:
+
+\LR{\begin{lstlisting}
+\exostart[1] %option [1] when put the Answers
+\end{lstlisting}}
+
+
+هذا ينشئ صفحة جديدة بخلفية ملونة مضاف فيها عنوان كما يظهر في الصفحة التالية.
+
+
+\subsection{بيئة التدريبات \ee{"exercices"}}
+لانشاء تدريب جديد؛   سنستخدم 
+هذه البيئة:
+
+\LR{\begin{lstlisting}
+\begin{exercice}
+My beautiful exercise.
+\end{exercice}
+\end{lstlisting}}
+
+أحيانا تكون العبارة طويلة  تفوق الصفحة، لتجنب ذلك يمكننا استخدام الخيار التالي
+\LR{\begin{lstlisting}
+ \begin{exercice}
+Beginning statement long enough....
+\end{exercice}
+\begin{exercice}[1]
+ Following the statement   long enough.
+\end{exercice}
+\end{lstlisting}}
+
+يسمح هذا الخيار "بقطع" بيئة "تدريبات" لكن يجب ألا تقطع في بيئة 
+\ee{"enumerate"}
+  يمكننا استخدام الحل التالي:
+  \LR{\begin{lstlisting}
+ \begin{exercice}
+\begin{enumerate}
+\item Question 1
+\item Question 2
+\end{enumerate}
+\end{exercice}
+
+\begin{exercice}[1]
+\begin{enumerate}[start=3]
+\item Question 3
+\end{enumerate}
+\end{exercice}
+\end{lstlisting}}
+
+في المثال التالي سأستخدم بيئة 
+\ee{"multicols"}
+التي تقسم الصفحة إلى عمودين.
+
+ \exostart[1]
+ \setlength{\columnseprule}{3pt}
+ \begin{multicols}{2}
+
+\begin{exercice}
+ الإنزال لم. فبعد قُدُماً الأراضي ان حتى.
+وبعد وفرنسا الجنرال بـ الى. البرية لليابان أسر أي. قامت الجنرال الأوروبي حيث عن, ٣٠ ومضى شرسة الجنوب بال, فقد ما سابق ممثّلة وبريطانيا. بحشد القوى لها مع. بحق وترك ضمنها الأرواح مع. ذات من شدّت بالمطالبة, أفاق الإقتصادية قد ذلك, عل لكل اللازمة الإتحاد. بين اللا كنقطة والقرى من.
+\end{exercice}
+
+
+\begin{exercice}
+ أفاق إعمار والفرنسي و لان. واستمر بالتوقيع ضرب بـ, بها تم مسارح فرنسية والروسية. مع دار إحتار بولندا، عشوائية. مما ثم وسفن اتفاق اقتصادية, ما اتفاق وبريطانيا ضرب, أم لإعادة واتّجه لكل. أن شيء الإتحاد لتقليعة. السيء تزامناً اليابان أي ذات.
+مع مدن إيطاليا ولكسمبورغ, تم ودول نهاية غير, دنو فبعد المتحدة هو. لغزو الخارجية استطاعوا ثم حتى, إذ بحث أوزار أفريقيا. لها وإقامة وسمّيت ما, لكل كثيرة قتيل، 
+\end{exercice}
+\begin{exercice}
+ \begin{enumerate}
+\item   السؤال 1
+\item    السؤال 2
+\end{enumerate}
+\end{exercice}
+\begin{exercice}
+أحسب المغنطة العظمى أو الإشباع التي نتوقعها في الحديد. الذي له ثابت شبكة مكعبة مركزية الجسم 
+$2.866 \:\text{\AA}  $
+. قارن هذه القيمة مع 
+$2.1$
+تسلا
+(قيمة كثافة تدفق الإشباع الملاحظة      تجريبياً للحديد النقي).
+ \end{exercice}
+ 
+
+ 
+ 
+ 
+ 
+ 
+ \begin{exercice}
+ \begin{enumerate}
+\item   السؤال 1
+\item   السؤال 2
+\end{enumerate}
+\end{exercice}
+ 
+ 
+  \begin{exercice}[1]
+ \begin{enumerate}[start=3]
+\item   السؤال 3
+\item  السؤال 4
+\end{enumerate}
+\end{exercice}6 
+ \end{multicols}
+ 
+ \newpage
+\pagecolor{white}
+ 
+ \section{التصحيح}\index{التدريبات: إدراج التصحيحات}
+ 
+ \subsection{بيئة التصحيح \ee{"correction"} }
+ 
+ عندما نضع الأجابات لكل تمرين، يجب أن نتبع كل بيئة "تدريب" ببيئة "تصحيح" نضع فيها إجابة التدريب
+ 
+\LR{\begin{lstlisting}
+\begin{exercice}
+Exercice.
+\end{exercice}
+\begin{correction}
+Correction.
+\end{correction}
+\end{lstlisting}}
+ 
+ 
+ 
+ 
+ \subsection{المجلد الذي ضمنه يتم إجراء التصحيحات}
+ من الضروري إنشاء مجلد فرعي باسم 
+ \ee{"corriges"}
+ في المجلد الحالي لأنه موجود في هذا الدليل، المجلد الذي سيوفر تلقائياً التصحيحات.
+ 
+ \subsection{إظهار التصحيحات }
+ \subsubsection{إنشاء قسم "تصحيحات التدريبات"}
+ 
+\LR{\begin{lstlisting}
+ \corrstart
+\end{lstlisting}}
+ 
+ هذا الأمر يولد صفحة جديدة ويضع فيها العنوان.
+ 
+ 
+ \subsubsection{عرض جميع التصحيحات}
+  
+\LR{\begin{lstlisting}
+ \AfficheCorriges[<list of options>]
+\end{lstlisting}}
+ 
+ ستكون الخيارات في النموذج
+\ee{"num ex/ command"}
+ حيث
+ \ee{"num ex"}
+ هو رقم التمرين الذي يجب تنفيذ الأمر عنده. مثلاً:
+ \LR{\begin{lstlisting}
+ \AfficheCorriges[3/\columnbreak]
+ %Executes the command before displaying the correction for Exercise 3
+\end{lstlisting}}
+ أي ينفذ الأمر قبل عرض تصحيح التدريب 3
+ 
+\corrstart
+
+\begin{multicols}{2}
+\AfficheCorriges[4/{\columnbreak}]
+\end{multicols}
+
+  %\AfficheCorriges 
+ 
+%\input{corriges/3-1.tex}
+ %\input{corriges/3-2.tex}
+ %\input{corriges/3-3.tex}
+ %\input{corriges/3-4.tex}
+ 
+ \newpage
+ \pagecolor{white}
+ 
+ \section{المحتويات}\index{المحتويات}
+ \subsection{العنوان}
+ تم وضع عنوان افتراضي 
+ "الفهرس"
+لكن بإمكانك تغيره باستخدام الأمر:
+  \LR{\begin{lstlisting}
+% For exemple :
+ \addto\captionsarabic{\renewcommand{\contentsname}{<arabic title>}}
+\end{lstlisting}}
+
+  كما ترون، العنوان هو"مسار"؛ عندما يكون العنوان أطول من الافتراضي فإنه قد يتعدى على الفهرس نفسه؛ يجب بعد ذلك أن نتحكم في "المسار"
+ 
+  \LR{\begin{lstlisting}
+ \setlength{\controltoctitle}{0.1cm} % for exemple
+\end{lstlisting}}
+القيمة الإفتراضية للتحكم هي $0.25 \ \text{cm}$
+ 
+ 
+ \subsection{الفهرس}
+ يتم وضعه بالأمر:
+  
+   \LR{\begin{lstlisting}
+\tableofcontents
+\end{lstlisting}}
+ 
+ \section{ إنشاء جدول دليل 
+\ee{index} 
+ }
+ \subsection{تحديد عدد الأعمدة}
+ بشكل إفتراضي تم ضبط الدليل بعمودين،  
+وتتم معالجته باستخدام الأمر التالي:  
+  
+     \LR{\begin{lstlisting}
+ \def\nbcolindex{<number of columns>}
+% Exemple :
+\def\nbcolindex{1} % for 1  column
+\end{lstlisting}}
+  
+  \subsection{إنشاء وعرض جدول الدليل }
+  أذكرك أنه يجب عليك وضع الأمر:
+  
+     \LR{\begin{lstlisting}
+\makeindex
+\end{lstlisting}}
+  في ديباجة الوثيقة، والأمر
+       \LR{\begin{lstlisting}
+\printindex
+\end{lstlisting}}
+  حيث يمكنك عرض جدول الدليل. بالإضافة لأنه يمكنك تغيير العنوان "جدول الدليل" باستخدام الأمر:
+         \LR{\begin{lstlisting}
+\renewcommand{\indexname}{<name personalty>}
+\end{lstlisting}}
+  إضافةً يجب عليك إنشاء ملف 
+  \ee{"index"}
+  باستخدام سطر الأوامر (في طرفية نظام جهازك أو عن طريق محرر 
+  \LaTeX
+  الخاص بك مثل
+  \ee{\TeX Maker}
+  بالضغط على المفتاح
+  [F12]):
+      \LR{\begin{lstlisting}
+ makeindex %.idx
+\end{lstlisting}}
+ سترى النتيجة في الصفحة الأخيرة.
+  
+  \chapter{التحديثات}
+  
+  
+ 
+  
+ 
+  
+ \paragraph{\ee{18 aug 2013}}
+  \qquad
+  ثمة مشكلة مع إظهار الترميز utf8 
+   وتم إصلاحها.
+ 
+\paragraph{\ee{8 may 2016}}
+  \qquad
+     إنشاء أمر 
+   \ee{\textbackslash breakbox}.
+ 
+\paragraph{\ee{7 sep 2016}}
+  \qquad
+   حُلت ثغرة في تصميم التدريبات والتصحيحات ، وتم إنشاء الأمرين 
+ \\\ee{\textbackslash DefineNewBoxLikeRem,
+ \textbackslash DefineNewBoxLikeDef} 
+ 
+ \backmatter
+  \def\nbcolindex{1}
+\printindex
+  
+  
+  
+ 
+  
+  
+  	 
+ 
+ 
+ \end{document}

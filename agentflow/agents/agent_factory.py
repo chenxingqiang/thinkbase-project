@@ -1,56 +1,38 @@
-"""Agent factory module."""
+"""Agent factory module for creating instruction-based agents."""
 
-from typing import Dict, Any, Optional, List, Union, Type
-from pydantic import BaseModel, Field
+from typing import Dict, Any, Optional, List, Type, Set
+from pydantic import BaseModel
 import uuid
 import logging
 
-from .agent_types import AgentConfig, AgentType, AgentMode
+from .config import AgentType, AgentConfig
 from .agent import Agent
-from .base import Agent
-from .default_agent import DefaultAgent
-from .test_agent import TestAgent
-from ..core.config import AgentConfig
-from ..core.base_types import AgentType, AgentStatus
+from ..core.instructions.base import BaseInstruction as Instruction
 
 logger = logging.getLogger(__name__)
 
-def create_agent(config: Optional[AgentConfig] = None, agent_type: Optional[AgentType] = None) -> 'Agent':
-    """Create an agent instance.
-    
-    Args:
-        config: Agent configuration
-        agent_type: Type of agent to create (overrides config.type if provided)
-        
-    Returns:
-        Agent: Created agent instance
-        
-    Raises:
-        ValueError: If agent type is invalid
-    """
-    # Import here to avoid circular imports
-    from .agent import Agent
-    
-    if config is None:
-        config = AgentConfig()
-    
-    if agent_type is not None:
-        config.type = agent_type
-        
-    return Agent(config)
+class InstructionSet(BaseModel):
+    """Represents a set of instructions for an agent."""
+    pattern_learning: Optional[Instruction] = None
+    agent_learning: Optional[Instruction] = None
+    objective_handling: Optional[Instruction] = None
+    custom_instructions: Set[Instruction] = set()
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class AgentFactory:
-    """Factory class for creating agents."""
+    """Factory class for creating instruction-based agents."""
     
     _instance = None
     _agents: Dict[str, Agent] = {}
-    _agent_types: Dict[str, Type[Agent]] = {}
+    _instruction_sets: Dict[str, InstructionSet] = {}
     
     def __init__(self):
         """Initialize agent factory."""
         self.id = str(uuid.uuid4())
         self.name = "AgentFactory"
-        self.description = "Factory for creating agents"
+        self.description = "Factory for creating instruction-based agents"
         self.metadata: Dict[str, Any] = {}
     
     def __new__(cls):
@@ -58,19 +40,12 @@ class AgentFactory:
             cls._instance = super(AgentFactory, cls).__new__(cls)
         return cls._instance
     
-    @classmethod
-    def register_agent(cls, agent_type: str, agent_class: Type[Agent]) -> None:
-        """Register an agent type.
-        
-        Args:
-            agent_type: Agent type identifier
-            agent_class: Agent class to register
-        """
-        cls._agent_types[agent_type] = agent_class
+    def register_instruction_set(self, agent_type: str, instruction_set: InstructionSet) -> None:
+        """Register an instruction set for an agent type."""
+        self._instruction_sets[agent_type] = instruction_set
     
-    @classmethod
-    def create_agent(cls, config: Union[Dict[str, Any], AgentConfig]) -> Agent:
-        """Create an agent instance.
+    def create_agent(self, config: Dict[str, Any]) -> Agent:
+        """Create an agent with specified instructions.
         
         Args:
             config: Agent configuration
@@ -79,63 +54,44 @@ class AgentFactory:
             Agent: Created agent instance
             
         Raises:
-            ValueError: If agent type is not registered
+            ValueError: If agent type is not supported
         """
-        # Extract agent type from config
-        if isinstance(config, dict):
-            agent_type = config.get("AGENT", {}).get("type")
-            if not agent_type:
-                raise ValueError("Agent type not specified in configuration")
-            
-            agent_mode = config.get("AGENT", {}).get("mode")
-            if isinstance(agent_mode, str):
-                # Convert mode to lowercase to match enum values
-                agent_mode = AgentMode(agent_mode.lower())
-            
-            # Convert config to AgentConfig
-            agent_config = AgentConfig(
-                type=AgentType(agent_type),
-                name=config.get("AGENT", {}).get("name", "Default Agent"),
-                mode=agent_mode or AgentMode.SYNC,
-                version=config.get("AGENT", {}).get("version", "1.0.0"),
-                model=config.get("MODEL", {}),
-                workflow=config.get("WORKFLOW", {}),
-                domain_config=config.get("DOMAIN_CONFIG", {})  # Include domain_config
-            )
-        else:
-            agent_config = config
-            agent_type = config.type.value if isinstance(config.type, AgentType) else config.type
-            
-        if agent_type not in cls._agent_types:
-            logger.warning(f"Agent type {agent_type} not registered, using default agent")
-            agent_class = DefaultAgent
-        else:
-            agent_class = cls._agent_types[agent_type]
-            
-        # Create agent with the converted agent_config
-        agent = agent_class(config=agent_config)
+        # Convert dict to AgentConfig
+        agent_config = AgentConfig(**config)
+        agent_type = agent_config.type
+        
+        # Create base agent
+        agent = Agent(
+            id=str(uuid.uuid4()),
+            name=agent_config.name,
+            type=agent_type,
+            config=agent_config
+        )
+        
+        # Add instructions based on agent type
+        instruction_set = self._instruction_sets.get(agent_type)
+        if instruction_set:
+            if instruction_set.pattern_learning:
+                agent.add_instruction(instruction_set.pattern_learning)
+            if instruction_set.agent_learning:
+                agent.add_instruction(instruction_set.agent_learning)
+            if instruction_set.objective_handling:
+                agent.add_instruction(instruction_set.objective_handling)
+            for instruction in instruction_set.custom_instructions:
+                agent.add_instruction(instruction)
+        
+        # Store agent
+        self._agents[agent.id] = agent
+        
+        logger.info(f"Created agent {agent.id} of type {agent_type}")
         return agent
     
-    @classmethod
-    def get_registered_types(cls) -> Dict[str, Type[Agent]]:
-        """Get registered agent types.
-        
-        Returns:
-            Dict[str, Type[Agent]]: Dictionary of registered agent types
-        """
-        return cls._agent_types.copy()
-    
-    @classmethod
-    def clear_registrations(cls) -> None:
-        """Clear all registered agent types."""
-        cls._agent_types.clear()
-    
     def get_agent(self, agent_id: str) -> Optional[Agent]:
-        """Get an agent."""
+        """Get an agent by ID."""
         return self._agents.get(agent_id)
     
     def list_agents(self) -> List[str]:
-        """List all agents."""
+        """List all agent IDs."""
         return list(self._agents.keys())
     
     def remove_agent(self, agent_id: str) -> None:

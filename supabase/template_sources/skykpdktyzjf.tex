@@ -1,0 +1,171 @@
+%%% ----------------------------------------------------------
+%%% Vorlage Abschlussarbeit (LaTeX)
+%%% 
+%%% 03/2017, Prof. Dr. Stefan Etschberger (HSA)
+%%% ----------------------------------------------------------
+\documentclass[12pt,a4paper,%
+	             twoside,   % Fuer Veröffentlichung
+	             openright,% Kapitel immer auf 
+               titlepage,
+               DIV12,
+               pagesize=dvips,%
+               headinclude,
+               footinclude=false,%
+               cleardoublepage=empty,%
+               parskip=half,      % typographisch
+                                  % besser mit Einzug,
+               %pointednumbers,   % das macht die
+                                  % Komaautomatik 
+                                  % dudenkonform
+               %draft%
+               ]{scrbook}
+
+\usepackage{blindtext}
+
+\usepackage{Stil_Abschlussarbeit}
+
+% Literaturdatenbank
+\bibliography{lib_Abschlussarbeit}
+
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, 
+            linkcolor=blue!60!black,
+            citecolor=blue!80!black]{hyperref}
+
+\graphicspath{{Bilder/}}
+
+% ==================================
+% ---- Baustellen: -----------------
+%\includeonly{Vorwort}
+
+% ---- Fertig: ---------------------
+%\includeonly{01Einleitung}
+%\includeonly{03Anforderungsprofil}
+% ===================================
+\usepackage{caption}
+\DeclareCaptionLabelFormat{something}{#2.#1.}
+\captionsetup[lstlisting]{labelformat=something}
+
+\begin{document}
+
+%\newcommand*{\origlstlistingname}{\lstlistingname}
+%\renewcommand{\lstlistingname}{Listing}
+
+
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+%%% --------------------------------------------------
+%%% Titelseite
+%%% --------------------------------------------------
+\begin{titlepage}
+%\title{
+{
+\large \sffamily
+{\centering\begin{tabular}{c} \toprule
+\LARGE Titel der Bachelorarbeit \\
+\large eventuell mit einem Untertitel \\ \bottomrule
+\end{tabular}\par}
+
+\vspace{8ex}
+\large% 
+
+\noindent Abschlussarbeit\\[5ex]
+zur Erlangung des akademischen Grades eine(s/r) \\
+Bachelors of Engineering in Wirtschaftsingenieurwesen\\[8ex]
+
+vorgelegt von \emph{Vorname Nachname}\\[1ex]
+\small%
+\\
+\emph{Matrikelnummer}\\[1ex]
+\emph{Semesteranschrift}\\
+\emph{PLZ Wohnort}\\[1ex]
+\emph{E-Mail}\\
+\emph{Telefonnummer}\\[3ex] 
+\small Hochschule Augsburg\\[10ex]
+\small Erstgutachter: \emph{Titel Vorname Name}\\
+\small Zweitgutachter: \emph{Titel Vorname Name}\\[8ex]
+\small Abgabetermin: \emph{\today}\\
+\normalsize Datum: \today
+}
+\end{titlepage}
+%}
+%\author{
+%\maketitle
+
+%\include{Vorwort}
+\tableofcontents
+
+
+%%% --------------------------------------------------
+%%% real content
+%%% --------------------------------------------------
+\clearemptydoublepage\cleardoubleemptypage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\part{Konzept\label{Konzept und Umsetzung}}
+\include{01Einleitung}
+
+\part{Anwendung\label{Anwendung}}
+\include{02HauptkapitelA}
+%
+\subsection{Hier kommt ein Stück Code}
+
+\begin{lstlisting}[language=Perl,caption=Beschreibung,frame=shadowbox, rulesepcolor=\color{gray},numbers=left]
+# find longest common prefix of scalar list
+sub longest_common_prefix {
+  my $prefix = shift;
+  for (@_) {
+    chop $prefix while (!/^\Q$prefix\E/);
+  }
+  return $prefix;
+} ## end sub longest_common_prefix
+\end{lstlisting}
+
+\include{02HauptkapitelB}
+
+\part*{Anhang}
+\appendix
+
+\chapter*{Selbständigkeitserklärung}
+
+Hiermit erkläre ich, die vorliegende Arbeit selbständig und ohne fremde Hilfe verfasst zu haben nur unter Zuhilfenahme der angegebenen Literatur und Hilfsmittel.
+
+\listoffigures % Abbildungsverzeichnis
+\listoftables % Tabellenverzeichnis
+
+%%% --------------------------------------------------
+%%% Bibliographie
+%%% --------------------------------------------------
+
+% \addcontentsline{toc}{section}{Literaturverzeichnis}
+%%% --------------------------------------------------
+%%% Bibliographie
+%%% --------------------------------------------------
+%\renewcommand{\bibfont}{\scriptsize}
+\printbibliography[title={Literaturverzeichnis}, heading=bibintoc]
+
+
+%%% --------------------------------------------------
+%%% Index
+%%% --------------------------------------------------
+{\setkomafont{chapter}{\Huge} % temporarily set chapter font
+\printindex
+}
+
+\end{document}
+
+%%% % dummy indices for page breaks in Index
+%%% \index{GleichungrZZZ@{\hspace*{72ex}}|myNewpage}
+%%% %\index{MaximalZZZ@{\hspace*{72ex}}|myNewpage}
+%%% %\index{ZZZ@{\hspace*{72ex}}|myVspace{8cm}}
+%%% \index{EZZZ@{\hspace*{72ex}}|myVspace{-1ex}}
+%%% \index{Faaa@{\hspace*{72ex}}|myVspace{-1.5ex}}
+%%% \index{FZZZ@{\hspace*{72ex}}|myVspace{-1.5ex}}
+%%% \index{Gaaa@{\hspace*{72ex}}|myVspace{-1.5ex}}
+%%% \index{LZZZ@{\hspace*{72ex}}|myVspace{-.3ex}}
+%%% \index{Maaa@{\hspace*{72ex}}|myVspace{-.5ex}}
+
+

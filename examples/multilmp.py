@@ -1,5 +1,5 @@
 from typing import List
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import os
 import openai
 
@@ -12,10 +12,10 @@ if not api_key:
 client = openai.OpenAI(api_key=api_key)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -49,7 +49,7 @@ async def get_completion(prompt: str, system_message: str = "") -> str:
         return "No response generated"
     return content
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def generate_story_ideas(about: str) -> str:
     """Generate a creative story idea."""
     system_message = """You are an expert story ideator. Generate a creative and engaging story idea in a single sentence.
@@ -66,7 +66,7 @@ Respond with ONLY the story idea in a single sentence."""
     
     return await get_completion(prompt, system_message)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def write_a_draft_of_a_story(idea: str) -> str:
     """Write a story draft."""
     system_message = """You are an adept story writer. Write a concise but emotionally resonant story in exactly three paragraphs.
@@ -83,7 +83,7 @@ Write ONLY the story, no additional text."""
     
     return await get_completion(prompt, system_message)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def choose_the_best_draft(drafts: List[str]) -> str:
     """Select the best story draft."""
     system_message = """You are an expert fiction editor with a keen eye for compelling narratives.
@@ -98,7 +98,7 @@ Return ONLY the text of the best draft, no explanation or commentary."""
     
     return await get_completion(prompt, system_message)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def write_a_really_good_story(about: str) -> str:
     """Write a complete story in Hemingway's style."""
     print("\nGenerating story ideas...")

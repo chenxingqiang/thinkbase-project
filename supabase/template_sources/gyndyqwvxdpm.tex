@@ -1,0 +1,170 @@
+\documentclass[12pt,          % font size: 11pt or 12pt
+               phd,           % degree:    ms or phd
+               onehalfspacing % spacing: onehalfspacing or doublespacing
+               ]{ncsuthesis}
+
+%%----------------------------------------------------------------------------%%
+%%------------------------------ Import Packages -----------------------------%%
+%%----------------------------------------------------------------------------%%
+
+\usepackage{booktabs}  % professionally typeset tables
+\usepackage{amsmath}
+\usepackage{textcomp}  % better copyright sign, among other things
+\usepackage{xcolor}
+\usepackage{lipsum}    % filler text
+\usepackage{longtable}
+%\usepackage{subfig}    % composite figures
+\usepackage{natbib}    % ability to use citet,citep
+%\usepackage{fancyhdr}  % creates headers
+%\pagestyle{fancy}
+
+
+%Citations should be of the form ``author year''  not ``author, year''
+\bibpunct{(}{)}{;}{a}{}{,} % changes apalike bst into AMS format
+ 
+%%----------------------------------------------------------------------------%%
+%%---------------------------- Formatting Options ----------------------------%%
+%%----------------------------------------------------------------------------%%
+%%
+
+%% -------------------------------------------------------------------------- %%
+%% Disposition format -- any titles, headings, section titles
+%%  These formatting commands affect all headings, titles, headings,
+%%  so sizing commands should not be used here.
+%%  Formatting options to consider are
+%%     +  \sffamily - sans serif fonts.  Dispositions are often typeset in
+%%                    sans serif, so this is a good option. 
+%%     +  \rmfamily - serif fonts
+%%     +  \bfseries - bold face
+%\dispositionformat{\sffamily\bfseries}   % bold and sans serif
+\dispositionformat{\bfseries}            % bold and serif
+
+%% -------------------------------------------------------------------------- %%
+%% Formatting for centered headings - Abstract, Dedication, etc. headings
+%%  This is where one might put a sizing command.
+%%  \MakeUppercase can be used to typeset all headings in uppercase.
+\headingformat{\large\MakeUppercase}   % All letters uppercase
+%\headingformat{\large}                % Not all uppercase
+%\headingformat{\Large\scshape}        % Small Caps, used with serif fonts.
+
+%% Typographers recommend using a normal inter-word space after
+%% sentences. TeX's default is to add an wider space, but \frenchspacing
+%% gives a normal spacing. Comment out the following line if you prefer wider spaces between sentences.
+\frenchspacing
+
+%% -------------------------------------------------------------------------- %%
+%%  Optional packages
+%%    A number of compatible packages to improve the look and feel of
+%%    your document are available in the file optional.tex 
+%%    (For example, hyperlinks, fancy chapter headings, and fonts)
+%% To use these options, uncomment the next line and see optional.tex
+\include{optional}
+%solve bug from fancyhdr in optional
+%http://nw360.blogspot.com/2006/11/latex-headheight-is-too-small.html
+\setlength{\headheight}{26.94345pt} % corrected error in Overleaf
+\fancyhead[L]{\vspace{1mm}} % only puts chapter title in headers
+
+%%----------------------------------------------------------------------------%%
+%%---------------------------- Content Options -------------------------------%%
+%%----------------------------------------------------------------------------%%
+%% Size of committee: 3, 4, 5, or 6 -- this number includes the chair
+\committeesize{5}
+
+%% Members of committee
+%%  Each of the following member commands takes an optional argument
+%%   to specify their role on the committee.
+%%  For co-chairs, use the commands:
+%%      \cochairI{Doug Dodd}
+%%      \cochairII{Chris Cox}
+%%
+\chair{Chair first and last name}
+\memberI{Member 1 name}
+\memberII{Member 2 name}
+\memberIII{Member 3 name}   % unnecessary if committeesize=3
+\memberIV{Member 4 name}    % unnecessary if committeesize=3, 4
+
+%% Student writing thesis, \student{First Middle}{Last}
+\student{First name and Middle names}{Last Name} % a full middle name
+
+%% Degree program e.g. Marine, Earth, and Atmospheric Science
+\program{program name}
+
+%%!!!!!! To Change Year !!!!!!%%
+% If year of graduation is not same as current year (common for December graduates
+% thanks to the Grad Schools odd graduation rules) go into ncsuthesis.cls and change 
+% \the\year in the line:
+% \newcommand{\ncsu@year}{\the\year}
+% to the year of graduation. E.g.:
+% \newcommand{\ncsu@year}{2020}
+
+%% Thesis Title
+%%  Keep in mind, according to ETD guidelines:
+%%    +  Capitalize first letter of important words.
+%%    +  Use inverted pyramid shape if title spans more than one line.
+%%
+%%  Note: To break the title onto multiple lines, use \break instead of \\.
+%\thesistitle{A North Carolina State University Sample \LaTeX{} Thesis \break 
+%with a Title So Long it Needs a Line Break}
+\thesistitle{Dissertation title}
+
+%% Degree year. Necessary if your degree year doesn't equal the current year.
+%\degreeyear{1995}
+
+%% While your here make sure to change the PDF characteristics in optional.tex!!!
+
+%%----------------------------------------------------------------------------%%
+%%---------------------------- Personal Macros -------------------------------%%
+%%----------------------------------------------------------------------------%%
+
+%% A central location to add your favorite macros.
+
+%% A few examples to get you started.
+\newcommand{\uv}[1]{\ensuremath{\mathbf{\hat{#1}}}}
+\newcommand{\bo}{\ensuremath{\mathbf{\Omega}}}
+\newcommand{\eref}[1]{Eq.~\ref{#1}}
+\newcommand{\fref}[1]{Fig.~\ref{#1}}
+\newcommand{\tref}[1]{Table~\ref{#1}}
+
+%%---------------------------------------------------------------------------%%
+\begin{document}
+%%---------------------------------------------------------------------------%%
+\frontmatter
+
+\include{front}
+
+%%---------------------------------------------------------------------------%%
+\mainmatter
+
+% Chapters can remove or add
+\include{Chapter-1/Chapter-1}
+\include{Chapter-2/Chapter-2}
+\include{Chapter-3/Chapter-3}
+\include{Chapter-4/Chapter-4}
+\include{Chapter-5/Chapter-5}
+\include{Chapter-6/Chapter-6}
+
+%%---------------------------------------------------------------------------%%
+%%  Bibliography 
+%% or use BibTeX
+\bibliography{StudentName-thesis}
+\bibliographystyle{apalike}
+
+%%---------------------------------------------------------------------------%%
+% Appendices
+%\ensureoddstart
+\restoregeometry
+\appendix
+%\newgeometry{margin=1in,lmargin=1.25in,footskip=\chapterfootskip, includehead, includefoot}
+
+% Can remove or add
+\include{Appendix-A/Appendix-A}
+\include{Appendix-B/Appendix-B}
+
+\restoregeometry
+
+%%---------------------------------------------------------------------------%%
+
+%%---------------------------------------------------------------------------%%
+\backmatter
+
+\end{document}

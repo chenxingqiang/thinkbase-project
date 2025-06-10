@@ -1,0 +1,124 @@
+%-----------------------------------------------------------------------
+% Polytechnic University of Bari
+% Year's Work Report or Graduation Thesis Model in LaTEX
+% Prof. Eng. Francesco Adamo, PhD
+% October 2021
+%
+% Based on the work of Loïc Barrault, Le Mans Universitè - September 2021
+% and on the work of Prof. Roger K. Moore, University of Sheffield - July 2018
+%------------------------------------------------------------------------
+
+\documentclass[12pt,twoside,italian]{book} % se necessario cambiare il vocabolario qui
+\usepackage[bindingoffset=1cm, margin=2cm]{geometry} % offset di 1 cm necessario per garantire una corretta rilegatura del volume
+\usepackage[toc,page]{appendix}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage[hidelinks]{hyperref} % opzione hidelinks per sopprimere i box rossi intorno ai link ipertestuali negli indici
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel} % se necessario cambiare il vocabolario qui 
+\usepackage{caption}
+\usepackage{nextpage} % aggiunge il comando \cleartooddpage[1]
+\usepackage{pdfpages}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{gensymb}
+\usepackage{textcomp} 
+\usepackage[normalem]{ulem}
+\usepackage{titlesec}
+\usepackage[numbers]{natbib} % per ottenere la bibliografia e i collegamenti con stile numerato
+\usepackage{listings}
+\usepackage{float}
+
+% Definisce lo stile di numerazione per i titoli dei paragrafi di quarto livello
+\titleclass{\subsubsubsection}{straight}[\subsection]
+
+\newcounter{subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection.\arabic{subsubsubsection}}
+
+\titleformat{\subsubsubsection}
+  {\normalfont\normalsize\bfseries}{\thesubsubsubsection}{1em}{}
+\titlespacing*{\subsubsubsection}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+\makeatletter
+\def\toclevel@subsubsubsection{4}
+\def\l@subsubsubsection{\@dottedtocline{4}{7em}{4em}}
+\makeatother
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+% Modifica titoli predefiniti per le appendici
+\renewcommand{\appendixtocname}{Appendici}%
+\renewcommand{\appendixpagename}{Appendici}%
+
+\begin{document}
+
+\captionsetup[figure]{margin=1.5cm,font=small,labelfont={bf},name={Figura},labelsep=colon,textfont={it}}
+\captionsetup[table]{margin=1.5cm,font=small,labelfont={bf},name={Tabella},labelsep=colon,textfont={it}}
+\SetLipsumDefault{1}
+
+% -------------------------------------------------------------------
+% Frontespizio
+% -------------------------------------------------------------------
+\addcontentsline{toc}{chapter}{frontespizio}
+\input{sections/frontespizio.tex}
+
+% -------------------------------------------------------------------
+% Modulo della liberatoria alla consultazione della tesi
+% -------------------------------------------------------------------
+\cleartooddpage
+\includepdf[pages=1,pagecommand={\phantomsection\addcontentsline{toc}{chapter}{liberatoria}}]{sections/modulo_liberatoria.pdf} % eventualmente sostituire il file con la scansione del modulo compilato
+
+% -------------------------------------------------------------------
+% Dedica
+% -------------------------------------------------------------------
+\input{sections/dedica.tex}
+
+% -------------------------------------------------------------------
+% Ringraziamenti
+% -------------------------------------------------------------------
+\input{sections/ringraziamenti.tex}
+
+
+% Ridefinisce i nomi delle sezioni dell'indice delle figure e dell'indice delle tabelle
+\renewcommand{\listfigurename}{Indice delle figure}
+\renewcommand{\listtablename}{Indice delle tabelle}
+
+% -------------------------------------------------------------------
+% Sommario, indice delle figure e indice delle tabelle
+% -------------------------------------------------------------------
+\tableofcontents
+\addcontentsline{toc}{chapter}{Indice}
+
+\listoffigures
+\addcontentsline{toc}{chapter}{Indice delle figure}
+
+\listoftables
+\addcontentsline{toc}{chapter}{Indice delle tabelle}
+
+
+% -------------------------------------------------------------------
+% Introduzione generale (o abstract)
+% -------------------------------------------------------------------
+\input{sections/introduzione.tex}
+
+% -------------------------------------------------------------------
+% Contenuto principale
+% -------------------------------------------------------------------
+\mainmatter
+\input{sections/capitolo_1/capitolo_1.tex}
+\input{sections/capitolo_2/capitolo_2.tex}
+\input{sections/conclusioni.tex}
+\input{sections/bibliografia.tex}
+
+% -------------------------------------------------------------------
+% Appendici
+% -------------------------------------------------------------------
+
+\begin{appendices}
+\input{sections/appendice_A/appendice_A.tex}
+\end{appendices}
+
+\end{document}

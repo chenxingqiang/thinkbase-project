@@ -1,0 +1,41 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{ebgaramond}
+\usepackage[T1]{fontenc}
+
+\usepackage[active,tightpage]{preview}
+
+\PassOptionsToPackage{dvipsnames,svgnames}{xcolor}
+\usepackage[object=vectorian]{pgfornament}
+\usetikzlibrary{shapes.geometric,calc}
+\definecolor{fondpaille}{cmyk}{0,0,0.1,0}
+
+\title{Beautiful ornaments with pgfornament}
+
+\begin{document}
+\pagecolor{fondpaille}
+\color{Maroon} 
+
+\setlength{\PreviewBorder}{1em}
+
+\begin{preview}
+\input{ornament-poem}
+\end{preview}
+
+\begin{preview}
+\input{ornament-logo}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}
+\node[regular polygon, regular polygon sides=5, 
+      minimum size=8cm,inner sep=0pt](h)  {}; 
+\foreach \i [count=\next from 2] in {1,...,5}
+  {% 
+   \draw (h.corner \i) to [ornament=84] (h.corner \next);
+   \pgfmathtruncatemacro{\next}{mod(\next,5)} }
+\end{tikzpicture} 
+\end{preview}
+
+\end{document}

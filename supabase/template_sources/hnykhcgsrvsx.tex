@@ -1,0 +1,306 @@
+%!TEX TS-program = pdflatexmk
+%the line above is only for offline compilation (assuming your system is set up for it)
+%this will be based on the amsart class, which probably causes more pain than necessary
+%but gets a lot of the formatting the way I like it
+%look for !!!EDIT comments
+\documentclass[oneside,12pt]{amsart}
+
+%format
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,footskip = 0.333in]{geometry} %add showframe option to show true border
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%math
+\usepackage{nicefrac} %provides nicefrac env
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+
+%utility
+\usepackage{longtable} %provides longtable env
+\usepackage[hyphens]{url} %include urls but allow breaks at hyphens (for footnotes)
+\usepackage{tabularx} %provides tabularx env
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}} %define left justified column type
+
+%figures
+\usepackage{graphicx}
+\usepackage[margin=0.1cm,textfont=it]{caption}
+\usepackage{subcaption}
+\captionsetup[subfigure]{labelfont=rm}
+\usepackage{wrapfig}
+
+%create \nopar command to force a paragraph break without extra spacing
+%useful when trying to get wrapfigure to behave
+\newcommand{\nopar}{{\parfillskip=0pt \parskip=0pt \par}}
+%useful command to issue inside math env to play nice with wrapfig:
+%\displaywidth=\parshapelength\numexpr\prevgraf+2\relax
+
+%include pdfs
+% \usepackage{pdflscape} %only needed if doing a landscape PDF
+% \usepackage{rotating}
+\usepackage{pdfpages}
+
+%%for Draft watermark (editing phase only)
+%\usepackage{draftwatermark}
+%\SetWatermarkText{DRAFT}
+%\SetWatermarkScale{5}
+
+%set up header (this has to come before the section patching)
+\usepackage{fancyhdr}
+\setlength{\headheight}{0.2in}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small \sc Program} %!!!EDIT
+\chead{\small \sc \rightmark}
+\rhead{\footnotesize \thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% need to redefine section to allow rightmark to work with amsart
+\let\origsection\section
+\renewcommand{\section}[1]{\sectionmark{#1}\origsection{#1}}
+% redefine sectionmark
+\renewcommand\sectionmark[1]{\markboth{#1}{#1}}
+
+%fix toc
+\setcounter{tocdepth}{4}% to get subsubsections in toc use 3, 4 to include paragraphs too
+\makeatletter
+\renewcommand{\@pnumwidth}{2em}% default is 1.55em -accommodates wider page numbers
+\def\@tocline#1#2#3#4#5#6#7{\relax
+  \ifnum #1>\c@tocdepth % then omit
+  \else
+    \par \addpenalty\@secpenalty\addvspace{#2}%
+    \begingroup \hyphenpenalty\@M
+    \@ifempty{#4}{%
+      \@tempdima\csname r@tocindent\number#1\endcsname\relax
+    }{%
+      \@tempdima#4\relax
+    }%
+    \parindent\z@ \leftskip#3\relax \advance\leftskip\@tempdima\relax
+    \rightskip\@pnumwidth plus4em \parfillskip-\@pnumwidth
+    #5\leavevmode\hskip-\@tempdima
+      \ifcase #1
+       \or\or \hskip 1em \or \hskip 2em \else \hskip 3em \fi%
+      #6\nobreak\relax
+    \dotfill\hbox to\@pnumwidth{\@tocpagenum{#7}}\par
+    \nobreak
+    \endgroup
+  \fi}
+\makeatother
+
+%redefine paragraph to subsubsubsection level
+\makeatletter
+\expandafter\newcommand\csname r@tocindent4\endcsname{4in} %need tocline for paragraph is it's going to be included in toc
+\def\paragraph{\@startsection{paragraph}{4}%redefine paragraph heading to be bolded
+  \z@\z@{-\fontdimen2\font}%
+  {\normalfont\bfseries}}
+  \def\l@paragraph{\@tocline{4}{0pt}{1pc}{9pc}{}} %redefine paragraph to be below subsubsection 
+\makeatother
+
+%section numbering (down to paragraph level)
+\setcounter{secnumdepth}{4}
+\renewcommand{\thesubsection}{\alph{subsection}}
+\renewcommand{\thesubsubsection}{\roman{subsubsection}}
+\renewcommand{\theparagraph}{\arabic{paragraph}}
+\makeatletter
+\renewcommand{\p@subsection}{\thesection.}
+\renewcommand{\p@subsubsection}{\thesection.\thesubsection.}
+\renewcommand{\p@paragraph}{\thesection.\thesubsection.\thesubsubsection.}
+\makeatother
+
+%create invisible section and subsection (for including pdf subdocs)
+\newcommand\invisiblesection[1]{%
+  \refstepcounter{section}%
+  \refstepcounter{page}  %%only if numbering pages within sections
+  \addcontentsline{toc}{section}{\protect\numberline{\thesection.}#1}%
+  \sectionmark{#1}}
+
+\newcommand\invisiblesubsection[1]{%
+  \refstepcounter{subsection}%
+  \addcontentsline{toc}{subsection}{\thesubsection.{\hskip 1em}#1}%
+  %\sectionmark{#1}}
+ }
+ 
+%page numbering by section
+\numberwithin{page}{section}
+\renewcommand{\thepage}{\thesection-\arabic{page}}
+
+%% Make sure that page starts from 1 with every \section
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@sect}% <cmd>
+  {\protected@edef}% <search>
+  {\def\arg{#1}\def\arg@{section}%
+   \ifx\arg\arg@\stepcounter{page}\fi%
+   \protected@edef}% <replace>
+  {}{}% <success><failure>
+\makeatother
+
+%hyperref load has to come after section  patching
+\usepackage[breaklinks=true,colorlinks=true,citecolor=red]{hyperref}
+\newcommand{\nlhref}[1]{\href{#1}{\nolinkurl{#1}}} %automatically create exact url with href
+
+%create boolean for toggling inclusion of backmatter
+\providetoggle{backmatter}
+\settoggle{backmatter}{true} %set to true to toggle on/false off
+
+%bibliography handling - has to be numeric for anonymized proposals!
+\usepackage[citestyle=numeric-comp,bibstyle=numeric, sorting=none, natbib=true, backend=bibtex,hyperref=true,maxbibnames=99,maxcitenames=2]{biblatex}
+\addbibresource{refs.bib, Main.bib, local.bib}
+
+
+% private defs
+\def\mf{\mathbf}
+\def\mb{\mathbb}
+\def\mc{\mathcal}
+\newcommand{\mfbar}[1]{\mf{\bar{#1}}}
+\newcommand{\mfhat}[1]{\mf{\hat{#1}}}
+\newcommand{\refeq}[1]{Equation  (\ref{#1})} 
+\newcommand{\refsec}[1]{\S\ref{#1}} 
+\newcommand{\reftable}[1]{Table \ref{#1}} 
+\newcommand{\refch}[1]{Chapter  \ref{#1}} 
+\newcommand{\reffig}[1]{Figure \ref{#1}}
+\newcommand{\intd}[1]{\ensuremath{\,\mathrm{d}#1}}
+\newcommand{\leftexp}[2]{{\vphantom{#2}}^{#1}\!{#2}}
+\newcommand{\leftsub}[2]{{\vphantom{#2}}_{#1}\!{#2}}
+\newcommand{\fddt}[1]{\ensuremath{\leftexp{\mathcal{#1}}{\frac{\mathrm{d}}{\mathrm{d}t}}}}
+\newcommand{\fdddt}[1]{\ensuremath{\leftexp{\mathcal{#1}}{\frac{\mathrm{d}^2}{\mathrm{d}t^2}}}}
+
+%normal spacing
+\renewcommand{\baselinestretch}{1}\normalsize
+
+\begin{document}
+
+\section{Proposal Summary}
+
+\clearpage
+
+%!!!EDIT
+\begin{center}
+\textsc{\textbf{Title}\\
+\bigskip
+Solicitation \#/Name}
+\end{center}
+
+\section{Table of Contents}
+\renewcommand\contentsname{}
+\tableofcontents
+
+\clearpage
+
+
+\section{Scientific/Technical/Management}
+
+\subsection{Objectives and Expected Significance}\label{sec:obj}
+
+\subsection{Perceived Impact}\label{sec:impact}
+
+\subsection{Relevance of Proposed Work}\label{sec:relevance}
+
+\subsection{Technical Approach and Methodology} \label{sec:tech}
+
+\subsubsection{Background}\label{sec:back}  
+
+\paragraph{Deeper Background}
+
+\subsection{Potential Risks and Mitigation Strategies}\label{sec:risks}
+
+
+\subsection{Plan of Work and Management Structure}\label{sec:plan}
+
+%milestones table (optional)
+ {
+\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{|m{0.03\textwidth}|m{0.65\textwidth}|m{0.25\textwidth}|}
+\caption{Major project milestones.\label{tbl:milestones}}\\
+\hline
+ & \textbf{Milestone} & \textbf{Expected} \\
+\hline
+\endfirsthead
+\multicolumn{3}{c}%
+{\tablename\ \thetable\ -- \textit{Continued from previous page}} \\
+\hline
+ & \textbf{Milestone} & \textbf{Expected} \\
+\hline
+\endhead
+\hline \multicolumn{3}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+1 & Win Award & 2020\\
+\hline
+2 & Get Money & 2025\\
+\hline
+3& Complete Work &  2028\\
+\hline
+\end{longtable}
+}
+
+%NB: some ROSES elements want this here, some want a separate DMP
+\subsection{Data Management Plan}\label{sec:dmp}
+\subsubsection{Data Types, Volume, and Formats}
+
+\subsubsection{Data Archiving}
+
+\subsubsection{Mechanisms for Long-term Preservation and Public Access}
+
+\subsubsection{Schedule for Data Archiving and Sharing}  
+
+
+\clearpage
+\section{References}
+\printbibliography[heading=none]
+
+%%most of the backmatter will be moved to unredacted separate doc
+\iftoggle{backmatter}{
+
+\clearpage
+\section{Personnel and Work Effort Table} %fully anonymized
+\renewcommand*{\arraystretch}{1.5}
+\noindent\begin{tabular}{| L{1.35in} | L{1.65in} | L{1.5in} | L{1.2in} |}
+\hline
+\textbf{Person or Role} &
+\textbf{Time Charged to this Proposal} & 
+\textbf{Time not charged to this proposal} & 
+\textbf{Total time per person/year} \\
+\hline
+PI (Institution 1) & 0.5 academic months/year & N/A & 0.5 months/year \\
+\hline
+GRA 1 (Institution 1) & 12 months/year & N/A & 12 months/year\\
+\hline
+Co-I 1 (Institution 2) & 1 month/year & N/A & 1 month/year\\
+\hline
+GRA 2 (Institution 2) & 12 months/year & N/A & 12 months/year\\
+\hline
+Co-I 2   (Institution 3) & 1 months/year & N/A & 1 months/year  \\
+\hline
+GRA 3 (Institution 3) & 3 months/year & N/A & 3 months/year\\
+\hline
+Collaborator 1 &  N/A  & de minimis & de minimis \\
+\hline
+\end{tabular}
+
+\clearpage
+%remember - these must all be anonymous AND redacted for salary/fringe
+\invisiblesection{Budget Narrative}
+\invisiblesubsection{Institution 1 (lead)}
+%\includepdf[pages=-,pagecommand={}]{inst1_budget_justification_redacted}
+\invisiblesubsection{Institution 2}
+%\includepdf[pages=-,pagecommand={}]{inst2_budget_justification_redacted}
+\invisiblesubsection{Institution 3}
+%\includepdf[pages=-,pagecommand={}]{inst3_budget_justification_redacted}
+
+\clearpage
+\invisiblesection{Detailed Budget}
+\invisiblesubsection{Institution 1 (lead)}
+%\includepdf[pages=-,pagecommand={}]{inst1_detailed_budget_redacted}
+\invisiblesubsection{Institution 2}
+%\includepdf[pages=-,pagecommand={}]{inst2_detailed_budget_redacted}
+\invisiblesubsection{Institution 3}
+%\includepdf[pages=-,pagecommand={}]{inst3_detailed_budget_redacted}
+}
+
+
+%Separate PDF documents from proposal document
+%"Total" Budget Document (separate PDF file attached as document type "Total Budget")
+%"Non-anoynmized expertise and resources doc
+
+
+\end{document}

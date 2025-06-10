@@ -1,0 +1,178 @@
+% ---------------------------------------------------------------------
+% --- Arquivo principal e os demais serao os dos capitulos.
+% --- EXPRESSÔES ENTRE <> DEVERÂO SER COMPLETADAS COM A INFORMAÇÂO ESPECÌFICA DO TRABALHO 
+% ---------------------------------------------------------------------
+
+% Atualizado para atender as normas ABNT por Mônica da Silva (04/11/2021)
+
+%configuração da entrada 
+    % 12pt, 	% tamanho da fonte
+    %openright, % capítulos começam em pág ímpar (insere página vazia caso preciso)
+    % oneside, %% IMPRESSÃO dos elementos textuais e pós-textuais: oneside (apenas no anverso) ou twoside (anverso e verso, se mais de 100 p.) (insere páginas em branco).
+    % a4paper, % tamanho do papel. 
+    % english, % idioma adicional para hifenização
+   	%english,			% idioma adicional para hifenização
+	%french,				% idioma adicional para hifenização
+	%spanish,			% idioma adicional para hifenização
+	%brazil,				% o último idioma é o principal do documento
+
+\documentclass[ruledheader, 12pt, openright, a4paper, oneside, english, brazil]{PPGC_UFF}
+%---pacotes para hiphenizacao e acentuacao em portugues
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}	
+%\usepackage[latin1]{inputenc}
+
+
+
+%--- pacote para figuras
+\usepackage{epsf, subfigure}
+\usepackage[dvips]{epsfig,graphicx}
+\usepackage{chngcntr} %configuração dos padrões numéricos das Figuras e Tabelas
+\counterwithout{figure}{chapter} %formata figura para padrão: Figura 1.
+\counterwithout{table}{chapter} %formata tabela para padrão: Tabela 1.
+
+
+%--- pacote de simbolos
+\usepackage{pifont,textcomp,latexsym}
+
+%--- simbolos matematicos
+\usepackage{amssymb,amstext,amsthm,icomma,amsmath}
+
+%--- pacote para gerar pseudo-codigo
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\floatname{algorithm}{Algoritmo}
+
+%--- outros pacotes
+\usepackage{url}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{quoting}
+
+%Tabela Colorida
+\usepackage{bigdelim,booktabs, colortbl, longtable, multirow, multicol,rotating }
+
+
+
+%%===============================================================================
+%% INICIO do Pacotes - Lista de abreviaturas, siglas e acrônimos
+%%===============================================================================
+		
+% Modo "file": utiliza os termos definidos no arquivo acronimos.tex
+%  1) Inserção tabular da listas
+%  2) Controle da ordem de apresentação das listas
+%  3) Não é preciso referenciar no texto
+% nonumberlist, %do not show page numbers
+% acronym,      %generate acronym listing   -> Not used in this example (see line with)
+% toc,          % Inclui a abreviatura no sumário e conta pagina
+% section]      %use section level for toc entries
+\usepackage[acronym,nopostdot,shortcuts, nonumberlist]{glossaries}
+
+
+\makeglossaries
+\input{pre-textuais/acronimos}
+
+%%===============================================================================
+%% FIM do Pacotes Lista de abreviaturas, siglas e acrônimos
+%%===============================================================================
+
+%%===============================================================================
+%% Configuração das citações e personalização 
+%%===============================================================================
+
+% Os pacotes abaixo só podem ser usados juntamente com o pacote ABNT abaixo e na ordem atual. 
+% Esse conjunto de pacotes permite que as citações fiquem na cor azul e sejam usadas como link para as referencias. 
+\usepackage[bookmarksopen=true,
+            linktoc=page, 
+            colorlinks=true,  %ativa a cor do link na referencia
+            linkcolor=blue, %muda a cor do link na referencia \ref{} números de tabelas, figuras, seções, sumário etc. 
+            citecolor=blue, % muda a cor das citações \cite \textcite
+            filecolor=magenta, 
+            urlcolor=blue, %muda a cor da url \url no texto e ref. bibliográfica
+            ]{hyperref}
+
+
+\usepackage[ %mais informações de personalização das referencias olhar nos arquivos PDF na pasta MANUAIS OU https://www.overleaf.com/learn/latex/Biblatex_bibliography_styles
+    style = abnt, % Sistema alfabético
+    %style = abnt-numeric, % Sistema numérico
+    %style = abnt-ibid, % Notas de referência
+    language=brazil,
+    backend=biber,
+]{biblatex}
+
+\addbibresource{bibliografia.bib} % A biblioteca para ser utilizada na dissertação/tese.
+
+%%===============================================================================
+%% FIM da configuração das citações e personalização 
+%%===============================================================================
+
+\hyphenation{
+a-de-qua-da-men-te 
+di-men-sio-na-men-to 
+}
+
+%---------usando tipo de fonte padrão  
+% mathptmx (títulos sem negrito) ou ptm (títulos negrito)  - Times - Padrão 
+% ugq (títulos negrito) - Arial 
+%% --  Padrão do template é: ptm  -- %%
+\renewcommand{\ABNTchapterfont}{\bfseries\fontfamily{ptm}\fontseries{b}\selectfont} 
+\renewcommand{\ABNTsectionfont}{\bfseries\fontfamily{ptm}}
+
+
+% --- -----------------------------------------------------------------
+% --- Documento Principal.
+% --- -----------------------------------------------------------------
+
+\begin{document}
+
+
+% --- -----------------------------------------------------------------
+% --- Titulo, abstract, dedicatórias e agradecimentos.
+% --- Índice geral, lista de figuras e tabelas.
+% --- -----------------------------------------------------------------
+\include{pre-textuais/cap0} %na pasta capítulos
+
+% --- -----------------------------------------------------------------
+% --- Inserção dos capítulos.
+% --- todos os arquivos estão na pasta capítulos
+% --- -----------------------------------------------------------------
+
+\setcounter{page}{1} %parâmetros da contagem de paginas.
+\pagenumbering{arabic} %padrão de números de paginas em arábico (1,2,3) 
+\setcounter{page}{12} %inicia a contagem das paginas 12 - folha de rosto e considera a pagina da 
+
+\pagestyle{ruledheader}
+\include{capitulos/cap1}
+
+%\pagestyle{ruledheader}
+%\include{capitulos/cap2}  %inclui novo capítulo
+
+%\pagestyle{ruledheader} %inclui novo capítulo
+%\include{capitulos/cap2}
+
+
+% --- -----------------------------------------------------------------
+% --- Referencias Bibliograficas. (Obrigatorio)
+% --- -----------------------------------------------------------------
+\cleardoublepage
+
+ %para personalização da bibliografia olhar os PDFs na pasta "MANUAIS"
+\printbibliography[
+   % heading=bibintoc,
+    title={REFERÊNCIAS} %TITULO DA SEÇÃO
+] 
+
+% --- -----------------------------------------------------------------
+% --- Apendice.(Opcional)
+% --- -----------------------------------------------------------------
+\cleardoublepage
+\appendix
+%para melhor organização deixar os Anexos e Apêndices na pasta anexos.
+\include{pos-textuais/appendixA}
+
+
+\include{pos-textuais/anexoA}
+
+\end{document}
+

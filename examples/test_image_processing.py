@@ -37,7 +37,7 @@ async def main():
         
         # Create image processing instruction with mock models for testing
         try:
-            image_processor = ImageProcessingInstruction.remote(use_mock=True)
+            image_processor = ImageProcessingInstruction.remote()
             logger.info("Created image processing instruction")
         except Exception as e:
             logger.error(f"Failed to create image processor: {e}")

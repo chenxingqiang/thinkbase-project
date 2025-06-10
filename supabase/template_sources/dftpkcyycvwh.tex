@@ -1,0 +1,125 @@
+\documentclass[12pt,a4paper,twoside]{unex}
+
+% comentar caso seja uma disseração de mestrado
+
+\usepackage[spanish]{babel}
+\graphicspath{{./images/}}
+\usepackage{listings} % incluir listagens
+\usepackage{url} % typeset URL's
+\usepackage[colorlinks=true,
+                    urlcolor=black, %blue
+                    linkcolor=black,
+                    citecolor=black, %cor das citações
+                    bookmarks=true,
+                    pdfstartview=FitH]{hyperref}
+
+% Pode ser usado biblatex
+\usepackage[style=apa,backend=biber]{biblatex}
+\DeclareLanguageMapping{spanish}{spanish-apa}
+\addbibresource{lib/refs.bib}
+
+\usepackage{lipsum}
+
+\usepackage{tabulary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{My Título}
+
+\author{Este soy yo}
+%\authnum{1}
+%\secondauthor{Nome do Aluno - Número Mecanográfico}
+%\secauthnum{2}
+
+\supervisor{My profesor}
+%\cosupervisor{Prof. Nome do Co-Orientador}
+
+\area{Turismo}
+
+% Para definir o ano letivo
+\courseyear{2017-2018}
+
+% Para nao mostrar a lista de tabelas
+%\tablespagefalse
+
+%\makeglossary
+\makenoidxglossaries
+\loadglsentries{acronym}
+
+
+%http://tex.stackexchange.com/questions/59572/custom-page-numbering-for-appendix
+\usepackage{etoolbox}
+
+
+\begin{document}
+	
+% Coloca a capa, primeira pagina e outros
+
+\beforepreface
+
+%\cleardoublepage
+
+\prefacesection*{Dedicación}
+\input{chapters/dedicacion}
+
+%\cleardoublepage
+
+\prefacesection*{Agradecimientos}
+\input{chapters/agradecimientos}
+
+%\cleardoublepage
+
+\prefacesection*{Resumen}
+\input{chapters/resumen}
+
+%\cleardoublepage
+
+\prefacesection*{Abstract}
+\input{chapters/abstract}
+
+% Coloca indices
+\afterpreface
+%\cleardoublepage
+%\printglossary[type=\acronymtype,title={Acrónimos}]
+%\printglossary[type=\acronymtype,title={Siglas}]
+\printnoidxglossary[type=\acronymtype,title={Siglas}]
+
+\bodystart
+
+
+% Capitulos do documento
+\cleardoublepage
+\input{chapters/cap01}
+\cleardoublepage
+\input{chapters/cap02}
+\cleardoublepage
+\input{chapters/cap03}
+\cleardoublepage
+\input{chapters/cap04}
+\cleardoublepage
+\input{chapters/cap05}
+
+%% estilo de referências. outros valores posíveis são 'plain' e 'abbrv' apalike
+%\bibliographystyle{plain}
+%% listagem de referências
+%\bibliography{lib/refs}
+
+%  Caso seja usado biblatex
+\printbibliography
+
+
+% Apêndices
+\appendix
+
+%http://tex.stackexchange.com/questions/59572/custom-page-numbering-for-appendix
+\pretocmd{\chapter}{%
+	\clearpage
+	\pagenumbering{arabic}%
+	\renewcommand*{\thepage}{\thechapter\arabic{page}}%
+}{}{}
+
+%\input{chapters/apendice01}
+\input{chapters/apendice01}
+
+
+\end{document}

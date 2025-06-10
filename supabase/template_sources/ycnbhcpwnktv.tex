@@ -1,0 +1,128 @@
+\documentclass[tikz,border=10pt]{standalone}
+
+% It's based on http://www.texample.net/tikz/examples/hierarchical-diagram/
+% Relevant link http://tex.stackexchange.com/questions/226461/how-to-draw-hierarchical-graph-like-this-one
+%the output of this graph is used in Figure 1 of the paper: Wangyan Li, Zidong Wang, Guoliang Wei, Lifeng Ma, Jun Hu, and Derui Ding, “A Survey on Multisensor Fusion and Consensus Filtering for Sensor Networks,” Discrete Dynamics in Nature and Society, vol. 2015, Article ID 683701, 12 pages, 2015. doi:10.1155/2015/683701. https://www.hindawi.com/journals/ddns/2015/683701/cta/
+
+\usepackage{hyperref}%for \hypersetup
+\hypersetup
+{
+    pdfauthor={Wangyan Li liwangyan618907@gmail.com},
+    pdfsubject={tikz, structure},
+    pdftitle={The architecture of the consensus filtering algorithm},
+    pdfkeywords={tikz, structure}
+}
+
+\usepackage{verbatim}
+\usepackage{forest}
+\usetikzlibrary{arrows.meta, shapes.geometric, calc, shadows,fit}
+
+\colorlet{mygreen}{green!75!black}
+\colorlet{col1in}{red!30}
+\colorlet{col1out}{red!40}
+\colorlet{col2in}{mygreen!40}
+\colorlet{col2out}{mygreen!50}
+\colorlet{col3in}{blue!30}
+\colorlet{col3out}{blue!40}
+\colorlet{col4in}{mygreen!20}
+\colorlet{col4out}{mygreen!30}
+\colorlet{col5in}{blue!10}
+\colorlet{col5out}{blue!20}
+\colorlet{col6in}{blue!20}
+\colorlet{col6out}{blue!30}
+\colorlet{col7out}{orange}
+\colorlet{col7in}{orange!50}
+\colorlet{col8out}{orange!40}
+\colorlet{col8in}{orange!20}
+\colorlet{linecol}{blue!60}
+
+\begin{document}
+\title{consensus filtering}
+\pgfkeys{/forest,
+ rect/.append style   = {rectangle, rounded corners = 2pt,
+                     inner color = col6in, outer color = col6out},
+ ellip/.append style  = {ellipse, inner color = col5in,
+                      outer color = col5out},
+ orect/.append style  = {rect, font = \sffamily\bfseries,
+                      text width = 280pt, text centered,
+                     minimum height = 10pt, outer color = col3out},
+ oellip/.append style = {ellip,
+                      font = \sffamily\bfseries\large, text centered}}
+\begin{forest}
+ for tree={
+  font=\sffamily\bfseries,
+  line width=1pt,
+  draw=linecol,
+  ellip,
+  align=center,
+  child anchor=north,
+  parent anchor=south,
+  drop shadow,
+  l sep=1cm,
+  edge path={
+    \noexpand\path[color=linecol, rounded corners=5pt,
+      >={Stealth[length=10pt]}, line width=1pt, ->, \forestoption{edge}]
+      (!u.parent anchor) -- +(0,-5pt) -|
+      (.child anchor)\forestoption{edge label};
+    },
+  where level={3}{tier=tier3}{},
+  where level={0}{l sep-=15pt}{},
+  where level={1}{
+    if n={1}{
+      edge path={
+        \noexpand\path[color=linecol, rounded corners=5pt,
+          >={Stealth[length=10pt]}, line width=1pt, ->,
+          \forestoption{edge}]
+          (!u.south) --++(0,-8pt) -| (.child anchor)\forestoption{edge label};
+        },
+    }{
+      edge path={
+        \noexpand\path[color=linecol, rounded corners=5pt,
+          >={Stealth[length=10pt]}, line width=1pt, ->,
+          \forestoption{edge}]
+          (!u.south) --++(0,-8pt) -| (.child anchor)\forestoption{edge label};
+        },
+     }
+    }{},
+  }
+   [Dynamic Object,l sep=1.5cm, outer color=col3out
+    [Sensor 1,name=sensor1,
+    [Filter 1, rect, name=sse1
+    ]
+  ]
+  [Sensor 2,name=sensor2,
+    [Filter 2, rect, name=sse2
+    ]
+  ]
+  [, phantom, calign with current
+    [A\\B, phantom
+      [Distributed Multi-sensor Fusion, orect, name=us
+        [{Consensus}, oellip
+        ]
+      ]
+    ]
+  ]
+  [Sensor N-1,name=sensor3,
+    [Filter N-1, rect, name=sse3
+    ]
+  ]
+  [Sensor N,name=sensor4,
+    [Filter N, rect, name=sse4
+    ]
+  ]
+]
+  \begin{scope}[color = linecol, rounded corners = 5pt,
+    >={Stealth[length=10pt]}, line width=1pt, ->]
+    \draw (sse2.south) -- (us.north -| sse2.south);
+    \draw (sse3.south) -- (us.north -| sse3.south);
+    \coordinate (c1) at ($(sse1.south)!2/5!(sse2.south)$);
+    \coordinate (c2) at ($(sse3.south)!3/5!(sse4.south)$);
+    \draw (sse1.south) -- +(0,-22pt) -| (us.north -| c1);
+    \draw (sse4.south) -- +(0,-22pt) -| (us.north -| c2);
+    \node[draw,dash dot,fit=(sensor1)(sse4)(sensor4),inner ysep=12pt,]{};
+    \coordinate (m1) at ($(sse2)!0.5!(sensor2)$);
+    \coordinate (m2) at ($(sensor2)!0.5!(sensor3)$);
+    \node[scale=3] at (m1-|m2) {...};
+  \end{scope}
+\end{forest}
+\end{document}

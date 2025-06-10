@@ -1,0 +1,161 @@
+\documentclass{wissdoc}
+% ----------------------------------------------------------------
+% Abschlussarbeit - Hauptdokument
+% ----------------------------------------------------------------
+%%
+%%
+% wissdoc Optionen: draft, relaxed, pdf --> siehe wissdoc.cls
+% ------------------------------------------------------------------
+% Weitere packages: (Dokumentation dazu durch "latex <package>.dtx")
+\usepackage[numbers,sort&compress]{natbib}
+
+\usepackage{ngerman} % deutsche Spracheinstellung für Umlaute etc., keine Rechtschreibprüfung
+\usepackage[utf8]{inputenc} % korrekte Darstellung von Umlauten
+\usepackage[printonlyused]{acronym} % Abkürzungsverzeichnis nur mit Abkürzungen, die auch verwendet werden
+
+% useful packages:
+% \usepackage{amsmath} % Standardpaket für Bereich Mathematik
+% \usepackage{rotating} % Rotation von z.B. Bildern, Tabellen etc.
+% \usepackage{enumitem} % Kontrolle über Layout von itemize, enumerate, description
+% \usepackage{pdfpages} % Seiten aus PDF/ ganzes PDF einbinden
+% \usepackage{newunicodechar} % Bedeutung von Unicode Characters definieren, Nutzung über \newunicodechar{}{}
+
+
+% \usepackage{varioref}
+% \usepackage{verbatim}
+% \usepackage{float}    %z.B. \floatstyle{ruled}\restylefloat{figure}
+% \usepackage{subfigure}
+% \usepackage{fancybox} % für schattierte,ovale Boxen etc.
+% \usepackage{tabularx} % automatische Spaltenbreite
+% \usepackage{supertab} % mehrseitige Tabellen
+%% ---------------- end of usepackages -------------
+
+
+%% Informationen für die PDF-Datei
+\hypersetup{
+ pdfauthor={N.N.},
+ pdftitle={Not set}
+ pdfsubject={Not set},
+ pdfkeywords={Not set}
+}
+
+% Print URLs not in Typewriter Font
+\def\UrlFont{\rm}
+
+\newcommand{\blankpage}{% Leerseite ohne Seitennummer, nächste Seite rechts
+ \clearpage{\pagestyle{empty}\cleardoublepage}
+}
+
+%% Einstellungen für das gesamte Dokument
+
+% Trennhilfen
+% Wichtig! 
+% Im ngerman-paket sind zusätzlich folgende Trennhinweise enthalten:
+% "- = zusätzliche Trennstelle
+% "| = Vermeidung von Ligaturen und mögliche Trennung (bsp: Schaf"|fell)
+% "~ = Bindestrich an dem keine Trennung erlaubt ist (bsp: bergauf und "~ab)
+% "= = Bindestrich bei dem Worte vor und dahinter getrennt werden dürfen
+% "" = Trennstelle ohne Erzeugung eines Trennstrichs (bsp: und/""oder)
+
+% Trennhinweise fuer Woerter hier beschreiben
+\hyphenation{
+% Pro-to-koll-in-stan-zen
+% Ma-na-ge-ment  Netz-werk-ele-men-ten
+% Netz-werk Netz-werk-re-ser-vie-rung
+% Netz-werk-adap-ter Fein-ju-stier-ung
+% Da-ten-strom-spe-zi-fi-ka-tion Pa-ket-rumpf
+% Kon-troll-in-stanz
+}
+
+% Index-Datei öffnen
+\ifnotdraft{\makeindex}
+%%%%%%%%%%%%%% includeonly %%%%%%%%%%%%%%%%%%%
+% Es werden nur die Teile eingebunden, die hier 
+% aufgefuehrt sind!
+\includeonly{%
+chapters/abstract_de, % Abstract Deutsch
+abkuerzungen, %  
+titelseite,%
+erklaerung,% Ist in KA Pflicht für Abschlussarbeiten
+chapters/einleitung,% Motivation, Zielsetzung, Gliederung
+chapters/grundlagen,% Grundlagen 
+chapters/analyse,   % Problembeschreibung (Detail) und Related Work
+chapters/entwurf,   % Beschreibung der Problemlösung (Konzepte, allg. Architektur, ...)
+chapters/implementierung,  % Beschreibung der Umsetzung/Implementierung
+chapters/evaluation,      % Nachweis und Auswertung
+chapters/zusammenfassung,  % Zusammenfassung der Ergebnisse und Ausblick
+anhang
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\frontmatter
+\pagenumbering{roman}
+\ifnotdraft{
+ \include{titelseite}
+ \blankpage % Leerseite auf Titelrückseite
+ %
+ % Die folgende Erklärung ist für Diplomarbeiten Pflicht
+ % (siehe Prüfungsordnung), für Studienarbeiten nicht notwendig
+ \include{erklaerung}
+ \blankpage % Leerseite auf Erklärungsrückseite
+}
+%
+%% *************** Hier geht's ab ****************
+\include{chapters/abstract_de}
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Verzeichnisse
+%% ++++++++++++++++++++++++++++++++++++++++++
+\setcounter{tocdepth}{2}
+\ifnotdraft{
+{\parskip 0pt\tableofcontents} % toc bitte einzeilig
+\blankpage
+\listoffigures
+\blankpage
+\listoftables
+\blankpage
+\include{abkuerzungen}
+}
+
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Hauptteil
+%% ++++++++++++++++++++++++++++++++++++++++++
+\graphicspath{{Bilder/}}
+
+\mainmatter
+\pagenumbering{arabic}
+\include{chapters/einleitung}  % Einleitung
+\include{chapters/grundlagen}  % Grundlagen
+\include{chapters/analyse}     % Analyse
+\include{chapters/entwurf}     % Entwurf
+\include{chapters/implementierung}    % Implementierung
+\include{chapters/evaluation}        % Evaluierung
+\include{chapters/zusammenfassung}   % Zusammenfassung und Ausblick
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Literatur
+%% ++++++++++++++++++++++++++++++++++++++++++
+%  mit dem Befehl \nocite werden auch nicht 
+%  zitierte Referenzen abgedruckt
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bibname}
+%%
+\nocite{*} % nur angeben, wenn auch nicht im Text zitierte Quellen 
+           % erscheinen sollen
+\bibliographystyle{accessabbrv} % mit abgekürzten Vornamen der Autoren
+%\bibliographystyle{gerplain} % abbrvnat unsrtnat
+% \bibliographystyle{alpha}
+\bibliography{thesis}
+
+%% ++++++++++++++++++++++++++++++++++++++++++
+%% Anhang
+%% ++++++++++++++++++++++++++++++++++++++++++
+
+\appendix
+\include{anhang}
+%\include{anhang_b}
+
+\end{document}
+%% end of file

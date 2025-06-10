@@ -1,0 +1,278 @@
+\documentclass[12pt, a4paper]{report}
+\usepackage[spanish, es-lcroman, es-noshorthands]{babel} %es-lcroman sirve para la numeración en números romanos
+\usepackage[latin1, utf8]{inputenc} % podés escribir con tildes directamente
+\usepackage{lmodern}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{geometry}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+\usepackage{caption}
+\usepackage{pgfplots}
+\usepackage{natbib} % para la bibliografía
+\usepackage[intoc, spanish]{nomencl}\makenomenclature
+\setcitestyle{authoryear,open={(},close={)}}
+
+\usepackage{listofitems} % for \readlist to create arrays
+\usetikzlibrary{arrows.meta} % for arrow size
+\usepackage[outline]{contour} % glow around text
+\contourlength{1.4pt}
+
+\pgfplotsset{compat = newest}
+\DeclareMathAlphabet\mathrsfso{U}{rsfso}{m}{n} % para escribir letras en otras fuentes
+
+% PARA AÑADIR CÓDIGO
+% Si tu documento no tiene código de ningún tipo podés eliminar esta parte.
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+% OCULTAR EN EL TOC
+% Lo utilizo para ocultar la aparición de \chapter{blablabla} en el toc
+% para los capítulos de apéndices y anexos
+\newcounter{oldtocdepth}
+\newcommand{\hidefromtoc}{%
+  \setcounter{oldtocdepth}{\value{tocdepth}}%
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{-10}}%
+}
+\newcommand{\unhidefromtoc}{%
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{\value{oldtocdepth}}}%
+}
+\usepackage{hyperref}
+\usepackage{bookmark}
+
+% CONFIGURAR LA NOMENCLATURA
+\renewcommand{\nomgroup}[1]{%
+\ifthenelse{\equal{#1}{A}}{\item[\textbf{Símbolos Romanos}]}{%
+\ifthenelse{\equal{#1}{G}}{\item[\textbf{Símbolos Griegos}]}{%
+\ifthenelse{\equal{#1}{Z}}{\item[\textbf{Acrónimos / Abreviaciones}]}{%
+\ifthenelse{\equal{#1}{R}}{\item[\textbf{Superíndices}]}{%
+\ifthenelse{\equal{#1}{S}}{\item[\textbf{Subíndices}]}{%
+\ifthenelse{\equal{#1}{X}}{\item[\textbf{Otros Símbolos}]}
+{}
+}% matches mathematical symbols > X
+}% matches Subscripts           > S
+}% matches Superscripts         > R
+}% matches Abbreviations        > Z
+}% matches Greek Symbols        > G
+}% matches Roman Symbols        > A
+
+% PARAMETROS PARA LAS GRAFICAS DE LAS REDES NEURONALES
+% En caso que no las necesites puedes borrar esta parte
+%\tikzset{>=latex} % for LaTeX arrow head
+\usepackage{xcolor}
+\colorlet{myred}{red!80!black}
+\colorlet{myblue}{blue!80!black}
+\colorlet{mygreen}{green!60!black}
+\colorlet{myorange}{orange!70!red!60!black}
+\colorlet{mydarkred}{red!30!black}
+\colorlet{mydarkblue}{blue!40!black}
+\colorlet{mydarkgreen}{green!30!black}
+\tikzstyle{node}=[thick,circle,draw=myblue,minimum size=22,inner sep=0.5,outer sep=0.6]
+\tikzstyle{node in}=[node,green!20!black,draw=mygreen!30!black,fill=mygreen!25]
+\tikzstyle{node hidden}=[node,blue!20!black,draw=myblue!30!black,fill=myblue!20]
+\tikzstyle{node convol}=[node,orange!20!black,draw=myorange!30!black,fill=myorange!20]
+\tikzstyle{node out}=[node,red!20!black,draw=myred!30!black,fill=myred!20]
+\tikzstyle{connect}=[thick,mydarkblue] %,line cap=round
+\tikzstyle{connect arrow}=[-{Latex[length=4,width=3.5]},thick,mydarkblue,shorten <=0.5,shorten >=1]
+\tikzset{ % node styles, numbered for easy mapping with \nstyle
+  node 1/.style={node in},
+  node 2/.style={node hidden},
+  node 3/.style={node out},
+}
+\def\nstyle{int(\lay<\Nnodlen?min(2,\lay):3)} % map layer number onto 1, 2, or 3
+
+% BIBLIOGRAFIA
+\newlength\mybibindent
+\setlength\mybibindent{0pt}
+\makeatletter
+\renewenvironment{thebibliography}[1]
+    {\chapter*{\bibname}%
+     \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}%
+     \list{\@biblabel{\@arabic\c@enumiv}}
+          {\settowidth\labelwidth{\@biblabel{999}}
+           \leftmargin\labelwidth
+            \advance\leftmargin\dimexpr\labelsep+\mybibindent\relax\itemindent-\mybibindent
+           \@openbib@code
+           \usecounter{enumiv}
+           \let\p@enumiv\@empty
+           \renewcommand\theenumiv{\@arabic\c@enumiv}}
+     \sloppy
+     \clubpenalty4000
+     \@clubpenalty \clubpenalty
+     \widowpenalty4000%
+     \sfcode`\.\@m}
+    {\def\@noitemerr
+      {\@latex@warning{Empty `thebibliography' environment}}
+     \endlist}
+\makeatother
+
+
+
+% MARGENES DE TEXTO
+\geometry{twoside, 
+  paperheight = 24.0cm,
+  paperwidth = 17.0cm,
+  columnsep = 1.0cm,
+  textheight = 19.0cm,
+  textwidth = 12.8cm,
+  centering,
+  marginparwidth = 1cm,
+  top = 3.0cm}
+
+% ESPACIADO Y PENALTIES  
+\parskip=0.5pt plus 1.0pt minus 0.5pt
+\addtolength{\skip\footins}{1pt plus 5pt minus 1pt}
+
+\clubpenalty=225
+\widowpenalty=225
+\displaywidowpenalty=75
+
+% ESTILOS TEOREMA
+% Si querés cambiar la numeración podés cambiar el texto entre corchetes
+\newtheorem{ejercicio}{Ejercicio}[chapter]
+\newtheorem{ejemplo}{Ejemplo}[chapter]
+\newtheorem{obs}{Observación}[chapter]
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{lema}{Lema}[chapter]
+\newtheorem{corolario}{Corolario}[chapter]
+\newtheorem{defi}{Definición}[chapter]
+\newtheorem{propos}{Proposición}[chapter]
+
+\input{info}
+
+% CAMBIAR TEXTO EN ÍNDICES
+% Esta parte cambia el nombre con el que tendremos nuestras listas en la
+% tabla de contenidos
+\renewcaptionname{spanish}{\contentsname}{Tabla de contenidos}
+\renewcaptionname{spanish}{\listfigurename}{Lista de figuras}
+\renewcaptionname{spanish}{\listtablename}{Lista de tablas}
+
+\begin{document}
+% TEXTO PREVIO
+% Las primeras páginas suelen numerarse con números romanos en minúscula.
+\pagenumbering{roman}
+
+    \input{Previo/Titulo}
+    % En las tesis de la UMSA no se suelen incluir las páginas de Comite
+    % de Tesis o Asesor Externo, tampoco tengo datos claros sobre si la
+    % universidad paga derechos de autor para las tesis de grado.
+    
+    %\input{Previo/Comite de Tesis}
+    %\input{Previo/Asesor Externo}
+    \input{Previo/Dedicatoria}
+    \input{Previo/Derechos de autor}
+    \input{Previo/Agradecimientos}
+    \input{Previo/Declaracion}
+    
+    \input{Previo/Resumen}
+    
+    % Solo la lista de figuras, tablas y nomenclatura aparecerán en la
+    % tabla de contenidos.
+
+    % Si no aparece la nomenclatura (puede pasar si no lo compilás
+    % overleaf),  en cmd hacé lo siguiente
+    % usando cd entra a la carpeta en la que esta tu proyecto
+    % por ejemplo, si esta en el disco C, en la dirección, User\tesis
+    % se vería así
+    % cd C:\User\tesis
+    % ahora, suponiendo que este archivo tenga el nombre main.tex
+    % escribí lo siguiente en cmd y apretá enter.
+    % makeindex main.nlo -s nomencl.ist -o main.nls
+    % suponiendo que este archivo se llame main.tex
+    
+    \cleardoublepage\tableofcontents\setcounter{tocdepth}{2}
+    \cleardoublepage\listoffigures \addcontentsline{toc}{chapter}{Lista de figuras}\setcounter{tocdepth}{2}
+    \cleardoublepage\listoftables \addcontentsline{toc}{chapter}{Lista de tablas}\setcounter{tocdepth}{2}
+    \cleardoublepage\printnomenclature
+    
+    \newpage
+
+% CAPÍTULOS    
+\pagenumbering{arabic}
+    
+    \chapter{Introducción}
+    \input{Capitulos/capitulo1}
+    
+    \chapter{Redes neuronales prealimentadas}
+    \input{Capitulos/capitulo2}
+    
+    \chapter{Conclusión}
+    \input{Capitulos/capitulo3}
+
+% NOMENCLATURA
+% El siguiente espacio contiene los términos que aparecerán en la página
+% nomenclatura.
+\nomenclature[z-FNN]{FNN}{Red Neuronal Prealimenrada (Feedforward Neural Network)}
+\nomenclature[z-DNN]{DNN}{Red Neuronal Profunda (Deep Neural Network)}
+\nomenclature[z-CMAT]{CMAT}{Carrera de matemáticas.}
+\nomenclature[a-L]{L}{Conjunto de funciones integrables.}
+\nomenclature[g-theta]{$\theta$}{Ángulo.}
+\nomenclature[r-c]{$c$}{Complemento de un conjunto.}
+\nomenclature[s-i]{$i$}{Valor inicial, por ejemplo, en una ecuación diferencial.}
+\nomenclature[x-R]{$\mathbb{R}$}{Números reales.}
+
+% BILIOGRAFÍA
+% La referencia se añade directamente de los autores que citaste en el
+% archivo references.bib
+\renewcommand\bibname{Referencias}
+\bibliography{references}
+\addcontentsline{toc}{chapter}{Referencias}
+\bibliographystyle{apalike2}
+%\bibliographystyle{plain}
+
+% SECCIONES FINALES
+% Anexos y Apéndices
+% Luego de pensar en varias formas de numerar estas secciones en la tabla
+% de contenidos, creo que la mejor manera es simplemente numerando a mano y
+% eliminando el encabezado del título.
+
+% Apéndices
+\appendix
+\renewcommand\appendixname{Apéndice} % cambia el texto en el encabezado
+
+\hidefromtoc\chapter{Apéndice de ejemplo}\unhidefromtoc
+\addcontentsline{toc}{chapter}{Apéndice A: Apéndice de ejemplo}
+\input{Final/apendice1}
+
+\hidefromtoc\chapter{Otro apéndice de ejemplo}\unhidefromtoc
+\addcontentsline{toc}{chapter}{Apéndice B: Otro apéndice de ejemplo}
+\input{Final/apendice2}
+
+% Anexos
+\renewcommand\appendixname{Anexo} % cambia el texto en el encabezado
+%\setcounter{chapter}{0} % reiniciamos el contador de capítulos
+
+\hidefromtoc\chapter{Anexo de ejemplo}\unhidefromtoc
+\addcontentsline{toc}{chapter}{Anexo C: Anexo de ejemplo}
+\input{Final/anexo1}
+
+\hidefromtoc\chapter{Otro anexo de ejemplo}\unhidefromtoc
+\addcontentsline{toc}{chapter}{Anexo D: Otro anexo de ejemplo}
+\input{Final/anexo2}
+
+
+\end{document}

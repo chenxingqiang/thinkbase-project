@@ -1,0 +1,187 @@
+% UTUgradu ja saavutettavuusohjeet täyttävä latex-pohja graduille
+% 08/2024 Petriina Paturi
+
+
+% Tässä metadata gradujen pdf/a tiedostomuotoa varten. Muista päivittää!
+\begin{filecontents*}{\jobname.xmpdata}
+\Title{Gradu}
+\Author{O. Opiskelija}
+\end{filecontents*}
+\documentclass[a4paper,pdfa,pdfpagelabels,colorlinks]{utugradu2020}  % Lataa utugradu2020.cls intrasta.
+% pdfpagelabels optio laittaa pdf:ään samat sivunumerot kuin  sivulla on 
+% näkyvissä. Saavutettavuus vaatii tämän
+
+\usepackage[utf8]{inputenc} % Tällä toimii utf-8
+\usepackage[T1]{fontenc}      % Ja tämä liittyy edelliseen
+\usepackage[finnish]{babel} %Suomenkielinen tavutus
+\usepackage{tytiivis} %Tiivistelmäsivun laatimiseksi, lataa tytiivis.sty
+\usepackage{graphicx}%Saadaan kuvat toimimaan
+\usepackage{lastpage}
+\usepackage[sort&compress, comma, square, numbers]{natbib} %viitteet kasaan
+\usepackage{amssymb, amsthm, amsmath}
+\usepackage{mathtools}
+
+\usepackage{icomma}
+
+%\usepackage{accessibility} %Saavutettavuuspaketti, kaavoista luettavammat ruudunlukijalla, mutta rikkoo jotkut muut paketit
+
+\usepackage[a-3b]{pdfx}  % pdf:n tulee graduissa olla pdf/a-3b-standardin mukaista. Tällä ja pdflatexia käyttämällä se onnistuu
+\usepackage{hyperref} % Tämä tarvitaan myös gradujen arkistointia varten.
+% pdflatex vaatii, että kuvat ovat jotain muuta kuin eps-muotoisia. Esimerkiksi pdf käy mainiosti vektorikuville, kunhan ovat samaa pdf/a-3b muotoa  ja png pikselikuville
+\hypersetup{  % Laitetaan hyperlinkit niin, että eivät näy printatessa. 
+    linkcolor = {black},
+    citecolor = {black}
+}
+
+
+%
+% Esimerkkejä uusien käskyjen määrittelyistä.
+% Käsky \mathbi{``vektorin symboli''} luo boldin italicin kirjaimen. Kreikkalaisille
+% kirjaimille taitaa olla pakko käyttää \pmb:tä.
+\newcommand{\mathbi}[1]{\textbf{\em #1}}
+
+\begin{document}
+\pagenumbering{roman} % roomalaiset sivunumerot varsinaisen tekstin alkuun asti
+
+\title{Gradu}  % Gradun nimi
+\opinnayte{Pro Gradu}  
+\author{Fil. yo. Olli Opiskelija}  % Tekijä
+\vuosi{2020}
+\oppiaine{Fysiikka}
+\tarkastaja{Prof. P.P.}
+\tarkastaja{FT H.H.}
+\maketitle
+\newpage
+\thispagestyle{empty}
+\vspace*{10cm}
+
+\vfill
+
+\hspace*{-2cm}\parbox{\textwidth}{Turun yliopiston laatujärjestelmän mukaisesti
+  tämän julkaisun alkuperäisyys on tarkastettu Turnitin
+  OriginalityCheck-järjestelmällä} 
+%Huomaa, että joudut kuitenkin printtaamaan tämän sivun erikseen
+%kaksipuoleseksi kannen kanssa.
+
+
+\newpage
+\begin{tiivistelma}%
+        {Fysiikan laitos}%
+        {Opiskelija, Olli}%
+        {Tutkielman otsikko}
+        {Pro Gradu, \pageref{LastPage} s., 3 liites.}%
+        {Fysiikka}% Oppiaine
+        {Huhtikuu 2020}%
+	Tiivistä tähän !
+	
+	Asiasanat: joitain kuvaavia sanoja tähän
+\end{tiivistelma}
+
+
+\tableofcontents %Sisällysluettelo
+\newpage
+\pagenumbering{arabic} % Aloitetaan arabialaisilla numeroilla tältä sivulta
+\section*{Johdanto}
+\addcontentsline{toc}{section}{Johdanto}
+%Näin tehtynä Johdannolle ei tule numeroa sisälllysluetteloon
+
+
+Gradua kirjoitettaessa on hyvä muistaa muutamat perussäännöt:
+\begin{enumerate}
+\item Kaikkiin
+kuviin tulee viitata tekstissä, esim. ``Kuvasta \ref{kuva1} nähdään,
+että kuviin viittaaminen on latexissa lastenleikkiä''. 
+\item Kuvat ja taulukot kuuluvat oikeasti sivujen ylälaitaan. Latex
+  tekee tämän automaattisesti oikein, älä lisäile mitään paikkamääreitä.
+\item Kuvat tulisi laatia kohtuullisen tiiviiksi. Siten, että kuva-ala
+  tulee kokonaan hyötykäyttöön.
+\item Kuva- ja taulukkoteksteissä kuuluu olla niin paljon tietoa, että
+  kuva/taulukko on ymmärrettävissä ilman tekstin lukua, mm. suureet ja
+  lyhenteet tulee esitellä. Näin myös saavutettavuus on parempi. Latex ei toistaiseksi suoraan tue vaihtoehtoisia tekstejä.
+\item Jos otat kuvan jostain lähteestä, muista viitata. Gradut menevät
+ julkiseen sähköiseen arkistoon: muista copyright!
+\item Esittele kaikki lyhenteet ensimmäisen käytön yhteydessä:
+  esim. elektronimikroskooppi (SEM).
+\item Jos joudut keksimään itse käännöksiä termeille, lisää
+  ensimmäisen käyttökerran jälkeen alkuperäinen
+  termi. Esim. lukkiutumispotentiaali (engl. pinning potential)
+\item Suureet kirjoitetaan italicilla, kuten $\rho = m/V$. Yksiköt sen
+  sijaan romanilla, esim. 1 m$^2$. Vektorit boldilla italicilla,
+  $\mathbi{v}$.
+\item Kaavat ovat osa tekstiä, näin ollen pilkut ja pisteet tulevat
+  kaavan sisään. Ja pilkun jälkeen jatketaan pienellä kirjaimella. Älä laita ylimääräistä tyhjää riviä kaavan jälkeen.
+\item Kaavojen jälkeen esitellään kaikki uudet suureet. Esim Newtonin
+  toinen laki on 
+\begin{equation}
+\mathbi{F} = m\mathbi{a},
+\end{equation}
+missä $\mathbi{F}$ on kappaleeseen vaikuttava voima, $m$ on kappaleen
+massa ja $\mathbi{a}$ on sen kiihtyvyys.
+\item Jos koko kappaleen tiedot ovat yhdestä lähteestä, lähdeviite
+  tulee kappaleen loppuun, pisteen jälkeen. Kaikissa muissa
+  tapauksissa ennen pistettä \cite{BHcurve}. Muista viitata aina, kun otat käyttöön 
+  numeroarvoja tai muuta tarkkaa tietoa.\cite{COEY2020119}
+
+\end{enumerate}
+
+Näitä noudattamalla saadaan vähennettyä ainakin yksi tarkastuskierros.
+
+
+%esimerkki kuvan liittämisestä
+\begin{figure}
+\begin{center}
+\setlength{\unitlength}{1cm}
+\begin{picture}(6,6)(-3,-3)
+\put(-1.5,0){\vector(1,0){3}}
+\put(2.7,-0.1){$\chi$}
+\put(0,-1.5){\vector(0,1){3}}
+\multiput(-2.5,1)(0.4,0){13}
+{\line(1,0){0.2}}
+\multiput(-2.5,-1)(0.4,0){13}
+{\line(1,0){0.2}}
+\put(0.2,1.4)
+{$\beta=v/c=\tanh\chi$}
+\qbezier(0,0)(0.8853,0.8853)
+(2,0.9640)
+\qbezier(0,0)(-0.8853,-0.8853)
+(-2,-0.9640)
+%\put(-3,-2){\circle*{0.2}}
+\end{picture}
+
+%includegraphics[width=10cm]{tiedosto.png}  % Näin käytännössä tiedoston käyttö. Jos käytät pdf-kuvia, niiden pitää olla myös pdf/a-3b-muotoisia.
+\caption{Hyperbolinen tangenttifunktio lähestyy asymptoottisesti arvoja $\pm 1$}
+\label{kuva1}
+\end{center}
+\end{figure}
+
+\begin{table}
+    \begin{center}
+        
+    
+    \caption{Esimerkkitaulukko \label{tab:my_label}}
+    
+    \begin{tabular}{c|c} 
+                 & Valmistusmenetelmä \\ \hline
+         Näyte 1 &  PLD\\
+         Näyte 2 &  CSD \\ \hline
+         
+    \end{tabular}
+    \end{center}
+\end{table}
+\section{Teoria}
+
+\newpage
+% Rivinväli pienemmäksi viiteluettelossa. Fonttia on vaihdettava, jotta käsky
+% toimisi !
+\renewcommand{\baselinestretch}{1}\large\normalsize
+
+\bibliography{kirjallisuus}
+\bibliographystyle{utugradu}
+
+% Vaihtoehtoisesti voit tehdä elämästäsi hankalaa ja kirjoittaa viitteet käsin tähän:
+%\begin{thebibliography}{50}% Viiteluettelo. TÄTÄ ON PAKKO KÄYTTÄÄ !
+%\bibitem{lshort} T. Oetiker, H. Partl, I. Hyna and E. Schlegl,
+%Not so short introduction to \LaTeX 2e, 1998
+%\end{thebibliography}
+
+\end{document} % Se oli siinä !

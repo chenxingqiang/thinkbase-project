@@ -1,0 +1,425 @@
+\documentclass[11pt,oneside]{report}
+\usepackage[english]{babel}
+\usepackage{usbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\usepackage{subfig}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage{textcomp}
+\usepackage{titlesec}
+\usepackage[titletoc]{appendix}
+\usepackage{etoolbox}
+\newif\ifmodule 
+\newif\ifoneauthor 
+
+
+%% Copyright (C) 2019 by David Rodwell <rodwell@sun.ac.za>
+%% 
+%% This file may be distributed and/or modified under the conditions
+%% of the LaTeX Project Public License, either version 1.2 of this
+%% license or (at your option) any later version.  The latest version
+%% of this license is in:
+%% 
+%%    http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.2 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INSERT YOUR THESIS DETAILS HERE %%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\title{Insert title of project here}                             % Title
+\author{David Timothy Rodwell}							        % Author 1
+\newcommand\authorsurname{Rodwell}                              % Author 1 Surname
+\newcommand\authorinitials{D.T.}                                % Author 1 initials
+\newcommand\authortwo{Robert Cronje}                            % Author 2 
+\newcommand\authortwosurname{Cronje}                            % Author 2 Surname
+\newcommand\authortwoinitials{R.}                               % Author 2 initials
+\newcommand\studentnumber{18965296}                             % Author 1 Student Number
+\newcommand\studenttwonumber{19176899}                          % Author 2 Student Number
+\newcommand\fulldegree{BComHons (Financial Risk Management)}    % Degree / module name
+\newcommand\supervisor{W.J. Conradie}                           % Supervisor
+\newcommand\supervisortitle{Prof.}                              % Supervisor Title (Mr., Mrs., Dr., Prof.)
+\newcommand\degreeofconf{A}                                     % Degree of Confidentiality
+\newcommand\yeardate{2019}								        % Year Date
+\newcommand\monthdate{December}                                 % Month Date
+\newcommand\daydate{23}                                         % Day Date
+\newcommand\projecttype{Assignment}                                 % Project Type (Thesis, Research assignment)
+\modulefalse                                                     %set to \moduletrue if module assignment                                                                 %and \modulefalse for research assignment
+\oneauthorfalse                                                 %set to \oneauthorfalse if two authors,
+                                                                %and  \oneauthortrue for a single author
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BACKEND LATEX FORMATTING DO NOT EDIT %%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{secnumdepth}{5}                     
+\renewcommand{\arraystretch}{1.5}
+\makeatletter
+\renewcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
+                    \thispagestyle{plain}%
+                    \global\@topnum\z@
+                    \@afterindentfalse
+                    \secdef\@chapter\@schapter}
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+                       \if@mainmatter
+                         \refstepcounter{chapter}%
+                         \typeout{\@chapapp\space\thechapter.}%
+                         \addcontentsline{toc}{chapter}%
+                                   {\protect\numberline{\thechapter}\MakeUppercase{#1}}%
+                       \else
+                         \addcontentsline{toc}{chapter}{\MakeUppercase{#1}}%
+                       \fi
+                    \else
+                      \addcontentsline{toc}{chapter}{\MakeUppercase{#1}}%
+                    \fi
+                    \chaptermark{#1}%
+                    \addtocontents{lof}{\protect\addvspace{10\p@}}%
+                    \addtocontents{lot}{\protect\addvspace{10\p@}}%
+                    \if@twocolumn
+                      \@topnewpage[\@makechapterhead{#2}]%
+                    \else
+                      \@makechapterhead{#2}%
+                      \@afterheading
+                    \fi}
+
+\makeatother
+
+\titleformat{\chapter}[display]
+{\bfseries\Large\filcenter}
+{\Large\bfseries\MakeUppercase{\chaptertitlename} \thechapter}
+{-0.01cm}
+{\Large\MakeUppercase}
+
+\titlespacing*{\chapter}
+  {10pt}
+  {-5em}
+  {20pt}
+
+\titleformat{name=\chapter,numberless}
+  {\normalfont \Large \bfseries \center}{}{0.5em}{}
+  
+\titleformat{\section}
+  {\large\bfseries \uppercase}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\itshape}{\thesubsubsection}{1em}{}
+
+\setmarginsrb{2.5cm}{2 cm}{2 cm}{2 cm}{1 cm}{1.5 cm}{0 cm}{1.5 cm}
+
+\linespread{1.5}
+\parindent 0mm
+\parskip 2mm plus 1pt
+\addto\captionsenglish{
+  \renewcommand{\contentsname}
+    {TABLE OF CONTENTS}
+}
+\addto{\captionsenglish}{\renewcommand{\bibname}{REFERENCES}}
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+
+\fancyhf{}
+\renewcommand\headrulewidth{0pt}
+\fancyhf[c]{\thepage} 
+\pagenumbering{roman}
+%\pagestyle{fancy}
+
+%\assignpagestyle{\chapter}{fancy}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                FRONT MATTER
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document Begins %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\renewcommand*\listfigurename{LIST OF FIGURES} 
+\renewcommand*\listtablename{LIST OF TABLES} 
+\renewcommand{\appendixname}{APPENDIX}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+
+\ifmodule  \renewcommand{\chaptername}{Task} \fi
+
+
+%The below command splits the formatting into two conditions, the first is if the paper if there is only one author, the second condition is if there are two authors
+
+%\newcommand\mycmd[2][]{%
+%  \ifstrempty{#1}{%
+\ifoneauthor  
+%----------------------------Condition One-------------------------------------   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title Page %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+	\centering
+	\vspace{5cm}
+	\LARGE\textbf{\thetitle}\\[1.0 cm]                       %Title of Thesis, if the title is long and causes the title page to overflow adjust the spacing at the bottom at the vspace commands
+    \includegraphics[scale = 3]{UScrest-WM.jpg}\\[1.0 cm]	% University Logo
+	\LARGE \textbf{\theauthor}\\ \ifmodule  \textbf{\studentnumber} \\ \fi \vspace{2cm} 
+	\normalsize \projecttype \text{ }presented in the partial fulfilment\\
+	of the requirement for the \ifmodule course \else degree of \fi \\
+	\fulldegree \\
+	\ifmodule \monthdate \ \yeardate \else at the University of Stellenbosch \fi \\
+	\vspace{2cm}
+	\textbf{\ifmodule Lecturer: \else Supervisor: \fi}\supervisortitle \ \supervisor 
+	\vspace{2cm}
+	\ifmodule \else
+	\begin{flushleft}
+	Degree of confidentiality: \degreeofconf \hspace{22em} \monthdate \ \yeardate
+	\end{flushleft}
+	\fi
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plagiarism Declaration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{page}{2}
+
+\chapter*{PLAGIARISM DECLARATION}
+
+\begin{enumerate}
+    \item Plagiarism is the use of ideas, material and other intellectual property of another's work and to present it as my own. 
+    \item I agree that plagiarism is a punishable offence because it constitutes theft. 
+    \item Accordingly, all quotations and contributions from any source whatsoever (including the internet) have been cited fully. I understand that the reproduction of text without quotation marks (even when the source is cited) is plagiarism.
+    \item I also understand that direct translations are plagiarism. 
+    \item I declare that the work contained in this \MakeLowercase{\projecttype}, except otherwise stated, is my original work and that I have not previously (in its entirety or in part) submitted it for grading in this \MakeLowercase{\projecttype} or another \MakeLowercase{\projecttype}. 
+\end{enumerate}
+\vspace{2cm}
+
+\begin{table*}[htpb]
+\centering
+\begin{tabular}{|p{7.75cm}|p{7.75cm}|} 
+\hline
+        &                \\ 
+        &               \\
+\studentnumber   &      \\
+\hline
+\large{Student number}   & \large{Signature}      \\ 
+\hline
+& \\
+& \\
+\authorinitials \ \authorsurname & \daydate \ \monthdate \ \yeardate  \\ 
+\hline
+Initials and surname & \large{Date} \\
+\hline
+\end{tabular}
+\end{table*}
+\vspace{2cm}
+\begin{center}
+    Copyright \textcopyright\, \yeardate  \ Stellenbosch University\\
+    All rights reserved
+\end{center}
+\addcontentsline{toc}{chapter}{PLAGIARISM DECLARATION}
+\newpage
+%  }{%
+\else  
+%----------------------------Condition Two-------------------------------------   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title Page %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+    \begin{titlepage}
+	\centering
+	\ifmodule \vspace{3cm} \else \vspace{5cm} \fi
+	\LARGE\textbf{\thetitle}\\[1.0 cm]                       %Title of Thesis, if the title is long and causes the title page to overflow adjust the spacing at the bottom at the vspace commands
+    \includegraphics[scale = 3]{UScrest-WM.jpg}\\[1.0 cm]	% University Logo
+	\Large \textbf{\theauthor}\text{ } \\ \ifmodule  \textbf{\studentnumber} \\ \fi
+	\textbf{and} \\ 
+	\textbf{\authortwo} \ifmodule \\  \textbf{\studenttwonumber}  \fi \\[1cm]  
+	\normalsize \projecttype \text{ }presented in the partial fulfilment\\
+	of the requirement for the \ifmodule course \else degree of \fi \\
+	\fulldegree \\
+	\ifmodule \monthdate \ \yeardate \else at the University of Stellenbosch \fi \\
+	\vspace{1.5cm} 
+	\textbf{\ifmodule Lecturer: \else Supervisor: \fi}\supervisortitle \ \supervisor 
+	\vspace{1.5cm} 
+	\ifmodule \else 
+	\begin{flushleft}
+	Degree of confidentiality: \degreeofconf \hspace{22em}  \monthdate \ \yeardate
+	\end{flushleft}
+	\fi
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plagiarism Declaration %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{page}{2}
+
+\chapter*{PLAGIARISM DECLARATION}
+
+\begin{enumerate}
+    \item Plagiarism is the use of ideas, material and other intellectual property of another's work and to present it as our own. 
+    \item We agree that plagiarism is a punishable offence because it constitutes theft. 
+    \item Accordingly, all quotations and contributions from any source whatsoever (including the internet) have been cited fully. We understand that the reproduction of text without quotation marks (even when the source is cited) is plagiarism.
+    \item We also understand that direct translations are plagiarism. 
+    \item We declare that the work contained in this \MakeLowercase{\projecttype}, except otherwise stated, is our original work and that we have not previously (in its entirety or in part) submitted it for grading in this \MakeLowercase{\projecttype} or another \MakeLowercase{\projecttype}. 
+\end{enumerate}
+\vspace{1cm}
+
+\begin{table*}[htpb]
+\centering
+\begin{tabular}{|p{7.75cm}|p{7.75cm}|} 
+\hline
+        &                \\ 
+\studentnumber   &      \\
+\hline
+\large{Student number}   & \large{Signature}      \\ 
+\hline
+& \\
+\authorinitials \ \authorsurname & \daydate \ \monthdate \ \yeardate  \\ 
+\hline
+Initials and surname & \large{Date} \\
+\hline
+        &                \\ 
+\studenttwonumber   &      \\
+\hline
+\large{Student number}   & \large{Signature}      \\ 
+\hline
+& \\
+\authortwoinitials \ \authortwosurname & \daydate \ \monthdate \ \yeardate  \\ 
+\hline
+Initials and surname & \large{Date} \\
+\hline
+\end{tabular}
+\end{table*}
+\vspace{1cm}
+\begin{center}
+    Copyright \textcopyright \ \yeardate \ Stellenbosch University\\
+    All rights reserved
+\end{center}
+\addcontentsline{toc}{chapter}{PLAGIARISM DECLARATION}
+\newpage
+ % }%
+%}
+\fi
+
+
+
+
+
+
+
+
+
+% --------------Settings to set if paper has one or two authors--------------------
+
+%\mycmd[][\author]                      One author
+%\mycmd[\authortwo][\author]            Two authors
+
+%\mycmd[][]
+
+
+
+%%%%%%%%%%%%%%%%%%%%%% Insert Acknowledgements Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifmodule \else
+\chapter*{ACKNOWLEDGEMENTS}
+
+The Department of Statistics and Actuarial Science (the Department) wishes to acknowledge David Rodwell for generously creating a template based off the USB (University of Stellenbosch Business School) guidelines which have been adapted for the purposes of the department.
+
+\addcontentsline{toc}{chapter}{ACKNOWLEDGEMENTS}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%% Insert Your Abstract Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{ABSTRACT}
+
+Insert an abstract of not more than 500 words here\\\\
+\textbf{Key words:}\\
+Technical guidelines; Chapter outline; Examples
+
+\addcontentsline{toc}{chapter}{ABSTRACT}
+
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%% Insert Your Opsomming Here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{OPSOMMING}
+
+Sluit 'n Afrikaanse opsomming in\\\\
+\textbf{Sleutelwoorde:}\\
+Tegniese vereistes, Voorgestelde Hoofstukke, Voorbeelde.
+
+ \addcontentsline{toc}{chapter}{OPSOMMING}
+
+\newpage
+\fi
+
+\tableofcontents
+\pagebreak
+
+\ifmodule \else
+\listoffigures
+ \addcontentsline{toc}{chapter}{LIST OF FIGURES}
+\listoftables
+\addcontentsline{toc}{chapter}{LIST OF TABLES}
+\fi
+
+%%%%%%%%%%%%%%%%%% Insert your list of appendices here %%%%%%%%%%%%%%
+
+\chapter*{LIST OF APPENDICES}
+
+\begin{table}[htpb]
+\begin{tabular}{p{3cm} p{7cm}}
+APPENDIX A & QUESTIONNAIRE \\
+APPENDIX B & USB STYLE SHEET                       
+\end{tabular}
+\end{table}
+\addcontentsline{toc}{chapter}{LIST OF APPENDICES}
+\newpage
+%%%%%%%%%%%%%%%%%% Insert your list of abbrevations and/or acryonyms %%%%%%%%%%%%%%
+
+\chapter*{LIST OF ABBREVIATIONS AND/OR ACRONYMS}
+
+\begin{table}[htpb]
+\begin{tabular}{p{3cm} p{7cm}}
+USB & University of Stellenbosch Business School  \\
+Etc & Insert Acronym Here                       
+\end{tabular}
+\end{table}
+\addcontentsline{toc}{chapter}{LIST OF ABBREVIATIONS AND/OR ACRONYMS}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{arabic}
+\renewcommand{\arraystretch}{1}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% Input your chapters here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{Chapters/Chapter1.tex}
+\input{Chapters/Chapter2.tex}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{usmeg-a} 
+\bibliography{biblist}
+\addcontentsline{toc}{chapter}{REFERENCES}
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% Insert your appendix here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+\begin{appendices}
+\input{Appendices/Questionnaire.tex}
+\input{Appendices/USBStyleSheets.tex}
+\end{appendices}
+
+
+\end{document}

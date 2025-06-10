@@ -1,0 +1,131 @@
+% The LaTeX class file and the template have been created by Reimo Palm 
+% with some modifications by the Institute of Computer Science of UT  
+% following the guidelines of UT Press.
+% 
+% Last modified: 2021/01/14 v1.3
+% See full list of authors in README.md
+% 
+% Contact: ics@ut.ee
+
+\documentclass{phdunitartu}
+\usepackage{phdstyle}
+
+%
+\ThesisType{COLLECTION} % Possible values: MONOGRAPH, COLLECTION             
+%
+\author{Firstname Lastname}
+\title{Dissertation Title}
+
+%
+\institute{Institute of Computer Science} % Replace with your institute/college
+\faculty{Faculty of Science and Technology} % Replace with your Faculty
+\affiliation{University of Tartu} 
+
+%
+\ISSN{1024-4212}           % will be provided by UT Press
+\ISBNPRINT{978-9949-XX-XXX-X} % ISBN print, will be provided by UT Press
+\ISBNPDF{978-9949-XX-XXX-X} % ISBN PDF, will be provided by UT Press
+
+%
+\dissertationseriesname{Dissertationes informaticae Universitatis Tartuensis}  % will be provided by UT Press
+\dissertationseriesnumber{XX}  % will be provided by UT Press
+\thesisfield{Computer Science} % Replace with your field
+\commencementdate{XXX, 20XX} % Example: June, 2020
+\defensedate{XX, 20XX} % Example: 01, 2020
+\defensetime{XX:XX} % Example: 10:15
+\defenseloc{XXX} % Example: Narva mnt 18-322
+
+% supervisor(s)
+\addSup{Supervisor}{
+    Prof. & Firstname Lastname\\
+    & Address\\
+    & Address
+}
+
+% opponents
+\addOpp{Opponents}{
+    Prof. Dr.& Firstname Lastname\\
+    &Address\\
+    &Address\\
+    &Address\\
+    \\
+    Prof. & Firstname Lastname\\
+    &Address\\
+    &Address
+}
+
+%
+\addbibresource{bibliographies/publications.bib} % your publication
+\addbibresource{bibliographies/bibliography.bib} % any other references
+% why to use bibtex instead of manually listing the entries? check here: https://web.iit.edu/sites/web/files/departments/academic-affairs/graduate-academic-affairs/pdfs/biblio-help2.pdf
+
+% to remove a chapter you can easily comment out from the following list
+\includeonly
+{
+    sections/dedication,
+    sections/abstract,
+    sections/listofpublications,
+    sections/abbreviations,
+    sections/preface,
+    sections/introduction,
+    sections/chapterI,
+    sections/chapterII,
+    sections/conclusion,
+    sections/appendixA,
+    sections/appendixB,
+    sections/acknowledge,
+    sections/sisukokkuvote,
+    sections/publications,
+    sections/cv,
+    sections/elulookirjeldus,
+    sections/chapterpublications, % only for a monograph
+}
+
+\begin{document}
+    \maketitle
+    \thispagestyle{empty}
+    \include{sections/dedication}
+    \setcounter{page}{6}
+    \include{sections/abstract}
+    
+    %
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    \include{sections/abbreviations}
+    \IfThesisTypeIsCollection{\include{sections/listofpublications}}{}
+    
+    %
+    \include{sections/preface}
+    \include{sections/introduction}
+    
+    % body
+    \include{sections/chapterI}
+    \include{sections/chapterII}
+    
+    % conclusion
+    \include{sections/conclusion}
+    
+    % bibliography
+    % \nocite{*} % NB: remove this, fill in the bibliography.bib and use \cite in your text in order for your citations to show up in this section
+    % you can change the bibliography style from the phdstyle.sty file, bibliography section
+    \nocite{*}
+    \printbibliography
+    % \bibliography{bibliography.bib}
+
+    %
+    \appendix
+    \include{sections/appendixA}
+    \include{sections/appendixB}
+    
+    %
+    \setcounter{secnumdepth}{-1}
+    \include{sections/acknowledge}
+    \include{sections/sisukokkuvote} % summary in Estonian
+    \IfThesisTypeIsCollection{\include{sections/publications}}{}
+    
+    % curriculum vitae
+    \include{sections/cv} % English
+    \include{sections/elulookirjeldus} % Estonian
+    \IfThesisTypeIsCollection{}{\include{sections/chapterpublications}}
+\end{document}

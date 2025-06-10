@@ -1,0 +1,125 @@
+\documentclass[12pt, a4paper]{report}
+\input{Packages.tex}
+\usepackage{titling}
+\usepackage{graphicx}
+\hypersetup{pdftitle = Project Report, pdfauthor = {First Last}, pdfstartview=FitH, pdfkeywords = essay, pdfpagemode = FullScreen, colorlinks, anchorcolor = black, citecolor = blue, urlcolor=blue, filecolor=green, linkcolor = black, plainpages = false}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\rhead{}
+\chead{}
+\lhead{University of Oxford}
+\lfoot{\date{}}
+\cfoot{}
+\rfoot{\thepage}
+% Top and Bottom Line Rules
+
+\renewcommand{\headrulewidth}{0.4pt} %0.4pt
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyheadoffset{8pt}
+\fancyfootoffset{8pt}
+% Line spacing
+\renewcommand{\baselinestretch}{1.5} %1.5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{glossary}
+
+%Sorted list
+\newcommand{\sortitem}[1]{%
+  \DTLnewrow{list}% Create a new entry
+  \DTLnewdbentry{list}{description}{#1}% Add entry as description
+}
+\newenvironment{sortedlist}{%
+  \DTLifdbexists{list}{\DTLcleardb{list}}{\DTLnewdb{list}}% Create new/discard old list
+}{%
+  \DTLsort{description}{list}% Sort list
+  \begin{itemize}%
+    \DTLforeach*{list}{\theDesc=description}{%
+      \item \theDesc}% Print each item
+  \end{itemize}%
+}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{\vspace{-4cm} Interesting Scientific Title That Encompasses your DPhil Subject \\  Transfer of Status  
+        }
+
+\author{\vspace{7cm}\\ \Large{\YourName}
+\\ Supervisor: Your Supervisor
+\\
+\\
+\\ St. Hugh's College
+\\ University of Oxford
+\\
+\\ 
+September 2023
+}
+
+\begin{document}
+\AddToShipoutPictureBG*{%
+  \AtPageCenter{%
+    \makebox(0,0){%
+      \raisebox{0.7\totalheight}{% Adjust the value as needed
+        \includegraphics[width=0.4\columnwidth]{figures/beltcrest.pdf}%
+      }%
+    }%
+  }%
+}
+\maketitle
+% \begin{titlepage}
+% \centering
+% % \includegraphics[width=0.4\columnwidth]{../figures/beltcrest.pdf}
+% \vspace*{-4cm} % Adjust the vertical spacing as needed
+% \maketitle
+% \end{titlepage}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\lstlistoflistings
+\newpage
+
+
+
+\newpage
+\thispagestyle{empty}
+% \maketitle
+
+\pagenumbering{arabic}
+
+\input{report/0_abstract}
+\newpage
+\input{1_introduction}
+\newpage
+\input{2_lit_review}
+\newpage
+\input{3_proposal}
+\newpage
+\input{report/4_future_work}
+\newpage
+\input{5_conclusion}
+
+\pagebreak
+\bibliographystyle{IEEEtran}
+\bibliography{report/references}
+
+\appendices
+
+%Not adding glossary, just using gls to help expand acronyms on their first usage.
+%\section{Glossary}
+%\printnoidxglossaries
+%\newpage
+
+\newpage
+\chapter{Personal \& Professional Development}
+\label{sec:personal-development}
+\input{6_appendix_development}
+
+\newpage
+\chapter{Paper In-progress}
+\label{sec:paper}
+
+\newpage
+
+\end{document}

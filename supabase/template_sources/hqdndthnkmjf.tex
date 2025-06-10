@@ -1,0 +1,160 @@
+\documentclass[a4paper, 11pt, addpoints]{exam}
+
+% A documentação completa da classe Exam pode ser encontrada em:
+%		https://ctan.org/pkg/exam
+% É bastante recomendável sua leitura, principalmente no caso de você querer modificar alguma configuração.
+
+% Utilizando o estilo de prova da Uninassau
+\usepackage{UninassauProva}
+
+% Informações gerais sobre a prova. Vá a esse arquivo para modificar as informações de acordo com a sua necessidade.
+\input{InfGerais}
+
+% Começo do Documento
+\begin{document}
+	% Inserindo o cabeçalho
+	\cabecalho
+	% Inserindo as informações da prova e garantindo que estarão centralizados na página.
+	\info
+	
+	% Descomente a linha seguinte caso você queira gerar um PDF com as soluções às questões.
+	\printanswers
+	
+	%---------------------------------------------------------------------------
+	% QUESTÕES -----------------------------------------------------------------
+	\begin{questions} % Ambiente de questões
+		% Comando para deixar os textos justificados. É necessário repetir o comando para cada novo ambiente.
+		\justifying
+		% Cada novo comando \question iniciará uma nova questão. A numeração será adicionada automaticamente.
+		\question[1] % O número dentro dos colchetes é o valor da questão.
+		Este é o exemplo de uma questão: o que significa o valor entre colchetes?
+		%-----------------------------------------------------------------------
+		\question[1\half] % Não é possível uma questão ter pontuação "quebrada", ou seja, 1,5. Mas é possível expressar com frações. Outra solução é expressar a pontuação entre 0 e 100.
+		Este é o exemplo de uma questão contendo equações ou fórmulas:\\ 
+		$x^{2} + 2\pi + \pi^{2}$
+		%-----------------------------------------------------------------------
+		\question % Definir a pontuação é opcional. Ao se definir junto do comando \question o LaTeX faz cálculos para mostrar a quantidade total de pontos da prova. Não há necessidade desse cálculo, portanto, caso o professor queira, talvez seja melhor acrescentar a pontuação da forma que melhor lhe convir.
+		Mais uma questão de exemplo: a definição da pontuação é opcional [1,0].
+		%-----------------------------------------------------------------------
+		\question
+		Uma questão pode também ser dividida em partes listadas como letras.
+			% Começando o ambiente de partes
+			\begin{parts}
+				\justifying % Tem de ser declarado em todo novo ambiente
+				\part[1] Essa é a primeira letra. % Uma parte pode também ter pontuação
+				\part 
+				Fazendo essa questão encontrará a resposta? % Pode ficar na linha seguinte, que nem as questões
+				\part Na verdade a resposta você encontra ao resolver a letra (\ref{letraE}).
+				\part Resolva a (\ref{letraE}).
+				\part Aqui você encontra a resposta.\label{letraE}
+					\begin{subparts}
+						\subpart Ou será que não? % Subpartes, e subsubpartes são permitidos.
+					\end{subparts}
+			\end{parts}
+		%-----------------------------------------------------------------------
+		\question
+		Deixando um espaço para que os alunos possam resolver a questão.
+		\vspace{3cm} % v[ertical]space
+		% Caso você queira distribuir os espaços igualmente enter todas as questões, e partes, subpartes e subsubpartes, basta escrever o seguinte comando ao fim da questão:
+		%			\vspace{\stretch{1}}
+		% Se alguma questão necessita do dobro de espaço em relação às demais, basta escrever ao fim da questão o seguinte comando:
+		%			\vspace{\stretch{2}}
+		% O mesmo raciocínio se aplica ao triplo do espaço, etc.
+		%-----------------------------------------------------------------------
+		\question
+		A questão seguinte vem depois do espaço dado para a questão anterior.
+			\begin{parts}
+				\part O espaçamento pode ser usado nas partes também. \vspace{1cm}
+				\part A parte seguinte vem depois de um espaço.
+			\end{parts}
+		%-----------------------------------------------------------------------
+		% Caso queira mudar logo de página, garantindo o espaço restante para a última questão, basta utilizar o comando a seguir:
+		\newpage
+		\question
+		Questão em uma nova página. E dá para deixar linhas para os alunos responderem.
+		\fillwithlines{5cm}
+		%-----------------------------------------------------------------------
+		\question
+		Uma questão de múltipla escolha:
+			\begin{choices}
+				\choice Essa é a alternativa correta.
+				\choice Na verdade é essa.
+				\choice Não é a anterior.
+				\choice Mas talvez seja.
+				\choice Melhor marcar essa aqui.
+			\end{choices}
+		%-----------------------------------------------------------------------
+		\question
+		Se as alternativas puderem ser em somente uma linha, basta utilizar o ambiente \texttt{oneparchoices}.
+			\begin{oneparchoices}
+				\choice Eu
+				\choice Ele
+				\choice Ela
+				\choice Nós
+				\choice Ninguém
+			\end{oneparchoices}
+		%-----------------------------------------------------------------------
+		\question
+		Mas também é possível fazer assim:
+			\begin{enumerate}[a)]
+				\item Primeira alternativa.
+				\item Segunda alternativa.
+				\item Terceira alternativa.
+				\item Quarta alternativa.
+				\item Quinta alternativa.
+			\end{enumerate}
+		%-----------------------------------------------------------------------
+		\question
+		Utilizando \texttt{multicols} para separar as alternativas em uma mesma linha:
+			\begin{multicols}{5}
+				\begin{enumerate}[(A)]
+					\item Alternativa 1
+					\item Alternativa 2
+					\item Alternativa 3
+					\item Alternativa 4
+					\item Alternativa 5
+				\end{enumerate}
+			\end{multicols}
+		%-----------------------------------------------------------------------
+		\question
+		Uma questão de múltipla escolha pode ter uma alternativa já marcada como a correta:
+			\begin{choices}
+				\justifying
+				\CorrectChoice A alternativa correta vai aparecer se a opção \texttt{printanswers} estiver ativa no início do documento.
+				\choice Alternativa errada.
+				\choice Alternativa errada.
+				\choice Alternativa errada.
+				\choice Alternativa errada.
+			\end{choices}
+		%-----------------------------------------------------------------------
+		\question
+		\justifying
+		Uma questão pode ter outros tipos de solução (no arquivo UninassauProva.sty tem um trecho onde é possível fazer outras configurações no ambiente de solução):
+			\begin{solution}
+				\justifying Solução utilizando o ambiente \texttt{solution}. Se \texttt{printanswers} estiver desabilitado, você deve fornecer o tamanho do espaço em branco que será posto no lugar da solução. Caso esse valor não seja especificado, o LaTeX não acrescentará espaço em branco.\\ 
+                Ex.: \verb*|\begin{solution}[5cm]|
+			\end{solution}
+			\begin{solutionorbox}
+				Solução com o ambiente \texttt{solutionorbox}. Se a solução não for impressa, haverá no lugar uma caixa de texto em branco, do tamanho especificado pelo usuário.\\ 
+                Ex.: \verb*|\begin{solutionorbox}[2cm]|
+			\end{solutionorbox}
+			\begin{solutionorlines}
+				Solução com o ambiente \texttt{solutionorlines}. Se a solução não for impressa, haverá no lugar linhas para o aluno escrever.\\
+                Ex.: \verb*|\begin{solutionorlines}[2cm]|
+			\end{solutionorlines}
+			\begin{solutionordottedlines}
+				Solução com o ambiente \texttt{solutionordottedlines}. Se a solução não for impressa, haverá no lugar linhas pontilhadas para o aluno escrever.\\
+                Ex.: \verb*|\begin{solutionordottedlines}[2cm]|
+			\end{solutionordottedlines}
+			\begin{solutionorgrid}
+				Solução com o ambiente \texttt{solutionorgrid}. Se a solução não for impressa, haverá no lugar uma grade.\\
+                Ex.: \verb*|\begin{solutionorgrid}[2cm]|
+			\end{solutionorgrid}
+		%-----------------------------------------------------------------------
+		% A linha abaixo serve para formatar a aparência da questão bônus.
+		\bonusqformat{\textbf{Questão bônus} \dotfill [\thepoints]}
+		\bonusquestion[1]
+		É possível acrescentar também questões bônus.
+	\end{questions}
+	
+\end{document}

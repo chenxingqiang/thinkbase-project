@@ -1,0 +1,174 @@
+\documentclass[a4paper,12pt]{article}
+
+% Paquetes necesarios
+\usepackage[utf8]{inputenc} % Codificación de caracteres UTF-8
+\usepackage[spanish]{babel} % Soporte para español
+\usepackage{graphicx} % Insertar imágenes
+\usepackage{fancyhdr} % Encabezados y pies de página personalizados
+\usepackage{tocbibind} % Para incluir la bibliografía en el índice
+\usepackage{setspace} % Controlar el espacio entre líneas
+\usepackage{enumitem} % Listas personalizadas
+\usepackage{titlesec} % Formatear títulos
+\usepackage{geometry} % Configurar márgenes
+\usepackage{newtxtext,newtxmath} % Tipografía Times New Roman
+\usepackage{ragged2e} % Alineación justificada
+\usepackage{url} % Mostrar URLs
+\usepackage{array} % Mejoras en las tablas
+\usepackage{pgfgantt} % Diagramas de Gantt
+\usepackage{lscape} % Páginas en modo apaisado
+\usepackage{xcolor} % Colores personalizados
+\usepackage{verbatim} % Entorno verbatim
+\usepackage{listings} % Mostrar código fuente
+
+% Configuración de márgenes
+\geometry{
+	a4paper,
+	left=3.5cm,
+	right=2.5cm,
+	top=3.5cm,
+	bottom=3.5cm
+}
+
+% Espaciado entre líneas
+\onehalfspacing
+
+% Configuración de los títulos para secciones
+\titleformat{\section}
+{\normalfont\bfseries\large} % Formato de sección: normal, negrita, 14pt (LARGE)
+{\thesection}{1em}{\MakeUppercase} % Mayúsculas
+\titlespacing*{\section}{0pt}{6pt}{18pt} % Espaciado de sección: 6pt antes, 18pt después
+\newcommand{\sectionbreak}{\clearpage} % Nueva página para cada sección
+
+% Configuración de los títulos para subsecciones
+\titleformat{\subsection}
+{\normalfont\bfseries\normalsize} % Formato de subsección: normal, negrita, 12pt (Large)
+{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{6pt}{18pt} % Espaciado de subsección: 6pt antes, 18pt después
+
+% Configuración de los títulos para subsubsecciones
+\titleformat{\subsubsection}
+{\normalfont\bfseries\normalsize} % Formato de subsubsección: normal, negrita, 10pt (large)
+{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{6pt}{18pt} % Espaciado de subsubsección: 6pt antes, 18pt después
+
+% Formato específico para Resumen y Abstract
+\titleformat{name=\section,numberless}[block]
+{\normalfont\bfseries\normalsize\centering}
+{}
+{0pt}
+{}
+
+% Capitalizar títulos
+\addto\captionsspanish{
+	\renewcommand{\contentsname}{Índice General}
+	\renewcommand{\listfigurename}{Índice de Imágenes}
+	\renewcommand{\listtablename}{Índice de Figuras}
+	\renewcommand{\tablename}{Tabla}
+	\renewcommand{\refname}{Referencias Bibliográficas}
+}
+
+% Configuración de los encabezados y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead{} % Eliminar contenido del encabezado
+\fancyfoot[R]{\thepage} % Número de página en la esquina inferior derecha
+\renewcommand{\headrulewidth}{0pt} % Eliminar la línea horizontal en la cabecera
+\renewcommand{\footrulewidth}{0pt} % Eliminar la línea horizontal en el pie de página
+
+% Redefinir numeración romana para minúsculas en las páginas preliminares
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyfoot[R]{\thepage}
+	\renewcommand{\thepage}{\roman{page}}
+}
+
+\begin{document}
+	
+	% Inclusión de la portada
+	\include{secciones/portada}
+	
+	% Para numeración romana desde la Hoja de Aprobación hasta el Índice de Figuras
+	\clearpage
+	
+	\pagenumbering{roman}    
+	
+	\setcounter{page}{2} % Iniciar en ii
+	\renewcommand{\thepage}{\roman{page}}
+	
+	% Hoja de aprobación
+	\pagestyle{plain}
+	\include{secciones/hoja_aprobacion}
+	\thispagestyle{plain} % Asegurarse de que la hoja de aprobación tenga número de página
+	
+	\newpage
+	
+	% Declaración de conformidad
+	\pagestyle{plain}
+	\include{secciones/declaracion_conformidad}
+	\thispagestyle{plain} % Asegurarse de que la página tenga número de página
+	
+	% Índice General (excluido del TOC)
+	\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+	\tableofcontents
+	\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+	\newpage
+	
+	% Índice de Tablas (excluido del TOC)
+	\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+	\listoftables
+	\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+	\newpage
+	
+	% Índice de Figuras (excluido del TOC)
+	\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+	\listoffigures
+	\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+	\newpage
+	
+	% Resumen o Abstract
+	\pagestyle{plain}
+	\include{secciones/resumen}
+	\thispagestyle{plain}
+	\newpage
+	
+	% Cambio a numeración arábiga
+	\pagenumbering{arabic}
+	\fancyfoot[R]{\thepage} % Número de página en la esquina inferior derecha
+	
+	% Justificar el contenido
+	\justifying
+	
+	% Eliminar la sangria en los parrafos
+	\setlength{\parindent}{0pt}
+	
+	% Espaciado entre párrafos de 6 puntos
+	\setlength{\parskip}{6pt} 
+	
+	% Sección 1: Introducción
+	\include{capitulos/introduccion}
+	
+	% Sección 2: Conceptos Fundamentales
+	\include{capitulos/conceptos_fundamentales}
+	
+	% Sección 3: Materiales y Métodos
+	\include{capitulos/materiales_y_metodos}
+	
+	% Sección 4: Análisis de Datos
+	\include{capitulos/analisis_de_datos}
+	
+	% Sección 5: Aspectos que puedan anticiparse
+	\include{capitulos/aspectos_anticipables}
+	
+	% Sección 6: Calendarización
+	\include{capitulos/calendarizacion}
+	
+	% Referencias Bibliográficas
+	\bibliographystyle{IEEEtran}
+	\bibliography{bibliografia/referencias}
+	
+	% Sección 8: Anexos
+	\addcontentsline{toc}{section}{Anexos} % Añadir Anexos al índice
+	\include{capitulos/anexos}
+	%\include{secciones/miscelaneas}
+	
+\end{document}

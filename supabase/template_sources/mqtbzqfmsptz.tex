@@ -1,0 +1,115 @@
+%Book style with A4 paper, chapeters start on left page only, using times fonts
+\documentclass[12pt,a4paper,oneside]{book}			
+
+\input{packages.tex}
+
+\begin{document}
+\selectlanguage{brazil}
+% \selectlanguage{english}
+
+% Define o título da tese.
+\def\thesisTitle{Título da Dissertação de Mestrado} 
+
+% Defina o nome do(a) autor(a) (é o seu nome).
+\def\thesisAuthor{Nome do(a) Autor(a)} 
+
+% Defina o nome do(a) orientador(a) 
+\def\thesisAdvisor{Nome do(a) Orientador(a)} 
+
+% Defina o nome do(a) co-orientador(a) 
+% Comente a linha abaixo se não tiver coorientador 
+\def\thesisCoAdvisor{Nome do(a) Coorientador(a)} 
+
+\pagestyle{empty}
+
+\include{cover/titulo} 
+
+\include{cover/ficha} 
+
+\include{cover/assinaturas} 
+
+% Includes page number at the bottom of the page.
+\pagestyle{plain}
+
+% Uses small roman numbers for page numbering.
+\pagenumbering{roman} 				
+
+% Resets the page counter to 1.
+\setcounter{page}{1}
+
+\include{cover/abstract}
+\include{cover/resumo} 
+\include{cover/prefacio} 
+\include{cover/agradecimentos} 
+\include{cover/dedicatoria} % opcional 
+
+
+%Prints the table of contents
+\renewcommand{\contentsname}{Sumário}
+\tableofcontents
+%\addcontentsline{toc}{chapter}{Sumário}
+\clearpage
+
+% Describes the research line and how the thesis is related with it 
+\include{cover/linha}
+
+% Prints a list of prizes and bibliographic and technical production 
+\include{cover/producao}
+
+
+% Prints a list of tables
+\listoftables					
+\addcontentsline{toc}{chapter}{Lista de Tabelas}
+\clearpage
+
+
+% Prints a list of figures
+\listoffigures									
+\addcontentsline{toc}{chapter}{Lista de Figuras}
+\cleardoublepage
+
+% Prints a list of abbreviations
+\include{cover/abreviacoes}
+
+% Prints a list of symbols
+\include{cover/simbolos}
+
+
+% Fancing heading alternating section and chapter with page count on the top
+\pagestyle{fancy}
+\fancyhead[LE,RO]{\thepage} 
+\fancyhead[RE,LO]{\nouppercase{\leftmark}} 
+\setlength{\headheight}{14.5pt}
+\cfoot{}
+
+\pagenumbering{arabic} 				
+% Uses arabic numbers (normal numbers) for page numbering.
+
+\setcounter{page}{1}
+% Resets the page counter to 1.
+
+% The chapters
+\include{chapters/a_introducao}
+\include{chapters/b_revisao}
+\include{chapters/c_metodologia}
+\include{chapters/d_resultados}
+\include{chapters/e_discussao}
+\include{chapters/f_conclusoes}
+
+%Without the word "section"
+\fancyhead[LO]{\nouppercase{\rightmark}} 
+
+\renewcommand{\bibname}{Referências} 
+\addcontentsline{toc}{chapter}{Referências}
+\bibliographystyle{apalike-portuguese} % note o uso do pacote natbib (para uso de referencia direta e indireta com \citet, \citep, etc.). 
+% \bibliographystyle{apalike} % Caso a proposta seja em inglês, descomentar para usar o estilo apalike original que vem com o pacote natbib. 
+\bibliography{referencias}
+
+% To start appendices with different chapter numbering
+\appendix
+
+\fancyhead[LO]{\nouppercase{\rightmark}} 
+
+\input{chapters/z_apendices.tex}
+
+\end{document}

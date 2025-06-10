@@ -10,7 +10,7 @@ class InstructionSelector:
     def __init__(self, config: AgentConfig):
         """Initialize instruction selector."""
         self.config = config
-        self.optimization_strategy = config.domain_config.get('optimization_strategy', 'default')
+        self.optimization_strategy = 'default'
         self.reward_history = []
 
     async def initialize(self):

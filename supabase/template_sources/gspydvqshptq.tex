@@ -1,0 +1,89 @@
+\documentclass{abertaythesis}  
+
+%load any additional packages
+\input{0-Utilities/0-packages}
+\input{0-Utilities/1-abbreviation_definitions}
+%input macros (i.e. write your own macros file called mymacros.tex 
+%and uncomment the next line)
+%\include{mymacros}
+
+%use \\[1ex] is a line break in the title
+\title{TITLE}
+
+\author{NAME}    %your name
+\division{Division of Cybersecurity} 
+\school{School of Design and Informatics}
+\supervisor{PRINCIPAL SUPERVISOR}
+
+% \degree{Doctor of Philosophy (PhD)}     %the degree
+\degree{DEGREE}
+\degreedate{MONTH, YEAR}         %the degree date
+
+% create commands to be able to use these values later
+% Commands added by Simon Liebl
+\makeatletter
+\let\inserttitle\@title
+\let\insertauthor\@author
+\let\insertdegree\@degree
+\let\insertsupervisor\@supervisor
+\makeatother
+
+% Change the number of chapters contained within your thesis
+\renewcommand{\MaxNumOfChapters}{5}
+
+%end the preamble and start the document
+\begin{document}
+
+% Please comment this line before using the template to remove the readme from the document
+\include{0-Utilities/2-readme}
+
+
+%set the number of sectioning levels that are numbered and appear in the contents
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+
+\maketitle                  % create a title page from the preamble info
+\myemptypage
+
+% start roman page numbering
+\begin{romanpages}
+\include{1-Pre-chapters/0-declaration}
+\include{1-Pre-chapters/1-quote}
+\include{1-Pre-chapters/2-acknowledgement}
+\include{1-Pre-chapters/3-dedication}
+\include{1-Pre-chapters/4-abstract}
+\include{1-Pre-chapters/6-acronyms}
+\include{1-Pre-chapters/8-symbols}
+\include{1-Pre-chapters/5-publications}
+
+\tableofcontents            % generate and include a table of contents
+\addcontentsline{toc}{chapter}{Table of Contents}
+
+\listoffigures              % generate and include a list of figures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+% \listofalgorithms
+% \addcontentsline{toc}{chapter}{List of Algorithms}
+
+\include{1-Pre-chapters/7-definitions}
+\end{romanpages}            % end roman page numbering
+
+%now include the files of latex for each of the chapters etc
+\include{2-Chapters/0-main}
+
+
+
+%next line adds the Bibliography to the contents page
+\addcontentsline{toc}{chapter}{Bibliography}
+%uncomment next line to change bibliography name to references
+%\renewcommand{\bibname}{References}
+\bibliography{4-Bibliography/bibliography.bib}        %use a bibtex bibliography file refs.bib
+\bibliographystyle{IEEEtranN}  %use the plain bibliography style
+
+\include{3-Appendices/0-header}
+
+\end{document}

@@ -1,0 +1,146 @@
+\documentclass[a4paper,12pt,oneside]{report}
+
+%% Escrever em Português
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Português correto:
+% Índice ao invés de Sumário
+\addto\captionsbrazil{%
+  \renewcommand{\contentsname}%
+    {Índice}%
+}
+% Bibliografia ao invés de Referências Bibliográficas
+\addto\captionsbrazil{%
+  \renewcommand{\bibname}%
+    {Referências}%
+}
+
+%% Escolha das fontes
+% Combo: Palatino + Helvetica + Courier, com EulerVM para matemática
+\usepackage{mathpazo}
+\usepackage[scaled=.95]{helvet}
+\usepackage{courier}
+\linespread{1.05} %%% Palatino needs more spacing.
+
+%% Geometria da página. 
+% Sugiro manter estas mesmas margens e 15 cm de espaço de texto, para ser igual à do IFT
+\usepackage[a4paper,pdftex,top=2.8cm,bottom=4cm,left=3.4cm,right=2.6cm]{geometry}
+\textwidth=15.0 true cm
+
+%% Pacotes úteis
+\usepackage{amsmath}
+%\usepackage{amsfonts}
+%\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{bm}
+%\usepackage{cite} % Use cite ou natbib, mas não os dois.
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{indentfirst} 
+\usepackage{mathrsfs} % Para script fonts.
+\usepackage{microtype}
+\usepackage[numbers]{natbib}
+\usepackage[textstyle,derived,squaren]{SIunits}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{slashed}
+\usepackage[nottoc]{tocbibind}
+\usepackage{verbatim}
+\usepackage{xspace}
+\usepackage[pdftex]{hyperref}
+
+%% Table of Contents com dois níveis
+\setcounter{tocdepth}{2}
+
+%% description mais compacto
+\newenvironment{compact_description}{
+  \begin{description}
+    \setlength{\itemsep}{0pt}
+    \setlength{\partopsep}{0pt}
+    \setlength{\parskip}{0pt}
+  }{\end{description}}
+
+%% itemize mais compacto
+\newenvironment{compact_itemize}{
+  \begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \setlength{\partopsep}{0pt}
+    \setlength{\parskip}{0pt}
+    }{\end{itemize}}
+
+%% Headers bonitos
+\usepackage{fancyhdr}
+\setlength{\headheight}{15.2pt}
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{%
+\markboth{\chaptername\ \thechapter.\ #1}{}}
+
+%% Menos espaço entre começo do capítulo e começo do texto
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\rmfamily\huge\mdseries}
+  {\chaptertitlename\ \thechapter}{20pt}{\huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{40pt}
+
+%% Páginas bonitas
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[C]{\textit \thepage} % except the center
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+\fancypagestyle{fancyplain}{%
+\fancyhf{}
+\fancyhead[L]{\textit{\leftmark}}
+\fancyhead[R]{\textit{\thepage}}
+%\fancyfoot[C]{\today} % Use este fancyfoot pros drafts (data no pé da página)!
+\fancyfoot[C]{} % Use este fancyfoot (vazio) pra versão final!
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+
+%% Informação dos PDFs
+\hypersetup{pdftitle={Título},
+            pdfauthor={Nome},
+            pdfsubject={Assunto},
+            pdfkeywords={Keyword1}
+            			{Keyword2}
+            			{Keyword3},
+			colorlinks=true,
+			citecolor=blue,
+			linkcolor=blue			
+            }
+
+\begin{document}
+
+%% Toda a parte preliminar da tese (Agradecimentos, Epígrafe, Resumo, etc.)
+\pagestyle{plain}
+\input Preambulo.tex
+
+%% Table of Contents e nova página
+\tableofcontents
+\newpage
+
+%% Capítulos da tese
+\pagestyle{fancyplain}
+\pagenumbering{arabic}
+
+\input cap1.tex
+%\input cap2.tex
+%\input cap3.tex
+%\input cap4.tex
+%\input cap5.tex
+%\input cap6.tex
+\appendix
+%% Truque
+\renewcommand{\chaptername}%
+    {Apêndice}
+%\input ap1.tex
+%\input ap2.tex
+%\input ap3.tex
+\bibliography{bibliografia}{}
+\bibliographystyle{estilobibliografia}
+
+\end{document}

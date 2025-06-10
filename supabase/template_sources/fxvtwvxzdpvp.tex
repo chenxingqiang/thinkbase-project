@@ -1,0 +1,730 @@
+% SNU Dissertation for CUMG members v1.2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% v.1.2 RELEASE NOTE
+% Margins: adjusted text height (bottom margin) to allow for proper space for page number when printed
+% Colophone page: inserted the SNU seal 
+% Chapter style: consistent chapter style applied to abstract and acknowledgements
+% Reduced flexibility for paragraph spacing (\addtolength{\parskip}{0pt plus 3pt minus 3pt})
+% Title page: English title page adjusted
+% Additional notes on bibliography style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% v1.1 RELEASE NOTE
+% fixed typos, colophone margin and website address bug
+% variable page number box for table of contents
+% fixed inconsistent styles btw thm and def
+% Hardcover (Eng. ver.) redesign
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX template designed by zeta709 and heavily modified by S. Moon
+% For printing on A4 paper, use ``fit'' option
+% For submission copy, consider turning on all entries under (ssss)
+% For defense manuscript, turn on the defense cover (dddd) and turn off all others (ssss)
+% Be sure to modify ./Injun/injun (인준지) and references.bib (인용)
+% For questions, please do not hesistate: sj.moon.math@gmail.com
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% UNDER THE HOOD (DO NOT MODIFY IF YOU DON'T KNOW WHAT YOU'RE DOING)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\RequirePackage{fix-cm}
+% options
+% 	oneside
+% 	twoside
+% 	ko: Korean
+% 	master
+% 	phd
+% 	openright: chapter title only on odd pages
+\documentclass[twoside,phd,4x6]{snuthesis}
+
+\include{snutocstyle} % SNU toc style
+\newlength\longest
+
+%% PDF SET UP
+\ifpdf
+	\input glyphtounicode\pdfgentounicode=1 %type 1 font
+	\usepackage[pdftex]{graphicx}
+\else
+	\usepackage[dvipdfmx]{graphicx}
+\fi
+
+\renewcommand{\cftpartpresnum}{Part~}
+\let\cftoldpartfont\cftpartfont
+\renewcommand{\cftpartfont}{\cftoldpartfont\cftpartpresnum} %part in front of part number
+\cftpagenumbersoff{part} % page number off for parts
+
+%% custom line breaks for long words (add your own!)
+\hyphenation{Lo-renz}
+\hyphenation{synch-ro-ni-zation}
+\hyphenation{dimen-sion-al}
+\hyphenation{Lee-Joo-Hyun-babo}
+
+\usepackage[defaultlines=2,all]{nowidow} % do you hate poor widows?
+\usepackage{lipsum} % lorem ipsum example contents
+\usepackage{xpatch}
+\usepackage{booktabs} % to use \toprule \midrule \bottomrule commands in tabular
+\usepackage[backend=bibtex,style=authoryear-comp,dashed=false,abbreviate=false,backref=false,maxbibnames=12,maxcitenames=2,sortcites=false]{biblatex}
+	\setlength\bibitemsep{\baselineskip} % spacing between bibitems when single-spacing is used
+	\addtolength\bibitemsep{0pt plus 10pt minus 10pt} % some wiggle room for bibitem spacing
+	\xpatchbibmacro{date+extradate}{%
+		\printtext[parens]%
+	}{%
+		\setunit*{\addcomma\space}%
+		\printtext%
+	}{}{} 
+	\renewbibmacro{in:}{}
+	\DeclareFieldFormat[article,incollection,inproceedings]{pages}{#1}
+	\DeclareFieldFormat[book,inbook]{pages}{#1\addspace pp\adddot} % pp. for books
+	\DeclareDelimFormat[bib,biblist]{nametitledelim}{\addcolon\space} % colon after year
+	\DeclareFieldFormat
+	[article,incollection,inproceedings]
+	{title}{#1}
+	\renewbibmacro*{journal+issuetitle}{%
+		\usebibmacro{journal}%
+		\setunit*{\addcomma\space}%
+		\iffieldundef{series}
+		{}
+		{\newunit
+			\printfield{series}%
+			\setunit{\addspace}}%
+		\usebibmacro{volume+number+eid}%
+		\setunit{\addspace}%
+		\usebibmacro{issue+date}%
+		\setunit{\addcolon\space}%
+		\usebibmacro{issue}%
+		\newunit}
+	\DeclareFieldFormat{journaltitle}{\mkbibemph{#1\isdot}}
+	\DeclareFieldFormat[article]{volume}{\bfseries #1}
+	\renewbibmacro{volume+number+eid}{% removing number entry
+		\printfield{volume}%
+		\setunit{\addcomma\space}%
+		\printfield{eid}}
+	\DeclareFieldFormat{titlecase}{\MakeTitleCase{#1}}
+	\newrobustcmd{\MakeTitleCase}[1]{%
+		\ifthenelse{\ifcurrentfield{booktitle}\OR\ifcurrentfield{booksubtitle}%
+		\OR\ifcurrentfield{maintitle}\OR\ifcurrentfield{mainsubtitle}%
+		\OR\ifcurrentfield{journaltitle}\OR\ifcurrentfield{journalsubtitle}%
+		\OR\ifcurrentfield{issuetitle}\OR\ifcurrentfield{issuesubtitle}%
+		\OR\ifentrytype{book}\OR\ifentrytype{mvbook}\OR\ifentrytype{bookinbook}%
+		\OR\ifentrytype{booklet}\OR\ifentrytype{suppbook}%
+		\OR\ifentrytype{collection}\OR\ifentrytype{mvcollection}%
+		\OR\ifentrytype{suppcollection}\OR\ifentrytype{manual}%
+		\OR\ifentrytype{periodical}\OR\ifentrytype{suppperiodical}%
+		\OR\ifentrytype{proceedings}\OR\ifentrytype{mvproceedings}%
+		\OR\ifentrytype{reference}\OR\ifentrytype{mvreference}%
+		\OR\ifentrytype{report}\OR\ifentrytype{thesis}}
+		{#1}
+		{\MakeSentenceCase{#1}}} % make only first letter of article title capital only
+	\addbibresource{references.bib}
+	% comma after author even when there are two authors (AMS peculiarity)
+	\AtBeginBibliography{%
+		\renewcommand*{\finalnamedelim}{%
+		%   \ifnumgreater{\value{liststop}}{2}{\finalandcomma}{} % removed from original
+			\finalandcomma % added to original
+			\addspace\bibstring{and}\space}%
+		}
+\usepackage{amsmath} \allowdisplaybreaks[4] % this will allow page breaks for align. Likelihood options: 0-4
+\usepackage{amssymb}
+\usepackage{amsthm}
+%	\theoremstyle{definition}
+	\newtheoremstyle{newdef}% name of the style to be used
+	{}% measure of space to leave above the theorem. E.g.: 3pt
+	{}% measure of space to leave below the theorem. E.g.: 3pt
+	{}% name of font to use in the body of the theorem
+	{}% measure of space to indent
+	{\bfseries}% name of head font
+	{}% punctuation between head and body
+	{1em}% space after theorem head; " " = normal interword space
+	{}
+	\theoremstyle{newdef}
+	\newtheorem{definition}{Definition}[chapter]
+	\makeatletter
+	\def\thm@space@setup{%
+		\thm@preskip=0.5\baselineskip % modifying buffer for theorems and definitions
+		\thm@postskip=\thm@preskip % or whatever, if you don't want them to be equal
+	}
+	\makeatother
+	\newtheoremstyle{slthm}% name of the style to be used
+	{}% measure of space to leave above the theorem. E.g.: 3pt
+	{}% measure of space to leave below the theorem. E.g.: 3pt
+	{\slshape}% name of font to use in the body of the theorem
+	{}% measure of space to indent
+	{\bfseries}% name of head font
+	{}% punctuation between head and body
+	{1em}% space after theorem head; " " = normal interword space
+	{}
+	\theoremstyle{slthm}
+	\newtheorem{theorem}{Theorem}[chapter]
+	\newtheorem{corollary}{Corollary}[theorem]
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}{Proposition}[chapter]
+\usepackage{commath}
+\renewcommand{\labelenumi}{\upshape{(\alph{enumi})}}
+\renewcommand{\labelenumii}{\alph{enumi}~\Roman{enumii}.}
+\usepackage{enumitem}
+	\setlist{nolistsep} % remove spacing between items in a list
+\usepackage{upgreek}
+\usepackage{mathrsfs}
+\usepackage{siunitx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\tikzset{>=latex}
+\usepackage{tabularx}
+\usepackage[flushleft]{threeparttable}
+%\usepackage{kbordermatrix} % http://www.hss.caltech.edu/~kcb/TeX/kbordermatrix.sty
+%	\renewcommand{\kbldelim}{[} % Left delimiter
+%	\renewcommand{\kbrdelim}{]} % Right delimiter
+%	\newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}} % matrix scaling
+\usepackage[nodisplayskipstretch]{setspace} 
+% remove setspace package to change back caption spacing to double spacing & delete font= options below
+% setspace option also meant to reduce display equation spacing
+\usepackage[labelfont=bf]{caption} % change number for spacing modification in: font={stretch=1.1}
+	\captionsetup[figure]{labelfont={bf},name={Figure},labelsep=quad,font={stretch=1.1}}
+	\captionsetup[table]{labelfont={bf},name={Table},labelsep=quad,font={stretch=1.1}}
+\usepackage{tocloft} % table of contents
+	\setlength\cftbeforesubsecskip{0.5\baselineskip} % item spacing for toc subsections - if single spacing used
+	\setlength\cftbeforesecskip{0.5\baselineskip} % item spacing for toc sections - if single spacing is used
+	\setlength\cftbeforechapskip{\baselineskip} % item spacing for toc chapters - if single spacing is used
+	\setlength\cftbeforefigskip{\baselineskip} % item spacing for list of figures - if single spacing used
+	\setlength\cftbeforetabskip{\baselineskip} % item spacing for list of tables - if single spacing used
+	\addtolength\cftbeforefigskip{0pt plus 10pt minus 10pt} % wiggle room for figure spacing
+	\addtolength\cftbeforetabskip{0pt plus 10pt minus 10pt} % wiggle room for table spacing
+	\renewcommand{\cftchapdotsep}{\cftnodots} % change to 2 if leader dots for chap are desired
+	\renewcommand{\cftsecdotsep}{2}
+	\renewcommand{\cftsubsecdotsep}{2}
+	\renewcommand{\cftfigdotsep}{2}
+	\renewcommand{\cfttabdotsep}{2} % adjust number to control spacing between the dots
+	\renewcommand{\cftpnumalign}{r} % l: page number left-aligned, r: page number right-aligned
+% remove spacing between chapters in lof and lot
+\usepackage{xpatch}
+
+\makeatletter
+\xpatchcmd{\@chapter}{%
+	\addtocontents{lof}{\protect\addvspace{10\p@}}%
+	\addtocontents{lot}{\protect\addvspace{10\p@}}%
+}{}{}{}
+\makeatother
+%\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+\usepackage{etoolbox}
+	\AtBeginEnvironment{quote}{\singlespace\vspace{-\topsep}}
+	\AtEndEnvironment{quote}{\vspace{-\topsep}\endsinglespace}
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+	\SetTracking{encoding={*}, shape=sc}{40} % reduce spacing in scshape
+	\hyphenpenalty=1500 % reduce hyphenation frequency (10000 to disallow it completely)
+%	\exhyphenpenalty=100 % allows preexisting hyphens 
+%	\pretolerance=2000 % allowing some white spaces (9999 to maximize)
+%	\tolerance=2000 % allowing some white spaces (9999 to maximize) TeX's secondattempt
+\setlength{\skip\footins}{2\baselineskip} % proper spacing between footnote and main text
+%\counterwithout{footnote}{chapter} % continuous numbering of footnotes throughout doc if desired
+\usepackage{mathtools} % for dashed and dotted lines %\sampleline{},\sampleline{dashed},\sampleline{dotted},\sampleline{dash pattern=on .7em off .2em on .05em off .2em}
+\DeclareRobustCommand\sampleline[1]{%
+	\tikz\draw[#1,line width=0.35mm] (0,0) (0,\the\dimexpr\fontdimen22\textfont2\relax)
+	-- (1.5em,\the\dimexpr\fontdimen22\textfont2\relax);%
+}
+\usepackage[figuresright]{rotating}
+%\renewcommand{\arraystretch}{0.75}
+\raggedbottom % removes random spacing between paragraphs, use with caution! To undo, use \flushbottom
+\usepackage{imakeidx}
+	\makeindex[columns=2, title=Index, 
+	options= -s mystyle.ist]
+	% get rid of unwanted indent
+	\makeatletter
+	\def\@idxitem{\par\hangindent 0pt}
+	\makeatother
+	\indexsetup{othercode=\small}
+	
+\usepackage{lettrine}
+\usepackage{GoudyIn}
+\renewcommand{\LettrineFontHook}{\color{black}\GoudyInfamily{}}
+	\setcounter{DefaultLines}{3}
+	\setlength{\DefaultNindent}{0pt}
+	\setlength{\DefaultFindent}{1pt}
+	\usepackage{pgfornament}
+	
+\usepackage{needspace} % for unusual circumstances requiring more space in page (ex. \needspace{4\baselineskip})
+
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\fontsize{14}{14}\bfseries}{\thesection}{1em}{\hspace{0em}}{}
+\titleformat{\chapter}{\normalfont\fontsize{16}{16}\bfseries}{\thechapter}{1em}{\hspace{0em}}{}
+
+\usepackage{afterpage} % needed for full page figures
+\makeatletter
+\@fpsep\textheight
+\afterpage{\global\setlength\@fpsep{8\p@ \@plus 2fil}}
+\makeatother
+
+\renewcommand\floatpagefraction{.001}
+\makeatletter
+\setlength\@fpsep{\textheight}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% END OF UNDER THE HOOD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% USER-DEFINED MACROS (ADD YOUR OWN AS NEEDED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\ihat}{\hat{\textbf{\i}}} % tensor notation stuff
+\newcommand{\jhat}{\hat{\textbf{\j}}}
+\newcommand{\khat}{\mathbf{\hat{k}}}
+\let\oldvec\vec 
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\ddt}[2]{\frac{\Delta {#1}}{\Delta{#2}}}
+\newcommand{\pdt}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\paren}[1]{\left( #1 \right)}
+\def \nobreakseq {\nobreak \hskip 0pt \hbox}
+%\def\v#1{\vec{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% USER INFORMATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% TITLE
+\title{A Very Long \\English Title of \\Your Dissertation} % main title
+\title*{한국어 제목} % Korean title
+\allcapstitle{A VERY LONG}{ENGLISH TITLE OF}{YOUR DISSERTATION} %allcaps title (for english hardcover design)
+
+%% 소속
+\academicko{이학}
+\schoolen{서울대학교 대학원}
+\departmenten{지구환경과학부}
+\departmentko{지구환경과학부}
+\bachelors{Jibang University}
+\bsyear{2013}
+\masters{Waeguk University}
+\msyear{2016}
+
+%% Author's(Your) name
+\author{Your Name} % English Name
+\author*{너~~이~~름} % Korean Name
+\authorallcaps{YOUR NAME} % All caps English name
+\cvlink{www.yourwebsite.com} % link to your CV or personal website
+
+%% 학번
+\studentnumber{0000-00000}
+
+%% 지도교수님 성함 Advisor's name
+\advisor{Jong-Jin Baik}
+\advisor*{백~종~진}
+
+%% 학위 수여일 Graduation date
+\graddate{2030년~~8월} % Graduation Year and Month in Korean
+\endate{August 2030} % Graduation Month in English
+\defensedate{2030년~~5월~~7일} % Defense Date in Korean
+\gradyear{2030} % Year of Graduation
+
+%% 인준지 submission date
+\submissiondate{2021~년~5~월}
+
+%% 인준지 approval date
+\approvaldate{2030~년~7~월}
+
+%% Note: 인준지의 교수님 성함은
+%% 컴퓨터로 출력하지 않고, 교수님께서
+%% 자필로 쓰시기도 합니다.
+
+%% Committee members' names in Korean
+\committeemembers%
+{김~유~명}%
+{백~종~진}%
+{이~저~명}%
+{박~돌~출}%
+{최~외~부}
+
+%% Committee members' names in English
+\encommitteemembers%
+{Professor Famous Kim, Chair}%
+{Professor Jong-Jin Baik, Advisor}%
+{Professor Renowned Lee}%
+{Professor Eminent Park}%
+{Professor External Choi}
+
+%% PDF Information
+\usepackage[]{hyperref}
+\hypersetup{
+	pdftitle={CUMG Dissertation Template},
+	pdfauthor={Your Name},
+	pdfsubject={PhD Dissertation},
+	pdfkeywords={SNU, CUMG, PhD, dissertatio, template},
+	bookmarksnumbered=true,     
+	bookmarksopen=true,         
+	bookmarksopenlevel=1,       
+	colorlinks=false, % do not use links for references and footnotes
+	hidelinks, % remove ugly boxed windows indicating links           
+	pdfstartview=Fit, % choose "Fit" to start with fit window            
+	pdfpagemode=UseOutlines,    % outlines on pdf document
+	pdfpagelayout=TwoPageRight % two page viewer with odd number pages to the right/ other option: "OneColumn" for scrolling
+}
+
+\usepackage{pdfpages} % activate for inserting injun.pdf
+%\renewcommand{\theequation}{\thechapter.\arabic{equation}} % chapter 0 considerations
+%\renewcommand{\thefigure}{\thechapter.\arabic{figure}} % chapter 0 considerations
+
+\begin{document}
+\pagenumbering{Roman}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% FRONT MATTER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Cover to be used for thesis defense (dddd)
+%\presentation{최종} % options: 최종, 중간, 제안
+%\makefrontcover % final defence
+
+%% Hardcover (English version) (ssss)
+%\hardcoveren
+%\cleardoublepage
+
+% Hardcover (Default - Korean based) (ssss)
+\hardcover
+\cleardoublepage
+
+%% To Insert Injun Page (ssss)
+\includepdf[pages=-]{./Injun/injun.pdf} % injun template in FinalDraft2 folter
+\cleardoublepage
+
+%% Turn on inner cover (English title and committee member names) options: jadae vs. non-jadae (ssss)
+%\makefrontcoveren % for those who did not go to snu for undergrand and master's
+\makefrontcoverenjadae % jadae option for those who went to snu for undergrand
+
+
+%% REQUIRED
+\makeapproval % for some reason page margins get messed up without this command
+
+
+%% Colophon (ssss)
+\publications{Name~et~al., 2021. \emph{J. Good Sci.} 96, 105708; }{Name~et~al., 2021. \emph{Int. J. Nice Sci.} 31, To Appear; }{}{}{}
+\makecolophon
+\clearpage
+
+%% Dedication page (ssss)
+%\thispagestyle{empty}
+%\null\vfill
+%\settowidth\longest{\lettrine{A}{nte mare et terr\={a}s} et quod tegit omnia caelum}
+%\begin{center}
+%	\parbox{\longest}{%
+%		\raggedleft
+%		{\slshape To My Mother}
+%	}
+%\end{center}
+%\vfill\vfill
+%\cleardoublepage
+
+%% To Include an epigraph (ssss)
+%\cleardoublepage
+%\thispagestyle{empty}
+%\null\vfill
+%\settowidth\longest{\lettrine{A}{nte mare et terr\={a}s} et quod tegit omnia caelum}
+%\begin{center}
+%	\parbox{\longest}{%
+%		\begingroup
+%		\setstretch{1.2}
+%		\raggedright{%
+%			\lettrine{N}{ice} and inspirational quote can be inserted here.\par\bigskip
+%		}
+%		\raggedleft{---Famous Person, \emph{Magnum Opus}}\par%
+%		\endgroup
+%	}
+%\end{center}
+%\vfill\vfill
+%\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ABSTRACT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{roman} % start page numbering (first in Roman numeral)
+
+\keyword{PhD, CUMG, dissertation, template, cloud, urban, chaos}
+\begin{abstract}
+\noindent 
+The abstract should not be too long but long enough ($>2$ pages). This should not have any citations or references to chapters. It can be broken up into paragraphs. Example text: \lipsum[1-4]
+\end{abstract}
+
+%% Turn on for acknowledgmentin the front matter (English)
+%\cleardoublepage
+%\acknowledgment
+%Thank you.
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TABLE OF CONTENTS, LIST OF FIGURES, ETC (NO NEED TO MODIFY; ALREADY FORMATTED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begingroup
+\setstretch{1.1} % make multiline chapter titles single spaced, also turn on tocloft options
+	\cftsetpnumwidth{2.0em} \cftsetrmarg{3.55em} % adjust spacing between page number and title
+	\phantomsection\clearpage\addcontentsline{toc}{chapter}{Contents}%
+%	\tableofcontents
+	{\def\makebox[#1][#2]#3{#3}\tableofcontents}
+\endgroup
+% some tolerance for nicer pagenation
+\addtolength{\topskip}{0pt plus 5pt minus 5pt}
+\addtolength{\parskip}{0pt plus 3pt minus 3pt}
+% make captions single spacing in list of figures and list of tables
+% be sure to also modify tocloft options for item separation
+\begin{sloppypar} % sloppy command here to avoid overfull hbox
+\begingroup
+\emergencystretch 1em % reduce spacing between words under sloppy
+\countdef\interlinepenalty255 %allow pagebreaks for LoF figure captions
+\setstretch{1.1} 
+	\cftsetpnumwidth{2.0em} \cftsetrmarg{3.55em} % adjust spacing between page number and caption
+	\clearpage\phantomsection\clearpage\addcontentsline{toc}{chapter}{List of Figures}%
+%	\listoffigures
+    {\def\makebox[#1][#2]#3{#3}\listoffigures}
+	\clearpage\phantomsection\clearpage\addcontentsline{toc}{chapter}{List of Tables}%
+%	\listoftables
+    {\def\makebox[#1][#2]#3{#3}\listoftables}
+\endgroup
+\end{sloppypar}
+
+\flushbottom % For consistent bottom page margins, use with caution! to undo, use \raggedbottom
+\addtolength{\baselineskip}{0pt plus 1pt minus 1pt} % with flushbottom, give linespace some room
+
+\cleardoublepage % fresh start for chapter 1
+\pagenumbering{arabic}
+\addtolength{\topskip}{0pt plus-3pt minus-3pt} %undo too much wiggle room
+\addtolength{\parskip}{0pt plus-4pt minus-4pt}
+%\setcounter{chapter}{-1} % Chapter 0 for "Overview" (per tradition).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% MAIN CONTENTS (START WRITING YOUR DISSERTATION!)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter[An Example Chapter]{An Example Chapter}\label{ch:example}
+
+\section{Basic guide: How to use the {\LaTeX} template}
+Note that in English writing, the first paragraph is generally not indented. Here's how an equation is inserted: \begin{equation} \frac{d}{d\tau}\delta Z_{k} = -k^{2}b\delta Z_{k} + \smashoperator{\sum_{(i,j)\in Q_{k}}}\left(k X_{i}\delta Y_{j}\mathscr{S}_{Z}\vphantom{\sqrt{2}}\right).
+\end{equation} Notice, for the summation, the command \verb|\smashoperator| is used for nicer alignment (otherwise, there will be a gap between $+$ and $\Sigma$. Here's how to insert block equations\index{equation}: \begin{align}
+&\dot{X} = -\sigma X+\sigma Y,\label{eq:loi3x}\\
+&\dot{Y} = -XZ + rX - Y,\label{eq:loi3y}\\
+&\dot{Z} = XY - bZ,\label{eq:loi3z}
+\end{align} where $r$, $\sigma$, and $b$ are real positive parameters, and the dot above each variable denotes its first derivative with respect to the scaled time $\tau$. Note that the word ``equation'' is indexed. To activate index, retrieve the \verb|\makeindex| command at the end of this document. This is how inline math works: the variable $x$ is a random variable pulled out of a normal distribution: $x\sim\mathscr{N}(\mu,\sigma)$. Equations are referenced with parentheses only as in (\ref{eq:loi3x})--(\ref{eq:loi3z}).
+
+The following is the theorem environment. The options include: definition, theorem, proposition, lemma, and proof.
+\begin{definition}\label{def:chaos}
+	Given a compact metric space $X$, a continuous map $f:X\rightarrow X$ is \emph{chaotic} if
+	\begin{enumerate}
+		\item $f$ is topologically transitive; i.e., there exists an initial condition $x_{0}\in X$ such that for every $\delta > 0$ and $y\in X$, $\abs{f(t,x_{0})-y}<\delta$ at some time $t$,
+		\item the periodic points of $f$ are dense in $X$; i.e., the initial conditions leading to periodic orbits form a dense set in $X$, and
+		\item $f$ exhibits sensitive dependence on initial conditions; i.e., given an error bar $\varepsilon>0$, for every $\delta > 0$ and $x\in X$ there exists $y\in X$, $\abs{x-y}<\delta$, such that $\abs{f(t,x)-f(t,y)}\geq\varepsilon$ at some time $t$.
+	\end{enumerate}
+\end{definition}
+
+This is how citation works. For inline citation, use \verb|\textcite| as in \textcite{ahmed2020a} and \textcite{kalnay2010ensemble}. For parenthetical citations, use \verb|\parencite| as follows \parencite{aligo2009on,lorenz96}. Here's how footnote works\footnote{Like this. You can also include citations in the footnote \parencite{argyris2005chaos,arnett2011turbulent}.} Datasets are also cited properly, but be sure to use the right format in the \verb|references.bib| file \parencite{ecmwf-hres,era5}.
+
+Chapters and sections can also be referenced if labeled properly. For example, this is Chapter~\ref{ch:example}. The next section is Section~\ref{sec:figtab}.
+
+Units should be implemented using siunitex. For example, the length of this page is 1~\si{\kilo\metre}. My favorite temperature is 18~\si{\celsius}. I can walk at the speed of ${\sim}30~\si{\metre\per\second}$.
+
+Here's a theorem:
+\begin{theorem}\label{thm:chaos}
+	Let $f$ be a continuous real function defined on a closed interval $[a,b]$, and let $\epsilon > 0$ be given. Then there exists a polynomial $p$ with real coefficients such that $\abs{f(x)-p(x)}<\epsilon$ for all $x$ in $[a,b]$.
+\end{theorem}
+
+\section{Inserting figures and tables}\label{sec:figtab}
+\subsection{Inserting a figure}
+Moving on to the figures: figures should be placed in the center of their own separate page. The captions should go directly below it or in some rare cases (not recommended) on the next page at the center. It is shown in Fig.~\ref{fig:pngex} how png files are inserted. Figure~\ref{fig:epsex} shows how eps files are inserted. As usually, the figures can be cropped by using the trim command. I think the numbers for the crop margins mean: left, top, right, bottom, in this order, but I am not sure.
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=\textwidth, trim= 40 40 40 80, clip]{./figs/terminology.png}
+	\caption{\label{fig:pngex} Example of png figure insertion.}
+\end{figure}
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=\textwidth, trim= 0 0 0 0, clip]{./figs/twinex_genlo.eps}
+	\caption{\label{fig:epsex} Example of eps figure insertion.}
+\end{figure}
+
+pgf/TikZ can be a handy tool for diagrams especially if you don't want to deal with inkscape or Adobe (\emph{see} Fig.~\ref{fig:tikzex})
+
+\begin{figure}[p]
+	\centering
+	\scalebox{0.8}{
+		\begin{tikzpicture}[]
+			
+			% limits
+			\newcount\yearOne; \yearOne=0
+			\def\w{14}    % width of axes
+			\def\n{3}     % number of decades
+			\def\noffset{1} % offset labels
+			\def\lt{0.3} %  ten tick length
+			\def\lf{0.20} % five tick length
+			\def\lo{0.20} %  one tick length
+			
+			% help functions
+			\def\yearLabel(#1,#2){\node[right] at ({(#1-\yearOne)*\w/\n/10},\lt-0.3) {#2};}
+			\def\yearArrowLabel(#1,#2,#3,#4){
+				\def\xy{{(#1-\yearOne)*\w/\n/10}}; \pgfmathparse{int(#2*100)};
+				\ifnum \pgfmathresult<0
+				\def\yyp{{(\lt*(0.90+#2))}}; \def\yyw{{(\yyp-\lt*#3)}}
+				\draw[<-,thick,black,align=center,execute at begin node=\setlength{\baselineskip}{10pt}] (\xy,\yyp) -- (\xy,\yyw) node[below,black] at (\xy,\yyw) {\Large#4};
+				\else
+				\def\yyp{{(\lt*(0.10+#2)}}; \def\yyw{{(\yyp+\lt*#3)}}
+				\draw[<-,thick,black,align=center,execute at begin node=\setlength{\baselineskip}{10pt}] (\xy,\yyp) -- (\xy,\yyw) node[above,black] at (\xy,\yyw) {\Large#4};
+				\fi}
+			\def\numLabel(#1,#2,#3,#4){
+				\def\xy{{(#1-\yearOne)*\w/\n/10}}; \pgfmathparse{int(#2*100)};
+				\ifnum \pgfmathresult<0
+				\def\yyp{{0}}; \def\yyw{{\lt}}
+				\draw[-,thick,black,align=center] (\xy,\yyp) -- (\xy,\yyw) node[above,black] at (\xy,\yyw) {\large#4};
+				\else
+				\def\yyp{{0}}; \def\yyw{{-\lt}}
+				\draw[-,thick,black,align=center] (\xy,\yyp) -- (\xy,\yyw) node[below,black] at (\xy,\yyw) {\large#4};
+				\fi}
+			% axis
+			%\draw[thick] (0,0) -- (\w,0);
+			\draw[->,thick] (-\w*0.03,0) -- (\w*1.03,0);
+			
+			% label
+			\yearLabel(31,\huge$r$)
+			\yearArrowLabel(2,0.5,4.0,pitchfork\\bifurcation)
+			\numLabel(2,0.0,1.0,1)
+			\yearArrowLabel(11, 0.5,4.0,homoclinic\\bifurcation)
+			\numLabel(11, 0.0,1.0,13.9...)
+			\yearArrowLabel(20, 0.5,10.0,heteroclinic\\bifurcation)
+			\numLabel(20, 0.0,1.0,24.06...)
+			\yearArrowLabel(24.5,0.5,4.0,Hopf\\bifurcation)
+			\numLabel(24.5, 0.0,1.0,24.74...)
+			
+			% phenomena
+			%\draw[-|,thick,gray] (-1*\w/\n/10,-1.0) -- (2.0*\w/\n/10,-1.0)
+			%node[midway,below=1pt,align=left,execute at begin node=\setlength{\baselineskip}{10pt}] {stable};
+			\draw[<-,thick,gray] (20*\w/\n/10,2.7) -- (30*\w/\n/10,2.7)
+			node[near end,above=0.1pt] {\it{strange attractor}};
+			\draw[-,dotted,thick,gray] (30*\w/\n/10,2.7) -- (31*\w/\n/10,2.7);
+			
+			\node[above,gray,align=left,execute at begin node=\setlength{\baselineskip}{10pt}] at (0.5*\w/\n/10,0.1) {\small\it{all}\\\small\it{stable}};
+			\node[above,gray,align=left,execute at begin node=\setlength{\baselineskip}{10pt}] at (6.5*\w/\n/10,0) {\small\it{trivial points unstable}\\\small\it{nontrivial points stable}};
+			\node[above,gray,align=left,execute at begin node=\setlength{\baselineskip}{10pt}] at (15.5*\w/\n/10,0) {\small\it{transient chaos}\\\small\it{nontrivial points stable}};
+			\node[above,gray,align=left,execute at begin node=\setlength{\baselineskip}{10pt}] at (28*\w/\n/10,0.1) {\small\it{strange attractor}\\\small\it{all unstable}};
+			\node[above,gray,align=left,execute at begin node=\setlength{\baselineskip}{10pt}] at (22.25*\w/\n/10,0.1) {\small\it{attractor}\\\small\it{coexistence}};
+			
+		\end{tikzpicture}
+	}
+	\caption{An example TikZ plot.\label{fig:tikzex}}
+\end{figure}
+
+\subsection{Inserting a table}
+Table~\ref{tab:ex1} shows how a table can be inserted. If the table is too long, then it can be rotated 90$^{\circ}$ as shown in Table~\ref{tab:ex2}.
+
+\begin{table}[p]
+	\caption{\label{tab:ex1}This is an example table caption. Some argue that table captions should omit periods. I am not so sure about that.}
+	\begin{center}
+		\begin{tabular*}{\textwidth}{l @{\extracolsep{\fill}} ccc}
+			\toprule
+			& vs. original & Horizontal & Diagonal\\
+			\cmidrule{2-4}
+			Level 1 & 0.1704 & 0.0198 & $\hphantom{-}$0.0208 \\
+			Level 2 & 0.0426 & 0.0037 & $-0.0015$\\
+			Level 3 & 0.0024 & 0.0032 & $\hphantom{-}$0.0022 \\
+			\bottomrule
+		\end{tabular*}
+	\end{center}
+\end{table}
+
+\begin{sidewaystable}[p!]
+	\centering
+	\captionsetup{width=.85\textwidth,font={stretch=1.1}}
+	\caption{\label{tab:ex2}Example table caption. In order to include references to other figures or tables, be sure to use the ``protect'' command as follows: Fig.~\protect{\ref{fig:tikzex}}.}
+	\begin{tabular*}{.85\textwidth}{l@{\extracolsep{\fill}}cccccccccc}
+		\toprule
+		Classification & &\multicolumn{5}{c}{$r$ value} & &\multicolumn{3}{c}{Receiver dimension}\\
+		\cmidrule{3-7} \cmidrule{9-11}
+		& &500 & 525 & 550 & 575 & 600 & & 3 & 12 & 24 \\
+		\midrule
+		Correlation coefficient	& & 0.9083 & 0.9240 & 0.8983 & 0.9041 & 0.8666 & & 0.7883 & 0.9513 & 0.9611\\
+		\bottomrule
+	\end{tabular*}
+\end{sidewaystable}
+
+
+\begin{sloppypar}
+\lipsum[2]
+\end{sloppypar}
+
+
+\chapter[Other \\Things]{Other Things}
+
+Sometimes paragraphs are too weird that words tend to stick out. In that case use the \verb|sloppypar| environment for that paragraph. Do not overuse it as it can make the paragraph look bad.
+
+If there is a hanging line with only one word, be sure to put repalce the space with \verb|\tilde|: For example, this is the end of the~sentence.
+
+For chapter headings, the title inside the brackets is the one showing up in the table of contents. For the sake of creating an example, I made this chapter title so that it occupies two lines in the table of contents.
+
+\section{Font usage: Best practices}
+
+Specialized terminologies, \emph{jargon}, should be italicized by \verb|\emph|. Questions or block quotations should be slanted, which is different from the italic font---\textsl{A slanted question, isn't that weird?} The following block quote is from \textcite{crichton1990jurassic}: \begin{quote} \onehalfspacing% <--- Local line spacing
+{\slshape Broadly speaking, the ability of the park to control the spread of life-forms. Because the history of evolution is that life escapes all barriers. Life breaks free. Life expands to new territories. Painfully, perhaps even dangerously. But life finds a way.} \end{quote} Note that block quotes do not have quotation marks. By default, hyphenation should not happen so often. To suppress hyphenation of a specific word like \mbox{thisveryimportantname}, use the \verb|\mbox| command.
+
+For in-text all-caps fonts, small-caps are recommended. For example, use {\large\textsc{covid-}}19 rather than COVID-19.
+
+\section{Backmatter} 
+
+After the last main chapter (which is probably Summary and Conclusions), only include Bibliography when you are defending. After defense, the submission copy should also have the Korean abstract and acknowledgments. English acknowledgments generally go in the front matter, but the SNU Library rules state that it should go in the back matter. If the acknowledgments are written in Korean, it should go at the very end. The English acknowledgment uses the command \verb|\acknowledgment| and the Korean acknowledgment uses the command \verb|\acknowledgement|. Optionally, Index can also be included.
+
+\section{Some notes on bibliography}
+
+Bibliography follows the AMS format. General guidelines for your bib file include:\begin{itemize}
+    \item Names must be input in the following format: Baik, J.-J. and Seo, J. M. and Moon, S
+    \item Only the first letters of article titles capitalized except after colon. Ex. An new study: {P}art~{I}
+    \item The first letter of every word except conjunctions/prepositions must be capitalized. The book titles follow the same style as the journal name style (italicized). Ex. \emph{Jurassic Park}
+    \item See the AMS website for proper journal abbreviations.
+    \item URLs and DOIs are typeset in sans-serif.
+    \item Refer to the included \verb|references.bib| for specific examples.
+\end{itemize}
+
+\section{Example text: Lipsum}
+\lipsum[10-13]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% END OF MAIN MATTER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BACK MATTER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% BIBLIOGRAPHY
+\clearpage
+\begingroup
+\setstretch{1.1} % remove to make all references double spacing 
+%\nohyphenation % turn on to prevent hyphenation in bibliography
+% (remember to remove \setlength\bibitemsep in preamble if you choose to use double spacing)
+	\phantomsection\clearpage\addcontentsline{toc}{chapter}{Bibliography}	
+	\printbibliography
+\endgroup
+
+%% Turn on for acknowledgment (English) (ssss)
+%\cleardoublepage
+%\acknowledgment
+%Thank you!
+%
+%{\raggedleft \hspace*{\fill}Your Name\\\hspace*{\fill}Seoul, July 2030}
+
+%% Turn on to include index (ssss)
+%\cleardoublepage
+%\begingroup
+%\setstretch{1.2}
+%\phantomsection\clearpage\addcontentsline{toc}{chapter}{Index}
+%\printindex
+%\endgroup
+
+%% Turn on for Korean abstract (ssss)
+\cleardoublepage
+%\addtolength{\topskip}{0pt plus-10pt}
+%\addtolength{\parskip}{0pt plus-10pt}
+% !compose Korean abstract separately and copy--paste. Many TeX editors do not play well with Korean typing!
+% need to manually indent at the start of the first paragraph (Korean writing)
+\keywordalt{서울대, 박사, 대류 도시 기상 연구실, 템플릿\\\hphantom{주요어: }학위 논문, 구름, 도시, 혼돈}
+\begin{abstractalt}
+\hspace{\parindent}국문 초록은 영문 초록의 직역을 원칙으로 한다. \texttt{{\textbackslash}parindent}가 들어간 이유는 국문일 경우 첫 문단 들여쓰기를 해야 하기 때문이다.
+\end{abstractalt}
+
+%% Turn on for Korean acknowledgment (ssss)
+\cleardoublepage
+\acknowledgement
+\hspace{\parindent}한국어로 감사합니다!
+
+\end{document}

@@ -1,0 +1,173 @@
+\documentclass[10pt,respuestas,a4]{aleph-examen}
+%\documentclass[10pt,a4]{aleph-examen}
+% Intercambiar el comentario de las primeras lineas
+% para mostrar/ocultar respuestas
+
+% Se recomienda leer la documentación de esta
+% clase en https://github.com/alephsub0/LaTeX_aleph-examen
+
+% -- Paquetes
+\usepackage{aleph-comandos}
+
+% -- Datos del examen
+\institucion{Proyecto Alephsub0}
+% \carrera{}
+\asignatura{Introducción al cálculo}
+\tema{Examen no. 1: Lógica y Números reales}
+\autor{Andrés Merino - Mario Cueva}
+\fecha{Semestre 2023-1}
+
+\logouno[4.5cm]{Logos/LogoAlephsub0-02}
+\definecolor{colortext}{HTML}{0030A1}
+\definecolor{colordef}{HTML}{0030A1}
+\fuente{montserrat}
+
+% -- Comandos extra
+% \geometry{margin=2cm} % - Para cambiar los márgenes
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\encabezado
+
+\begin{preguntas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item
+    La Sonda Solar Parker es una misión de la NASA cuyo objetivo es acercarse a la corona del Sol. Suponga que la sonda detecta que en un punto determinado del espacio, la temperatura en la dirección $(1,1,1)$ disminuye a razón de dos unidades, en la dirección $(1,0,1)$ aumenta a razón de una unidad y en la dirección $(0,-1,1)$ disminuye en razón de una unidad. Si, además de esto, la sonda detecta que está en un lugar donde la temperatura puede afectar su funcionamiento y debe alejarse de tal manera que la temperatura disminuya a la mayor razón, ¿qué dirección debe seguir la sonda?\puntaje{2.0}
+
+\begin{respuesta}
+    Sean $\func{f}{\R^3}{\R}$ la función que modela la temperatura y $a\in\R^3$ el punto donde se encuentra la sonda. Se conoce que
+    \[
+        f'(a;(1,1,1)) = -2,
+        \qquad
+        f'(a;(1,0,1)) = 1
+        \texty
+        f'(a;(0,-1,1)) = -1.
+    \]
+    Se busca la dirección de máximo decrecimiento de la función, la cual es contraria al gradiente, por lo tanto, debemos calcular $\nabla f(a)$. Sabemos que
+    \[
+        f'(a;(1,1,1)) = \nabla f(a) \cdot (1,1,1),
+        \qquad
+        f'(a;(1,0,1)) = \nabla f(a) \cdot (1,0,1)
+    \]
+    t
+    \[
+        f'(a;(0,-1,1)) = \nabla f(a) \cdot (0,-1,1),
+    \]
+    por lo tanto
+    \[
+        \nabla f(a) \cdot (1,1,1) = -2,
+        \qquad
+        \nabla f(a) \cdot (1,0,1) = 1
+        \texty
+        \nabla f(a) \cdot (0,-1,1) = -1
+    \]
+    Si tomamos $\nabla f(a) = (u,v,w)$, tenemos que
+    \[
+        -2 = \nabla f(a) \cdot (1,1,1) = (u,v,w) \cdot (1,1,1) = u + v + w,
+    \]
+    \[
+        1 = \nabla f(a) \cdot (1,0,1) = (u,v,w) \cdot (1,1,1) = u + w
+    \]
+    y
+    \[
+        -1 = \nabla f(a) \cdot (0,-1,1) = (u,v,w) \cdot (-1,1) = -v + w,
+    \]
+    por lo tanto
+    \[
+        u = 5
+        \qquad
+        v = -3
+        \texty
+        w = -4.
+    \]
+    Con esto, se tiene que 
+    \[
+        \nabla f(a) = (5,-3,-4),
+    \]
+    por lo tanto, la dirección que debe seguir la sonda es $(-5,3,4)$.
+\end{respuesta}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item
+    \begin{enumerate}
+    \item 
+        Utilizando el Segundo Teorema Fundamental del Cálculo calcular $\dint_0^2 x\cos(\pi x^2)\,dx$.\puntaje{1.0}
+    \item
+        Utilizando el Primer Teorema Fundamental del Cálculo determinar la derivada de la función definida por $F(x)= \dint_1^{x^2} \frac{\sen(t)}{t} \,dt$, para $x>0$.\puntaje{1.0}
+    \end{enumerate}
+
+\begin{respuesta}
+    \begin{enumerate}[leftmargin=*]
+    \item 
+        Tomemos el cambio de variable
+        \[
+            u = \pi x^2\qquad
+            du = 2\pi x\, dx
+        \]
+        con lo cual, tenemos
+    	\[
+    	    \begin{array}{c|c}
+    	        x & u\\ \hline
+    	        0 & 0 \\
+    	        2 & 4\pi
+    	    \end{array}
+    	\]
+    	Por lo tanto
+    	\begin{align*}
+    	    \int_0^2 x\cos(\pi x^2)\,dx
+    	    & = \frac{1}{2\pi}\int_0^{4\pi} \cos(u)\,du \\
+    	    & = \frac{1}{2\pi}\left( \sen(u) \right)\bigg|_0^{4\pi}\\
+    	    & = \frac{1}{2\pi}\left(\sen(4\pi)-\sen(0)\right)=0.
+    	\end{align*}
+    \item
+        Dado que la función definida por 
+        \[
+            t\mapsto \frac{\sen(t)}{t}
+        \]
+        es continua entre $1$ y $x^2$ y la función $x\to x^2$ es derivable, se tiene que
+        \[
+            F'(x) 
+            = \frac{d}{dx}\left(\int_0^{x^2} \frac{\sen(t)}{t}\, dt\right)
+            = \frac{\sen(x^2)}{x^2}(x^2)'
+            = \frac{\sen(x^2)}{x^2}(2x)
+            = \frac{2\sen(x^2)}{x}.\qedhere
+        \]
+    \end{enumerate}    
+    
+\end{respuesta}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item
+    La derivada de la función definida por $f(x)=x^2$ es
+    \opciones{$f'(x)=x^2$}{$f'(x)=x$}{$f'(x)=2x$}{$f'(x)=2x^2$}
+
+\begin{respuesta}
+    La opción correcta es la \textit{c)}.
+\end{respuesta}
+    
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\item
+    La derivada de la función definida por $f(x)=x^2$ es
+    
+    \opcionesl{$f'(x)=x^2$}{$f'(x)=x$}{$f'(x)=2x$}{$f'(x)=2x^2$}
+
+\begin{respuesta}
+    La opción correcta es la \textit{c)}.
+\end{respuesta}
+
+\end{preguntas}
+
+\end{document}

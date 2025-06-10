@@ -5,8 +5,8 @@ from agentflow.core.workflow_types import WorkflowConfig, WorkflowStep, Workflow
 from agentflow.agents.agent import Agent
 from agentflow.agents.agent_types import AgentType
 from agentflow.core.config import AgentConfig, ModelConfig
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 import asyncio
 import os
 import logging
@@ -26,9 +26,9 @@ from typing import Dict, Any, Optional
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Initialize ELL2A with configuration
-ell2a = ELL2AIntegration()
-ell2a.configure({
+# Initialize ELL with configuration
+ell = ELLIntegration()
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -45,7 +45,7 @@ ell2a.configure({
         "format": "plain"
     }
 })
-logger.debug("ELL2A configured")
+logger.debug("ELL configured")
 
 def format_time(seconds: float) -> str:
     """Format time duration in a readable way."""
@@ -98,7 +98,7 @@ class ResearchPaperGenerator(Agent):
         super().__init__(config)
         self.generation_progress = {}
 
-    @ell2a.with_ell2a(mode="simple")
+    @ell.with_ell(mode="simple")
     async def generate_section(self, section_name: str, prompt: str) -> str:
         """Generate a section of the research paper."""
         try:
@@ -106,7 +106,7 @@ class ResearchPaperGenerator(Agent):
             self.generation_progress[section_name] = "in_progress"
             print(f"\nGenerating {section_name}...")
             
-            # Create message for ELL2A
+            # Create message for ELL
             system_msg = Message(
                 role=MessageRole.SYSTEM,
                 content=f"""You are an expert in distributed machine learning systems. Write the {section_name} section of a research paper. 
@@ -132,16 +132,16 @@ class ResearchPaperGenerator(Agent):
             )
             logger.debug(f"Created messages for {section_name}")
             
-            # Process messages through ELL2A
+            # Process messages through ELL
             logger.debug(f"Processing message for {section_name}")
             try:
                 # Process messages one at a time
-                response = await ell2a.process_message(system_msg)
-                response = await ell2a.process_message(user_msg)
+                response = await ell.process_message(system_msg)
+                response = await ell.process_message(user_msg)
                 logger.debug(f"Received response for {section_name}: {response}")
                 
                 if not response:
-                    raise ValueError(f"No response received from ELL2A for {section_name}")
+                    raise ValueError(f"No response received from ELL for {section_name}")
                 
                 if not hasattr(response, 'content') or not response.content:
                     raise ValueError(f"Response has no content for {section_name}")

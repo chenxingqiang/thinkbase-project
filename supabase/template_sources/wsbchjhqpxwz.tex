@@ -1,0 +1,173 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%% mainthesis.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Template for University of Maryland Thesis and Dissertation files  %
+% Written by   Michael Jarret                                        %
+%              Perimeter Institute of Theoretical Physics            %
+%              Waterloo, Ontario, Canada                             %
+%              June 25, 2017                                         %
+% First version written Feb, 2016 while a student at                 %
+%       Joint Center for Quantum Information and Computer Science    %
+%       University of Maryland, College Park                         %
+%       Feb, 2016                                                    %
+% Modified: June 25, 2017 by Michael Jarret                          %
+% Based upon: UMD Dissertation Template by Dorothea F Brosius        %
+%             Institute for Electronics and Applied Physics          %
+%             University of Maryland, College Park                   %
+%             Version from June 2015                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[letterpaper,12pt]{umd-thesis}  
+\usepackage{mathptmx} % This is a close match to Timesop New Roman, which is recommended by the grad school
+
+% hyperref automatically hyperlinks references
+\usepackage{hyperref,xcolor}
+
+% graphics packages
+\usepackage{graphicx,epstopdf}			
+
+% path to graphics files
+\graphicspath{{graphics/}} 
+
+% Some math packages
+\usepackage{amsmath,amsthm,amsfonts,amssymb,mathrsfs,dsfont,breqn} 
+
+% Cleveref MUST come after ams packages if AMS packages are used.
+\usepackage{cleveref}  
+
+% Natbib citation package is probably most elegant
+\usepackage[numbers,sort&compress]{natbib}
+
+% These are my own custom latex commands, uncomment if unwanted
+\input{custom_commands.tex}
+
+% Custom formatting options
+\hypersetup{linktocpage, linkbordercolor=blue}  % Blue outlined hyperlinks in TOC
+
+% This changes the numbering style to (chapter).(equation/thm/etc.) 
+% Note that this is an amsmath command and depends upon the inclusion
+% of the amsmath pacakage
+\numberwithin{equation}{chapter}  
+\numberwithin{thm}{chapter}
+\numberwithin{lem}{chapter}
+\numberwithin{cor}{chapter}
+\numberwithin{definition}{chapter}
+
+% Plain is the standard choice
+\bibliographystyle{plain}
+
+% Everything here is reasonably obvious
+\title{Spectral graph theory with applications to quantum adiabatic optimization}
+\author{Michael Jarret}
+\department{Department of Physics}
+\gradyear{2016}
+\degree{Doctor of Philosophy}
+
+% Your {advisor}[his department][his institution]
+\principaladvisor{Professor Stephen P. Jordan}[University of Maryland Institute for Advanced Computer Studies] 
+
+% Comment out if no co-advisor
+\coadvisor{Professor Alexey Gorshkov}[Department of Physics]
+% Uncomment the following line if your co-advisor is your chair
+
+% Uncomment the following line if someone other than your principal advisor or co-advisor is your chair and add his/her details
+\committeechair{Professor Andrew Childs}[Department of Computer Science]
+
+% Add any additional committee members in alphabetical order below
+% \reader{Name}[Department][Institution]. 
+% They will not be automatically ordered 
+% Department and Institution aren't implemented as of Feb. 2016.
+\secondreader{Professor Jay Deep Sau}
+\thirdreader{Professor Jeffrey Bub}[Department of Philosophy]
+%\fourthreader{Reader Four}
+%\fifthreader{Reader Five}
+%\sixthreader{Reader Six}
+
+
+
+% The options below should be self explanatory, uncomment as needed
+% \coadvisorischair % Only use this if you did not add a committee chair
+% \copyrightfalse
+% \tablespagefalse
+% \figurespagefalse
+% \contentspagefalse
+% \bibpagefalse
+
+\begin{document}
+
+% Type the abstract below
+\begin{abstract}
+    In this dissertation I draw a connection between quantum adiabatic optimization, spectral graph theory, heat-diffusion, and sub-stochastic processes through the operators that govern these processes and their associated spectra. In particular, we study Hamiltonians which have recently become known as ``stoquastic'' or, equivalently, the generators of sub-stochastic processes. The operators corresponding to these Hamiltonians are of interest in all of the settings mentioned above.
+    
+    I predominantly explore the connection between the spectral gap of an operator, or the difference between the two lowest energies of that operator, and certain equilibrium behavior. In the context of adiabatic optimization, this corresponds to the likelihood of solving the optimization problem of interest. I will provide an instance of an optimization problem that is easy to solve classically, but leaves open the possibility to being difficult adiabatically.
+
+	Aside from this concrete example, the work in this dissertation is predominantly mathematical and we focus on bounding the spectral gap. Our primary tool for doing this is spectral graph theory, which provides the most natural approach to this task by simply considering Dirichlet eigenvalues of subgraphs of host graphs. I will derive tight bounds for the gap of one-dimensional, hypercube, and general convex subgraphs. The techniques used will also adapt methods recently used by Andrews and Clutterbuck to prove the long-standing ``Fundamental Gap Conjecture''.
+\end{abstract} 
+
+% This is the frontmatter and can include the preface, foreword, dedication, and acknowledgements. Any
+% of these can be commented out if unwanted.
+\begin{preliminary}
+
+    \begin{preface}
+        \lipsum[1]
+    \end{preface}
+
+    \begin{foreword}
+        \lipsum[1]
+    \end{foreword}
+
+
+	\begin{dedication}
+		To the ignorance of youth, without which this never would have happened.
+	\end{dedication}
+
+	\begin{acknowledgements}	
+		It is nearly impossible to thank everyone that had a hand in my successful completion of this dissertation. In fact, some of the people mentioned below might not remember their relevance in my progress, however their impact was substantial and will not be forgotten.
+		
+		First and foremost, this work would have been impossible without funding from Booz Allen Hamilton, The University of Maryland Department of Physics and graduate school, the Joint Quantum Institute (JQI), and the Joint Center for Quantum Information and Computer Science (QuICS). I would like to thank each of them for their support. 
+		
+		On more personal notes, I would like to thank my advisor Stephen P. Jordan. Stephen has been a wonderful mentor, collaborator, and friend. Aside from his help in successfully completing this dissertation, I am quite proud of the work we have done together. I would also like to thank Jeffrey Bub, both for always providing much needed direction and advice. Brad Lackey also helped make this possible with both helpful insight and collaboration. My path throughout graduate school has been far from traditional, and I ultimately found my way due to a path of advice and introductions that came from Diane O'Leary, Konstantina Trivisa, Eileen Zagone. Without these people, I surely would never have gotten to where I am.
+		
+		I would also like to thank the close friends who were with me through this period of my life. Above all else, I owe special thanks to Prabal Adhikari, my earliest and closest friend from the University of Maryland. Also always there to help me were Prabin Adhikari and Clare Scott. Also, I should thank Ben Gross, because, why not?
+		
+		My family: my mother, stepfather, and Uncle. (Uncle being capitalized because, in his case, it is a proper noun.) This dissertation should really be dedicated to them, however I would never let sentimentality inhibit humor. Last, I would like to thank my dog Matoskah (`Matty'), who never forgets to remind me that there are more important things than work, such as balls, octopuses, and good conversation. 
+	\end{acknowledgements}
+%% if you need a "List of Symbols or Abbreviations" look into
+% gatech-thesis-gloss.sty.
+\end{preliminary}
+
+\include{chapters/introduction}
+
+\include{chapters/spectral-theory}
+
+\include{chapters/optimization}
+
+\include{chapters/1dgap}
+
+\include{chapters/mocbound}
+
+\chapter{Conclusions and open problems}
+The examples analyzed here and in \cite{R04, DMV01, FGG02, VDV03,
+  aminchoi} show that quantum adiabatic algorithms can succeed in
+finding the minimum in polynomial time in cases where classical local
+search fails to do so, and can fail in cases where classical local
+search succeeds. For both classical local search and adiabatic
+optimization, local minima of the potential that one is seeking to
+minimize play an important role in determining runtime. However, as
+the present work shows, these local minima do not tell the whole
+story. In particular, absence of local minima does not imply large
+eigenvalue gap.
+
+In addition, we note that there remains much to be learned regarding
+the performance of adiabatic optimization algorithms relative to
+classical computation in the general case that one is not comparing
+only to classical local search. In particular, the ease of modulus of continuity methods indicate that heat diffusion processes are a good foil for adiabatic quantum computing, and we are currently exploring algorithms of this nature.
+
+Probably the most significant results of this dissertation are those of \Cref{chap:MOC}. In general, modulus of continuity methods seem readily adaptable to both spectral graph theory and quantum theory. In particular, the results of \Cref{sec:homogeneous1} demonstrate that these estimates are quite strong for at least a certain class of graphs. The results of \Cref{sec:Dirichlet} are not immediately applicable in physical contexts, however \Cref{sec:log-concave} demonstrates ways in which they might be applied. These results can be strengthened by learning more about the relationship between the ratio $u_1/u_0$ and $u_0$ itself. Additionally, although a weak restriction, log-concavity may be an overly strong characterization of $u_0$ for practical purposes and one may prefer to derive results entirely in terms of the modulus of concavity of $\log(u_0)$. Further, bounds on the modulus of concavity of $\log(u_0)$ should be reducible to bounds on the modulus of concavity of the potential term $W'$ as seen in \cite{Andrews2011}. This comparison theorem is saved for future work, but since the potential term $W'$ is typically provided in both physical and quantum-computational contexts, in common settings this modulus of concavity should be explicitly calculable.
+
+There remains a great deal of work to be done on estimating runtimes for Adiabatic, sub-stochastic, and diffusive processes as well as classical algorithms for simulating them. The similarities between these different phenomena, mainly that they all approach their ground-states in time that scales with the spectral gap, is suggestive that they share asymptotic regimes and may indeed correspond in the adiabatic limit. 
+
+
+\include{chapters/appendices}
+
+\bibliography{library.bib}
+
+\end{document}

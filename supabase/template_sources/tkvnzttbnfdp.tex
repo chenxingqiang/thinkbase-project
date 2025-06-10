@@ -1,0 +1,413 @@
+%	Classe, pacotes e configurações de pacotes
+\documentclass[12pt,a4paper,notitlepage]{report}
+\usepackage{lmodern}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{titling}
+\usepackage[svgnames]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage[includehead,footskip=2.5cm,headsep=1.5cm,top=1cm,bottom=1cm,left=2cm,right=2cm,height=27.7cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{times}
+\usepackage{setspace}
+\usepackage{sectsty}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{rotating}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{varioref}
+\usepackage[tableposition=top,margin=0pt,font=small,labelfont=bf,labelsep=endash]{caption}
+\usepackage{titlesec}
+\usepackage{tablefootnote}
+\usepackage{adjustbox}
+\usepackage{float}
+\usepackage{lscape}
+\usepackage[flushleft]{threeparttable}
+
+%	Define parâmetros de formatação de parágrafos e afins
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1ex}
+\renewcommand{\baselinestretch}{1}
+
+%	Redefine tamanho das fontes das seções
+\chapterfont{\fontsize{12}{12}\selectfont}
+\sectionfont{\fontsize{12}{12}\selectfont}
+\subsectionfont{\fontsize{12}{12}\selectfont}
+\subsubsectionfont{\fontsize{12}{12}\selectfont}
+\addto\captionsportuguese{\renewcommand{\contentsname}{\large{SUMÁRIO}}}
+
+%	Retira o número do Capítulo e diminui o tamanho
+\makeatletter
+\def\@makechapterhead#1{
+\vspace*{0\p@}
+{\parindent \z@ \raggedright \selectfont
+\ifnum \c@secnumdepth >\m@ne
+\if@mainmatter
+\large\bfseries \thechapter.\space
+\fi
+\fi
+\interlinepenalty\@M
+\large \bfseries #1\par\nobreak
+\vskip 20\p@}}
+\makeatother
+
+%	Funções auxiliares para xtable
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\
+\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\
+\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\
+\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{P}[1]{>{\raggedright\tabularxbackslash}p{#1}}
+
+%	Constrói a capa do relatório
+\newcommand*{\titleAT}
+{\begingroup % Create the command for including the title page in the document
+\thispagestyle{capa}
+\newlength{\drop} % Command for generating a specific amount of whitespace
+\drop=0.1\textheight % Define the command as 10% of the total text height
+\vspace*{2\drop} % Whitespace between the top lines and title
+\centering % Center all text
+\Large{\bf{DADOS DO DRAWBACK SUSPENSÃO E ISENÇÃO}} \\
+\vspace{0.25\drop}
+\Large{\bf{JANEIRO DE 2018}} \\
+\vspace{2.75\drop}
+\renewcommand{\baselinestretch}{1.5}
+\normalsize\bf{Compilação dos dados de drawback referentes} \\
+\normalsize\bf{ao mês de janeiro de 2018} \\
+\vspace{1.5\drop}
+\normalsize\bf{Coordenação-Geral de Exportação e Drawback - CGEX} \\
+\normalsize\bf{Brasília, 23 de abril de 2018} \\
+\endgroup}
+
+%	Estilos
+
+%	Define o estilo da capa
+\fancypagestyle{capa}{%
+\fancyhf{}% Clear header and footer
+\chead{\includegraphics[scale=0.15]{brasao-da-republica.jpg} \\
+\textbf{MINISTÉRIO DA INDÚSTRIA, COMÉRCIO EXTERIOR E SERVIÇOS} \\
+\textbf{SECRETARIA DE COMÉRCIO EXTERIOR} \\
+\textbf{DEPARTAMENTO DE OPERAÇÕES DE COMÉRCIO EXTERIOR}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{3cm}}
+
+%	Define o estilo das páginas com texto
+\fancypagestyle{texto}{%
+\fancyhf{}% Clear header and footer
+\chead{\includegraphics[scale=0.15]{brasao-da-republica.jpg} \\
+\textbf{MINISTÉRIO DA INDÚSTRIA, COMÉRCIO EXTERIOR E SERVIÇOS} \\
+\textbf{SECRETARIA DE COMÉRCIO EXTERIOR} \\
+\textbf{DEPARTAMENTO DE OPERAÇÕES DE COMÉRCIO EXTERIOR}}
+%\fancyfoot[R]{\thepage\ de \pageref{ultima}}% Custom footer
+\fancyfoot[R]{\thepage}% Custom footer
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{3cm}}
+
+%	Redefine o estilo das páginas com capítulo
+\fancypagestyle{plain}{%
+\fancyhf{}% Clear header and footer
+\chead{\includegraphics[scale=0.15]{brasao-da-republica.jpg} \\
+\textbf{MINISTÉRIO DA INDÚSTRIA, COMÉRCIO EXTERIOR E SERVIÇOS} \\
+\textbf{SECRETARIA DE COMÉRCIO EXTERIOR} \\
+\textbf{DEPARTAMENTO DE OPERAÇÕES DE COMÉRCIO EXTERIOR}}
+\fancyfoot[R]{\thepage}% Custom footer
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{3cm}}
+\textheight=19cm
+
+%	Início do Documento
+\begin{document}
+
+%	Insere a capa do relatório
+\titleAT
+
+%	Insere o sumário
+\tableofcontents
+
+%	Define o estilo para o texto
+\pagestyle{texto}
+
+%	Insere o corpo do relatório
+\newpage
+
+\chapter{DESTAQUES DO PERÍODO}\label{destaques-do-periodo}
+
+\begin{itemize}
+\item
+  Em janeiro de 2018, as exportações com \emph{drawback} suspensão
+  somaram \textbf{US\$ 4 bilhões}, equivalentes a \textbf{23,7\%} do
+  total exportado no período (\textbf{US\$ 17 bilhões}). As importações,
+  por sua vez, atingiram \textbf{US\$ 825,4 milhões}, \textbf{5,8\%} de
+  um total de \textbf{US\$ 14,2 bilhões} importados no período. As
+  compras do mercado interno somaram \textbf{US\$ 31,7 milhões}, o que
+  representa \textbf{3,7\%} (\textbf{US\$ 857,2 milhões}) do total de
+  insumos adquiridos - importações e compras no mercado interno - ao
+  amparo do \emph{drawback} suspensão;
+\item
+  Nos últimos 12 meses, as exportações com \emph{drawback} atingiram
+  \textbf{US\$ 50,6 bilhões}, representando \textbf{23\%} do total
+  exportado. No mesmo período, as importações com \emph{drawback}
+  atingiram \textbf{US\$ 7,7 bilhões}, correspondendo a \textbf{5\%} do
+  total importado. Quanto às compras de mercado interno, estas
+  alcançaram \textbf{US\$ 513,6 milhões}, \textbf{6,3\%} do total de
+  insumos comprados via regime;
+\item
+  No mês de janeiro de 2018, as exportações com \emph{drawback} por
+  fator agregado compuseram-se da seguinte forma: \textbf{49,9\%}
+  referentes a produtos manufaturados; \textbf{21,6\%} a produtos
+  básicos; e \textbf{28,5\%} a produtos semimanufaturados. Em relação às
+  importações com \emph{drawback} por fator agregado, \textbf{66,7\%}
+  compuseram-se de manufaturados, \textbf{27,2\%} de produtos básicos e
+  \textbf{6,1\%} de semimanufaturados. As compras no mercado interno com
+  \emph{drawback} em janeiro de 2018 corresponderam a \textbf{87,5\%}
+  de produtos manufaturados, \textbf{5\%} de básicos e \textbf{7,5\%} de
+  semimanufaturados;
+\item
+  De acordo com a Pauta de Produtos de Exportação (PPE), os produtos
+  mais exportados sob o \emph{drawback} suspensão, em janeiro de 2018 ,
+  foram: \textbf{(1) Minérios de ferro e seus concentrados}, \textbf{(2)
+  Celulose} e \textbf{(3) Produtos semimanufaturados de ferro ou aços}.
+  Os produtos mais importados, classificados de acordo com a Pauta de
+  Produtos de importação (PPI) foram: \textbf{(1) Hulhas, mesmo em pó,
+  mas não aglomeradas}, \textbf{(2) Partes e pecas para veículos
+  automóveis e tratores} e \textbf{(3) Produtos laminados planos de
+  ferro ou aços}. Para compras no mercado interno, destacaram-se:
+  \textbf{(1) Coque de petróleo}, \textbf{(2) Produtos laminados planos
+  de ferro ou aços} e \textbf{(3) Sabões, produtos e preparações, para
+  limpeza};
+\item
+  O índice médio das \textbf{Importações/Exportações}, com relação à
+  agregação de valor no mês de janeiro de 2018, foi \textbf{20,5\%}, e
+  o índice médio de \textbf{Compras no Mercado Interno/Exportações} foi
+  \textbf{0,8\%};
+\item
+  Em janeiro de 2018, as reposições de estoques de insumos importados e
+  adquiridos no mercado interno amparadas pelo regime de \emph{drawback}
+  isenção, cursadas no sistema web, atingiram \textbf{US\$ 114,1
+  milhões};
+\item
+  No período em questão, \textbf{974} empresas exportaram ao amparo do
+  \emph{drawback} suspensão. \textbf{583} empresas importaram
+  utilizando-se do \emph{drawback} suspensão e \textbf{256} da
+  modalidade isenção.
+\end{itemize}
+
+\newpage
+
+\chapter{REPRESENTATIVIDADE DO DRAWBACK SUSPENSÃO NO COMÉRCIO EXTERIOR
+BRASILEIRO}\label{representatividade-do-drawback-suspensao-no-comercio-exterior-brasileiro}
+
+\section{EXPORTAÇÕES}\label{exportacoes}
+
+Em janeiro de 2018, as exportações brasileiras amparadas pelo regime
+aduaneiro especial de \emph{drawback}, na modalidade suspensão,
+atingiram US\$ 4 bilhões, correspondendo a 23,7\% do total exportado
+neste mês (US\$ 17 bilhões). Em relação ao mês de janeiro de 2017,
+ a análise comparativa evidencia aumento de 12\% das operações
+amparadas pelo regime de \emph{drawback}, representando aumento de US\$
+0,4 bilhão (variação de 3,6 para 4 bilhões de dólares). No acumulado dos
+últimos doze meses, as exportações via \emph{drawback} somaram US\$ 50,6
+bilhões, correspondendo a 23\% do total exportado (US\$ 219,8 bilhões).
+
+\begin{table}[H]
+\centering
+\caption{Exportações sob o regime de \textit{drawback} suspensão em comparação com as exportações totais (em US\$).} 
+\scalebox{1}{
+\begin{tabular}{R{2cm}C{3cm}C{3cm}C{3cm}}
+  \hline
+Mês & Exportações com Drawback & Exportações Totais & (\%) \\ 
+  \hline
+Fev/16 & 2.819.472.271 & 13.342.876.253 & 21,1 \\ 
+  Mar/16 & 3.153.575.636 & 15.991.809.841 & 19,7 \\ 
+  Abr/16 & 3.403.283.530 & 15.371.763.216 & 22,1 \\ 
+  Mai/16 & 4.434.252.016 & 17.568.725.446 & 25,2 \\ 
+  Jun/16 & 3.346.394.993 & 16.738.066.984 & 20,0 \\ 
+  Jul/16 & 3.619.103.247 & 16.328.206.520 & 22,2 \\ 
+  Ago/16 & 3.907.264.068 & 16.986.462.166 & 23,0 \\ 
+  Set/16 & 3.826.603.202 & 15.800.119.615 & 24,2 \\ 
+  Out/16 & 3.597.659.080 & 13.713.132.417 & 26,2 \\ 
+  Nov/16 & 4.000.610.735 & 16.215.928.363 & 24,7 \\ 
+  Dez/16 & 4.345.463.594 & 15.940.640.971 & 27,3 \\ 
+  Jan/17 & 3.588.099.942 & 14.908.251.428 & 24,1 \\ 
+  Total & 44.041.782.314 & 188.905.983.220 & 23,3 \\ 
+  Fev/17 & 3.691.926.306 & 15.468.687.009 & 23,9 \\ 
+  Mar/17 & 4.067.462.123 & 20.073.934.070 & 20,3 \\ 
+  Abr/17 & 3.868.840.395 & 17.679.825.632 & 21,9 \\ 
+  Mai/17 & 3.921.849.915 & 19.789.991.540 & 19,8 \\ 
+  Jun/17 & 4.220.407.396 & 19.779.117.924 & 21,3 \\ 
+  Jul/17 & 4.201.921.633 & 18.758.761.617 & 22,4 \\ 
+  Ago/17 & 4.439.651.964 & 19.470.944.987 & 22,8 \\ 
+  Set/17 & 4.643.340.328 & 18.659.331.625 & 24,9 \\ 
+  Out/17 & 4.728.303.514 & 18.871.943.089 & 25,1 \\ 
+  Nov/17 & 4.135.330.771 & 16.683.104.126 & 24,8 \\ 
+  Dez/17 & 4.625.144.811 & 17.595.284.030 & 26,3 \\ 
+  Jan/18 & 4.018.729.765 & 16.965.358.653 & 23,7 \\ 
+  Total & 50.562.908.921 & 219.796.284.302 & 23,0 \\ 
+   \hline \multicolumn{4}{l}{\footnotesize{Fonte: SISCOMEX.}}\\\end{tabular}
+}
+\end{table}
+
+\includegraphics{201801ALICEWEB_files/figure-latex/Grafico1ExportacoesBarras-1.pdf}
+
+\includegraphics{201801ALICEWEB_files/figure-latex/Grafico1Participacao-1.pdf}
+
+\section{IMPORTAÇÕES}\label{importacoes}\textbf{}
+
+Em janeiro de 2018, as importações brasileiras amparadas pelo regime
+aduaneiro especial de \emph{drawback}, na modalidade suspensão,
+atingiram US\$ 825,4 milhões, correspondendo a 5,8\% do total importado
+neste mês (US\$ 14,2 bilhões). Em relação ao mês de janeiro de 2017,
+ a análise comparativa evidencia aumento de 34,5\% das operações
+amparadas pelo regime de \emph{drawback}, representando aumento de US\$
+211,8 milhões (variação de 613,6 para 825,4 milhões de dólares). No
+acumulado dos últimos doze meses, as importações via \emph{drawback}
+foram de US\$ 7,7 bilhões, correspondente a 5\% do total importado (US\$
+152,8 bilhões).
+
+\begin{table}[H]
+\centering
+\caption{Importações sob o regime de \textit{drawback} suspensão em comparação com as importações totais (em US\$).} 
+\scalebox{1}{
+\begin{tabular}{R{2cm}C{3cm}C{3cm}C{3cm}}
+  \hline
+Mês & Importações com Drawback & Importações Totais & (\%) \\ 
+  \hline
+Fev/16 & 445.115.474 & 10.301.097.607 & 4,3 \\ 
+  Mar/16 & 523.065.954 & 11.560.717.619 & 4,5 \\ 
+  Abr/16 & 537.093.883 & 10.509.741.662 & 5,1 \\ 
+  Mai/16 & 551.854.853 & 11.136.159.386 & 5,0 \\ 
+  Jun/16 & 708.554.700 & 12.769.486.773 & 5,5 \\ 
+  Jul/16 & 582.110.587 & 11.752.696.206 & 5,0 \\ 
+  Ago/16 & 612.822.790 & 12.848.449.517 & 4,8 \\ 
+  Set/16 & 586.311.991 & 11.987.439.087 & 4,9 \\ 
+  Out/16 & 513.572.258 & 11.375.442.181 & 4,5 \\ 
+  Nov/16 & 551.488.209 & 11.462.652.908 & 4,8 \\ 
+  Dez/16 & 634.774.434 & 11.525.482.231 & 5,5 \\ 
+  Jan/17 & 613.573.643 & 12.197.812.220 & 5,0 \\ 
+  Total & 6.860.338.776 & 139.427.177.397 & 4,9 \\ 
+  Fev/17 & 487.893.044 & 10.913.268.165 & 4,5 \\ 
+  Mar/17 & 801.732.684 & 12.937.668.769 & 6,2 \\ 
+  Abr/17 & 455.807.044 & 10.716.651.947 & 4,3 \\ 
+  Mai/17 & 648.151.128 & 12.129.011.084 & 5,3 \\ 
+  Jun/17 & 593.571.485 & 12.595.230.268 & 4,7 \\ 
+  Jul/17 & 681.290.192 & 12.473.402.051 & 5,5 \\ 
+  Ago/17 & 745.390.136 & 13.879.229.349 & 5,4 \\ 
+  Set/17 & 511.586.958 & 13.488.324.102 & 3,8 \\ 
+  Out/17 & 640.806.765 & 13.678.839.517 & 4,7 \\ 
+  Nov/17 & 637.182.635 & 13.142.503.350 & 4,8 \\ 
+  Dez/17 & 650.921.714 & 12.597.512.127 & 5,2 \\ 
+  Jan/18 & 825.432.053 & 14.201.242.082 & 5,8 \\ 
+  Total & 7.679.765.838 & 152.752.882.811 & 5,0 \\ 
+   \hline \multicolumn{3}{l}{\footnotesize{Fonte: SISCOMEX.}} \\\end{tabular}
+}
+\end{table}
+
+\includegraphics{201801ALICEWEB_files/figure-latex/Grafico2ExportacoesBarras-1.pdf}
+
+\includegraphics{201801ALICEWEB_files/figure-latex/Grafico2Participacao-1.pdf}
+
+\section{COMPRAS NO MERCADO INTERNO}\label{compras-no-mercado-interno}
+
+Em janeiro de 2018, as compras no mercado interno amparadas pelo regime
+aduaneiro especial de \emph{drawback}, na modalidade suspensão,
+atingiram US\$ 31,7 milhões, correspondendo a 3,7\% do total de
+insumos\footnote{Soma das importações e compras no mercado interno, amparados pelo regime especial de \textit{drawback}}
+utilizados neste mês (US\$ 857,2 milhões). Em relação ao mês de janeiro
+de 2017, a análise comparativa evidencia redução de 25,2\% das
+operações amparadas pelo regime de \emph{drawback}, representando
+diminuição de US\$ 10,7 milhões (variação de 42,4 para 31,7 milhões de
+dólares). No acumulado dos últimos doze meses, as compras no mercado
+interno, via \emph{drawback}, somaram US\$ 513,6 milhões, correspondente
+a 6,3\% do total de insumos utilizados nos processos produtivos (US\$
+8,2 bilhões).
+
+\begin{table}[H]
+\centering
+\caption{Compras no mercado interno sob o regime de \textit{drawback} suspensão em comparação com os insumos totais (em US\$).} 
+\scalebox{1}{
+\begin{tabular}{R{2cm}C{3cm}C{3cm}C{3cm}}
+  \hline
+Mês & Compras no Mercado Interno & Insumos Totais & (\%) \\ 
+  \hline
+Fev/16 & 37.076.823 & 482.192.297 & 7,7 \\ 
+  Mar/16 & 47.150.633 & 570.216.587 & 8,3 \\ 
+  Abr/16 & 53.335.628 & 590.429.511 & 9,0 \\ 
+  Mai/16 & 55.634.273 & 607.489.126 & 9,2 \\ 
+  Jun/16 & 51.329.912 & 759.884.612 & 6,8 \\ 
+  Jul/16 & 51.254.938 & 633.365.525 & 8,1 \\ 
+  Ago/16 & 72.530.175 & 685.352.965 & 10,6 \\ 
+  Set/16 & 56.734.331 & 643.046.322 & 8,8 \\ 
+  Out/16 & 45.721.098 & 559.293.356 & 8,2 \\ 
+  Nov/16 & 45.474.817 & 596.963.026 & 7,6 \\ 
+  Dez/16 & 43.469.057 & 678.243.491 & 6,4 \\ 
+  Jan/17 & 42.403.906 & 655.977.549 & 6,5 \\ 
+  Total & 602.115.591 & 7.462.454.367 & 8,1 \\ 
+  Fev/17 & 42.930.081 & 530.823.125 & 8,1 \\ 
+  Mar/17 & 51.528.038 & 853.260.722 & 6,0 \\ 
+  Abr/17 & 40.199.167 & 496.006.211 & 8,1 \\ 
+  Mai/17 & 45.621.212 & 693.772.340 & 6,6 \\ 
+  Jun/17 & 39.427.236 & 632.998.721 & 6,2 \\ 
+  Jul/17 & 36.914.967 & 718.205.159 & 5,1 \\ 
+  Ago/17 & 48.785.109 & 794.175.245 & 6,1 \\ 
+  Set/17 & 46.834.715 & 558.421.673 & 8,4 \\ 
+  Out/17 & 43.875.223 & 684.681.988 & 6,4 \\ 
+  Nov/17 & 43.430.502 & 680.613.137 & 6,4 \\ 
+  Dez/17 & 42.370.327 & 693.292.041 & 6,1 \\ 
+  Jan/18 & 31.731.474 & 857.163.527 & 3,7 \\ 
+  Total & 513.648.051 & 8.193.413.889 & 6,3 \\ 
+   \hline \multicolumn{3}{l}{\footnotesize{Fonte: SISCOMEX.}} \\\end{tabular}
+}
+\end{table}
+
+\includegraphics{201801ALICEWEB_files/figure-latex/Grafico3ComprasnoMercadoInternoBarras-1.pdf}
+
+\includegraphics{201801ALICEWEB_files/figure-latex/Grafico3Participacao-1.pdf}
+\newpage
+
+\chapter{DISTRIBUIÇÃO POR FATOR AGREGADO NO DRAWBACK
+SUSPENSÃO}\label{distribuicao-por-fator-agregado-no-drawback-suspensao}
+
+\newpage
+
+\chapter{PAUTA DE PRODUTOS DE EXPORTAÇÃO E IMPORTAÇÃO DA ECONOMIA NO
+DRAWBACK
+SUSPENSÃO}\label{pauta-de-produtos-de-exportacao-e-importacao-da-economia-no-drawback-suspensao}
+
+\newpage
+
+\chapter{AGREGAÇÃO DE VALOR NO DRAWBACK
+SUSPENSÃO}\label{agregacao-de-valor-no-drawback-suspensao}
+
+\newpage
+
+\chapter{TIPOS DE ATOS CONCESSÓRIOS DE DRAWBACK
+SUSPENSÃO}\label{tipos-de-atos-concessorios-de-drawback-suspensao}
+
+\newpage
+
+\chapter{SITUAÇÃO DOS ATOS CONCESSÓRIOS DE DRAWBACK
+SUSPENSÃO}\label{situacao-dos-atos-concessorios-de-drawback-suspensao}
+
+\newpage
+
+\chapter{DRAWBACK ISENÇÃO}\label{drawback-isencao}
+
+\newpage
+
+\chapter{SITUAÇÃO DOS ATOS CONCESSÓRIOS DE DRAWBACK
+ISENÇÃO}\label{situacao-dos-atos-concessorios-de-drawback-isencao}
+
+\newpage
+
+\chapter{NÚMERO DE EMPRESAS
+BENEFICIÁRIAS}\label{numero-de-empresas-beneficiarias}
+
+%	Fim
+\end{document}

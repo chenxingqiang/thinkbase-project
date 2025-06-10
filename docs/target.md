@@ -914,9 +914,9 @@ This example demonstrates how the CO-STAR framework structures and manages compl
 
 相关文件：
 
-- `/agentflow/integrations/ell2a_integration.py` - ELL集成模块
-- `/agentflow/visualization/ell2a_visualizer.py` - ELL可视化组件
-- `/templates/ell2a_config.json` - ELL配置模板
+- `/agentflow/integrations/ell_integration.py` - ELL集成模块
+- `/agentflow/visualization/ell_visualizer.py` - ELL可视化组件
+- `/templates/ell_config.json` - ELL配置模板
 
 #### 3.2 Visualization Components
 
@@ -927,7 +927,7 @@ This example demonstrates how the CO-STAR framework structures and manages compl
 
 相关文件：
 
-- `/agentflow/visualization/ell2a_visualizer.py` - ELL可视化组件
+- `/agentflow/visualization/ell_visualizer.py` - ELL可视化组件
 - `/templates/dashboard_templates.json` - 仪表盘模板
 - `/docs/visualization.md` - 可视化文档
 
@@ -940,7 +940,7 @@ This example demonstrates how the CO-STAR framework structures and manages compl
 
 相关文件：
 
-- `/agentflow/integrations/ell2a_integration.py` - ELL集成模块
+- `/agentflow/integrations/ell_integration.py` - ELL集成模块
 - `/templates/metric_mappings.json` - 指标映射配置
 - `/docs/metrics.md` - 指标文档
 

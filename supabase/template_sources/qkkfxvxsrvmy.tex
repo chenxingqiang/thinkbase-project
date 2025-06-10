@@ -1,0 +1,506 @@
+\documentclass[a4paper,12pt,bibliography=totoc]{scrreprt}
+%\usepackage{setspace}
+%\setstretch{1.15} % Line spacing, falls nötig
+\usepackage[left= 2.5cm,right = 2cm, bottom = 4 cm]{geometry}
+
+\def\MYAUTHOR{Vorname Nachname}
+\def\MYTITLE{Hier steht der Titel der Arbeit}
+
+% Dokumentinformationen für PDF Erstellung
+\usepackage[
+	pdftitle={\MYTITLE},
+	pdfsubject={},
+	pdfauthor={\MYAUTHOR},
+	pdfkeywords={},
+	hidelinks
+]{hyperref}
+
+% =======================================================
+% ======================= Packages ======================
+% =======================================================
+% Standard Packages
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx, subfig}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{csquotes} % richtige Anführungszeichen
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{acronym}
+\let\bibhang\relax
+\usepackage{listingsutf8}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage[redeflists]{IEEEtrantools}
+\usepackage{paralist}
+\usepackage[subfigure,titles]{tocloft}
+\usepackage{bookmark}
+\usepackage{multirow}
+
+% =======================================================
+% ============= Für Autoref die Bezeichnungen ===========
+% =======================================================
+\addto\extrasngerman{\def\figureautorefname{Abbildung}}
+\addto\extrasngerman{\def\sectionautorefname{Abschnitt}}
+\addto\extrasngerman{\def\subsectionautorefname{Abschnitt}}
+\addto\extrasngerman{\def\chapterautorefname{Kapitel}}
+\addto\extrasngerman{\def\tableautorefname{Tabelle}}
+\addto\extrasngerman{\def\listingautorefname{Codeausschnitt}}
+\addto\extrasngerman{\def\itemautorefname{Anforderung}}
+\renewcommand{\lstlistingname}{Codeausschnitt}
+
+% =======================================================
+% === Grafikpfad, kann gerne angepasst werden bei =======
+% === abweichender Ordnerstruktur				  =======
+% =======================================================
+\graphicspath{{img/}}
+
+
+% =======================================================
+% ================ nicht einrücken nach Absatz ==========
+% =======================================================
+\setlength{\parindent}{0pt}
+
+% =======================================================
+% ================= Eigene Seiten Styles ================
+% =======================================================
+\fancypagestyle{mystyle}{
+	\fancyhf{}
+	\fancyhead{}
+	 % Kapitel oben links, italic
+	\fancyhead[L]{\slshape\ \chaptername\ \thechapter}
+	\fancyhead[C]{}
+	 % Titel des Kapitel oben rechts, italic
+	\fancyhead[R]{\slshape\leftmark}
+
+	\fancyfoot{}
+	\fancyfoot[L]{}
+	\fancyfoot[C]{}
+	 % Seitenzahl unten rechts
+	\fancyfoot[R]{\thepage}
+}
+
+% Für Literaturverzeichnisse, ohne Kapitelzahl
+\fancypagestyle{plain}{
+	\fancyhf
+	\fancyhead{}
+	\fancyhead[L]{}
+	\fancyhead[C]{}
+	\fancyhead[R]{\slshape\nouppercase{\leftmark}}
+
+	\fancyfoot{}
+	\fancyfoot[L]{}
+	\fancyfoot[C]{}
+	\fancyfoot[R]{\thepage}
+}
+
+% Fancy Pagestyle updaten
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+%
+\lhead{}
+\chead{}
+\rhead{}
+%%
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+% Die Linien ausschalten
+\renewcommand{\headrulewidth}{0.0pt}
+\renewcommand{\footrulewidth}{0.2pt}
+\cleardoublepage
+
+% Seite sichern für Nummerierung
+\newcounter{savepage}
+\captionsetup{justification=centering}
+
+% Die Größe eines Halfspaces einstellen, bei 1,5 entsprechend 0,75
+\newcommand{\halfspace}[0]{0.75ex}
+
+% =======================================================
+% =================== Dokumentbeginn ====================
+% =======================================================
+
+\begin{document}
+
+% Starten mit römischer Nummerierung für Formkapitel
+\pagenumbering{Roman}
+
+% =======================================================
+% ===================== TITELSEITE ======================
+% =======================================================
+\begin{titlepage}
+	\centering
+	\vspace*{\fill}
+
+	\includegraphics[width=0.7\textwidth]{logo_hsos.pdf}
+
+	\vspace{2em}
+	{\LARGE\textsc{\MYTITLE}\par}
+
+	\vspace{2em}
+	{
+		\large
+		Fakultät für Ingenieurwissenschaften und Informatik \\
+		der Hochschule Osnabrück \\
+		Studiengang \enquote{Verteilte und Mobile Anwendungen} \\
+	}
+
+	\vspace{2.5em}
+	{\Large\textbf{(Master-/Bachelor-/Projekt-)arbeit}\par}
+
+	\vspace{1em}
+	% If Master/Bachelorarbeit
+	zur Erlangung des akademischen Grades \\
+	Master/Bachelor of Science/Engineering\par
+	% else if Projektarbeit
+	%	Im Modul \\
+	%	--- hier Modulname ---\par
+
+	\vspace{1.5em}
+	vorgelegt von\par
+	\vspace{1em}
+	{\large\textbf{\MYAUTHOR}\par}
+
+	\vspace*{\fill} % nach unten fließen
+	\begin{center}
+		\begin{tabular}{lll}
+			\textbf{Matrikelnummer:} &  & XXXXXX                                \\
+			\textbf{Ausgabedatum:}   &  & TT.MM.YYYY                            \\
+			\textbf{Abgabedatum:}    &  & TT.MM.YYYY                            \\
+			\textbf{Erstprüfer:}     &  & Name des 1. Prüfers inkl. akad. Titel \\
+			\textbf{Zweitprüfer:}    &  & Name des 2. Prüfers inkl. akad. Titel \\
+		\end{tabular}
+	\end{center}
+\end{titlepage}
+
+% =======================================================
+% ====================== DANKSAGUNG =====================
+% =======================================================
+\onehalfspacing						% Ab hier 1,5mm Abstand
+\pagestyle{plain}					% Formatierung der Kopf und Fußzeilen
+\setcounter{page}{1}				% Counter neu setzen, das ist die erste Seite
+
+\addsec{Danksagungen}
+\label{danksagungen}
+% Generell optional, kann aber gerne eingefügt werden bei größeren Arbeiten
+% Bei Projektarbeiten sehr unüblich
+Ich danke allen unfassbar tollen Mitarbeitern im Labor für Hochfrequenztechnik und Mobilkommunikation. Ihr seid die besten <3. Besonders möchte ich Daniel Brettschneider danken, der diese LaTeX Vorlage erstellt hat und Julian Dreyer, der diese Vorlage erweitert und an das modernere Design angepasst hat.
+\pagebreak
+
+% =======================================================
+% ==================== ZUSAMMENFASSUNG ==================
+% =======================================================
+
+% Hier nicht mit sections arbeiten. Das macht unnötig Aufwand
+\addsec{Zusammenfassung/Abstract}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\minisec{Abstract}
+Das Ganze auf Englisch.
+\pagebreak
+
+% Jetzt kann gerne eine Header Linie da sein
+\renewcommand{\headrulewidth}{0.2pt}
+% =======================================================
+% ================== INHALTSVERZEICHNIS =================
+% =======================================================
+% Das Inhaltsverzeichnis auch im Inhaltsverzeichnis auftauchen lassen
+\addcontentsline{toc}{section}{\texorpdfstring{Inhaltsverzeichnis}{Inhaltsverzeichnis}}
+% Section Counter erhöhen, wir haben ja eine neue section eingefügt
+\addtocounter{section}{1}
+
+% Maximal Tiefe 1 (max bis 1.1, nicht 1.1.1) im TOC
+% ggf. auf 2 ändern, falls 1.1.1 gewünscht ist
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+% =======================================================
+% ================== ABBILDUNGSVERZEICHNIS ==============
+% =======================================================
+% zu dem Inhaltsverzeichnis (TOC) hinzufügen
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+\pagestyle{fancy}
+
+% =======================================================
+% ================== TABELLENVERZEICHNIS ================
+% =======================================================
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+\pagestyle{fancy}
+
+% =======================================================
+% ================== Codeverzeichnis ====================
+% =======================================================
+\renewcommand{\lstlistlistingname}{Quellcodeverzeichnis}
+{\labelsep2cm\lstlistoflistings}
+\addcontentsline{toc}{chapter}{\lstlistlistingname}
+
+
+% =======================================================
+% ================== Abkürzungsverzeichnis ==============
+% =======================================================
+\addchap{Abkürzungsverzeichnis}
+\thispagestyle{plain}
+\begin{acronym}[OSGi]						 % längste Abkürzung steht in eckigen Klammern
+	\setlength{\itemsep}{-\parsep} 			 % geringerer Zeilenabstand
+	\acro{IMU}{Inertial Measurment Unit}
+ 
+	\acro{OSGi}{Open Service Gateway initiative}
+	\acro{RSA}{Rivest Shamir Adleman}
+\end{acronym}
+% Nun kann mit den Befehlen \ac zB gearbeitet werden
+\newpage
+
+% =======================================================!
+% =======================================================!
+% =================== INHALTSBEGINN =====================!
+% =======================================================!
+% =======================================================!
+
+
+
+% =======================================================
+% ======================= EINLEITUNG ====================
+% =======================================================
+% Ab jetzt arabische Nummerierung. Zurücksetzen der Nummerierung
+\setcounter{savepage}{\arabic{page}}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% Ab hier nun stets den mystyle Pagestyle für oben links
+\pagestyle{mystyle}
+\chapter{Einleitung}
+\label{chap:einleitung}
+Dieses Kapitel enthält Beispiele zum Einfügen von Abbildungen, Tabellen, etc.
+
+\section{Bilder}
+\label{sec:bilder}
+Zum Einfügen eines Bildes, siehe Abbildung \ref{fig:osgi}, wird die \textit{minipage}-Umgebung genutzt, da die Bilder so gut positioniert werden können.
+
+\vspace{1em}
+\begin{minipage}{\linewidth}
+	\centering
+	\includegraphics[width=0.7\linewidth]{layering-osgi.png}
+	\captionof{figure}[OSGi Architektur]{OSGi Architektur\footnotemark }
+	\label{fig:osgi}
+\end{minipage}
+\footnotetext{Quelle: \url{http://www.osgi.org/Technology/WhatIsOSGi}}
+
+\section{Tabellen}
+\label{sec:tabellen}
+In diesem Abschnitt wird eine Tabelle (siehe Tabelle \ref{tab:beispiel}) dargestellt.
+
+\vspace{1em}
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Name} & \textbf{Name} & \textbf{Name} \\
+		\hline
+		1             & 2             & 3             \\
+		\hline
+		4             & 5             & 6             \\
+		\hline
+		7             & 8             & 9             \\
+		\hline
+	\end{tabular}
+	\caption{Beispieltabelle}
+	\label{tab:beispiel}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Pin} & \textbf{Anschluss} & \textbf{Kabelfarbe} \\
+		\hline
+		Pin 1           & GND           & Weiß          \\
+		\hline
+		Pin 2           & CAN L         & Braun         \\
+		\hline
+		Pin 3           & CAN H         & Blau          \\
+        \hline
+        Pin 4           & UBAT          & Schwarz       \\
+		\hline
+	\end{tabular}
+	\caption{Pinout IMU}
+	\label{tab:Pinout IMU}
+\end{table}
+
+\section{Auflistung}
+\label{sec:auflistung}
+Für Auflistungen wird die \textit{compactitem}-Umgebung genutzt, wodurch der Zeilenabstand zwischen den Punkten verringert wird.
+
+\begin{compactitem}
+	\item Nur
+	\item ein
+	\item Beispiel.
+\end{compactitem}
+
+\section{Listings}
+\label{sec:listing}
+Zuletzt ein Beispiel für ein Listing, in dem Quellcode eingebunden werden kann, siehe Listing \ref{lst:arduino}.
+
+\vspace{1em}
+\begin{lstlisting}[caption=Arduino Beispielprogramm, label=lst:arduino]
+int ledPin = 13;
+void setup() {
+    pinMode(ledPin, OUTPUT);
+}
+void loop() {
+    digitalWrite(ledPin, HIGH);
+    delay(500);
+    digitalWrite(ledPin, LOW);
+    delay(500);
+}
+\end{lstlisting}
+
+\section{Tipps}
+Die Quellen befinden sich in der Datei \textit{bibo.bib}. Eine Buch-, eine Paper- und eine Online-Quelle sind beispielhaft eingefügt. [Vgl. \cite{buch}, \cite{iotbds20}, \cite{online}]
+
+Abkürzungen lassen sich natürlich auch nutzen (\ac{OSGi}). Weiter oben im Latex-Code findet sich das Verzeichnis.
+
+Mittels labels lassen sich auch Sektionen im Text referenzieren, z.B. \ref{sec:listing}, oder mit Autoref \autoref{sec:listing}.
+
+% =======================================================
+% ====================== Grundlagen =====================
+% =======================================================
+\chapter{Grundlagen}
+\label{chap:grundlagen}
+Lorem ipsum dolor sit amet.
+
+\section{Unterkapitel}
+\label{sec:u1}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\subsection{Unterunterkapitel}
+\label{sec:u2}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+
+% =======================================================
+% ====================== Durchführung =====================
+% =======================================================
+\chapter{Durchführung}
+\label{chap:durchführung}
+Lorem ipsum dolor sit amet.
+
+\section{Unterkapitel}
+\label{sec:u3}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\subsection{Unterkapitel}
+\label{subsec:uu1}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+% Kommt nicht im TOC vor!
+\subsubsection{Unterkapitel}
+\label{subsubsec:uuu1}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+
+% =======================================================
+% ====================== Analyse ========================
+% =======================================================
+\chapter{Analyse}
+\label{chap:analyse}
+Lorem ipsum dolor sit amet.
+
+\section{Unterkapitel}
+\label{sec:u4}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\subsection{Unterunterkapitel}
+\label{subsec:uu2}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+
+% =======================================================
+% ======================== Fazit ========================
+% =======================================================
+\chapter{Fazit}
+\label{chap:fazit}
+Lorem ipsum dolor sit amet.
+
+\section{Unterkapitel}
+\label{sec:u5}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+\subsection{Unterunterkapitel}
+\label{sec:uu3}
+Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+
+
+% =======================================================
+% ===================== Literatur =======================
+% =======================================================
+% Ab hier nun wieder römische Seitenzahlen
+\newpage
+\pagenumbering{Roman}
+\setcounter{page}{\thesavepage}
+
+
+% Wenn nicht anders gewünscht, wird hier IEEE Citation verwendet
+\bibliographystyle{myIEEEtran}
+\bibliography{bibo}
+
+
+% =======================================================
+% ======================= Anhang ========================
+% =======================================================
+
+\newpage
+\addchap{Anhang}
+\label{anhang}
+
+\addsec{Inhalt der CD}
+Hier steht die Inhaltsstruktur der beigelegten CD. Im Folgenden ist ein beispielhafter Aufbau dazu dargestellt:
+
+\begin{table}[h]
+	\begin{tabular}{|p{0.3\linewidth}|p{0.3\linewidth}|p{0.4\linewidth}|}
+		%\begin{tabular}{|l|l|l|}
+		\hline
+		Ordnerverzeichnis                               & Dateien                                & Beschreibung                                         \\ \hline
+		\multirow{2}{*}{\textbackslash{}Bachelorarbeit} & Bachelorarbeit\_Name.pdf               & Die Bachelorarbeit im Portable Document Format (PDF) \\
+		                                                & \textbackslash{}Bachelorarbeit\_Source & Die LaTeX-Quelldateien der Bachelorarbeit            \\ \hline
+		\textbackslash{}Referenzen                      & *.pdf                                  & Beschaffte Texte im Portable Document Format (PDF)   \\ \hline
+		\multirow{2}{*}{\textbackslash{}Source\_Code}   & \textbackslash{}programm\_1            & Programm 1                                           \\
+		                                                & \textbackslash{}generated\_data        & Repository für generierte Daten                      \\\hline
+	\end{tabular}
+	\label{tab:anhang-inhalt-cd}
+	\caption{Inhalt der CD}
+\end{table}
+
+
+\addsec{Weitere Anhänge}
+
+% =======================================================
+% ===================== Erklärung =======================
+% =======================================================
+\newpage
+\addchap{Eidesstattliche Erklärung}
+\label{erklaerung}
+
+Hiermit erkläre ich an Eides statt, dass ich die vorliegende Arbeit selbständig und ohne fremde Hilfe angefertigt habe. Die aus fremden Quellen direkt oder indirekt übernommenen Gedanken sind als solche einzeln kenntlich gemacht. Es wurden keine anderen als die angegebenen Quellen und Hilfsmittel benutzt. Die Arbeit wurde bisher keiner anderen Prüfungsbehörde vorgelegt und auch nicht veröffentlicht.
+\vspace*{2em}
+
+Osnabrück, \hrulefill\qquad Unterschrift: \hrulefill
+\vspace*{3em}
+
+
+% Optional, muss nicht
+\section*{Urheberrechtliche Einwilligungserklärung}
+
+Hiermit erkläre ich, dass ich damit einverstanden bin, dass meine Arbeit zum Zwecke des Plagiatsschutzes bei der Fa. Ephorus BV bis zu 5 Jahren in einer Datenbank für die Hochschule Osnabrück archiviert werden kann. Diese Einwilligung kann jederzeit widerrufen werden.
+\vspace*{2em}
+
+Osnabrück, \hrulefill\qquad Unterschrift: \hrulefill
+
+
+\end{document}

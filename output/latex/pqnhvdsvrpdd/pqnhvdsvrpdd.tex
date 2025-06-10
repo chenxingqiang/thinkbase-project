@@ -1,0 +1,279 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{gensymb}
+\usepackage{appendix}
+ \geometry{
+ a4paper,
+ total={180mm,257mm},
+ left=15mm,
+ top=20mm,
+ }
+ \usepackage{multicol}
+ \usepackage{color}
+ \setlength{\columnseprule}{0.4pt} %Separator ruler width
+\def\columnseprulecolor{\color{black}} %Separator ruler colour
+\usepackage[
+backend=biber,
+style=alphabetic,
+sorting=ynt
+]{biblatex}
+\addbibresource{name.bib}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Corso di Laurea in Fisica - A.A. 2019/20 \\ Università degli Studi di Torino}
+\lhead{Esperimentazioni II (corso B) \\ Modulo I - Prof. Roberto Bellan}
+\rfoot{\thepage}
+\begin{document}
+% inserire titolo dell'esperienza
+
+\noindent
+\textbf{\LARGE Strumenti di misura, caratteristica I-V di una lampadina ed interruttori}
+\\
+\\
+\\
+\textbf{\large Thomas Robiglio\textsuperscript{1}, Lorenzo Stefanuto e Sergio G. Tamburi}\\
+\textsuperscript{1} Thomas Robiglio, e-mail: \verb|thomas.robiglio@edu.unito.it|
+\begin{table}[h!]
+\begin{tabular}{|l|l|}
+\hline
+Inviato  & 03/03/2020              \\ \hline \hline
+Ricevuto & ..................... \\ \hline \hline
+Valutato & ..................... \\ \hline
+\end{tabular}
+\end{table}
+
+% inserire obbiettivi di misura
+\hrule
+\begin{center}
+\textbf{\underline{\large OBIETTIVI DELL'ESPERIENZA}}
+\end{center}
+L'esperienza svolta è articolata in 3 parti distinte, ciascuna con obiettivi differenti.\\
+La prima parte dell'esperienza mira a determinare la resistenza interna di un tester digitale (\textsc{Amprobe 37xr-a}) e di un tester analogico (\textsc{Supertester 680r}), impiegati sia come voltmetro che come amperometro, andando a calcolare anche la potenza consumata dagli strumenti per fornire le misure.\\
+La seconda parte dell'esperienza è volta a determinare, effettuando misure di corrente e tensione, la caratteristica \(I-V\) di una lampadina e a verificare la validità della legge di corpo nero per un filamento di tungsteno riscaldato.\\
+La terza parte dell'esperienza - puramente operativa - consiste nell'implementare, utilizzando due switch, un generatore di tensione e una lampadina, un circuito \textsc{And}, un circuito \textsc{Or} e un circuito \textit{two-way switching}.
+\\
+\hrule
+\begin{multicols}{2}
+\noindent
+\underline{NOTA}: Per le procedure sperimentali e la simbologia si è fatto riferimento alle dispense fornite dal docente.\\
+\\
+Per la prima parte dell'esperienza, in riferimento a quanto presente nelle dispense, si è impiegata una resistenza da \((487\pm3)k\Omega\) misurata con \textsc{Agilent u1731a}.  
+\section{Elaborazione dei dati}
+\subsection{Multimetri impiegati come voltmetri}
+Per determinare la resistenza interna dei multimetri impiegati come voltmetri, dalla formula per il partitore di tensione \cite{boyestad} si ha: 
+\begin{equation}
+    \frac{V_{AG}}{R+R_i}=V_{BG} \Rightarrow R_i=\frac{V_{BG}\cdot R}{V_{AB}-V_{BG}}
+\end{equation}
+La potenza consumata si determina a partire dalla legge di Ohm \cite{boylestad}:
+\begin{equation}
+    P=\frac{V_{BG}^2}{R_i}=\frac{V_{AB}-V_{BG}}{R}\cdot V_{BG}
+\end{equation}
+\subsection{Multimetri impiegati come amperometri}
+La resistenza interna e la potenza dissipata si ricavano direttamente dalla legge di Ohm.
+\subsection{Potenza dissipata per una lampadina a filamento di tungsteno}
+Dalle letteratura (\cite{agrawal} e \cite{clauss}) sono note, per una lampadina a filamento di tungsteno, le relazioni:
+\begin{equation}
+    P=k(T-T_0)+e\sigma A_s(T^4 - T_0^4)
+\end{equation}
+\begin{equation}
+    R=R_0 (\frac{T}{T_0})^b \Rightarrow T=\beta R^{\gamma}
+\end{equation}
+Note (3) e (4) è possibile operare alcune apprrossimazioni per descrivere i dati raccolti.\\  
+In prima approssimazione (\textbf{ipotesi 1}) si trascura sia il termine conduttivo e convettivo della potenza dissipata sia il termine \(e\sigma A_s T_0^4\) - si ipotizza infatti che la temperatura iniziale della lampadine \(T_0\) sia trascurabile rispetto alle temperature raggiunte dal filamento (\(>  2000 \celsius\)); si ha quindi una relazione del tipo:
+\begin{equation}
+    P=mR^q
+\end{equation}
+L'altra ipotesi (\textbf{ipotesi 2}) tiene conto di tutti i termini presenti in (3):
+\begin{equation}
+    P=mR^q +nR^{\frac{q}{4}}+K
+\end{equation}
+Si noti che in (6) il termine \(K\) deve assumere valore negativo.\\
+Si procede quindi effettuando delle regressioni sui dati sperimentali (avendo ricavato dai dati raccolti i valori di \(R\) e \(P\) con la legge di Ohm) con le forme funzionali delle 2 ipotesi. 
+\subsection{Caratteristica I-V di una lampadina a filamento di tungsteno}
+Dalla relazione (7) si può ricavare (ricordando che \(P=VI\) e \(R=\frac{V}{I}\)) la relazione tra la corrente e la tensione ai capi della lampadina:
+\begin{equation}
+VI=m(\frac{V}{I})^q \Rightarrow I=sV^{p}   
+\end{equation}
+dove \(s=\sqrt[q+1]{m}\) e \(p=\frac{q-1}{q+1}\).\\
+Si esegue quindi una regressione sui dati di \(I\) e \(V\) raccolti per verificare sperimentalmente la coerenza tra l'ipotesi di corpo nero e la caratteristica \(I-V\) della lampadina.
+
+
+\section{Risultati}
+In riferimento a \textsection 1.1 i valori ottenuti per lo strumento \textsc{Supertester 680r} con fondo scala a \(10V\) sono:
+\begin{itemize}
+    \item \(R_i=(180 \pm 13) k\Omega\)
+    \item \(P=(2,2 \pm 0,3)\cdot 10^{-5}W\)
+\end{itemize}
+Per lo strumento \textsc{Amprobe 37xr-a}:
+\begin{itemize}
+    \item \(R_i=(9,2 \pm 0,4) M\Omega\)
+    \item \(P=(6,2 \pm 0,3)\cdot 10^{-6}W\)
+\end{itemize}
+In riferimento a \textsection 1.2 i valori ottenuti per lo strumento \textsc{Supertester 680r} con fonda scala a \(5mA\) sono:
+\begin{itemize}
+    \item \(R_i=(63 \pm 2) \Omega\)
+    \item \(P=(18,3 \pm 0,6)\cdot 10^{-5}W\)
+\end{itemize}
+Per lo strumento \textsc{Amprobe 37xr-a}:
+\begin{itemize}
+    \item \(R_i=(11,1 \pm 0,2) \Omega\)
+    \item \(P=(32,8 \pm 0,7)\cdot 10^{-6}W\)
+\end{itemize}
+In riferimento a \textsection 1.3 solo l'\textbf{ipotesi 2} risulta significativa  e coerente con le previsioni teoriche sull'intero set di misure, con i parametri:
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+parametro  \(m\) & \((6,3\pm1,4) \cdot 10^{-6}\frac{W}{\Omega^q}\) \\ \hline
+parametro \(n\)  & \((0,55\pm0,02) \frac{W}{\Omega^{\frac{q}{4}}}\)          \\ \hline
+parametro \(q\)  & \((3,96\pm0,05\))                             \\ \hline
+parametro \(K\)  & \((-5,2\pm0,5)W\)                           \\ \hline
+\end{tabular}
+\end{center}
+Con cui si ha il valore:
+\[\gamma=\frac{q}{4}=(0,989\pm 0,012)\]
+\noindent
+L'\textbf{ipotesi 1} risulta significativa considerando le ultime 19 coppie di valori; con i parametri:
+\begin{center}
+    \begin{tabular}{|l|l|}
+\hline
+parametro \(m\) & \((2,8\pm0,4) \cdot 10^{-5} \frac{W}{\Omega^q}\) \\ \hline
+parametro \(q\) & \((3,65\pm0,03\))                                \\ \hline
+\end{tabular}
+\end{center}
+Con cui si ha il valore:
+\[\gamma=(0,913\pm 0,008)\]
+In riferimento a \textsection 1.4 i parametri ottenuti dalla regressione (eseguita sulle ultime 19 coppie di valori, coerentemente con quanto visto sopra) sono: 
+\begin{center}
+    \begin{tabular}{|l|l|}
+\hline
+parametro \(s\) & \((23,76\pm0,17) \frac{A}{V^p}\) \\ \hline
+parametro \(p\) & \((0,571\pm0,004\))             \\ \hline
+\end{tabular}
+\end{center}
+É quindi possibile ricavare il valore dell'esponente \(q\):
+\[p=\frac{q-1}{q+1} \Rightarrow q=\frac{1+p}{1-p}=(3,66\pm0,02)\]
+Che da il valore:
+\[\gamma=(0,916\pm 0,005)\]
+\section{Osservazioni e conclusioni}
+I risultati della prima parte dell'esperienza appaiono apprezzabili e coerenti con le previsioni teoriche \cite{boylestad} per i valori delle resistenze interne di voltmetri e amperometri.\\
+L'analisi della seconda parte dell'esperienza ha mostrato che la legge di corpo nero descrive in maniera soddisfacente il comportamento \(P(R)\) di una lampadina solo a temperature sufficientemente elevate; considerando l'intero set di dati i termini di potenza consumata per via convettiva e conduttiva non risultano trascurabili.\\
+Sul set di dati ristretto l'ipotesi di corpo nero si è dimostrata consistente con la caratteristica \(I-V\) della lampadina (compatibilità tra i valori del parametro \(q\) ottenuti).\\
+I valori sperimentali di \(\gamma\) determinati nelle due differenti ipotesi non sono risultati compatibili tra loro; si ipotizza che tale risultato sia legato a un comportamento diverso da quello descritto da (4) per basse temperature. Inoltre tali valori non si sono mostrati significativamente consistenti con i valori teorici (nonchè privi di errore) presenti in letteratura (\cite{gluck}, \cite{clauss} e \cite{agrawal}), si evidenzia quindi la necessità di approfondire le ricerche per evidenziare eventuali fonti di errore non considerate.\\ 
+La terza parte dell'esperienza è stata svolta con successo; sono state verificate le tavole di verità e i comportamenti dei tre circuiti.
+\end{multicols}
+\medskip
+\noindent
+\textit{Si presentano in appendice i grafuci, i parametri dei test di verifica delle bontà dei fit per i risultati ottenuti e le modellizzazioni dei circuiti implementati nella terza parte dell'esperienza.}
+
+\medskip
+ 
+\printbibliography
+
+\newpage
+\begin{center}
+\textbf{\underline{\Large APPENDICE}}
+\end{center}
+In riferimento a \textsection 1.3, per l'\textbf{ipotesi 2}:
+\begin{figure}[h!]
+\caption{Grafico \(P(R)\) per l'\textbf{ipotesi 2}}
+\centering
+\includegraphics[width=0.7\textwidth]{noapprossimazioni.png}
+\end{figure}
+\begin{tabular}{c|c}
+\end{tabular}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\(\chi^2\)      & 6,55   \\ \hline \hline
+Gradi di libertà & 20     \\ \hline \hline
+Probabilità      & 0,9979 \\ \hline
+\end{tabular}
+\end{center}
+\medskip
+In riferimento a \textsection 1.3, per l'\textbf{ipotesi 1}, dalla regressione eseguita sulle ultime 19 coppie di valori:
+\begin{figure}[h!]
+\caption{Grafico \(P(R)\) per l'\textbf{ipotesi 1} - Radiazione di corpo nero}
+\centering
+\includegraphics[width=0.7\textwidth]{corponero.png}
+\end{figure}
+\begin{tabular}{c|c}
+\end{tabular}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\(\chi^2\)      & 11,15   \\ \hline \hline
+Gradi di libertà & 16     \\ \hline \hline
+Probabilità      & 0,8002 \\ \hline
+\end{tabular}
+\end{center}
+\newpage
+In riferimento a \textsection 1.4 dalla regressione eseguita sulle ultime 19 coppie di valori:
+\begin{figure}[h!]
+\caption{Grafico \(I(V)\) - Caratteristica I-V di una lampadina}
+\centering
+\includegraphics[width=0.7\textwidth]{corrente.png}
+\end{figure}
+\begin{tabular}{c|c}
+\end{tabular}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\(\chi^2\)      & 8,21   \\ \hline \hline
+Gradi di libertà & 16     \\ \hline \hline
+Probabilità      & 0,9423 \\ \hline
+\end{tabular}
+\end{center}
+\medskip
+Per la terza parte dell'esperienza i 3 circuiti sono stati implementati come mostrato nelle figure.
+\begin{figure}[h!]
+\caption{Circuito \textsc{And}}
+\centering
+\includegraphics[width=0.3\textwidth]{AND.png}
+\end{figure}
+\begin{figure}[h!]
+\caption{Circuito \textsc{Or}}
+\centering
+\includegraphics[width=0.3\textwidth]{OR.png}
+\end{figure}
+\begin{figure}[h!]
+\caption{Circuito \textit{two-way switching}}
+\centering
+\includegraphics[width=0.3\textwidth]{switch.png}
+\end{figure}
+
+\end{document}
+
+
+\end{document}

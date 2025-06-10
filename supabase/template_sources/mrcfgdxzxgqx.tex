@@ -1,0 +1,168 @@
+%%%% This is the general thesis/project report template for most users
+\documentclass[showtrims]{rubook}
+%% RU Book options (subclass of memoir)
+%% a4paper or b5paper(default):  paper stock size.
+%%   If A4, show cut lines.  If b5, no cut lines.
+%%   If you wish to print big text in A4, just output using B5 and use the scaling feature in your printer driver to fill the page
+\usepackage[]{ruthesis}
+%% Options for ruthesis in []:
+%%   IS Icelandic is main language, otherwise default to English
+
+%%%   Setup citations
+\usepackage[backend=biber,style=ieee]{biblatex}
+\addbibresource{references.bib}
+%%%%%% Packages and Macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{custom}
+%% Commonly-used packages and macros are in custom.sty
+%% Put any additional packages after this line
+%% !!WARNING: The geometry package is incompatible with this template!
+
+\usepackage{lipsum}%provides us with text for testing
+%% usage: \lipsum[STARTNUM-ENDNUM]
+
+\graphicspath{{graphics-cropped/}{graphics/}}
+%% This is a list of folders to search for graphics files to include
+%% for the graphicx package (already loaded).  This may be case-sensitive.
+%% LaTeX will search from left to right in the list, so you can put "cropped" versions
+%% in the first directory and it will grab them first to keep the document smaller. e.g.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Engineering Design Report Template}
+\author{Joseph~T.~Foley and Vilhjálmur Páll Thorarensen}
+\date{2024}{1}{31}%{Year}{Month}{Day}%use numbers
+
+%\DocumentInfo{TYPE}{ABBREVIATION}{DEGREE}{PROGRAM}{ECTS}{School/Department}
+%\DocumentInfo{Report}{BSc.}{Master of Science}{Mechatronics}{30}{Department of Engineering}
+%\DocumentDescription{\theDocumentType{} of \theECTS{} ECTS credits
+%         submitted to the \theSchool{} at \theInstitution{} in partial fulfillment
+%         of the requirements for the degree of \theDegreeLong}
+
+
+\DocumentDescription{Short project description goes here}
+% Change this if you need a custom title or if it needs to be in Icelandic
+
+%% PhD only have Thesis Committee with roles.  Examiner is part of committee.
+\SupervisorHeading{Advisors}
+\Supervisors{
+\personinfo{Jon Jonsson}{Liason}{Head of Research}{Icelandic Company, ehf.}{Iceland}
+\personinfo{Helpful S. Leader}{Advisor}{Assistant Professor}{Reykjavik University}{Iceland}
+\personinfo{Smart T. Assistant}{Teaching Assistant}{MSc. Student}{Reykjavik University}{Iceland}
+\personinfo{Joseph T. Foley}{EngineeringX Head Instructor}{Assistant Professor}{Reykjavik University}{Iceland}  
+}
+
+\usepackage[hidelinks]{hyperref}%clickable links including URLs
+\begin{document}
+\maketitle{}
+\disableindents{}%frontmatter material mostly doesn't need indents
+\copyrightpage{}
+
+\tableofcontents{}
+\listoffigures{}
+\listoftables{}
+%% A list of abbreviations is an example of a special list
+%% Other lists may be added, such as lists of algorithms, symbols, theorems, etc.
+%% IN CS PhD, this is sometimes centered.
+\frontmatterhead{List of Symbols}%%RUM: Not mentioned
+%% This list demonstrates the "siunitx" package capabilities
+\begin{tabular}{lll}\toprule
+  Symbol &Description &Value/Units\\\midrule
+  $E$ &Energy &\si{\joule}\\ %New function:  \unit{} in Livetex 2021
+  $m$ &Mass &\si{\gram}\\ %New function:  \unit{} in Livetex 2021
+  $c$ &Speed of Light &\SI{2.99E9}{\meter\per\square\second}\\\bottomrule
+  % New function:  \qty{} in Livetex 2021
+\end{tabular}
+
+\enableindents{}%The rest of the front matter does need indents
+\begin{abstract}
+  The abstract follows the addresses and should give readers concise information about the content of the article and indicate the main results obtained and conclusions drawn.
+  As the abstract is not part of the text it should be complete in itself; no table numbers, figure numbers, references or displayed mathematical expressions should be included.
+  It should be suitable for direct inclusion in abstracting services and should not normally exceed 200 words.
+  The abstract should generally be restricted to a single paragraph.
+  Since contemporary information-retrieval systems rely heavily on the content of titles and abstracts to identify relevant articles in literature searches, great care should be taken in constructing both (from EDP Science's MATEC Web of Science LaTeX template).
+
+  Beal's ``From Prototype to Paper in Six Easy Steps'' suggests answering these questions: What is the problem and who/what does it affect?
+  What is the general approach to fixing it?  (What have others done?)
+  What was your strategy to improve the situation?
+  What were your specific accomplishments?
+  Your succes/failure is confirmed by quantitative results?
+
+    For extample, the goal of this template is to produce electronic output to be uploaded to Skemman that can be later printed out and bound into a professional looking textbook that fits on standard library shelves.
+  It is important to note that A4 paper when bound requires taller shelf spacing, so the B5 paper format was chosen instead.
+  When binding a book, the edges that face outward need to be very smooth to reduce contamination and dust from entering the book when it sits on a shelf; this is why traditionally a larger paper size is cut down to the book size.
+  If your print house expects the stock to be A4, then make sure the rubook has the ``a4paper'' option.
+  If they prefer to deal with preparation themselves from a B5 pdf, then the default ``b5paper'' option is correct.
+  The template is optimized for lualatex, but should still work with pdflatex.
+  (If you switch to Icelandic mode (IS option to ruthesis) then abstract will become \'{U}tdr\'{a}ttur)
+  Thesis have been printed out in December 2023 that were successfully bound into B5 books by local printers.
+  
+  Keywords:  Keywords, separated, by, commas
+\end{abstract}
+
+
+% RUM: "Acknowledgements (optional)"
+\chapter*{Acknowledgments} 
+\begin{quotation}
+So long, and thanks for all the fish.
+\end{quotation}\sourceatright{Douglas Adams\cite{adams84fish}}\vspace{\baselineskip}%add blank line
+
+This work was funded by \the\year~RANNIS grant ``Survey of man-eating Minke whales'' 1415550.
+Additional equipment was generously donated by the Icelandic Tourism Board.
+Just kidding!
+
+{\em Acknowledgements are important to acknowledge any people, funding, and companies that helped in the work in any significant way.\/}
+%\/ is italic correction at the end of \em and italics
+\clearpage{}
+
+\mainmatter{}%% switch to the main content of the docuemnt
+
+%% Helpful macros you use in all of the files are best defined early
+%% or you can put them in custom.sty
+
+%% Axiomatic Design formulas
+%% Typeset the Axiomatic symbols properly
+\newcommand\CN[1]{\ensuremath{\text{CN}_{#1}}}%Customer Need
+\newcommand\FR[1]{\ensuremath{\text{FR}_{#1}}}%Functional Requirement
+\newcommand\DP[1]{\ensuremath{\text{DP}_{#1}}}%Design Parameter
+\newcommand\PV[1]{\ensuremath{\text{PV}_{#1}}}%Process Variable
+\newcommand\CON[1]{\ensuremath{\text{CON}_{#1}}}%Constraint
+
+
+%% If you would like to separate chapters into different files, use \include{chapterfile}
+%% It starts a new page to separate the files
+\include{instructions}%% comment this out once you start putting in your own text
+\include{introduction}
+\include{design}
+\include{analysis}
+\include{conclusion}
+
+\printbibliography{}
+
+%% If appendices are needed, uncomment the following line
+%% and include the appendices in separate files
+\appendix{}%%RUM: "Appendicies (as appropriate)
+
+
+%% \input{} does not start a new chapter but puts the content of the file here
+\input{interviews}% such as meetings with stakeholders
+\input{code}% relevant and important code
+% Generally you don't need all of the code:  put it into a repository
+
+\backmatter{} % Sections after this don't get numbers like the back cover and disclaimers
+%%%%%%%%%%%%% SHOW INDEX %%%%%%%%%%%%%%%%%%
+%% Index, optional.  A good idea on longer documents
+%\clearforchapter{}
+%\printindex{}%%RUM: Not mentioned
+
+\end{document}
+%%%%% TexStudio configuration 
+% !TeX spellcheck = en_US
+% !TeX encoding = utf8
+% !TeX program = lualatex
+% !TeX TXS-program:bibliography = txs:///biber
+
+%%%%% Emacs configuration
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% TeX-engine: luatex
+%%% End:

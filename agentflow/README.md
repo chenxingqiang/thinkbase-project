@@ -27,7 +27,7 @@ agentflow/
 │   ├── workflow.py      # Workflow engine
 │   └── workflow_executor.py # Workflow execution
 │
-├── ell2a/               # ELL2A integration
+├── ell/               # ELL integration
 │   ├── integration.py   # Integration module
 │   └── types/          # Message and content types
 │
@@ -68,8 +68,8 @@ agentflow/
    - Configuration management
    - Base type definitions
 
-3. **ell2a/**
-   - ELL2A integration components
+3. **ell/**
+   - ELL integration components
    - Message type definitions
    - Communication protocols
 

@@ -1,0 +1,255 @@
+% #----------------------------------------------#
+% |   Autor Plantilla: Eduardo Cañete Carmona    |
+% |   Fecha creación: 01/07/2019                 |
+% |   Ultima actualización: 10/06/2024           |
+% |   Versión: 3.2                               |
+% #----------------------------------------------#
+
+\documentclass[a4paper, 12pt]{book}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage[left = 35mm, right = 25mm, top = 25mm, height = 206mm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage[square,numbers]{natbib}
+\usepackage[skip=12pt,font=small]{caption}  %Tamaño de la leyenda
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{afterpage}
+\usepackage{titlesec}
+\usepackage{color, colortbl}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{eurosym}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{wrapfig}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{url}
+\usepackage{eurosym}
+\usepackage{appendix}
+\usepackage{pdfpages}
+\usepackage{pdflscape} %poner pdf horizontal
+\usepackage[hidelinks]{hyperref}%para el hiperlink de las secciones
+\usepackage[newfloat]{minted}
+\usepackage[nottoc]{tocbibind}
+\usepackage{glossaries}
+
+
+\usepackage{tikz} % Diagramas de flujo
+\usetikzlibrary{shapes.geometric, arrows} %Libería de flechas
+
+\usepackage{datetime}
+\newdateformat{monthyeardate}{\monthname, \THEYEAR}
+
+% Entorno para código
+\newenvironment{code}{\captionsetup{type=listing}}{}    
+
+% Cambiamos el caption de los listing a español
+\renewcommand{\listingname}{Código}    
+
+ % Cambiamos el idioma del índice de códigos
+\renewcommand*{\listlistingname}{Índice de Códigos}    
+
+\newfloat{diagrama}{htbp}{loc}
+\floatname{diagrama}{Diagrama}
+\newcommand{\listofdiagrams}{\listof{diagrama}{Índice de Diagramas de Flujo}}
+\floatstyle{plaintop}
+\restylefloat{table}
+
+\graphicspath{ {Imagenes/} }
+
+
+\input{Configuracion/confg_colores}
+\input{Configuracion/confg_codigo}
+\input{Configuracion/confg_diagrama_flujo}
+%----------------------------------------------------------------------------------------
+%	ENCABEZADOS Y PIE DE PAGINA
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy}
+	\fancypagestyle{cuerpo}{
+      \fancyfoot{}
+      \fancyfoot[L]{Trabajo Fin de Grado} %Autor
+      \fancyfoot[C]{}
+      \fancyfoot[R]{- \thepage \ -}
+      \fancyhead{}
+      \fancyhead[L]{\leftmark} %Nombre del documento
+      \fancyhead[R]{\includegraphics[height=1.8cm]{logo_uco}} %Logo Universidad
+      \renewcommand{\headrulewidth}{0.4pt}
+      \renewcommand{\footrulewidth}{0.4pt}
+      \setlength{\headheight}{65pt}
+    }
+    \fancypagestyle{indice}{
+      \fancyfoot{}
+      \fancyfoot[L]{\AutorTFG} %Autor
+      \fancyfoot[R]{- \thepage \ -} %Asignatura
+      \fancyhead{}
+      \fancyhead[L]{Trabajo Fin de Grado} %Nombre del documento
+      \fancyhead[R]{\includegraphics[height=1.8cm]{logo_uco}} %Logo
+      \renewcommand{\headrulewidth}{0.4pt}
+      \renewcommand{\footrulewidth}{0.4pt}
+      \setlength{\headheight}{65pt}
+      }
+      
+    \fancypagestyle{plain}{% % <-- this is new
+     \fancyfoot{}
+      \fancyfoot[L]{Trabajo Fin de Grado} %Autor
+      \fancyfoot[C]{} %ecc
+      \fancyfoot[R]{- \thepage \ -}
+      \fancyhead{}
+      \fancyhead[L]{\leftmark} %Nombre del documento
+      \fancyhead[R]{\includegraphics[height=1.8cm]{logo_uco}} %Logo Universidad
+      \renewcommand{\headrulewidth}{0.4pt}
+      \renewcommand{\footrulewidth}{0.4pt}
+      \setlength{\headheight}{65pt}
+    }
+  
+\setcounter{secnumdepth}{4}
+
+\pagenumbering{empty}
+
+
+%%%%%%%%%
+% ANEXO %
+%%%%%%%%%
+
+% Para que ponga ANEXO en vez de APENDICE
+ \addto\captionsspanish{\renewcommand{\appendixname}{Anexo}} %para que ponga anexo y no apéndice.
+
+\makeglossaries
+\raggedbottom  % Quita huecos grandes en blanco
+\begin{document}
+
+%%%%%%%%%%%
+% PORTADA %
+%%%%%%%%%%%
+\input{Portada/cover}
+\newpage
+\thispagestyle{empty}   % Página en blanco entre la portada y el comienzo del documento
+\mbox{} 
+$\ $
+\thispagestyle{empty} % para que no se numere esta pagina
+\newpage
+$\ $
+\thispagestyle{empty} % para que no se numere esta pagina
+
+%%%%%%%%%%%%%%%
+% DEDICATORIA %
+%%%%%%%%%%%%%%%
+\pagenumbering{Roman} % para comenzar la numeracion de paginas en numeros romanos
+\pagestyle{indice}
+\thispagestyle{indice}
+\begin{flushright}
+\textit{Dedicado a \\
+mi familia}
+\end{flushright}
+
+%%%%%%%%%%%%%%%%%%%
+% AGRADECIMIENTOS %
+%%%%%%%%%%%%%%%%%%%
+\input{0_agradecimientos}
+
+%%%%%%%%%%%%%%%%%%%%%%
+% RESUMEN Y ABSTRACT %
+%%%%%%%%%%%%%%%%%%%%%%
+\input{0_resumen_y_abstract}
+
+%%%%%%%%%%%%%%%%%%
+% INDICE GENERAL %
+%%%%%%%%%%%%%%%%%%
+\newpage
+\thispagestyle{fancy} 
+
+\tableofcontents
+
+\cleardoublepage
+\listoffigures
+
+\cleardoublepage
+\listoftables
+
+% Descomentar las siguientes líneas si tienes pensado añadir diagramas de flujo.
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Índice de diagramas de flujo}
+\listofdiagrams
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Lista de Acrónimos}
+
+\include{lista_acronimos}
+\printglossary[type=\acronymtype, title={Acrónimos}]
+
+%---------------------%
+%	CUERPO DE TEXTO   %
+%---------------------%
+
+\afterpage{\null\newpage}
+
+\newpage
+\newpage
+
+\pagestyle{cuerpo}
+\thispagestyle{cuerpo}
+
+\pagenumbering{arabic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         ESTRUCTURA CONTENIDO                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------%
+%	CAPÍTULOS      %
+%------------------%
+
+\input{1_introduccion}
+\input{2_objetivos}
+
+% --> poner otros capítulos. Por ejemplo:
+    %\input{3_antecedentes}    
+    %\input{4_materiales}
+    %\input{5_diseno}
+    %\input{6_pruebas}
+
+% Comentar en la versión final
+\input{EJEMPLOS_LATEX}
+
+\input{7_conclusiones}
+
+%--------------------%
+% DOCUMENTOS TÉNICOS %
+%--------------------%
+
+\input{presupuesto}
+
+
+
+%------------------%
+%	BIBLIOGRAFIA   %
+%------------------%
+
+%Estilo de la bibliografia
+\bibliographystyle{unsrtnat} 
+%\bibliographystyle{elsarticle-num}
+\bibliography{referencias.bib} 
+
+%------------------%
+%      ANEXOS      %
+%------------------%
+
+\input{planos}
+
+\appendix
+
+\input{anexo_hojas_de_caracteristicas}
+\input{anexo_codigo}
+\input{anexo_manual_usuario}
+
+\end{document}

@@ -1,0 +1,182 @@
+%
+% Adaptation of the Thesis Template bei Philip Döbler shared under CC-BY 3.0
+% Ergänzungen von:
+% Till Tantau (teilweise entfernt)
+% André Calero Valdez
+% Tim Schrills
+
+% Note for Overleaf free users:
+% If your file does not compile, you can deactivate syntax checks in the Recompile menu above the PDF. This saves compile time.
+
+\documentclass[
+    paper = a4,
+    fontsize = 12pt,
+    headinclude = true,
+    % start chapters on the right side
+    open = right,
+    % Use twosided layout? Every chapter starts on the right side, therefore sometimes blank pages are added between chapters.
+    twoside = false,
+    BCOR = 10mm,
+    % add lists and bibliography to table of contents
+    toc = listofnumbered,
+    toc = bibnumbered,
+    % enumerate chapters as x.y instead of x.y.
+    numbers = noendperiod
+]{scrreprt}
+
+% use some additional package, add your own below if required
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% package for code listings
+\usepackage{listings}
+% package providing colors (e.g. for syntax highlighting in listings)
+\usepackage{xcolor}
+% package for german language, change to english if required
+\usepackage[ngerman]{babel}
+\usepackage[german=quotes]{csquotes}
+\usepackage{xpatch}
+\usepackage{hyphenat}
+% package to set the line spacing
+\usepackage{setspace}
+% package for hyperlinks (e.g., in the table of contents) and set links to same style as text
+\usepackage[hidelinks]{hyperref}
+% package to create acronyms
+\usepackage[acronym]{glossaries}
+% package for pseudocode
+\usepackage[german, algochapter, linesnumbered]{algorithm2e}
+% package to create diagrams
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzset{font={\fontsize{10pt}{12}\selectfont}}
+
+%%% additions by ACV
+% Citations using APA style with biblatex
+\usepackage[style=apa,backend=biber,backref=true,maxbibnames=20]{biblatex}
+% Biblatex allows multiple bib-files
+\addbibresource{bibliography/references.bib}
+\addbibresource{bibliography/websources.bib}
+\addbibresource{bibliography/normen.bib}
+
+% Tables using APA Style
+\usepackage{booktabs}
+
+% use microkerning for improved typesetting
+\usepackage{microtype}
+
+% include acronyms
+\input{preamble/acronyms}
+
+% avoid bold caption for algorithms to be consistent with other captions
+\SetAlCapSty{}
+\SetNlSty{footnotesize}{}{}
+
+% definitions for syntax highlighting in listings environment
+% define custom colors for syntax highlighting in code listings
+\definecolor{lst_comments}{rgb}{0, 0.75, 0}
+\definecolor{lst_linenumbers}{rgb}{0.2, 0.2, 0.2}
+\definecolor{lst_keywords}{rgb}{0, 0, 0.75}
+\definecolor{lst_strings}{rgb}{0.75, 0, 0}
+\definecolor{lst_background}{rgb}{0.97, 0.97, 0.97}
+
+% define style for listings
+\lstdefinestyle{msqc_style}{
+    backgroundcolor=\color{lst_background},   
+    commentstyle=\color{lst_comments},
+    keywordstyle=\color{lst_keywords},
+    stringstyle=\color{lst_strings},
+    % style of the line numbers on the left side
+    numberstyle=\tiny\color{lst_linenumbers},
+    % use monospace font for code and set size to the size of footnotes
+    basicstyle=\footnotesize,
+    xleftmargin=2em,
+    % break long lines, if this happens it might be better to manually add a line break at an appropriate place
+    breaklines = true,
+    % place caption below the listing
+    captionpos = b,
+    % don't drop spaces to fix alignment and always convert tabs to spaces
+    keepspaces = true,
+    % place line numbers on the left side
+    numbers = left,
+    % distance between line numbers and listing
+    numbersep = 7pt,
+    % don't show special characters for spaces
+    showspaces = false,
+    % don't show special characters for spaces in strings
+    showstringspaces = false,
+    % don't show special characters for tabs
+    showtabs = false,
+    % set size of tab to 4 spaces
+    tabsize = 4
+}
+% set style for the document
+\lstset{style=msqc_style}
+
+% set line spacing to 1.5
+\onehalfspacing
+
+\begin{document}
+    % use roman numbering for preamble
+    \pagenumbering{Roman}
+    % add title page and abstract
+    \input{preamble/title_page}
+    \input{preamble/abstract}
+    
+    % print table of contents
+    \tableofcontents
+    
+    % use arabic numbering for main part
+    \cleardoublepage\pagenumbering{arabic}
+
+    % Deutsche Paragrapheinzüge auf 0 und Parskip auf 10 pt
+    % Für englische Text auskommentieren
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{10pt}
+    
+    % create a tex file for each chapter and include it below
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+    % Inhalt der Arbeit
+    \include{chapters/10_introduction}
+    \include{chapters/20_relatedwork}
+    \include{chapters/30_implementation}
+    %\include{chapters/40_method}
+    %\include{chapters/50_results}
+    %\include{chapters/60_discussion}
+    \include{chapters/70_conclusion}
+
+    % diese Zeilen auskommentieren, um das Tutorial aus der Arbeit auszublenden.
+    \include{chapters/99_tutorial}
+    \include{chapters/999_LatexTutorial}
+
+    % add bibliography
+    %\printbibheading
+    % Die Kategorien können hier angepasst werden.
+    \printbibliography[nottype=online,notkeyword=norm]
+    \printbibliography[type=online,heading=subbibliography,
+title={Online-Quellen}]
+    \printbibliography[keyword=norm,heading=subbibliography,
+title={Normen}]
+    
+    \begin{appendix}
+        % create a tex file for each appendix and include it below
+        \input{appendices/example_appendix}
+        
+        % add lists of figures, tables and listings to the appendix
+        \listoffigures
+        \listoftables
+        \lstlistoflistings
+        
+        % add acronyms
+        \printglossary[type=\acronymtype, title=Abkürzungsverzeichnis, toctitle=Abkürzungsverzeichnis, numberedsection] 
+        
+
+    \end{appendix}
+    \newpage
+    \input{appendices/erklaerung}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+    
+\end{document}

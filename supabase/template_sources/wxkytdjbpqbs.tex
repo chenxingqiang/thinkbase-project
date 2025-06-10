@@ -1,0 +1,147 @@
+
+%                  Copyright Lukas Joisten
+% Distributed under the Boost Software License, Version 1.0.
+%       (See accompanying file LICENCE.txt or copy at
+%          https://www.boost.org/LICENSE_1_0.txt)
+
+% !TeX spellcheck = de_DE
+% !TeX encoding = UTF-8
+% !TeX program = pdflatex 
+% !BIB program = biber
+
+\input{pre-preamble} 
+
+\setboolean{TimesNewRoman}{true} % Um Arial zu verwenden, auf "false" umstellen
+
+% Um Einstellungen zu ändern, schaue bitte in preamble.tex
+\input{preamble} % Fügt die Präambel mit allen Einstellungen in das Dokument ein
+
+\begin{document}
+	
+	\newboolean{ExternalDeckblatt}
+	\setboolean{ExternalDeckblatt}{false} % Um ein externes Deckblatt zu verwenden, diesen Wert von "false" auf "true" ändern
+	
+	\ifthenelse{\boolean{ExternalDeckblatt}}{
+		\includepdf[page=1]{Einzubindende_PDFs/Externes_Deckblatt_Beispiel.pdf}
+	}{
+		\input{deckblatt} % Geh zu deckblatt.tex um dein Deckblatt einzurichten
+	}
+
+	\pagenumbering{arabic}
+%	\section*{Vorwort}
+%	Hier kommt ein Vorwort hin.
+	\pdfbookmark{\contentsname}{toc}
+	\tableofcontents % Inhaltsverzeichnis 
+	\bookmarksetup{startatroot}
+%	\listoffigures % Abbildungsverzeichnis
+%	\listoftables % Tabellenverzeichnis
+%	Abkürzungsverzeichnis % https://www.heise.de/tipps-tricks/Abkuerzungsverzeichnis-in-LaTeX-erstellen-4982473.html 
+%	Symbolverzeichnis % Google is your friend: Es gibt viele verschiedene sinnvolle Möglichkeiten (Aber Achtung: listofsymbols geht nicht)
+	\cleardoubleoddpage
+%----------------------------------------------------	
+	\section{Einleitung}
+		Das ist ein Template für eine Hausarbeit. Hier ein paar Formatierungsbeispiele:\\\\		
+		\textbf{Fetter Text}, \underline{Unterstrichener Text}, \textit{Kursiver Text}, \emph{Hervorgehobener Text}.\\\\
+		{\Huge Sehr sehr groß}, {\huge sehr groß}, {\LARGE GROẞ}, {\Large Groß}, {\large groß}, {\normalsize Normal}, {\small klein}, {\footnotesize kleiner}
+		
+		\subsection{Absätze und Zeilenumbrüche}
+				Eine Leerzeile fügt einen Absatz ein. 
+			
+				Zwei Backslash hintereinander (\lstinline|\\|) fügen einen Zeilenumbruch ein. Geht aber mit letzterem sparsam um.\\
+		
+		\subsection{Belege}
+			Hier ein paar Beispiele für Belege:\\
+			\parencite[97]{Wilhelmy.2002}, \parencite[211]{Ahnert.2015}, \parencite[223]{Einstein.1926} \parencite[439]{Schellmann.2011}.\\
+			Im Text belegt man so: \textcite[123]{Ahnert.2015} sagt etwas.
+			
+			Das Literaturverzeichnis wird automatisch erstellt, wenn man einen Beleg verwendet. Die entsprechenden Bibtex-Keys werden in der Datei literatur.bib eingetragen. Die Bibtex-Keys kann man sich z.B. von Citavi exportieren lassen. Dort kann man auch anhand der ISBN nach Literatur suchen. Citavi macht den Rest. 
+			
+			Aber Achtung. Es müsen vielleicht noch einige Änderungen an den Feldern vorgenommen werden: In das Feld \emph{publisher} muss \enquote{Ort: Verlag} manuell eingetragen werden und etwaige unerwünschte URL-Felder müssen gelöscht werden.
+		
+		\subsection{Bilder und Formeln}
+			
+			\begin{figure}[hbt]
+				\centering
+				\includegraphics[width=0.75\linewidth]{Bilder/The_Earth_seen_from_Apollo_17.jpg}
+				\caption[Eintrag für das Abbildungsverzeichnis]{Das Bild zeigt die Erde \parencite{Wikipedia.1972}. Das ist auch gleichzeitig ein Beispiel für Belege von Internetseiten. Merke, dass Wikipedia nicht der Autor des Bildes ist. Wikipedia ist hier nur zu Veranschaulichungszwecken als Autor gewählt worden.}
+				\label{fig:erde}
+			\end{figure}
+		
+			So wird eine Formel angegeben: $Abfluss = Querschnitt \times Str\text{\emph{ö}}mungsgeschwindigkeit$, was das Wasservolumen pro Zeiteinheit ($\frac{V}{t}$ oder in SI-Einheiten $\frac{m^3}{s}$) beschreibt. Anführungszeichen setzt man am Besten so: \enquote{Begriff} 
+
+			\Cref{fig:erde} zeigt die Erde. Das Bild stammt von \href{https://de.wikipedia.org/wiki/Erde#/media/Datei:The_Earth_seen_from_Apollo_17.jpg}{Wikipedia} und ist gemeinfrei. Und so macht man übrigens auch Links. Innerhalb des Dokuments mit \emph{ref} oder \emph{Cref}. Links zu URLs macht man mit \emph{href}.
+		
+		\subsection{Aufzählungen}
+			\begin{itemize}
+				\item Eins
+				\item Zwei
+				\item Drei
+			\end{itemize}
+			\hrule
+			\begin{enumerate}
+				\item Eins
+				\item Zwei
+				\item Drei
+			\end{enumerate}
+		
+		\subsection{Tabellen}
+			Tabellen sind in \LaTeX\space etwas schwieriger zu erstellen, aber dennoch gut möglich. Anleitungen dazu gibt es unter:
+			\begin{itemize}
+				\item \url{https://de.wikibooks.org/wiki/LaTeX-Kompendium:_Tabellen}
+				\item \url{https://www.uni-muenster.de/IT.DamianBucher/latex-Blockkurs-2.pdf}
+				\item \url{https://de.overleaf.com/learn/latex/Tables}
+				\item \url{https://www.namsu.de/Extra/befehle/Tabellenumgebungen.html}
+			\end{itemize}
+			
+			Zur Unterstützung gibt es Table Generators im Internet: \url{https://www.tablesgenerator.com/} und \url{https://www.latex-tables.com/}.
+		
+		\subsection{Inhaltsverzeichnis und Literaturverzeichnis}
+			Das Inhaltsverzeichnis wird automatisch erstellt, wenn man mit \emph{section, subsection} und \emph{subsubsection} neue Kapitel erstellt.
+			
+			Das Literaturverzeichnis wird automatisch erstellt, wenn man \emph{parencite, textcite,} etc. benutzt.
+		
+	\section{Beispieltext}
+		Breite Verflachungen, die das Gefälle eines Talhangs unterbrechen, werden als \emph{Terrassen} bezeichnet \parencite[97]{Wilhelmy.2002}. Sie werden nach oben und unten durch steile Böschungen begrenzt \parencite[211]{Ahnert.2015}. Neben den strukturbedingt und ohne Mitarbeit von Flüssen entstandenen Denudationsterrassen, gibt es auch die durch fluviale Prozesse entstanden \emph{Flussterrassen}. Letztere hat diese Hausarbeit zum Thema.
+		
+		Nachdem sich ein Fluss in einen Talboden eingetieft hat, bleiben an den Hängen Reste ehemaliger Talböden zurück: Die Flussterrassen. Sie deuten auf die Phasen der Talentwicklung hin, in denen Tiefenerosion durch eine Phase der Seitenerosion oder Akkumulation von Flusssedimenten unterbrochen wurde.
+		
+		Flussterrassen dienen Menschen aufgrund ihrer besonderen Lage seit jeher als Siedlungsplätze \parencite[575]{Strahler.2009}. Sie sind ein flaches, fruchtbares Land, das aufgrund seiner exponierten Lage nicht überschwemmt wird. Dennoch ist der Fluss in unmittelbarer Nähe. Zudem lassen sich aufgrund der Flachheit, einfach Gebäude, Straßen und Bahnstrecken errichten.
+%------------------------------------------------------------------------------
+
+	\section{Kapitel}
+		\label{sec:Kapitel}
+	
+		Es gibt vier verschiedene Unterkapitel in Kapitel \ref{sec:Kapitel}: Unterkapitel 1 (\ref{subsec:Unterkapitel1}), Unterkapitel 2 (\ref{subsec:Unterkapitel2}), Unterkapitel 3 (\ref{subsec:Unterkapitel3}) und Unterkapitel 4 (\ref{subsec:Unterkapitel4}).
+		
+		\subsection{Unterkapitel 1}
+			\label{subsec:Unterkapitel1}
+		
+			Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					
+		\subsection{Unterkapitel 2}
+			\label{subsec:Unterkapitel2}
+		
+			Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+			
+		\subsection{Unterkapitel 3}
+			\label{subsec:Unterkapitel3}
+				
+			Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+			
+		\subsection{Unterkapitel 4}
+			\label{subsec:Unterkapitel4}
+			
+			Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+%----------------------------------------------------		
+	\section{Zusammenfassung} 
+	
+		Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+%----------------------------------------------------		
+	\printbibliography[heading=bibintoc,title=Literaturverzeichnis] % Literaturverzeichnis 
+	
+	\appendix % Anhänge
+	\section{Anhang 1}
+	
+	\section{Anhang 2}
+	
+\end{document}

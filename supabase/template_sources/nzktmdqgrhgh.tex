@@ -1,0 +1,80 @@
+\documentclass[12pt,onehalfspacing,headsepline,oneside,openright,a4paper]{report}
+\include{Settings}
+
+% TO-DO: change thesis information
+\newcommand*{\getUniversity}{Technische Universität München}
+\newcommand*{\getFaculty}{School of Management}
+\newcommand*{\getTitle}{\color{red}This is the title}
+\newcommand*{\getsubTitle}{\color{red}Subtitle}
+\newcommand*{\getTitleGer}{Titel der Abschlussarbeit}
+\newcommand*{\getDoctype}{{\color{red}Bachelor’s / Master's} Thesis for the Attainment of the Degree
+{\color{red}Bachelor of Science / Master of Science} at the 
+School of Management of the Technical University of Munich}
+
+\newcommand*{\getSupervisor}{Prof. Dr. Hanna Hottenrott} \newcommand*{\getChair}{Economics of Innovation} \newcommand*{\getAdvisor}{\color{red}Name of Person in Support}
+\newcommand*{\getAuthor}{\color{red}Max Mustermann}
+\newcommand*{\getAuthorAddress}{\color{red}Arcisstraße 21, 80333 Munich}
+\newcommand*{\getAuthorMatrNr}{\color{red}078265538}
+\newcommand*{\getSubmissionDate}{\color{red}Day.Month.Year}
+\newcommand*{\getCourseofStudy}{\color{red}Bachelor / Master in Management \& Technology}
+
+\makeglossaries
+
+\pagenumbering{Roman} %starts numbering of pages in Roman
+
+\begin{document}
+
+\selectlanguage{english}
+
+\include{Title} %inserts title page from file Title
+\setcounter{page}{0}%no numbering of the title page
+
+\include{Abstract} %inserts abstract from file Abstract
+
+\clearpage
+\tableofcontents %inserts table of contents 
+
+\clearpage
+\addcontentsline{toc}{chapter}{List of Figures}
+{%
+\let\oldnumberline\numberline%
+\renewcommand{\numberline}{\figurename~\oldnumberline}%
+\listoffigures%
+}
+
+\clearpage
+\addcontentsline{toc}{chapter}{\listtablename}
+{%
+\let\oldnumberline\numberline%
+\renewcommand{\numberline}{\tablename~\oldnumberline}%
+\listoftables%
+}
+\counterwithout{table}{section}%table numbering without section
+\counterwithout{table}{chapter}%table numbering without chapter
+
+\clearpage
+\include{Glossary}
+\printglossary[type=\acronymtype,title={List of Abbreviations},nonumberlist,style=super3col]
+
+
+\clearpage
+\setcounter{page}{1}%numbering starts at 1
+\pagenumbering{arabic}%main part is numbered in arabic
+
+%To-DO: include all your chapters needed
+\include{Chapters/1. Introduction} %include chapters of files
+
+\addcontentsline{toc}{chapter}{Bibliography}%adds Bibliography to Contents
+\printbibliography
+
+\appendix
+\include{Appendix}
+
+\cleardoublepage
+\pagenumbering{Roman}
+%TO-DO: set counter page number "List of Abbreviations"+1 -> continues with roman numbering
+\setcounter{page}{5} 
+
+\include{Declaration}
+
+\end{document}

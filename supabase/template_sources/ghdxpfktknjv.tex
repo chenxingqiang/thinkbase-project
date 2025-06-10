@@ -1,0 +1,252 @@
+\documentclass[
+  journal=Notes,
+  manuscript=for-review,
+  year=2023,
+  volume=x:x,
+]{continua-journal}
+
+\received{XXX}
+\revised{XXX}
+\accepted{XXX}
+\published{XXX}
+\usepackage[colorlinks=true,linkcolor=black, urlcolor=blue, citecolor=blue]{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[nopatch]{microtype}
+\usepackage{booktabs}
+\addbibresource{refs.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[linguistics]{forest}    %For drawing trees
+\usepackage{multicol}
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart,arrows.meta,positioning}
+\usepackage{soul}
+\usepackage{graphicx}
+\usepackage[T1]{tipa} %IPA symbols
+\renewcommand{\familydefault}{\sfdefault} 
+\usepackage{gb4e}   % Load in this package last
+%%Add additional packages here%%
+
+\let\eachwordone=\itshape   %% Italicizes first line of gloss 
+
+\forestset{
+  sn edges/.style={% manual page 8
+    for tree={
+      parent anchor=south,
+      child anchor=north
+    }
+  },
+  my nice empty nodes/.style={% modified from manual page 52
+    for tree={
+      calign=fixed edge angles,
+      calign angle=60,
+    },
+    delay={
+      where n children=0{
+        if content={}{
+          content=\strut,
+          anchor=north,
+        }{
+          align=center
+        },
+      }{
+        if content={}{
+          shape=coordinate,
+          for parent={
+            for children={
+              anchor=north
+            }
+          }
+        }{}
+      }
+    },
+  },
+  my pretty nice empty nodes/.style={
+    for tree={
+      calign=fixed edge angles,
+      calign angle=60,
+      parent anchor=south,
+      delay={
+        where n children=0{
+          if content={}{
+            content=\strut,
+            anchor=north,
+          }{
+            align=center
+          },
+        }{
+          if content={}{
+            inner sep=0pt,
+            edge path={\noexpand\path [\forestoption{edge}] (!u.parent anchor) -- (.south)\forestoption{edge label};}
+          }{}
+        }
+      }
+    }
+  }
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Continua Author Template}
+
+
+\keywords{Please provide, up to five (5), keywords that are, separated, by spaces} 
+
+\begin{document}
+
+
+\begin{abstract}
+Within 200 to 250 words, provide an overview of the theoretical perspective, the empirical domain, and the primary contributions of the paper. Please avoid citations and references in the abstract to the extent that it is possible. Finally, article keywords should also occur in the abstract.
+\end{abstract}
+
+\section{Section 1}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.\footnote{Here is a footnote. Please place footnotes after punctuation marks.} Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
+
+\subsection{Subsection 1}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ante in nibh mauris cursus mattis molestie a iaculis at. Varius vel pharetra vel turpis nunc eget lorem. Gravida rutrum quisque non tellus orci ac. Augue interdum velit euismod in pellentesque massa placerat duis. Ac tortor dignissim convallis aenean et. Tincidunt lobortis feugiat vivamus at. Non blandit massa enim nec dui nunc mattis. Tortor consequat id porta nibh venenatis. Consectetur adipiscing elit pellentesque habitant morbi. Justo laoreet sit amet cursus sit amet. Dignissim sodales ut eu sem. At erat pellentesque adipiscing commodo elit at. Nisi porta lorem mollis aliquam ut porttitor.
+
+\subsubsection{Subsubsection}
+Please limit to two levels of subsections. Here are some examples of how to make lists and use the \texttt{cite} function:
+\begin{itemize}
+    \item \texttt{cite}: \cite{natvigsalmons2020}
+    \item \texttt{citep}: \citep[27--29]{adger2011}
+    \item \texttt{citet}: \citet[3]{chomsky65}
+    \item \texttt{citeauthor} and \texttt{citeyear}: \citeauthor{halle1993}'s (\citeyear{halle1993}), please use sparingly
+\end{itemize}
+
+\noindent Here's how you put together a numbered list:
+
+\begin{enumerate}
+    \item One
+    \item Two
+    \item Three
+\end{enumerate}
+
+\section{Examples, tables, and trees}
+
+Here's how to gloss examples: 
+
+\begin{exe}
+    \ex \gll Ratten essen K\"ase \\
+             rats eat cheese \\
+        \glt `Rats eat cheese.' 
+
+    \ex Norwegian examples from \citep[154]{fabregas2020passives}
+        \begin{xlist}
+            \ex \gll Huset blir bygget av ham. \\
+                     house.\textsc{def} becomes built of him \\
+                \glt `The house is being built by him.'
+
+            \ex \gll Huset m\aa tte bli bygget av ham. \\
+                     house.\textsc{def} must become built of him \\
+                \glt `The house had to be built by him.' 
+        \end{xlist}
+\end{exe}
+
+% To emphasize/un-italicize something in a glossed example, use \emph{XXX}.
+% To bold something in a glossed example (and elsewhere), use \textbf{YYY}
+
+
+\noindent Please use the \texttt{tipa} package for IPA symbols. Here is the phonetic transcription for \textit{text}: \textipa{[t\textsuperscript{h}Ekst]}. You can find more information in the \texttt{tipa} manual (see \url{https://ctan.org/pkg/tipa?lang=en}). 
+
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{ccc}
+        Header1 & Header2 & Header3 \\\hline
+        1 & 2 & 3 \\ 
+        4 & 5 & 6 \\
+         7 & 8 & 9 \\
+         10 & 11 & 12 \\\hline
+    \end{tabular}
+    \caption{Here is an example of a table caption.}
+    \label{tab:example-table}
+\end{table}
+
+\noindent This is the basic template for a table. Adjusting to include additional lines (horizontal and vertical) is permitted as long as it's necessary to understand the table. Please use discretion and make tables as simple as possible. Refer to the table in the text using the label, like this: Table \ref{tab:example-table}.
+
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|} \hline
+     Header1 & Header2 & Header3 \\\hline
+        1 & 2 & 3 \\ \hline
+        4 & 5 & 6 \\\hline
+         7 & 8 & 9 \\\hline
+         10 & 11 & 12 \\\hline
+    \end{tabular}
+    \caption{This is another caption.}
+    \label{tab:example-table-boxed}
+\end{table}
+
+\noindent Table \ref{tab:example-table-boxed} is an example of a table with all boundary lines for all of the cells. Again, please try to avoid using these unless they are required to interpret the information presented in the table.
+
+\bigskip
+
+\noindent This is an example of a tree structure created/drawn using the \texttt{forest} package:
+
+\begin{exe}
+\ex
+\scalebox{0.8}{\begin{forest}
+[\hspace{3.5cm} EvtP $\Leftarrow$ External Argument [External Argument]
+  [Evt\textsuperscript{$\prime$} 
+    [Evt]
+    [\hspace{3.5cm}\textsc{init}P $\Leftarrow$ Causation subevent [\textsc{init}]
+       [\hspace{3.5cm}\textsc{proc}P $\Leftarrow$ Dynamic subevent [\textsc{proc}]
+         [\hspace{3.1cm}\textsc{res}P $\Leftarrow$ Result subevent [\textsc{res}] [(PP/AP/DP)]
+           ] ] ] ] ] \label{gilliantree} 
+\end{forest}}
+\end{exe}
+
+\noindent
+And yet another example of a tree using the \texttt{forest} package: 
+
+\begin{exe}
+
+\ex A slightly more complex tree
+
+\begin{forest}
+        baseline,
+        sn edges,
+        my pretty nice empty nodes
+            [ [\textsc{fin}, name=fin 
+            ] 
+                [ [`V'$^{2}$, name=v2  ]
+                    [ [\textsc{pst} 
+                    ]{ \draw (.west) node[left]{a $\Leftarrow$}; }
+                        [$\sqrt{\textnormal{kast}}$ ]
+                    ]
+                ]
+            ]
+\draw[] (v2) to[out=west,in=south] node[pos=0.6,xshift=-10mm]{har $\Leftarrow$} (fin);  
+    \label{Trees:part-a}\end{forest}
+\end{exe}
+
+\section*{Abbreviations} %%If applicable
+Please follow the glossing and abbreviation conventions of the Leipzig glossing rules: \url{https://www.eva.mpg.de/lingua/resources/glossing-rules.php}
+
+\section*{Supplementary files} %%If applicable
+This section should be used to provide a stable link to open data following the FAIR principles: \url{https://www.go-fair.org/fair-principles/}.
+
+\section*{Ethics and consent} %%If applicable
+This section is to provide information concerning protocols and consent for human subjects research.
+
+\section*{Funding statement} %%If applicable
+If accepted, provide full funding information following the guidelines of the relevant funding agency.
+
+\section*{Acknowledgements} %%Optional
+Thanks!
+
+\section*{Competing interests} %%Required
+ Authors must report any and all competing interests. If there are none, authors must provide a statement such as: ``The author(s) have no competing interests to declare.''
+ 
+\section*{Author contribution statement} %%Optional, but recommended
+A statement outlining individual author contributions is recommended. Author initials may be used, e.g., AB, CDE, and FG contributed equally to this manuscript.
+
+\nocite{conklin18,grosjeanpy91,putnam2018,putnam2019,putnam2020OFOH,putnam2020lex,polinsky18,wiltschko2014universal,hall2007,lardiere2008}
+
+\printbibliography
+
+\end{document}

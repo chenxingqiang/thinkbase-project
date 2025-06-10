@@ -1,0 +1,226 @@
+% --------------------------------------------------------------------------------
+% Student guideline for the final year dissertation using LaTeX2e
+% Alexandra Bonnici
+% Department of Systems and Control
+% 13th September 2017
+
+\documentclass[12pt, oneside]{Thesis}
+
+% --------------------------------------------------------------------------------
+% Some useful packages
+% You may add/remove any packages as you deem fit,
+% Recommended packages which are recommended are marked by [R] in the comment
+% --------------------------------------------------------------------------------
+
+% font options & general typesetting
+\usepackage{microtype}            % some refinements over the general appearance of text
+\usepackage{eqparbox}             % ensures that blocks of text occupy the same space
+
+% for figures
+\usepackage[pdftex]{graphicx}     %  [R] to use graphics
+\usepackage{subfigure}            %  [R] to make subfigures
+\usepackage{epstopdf}             %  [R] adds eps support in the graphics package
+\usepackage{wrapfig}              %  to allow text to wrap around figures
+
+
+% for tables
+\usepackage[table]{xcolor}
+\usepackage{multirow,bigstrut}    % to have tables with merged rows
+\usepackage{array, booktabs}      %  [R] for good looking tables
+\usepackage{longtable}            % to create tables that span more than one page
+\usepackage{adjustbox}            % so that long tables fit within the page
+\usepackage{rotating}             % adds support to rotate pages
+
+% to write nice mathematical equations
+\usepackage{mathtools}            %  [R] some mathematical tools
+\usepackage{amsmath}		      %  [R] to write math formulas easily	
+\usepackage{amssymb}              %  [R] for maths symbols
+\usepackage{amsthm}               % for the typesetting of theorems
+\usepackage{esvect}               % to make vector arrows
+\usepackage{bm}                   % to make bold maths symbols
+
+\usepackage{xfrac}                % [R] to make in-text fractions
+
+% more symbols
+\usepackage{pifont}               % Postscript standard Symbol and Dingbats fonts
+\usepackage{gensymb}              % generic symbols fonts 
+\usepackage{stackrel}             % to stack things on top of each other
+
+% to include urls
+\usepackage{url}                  % to write urls
+
+% to typeset pseudo code algorithms and source codes
+\usepackage{algorithm}            % to type set algorithms as pseudo code
+\usepackage{algpseudocode}        % more layout options for algorithm pseudo code
+\usepackage{listings}             % to add non-formatted text e.g. source code
+
+% to typeset theorems, lemmas and definitions
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+% --------------------------------------------------------------------------------
+% Information relevant to your dissertation. 
+% Substitute with your own name, supervisor and title details.
+%--------------------------------------------------------------------------------
+
+\thesistitle{\LaTeX\ Template for the Final Year Project Dissertation} % title
+\supervisor{Prof. Kenneth P. \textsc{Camilleri}}    % supervisor
+\cosupervisor{}  									% co-supervisor 
+\authors{Alexandra \textsc{Bonnici}}				% your name
+\keywords{Student, Guidelines, FYP dissertation}    % keywords
+\studentcode{12345M}  								% ID code
+\department{Department of Systems and Control Engineering}  % department name
+\Udegree{Bachelor of Engineering (Hons.)} 
+\subject{Undergraduate Dissertation}          
+\UNIVERSITY{UNIVERSITY OF MALTA}       
+\faculty{Faculty of Engineering}                                      
+
+\newif\ifHaveACosupervisor
+% toggle the comment on the true/false lines as appropriate
+%\HaveACosupervisortrue	
+\HaveACosupervisorfalse
+
+%--------------------------------------------------------------------------------
+% Creates the PDF meta-data (for the electronic version of your dissertation). 
+% There is no need to modify this information
+%--------------------------------------------------------------------------------
+\hypersetup{urlcolor=blue,%
+		    linkcolor=blue,% 
+            citecolor=blue,%
+            colorlinks=true,% 
+            hypertexnames=true}
+            
+\hypersetup{pdftitle={\ttitle}}
+\hypersetup{pdfsubject=\subjectname}
+\hypersetup{pdfauthor=\authornames}
+\hypersetup{pdfkeywords=\keywordnames}
+
+%--------------------------------------------------------------------------------
+% Creates the title page (typesetting is taken care of and details are as above)
+%--------------------------------------------------------------------------------
+\title{\ttitle}
+
+%--------------------------------------------------------------------------------
+% Creates the glossaries pages and index pages
+%--------------------------------------------------------------------------------
+\makeglossaries
+\makeindex
+
+%--------------------------------------------------------------------------------
+% The actual start of the dissertation
+%--------------------------------------------------------------------------------
+\begin{document}
+
+\frontmatter            % sets page numbers of the first few pages to roman 
+\setstretch{1.3}        % ensures a one-and-a-half line spacing
+\fancyhead{}            % clears the headers
+\rhead{\thepage}        % sets the top right header to the page number
+\lhead{}                % ensures that the top left header remains empty
+\pagestyle{fancy}     	% uses the "fancy" page style (adds the line at top)
+
+
+%--------------------------------------------------------------------------------
+% Prints out the title page
+%--------------------------------------------------------------------------------
+\input{./Chapters/TitlePage}
+
+% -------------------------------------------------------------------------------
+% Prints out the copyright page (you do not need to modify this)
+%--------------------------------------------------------------------------------
+\clearpage
+\input{./Chapters/Copyright}
+
+\clearpage
+\input{./Chapters/DeclarationPage}
+
+%--------------------------------------------------------------------------------
+% Prints out the abstract 
+% You will need to change the text in the file to reflect your own abstract
+%--------------------------------------------------------------------------------
+\clearpage
+\input{./Chapters/Abstract}
+
+
+%--------------------------------------------------------------------------------
+% Prints out the acknowledgements page 
+% You will need to change the text to reflect your own acknowledgements
+%--------------------------------------------------------------------------------
+\clearpage
+\input{./Chapters/Acknowledgements}
+
+
+%--------------------------------------------------------------------------------
+% Prints out the list of contents, figures and tables 
+% You don't have to modify any of this
+%--------------------------------------------------------------------------------
+\clearpage
+\pagestyle{fancy}
+
+\lhead{\emph{Contents}}
+\tableofcontents
+
+\lhead{\emph{List of Figures}}
+\listoffigures
+
+\lhead{\emph{List of Tables}}
+\listoftables
+
+%--------------------------------------------------------------------------------
+% Prints out the list of acronyms 
+% No changes will be necessary if used properly within text
+%--------------------------------------------------------------------------------
+\clearpage
+\setglossarystyle{altlist}
+\printglossary[type=\acronymtype, title=List of Acronyms, toctitle=List of Acronyms]
+
+%--------------------------------------------------------------------------------
+% Prints out the list of symbols 
+% No changes will be necessary if used properly within text, comment if not relevant
+%--------------------------------------------------------------------------------
+
+\clearpage
+\setglossarystyle{list}
+\printglossary[title=List of Symbols,toctitle=List of Symbols]
+
+
+%--------------------------------------------------------------------------------
+% Prints out the chapter contents
+%--------------------------------------------------------------------------------
+
+\mainmatter
+\pagestyle{fancy}
+
+\clearpage
+\chapter{Introduction}
+\label{Chapt:Introduction}
+\lhead{Chapter \thechapter. \emph{Introduction}}
+\input{./Chapters/Introduction}
+
+%--------------------------------------------------------------------------------
+% Prints out any appendices (comment/delete if you do not need any)
+%--------------------------------------------------------------------------------
+\clearpage
+\addtocontents{toc}{\vspace{2em}}
+\appendix
+\baselineskip=16pt
+
+\input{./Chapters/AppendixA}
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+\backmatter
+
+%--------------------------------------------------------------------------------
+% Prints out the bibliography
+%--------------------------------------------------------------------------------
+
+\label{Bibliography}
+
+\lhead{\emph{Bibliography}}
+\renewcommand{\bibname}{References}
+\bibliographystyle{MyBibliographyStyle}
+\bibliography{./Chapters/FYPBibliography}
+
+
+\end{document}  

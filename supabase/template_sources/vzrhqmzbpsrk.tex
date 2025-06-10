@@ -1,0 +1,164 @@
+\documentclass{thesisclass}
+
+%% -------------------------------
+%% |    ISSD Thesis Template       |
+%% -------------------------------
+%% Further additions by:
+%%   Philipp Stroehle, IM, 2013 
+%%   Jasper Feine, ISSD, 2018
+%%   Merlin Knaeble, ISSD, 2020-2022 
+%% firstname.lastname "at" kit.edu
+%%  Changed to style of HKA by:
+%%  Jakob Hopmann, HKA, 2023
+%% Notes:
+%% Language switch after \begin{document}
+
+% Based on thesisclass.cls of Timo Rohrberg, 2009
+% ----------------------------------------------------------------
+% Thesis - Main document
+% ----------------------------------------------------------------
+
+\usepackage[english]{babel}
+\usepackage{csquotes}
+
+%% ---------------------------------
+%% |      Additional packages      |
+%% ---------------------------------
+%% 
+
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\graphicspath{{./figures/}} %Use curly braces for each path to add and don't forget trailing slash '/'
+% \usepackage{epstopdf} %Nice to automatically convert eps figures to pdf format  (from inkscape, etc)
+\usepackage[style=apa, backend=biber, natbib=true, hyperref=true, uniquelist=true, language=american]{biblatex}
+\addbibresource{thesis.bib}
+\usepackage{booktabs}
+
+%% ---------------------------------
+%% | Needed for the List of Abbreviations |
+%% ---------------------------------
+\usepackage{nomencl}
+\renewcommand{\nomname}{List of Abbreviations}
+\setlength{\nomlabelwidth}{.40\hsize}
+\renewcommand{\nomlabel}[1]{#1 \dotfill}
+\setlength{\nomitemsep}{-\parsep}
+\makenomenclature
+\usepackage[normalem]{ulem}
+\newcommand{\markup}[1]{\uline{#1}}
+
+
+
+
+%% ---------------------------------
+%% | Information about the thesis  |
+%% ---------------------------------
+
+% uncomment one of the following, according to your thesis
+\newcommand{\mytype}{Bachelor's Thesis} 
+%\newcommand{\mytype}{Master's Thesis}
+%\newcommand{\mytype}{Seminar Thesis}
+
+\newcommand{\myname}{Name}
+\newcommand{\matricle}{12356}
+\newcommand{\mytitle}{Insert english Title}
+\newcommand{\mytitleger}{Insert German Title}
+\newcommand{\myinstitute}{Institute/Company}
+
+
+\newcommand{\reviewerone}{Prof. Dr.-Ing. ADD NAME}
+\newcommand{\advisor}{ADD NAME}
+
+\newcommand{\submissiontime}{DD.MM.20XX}
+
+%% -------------------------------
+%% |  Information for PDF file   |
+%% -------------------------------
+\hypersetup{
+ pdfauthor={\myname},
+ pdftitle={\mytitle},
+ pdfsubject={\mytype},
+ pdfkeywords={\mytype}
+}
+
+
+%% --------------------------------
+%% | Settings for word separation |
+%% --------------------------------
+% Describe separation hints here:
+\hyphenation{
+opos-sum
+he-lio-trope
+}
+
+
+%% ------------------------
+%% |    Including files   |
+%% ------------------------
+% Only files listed here will be included!
+% Userful command for partially translating the document (for bug-fixing e.g.)
+\includeonly{
+titlepage,
+text/abstract,
+text/content,  %feel free to introduce additional files for structuring your thesis
+text/affidavit,
+text/prototype_agreement,
+text/appendix
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Here, main documents begins %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\frontmatter
+\include{titlepage}
+\pagenumbering{roman}
+\include{text/abstract}
+
+% ISSD Style: No additional blank page
+% \blankpage
+
+
+%% -------------------
+%% |   Directories   |
+%% -------------------
+\tableofcontents
+
+% ISSD Style: No additional blank page
+% \blankpaage
+
+% You may elect not to include a list of figures, list of tables and list of abbreviations, if the work is a seminar thesis (comment out the following)
+\listoffigures \addcontentsline{toc}{chapter}{List of Figures} 
+\listoftables  \addcontentsline{toc}{chapter}{List of Tables} 
+\printnomenclature   \addcontentsline{toc}{chapter}{List of Abbreviations} 
+
+
+%% -----------------
+%% |   Main part   |
+%% -----------------
+\mainmatter
+\pagenumbering{arabic}
+\include{text/content}
+
+
+\backmatter
+\pagenumbering{Roman}
+
+
+%% --------------------
+%% |   Bibliography   |
+%% --------------------
+
+\phantomsection
+\addcontentsline{toc}{chapter}{\bibname}
+\printbibliography
+
+%% ----------------
+%% |   Appendix   |
+%% ----------------
+
+\input{text/appendix}
+
+\include{text/affidavit}
+%\include{text/prototype_agreement}
+\end{document}

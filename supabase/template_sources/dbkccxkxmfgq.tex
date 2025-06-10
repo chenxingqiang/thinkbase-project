@@ -1,0 +1,298 @@
+\documentclass[12pt, oneside]{article}
+\input{Vorlage/Vorlage_HFH}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Bibtex File einbinden %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\addbibresource{literatur.bib}  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Variabeln definieren  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% ACHTUNG! Alles einmal ausfüllen, bitte :)
+\newcommand{\vorname}{Monika}
+\newcommand{\nachname}{Musterfrau}
+\newcommand{\matrikelnummer}{1234567}
+\newcommand{\studiengang}{Master Maschinenbau}
+\newcommand{\thema}{Extrem genialer Titel}
+\newcommand{\artarbeit}{Hausarbeit/Bacherlorthesis/Masterthesis}
+\newcommand{\pruefer}{Prof. Dr. ???}
+\newcommand{\zweitpruefer}{Dipl. Ing. ???}
+\newcommand{\anfangszeit}{01.01.2021}
+\newcommand{\abgabezeitpunkt}{31.12.2021}
+\newcommand{\unternehmen}{Unternehmen xyz}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Beginn des Dokuments  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%% Abstände Absatz einstellen (geht nicht vor "begin{document}"
+\titlespacing{\chapter}{0pt}{6pt}{0pt}
+\titlespacing{\section}{0pt}{6pt}{12pt}
+\titlespacing{\subsection}{0pt}{6pt}{0pt}
+\titlespacing{\subsubsection}{0pt}{6pt}{0pt}
+
+%%% War nötig, weil der Compiler sonst meckert
+\renewcommand{\headheight}{13.6pt}
+
+
+
+%%%%%%%%%%%%%%%%%%
+%%  Titelseite  %%
+%%%%%%%%%%%%%%%%%%
+
+\thispagestyle{empty}
+
+%%% MÖGLICHKEIT 1: Titelblatt wird nicht von der HFH vorgegeben (z.B. Hausarbeiten)
+
+\input{Vorlage/Vorlage_Titelseite}
+
+%%% MÖGLICHKEIT 2: Titelblatt wird von der HFH vorgegeben (Projektarbeit, Abschlussarbeit)
+%%% Bei der Wahl dieser Möglichkeit --> Möglichkeit 1 löschen/auskommentieren
+
+%\includepdf[page=1]{Vorlage/Titelseite.pdf}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%  Sperrvermerk  %%
+%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\thispagestyle{empty}
+\section*{Sperrvermerk}
+\input{Vorlage/Sperrvermerk}
+
+
+
+%%%%%%%%%%%%%%%%
+%%  Abstract  %%
+%%%%%%%%%%%%%%%%
+
+%%% HINWEIS: Dies ist an der HFH nur bei Masterarbeiten notwendig %%%
+
+\newpage
+\thispagestyle{empty}
+\section*{Kurzfassung}
+\input{Text/Abstract} 
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%      Inhaltsverzeichnis     %%
+%%  wird automatisch erstellt  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\pagenumbering{Roman}
+
+\tableofcontents
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%    Abbildungsverzeichnis    %%
+%%  wird automatisch erstellt  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+%%% Phantomsection damit die Verlinkung im Inhaltsverzeichnis richtig bleibt
+\phantomsection 
+\listoffigures
+\addcontentsline{toc}{section}{Abbildungsverzeichnis}
+\markboth{Abbildungsverzeichnis}{Abbildungsverzeichnis}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%     Tabellenverzeichnis     %%
+%%  wird automatisch erstellt  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\phantomsection
+\listoftables
+\addcontentsline{toc}{section}{Tabellenverzeichnis}
+\markboth{Tabellenverzeichnis}{Tabellenverzeichnis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Abkürzungsverzeichnis %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\phantomsection
+\section*{Abkürzungsverzeichnis}
+\addcontentsline{toc}{section}{Abkürzungsverzeichnis}
+\markboth{Abkürzungsverzeichnis}{Abkürzungsverzeichnis}
+
+
+    %%%%%%%%%%%%%%%%%%
+    %%  Abkürzungen %%
+    %%%%%%%%%%%%%%%%%%
+    
+    %%% Hier werden die Abkürzungen gesammelt. 
+    %%% Es werden nur tatsächlich genutzte Abkürzungen im Verzeichnis ausgegeben.
+    %%% Sortierung nach Alphabet geht NICHT automatisch.
+    %%% Anlegen: \acro{Identifikator}[Abkürzung]{Langform}
+    %%% Verwendung im Text: \ac{Identifikator}
+    %%% Ausgabe im Text: 
+        %%% Bei der ersten Erwähnung in Langform mit Abkürzung in Klammern, 
+        %%% danach nur noch in Kurzform.
+        %%% Bei einer einzigen Erwähnung wie bei erster Erwähnung.
+    
+    \begin{acronym}[MMM]
+    \acro{usw}[usw.]{und so weiter}
+    \acro{bzw}[bzw.]{beziehungsweise}
+    \acro{abc}[ABC]{Alphabet}
+    \acro{oem}[OEM]{original equipment manufacturer}
+    \end{acronym}
+
+
+%%%%%%%%%%%%%%%%%
+%%  Hauptteil  %%
+%%%%%%%%%%%%%%%%%
+
+%%% Arabische Nummerierung, wieder bei 1 beginnen 
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+
+
+\section{Einleitung} \label{einleitung}
+\input{Text/Kapitel_1/Einleitung}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage  
+
+\section{Kapitel mit Unterkapiteln} \label{Kapitel mit Unterkapiteln}
+\input{Text/Kapitel_2/Kap2}
+    \subsection{Erstes Unterkapitel}\label{Erstes Unterkapitel}
+    \input{Text/Kapitel_2/kap2-1}
+    \subsection{Zweites Unterkapitel}\label{Zweites Unterkapitel}
+    \input{Text/Kapitel_2/kap2-2-2}
+        \subsubsection{Noch eine Ebene tiefer} \label{Noch eine Ebene tiefer}
+        \input{Text/Kapitel_2/kap2-2-1}
+        \subsubsection{Hier auch eine Ebene tiefer}\label{Hier auch eine Ebene tiefer}
+        \input{Text/Kapitel_2/kap2-2-2}
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\section{Hier gibt es ein paar Tabellen} \label{Hier gibt es ein paar Tabellen}
+\input{Text/Kapitel_3/kap3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\section{Hier gibt es Abbildungen}\label{Hier gibt es Abbildungen}
+\input{Text/Kapitel_4/kap4}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\section{Abkürzungen testen}\label{abkürzungen}
+\input{Text/Kapitel_5/kap5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\section{Zitieren testen}\label{zitieren}
+\input{Text/Kapitel_5/kap5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Literaturverzeichnis %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+
+
+%%% ACHTUNG! 
+%%% Der \nocite{*}-Befehl sorgt dafür, dass alle Quellen aus der Quelldatei im Verzeichnis landen, unabhängig davon, ob sie zitiert wurden oder nicht!!
+\nocite{*}
+
+%%% Gliedern des Quellenverzeichnisses:
+%%% https://texwelt.de/fragen/7532/wie-unterteile-ich-meine-biblatex-bibliografie
+\phantomsection
+\section*{Quellenverzeichnis}\label{Quellenverzeichnis}
+\addcontentsline{toc}{section}{Quellenverzeichnis}
+\markboth{Quellenverzeichnis}{Quellenverzeichnis}
+
+    \printbibliography[heading=subbibliography, type=book, title={Bücher}]
+    \printbibliography[heading=subbibliography, type=article, title={Artikel}]
+    \printbibliography[heading=subbibliography, nottype=article, nottype=book, title={Rest}]
+
+
+
+%%%%%%%%%%%%
+%% Anhang %%
+%%%%%%%%%%%%
+
+\newpage
+
+%%% Erzeugen der Überschrift "ANHANG" mit einer Leerzeile darüber
+\addtocontents{toc}{\cftpagenumbersoff{section}}
+\addcontentsline{toc}{section}{}
+\phantomsection
+\addcontentsline{toc}{section}{ANHANG}
+\phantomsection
+\section*{ANHANG}
+\addtocontents{toc}{\cftpagenumberson{section}}
+
+%%% Anhang startet
+\appendix
+
+
+%%% Damit die Zählweise die ABC Zählweise übernimmt
+\renewcommand{\thetable}{\Alph{section}.\arabic{table}}  
+\renewcommand{\thefigure}{\Alph{section}.\arabic{figure}}
+
+\section{Beispiel Anhang}
+    \subsection{Unterkapitel Beispielanhang}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Eigenständigkeitserklärung %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% HINWEIS: 
+%%% Stelle sicher, dass in dem Ordner "Vorlage" die aktuelle Version der Eigenständigkeitserklärung der HFH hochgeladen ist. Wenn du das Dokument neu hochladen musst (weil das hier nicht mehr aktuell ist), dann nenne es "Eigenständigkeitserklärung.pdf". 
+
+\newpage
+\phantomsection
+\thispagestyle{empty}
+
+%%% Damit der Eintarg im Inhaltsverzeichnis gemacht wird
+\addcontentsline{toc}{section}{Eigenständigkeitserklärung}
+
+
+%%% pdf der Eigenständigkeitserklärung einbinden
+\includepdf[]{Vorlage/Eigenstaendigkeitserklaerung.pdf}
+
+
+
+%%%%%%%%%%%%%%%%%%%
+%% Dokument Ende %%
+%%%%%%%%%%%%%%%%%%%
+
+\end{document}

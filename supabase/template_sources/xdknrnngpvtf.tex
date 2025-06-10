@@ -1,0 +1,136 @@
+\documentclass[dpia,subject=true]{scrlttr2}
+%\usepackage[italian]{babel}
+\usepackage{polyglossia}
+\setmainlanguage{italian}
+\usepackage{lipsum}
+\usepackage{metalogo}
+\usepackage{listings}
+
+\definecolor{Brown}{cmyk}{0,0.81,1,0.60}
+\definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
+\definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\lstset{
+basicstyle=\ttfamily\small,
+keywordstyle=\color{OliveGreen},
+identifierstyle=\color{CadetBlue}\bfseries,
+stringstyle=\color{blue},
+commentstyle=\color{Brown},
+morecomment=[l][\color{Brown}]{\#},
+breaklines=true,
+language=TeX
+}
+
+\setkomavar{fromname}{Prof. Luca Di Gaspero}
+\setkomavar{signature}{Luca Di Gaspero}
+\setkomavar{fromphone}{+39 0432 55 XXXXXX}
+\setkomavar{frommobilephone}{+39 XXX XXXXXXX}
+\setkomavar{fromemail}{<name>.<surname>@uniud.it}
+\setkomavar{fromurl}{www.dpia.uniud.it/<surname>}
+\setkomavar{lastpage}{true}
+
+\begin{document}
+  \begin{letter}{Spett.li Signori Utenti \LaTeX \\
+    dell'Università degli Studi di Udine \\
+    \MakeUppercase{Loro Sedi}
+    }
+    \setkomavar{subject}{nuovo stile \LaTeX Uniud corporate image}
+    \opening{Gentili signore e egregi signori,}
+
+è con gran piacere che vi presento il nuovo stile \LaTeX{} per la corrispondenza istituzionale basato sul manuale d'immagine della nostra Università.
+
+    Lo stile è modulare e personalizzabile ed è basato sulla classe \texttt{scrlttr2} del pacchetto \texttt{KOMAscript}. Per motivi legati all'utilizzo dei font (in particolare il package \texttt{fontspec}) è necessario utilizzare \XeLaTeX{} per la compilazione e avere a disposizione i font \emph{HelveticaNeue} e \emph{HelveticaNeue-Heavy} (in questo caso inclusi nella cartella font).
+    
+    Per scrivere una lettera usando lo stile è sufficiente impostare alcune variabili autoesplicative.
+\begin{lstlisting}
+\setkomavar{fromname}{Prof. Luca Di Gaspero}
+\setkomavar{signature}{Luca Di Gaspero}
+\setkomavar{fromphone}{+39 0432 55 XXXXXX}
+\setkomavar{frommobilephone}{+39 XXX XXXXXXX}
+\setkomavar{fromemail}{<name>.<surname>@uniud.it}
+\setkomavar{fromurl}{www.dpia.uniud.it/<surname>}
+\end{lstlisting}
+
+    Volendo modificare la firma (in modo da evitare il titolo indicato, invece, nell'intestazione) è possibile impostare la variabile \texttt{signature} nel modo seguente \lstinline|\setkomavar{signature}{Luca Di Gaspero}|.
+
+    Inoltre, è possibile, utilizzando i package \texttt{babel} o \texttt{polyglossia}, impostare la lingua del documento:
+\begin{lstlisting}
+\usepackage[italian]{babel}  
+\end{lstlisting}
+    oppure
+\begin{lstlisting}
+\usepackage{polyglossia}
+\setmainlanguage{english}
+\end{lstlisting}    
+
+    Per preimpostazione viene visualizzato, sul lato destro, il logo dell'accreditamento ISO-9001 d'Ateneo, qualora lo si volesse rimuovere è sufficiente, nel prologo, dare il comando:
+\begin{lstlisting}
+\setkomavar{qualitysystem}{}
+\end{lstlisting}
+  e il logo verrà sostituito dal più famigliare richiamo al web d'ateneo \textbf{www.uniud.it}.
+
+    È possibile, inoltre, modificare la struttura di afferenza e gli indirizzi, impostando le seguenti variabili nel prologo o, come vedremo in seguito, in un file di stile personalizzato:
+\begin{lstlisting}
+\setkomavar{fromdepartment}{\IfLanguagePatterns{italian}{Dipartimento politecnico di Ingegneria e Architettura}{Polytechnic Department of Engineering and Architecture}}
+\setkomavar{fromaddress}{\IfLanguagePatterns{italian}{via delle Scienze 206 \\ 33100 Udine}{via delle Scienze 206 \\ I-33100 Udine, Italy}}
+\end{lstlisting}
+  si osservi l'uso del comando \lstinline|IfLanguagePatterns{italian}{T}{F}| che consente di modificare il testo a seconda della lingua (il default è che venga utilizzata la dizione inglese se non è specificata esplicitamente la lingua italiana).
+  
+  Volendo creare una versione personalizzata della lettera per una struttura diversa, è sufficiente definire un nuovo file \texttt{nomestruttura.lco} contenente il codice simile al seguente:
+\begin{lstlisting}
+\ProvidesFile{dpia.lco}[2017/02/01 lco (Luca Di Gaspero)]
+\LoadLetterOption{uniud}
+% DPIA customization
+\setkomavar{fromdepartment}{\IfLanguagePatterns{italian}{Dipartimento politecnico di Ingegneria e Architettura}{Polytechnic Department of Engineering and Architecture}}
+\setkomavar{fromaddress}{\IfLanguagePatterns{italian}{via delle Scienze 206 \\ 33100 Udine}{via delle Scienze 206 \\ I-33100 Udine, Italy}}
+\end{lstlisting}
+   in particolare in questo caso si sono effettuate le personalizzazioni relative al Dipartimento Politecnico di Ingegneria e Architettura.
+  
+    Per usare lo stile è necessario installare sul proprio sistema i font \texttt{Helvetica Neue},  in particolare nella variante \textbf{heavy}, indispensabili per comporre l'intestazione e il pié di pagina secondo le specifiche del manuale di immagine.
+    
+    Infine, grazie a Stefano Miani che ha scovato questo pernicioso bug, è stata introdotta, nella versione 0.1.2, la variabile \texttt{lastpage} che può essere impostata a \lstinline{true} se si vuole ottenere una numerazione delle pagine che indichi anche il numero totale di pagine di cui è composta la lettera (nel classico formato \texttt{X/Y}). Per abilitare questa opzione è necessario inserire il comando:
+\begin{lstlisting}
+\setkomavar{lastpage}{true}
+\end{lstlisting}
+  nel preambolo. Tuttavia, in caso l'opzione sia attiva è necessario effettuare più di una compilazione perché, nel file \texttt{.aux} venga inserita questa informazione. Infatti, alla prima compilazione verrà segnalato un errore che poi sparisce nelle compilazioni successive (stile compilazioni multiple per indice/citazioni/riferimenti).
+    
+    Qualora ci fossero problemi nell'utilizzo di questo modello non esitate a contattarmi.
+
+    \closing{Cordialità,}
+    \vfill
+    \ps{P.S. Riporto di seguito lo schema di documento da cui è stata ottenuta questa lettera.}
+\begin{lstlisting}
+\documentclass[dpia,subject=true]{scrlttr2}
+\usepackage[italian]{babel}
+
+\setkomavar{fromdepartment}{\IfLanguagePatterns{italian}{Dipartimento politecnico di Ingegneria e Architettura}{Polytechnic Department of Engineering and Architecture}}
+\setkomavar{fromaddress}{\IfLanguagePatterns{italian}{via delle Scienze 206 \\ 33100 Udine}{via delle Scienze 206 \\ I-33100 Udine, Italy}}
+
+\setkomavar{fromname}{Prof. Luca Di Gaspero}
+\setkomavar{signature}{Luca Di Gaspero}
+\setkomavar{fromphone}{+39 0432 55 XXXXXX}
+\setkomavar{frommobilephone}{+39 XXX XXXXXXX}
+\setkomavar{fromemail}{<name>.<surname>@uniud.it}
+\setkomavar{fromurl}{www.dpia.uniud.it/<surname>}
+\setkomavar{lastpage}{true}
+
+
+\begin{document}
+  \begin{letter}{Spett.li Signori Utenti \LaTeX \\
+    dell'Università degli Studi di Udine \\
+    \MakeUppercase{Loro Sedi}
+    }
+    \setkomavar{subject}{nuovo stile \LaTeX Uniud corporate image}
+    \opening{Gentili signore e egregi signori,}
+    ...
+    \closing{Cordialità,}
+    \ps{P.S.  Riporto di seguito lo schema di documento da cui è stata ottenuta questa lettera.}
+    ...
+    \vfill
+    \encl{Non ce ne sono}
+  \end{letter}
+\end{document}
+\end{lstlisting}
+    \vfill
+    \encl{Non ce ne sono}
+  \end{letter}
+\end{document}

@@ -1,0 +1,285 @@
+% wichtige einstelungen zuvor:
+% Optionen > Texmaker konfigurieren >
+% schnelles Übersetzen: XeLaTeX + PDF anzeigen
+% 
+% schnelles Übersetzen nun per F1
+
+\documentclass[
+	10pt,
+	parskip=half-,		% regelt Zeilenabstand
+	paper=a4,			% Dokumentformat
+	english, ngerman		% Sprachen für Worttrennung
+	% die zuletzt aufgeführte ist die aktive
+	]{scrartcl}			%skript artikel
+	
+\textheight = 220mm		% Höhe des Satzspiegels / Layouts
+\footskip = 2cm			% Abstand zw. Fußzeile und Grundlinie letzter Textzeile
+
+% falls mit XeTex compiliert wird:
+\usepackage[cm-default]{fontspec}	% funktioniert nur mit den neueren Compilern z.B. XeLaTeX
+	% cm-default: für korrekte Darstellung mathematischer Zeichen
+\usepackage{xunicode} % zur Zeichensatzdeklaration anstelle von inputenc
+\usepackage{xltxtra}		% lädt andere Packete, so z.B. fontspec, xunicode, ifxetex und graphicx
+
+\usepackage[ngerman]{babel} % Spracheinstellung
+% ändert die Darstellung des Datums
+% Sonderzeichen: Umlaute mittels "a, "o, "u, ß mittels "s
+% deutsche Anführungszeichen
+% deutschen Worttrennungsregeln
+
+% falls mit älteren Compilern z.B. PDFLaTeX übersetzt wird, binde stattdessen folgende ein
+	%\usepackage[latin1]{inputenc}	% Umlaute erkennen & ß, Umlaute werden als Bild dargestellt
+									% STRG+C der Umlaute nicht möglich
+	%\usepackage[T1]{fontenc}	 	% Lateinsiches Alphabet + Umlaute, kein Scharf ß,
+									% STRG+C der Umlaute möglich 
+	% \usepackage{lmodern}			% lädt Latin Modern-Schriften und Postscript-Version der CM-Schriften
+
+\usepackage{microtype}	% für bessere Worttrennung
+
+% Mathepackete
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\usepackage{listings}	% Für Quellcode
+
+\usepackage[cmyk]{xcolor}	% um Farben zu benutzen
+% kann mehr als das Paket color
+ \definecolor{middlegray}{rgb}{0.5,0.5,0.5}
+ \definecolor{lightgray}{rgb}{0.8,0.8,0.8}
+ \definecolor{orange}{rgb}{0.8,0.3,0.3}
+ \definecolor{yac}{rgb}{0.6,0.6,0.1}
+
+% Syntaxhighlighting
+\lstset{
+   basicstyle=\scriptsize\ttfamily,
+   keywordstyle=\bfseries\ttfamily\color{orange},
+   stringstyle=\color{green}\ttfamily,
+   commentstyle=\color{middlegray}\ttfamily,
+   emph={square}, 
+   emphstyle=\color{blue}\texttt,
+   emph={[2]root,base},
+   emphstyle={[2]\color{yac}\texttt},
+   showstringspaces=false,
+   flexiblecolumns=false,
+   tabsize=2,
+   numbers=left,
+   numberstyle=\tiny,
+   numberblanklines=false,
+   stepnumber=1,
+   numbersep=10pt,
+   xleftmargin=15pt
+}
+
+\usepackage{paralist}	% andere Bullets für Aufzählungen
+
+\title{Funktionale Programmierung\\ Übung 01}
+\author{Dozent: mein Dozent\\%
+		Tutor: mein Tutor\\%
+		Studenten: person1 und person2}
+
+\date{tt.\,mm.\,jjjj}% festes Datum
+%\date{} % unterdrückt Datum
+%\date{\today}% setzt standardmäßig das heutige Datum
+
+% --------------------------------------
+
+\begin{document}
+\maketitle			% Schreibt Titel, Autor und Datum
+\newpage				% bricht Seite um
+\tableofcontents		% Inhaltsverzeichnis
+\newpage				% bricht Seite um
+
+\section{Text schreiben}
+Um einen Absatz zu erzeugen, betätigt man \emph{Enter/Return} zweimal, sodass im Quelltext eine Leerzeile entsteht. Vielfaches benutzen von \emph{Enter/Return} bewirkt nichts. Man kann auch \verb|\\| benutzen, allerdings ist davon abzuraten, da der Doppelbackslash für andere Zwecke gedacht ist.
+
+Der Text wird in \LaTeX optimal gesetzt, d.h. wenig Worttrennungen, kleine Wortzwischenräume, Vermeidung mehrerer Leerzeichen untereinander, etc. Darum sollte man so wenig wie möglich manuell dem entgegen wirken. Mehrfaches Anwenden der \emph{Leertaste/Space} bewirkt nichts. Dahingegen kann man seinen Code mit \emph{Returns, Spaces und Tabs} schön leserlich formatieren.
+
+Gedankenstriche -- wie diese hier -- werden durch \verb|--| erzeugt und sind nicht mit dem Bindestrich - zu verwechseln. Auch negative Zahlen werden nicht -3 sondern im Mathematikmodus $-3$ geschrieben.
+
+Eine Textgliederung wird mit \verb|\section{}|, \verb|\subsection{}| und \verb|\subsubsection{}| vorgenommen. So erscheinen diese dann auch im Inhaltsverzeichnis. Sollen manche Überschriften dort nicht erscheinen und keine Nummerierung erhalten, schreibt man \verb|\section*{}|.
+
+\section{Tabulatoren}
+Tabellen stehen in einem \verb|\begin{tabular}|~-~\verb|\end{tabular}|~-~Block.
+
+Spalten werden mittels \& voneinander getrennt und neue Zeilen werden mittels \verb|\\| umgebrochen. Auch der Inhalt einer Zeile -- damit er nicht zu lang wird -- kann manuell mittels \verb|\\| umgebrochen werden.
+
+\subsection{Tabulatoren zur Textstrukturierung}
+Hier ein einfaches Beispiel:
+
+\begin{verbatim}
+\begin{tabular}[c]{l c r}
+   Feld 1.1 & Feld 1.2 & Feld 1.3\\
+   Feld 2.1 & Feld 2.2 & Feld 2.3\\
+   Feld 3.1 & Feld 3.2 & Feld 3.3\\
+\end{tabular}
+\end{verbatim}
+
+Das sieht dann so aus:
+
+\begin{tabular}%
+	[c]%vertikale Ausrichtung der Tabelle zum Text mit [c] center, [t] on top, [b] on bottom
+	{l c r}% 3 Spalten, Ausrichtung der einzelnen Spalten: l, c, r
+	
+	Feld 1.1 & Feld 1.2 & Feld 1.3\\	% Spalten werden mittels & voneinander getrennt
+	Feld 2.1 & Feld 2.2 & Feld 2.3\\ % Feld wird ausgelassen
+	Feld 3.1 & Feld 3.2 & Feld 3.3\\
+\end{tabular}
+
+Der Ausdruck \verb|\begin{tabular}[Pos]{Spaltendefinitionen}| erlaubt zusätzliche Einstellungen: [Pos] entscheidet über die vertikale Ausrichtung zum Text und kann c (\emph{center}), t (\emph{on top}) und b (\emph{on bottom}) annehmen. In den \{Spaltendefinitionen\} steht für jede Spalte einer der folgenden Buchstaben: l (\emph{left}), r (\emph{right}) oder c (\emph{center}), welche sich auf die horizontale Ausrichtung in den Spalten auswirken.
+
+\subsection{Tabellen mittels Tabulatoren}
+Um Tabellen zu zeichnen, benötigt man Linien. Der Befehl \verb|\hline| zwischen den Zeilen erzeugt eine horizontale Linie. Die vertikalen Linien werden in den \emph{Spaltendefinitionen} festgelegt: das Zeichen | zwischen den Definitionen sorgt für eine vertikale Linie. Beispiel: \verb={|l|c|r|}=
+
+\begin{tabular}[c]
+	{|l|c|r|} %Trennung der Spalten durch vertikale Linien mit |
+	\hline % fügt eine Trennlinie ein
+	\textbf{Überschrift 1} & \textbf{Überschrift 2} & \textbf{Überschrift 3}\\
+	\hline
+	linksbündige Spalte & zentriert & rechtsbündige Spalte\\
+	\hline
+	Zellen können einfach leer gelassen werden &     & Feld 2.3\\
+	\hline
+	Feld 3.1 & Feld 3.2 enthält ein \&	& Feld 3.3\\%
+	\hline
+\end{tabular}
+
+Ein Umbruch zu langer Zellen ist hier leider nicht möglich. Dazu muss man Tabellen mit fester Spaltenbreite wählen. Allerdings ist der Inhalt dann linksbündig.
+
+\begin{tabular}{|l|p{5cm}|l|}
+	\hline
+	1. Zeile: & Es findet ein automatischer Umbruch statt. & kein Kommentar\\
+	\hline
+	2. Zeile & Man kann aber auch mittels \verb|\newline| manuell umbrechen. & kein Kommentar\\  
+	\hline
+\end{tabular}
+
+\section{Formeln}
+
+\subsection{Formeln im Text}
+Formeln werden im Text mit \$ eingeleitet und beendet.
+
+So können wir Formeln wie $ \sum_{i=0}^{n}i= \frac{n(n+1)}{2} $ schreiben.
+
+Wichtige Befehle:
+\begin{itemize}
+	\item \verb|\cdot| für die Multiplikation $a\cdot b$ anstelle von $a*b$
+	\item \verb|\frac{}{}| für Brüche $\frac{x+1}{x}$,
+	\item \verb|_{}| für Tiefstellen $x_{0},x_{1},\cdots ,x_{n}$ und
+	\item \verb|^{}| für Hochstellen $e^{-\phi\cdot 2\pi}$.
+\end{itemize}
+
+\subsection{Formeln im abgesetzten Mathematikmodus}
+Komplette Formelabsätze werden in \$\$ ... \$\$ geschrieben. Allerdings ist das Ausrichten der Zeilen zueinander etwas tricky. Für eine schöne Formatierung wird \emph{tabular} benutzt.
+$$ f(0) = 1 $$
+$$ f(x) = x \cdot f(x-1) $$
+
+\subsubsection{Gleichungen}
+Mit einem \verb|\begin{align}|~-~\verb|\end{align}|~-~Block kann man einen gesamten Absatz für mathematische Formeln erstellt. Dabei wird der Absatz automatisch zentriert, erhält eine Zeilennummer und die Zeilen werden untereinander am Gleichheitszeichen ausgerichtet.
+
+I.S. $k \longrightarrow k+1$
+\begin{align}
+\Leftrightarrow \sum_{i=0}^{k+1}i = \frac{(k+1)(k+2)}{2} \\
+\Leftrightarrow \sum_{i=0}^{k}i +(k+1) = \frac{(k+1)(k+2)}{2}\\
+\Leftrightarrow^{I.V.} \frac{(k+1)(k+2)}{2} +(k+1) = \frac{(k+1)(k+2)}{2}\\
+\Leftrightarrow \frac{(k+1)(k+2)}{2} = \frac{(k+1)(k+2)}{2}
+\end{align}
+
+\section{Quellcode}
+
+\subsection{Quellcode inline einbinden}
+Quellcode wird in einem \verb|\begin{lstlisting}|~-~\verb|\end{lstlisting}|~-~Block geschrieben. Einrücken von Zeilen muss mittels Spaces (Leerzeichen)~-~nicht aber mittels Tabs~-~erfolgen. Hierbei spielt die Sprache keine Rolle.
+
+\begin{lstlisting}
+--Pattern-Matching und Guards
+fac :: Integer->Integer
+fac 0 = 1        --Rekursionsanker
+fac n
+   | n>0	= n * fac (n-1)
+   | otherwise = error "Die Eingabe muss eine natürliche Zahle sein."
+\end{lstlisting}
+
+\subsection{Quellcode extern einbinden}
+Viel leichter ist es, externe Dateien einzubinden. Sie sollten in einem Verzeichnis des selben Ordners wie die Tex-Datei liegen. Das Einbinden erfolgt über:
+
+\verb|\lstinputlisting[Eigenschaften]{pfad/datei.typ}|. Mit den Eigenschaften werden Sprache, Beschreibungstext und dessen Position und das Label für die Referenz übergeben.
+\begin{itemize}
+	\item caption: Beschreibungstext
+	\item label: Label für Referenzen auf das Listing mit \verb|\ref{lst:xyz}|
+	\item captionpos: Position des Beschreibungstextes: t (\emph{top}) und b (\emph{bottom})
+	\item language: Angabe einer Programmiersprache (z.B. JAVA, XML, C, C++)
+\end{itemize}
+Der Vorteil hier: es findet Syntaxhighlighting statt und die Zeilen werden nummeriert.
+
+Beispiel:
+\begin{verbatim}
+\lstinputlisting
+   [caption={Pattern-Matching und Guards in Haskell}
+   \label{lst:haskell},
+       captionpos=t,language=HASKELL]
+{sources/fac.hs}
+\end{verbatim}
+
+Und so sieht es dann aus:
+\lstinputlisting
+   [caption={Pattern-Matching und Guards in Haskell}
+   \label{lst:haskell},
+       captionpos=t,language=HASKELL]{sources/fac.hs}
+
+
+\subsection{Text, der nicht interpretiert werden soll}
+Manchmal soll ein Teil eines Textes nicht vom \LaTeX-Compiler interpretiert werden. So kann man den Befehl mittels \verb=\verb|<nicht zu interpretierender Code>|= auszeichnen.
+
+Soll dies für einen gesamten Textabschnitt geschehen, geht dies in einem \verb|\begin{verbatim}|~-~\verb|\end{verbatim}|~-~Block. Allerdings ist dieser nicht für Quellcode gedacht.
+
+Beispiel:
+
+\begin{lstlisting}
+\begin{verbatim}
+   Hier werden keine \befehle{} interpretiert. Man kann \\ also alles schreiben: § $ % &
+\end{verbatim}
+\end{lstlisting}
+
+
+%----------------------------------------------------
+
+\section{Listen}
+\subsection{Aufzählungen}
+
+\subsubsection{Aufzählungen mit Nummerierung}
+\begin{enumerate}
+	\item Dies ist eine Aussage.\\
+		  Mit \verb|\\| kann man umbrechen.\\
+		  Und die Umbrüche werden automatisch eingerückt.
+	\item Hier ist eine weitere Aussage.
+	\begin{enumerate}
+		\item Aufzählungen können verschachtelt sein.
+		\item Wie man gut sehen kann
+	\end{enumerate}
+	\item Letzte Aussage.
+\end{enumerate}
+
+\subsubsection{Aufzählungen mit anderem Zählzeichen}
+\begin{compactenum}[(i)]
+	\item Analysis I
+	\item Lineare Algebra I
+	\item Analysis II
+	\item Lineare Algebra II
+	\item Analysis III
+\end{compactenum}
+
+\subsection{Stichpunkte mit Bullets}
+\begin{itemize}
+	\item Stichpunkt 1 
+	\item Stichpunkt 2
+	\item Stichpunkt 3
+\end{itemize}
+
+\subsection{Auflistung ohne Zeichen}
+\begin{itemize}
+\item[] Zeile 1 
+\item[] Zeile 2
+\item[] Zeile 3
+\end{itemize}
+
+\end{document}

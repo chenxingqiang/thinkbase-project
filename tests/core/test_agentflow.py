@@ -13,8 +13,8 @@ from agentflow.agents.agent import Agent
 from agentflow.core.config import AgentConfig, ModelConfig
 from agentflow.core.workflow_types import WorkflowConfig, WorkflowStep, StepConfig, WorkflowStepType
 from agentflow.core.workflow import WorkflowEngine
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 from agentflow.core.instruction_selector import InstructionSelector
 from agentflow.core.isa.isa_manager import ISAManager
 from agentflow.core.types import AgentStatus
@@ -38,9 +38,9 @@ def event_loop():
         loop.close()
 
 @pytest.fixture
-def mock_ell2a():
-    """Mock ELL2A integration."""
-    mock = MagicMock(spec=ELL2AIntegration)
+def mock_ell():
+    """Mock ELL integration."""
+    mock = MagicMock(spec=ELLIntegration)
     mock.enabled = True
     mock.tracking_enabled = True
     mock.config = {}
@@ -67,14 +67,14 @@ def mock_ell2a():
     return mock
 
 @pytest.fixture(autouse=True)
-async def cleanup_mocks(mock_ell2a):
+async def cleanup_mocks(mock_ell):
     """Clean up mocks after each test."""
     # Store original mock function
-    original_mock = mock_ell2a.process_message
+    original_mock = mock_ell.process_message
     yield
     # Reset mock and restore original function
-    mock_ell2a.reset_mock()
-    mock_ell2a.process_message = original_mock
+    mock_ell.reset_mock()
+    mock_ell.process_message = original_mock
 
 @pytest.fixture
 def mock_isa_manager():
@@ -136,7 +136,7 @@ def agent_config(model_config, workflow_config):
     )
 
 @pytest.fixture
-async def agent(workflow_config, mock_ell2a):
+async def agent(workflow_config, mock_ell):
     """Create and initialize test agent."""
     agent_config = AgentConfig(
         name="test_agent",
@@ -146,7 +146,7 @@ async def agent(workflow_config, mock_ell2a):
         workflow=workflow_config
     )
     _agent = Agent(config=agent_config)
-    _agent._ell2a = mock_ell2a
+    _agent._ell = mock_ell
     await _agent.initialize()
     _agent.metadata["test_mode"] = True
     try:
@@ -182,7 +182,7 @@ async def test_workflow_initialization(workflow_engine):
     """Test workflow engine initialization."""
     engine = await anext(workflow_engine)
     assert engine._initialized
-    assert engine._ell2a is not None
+    assert engine._ell is not None
     assert engine._isa_manager is not None
     assert engine._instruction_selector is not None
 
@@ -196,13 +196,13 @@ async def test_agent_registration(workflow_engine, agent):
     assert workflow_id in engine.workflows
 
 @pytest.mark.asyncio
-async def test_workflow_execution(workflow_engine, agent, mock_ell2a):
+async def test_workflow_execution(workflow_engine, agent, mock_ell):
     """Test workflow execution."""
     engine = await anext(workflow_engine)
     agent_instance = await anext(agent)
     
-    # Set up mock ELL2A
-    agent_instance._ell2a = mock_ell2a
+    # Set up mock ELL
+    agent_instance._ell = mock_ell
     
     workflow_id = await engine.register_workflow(agent_instance)
     input_data = {"message": "Test input", "test_mode": True}  # Add test_mode flag
@@ -211,10 +211,10 @@ async def test_workflow_execution(workflow_engine, agent, mock_ell2a):
     assert result is not None
     assert result["status"] == "success"
     assert "Test response" in result.get("content", "")
-    assert mock_ell2a.process_message.called
+    assert mock_ell.process_message.called
 
 @pytest.mark.asyncio
-async def test_workflow_error_handling(workflow_engine, agent, mock_ell2a):
+async def test_workflow_error_handling(workflow_engine, agent, mock_ell):
     """Test workflow error handling."""
     engine = await anext(workflow_engine)
     agent_instance = await anext(agent)
@@ -222,14 +222,14 @@ async def test_workflow_error_handling(workflow_engine, agent, mock_ell2a):
     workflow_id = await engine.register_workflow(agent_instance)
     
     # Set up mock to raise an exception
-    mock_ell2a.process_message = AsyncMock(side_effect=WorkflowExecutionError("Test error"))
-    agent_instance._ell2a = mock_ell2a
+    mock_ell.process_message = AsyncMock(side_effect=WorkflowExecutionError("Test error"))
+    agent_instance._ell = mock_ell
     
     with pytest.raises(WorkflowExecutionError):
         await engine.execute_workflow(workflow_id, {"message": "Test input", "test_mode": True})
 
 @pytest.mark.asyncio
-async def test_parallel_workflow_execution(workflow_engine, agent_config, mock_ell2a):
+async def test_parallel_workflow_execution(workflow_engine, agent_config, mock_ell):
     """Test parallel workflow execution."""
     engine = await anext(workflow_engine)
     agents = []
@@ -238,7 +238,7 @@ async def test_parallel_workflow_execution(workflow_engine, agent_config, mock_e
     # Create and register multiple agents
     for _ in range(3):
         agent = Agent(config=agent_config)
-        agent._ell2a = mock_ell2a
+        agent._ell = mock_ell
         await agent.initialize()
         agent.metadata["test_mode"] = True
         agents.append(agent)
@@ -262,7 +262,7 @@ async def test_parallel_workflow_execution(workflow_engine, agent_config, mock_e
         await agent.cleanup()
 
 @pytest.mark.asyncio
-async def test_workflow_cleanup(workflow_engine, agent, mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def test_workflow_cleanup(workflow_engine, agent, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test workflow cleanup."""
     engine = await anext(workflow_engine)
     agent_instance = await anext(agent)
@@ -274,12 +274,12 @@ async def test_workflow_cleanup(workflow_engine, agent, mock_ell2a, mock_isa_man
     await engine.execute_workflow(workflow_id, input_data)
     
     # Store mock references
-    ell2a = mock_ell2a
+    ell = mock_ell
     isa_manager = mock_isa_manager
     instruction_selector = mock_instruction_selector
     
     # Set engine's components to our mocks
-    engine._ell2a = ell2a
+    engine._ell = ell
     engine._isa_manager = isa_manager
     engine._instruction_selector = instruction_selector
     
@@ -289,6 +289,6 @@ async def test_workflow_cleanup(workflow_engine, agent, mock_ell2a, mock_isa_man
     # Verify cleanup
     assert not engine._initialized
     assert not engine.workflows
-    assert ell2a.cleanup.called
+    assert ell.cleanup.called
     assert isa_manager.cleanup.called
     assert instruction_selector.cleanup.called

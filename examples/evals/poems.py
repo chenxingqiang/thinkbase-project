@@ -4,12 +4,12 @@ import random
 from typing import Any, Dict, Iterable, Optional, Protocol, List, Union, cast, Type, Callable
 import os
 import asyncio
-from agentflow import ell2a
-from agentflow.ell2a.evaluation import Evaluation, EvaluationRun
-from agentflow.ell2a.lmp.simple import simple
-from agentflow.ell2a.types.message import Message, MessageRole, ContentBlock
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.lmp import LMPType
+from agentflow import ell
+from agentflow.ell.evaluation import Evaluation, EvaluationRun
+from agentflow.ell.lmp.simple import simple
+from agentflow.ell.types.message import Message, MessageRole, ContentBlock
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.lmp import LMPType
 import numpy as np
 import logging
 
@@ -22,9 +22,9 @@ api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("Please set OPENAI_API_KEY environment variable")
 
-# Initialize ELL2A integration
-ell2a_integration = ELL2AIntegration()
-ell2a_integration.configure({})
+# Initialize ELL integration
+ell_integration = ELLIntegration()
+ell_integration.configure({})
 
 @simple(model="deepseek-coder-33b-instruct")
 async def write_a_bad_poem() -> Message:
@@ -120,8 +120,8 @@ def sync_score(datapoint: Dict[str, Any], output: Message) -> float:
     thread.join()
     return 0.0  # Default return if thread fails
 
-# Initialize ELL2A with store
-ell2a_integration.configure({"store": "./logdir", "verbose": True})
+# Initialize ELL with store
+ell_integration.configure({"store": "./logdir", "verbose": True})
 
 eval = Evaluation(
     name="poem_eval",

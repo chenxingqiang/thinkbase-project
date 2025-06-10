@@ -1,0 +1,427 @@
+\documentclass[captions=tableheading, listof=leveldown, 11pt]{scrartcl}
+% Vorlage erstellt von Andreas Lenhart 2022
+% Vorlage gepflegt von Prof. Dr.-Ing. Michael Koch Fak. MB/VS
+% E-Mail: michael.koch@th-nuernberg.de
+%scrartcl, Einseitige Arbeit
+%Schriftgröße 11pt
+%listof=leveldown, bester befehl. Verzeichnisse in unterordner
+%captions =... macht mehr Abstand bei Überschriften von Tabellen, siehe setlength unten
+%********************************************************************************************
+% Details zur Arbeit
+%********************************************************************************************
+\newcommand{\titel}{Hier steht der Titel}
+\newcommand{\artderarbeit}{Bachelorarbeit oder Masterarbeit}
+\newcommand{\autor}{Georg Simon Ohm}
+\newcommand{\studiengang}{Maschinenbau}
+\newcommand{\matrikelnr}{12345678}
+\newcommand{\erstgutachter}{Prof.\,Dr.-Ing.~Betreuer/in}
+\newcommand{\zweitgutachter}{Prof.\,Dr.-Ing.~Betreuer/in}
+\newcommand{\betreuer}{Betreuer Unternehmen}
+\newcommand{\unternehmen}{Unternehmen AG}
+\newcommand{\keywords}{}
+\newcommand{\abgabe}{XX.XX.20XX}          %tatsächliches Abgabedatum!
+\newcommand{\ausgabe}{XX.XX.20XX}
+%********************************************************************************************
+% Packages
+%********************************************************************************************
+\usepackage[a4paper,left=30mm,right=20mm,top=25mm,bottom=25mm,head=25pt]{geometry}
+%Definiert die Seitenränder und das Papierformat
+\usepackage[ngerman]{babel} %Deutsches Wörterbuch
+\usepackage{blindtext} %Ermöglicht deutschen Blindtext
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage{array}
+\usepackage{booktabs}
+%\usepackage[headsepline]{scrlayer-scrpage}
+\usepackage[singlespacing]{scrlayer-scrpage}
+\usepackage{verbatim}
+\usepackage{upgreek}
+\usepackage{subfigure} %Ermöglicht Subfigures
+\usepackage[backend=biber,]{biblatex}
+%legt biber als Art des Literaturverzeichnises fest. Richtige Einstellung des TexMakers und JabRef beachten
+\DefineBibliographyStrings{ngerman}{
+  urlseen = {Abruf vom}
+} %ändert den Text bei Onlinequellen im Literaturverzeichnis zu 'Abruf vom'
+\usepackage{caption}
+\usepackage{nicefrac} 
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{wasysym}
+\usepackage{pdfpages}
+\usepackage{romannum}
+\usepackage[nohyperlinks]{acronym}
+\usepackage[
+    bookmarks=true,
+    bookmarksopen=true,
+    bookmarksnumbered=true,
+    bookmarksopenlevel=1,
+    pdftitle={\titel},
+    pdfauthor={\autor},
+    pdfcreator={\autor},
+    pdfsubject={\titel},
+    pdfkeywords={\keywords},
+    pdfpagelabels=true,
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=black,
+    anchorcolor=black,
+    citecolor=black,
+    filecolor=black,
+    menucolor=black,
+    plainpages=false,
+    hypertexnames=true,
+    linktocpage=false,
+]{hyperref} %Definiert die Parameter der PDF-Datei
+
+%********************************************************************************************
+ %Einstellen des 1.5fachen Zeilenabstands, abhängig von der Schriftgröße (10pt, 11pt, 12pt) (wie in Word)
+%********************************************************************************************
+\usepackage{setspace}
+\makeatletter
+\newcommand{\MSonehalfspacing}{%
+  \setstretch{1.44}%  default
+  \ifcase \@ptsize \relax % 10pt
+    \setstretch {1.448}%
+  \or % 11pt
+    \setstretch {1.399}%
+  \or % 12pt
+    \setstretch {1.433}%
+  \fi
+}
+\newcommand{\MSdoublespacing}{%
+  \setstretch {1.92}%  default
+  \ifcase \@ptsize \relax % 10pt
+    \setstretch {1.936}%
+  \or % 11pt
+    \setstretch {1.866}%
+  \or % 12pt
+    \setstretch {1.902}%
+  \fi
+}
+\makeatother
+\MSonehalfspacing
+%********************************************************************************************
+\setkomafont{sectioning}{\bfseries} %Überschriften in Serifenschrift (selbe wie Text)
+\setlength\abovecaptionskip{10pt} %mehr Abstand bei Überschriften von Tabellen, optisch viel schöner
+%********************************************************************************************
+% Literaturquelle, bitte Pfad angeben
+%********************************************************************************************
+%\addbibresource{../Literatur/Literatur_BA.bib} %via biber. Erstellt in JabRef
+%********************************************************************************************
+% Eigene Befehle
+%********************************************************************************************
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\renewcommand*{\refname}{Literaturverzeichnis} %kein Name für literaturverzeichnis, um es in unterverzeichnis schieben zu können
+\newcommand\anhang{Anhang \ref} %eigener Befehl um auf Anhang zu verweisen
+\newcommand{\komm}{\colorbox{red}} %eigener Befehl für Kommentare während des Schreibens
+%********************************************************************************************
+\begin{document}
+%********************************************************************************************
+\pagenumbering{Roman} %Erstmal römische Seitenzahlen für Nicht-Inhalt-Seiten
+%********************************************************************************************
+% Deckblatt, Pfade für Bilder angeben
+%********************************************************************************************
+\thispagestyle{empty} %Keine Seitenzahl und Kopfzeile
+
+\begin{titlepage}
+\newgeometry{left=25mm, right=25mm, top=30mm, bottom=20mm}
+
+  %\vspace{1cm}
+  \begin{center}
+    \includegraphics[width=4 cm]{Logo_Firma.png} \\ %Firmenlogo. bitte nicht zu groß!
+  \end{center}
+
+  \vspace{0.3cm}
+
+  \begin{center}
+    \includegraphics[width=14 cm]{Logo_TH_Fakultaet.png} \\  %Ohm-Logo mit Schrift.
+  \end{center}
+
+  \begin{center}
+   \vspace{-0.25cm}
+    %\huge \textbf{Technische Hochschule Nürnberg Georg-Simon-Ohm}\\
+    %\vspace{0.4cm}
+    \Large -- Fakultät Maschinenbau und Versorgungstechnik -- %ggf. andere Fakultät
+  \end{center}
+
+  \vfill
+
+  \begin{center}
+    \huge \textbf{Hier steht der Titel\\ zweite Zeile für den Titel} %Falls einzeilig auch \titel möglich
+  \end{center} 
+
+  \vfill
+  \vfill
+
+  \begin{center}
+    \Large Abschlussarbeit zur Erlangung des akademischen Grades\\
+    \vspace{0.3cm}
+    \Large \textit{Bachelor of Engineering (B.Eng.)} %ggf. Master
+  \end{center}
+
+  \vfill
+
+  \begin{center}
+    \Large vorgelegt von\\
+    \vspace{0.3cm}
+    \Large \textbf{\autor}\\
+    \abgabe
+  \end{center}
+
+  \vfill
+  \vfill
+
+  \begin{center}
+    \begin{tabular}{lll}
+       Erstkorrektor: & \erstgutachter \\
+      Zweitkorrektor: & \zweitgutachter \\
+      Betreuer Unternehmen: & \betreuer \\
+    \end{tabular}
+  \end{center} 
+\end{titlepage}
+\restoregeometry
+%********************************************************************************************
+%Einstellen des Kopfzeilenlayouts. Name der Kopfzeile muss für jeden Abschnitt selbst definiert werden. Pfad für Bild angeben
+%********************************************************************************************
+\pagestyle{scrheadings}
+\ihead{\includegraphics[height=20.5pt]{ohm_logo_schwarz.jpg}} %Optimiert für dieses Ohm-Bild
+%********************************************************************************************
+% Offizielles Deckblatt, analog zur PDF_Vorlage
+%********************************************************************************************
+\ohead{Offizielles Deckblatt} %Kopfzeile
+\pagenumbering{gobble} %Keine Seitenzahl, da nicht in Bewertung einfließend
+\section*{Offizielles Deckblatt} %Keine Aufnahme ins Inhaltsverzeichnis
+\begin{table}[htbp]
+\hspace{-0.37cm}
+  %\centering
+      \begin{tabular}{ll}
+    Bearbeiter: & \autor \\
+    Matrikel-Nr.: & \matrikelnr \\
+          &  \\
+          &  \\
+    Studiengang: & Maschinenbau \\
+    Studienschwerpunkt: & Konstruktion und Entwicklung \\
+          &  \\
+          &  \\
+    Erstprüfer: & \erstgutachter \\
+    Zweitprüfer: & \zweitgutachter \\
+          &  \\
+          &  \\
+    Durchgefüht bei Firma: & Unternehmen AG \\
+    Betreuer innerhalb der Firma: & \betreuer, \\
+          & XX XXX XX XXX XX XXX XX, 0911/XXXXXXXX \\
+          & (Name, Abteilung, Telefon) \\
+          &  \\
+          &  \\
+    Ausgabedatum: & \ausgabe \\
+    Abgabedatum: & \abgabe \\
+    \end{tabular}%
+  \label{tab:addlabel}%
+\end{table}
+\vspace{1cm}
+\noindent
+\textbf{Thema der Arbeit:}\\
+\titel
+\\\\
+Die Arbeit ist frei einsehbar: \hspace{1cm}Ja $\square$   \hspace{3cm}   Nein $\boxtimes$ \\ %Boxtimes bei angekreuzter Antwort
+Die Arbeit darf nur mit Zustimmung von (Name, Abteilung, Telefonnummer)\\
+\betreuer, Abteilung, 0911/XXXXXXXX\\
+eingesehen werden.
+%********************************************************************************************
+\newpage
+%********************************************************************************************
+% Prüfungsrechtliche Erklärung, händisch Ausfüllen
+%********************************************************************************************
+%\addcontentsline{toc}{section}{Prüfungsrechtliche Erklärung}
+\ohead{Prüfungsrechtliche Erklärung} %Kopfzeile
+\section*{Prüfungsrechtliche Erklärung}
+{Angaben des Studierenden:}\\\\
+%
+Name: Ohm\\
+Vorname: Georg Simon\\
+Matrikelnummer: \matrikelnr\\
+Fakultät: Maschinenbau und Versorgungstechnik\\
+Studiengang: Maschinenbau\\
+Semester: Sommersemester 20XX\\\\
+\textbf{Titel der Abschlussarbeit:}\\
+\titel\\\\
+\\\\
+Ich versichere, dass ich die Arbeit selbständig verfasst, nicht anderweitig für Prüfungszwecke vorgelegt, alle benutzten Quellen und Hilfsmittel angegeben sowie wörtliche und sinngemäße Zitate als solche gekennzeichnet habe.\\\\\\\\
+\hspace{50mm}
+% 3,5cm Abstand nach oben
+\vspace{15mm}
+% Ort, Datum
+\noindent{}Nürnberg, \abgabe,
+% 8 cm breite Linie für die Unterschrift
+\begin{minipage}[t]{8cm}
+% gepunktete Linie
+\centering \dotfill \\
+% Text unter der Linie
+\autor, Matrikelnummer: \matrikelnr
+\end{minipage}
+%
+\newpage
+%********************************************************************************************
+% Erklärung zur Veröffentlichung, analog zur PDF-Vorlage. Sperrvermerk. ggf. anpassen.
+%********************************************************************************************
+\ohead {Erklärung zu Veröffentlichung}
+\section*{Erklärung zur Veröffentlichung der vorstehend bezeichneten Abschlussarbeit} 
+Die Entscheidung über die vollständige oder auszugsweise Veröffentlichung der Abschlussarbeit liegt grundsätzlich erst einmal allein in der Zuständigkeit des studentischen Verfassers. Nach dem Urheberrechtsgesetz (UrhG) erwirbt der Verfasser einer Abschlussarbeit mit Anfertigung seiner Arbeit das alleinige Urheberrecht und grundsätzlich auch die hieraus resultierenden Nutzungsrechte wie z.B. Erstveröffentlichung (\S 12 UrhG), Verbreitung (\S 17 UrhG), Vervielfältigung (\S 16 UrhG), Online-Nutzung usw., also alle Rechte, die die nicht-kommerzielle oder kommerzielle Verwertung betreffen.\\\\
+Die Hochschule und deren Beschäftigte werden Abschlussarbeiten oder Teile davon nicht ohne Zustimmung des studentischen Verfassers veröffentlichen, insbesondere nicht öffentlich zugänglich in die Bibliothek der Hochschule einstellen.\\\\
+Hiermit genehmige ich \underline{nicht}, dass die oben genannte Abschlussarbeit durch die Technische Hochschule Nürnberg Georg Simon Ohm der Öffentlichkeit zugänglich gemacht wird.\\\\\\\\ %Hier ggf. Anpassung vornehmen
+\hspace{50mm}
+% 3,5cm Abstand nach oben
+\vspace{15mm}
+% Ort, Datum
+\noindent{}Nürnberg, \abgabe,
+% 8 cm breite Linie für die Unterschrift
+\begin{minipage}[t]{8cm}
+% gepunktete Linie
+\centering \dotfill \\
+% Text unter der Linie
+\autor, Matrikelnummer: \matrikelnr
+\end{minipage}
+%********************************************************************************************
+% Danksagung, optional
+%********************************************************************************************
+%\newpage
+%\ohead{Danksagung}
+%\section*{Danksagung}
+%\input{Kapitel/Danksagung}
+%********************************************************************************************
+% Abstract % WICHTIG! SEITENZAHL HIER IN CODE EINGEBEN (inkl. Deckblatt)!!!
+%********************************************************************************************
+\newpage
+\pagenumbering{Roman}
+\setcounter{page}{5} % WICHTIG! SEITENZAHL HIER IN CODE EINGEBEN (inkl. Deckblatt)!!!
+\ohead{Abstract}
+\section*{Abstract}
+%\input{Kapitel/Abstract}
+{Text, Text, Text}
+
+%********************************************************************************************
+% Inhaltsverzeichnis
+%********************************************************************************************
+\newpage
+\ohead{Inhaltsverzeichnis}
+\tableofcontents
+\newpage
+%********************************************************************************************
+% Kurzzeichenverzeichnis, am Besten in seperater TeX.Datei und dann einbinden, OPTIONAL!
+%********************************************************************************************
+%\addcontentsline{toc}{section}{Kurzzeichenverzeichnis}
+%\ohead{Kurzzeichenverzeichnis}
+%\section*{Kurzzeichenverzeichnis}
+%\input{Kapitel/Kurzzeichenverzeichnis}
+%\newpage
+%********************************************************************************************
+\pagenumbering{arabic}        %ab jetzt arabische Seitenzahlen
+%********************************************************************************************
+% BEGINN DES TEXTES
+%********************************************************************************************
+\section{Einleitung}
+\ohead{Einleitung}
+%\input{Kapitel/Einleitung}
+{Text, Text, Text}
+\newpage
+%********************************************************************************************
+\section{Stand der Technik}
+\ohead{Stand der Technik}
+%\input{Kapitel/Stand der Technik}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Problemstellung}
+\ohead{Problemstellung}
+%\input{Kapitel/Problemstellung}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Methodik}
+\ohead{Methodik}
+%\input{Kapitel/Methodik}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Vorauslegung}
+\ohead{Vorauslegung}
+%\input{Kapitel/Vorauslegung}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Konstruktive Auslegung}
+\ohead{Konstruktive Auslegung}
+%\input{Kapitel/Konstruktive Auslegung}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Ergebnisse}
+\ohead{Ergebnisse}
+%\input{Kapitel/Ergebnisse}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Diskussion}
+\ohead{Diskussion}
+%\input{Kapitel/Diskussion}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Zusammenfassung}
+\ohead{Zusammenfassung}
+%\input{Kapitel/Zusammenfassung}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\section{Ausblick}
+\ohead{Ausblick}
+%\input{Kapitel/Ausblick}
+Text, Text, Text
+\newpage
+%********************************************************************************************
+\addcontentsline{toc}{section}{Verzeichnisse}
+\section*{Verzeichnisse}
+\ohead{Verzeichnisse}
+%********************************************************************************************
+% Abbildungsverzeichnis
+%********************************************************************************************
+\addcontentsline{toc}{subsection}{Abbildungsverzeichnis}
+\listoffigures 
+\newpage
+%********************************************************************************************
+% Tabellenverzeichnis
+%********************************************************************************************
+\addcontentsline{toc}{subsection}{Tabellenverzeichnis}
+\listoftables
+\newpage
+%********************************************************************************************
+% Literaturverzeichnis
+%********************************************************************************************
+\addcontentsline{toc}{subsection}{Literaturverzeichnis}
+\printbibliography [heading=subbibliography] %Literatur als Unterverzeichnis
+\newpage
+%********************************************************************************************
+% Anhang. Anhänge müssen händisch in die PDF eingefügt werden, z.B mit Adobe Acrobat.
+%********************************************************************************************
+\pagenumbering{gobble} %Keine Seitennummern, keine Seitenzählung
+\ohead{Anhang}
+\addsec{Anhang}
+\appendix
+\refstepcounter{section}
+\textit{Der Anhang befindet sich aufgrund der Größe der angehängten Zeichnungen digital auf dem beigelegten Datenträger/Link.}
+\newpage
+\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+\subsection{Zeichnungen}
+\newpage
+\subsection{Zusammenbauzeichnung}
+\newpage
+\subsection{Einstufung Richtlinie}
+\newpage
+\subsection{Werkstoffdatenblatt} \label{Anh:datenblatt}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+%********************************************************************************************
+\end {document}
+
+
+
+

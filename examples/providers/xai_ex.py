@@ -2,8 +2,8 @@
 X.AI example: This example demonstrates using X.AI's Grok models.
 Make sure you have set the XAI_API_KEY environment variable.
 """
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 import openai
 import os
 

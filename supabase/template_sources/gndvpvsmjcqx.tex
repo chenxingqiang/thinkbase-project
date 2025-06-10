@@ -1,0 +1,59 @@
+\documentclass[11pt]{ctexart}
+\usepackage[margin=2cm,a4paper]{geometry}
+
+\setmainfont{Caladea}
+
+%% 也可以选用其它字库：
+% \setCJKmainfont[%
+%   ItalicFont=AR PL KaitiM GB,
+%   BoldFont=Noto Sans CJK SC,
+% ]{Noto Serif CJK SC}
+% \setCJKsansfont{Noto Sans CJK SC}
+% \renewcommand{\kaishu}{\CJKfontspec{AR PL KaitiM GB}}
+
+
+\usepackage{minted}
+
+\usepackage[breaklinks]{hyperref}
+
+\title{在Overleaf平台上使用C\TeX}
+\author{林莲枝}
+
+\begin{document}
+\maketitle
+
+Overleaf 伺服器上安装的字体都是开源授权的，因此很多C\TeX{}模板设定的默认字体都不能使用（都是微软视窗或Adobe字体）。导致有些朋友上载了自己的C\TeX{}文件却不能编译，抓狂不已。
+
+其实最重要的是，不要用 \verb|fontset=windows|！伺服器上没有 Windows 字体，真的有需要的话，请自行上传 .ttf 文件。
+
+其实无需再加任何 \verb|fontset| 选项，系统会在 XeLaTeX 或 LuaLaTeX 下自动调用 Fandol，编译、显示都没有问题。调用效果如下：
+
+\begin{itemize}
+\item 一般字体（\verb|\rmfamily|）为〖宋体〗。
+\item 需要强调时，Fandol \verb|\textbf| 用的是〖\textbf{加黑宋体}〗。
+\item \verb|\sffamily| 用的是 〖\textsf{黑体}〗。
+\item 中文字体是没有斜体的，因此 \verb|\emph|和 \verb|\textit| 都是〖\textit{楷体}〗。
+
+\item 单距字体（\verb|\ttfamily|）很多人爱用\texttt{〖仿宋〗}。
+
+\end{itemize}
+
+
+想调用其它字库的话，伺服器上现有的中文字库可参考这个列表：\url{https://www.overleaf.com/help/193#!CJK}。
+
+也可以自行上载 TTF/OTF 档案，直接用档案名来，如：\mintinline{LaTeX}{\setmainfont{shuti.otf}}。目前伺服器上没有幼圆、隶书字库可供C\TeX{}直接使用，抱歉了。
+
+
+繁体的话，先用\verb|nofonts|参数，再用\verb|fontspec|方法来配置字库。可以考虑 cwTeXKai, cwTeXMing, cwTeXHeiBold, cwTeXYen, Noto Serif CJK TC, Noto Sans CJK TC。比如：
+
+\begin{minted}{LaTeX}
+\documentclass[nofonts]{ctexart}
+\setCJKmainfont[
+  BoldFont={cwTeXHeiBold},
+  ItalicFont={cwTeXKai}]
+{cwTeXMing}
+\setCJKsansfont{cwTeXHei}
+\setCJKmonofont{cwTeXYen}
+\end{minted}
+
+\end{document}

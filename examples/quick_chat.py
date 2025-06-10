@@ -1,6 +1,6 @@
 import random
 from typing import List, Tuple
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import os
 import openai
 
@@ -13,10 +13,10 @@ if not api_key:
 client = openai.OpenAI(api_key=api_key)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -45,7 +45,7 @@ names_list = [
     "Jack",
 ]
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def create_personality() -> str:
     """Create a personality with a backstory."""
     name = random.choice(names_list)
@@ -81,7 +81,7 @@ async def create_personality() -> str:
 def format_message_history(message_history: List[Tuple[str, str]]) -> str:
     return "\n".join([f"{name}: {message}" for name, message in message_history])
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def chat(message_history: List[Tuple[str, str]], personality: str) -> str:
     """Generate a chat response based on personality and history."""
     try:

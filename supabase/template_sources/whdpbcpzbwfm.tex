@@ -1,0 +1,198 @@
+\documentclass[12pt, a4paper,twoside]{report}
+
+%% Every LaTeX document begins with a preamble, which loads packages and
+%% defines various settings to make the document look right. Mostly,
+%% you can ignore everything in this template before \begin{document} on
+%% line 74
+
+\usepackage{mathtools,amsthm} % Enable useful mathematical symbols/environments
+\usepackage{graphicx} % Enable graphics
+\usepackage{fancyhdr,titlesec,microtype} % enable various formatting commands
+\usepackage[margin=2.5cm]{geometry} % Set margin size
+\usepackage{palatino} % Set the font
+\usepackage[latin1]{inputenc} % Allow you to input accents, umlauts and other characters
+\usepackage[T1]{fontenc} % Lets LaTeX print a wider array of characters
+
+\usepackage{xcolor} % Enable coloured elements
+\definecolor{mypurple}{HTML}{622567} %%% Purple
+\definecolor{myred}{HTML}{D55C19} %%%EssexOrange
+\definecolor{myblue}{HTML}{007A87} %%%Seagrass
+
+% For technical reasons, hyperref should be loaded after all other packages
+\usepackage[colorlinks,linkcolor=myblue,citecolor=mypurple]{hyperref}
+
+\renewcommand{\baselinestretch}{1.5} % 1.5 line spacing
+
+% Define \begin{theorem}, \end{theorem}, etc.
+\theoremstyle{plain} % The following will be italicised
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition} % The following environments will not use italics
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark} % The following environments will not use italics or bold titles
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{chapter}
+
+% Fancy headings
+\pagestyle{fancy}
+\setlength{\headheight}{15pt}
+\fancyheadoffset[LE,RO]{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE]{\makebox[0pt][l]{\thepage}\hfill\leftmark}
+\fancyhead[RO]{\rightmark\hfill\makebox[0pt][r]{\thepage}}
+\fancypagestyle{plain}{%
+    \fancyhead{} % get rid of headers
+    \renewcommand{\headrulewidth}{0pt} % and the line
+}
+
+% Fancy chapter numbers
+\titleformat{\chapter}[display]
+    {\normalfont\bfseries\color{myred}}
+    {\filleft\hspace*{-60pt}%
+        \rotatebox[origin=c]{90}{%
+            \normalfont\color{black}\Large%
+            \textls[180]{\textsc{\chaptertitlename}}%
+        }
+        \hspace{10pt}%
+        {\setlength\fboxsep{0pt}%
+            \colorbox{myred}{\parbox[c][3cm][c]{2.5cm}{%
+                \centering\color{white}\fontsize{80}{90}\selectfont\thechapter}%
+            }
+        }
+    }
+    {10pt}
+    {\titlerule[2.5pt]\vskip3pt\titlerule\vskip4pt\LARGE\sffamily}
+
+\begin{document} % Start your document
+
+%%%%%%%%%%%% BEGIN TITLE PAGE %%%%%%%%%%%%
+
+\thispagestyle{empty} % For the title page, no header / footer
+
+\noindent
+    \begin{minipage}{0.1\textwidth}
+    \includegraphics[height=4.5em]{essex.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.5\textwidth}
+    \begin{center}
+        \renewcommand\familydefault{\sfdefault}
+        \fontfamily{phv}\selectfont
+        {\large School of Mathematics, Statistics and Actuarial Science}
+    \end{center}
+    \end{minipage}
+
+\begin{center}
+    \noindent\textcolor{myred}{\rule{\linewidth}{4.8pt}}
+    
+    \vspace{2em}
+    \noindent {\LARGE \sc Capstone Project Dissertation}
+    
+    \vspace{3em}
+    \noindent {\Huge{\color{myblue} YOUR PROJECT TITLE HERE}}
+    
+    \vspace{3em}
+    \noindent {\Large \bf YOUR NAME HERE}
+    \vfill
+    \noindent {\Large {Supervisor:} {\color{mypurple} \bf YOUR SUPERVISOR NAME HERE}}
+    
+    \vspace{0.5em}
+    \noindent\textcolor{myred}{\rule{\linewidth}{4.8pt}}
+    
+    \vspace{2em}
+    {\Large \today }
+    
+    {\Large Colchester}
+\end{center}
+
+\clearpage
+
+%%%%%%%%%%%% END TITLE PAGE %%%%%%%%%%%%
+
+\tableofcontents
+
+% If you have lots of figures with captions / numbers, uncomment the following line
+% \listoffigures
+
+% If you have lots of tables and want a list of them, uncomment the following line
+% \listoftables
+
+\chapter{Introduction}\label{ch:1}
+
+The first chapter of a Capstone document is usually an overview of what you've done. Often, it is the last chapter you will write.
+
+\begin{theorem} \label{example-theorem}
+Sometimes, you will want to state the main results of your document in the introduction.
+\end{theorem}
+
+\begin{remark}
+LaTeX is clever, and automatically generates numbers for theorems, remarks and anything else you might want to label. You can give these an invisible name using \verb!\label{your-key}! and referring back to it later using \verb!\ref{your-key}!, for example the following number will be the same as the theorem above: Theorem \ref{example-theorem}.
+\end{remark}
+
+Similarly, you will want to reference external sources as you write your document. The basic way to do this is to add \verb!\bibitem{your-chosen-key}!s at the end of your document (this template has three examples), and use \verb!\cite{your-chosen-key}! to refer to it. For instance, if I wanted to cite the example document by Noether, I can write \cite{bookByTuring}.
+
+Mathematics is added using dollar signs for in-line math, i.e. $x^2 + y^2 = z^2$, or by using open-bracket close-bracket for a displayed equation.
+\[ c^2 = a^2 + b^2 - 2ab\cos \theta. \]
+
+Ordered lists are written using the \verb!enumerate! environment:
+\begin{enumerate}
+    \item Hello.
+    \item This is the second item in my list.
+\end{enumerate}
+
+I can also write unordered lists using \verb!itemize!:
+\begin{itemize}
+    \item Hello.
+    \item This is now the second item in my list.
+\end{itemize}
+
+\chapter{Your first main chapter}\label{ch:2}
+
+Here is the meat of your document
+
+\section{Your first section of the first main chapter}\label{sec:2.1}
+
+... goes here.
+
+
+
+\chapter{Conclusions}\label{ch:concl}
+
+And here is the final chapter showing how clever you are ....
+
+
+
+%%% Remove the following example bibliography items and add your own %%%
+
+\begin{thebibliography}{999} % The '999' here tells LaTeX how much space to reserve for the bibliography item numbers. It has nothing to do with the actual number of references.
+
+%%% Bibliography items should be below this here %%%
+
+\bibitem{myFirstReference} % This is a key, so you can cite this with \cite{myFirstReference}
+E.~Noether.
+\newblock Invariante {V}ariationsprobleme.
+\newblock {\em Nachr. d. K{\"o}nig. Gesellsch. d. Wiss. zu G{\"o}ttingen,
+  Math-phys. Klasse, {Seite 235-157}}, 1918.
+
+\bibitem{bookByTuring}
+A.~M. Turing.
+\newblock Computing machinery and intelligence.
+\newblock {\em Mind}, 59:433--460, 1950.
+
+\bibitem{myFakeBook}
+J.~Fakename.
+\newblock Name of book or article goes here.
+\newblock \emph{Journal name}, page numbers, year, other specific info.
+
+\end{thebibliography}
+
+\end{document}
+

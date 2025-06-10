@@ -1,0 +1,161 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% \documentclass[a4paper]{article}
+
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+
+\usepackage{biblatex}
+\addbibresource{bibliography.bib} % Nodwch fod hwn yn wahanol i'r fersiwn Saesneg - er mwyn medu rhoi teitl Cymraeg i'r Cyferirnodau
+
+\title{Deall y Deilliad}
+\author{Vincent Knight}
+\date{1984/02/14}
+
+\renewcommand{\figurename}{Ffigwr} % Ail-enwi'r amgylchedd 'Figure' i 'Ffigwr'
+
+\begin{document}
+
+\maketitle
+
+\section{Cyflwyniad}
+
+Mae differu yn gysyniad yn Fathemateg a astudiwyd yng Nghalcwlws. Mae yna drafodaeth barhaus i weld pwy oedd y cyntaf i ddiffinio differu: Leibniz neu Newton \cite{bardi2006calculus}.
+
+Mae differu yn galluogi cyfrifiad graddiant tangiad cromlin ar unrhyw bwynt, fel a gweler yn Ffigwr \ref{exampleplot}.
+
+
+\begin{figure}[!htbp]
+\begin{center}
+\begin{tikzpicture}
+\draw[domain=-2:2, color=blue] plot (\x, {1 - (\x)^2}) node[above = .5cm, right, color=blue] {$f(x)=1-x^2$};
+\draw[domain=-2:2, color=red] plot(\x,-1 * \x + 1.25) node[above = .5cm, right, color=red] {Tangiad wrth $x=.5$};
+\draw [thick, ->] (-3,0) -- (3,0) node [above] {$x$};
+\draw [thick, ->] (0,-3) -- (0,3) node [right] {$y$};
+\node at (.5,.75) {\textbullet};
+\end{tikzpicture}
+\end{center}
+\caption{Y plot $f(x)=1-x^2$ gyda thangiad wrth $x=.5$.}\label{exampleplot}
+\end{figure}
+
+Mae differu nawr yn dechneg sy'n cael ei ddysgu i fyfyrwyr mathemateg trwy gydol y byd. Yn y ddogfen hon byddaf yn trafod rhai agweddau differu.
+
+
+\section{Archwilio'r deilliad yn defnyddio Sage}
+
+Diffiniad y terfan $f(x)$ yn $x=a$ wedi dynodi gan $f'(a)$ yw:
+
+\begin{equation}
+f'(a) = \lim_{h\to0}\frac{f(a+h)-f(a)}{h}
+\end{equation}
+
+Fe allwch ddefnyddio'r cod canlynol yn sage i roi'r terfan uchod:
+
+\begin{verbatim}
+def illustrate(f, a):
+    """
+    Ffwythiant sy'n cymryd ffwythiant ac yn dangos diffiniad terfannol y deilliad ar bwynt a rhoddir.
+    """
+    lst = []
+    for h in srange(.01, 3, .01):
+    	lst.append([h,(f(a+h)-f(a))/h])
+    return list_plot(lst, axes_labels=['$x$','$\\frac{f(%.02f+h)-f(%.02f)}{h}$' % (a,a)])
+\end{verbatim}
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=8cm]{sage1.png}
+\end{center}
+\caption{Y deilliad $f(x)=1-x^2$ yn $x=.5$ yn cydgyfeirio i -1 wrth i $h\to0$.}
+\end{figure}
+
+Os ydym ni eisiau plotio'r tangiad ym mhwynt $\alpha$ o'r ffwythiant, fe allwn ni defnyddio'r canlynol:
+
+\begin{align}
+y=&ax+b&&\text{(diffiniad llinell syth)}\nonumber\\
+  &f'(a)x+b&&\text{(diffiniad y deilliad)}\nonumber\\
+  &f'(a)x+f(a)-f'(a)a&&\text{(rydym yn gwybod fod y llinell yn croestorri $f$ yn $(a,f(a))$}\nonumber
+\end{align}
+
+Fe allwn gyfuno'r dull hwn gyda darn o god blaenorol i weld sut mae'r llinell tangiad yn cydgyfeirio wrth i diffiniad terfannol y deilliad cydgyfeirio:
+
+
+\begin{verbatim}
+def convergetangentialline(f, a, x1, x2, nbrofplots=50, epsilon=.1):
+    """
+    Ffwythiant sy'n gwneud i linell tangiad cydgyfeirio
+    """
+    clrs = rainbow(nbrofplots)
+    k = 0
+    h = epsilon
+    p = plot(f, x, x1, x2)
+    while k < nbrofplots:
+        tangent(x) = fdash(f, a, h) * x + f(a) - fdash(f, a, h) * a
+        p += plot(tangent(x), x, x1, x2, color=clrs[k])
+        h += epsilon
+        k += 1
+    return p
+\end{verbatim}
+
+Mae'r plot a ddangosir yn Ffigwr \ref{lines} yn dangos sut mae'r llinellau yn cydgyfeirio i'r tangiad go iawn $1-x^2$ wrth i $x=2$ (y llinell goch yw'r gromlin agosaf).
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=8cm]{sage0.png}
+\end{center}
+\caption{Llinellau yn cydgyfeirio i'r tangiad wrth i $h\to0$.}\label{lines}
+\end{figure}
+
+Nodwch fod y plot olaf yn defnyddio diffiniad \textbf{go iawn} y deilliad ac nid y brasamcan.
+
+\section{Casgliadau}
+
+Yn yr adroddiad hwn rydw i wedi archwilio diffiniad y terfan, ac yn delweddu deilliad ffwythiant wrth i $h\to 0$. Mae'r cod a ddefnyddiwyd \url{https://sage.maths.cf.ac.uk/home/pub/18/} yn defnyddio gallu differu Sage yn ogystal a'i gallu plotio.
+
+Mae yna agweddau amrywiol eraill gallaf wedi archwilio fel rheolau differu symbolaidd. Er enghraifft:
+
+$$\frac{dx^n}{dx}=(n+1)x^{n}\text{ os yw }x\ne-1$$
+
+Yn ogystal \^{a} hwn mae'n ddiddorol i nodi bodolaeth ffwythiannau sydd \textbf{ddim} yn ddifferadwy ym mhwynt, er enghraifft y ffwythiant $f(x)=\sin(1/x)$ sydd ddim yn ddifferadwy yn $x=0$. Dangosir plot o'r ffwythiant hwn yn Ffigwr \ref{notdiff}.
+
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=8cm]{sage2.png}
+\end{center}
+\caption{Ffwythiant annifferadwy yn $x=0$.}\label{notdiff}
+\end{figure}
+
+
+\printbibliography[title=Cyfeirnodau]
+\end{document}
+
+\end{document}

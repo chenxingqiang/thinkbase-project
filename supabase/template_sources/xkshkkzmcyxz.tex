@@ -1,0 +1,313 @@
+%*********************************************************************
+% RUC Thesis: 中国人民大学本科生毕业论文模板
+% Copyright 2022  Qiu Renxiang
+% 2022/03/02 v1.1 beta
+%
+%本文编写的依据是中国人民大学教务处2021年修订的《本科生毕业论文（设计）指导手册》（http://jiaowu.ruc.edu.cn/wjxz6/sjjx3/828d0d99e9bd4686b41b3526fe553b73.htm）以及本科毕业论文模板（http://jiaowu.ruc.edu.cn/wjxz6/sjjx3/d5aba7b8b1574080a34af94916c2464d.htm）
+%本文在2020年的1.0版本（2017年版论文指导手册）基础上进行修改完善：
+% 1. 首页格式依据最新指导手册进行更新
+% 2. 修改了上一版本部分字号以及字体使用不当的问题（针对多级标题和目录进行大量优化）
+% 3. 在参考文献引用上采用了GB/T7714－2015标准，按照著者-出版年制排序，如需更改请参考手册：https://ctan.math.illinois.edu/macros/latex/contrib/biblatex-contrib/biblatex-gb7714-2015/biblatex-gb7714-2015.pdf
+% 4. 脚注采用圆形脚注
+% 5. 添加了附录页和致谢页
+% 6. 官方本科毕业论文Word模板有较多地方与指导手册冲突，如遇与本模板不同，一切以指导手册为准
+
+
+%如果你有任何建议和疑问请发送邮件至qrx_math@ruc.edu.cn,协助我做的更好。
+% 重要提示：
+%   1. 请确保使用 UTF-8 编码保存
+%   2. 请使用 XeLaTeX编译
+%   3. 修改、使用、发布本文档请务必遵循 LaTeX Project Public License
+%   4. 不需要的注释可以尽情删除
+%*********************************************************************
+\documentclass[12pt,UTF8]{ctexart}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{geometry}
+\usepackage{appendix}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{threeparttable}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}%Times New Roman字体
+\usepackage{titletoc}
+\usepackage{fontspec}
+\usepackage{pdfpages}
+\usepackage{tikz}
+\usepackage{etoolbox}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+
+
+\usepackage[backend=biber,style=gb7714-2015,sorting = gb7714-2015]{biblatex}
+%biblatex宏包的参考文献数据源加载方式
+\addbibresource{references.bib}
+
+\captionsetup{font={small},labelfont={bf}} 
+\captionsetup[table]{skip=3pt}
+\captionsetup[figure]{skip=3pt}
+%圆形脚注
+\usepackage{pifont}
+\usepackage[perpage,symbol*]{footmisc}
+\DefineFNsymbols{circled}{{\ding{192}}{\ding{193}}{\ding{194}}
+{\ding{195}}{\ding{196}}{\ding{197}}{\ding{198}}{\ding{199}}{\ding{200}}{\ding{201}}}
+\setfnsymbol{circled}
+
+%图标编号按章节排序（可选）
+% \renewcommand {\thetable} {\thesection{}.\arabic{table}}
+% \renewcommand {\thefigure} {\thesection{}.\arabic{figure}}
+
+%修改目录
+
+\titlecontents{section} % set formatting for \section -
+                        % \subsection must be formatted separately 
+[2.3em]                 % adjust left margin
+{\heiti}             % font formatting
+{\contentslabel{2.3em}} % section label and offset
+{\hspace*{-2.3em}}
+{\titlerule*[1pc]{.}\contentspage}
+
+%以及小标题样式
+% 标题：各层标题均单独占行。
+% 一级标题：三号黑体（英文Times New Roman），加粗，居中，单倍行距，段前1行，段后1行，序号后空2个汉字符接标题内容，末尾不加标点，写法为“1 …”；
+% 二级标题：四号黑体（英文Times New Roman），加粗，顶左，单倍行距，段前1行，段后1行，序号后空2个汉字符接标题内容，末尾不加标点，写法为“1.1 …”；
+% 三级标题：小四号黑体（英文Times New Roman），加粗顶左，单倍行距，段前1行，段后1行，序号后空2个汉字符接标题内容，末尾不加标点，写法为“1.1.1  …”；
+% 四级标题：五号黑体（英文Times New Roman），加粗顶左，单倍行距，段前1行，段后1行，序号后空2个汉字符接标题内容，末尾不加标点，写法为“1.1.1.1  …”。
+\titleformat{\section}{\centering \zihao{3} \heiti \bfseries}{\thesection}{1em}{}
+
+\titleformat{\subsection}{\flushleft \zihao{4} \heiti \bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\flushleft \zihao{-4} \heiti \bfseries}{\thesubsubsection}{1em}{}
+
+%本科学生毕业论文要求纵向打印，页边距的要求为：
+%上（T）：2 cm
+%下（B）：2 cm
+% 左（L）：1.5 cm
+% 右（R）：1.5 cm
+% 装订线（T）：0.5 cm
+% 装订线位置（T）：左
+\geometry{a4paper,left = 2cm,right = 1.5cm,top = 2cm,bottom= 2cm}
+
+
+% 页眉：学校标志（教务处主页提供下载）：
+% 高度为0.98 cm，宽度为4.13 cm，居中放置。
+% 页码采用10.5号宋体字，居中放置，格式为：第1页。
+\pagestyle{fancy}
+\lhead{}
+\chead{\includegraphics[width = 4.13cm,height = 0.98cm]{head.png}}
+\rhead{}
+\lfoot{}
+\rfoot{}
+
+%目录和引用超链接
+\hypersetup{
+colorlinks=true,
+linkcolor=black,
+citecolor=black
+}
+
+
+
+
+
+
+
+
+\begin{document}
+
+\newcommand\dunderline[3][-1pt]{{%
+  \setbox0=\hbox{#3}
+  \ooalign{\copy0\cr\rule[\dimexpr#1-#2\relax]{\wd0}{#2}}}}
+
+% 2.3.1首页
+% 2.3.1.1论文编码： 12号黑体字，加粗，置顶，居右。
+% 2.3.1.2文头：“中国人民大学本科毕业论文（设计）”，在论文编码下一行， 28号黑体字，加粗，居中。
+% 2.3.1.3论文题名：论文文头下，隔一行，28号黑体字，加粗，居中。
+% 2.3.1.4论文副题名：居中排印在论文题名下，20号黑体字，加粗，副题名前加特殊符号中“长划线”。
+% 2.3.1.5作者、学院、专业、年级、学号、指导教师、论文成绩、日期：论文标题下隔六行，依次排印在论文副题名下，各占一行，距左端空5格，名称后用“：”， 20号黑体字，加粗，内容下需要加下划线，内容置于下划线中部，两端对齐。
+
+\begin{titlepage}
+\thispagestyle{fancy}
+\cfoot{}
+  \begin{flushright}
+    \heiti \textbf{论文编码：RUC-BK-050101-2018000000}
+  \end{flushright}
+
+
+
+  \fontsize{28pt}{\baselineskip}\textbf{\heiti{中国人民大学本科毕业论文（设计）}}
+
+  \vspace{24mm}
+  \centering
+  \fontsize{28pt}{\baselineskip}\textbf{\heiti 对xxx的研究}
+
+  \vspace{3mm}
+
+  \begin{spacing}{1.2}
+    \LARGE\selectfont{\textbf{\heiti ——以xx为例}}
+  \end{spacing}
+
+  \vspace{64mm}
+
+  \flushleft
+  \begin{spacing}{1.3}
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{作\hspace{14mm}者：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{邱任翔}}}
+  
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{学\hspace{14mm}院：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{信息学院}}}
+
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{专\hspace{14mm}业：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{财税数学实验班}}}
+
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{年\hspace{14mm}级：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{2018级}}}
+
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{学\hspace{14mm}号：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{2018000000}}}
+    
+
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{指导教师：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{XXX}}}
+    
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{论文成绩：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{}}}
+    
+    \hspace{27mm}\heiti\LARGE\selectfont{\textbf{完成日期：}\dunderline[-10pt]{1pt}{\makebox[78mm][c]{2022.03.02}}}
+  \end{spacing}
+
+  \vspace{25mm}
+
+\end{titlepage}
+
+% 中文摘要及关键词：
+% “摘要”，单倍行距，段前1行，段后1行，16号黑体字，加粗，居中。
+% 摘要内容， 12号宋体字，起行空两格，回行顶格， 1.5倍行距。
+% “关键词”，摘要下隔一行，左端顶格，12号黑体字，加粗，后面加“：”。
+% 关键词内容，直接放在“：”之后，词间间隔3格，12号宋体字。
+
+\newpage
+\renewcommand{\abstractname}{\textbf{\Large \heiti 摘要}}
+\renewenvironment{abstract}{%
+    \par\small
+    \noindent\mbox{}\hfill{\bfseries \abstractname}\hfill\mbox{}\par
+    \vskip 2.5ex}{\par\vskip 2.5ex} 
+%中文摘要及关键词放在扉页一、外文摘要及关键词放在扉二，页码编排为Ⅰ，Ⅱ，设置页眉
+\begin{abstract}
+%1.5倍行距
+\begin{onehalfspace}
+这里是中文摘要。在对论文进行总结的基础上，用简单、明确、易懂、精辟的语言对全文内容加以概括，提取论文的主要信息。
+\\[12pt]
+\textbf{\textbf{\heiti 关键词：}}关键词1 \quad 关键词2 \quad 关键词3
+\end{onehalfspace}
+\end{abstract}
+\setcounter{page}{1}
+\pagenumbering{Roman}
+\cfoot{\footnotesize \thepage}
+\newpage
+
+
+% 外文摘要及关键词：
+% Abstract，单倍行距，段前1行，段后1行，16号Times New Roman字，加粗，居中。
+% 内容使用12号Times New Roman字，起行空两格，回行顶格，两倍行距。
+% Key Words，英文摘要内容下隔一行，左端顶格，12号Times New Roman字，
+% 加粗，后面加“：”。
+% 关键词内容，直接放在“：”之后，互相之间间隔3格，12号Times New Roman字。
+
+\newcommand{\enabstractname}{\textbf{\Large Abstract}}
+\newenvironment{enabstract}{%
+    \par\small
+    \noindent\mbox{}\hfill{\bfseries \enabstractname}\hfill\mbox{}\par
+    \vskip 2.5ex}{\par\vskip 2.5ex}  
+\begin{enabstract}
+\begin{doublespace}
+This is abstract. Use simple, clear, understandable, incisive language to summarize the full text content, extract the main information of the paper.
+\\[12pt]
+\textbf{Keywords：}key word 1 \quad  key word 2  \quad key word3
+\end{doublespace}
+\end{enabstract}
+\cfoot{\thepage}
+\newpage
+\cfoot{}
+\renewcommand\contentsname{内容目录}
+\renewcommand\listfigurename{插\ 图}
+\renewcommand\listtablename{表\ 格}
+\tableofcontents
+%不需要图表目录可以删去下面两行
+\listoffigures
+\listoftables
+\newpage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\cfoot{\zihao{5} 第 \thepage 页}
+% 按照自然段依次排列，每段起行空两格，回行顶格。12号宋体字，（重点文句，12号宋体字，加粗），1.25倍行距。
+%正文、注释双面打印，编排页码，自第1页起，设置页眉。
+\begin{spacing}{1.25}
+\section{绪论}
+这里是一段正文示例\footnote{这是脚注。}。
+
+这是分项编号：
+\begin{enumerate}[label = (\arabic*)]
+    \item 111
+    \item 222
+        \begin{enumerate}[label=\textcircled{\arabic*}]
+            \item 1111
+            \item 2222
+        \end{enumerate}
+    \item 333
+\end{enumerate}
+
+这是一张带备注的三线表：
+\begin{table}[H]
+\centering
+\caption{2013年-2019年人均交通支出和人均可支配收入}
+\label{tab:trans}
+\begin{threeparttable}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{年份} & \textbf{人均交通消费支出(元)} & \textbf{人均可支配收入(元)} & \textbf{比值} \\ \midrule
+2013        & 1627                 & 18311               & 0.089       \\
+2014        & 1869                 & 20167               & 0.093       \\
+2015        & 2087                 & 21966               & 0.095       \\
+2016        & 2338                 & 23821               & 0.098       \\
+2017        & 2499                 & 25974               & 0.096       \\
+2018        & 2675                 & 28228               & 0.095       \\
+2019        & 2862                 & 30733               & 0.093       \\ \bottomrule
+\end{tabular}
+\begin{tablenotes}
+    \item \footnotesize 数据来源：国家统计局
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+这是一张带备注的图：
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale = 0.5]{title.jpg}
+    \caption{中国人民大学校徽}
+    \label{fig:age}
+    {\fontsize{8pt}{10pt}\selectfont\parbox{0.7\textwidth}{来源：中国人民大学教务处下载中心}}
+\end{figure}
+\subsection{研究意义}
+\subsubsection{理论意义}
+
+\section{文献综述}
+
+
+\newpage
+\end{spacing}
+\nocite{*}
+\addcontentsline{toc}{section}{\heiti 参考文献}
+\printbibliography[heading=bibliography,title=参考文献]
+\newpage
+\addcontentsline{toc}{section}{\heiti 附录}
+\section*{附录}
+\appendix
+\newpage
+\addcontentsline{toc}{section}{\heiti 致谢}
+\section*{致谢}
+\end{document}

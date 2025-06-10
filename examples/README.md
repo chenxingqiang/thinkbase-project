@@ -1,160 +1,139 @@
-# AgentFlow Examples
+# DeepSeek GitHub Agent
 
-This directory contains examples demonstrating how to use AgentFlow for various tasks.
+An AI-powered agent for GitHub projects, built with the DeepSeek language model. This agent automates various aspects of software development, from code generation to Git operations, following Test-Driven Development (TDD) principles.
 
-## Latest Version
+## Features
 
-Current version: v0.2.0
-- Added OpenAI integration with GPT-4 support
-- Enhanced workflow capabilities with async/await support
-- Added new chat and prompt caching examples
-- Improved error handling and validation
-- Added support for PDF report generation
+- **Repository Analysis**: Analyzes repository structure, dependencies, and development patterns
+- **Requirements Analysis**: Processes and analyzes project requirements
+- **Test-Driven Development**: Designs and generates test cases before implementation
+- **Code Generation**: Generates code based on test specifications
+- **Code Review**: Reviews code for quality, style, and potential issues
+- **Git Operations**: Automates Git operations like commits, pushes, and pull requests
+- **GitHub Integration**: Seamless integration with GitHub repositories
 
-## Examples Overview
+## Installation
 
-1. **Basic Workflow**
-   - Simple workflow creation and execution
-   - Transform function implementation
-   - Error handling
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/deepseek-github-agent.git
+cd deepseek-github-agent
+```
 
-2. **Data Science Workflow**
-   - Feature engineering transforms
-   - Outlier removal
-   - Performance optimization
-
-3. **Research Workflow**
-   - Document processing
-   - Multi-step workflows
-   - Dependency management
-   - PDF report generation with figures
-
-4. **Chat and Interaction**
-   - Quick chat simulation with AI personalities
-   - OpenAI prompt caching
-   - Audio processing capabilities
-   - Interactive conversations
-
-## Running Examples
-
-1. Install dependencies:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Set up OpenAI API key:
+3. Configure the agent:
+- Copy `examples/deepseek_github_agent_config.json` to your project
+- Update the configuration with your GitHub credentials and preferences
+- Set your DeepSeek API key in the configuration
+
+## Usage
+
+### Basic Usage
+
+```python
+from agentflow.core.memory import WorkingMemory
+from agentflow.providers.deepseek import DeepSeekProvider
+from examples.deepseek_github_agent import DeepSeekGitHubAgent
+
+# Initialize components
+memory = WorkingMemory()
+provider = DeepSeekProvider(api_key="your-api-key")
+
+# Create agent
+agent = DeepSeekGitHubAgent(
+    provider=provider,
+    memory=memory,
+    workspace="path/to/workspace",
+    github_config={
+        "username": "your-username",
+        "repository_url": "https://github.com/your/repo.git",
+        "default_branch": "main",
+        "commit_style": "conventional",
+        "auto_push": False,
+        "create_pr": False
+    }
+)
+
+# Initialize agent
+await agent.initialize()
+
+# Use agent features
+analysis = await agent.analyze_repository()
+test_cases = await agent.design_tests(analysis)
+code = await agent.implement_code(test_cases)
+review = await agent.review_code(code)
+
+# Commit changes
+commit_hash = await agent.commit_changes(
+    files=["new_file.py"],
+    message="feat: add new feature",
+    scope="core"
+)
+```
+
+### Configuration
+
+The agent can be configured through a JSON configuration file. Key configuration options include:
+
+- **Provider Settings**: Model selection, temperature, and API configuration
+- **GitHub Settings**: Repository settings, commit style, and automation preferences
+- **Instruction Settings**: Configuration for each instruction type (analysis, testing, etc.)
+- **Metrics Settings**: Enable/disable various metrics tracking
+
+See `examples/deepseek_github_agent_config.json` for a complete configuration example.
+
+## Components
+
+### Git Handler
+
+The `GitHandler` class provides Git operations functionality:
+
+- Repository initialization
+- File staging
+- Commit creation
+- Branch management
+- Push operations
+- Pull request creation
+
+### Instructions
+
+The agent supports various instruction types:
+
+- `RepositoryAnalysisInstruction`: Analyzes repository structure
+- `RequirementAnalysisInstruction`: Analyzes requirements
+- `TestDesignInstruction`: Designs test cases
+- `CodeImplementationInstruction`: Implements code
+- `CodeReviewInstruction`: Reviews code
+- `GitOperationsInstruction`: Handles Git operations
+
+## Development
+
+### Running Tests
+
 ```bash
-export OPENAI_API_KEY='your-api-key-here'
+pytest tests/
 ```
 
-3. Run examples:
-```bash
-# Basic workflow example
-python examples/basic_workflow.py
+### Adding New Features
 
-# Data science workflow example
-python examples/data_science_workflow.py
+1. Create new instruction types in `deepseek_instructions.py`
+2. Implement the instruction logic
+3. Register the instruction in `INSTRUCTION_REGISTRY`
+4. Add corresponding methods to `DeepSeekGitHubAgent`
+5. Add tests in `tests/test_deepseek_github_agent.py`
 
-# Research workflow example
-python examples/research_workflow.py
+## Contributing
 
-# Quick chat simulation
-python examples/quick_chat.py
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a pull request
 
-# OpenAI prompt caching
-python examples/openai_prompt_caching.py
+## License
 
-# Audio processing
-python examples/openai_audio.py
-```
-
-## New Example Details
-
-### Quick Chat Simulation
-
-```python
-# Create AI personalities with backstories
-@ell2a.with_ell2a(mode="simple")
-async def create_personality() -> str:
-    """Create a personality with a backstory."""
-    name = random.choice(names_list)
-    # ... personality creation logic ...
-
-# Generate chat responses
-@ell2a.with_ell2a(mode="simple")
-async def chat(message_history: List[Tuple[str, str]], personality: str) -> str:
-    """Generate a chat response based on personality and history."""
-    # ... chat generation logic ...
-```
-
-### OpenAI Prompt Caching
-
-```python
-@ell2a.with_ell2a(mode="simple")
-async def cached_chat(history: List[str], new_message: str) -> str:
-    """Chat with caching support for better performance."""
-    # ... cached chat implementation ...
-```
-
-### Research Report Generation
-
-```python
-def generate_pdf_report(content: str, output_path: str) -> str:
-    """Generate a PDF report with figures and formatting."""
-    # Create PDF document
-    doc = SimpleDocTemplate(output_path, pagesize=letter)
-    # ... report generation logic ...
-```
-
-## Example Output
-
-1. Feature Engineering Output:
-   - Standardized feature values
-   - Feature importance scores
-   - Transformation statistics
-
-2. Outlier Removal Output:
-   - Number of outliers detected
-   - Cleaned dataset
-   - Outlier indices
-
-3. Research Output:
-   - Research findings
-   - Generated documentation
-   - Analysis results
-   - PDF reports with figures
-
-4. Chat Simulation Output:
-   - AI-generated personalities
-   - Natural conversation flow
-   - Cached responses
-   - Audio processing results
-
-## Best Practices
-
-1. **Transform Functions**
-   - Always accept both `step` and `context` parameters
-   - Return dictionary with transformed data
-   - Include proper type hints and docstrings
-
-2. **Workflow Configuration**
-   - Use descriptive step names and IDs
-   - Set appropriate dependencies
-   - Configure error handling and retries
-
-3. **Testing**
-   - Write unit tests for transform functions
-   - Test workflow execution
-   - Verify error handling
-
-4. **OpenAI Integration**
-   - Always handle API errors gracefully
-   - Implement proper rate limiting
-   - Use environment variables for API keys
-   - Cache responses when possible
-
-5. **Report Generation**
-   - Include clear visualizations
-   - Maintain consistent formatting
-   - Handle large datasets efficiently
-   - Provide proper error handling
+MIT License - see LICENSE file for details

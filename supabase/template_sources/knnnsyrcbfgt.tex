@@ -1,0 +1,303 @@
+\documentclass{beamer}
+\usepackage{amsfonts,amsmath,oldgerm}
+\usetheme{WTU}
+\usepackage{xeCJK}
+
+\newcommand{\testcolor}[1]{\colorbox{#1}{\textcolor{#1}{test}}~\texttt{#1}}
+
+\usefonttheme[onlymath]{serif}
+
+\titlebackground*{assets/background-wtu}
+
+\newcommand{\hrefcol}[2]{\textcolor{cyan}{\href{#1}{#2}}}
+
+\title{在此键入标题}
+%\subtitle{报告副标题}
+% \course{Master's Degree in Computer Science}
+\author{报告人：作者}
+%\IDnumber{1234567}
+\date{2023年7月}
+
+\begin{document}
+\maketitle
+
+\begin{frame}
+
+此版本beamer模板是基于\hrefcol{mailto:federico.zenith@sintef.no}{Federico Zenith}的\hrefcol{https://www.overleaf.com/latex/templates/sintef-presentation/jhbhdffczpnx}{SINTEF Presentation}和Liu Qilong的\hrefcol{https://github.com/TOB-KNPOB/Beamer-LaTeX-Themes}{Beamer-LaTeX-Themes}与\hrefcol{https://github.com/FangWHao}{Wenhao Fang}的清华大学版本等衍生模板。
+
+\vspace{\baselineskip}
+
+ 武汉纺织大学beamer版本由 \hrefcol{mailto:asye@wtu.edu.cn}{Aoshuang Ye}编辑并维护。
+
+\vspace{\baselineskip}
+
+在接下来的部分将简要介绍如何使用\LaTeX\ 与beamer来完成幻灯片,此部分新手引导基于\hrefcol{mailto:federico.zenith@sintef.no}{Federico Zenith}的\hrefcol{https://www.overleaf.com/latex/templates/sintef-presentation/jhbhdffczpnx}{SINTEF Presentation}模板进行翻译并优化。
+
+% This template is released under \hrefcol{https://creativecommons.org/licenses/by-nc/4.0/legalcode}{Creative Commons CC BY 4.0} license
+
+\end{frame}
+
+\section{新手引导}
+
+\begin{frame}{武汉纺织大学Beamer幻灯片制作}
+\begin{itemize}
+\item Beamer幻灯片的制作需要一定的\LaTeX\ 使用基础; 如果你不具有\LaTeX\ 使用经验,
+\hrefcol{http://en.wikibooks.org/wiki/LaTeX/}{你可以在此处进行学习。}
+\item 使用\LaTeX\ 可以在Beamer中快速制作简洁美观的幻灯片。
+\item Beamer的\hrefcol{http://www.ctan.org/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf}{用户手册}有详细使用指南。
+\item 本新手引导提供一些最基本的使用操作方法。
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Beamer vs. PowerPoint}
+相较于PowerPoint, 使用\LaTeX\ 有以下优势:
+\begin{itemize}
+\item 非图形式操作界面，容易从\LaTeX\ 书写的文章移植内容。
+\item 输出为\texttt{pdf}格式：不在担忧字体、 公式、软件版本等问题。
+\item 幻灯片将保持一个较为统一的style，一次编辑不再费心排版等问题。
+\item 使用 \TeX\ 编辑数学公式快速、美观，下面提供一个例子:
+\begin{equation*}
+\mathrm{i}\,\hslash\frac{\partial}{\partial t} \Psi(\mathbf{r},t) =
+-\frac{\hslash^2}{2\,m}\nabla^2\Psi(\mathbf{r},t)
++ V(\mathbf{r})\Psi(\mathbf{r},t)
+\end{equation*}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{让我们动手开始吧！}
+\framesubtitle{Preamble}
+此模板基于\texttt{sintefbeamer}，因此，首先我们需要使用\LaTeX\ 在preamble部分写下以下语句：
+\begin{block}{Minimum SINTEF Beamer Document}
+\verb|\documentclass{beamer}|\\
+\verb|\usetheme{sintef}|\\
+\verb|\begin{document}|\\
+\verb|\begin{frame}{Hello, world!}|\\
+\verb|\end{frame}|\\
+\verb|\end{document}|\\
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{标题页/首页}
+在preamble部分写下以下语句可以生成一个典型的标题页/首页:
+\begin{block}{标题页/首页命令行}
+\begin{verbatim}
+\title{Sample Title}
+\subtitle{Sample subtitle}
+\author{First Author, Second Author}
+\date{\today} % Can also be (ab)used for conference name &c.
+\end{verbatim}
+\end{block}
+然后你可以通过\verb|\maketitle|生成这个页面。
+
+在使用\verb|\maketitle|命令之前，你可以通过\verb|\titlebackground|命令来设置\textbf{背景图片}，参数为你存储背景图片的路径。
+
+如果你使用\textbf{带*号版本}的\verb|\titlebackground*|命令, 则背景图片将被裁剪并显示在页面的右半部分。
+
+\end{frame}
+
+\begin{frame}[fragile]{插入中间页}
+    \framesubtitle{简单的中间页}
+    \begin{itemize}[<+->]
+        \item 这是列表的演示。
+        \item 这是列表的第二行。
+    \end{itemize}
+    \begin{block}{含列表页的代码}<+->
+    \begin{verbatim}
+    \begin{frame}{Writing a Simple Slide}
+    \framesubtitle{It's really easy!}
+    \begin{itemize}[<+->]
+        \item A typical slide has bulleted lists
+        \item These can be uncovered in sequence
+    \end{itemize}\end{frame}
+    \end{verbatim}
+    \end{block}
+\end{frame}
+
+\section{个性化/美化}
+
+\footlinecolor{sintefyellow}
+\begin{frame}[fragile]{修改幻灯片的配色}
+\begin{itemize}
+\item 你可以使用\verb|\themecolor{white}|或者\verb|\themecolor{main}|命令来选择白色或者\textit{主色调}作为\textbf{幻灯片色调}的基础配色，此模板的主色调设置为\testcolor{maincolor}。
+      \begin{itemize}
+      \item 如果需要修改，你可以通过添加
+      \verb|\usebeamercolor[fg]{normal text}|语句来实现。
+      \end{itemize}
+\item 你可以通过\verb|\footlinecolor{color}|命令来修改\textbf{页脚颜色}。
+      \begin{itemize}
+      \item 在命令\verb|frame|\textbf{之前}使用该语句。
+      \item 此模板中包含四种预设颜色: 
+      \testcolor{maincolor},\testcolor{sintefyellow}, 
+      \testcolor{sintefgreen}, \testcolor{sintefdarkgreen}
+      \item 默认不设置页脚栏，你可以通过\verb|\footlinecolor{}|命令启用。
+      \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{块}
+\begin{columns}
+\begin{column}{0.3\textwidth}
+\begin{block}{标准块}
+与页脚栏保持配色一致的色块。
+\begin{verbatim}
+\begin{block}{title}
+content...
+\end{block}
+\end{verbatim}
+\end{block}
+\end{column}
+
+\begin{column}{0.7\textwidth}
+\begin{colorblock}[black]{sinteflightgreen}{彩色块}
+彩色块可以选择块的背景色，文字颜色为预设, 可以通过修改参数来改变。
+\small
+\begin{verbatim}
+\begin{colorblock}[black]{sinteflightgreen}{title}
+content...
+\end{colorblock}
+\end{verbatim}
+\end{colorblock}
+色块预设配色有: \testcolor{sinteflilla}, 
+\testcolor{maincolor}, \testcolor{sintefdarkgreen}, and 
+\testcolor{sintefyellow}.
+\end{column}
+\end{columns}
+\end{frame}
+
+\footlinecolor{}
+\begin{frame}[fragile]{使用颜色}
+\begin{itemize}[<alert@2>]
+  \item 你可以使用命令
+        \verb|\textcolor{<color name>}{text}|来显示颜色\\
+        \textcolor{sintefdarkgreen}{这是一个例子这是一个例子这是一个例子}。
+  \item 这些颜色在\texttt{sintefcolor}文件里定义:
+  \begin{itemize}
+  \item 主配色：\testcolor{maincolor}与\testcolor{sintefgrey}
+  \item 绿色系：\testcolor{sinteflightgreen}, 
+  \testcolor{sintefgreen}, \testcolor{sintefdarkgreen}
+  \item 其他配色：\testcolor{sintefyellow}, \testcolor{sintefpurple}, 
+        \testcolor{sinteflilla}
+        \begin{itemize}
+        \item \verb|sintefcolor| 使用指南详见\hrefcol{https://sintef.sharepoint.com/sites/stottetjenester/%
+        kommunikasjon/grafisk-profil-new/Sider/default.aspx}{SINTEF profile 
+        manual}
+        \end{itemize}
+  \end{itemize}
+  \item 不要滥用颜色强调，大多数时候\verb|\emph{}|或者\verb|\textbf{}|已足够。
+  \item 使用\verb|\alert{}|来进行强调。
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{添加图片}
+\begin{columns}
+\begin{column}{0.7\textwidth}
+与\LaTeX\ 添加图片的方式类似：
+\begin{block}{添加图片代码}
+\begin{verbatim}
+\usepackage{graphicx}
+% ...
+\includegraphics[width=\textwidth]
+{assets/logo_RGB}
+\end{verbatim}
+\end{block}
+\end{column}
+\begin{column}{0.3\textwidth}
+\includegraphics[width=\textwidth]
+{assets/wtu-logo}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{分栏}
+对幻灯片页面进行分栏是一种常见展示方法。
+\begin{columns}
+\begin{column}{0.6\textwidth}
+这是第一栏
+\end{column}
+\begin{column}{0.3\textwidth}
+这是第二栏
+\end{column}
+\end{columns}
+\begin{block}{Column Code}
+\begin{verbatim}
+\begin{columns}
+    \begin{column}{0.6\textwidth}
+        This is the first column
+    \end{column}
+    \begin{column}{0.3\textwidth}
+        And this the second
+    \end{column}
+    % There could be more!
+\end{columns}
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{chapter}[assets/background-wtu-negative]{}{特殊页}
+\begin{itemize}
+\item 章节页
+\item 侧图页
+\end{itemize}
+\end{chapter}
+
+\footlinecolor{maincolor}
+\begin{frame}[fragile]{章节页}
+\begin{itemize}
+\item 与中间页\verb|frame|类似，但是内同更加丰富。
+\item 使用\verb|\begin{chapter}[<image>]{<color>}{<title>}|命令。
+\item 图片可选，颜色与标题是默认的。
+\item 有七种预设配色：\testcolor{maincolor}, 
+\testcolor{sintefdarkgreen}, \testcolor{sintefgreen}, 
+\testcolor{sinteflightgreen}, \testcolor{sintefpurple}, \testcolor{sintefyellow}, 
+\testcolor{sinteflilla}.
+      \begin{itemize}
+      \item 有大量配色可选，比页脚配色更多。
+      \item 根据喜好可以自选配色与页脚配合。
+      \end{itemize}
+\item 除此之外，章节页\verb|chapter|与中间页\verb|frame|基本一致。
+\end{itemize}
+\end{frame}
+
+\begin{sidepic}{assets/side-picture}{侧图页}
+\begin{itemize}
+\item 通过\texttt{$\backslash$begin\{sidepic\}\{<image>\}\{<title>\}}命令使用。
+\item 除此之外，侧图页\texttt{sidepic}与中间页\texttt{frame}基本一致。
+\end{itemize}
+\end{sidepic}
+
+\footlinecolor{}
+\begin{frame}
+\frametitle{字体}
+\begin{itemize}
+\item 字体设置中可读性是最优先事项。
+\item 以下是一些优秀例子：
+  \begin{itemize}
+  \item {\textrm{Use serif fonts only with high-definition projectors}}
+  \item {\textsf{Use sans-serif fonts otherwise (or if you simply prefer 
+them)}}
+  \end{itemize}
+\item 还有一些不好的的例子：
+  \begin{itemize}
+  \item {\texttt{Never use monospace for normal text}}
+  \item {\frakfamily Gothic, calligraphic or weird fonts: should always: be
+  avoided}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{更新规划}
+
+\begin{frame}
+\frametitle{未来更新}
+\begin{itemize}
+\item 拟对预设主题色进行更新配置。
+\item 拟更新纺大校训版本页眉。
+\item 拟更新英文版模板。
+\item 如果你有任何建议与合作，请联系
+\hrefcol{mailto:asye@wtu.eu.cn}{Aoshuang Ye}。
+\end{itemize}
+\end{frame}
+
+\backmatter
+\end{document}

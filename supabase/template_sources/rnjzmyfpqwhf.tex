@@ -1,0 +1,157 @@
+%
+% This is version 2022 for the NuSTRAP Group thesis template. (2022-01-26)
+% The basic structure is essentially the same with the previous versions.
+% Some changes and corrections in the source code have been incorporated:
+% - font size is set to 11 points
+% - changed the default main font (Google Roboto Slab is the new one)
+% - improved the blank page use
+% - separated title page, dedications etc from the main body text; different page numbering
+%
+% People using this have to maintain his top-level comment in the source code,
+% as well as preserving the page with the NuSTRAP logo and credit in the final
+% pdf file (that is, keep the file thesis_02_nustrap.tex active
+%
+% Comments / suggestions, please send to: tmertzi@phys.uoa.gr
+%
+
+\documentclass[11pt]{report}
+
+% package to activate greek language - the sequence languages appear below is IMPORTANT!!!
+\usepackage[greek,english]{babel}
+
+% package to handle graphics
+\usepackage{graphicx}
+% package to handle multiple figures in a minipage
+\usepackage{subfigure}
+% package to extend math capabilities
+\usepackage{amsmath,amssymb,isotope}
+\usepackage[version=4]{mhchem}
+%package to activate XeTeX font manager
+\usepackage{fontspec}
+
+% DOCUMENT LAYOUT
+\usepackage{geometry} 
+\geometry{a4paper, textwidth=160mm, textheight=220mm, marginparsep=4mm, marginparwidth=8mm}
+%\geometry{a4paper}
+\setlength\parindent{6mm}
+\setlength\parskip{4mm}
+
+% FONTS
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\usepackage{xcolor}
+\defaultfontfeatures{Mapping=tex-text} % converts LaTeX specials (``quotes'' --- dashes etc.) to unicode
+%\setromanfont [Ligatures={Common}, BoldFont={GFS Artemisia Bold}, ItalicFont={Gentium Italic}]{Gentium}
+%\setmonofont[Scale=0.8]{Monaco} 
+\setmainfont{Roboto Slab}
+
+% ---- CUSTOM AMPERSAND
+\newcommand{\amper}{{\fontspec[Scale=.95]{Roboto Slab Italic}\selectfont\itshape\&}}
+
+% package to handle line spacing
+\usepackage{setspace}
+
+
+% HEADINGS
+\usepackage{sectsty}
+%
+\usepackage{titlesec,titletoc}
+% level of expansion in Table of Contents
+\setcounter{tocdepth}{4}
+
+\usepackage[normalem]{ulem} 
+\sectionfont{\rmfamily\mdseries\upshape\Large}
+\subsectionfont{\rmfamily\mdseries\upshape\normalsize} 
+\subsubsectionfont{\rmfamily\mdseries\upshape\normalsize} 
+
+% PDF SETUP
+% ---- FILL IN HERE THE DOC TITLE AND AUTHOR
+\usepackage[driverfallback=dvipdfmx, bookmarksopen, colorlinks, breaklinks, pdftitle={Theo J. Mertzimekis - A thesis template for NuSTRAP group students},pdfauthor={tmertzi}]{hyperref}  
+\hypersetup{linkcolor=blue,citecolor=blue,filecolor=black,urlcolor=blue} 
+
+% package for fancy style headers and footers
+\usepackage{fancybox}
+
+% redefine bullet symbols and section style
+\renewcommand{\labelitemi}{$\blacktriangleright$}
+\renewcommand{\labelitemii}{$\bullet$}
+
+% change captions especially for greek language - if the document is in ENGLISH, they should vanish
+\addto\captionsenglish{%
+  \renewcommand\prefacename{Πρόλογος}%
+  \renewcommand\refname{Αναφορές}%
+  \renewcommand\abstractname{Περίληψη}%
+  \renewcommand\bibname{Βιβλιογραφία}%
+  \renewcommand\chaptername{Κεφάλαιο}%
+  \renewcommand\appendixname{Παράρτημα}%
+  \renewcommand\contentsname{Περιεχόμενα}%
+  \renewcommand\listfigurename{Κατάλογος Σχημάτων}%
+  \renewcommand\listtablename{Κατάλογος Πινάκων}%
+  \renewcommand\indexname{Ευρετήριο}%
+  \renewcommand\figurename{Εικόνα}%
+  \renewcommand\tablename{Πίνακας}%
+  \renewcommand\partname{Μέρος}%
+  \renewcommand\enclname{Συνημμένα}%
+  \renewcommand\ccname{Κοινοποίηση}%
+  \renewcommand\headtoname{Προς}%
+  \renewcommand\pagename{Σελίδα}%
+  \renewcommand\seename{βλέπε}%
+  \renewcommand\alsoname{βλέπε επίσης}%
+  \renewcommand\proofname{Απόδειξη}%
+  \renewcommand\glossaryname{Γλωσσάρι}%
+  }
+
+\usepackage{xgreek}
+
+%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%
+
+\begin{document}
+
+\setlanguage{greek} %% this is to activate greek hyphenation
+
+% make title out of \author, \title, \date  specified in the preamble
+\input{thesis_01_titlepage}
+
+% This is only meant to include the NuSTRAP group logo in a separate page.
+% Remove it if not interested.
+\include{thesis_02_nustrap}
+
+% include the abstract, written in a separate file called thesis_abstract.tex
+\include{thesis_03_abstract}
+\include{thesis_04_dedication}
+
+\setcounter{page}{1}
+
+% Create table of contents - not mandatory
+\tableofcontents
+
+% Create a list of figures - not mandatory
+%\listoffigures
+
+% include files with content. Changes the names according to your taste.
+\chapter{Εισαγωγή}
+\input{thesis_05_intro}
+
+\chapter{Βιβλιογραφική Ανασκόπηση}
+\input{thesis_06_theory}
+
+\chapter{Πειραματική Διαδικασία}
+\input{thesis_07_experiment}
+
+\chapter{Αποτελέσματα και Ανάλυση}
+\input{thesis_08_results}
+
+\chapter{Συμπεράσματα}
+\input{thesis_09_conclusions}
+
+
+\bibliographystyle{unsrt} % bibliography style is alpha:  eg. [Mer02]
+\bibliography{thesis_biblio} % this is the .bib file that holds the bibliography records 
+
+\appendix
+\chapter{Το λογισμικό}
+\input{thesis_appx01_software}
+\chapter{Σύντομο βιογραφικό σημείωμα}
+\input{thesis_appx02_vita}
+
+\end{document}

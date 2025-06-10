@@ -1,0 +1,709 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% LaTex-pohja tutkielman kirjoittajalle
+%%%% JYU, Matematiikan ja tilastotieteen laitos
+%%%% Tuomo Äkkinen
+%%%% Syksy 2022
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Ensin määritellään dokumentin ominaisuudet ja kieli. Näitä ei kannata lähteä 
+%% muuttamaan, Ainostaan dokumenttiluokkaa kannattaa lähteä muuttamaan jos on sitä %% mieltä, että välttämättä haluaa jonkin muunlaisen ladonnan. Katso esimerkkejä 
+%% dokumenttiluokasta etsimällä Latex document classes verkosta.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,12 pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[finnish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,tabularx,array,titling,lastpage}
+\usepackage{tikz}
+\usepackage{graphicx,pgfplots,enumitem,multirow,booktabs}
+\usetikzlibrary{calc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[colorlinks]{hyperref}
+\usepackage{kansisivu}
+\pgfplotsset{compat=1.18}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% Vaihda seuraaavat tiedot vastaamaan omiasi
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\project{Luonnontieteiden kandidaatintutkielma}
+\author{Meitsi Mesikämmen}
+\title{Tämä on minun otsikko}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Tehdään asetuksia ympäristöille. Näihinkänä ei tarvitse koskea ellet halua    %%%% muuttaa numerointia tai lisätä lauseympäristöjä tms. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{lause}{Lause}[section]
+\newtheorem{lemma}[lause]{Lemma}
+\newtheorem{corollary}[lause]{Seuraus}
+
+\theoremstyle{definition}
+\newtheorem{maaritelma}[lause]{M\"a\"aritelm\"a}
+\newtheorem{example}[lause]{Esimerkki}
+
+\theoremstyle{remark}
+\newtheorem{huomautus}[lause]{Huomautus}
+
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% Joitain matemaattisia operaattoreita (ks. luku 5)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DeclareMathOperator{\dom}{domain}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% Aloitetaan itse dokumentti
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%
+%%% Näistä ainoastaan tutkinto-ohjelma kohta tulee päivittää vastaamaan 
+%%% omaasi ja lisäksi tulee lisätä englannin kielinen otsikko.
+%%% Tiivistelmä 1-2 sivun mittainen 
+%%% Sivumäärä päivittyy oikeaksi kun käännät tex-tiedoston kahdesti.
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\tableofcontents
+
+\newpage
+\section*{Johdanto}
+\addcontentsline{toc}{section}{Johdanto} %% Lisätään johdanto-osa manuaalisesti sisällys luetteloon.
+
+Tämä dokumentti on pohja kandidaatin tutkielmalle tai pro gradu työlle. Tämän tiedoston tarkoituksena on antaa eväitä \LaTeX :n käyttöön ja esitellä yleisimmät tarvittavat komennot. Tätä pohjaa kannattaa lukea Tex-editorin kanssa siten, että tutkielma.tex tiedosto on auki tekstieditorissa (Tex-editorissa) ja siitä ladottu pdf-tiedosto sen vieressä. Osa Tex-koodista on kirjoitettu auki myös ladottuun pdf-tiedostoon, mutta osa kannattaa katsoa suoraan tex-tiedostosta.
+
+Tämän pohjan ei ole missään nimessä tarkoitus olla tyhjentävä esitys kaikesta mitä \LaTeX :iin liittyy vaan pikemminkin pika-apu alkuun pääsemiseen. Mikäli kaipaat lisää tietoa kannattaa katsoa suomenkielistä johdantokurssia \url{https://www.cs.helsinki.fi/u/jhasa/latexkurssi/}. Englannin kielisiä apuneuvoja löytyy internetin ihmeellisestä maailmasta kasoittain. Ota haluamasi hakukone
+ ja kuvaile sille ongelmaasi lisäämällä ongelman yhteyteen latex-sana ja varmasti löydät apua. Muista myös, että tex-ladonta antaa virheistä virheilmoituksen ja näiden tulkitseminen on yksi opeteltava asia. 
+
+Leipätekstiä voi kirjoittaa kuten missä tahansa tekstieditorissa.
+Uuden rivin aloittaminen tai välilyöntien lisääminen Tex-koodipuolella ei vaikuta mitenkään tekstin muotoiluun mutta tyhjän rivin (tai useammankin) jättäminen väliin aloittaa uuden kappaleen. Katso koodia tästä kohdasta!
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tristique finibus lacinia. Sed dapibus consequat erat vitae rhoncus. Maecenas semper porttitor ultrices. Donec ornare tempus libero. Vestibulum elit mi, fermentum non mattis vitae, interdum vitae metus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec imperdiet dignissim arcu, sed vestibulum nulla porta porta. Proin a pellentesque massa. Aenean consectetur et tellus ac accumsan. Aliquam erat volutpat.Pelkkä rivinvaihto ei riitä ja pelkät tyjät rivit koodissa eivät riitä tekmään tyhjää riviä lopulliseen dokumenttiin.
+
+\indent Sisennyksen voi poistaa kappaleen alusta komennolla
+
+\begin{verbatim}
+\noindent,
+\end{verbatim}
+
+\noindent jos niin haluaa. \textbf{Kappaleenvaihdoksi Kannattaa valita joko rivinvaihto ja sisennys tai tyhjällä rivi ja ei sisennystä, ja noudattaa samaa tapaa läpi koko kirjoitelman.} Jos haluaa erotella kappaleet toisistaan tyhjällä rivillä ja poistaa sisennyksen, niin tulee lisätä komennot
+
+\begin{verbatim}
+\parindent0pt
+\parskip12pt
+\end{verbatim}
+tex-tiedoston alkuun ennen kohtaa
+
+\begin{verbatim}
+\begin{document}
+\end{verbatim}
+Kokeile mikä muuttuu näiden kanssa.
+
+\LaTeX on kehitetty erityisesti matemattisen tekstin latomiseen eli matematiikan kirjoittamisen on helpottamiseksi. Leipätekstin sekaan tulevia matematiittisia symboleja kirjoitetaan aina tiettyjen merkkien sisälle koodissa. Tähän on kaksi tapaa
+
+\begin{verbatim}
+Matikkatila aloitetaan \( ja päätetään \)
+tai merkeillä $ ja $ 
+\end{verbatim}
+Vaikkakin dollarimerkki on helpompi kirjoittaa niin on suositeltavaa käyttää merkkejä
+
+\begin{verbatim}
+\( \)    
+\end{verbatim}
+sillä näistä ensimmäinen avaa matematiikkatilan ja jälkimmäinen päättää sen. Tällöin on selvää mitä on matematiikkatilan sisällä.
+
+Esimerkiksi nämä numerot  1,2,3,4,5,x,y,z ovat tekstitilassa ja nämä $1$, $2$, $3$, $4$, $5$, $x$, $y$, $z$ matematiikkatilassa kirjoitettuja. Huomaatko eron? 
+
+Omalle riville tehdyn kaavan saa kirjoittamalla kaavan seuraavien merkkien sisälle
+
+\begin{verbatim}
+\[ \]    
+\end{verbatim}
+eli koodi
+
+\begin{verbatim}
+\[\int f(x)\,dx=6.\]    
+\end{verbatim}
+tuottaa kaavan
+\[\int f(x)\,dx=6.\]    
+Kuten tekstin seassa olevan matematiikkatilan tapauksessa myös omalle riville tuleva kaava saadaan aikaiseksi monella eri tavalla:
+
+\begin{verbatim}
+Omalle riville tuleva kaava aloitetaan \[ ja päätetään \]
+tai merkeillä $$ ja $$ 
+tai kirjoittamalla \begin{equation*} ja \end{equation*}
+\end{verbatim}
+Kuten tekstin seassa olevan kaavan tapauksessa myös tässä suositaan merkkejä
+
+\begin{verbatim}
+\[ \]
+\end{verbatim}
+sillä jossain kohdin tekstin välistykset menevät pieleen jos käyttää tupladollareita. Näillä päästäänkin jo alkuun työn kirjoittamisessa.
+
+\newpage
+\section{(Matemaattisen) tekstin muotoilu}
+Uusi luku aloitetaan komennolla
+
+\begin{verbatim}
+\section{Matemaattisen tekstin muotoilu}
+\end{verbatim}
+aliluvun ja alialiluvun saa vastaavasti komennoilla
+
+\begin{verbatim}
+\subsection{Matemaattisen tekstin muotoilu}
+\subsubsection{Matemaattisen tekstin muotoilu}
+\end{verbatim}
+Numeroimaton aliluku (luku vast.) tulee koodilla
+
+\begin{verbatim}
+\subsection*{Matemaattisen tekstin muotoilu}
+\end{verbatim}
+Kannattaa kokeilla myös mitä tapahtuu komennoilla 
+
+\begin{verbatim}
+\begin{part}\end{part}
+\begin{chapter}\end{chapter} \\ Tämä toimii vain joillakin 
+tietyillä dokumenttiluokilla
+\end{verbatim}
+
+Tämän dokumentin koodiosan alussa on määritelty omat ympäristöt määritel\-mille, lauseille, lemmoille ja huomautuksille (ks. tex-tiedosto). Niiden avulla voidaan muotoilla lauseet, lemmat, määritelmät ja huomautukset omiksi kokonaisuuksiksi. Esimerkiksi koodi
+
+\begin{verbatim}
+\begin{lause}\label{ekalause} 
+Olkoon \(x\in \mathbb{R}\). Tällöin \(x^2\geq 0.\)
+\end{lause}
+\end{verbatim}
+
+tuottaa seuraavan:
+
+\begin{lause}\label{ekalause} 
+Olkoon \(x\in \mathbb{R}\). Tällöin \(x^2\geq 0.\)
+\end{lause}
+
+\noindent Ylle lisätty label-osa liittää itsekeksityn sisäisen nimen tähän lauseeseen ja sillä voimme viitata tähän Lauseeseen sen oikealla numerolla tilanteesta riippumatta. Todistuksillekin on oma ympäristö:
+
+\begin{verbatim}
+\begin{proof}
+Todistus tähän väliin...
+\end{proof}
+\end{verbatim}
+
+\begin{proof}
+Todistus tähän väliin...
+\end{proof}
+Jos Lausetta \ref{ekalause} käytetään myöhemmin tekstissä, niin voimme viitata siihen sille annetun nimen avulla käyttäen ref-komentoa:
+
+\begin{verbatim}
+\ref{ekalause}
+\end{verbatim}
+joka tuottaa lauseen numeron, mikä ikinä se sillä hetkellä onkaan.
+Lähde\-kirjallisuuteen viitataan sen sijaan cite-komennolla esimerkiksi Lauseen \ref{ekalause} sovelluksia voi löytää lähteestä \cite{Johdatus}. Tämä tuli siis komennolla (ks. dokumentin lopun viitteiden sisäiset nimet)
+
+\begin{verbatim}
+\cite{Johdatus}
+\end{verbatim}
+
+\begin{maaritelma}
+Tässä määritellään tarvittavia käsitteitä
+\end{maaritelma}
+
+\begin{lemma}[Erityinen epäyhtälö]
+Epäyhtälö
+\[2ab\leq a^2+b^2~~\text{pätee kaikilla}\ \ a,b\in\mathbb{R}.\]
+\end{lemma}
+Lauseille tai lemmoille voi antaa omia erityisiä nimiä (Kuten Hölderin epäyhtälö tms) kirjoittamalla ympäristön aloituksen perään hakasulkeissa haluamansa nimi. Edellä olevan tuotti siis koodi
+
+\begin{verbatim}
+\begin{lemma}[Erityinen epäyhtälö]
+Epäyhtälö
+\[2ab\leq a^2+b^2~~\text{pätee kaikilla}\ \ a,b\in\mathbb{R}.\]
+\end{lemma}
+\end{verbatim}
+
+\begin{huomautus}
+Huomataan, että tällainenkin ympäristö oli määritelty.
+\end{huomautus}
+
+\subsection{Kaavarivien numeroinnista ja ristiviittamisesta}
+
+Numeroimattoman kaavarivin saa merkeillä 
+\begin{verbatim}
+\[ \int_{-\infty}^\infty e^{-x^2}\,dx = \sqrt\pi. \]
+\end{verbatim}
+% numeroimaton kaava kaavarivin\"a
+\[
+\int_{-\infty}^\infty e^{-x^2}\,dx = \sqrt\pi.
+\]
+% numeroitu kaava kaavarivin\"a
+Jos haluaa kaavariville oman numeron, niin silloin kaavarivi on laitettava equation-ympäristöön. Koodi
+
+\begin{verbatim}
+\begin{equation}
+\int_{-\infty}^\infty e^{-x^2}\,dx = \sqrt\pi.
+\label{KElvin}
+\end{equation}
+\end{verbatim}
+tuottaa siis kaavan
+
+\begin{equation}
+\int_{-\infty}^\infty e^{-x^2}\,dx = \sqrt\pi.
+\label{KElvin}
+\end{equation}
+
+
+% Monirivinen kaava ja kaavaan sijoitettuja tekstikommentteja
+% Poistamalla t\"ahden kohdista \begin{align*} JA \end{align*}
+%  saat kaavanumeron jokaiselle kaavariville (ei kovin toivottava tapa)
+\noindent
+Useamman rivin pituisen kaavan voi kirjoittaa align-ympäristöllä
+
+\begin{verbatim}
+\begin{align}
+\end{aling}
+\end{verbatim}
+Huomattavaa on, että tässä ympäristössä tulee kertoa milloin halutaan rivinvaihto 
+
+\begin{verbatim}
+\\    
+\end{verbatim}
+ja lisäksi jokaisella rivillä on oltava tasausmerkki 
+
+\begin{verbatim}
+&    
+\end{verbatim}
+kertomassa, että mitkä kohdat tasataan samalla kohdalle eri riveistä. Koodi
+
+\begin{verbatim}
+\begin{align}
+\left( \int_{-\infty}^\infty e^{-x^2}\,dx \right)^2
+&=\left( \int_{-\infty}^\infty e^{-x^2}\,dx \right)
+  \left( \int_{-\infty}^\infty e^{-y^2}\,dy \right)\\
+&=\int_{-\infty}^\infty \int_{-\infty}^\infty
+  e^{-x^2}e^{-y^2}\,dx\,dy\\
+&=\int_{-\infty}^\infty \int_{-\infty}^\infty
+  e^{-(x^2+y^2)}\,dx\,dy
+\end{align}
+\end{verbatim}
+tuottaa kaavarivistön
+
+\begin{align}
+\left( \int_{-\infty}^\infty e^{-x^2}\,dx \right)^2
+&=\left( \int_{-\infty}^\infty e^{-x^2}\,dx \right)
+  \left( \int_{-\infty}^\infty e^{-y^2}\,dy \right)\\
+&=\int_{-\infty}^\infty \int_{-\infty}^\infty
+  e^{-x^2}e^{-y^2}\,dx\,dy\\
+&=\int_{-\infty}^\infty \int_{-\infty}^\infty
+  e^{-(x^2+y^2)}\,dx\,dy
+\end{align}
+Yksittäisistä numeroista pääsee eroon lisäämällä halutulle riville 
+
+\begin{verbatim}
+\notag
+\end{verbatim}
+ennen rivinvaihtoa. Ja jos haluaa eroon kaikista numeroista, niin sitten pitää käyttää ympäristöä
+
+\begin{verbatim}
+\begin{align*}
+\end{align*}
+\end{verbatim}
+Tähden lisäämisellä on sama vaikutus myös muihin ympäristöihin, joissa on automaatinumerointi. Jatketaan edellä tehtyä kaavarivistöä:
+
+\begin{verbatim}
+\begin{align}
+&=\int_0^{2\pi} \int_0^\infty
+  e^{-r^2} r\,dr\,d\theta\notag
+\\
+&=\int_0^{2\pi}\left[ \int_0^\infty
+  e^{-r^2}r\,dr\right] \,d\theta\label{tarkearivi}
+\\
+&=\int_0^{2\pi} \left[] \left. -\frac{e^{-r^2}}2
+  \right|_{r=0}^{r=\infty} \right] \,d\theta\notag
+\\
+&=\int_0^{2\pi} \left[\frac12\right]\,d\theta\notag
+\\
+&=\pi.
+\end{align}
+\end{verbatim}
+
+\begin{align}
+&=\int_0^{2\pi} \int_0^\infty
+  e^{-r^2} r\,dr\,d\theta\notag
+\\
+&=\int_0^{2\pi}\left[ \int_0^\infty
+  e^{-r^2}r\,dr\right] \,d\theta\label{tarkearivi}
+\\
+&=\int_0^{2\pi} \left[] \left. -\frac{e^{-r^2}}2
+  \right|_{r=0}^{r=\infty} \right] \,d\theta\notag
+\\
+&=\int_0^{2\pi} \left[\frac12\right]\,d\theta\notag
+\\
+&=\pi.
+\end{align}
+
+Edellä lisättiin toiselle riville 
+
+\begin{verbatim}
+\label{tarkearivi}
+\end{verbatim}
+ennen rivinvaihtosymbolia, jolloin voimme nyt viitata tähän kaavan  eqref-komennolla. (vrt.ref-komentoon) Koodi
+
+\begin{verbatim}
+Kaava \eqref{tarkearivi}
+\end{verbatim}
+antaa: Kaava \eqref{tarkearivi}. Jokaiselle riville voi antaa oman sisäisen nimen ja silloin kyseiseen riviin voi viitata tätä nimeä käyttämällä. Huomaa, että koodi
+
+\begin{verbatim}
+\notag
+\end{verbatim}
+esiintyy edellä kaikilla niillä riveillä joille ei tulosteta numeroa.
+
+Monesti tarvitsee myös kaavariviä, joka sisältää yksi- ja kaksirivisiä osia. Esimerkiksi funktion määrittely paloittain tehdään tekemällä kaavarivin sisälle cases-ympäristö. Koodi 
+
+\begin{verbatim}
+\[
+f(x)=\begin{cases}
+    x+1,\ \text{kun}\ x>1\\
+    x-1.\ \text{kun}\ x\leq 1\\
+    \end{cases}
+\]
+\end{verbatim}
+tuottaa kaavan
+
+\[
+f(x)=\begin{cases}
+    x+1,\ \text{kun}\ x>1\\
+    x-1,\ \text{kun}\ x\leq 1.\\
+    \end{cases}
+\]
+
+\noindent Huomaa, että matematiikkatilan sisällä tesktiä tulee kirjoittaa aina 
+
+\begin{verbatim}
+\text{}   
+\end{verbatim}
+ympäristöön, muuten välilyönnit häviävät ja tekstin muotoilu näyttää kummalliselta. Yllä välilyöntejä on pakotettu kaavan sisälle 
+
+\begin{verbatim}
+\+välilyönti
+\end{verbatim}
+joka tuottaa juuri yhden tekstimerkin suuruisen tyhjän tilan eli vastaa tavallisen tekstin välilyöntiä. Suurempia tai pienempiä välejä saa 
+
+\begin{verbatim}
+\,      \:     \;     \!     \quad   \qquad
+\end{verbatim}
+Kokeile miten välistykset muuttuvat näillä! Tähän mennessä käsitellyillä tiedoilla pääsee jo aika pitkälle työn kirjoittamisen suhteen. 
+
+\section{Yleisimpiä merkkejä ja sääntöjä}
+
+
+Yleisimmät matemaattisia lausekkeet ovat
+
+\begin{verbatim}
+\[\sin x,\cos x, \log x, e^x, \frac{a}{b} , f\colon A\to\mathbb{R}\]  
+\end{verbatim}
+
+\[\sin x,\cos x, \log x, e^x, \frac{a}{b}, f\colon A\to\mathbb{R}\]
+Näissä huomattavaa on se, että funktion määritelmässä kirjaimen $f$ jälkeinen erotin on
+
+\begin{verbatim}
+\colon eikä :
+\end{verbatim}
+
+
+
+
+Muita yleisesti tarvittavia merkkejä (katso LaTex-koodi tex-tiedostosta):
+
+\begin{table}[!ht]
+    \centering
+\begin{tabular}{c|c}
+
+Potenssit &$x^2$, $y_n$, $z_{k_i}^{2n+1}$\\
+Juuret &   $\sqrt{x}$, $\sqrt[5]{y^2+1}$. \\
+Kertomerkit &  $2\cdot 3$, $m\times n$ \\
+Murtoluvut &  $\frac{1}{2}$, $\frac{2x+2}{x^2-1}$\\
+Derivaatat &  $f'$, $g''(x)$, $h^{(n)}(t)$, $\partial y$, $\nabla F$ \\
+Pisteet &  $1,2,\dots,10$ ja $1+\frac{1}{2}+\frac{1}{3}+\cdots+\frac{1}{n}$\\
+Ääretön &  $\infty$ \\
+Nuolet &  $x\leftarrow y$, $y\rightarrow z$, $x\leftrightarrow z$, $A\Rightarrow B$, $B\Leftarrow C$, $A\Leftrightarrow C$ \\
+Joukko-oppi & $\{x\in X \mid x<2\}$, $\emptyset\subset A$, $A\subseteq B$, $C\cup D$, $E\cap F$, $G\setminus H$ \\
+Funktiot &  $f\colon X\to Y$, $x\mapsto x^2$ \\
+Negaatiot &  $x\not=y$, $A\not\subset B$ \\
+Approksimaatiot & $3\le 2$, $-1\ge -2$, $x\approx 3{,}14$, $C\sim D$ 
+\end{tabular}
+    \caption{Merkkejä}
+    \label{fig:my_label}
+\end{table}
+
+
+\section{Kuva ja kuvaan viittaaminen}
+
+Kuvia lisätään aina omaan ympäristöönsä ja näistä yleisin on figure-ympäristö. Tätä varten käytetään seuraavia koodirivejä
+
+\begin{verbatim}
+\begin{figure}
+    \centering
+    \includegraphics{kuva.jpg}
+    \caption{Kuvateksti}
+    \label{Oma kuvani}
+\end{figure}
+\end{verbatim}
+Tässä varsinainen kuva laitetaan kohtaan 
+
+\begin{verbatim}
+\includegraphics{mina.jpg}
+\end{verbatim}
+Kuva täytyy olla samassa hakemistossa(kansiossa) kuin missä Tex-tiedosto sijaitsee.
+\begin{figure}[!ht]
+    \centering
+\begin{tikzpicture}
+\begin{axis}
+[
+axis line style={shorten >=-10pt, shorten <=-10pt},
+axis y line=center,
+axis x line=middle,
+no markers,
+ytick={1.6 ,1.85},
+yticklabels={$s(\infty)$},
+xtick={1.631},
+xticklabels={$t_m$},
+  xlabel style={
+            anchor=west,
+            at={(ticklabel* cs:1.0)},
+            xshift=10pt
+},
+        ylabel style={
+            anchor=south,
+            at={(ticklabel* cs:1.0)},
+            yshift=10pt
+        },
+xlabel=$t$,ylabel=$s(t)$,
+]
+\addplot+[blue, thick, domain=0:20, samples=250] {1.6-1.6*sin(x/0.01745+90)*2.718^(-0.25*x)};
+\addplot+[dashed] coordinates{(0,1.6) (20,1.6)};
+\addplot+[dashed] coordinates{(0,1.85) (20,1.85)};
+\addplot+[dashed] coordinates{(1.631,0) (1.631,1.6)};
+\draw[<->] (axis cs:2.92,1.6) -- (axis cs:2.92,2.34);
+\node at (axis cs:6.5,2.2) {};
+\draw[<->] (axis cs:12,1.6) -- (axis cs:12,1.85);
+\node at (axis cs:14.5,1.725) {};
+\end{axis}
+\end{tikzpicture}
+    \caption{Hieno käppyrä}
+    \label{Omakuva}
+\end{figure}
+Koska kuvaympäristön sisällä on on annettu label-komento, niin voimme viitata tähän koodilla
+
+\begin{verbatim}
+Kuvassa \ref{Omakuva}
+\end{verbatim}
+joka tuottaa: Kuvassa \ref{Omakuva}. Huomaa, että edellisen luvun lopussa on esimerkki jolla saat aikaan taulukon ja sen ympärillä taulukolle tarkoitettu oma ympäristö, ks. tex-tiedoston koodi.
+
+\section{Luetteloita}
+Luetteloita saa aikaiseksi esimerkiksi enumerate- ja itemize ympäristöillä. Luettelon kohteet listataan item-komennon avulla.
+
+\begin{verbatim}
+\begin{enumerate}
+    \item 
+\end{enumerate}
+\begin{itemize}
+    \item 
+\end{itemize}
+\end{verbatim}
+Alla näitä kahta käyttäen sama luettelo.
+
+\noindent enumerate-ympäristö:
+
+\begin{enumerate}[label=\alph*)]
+
+\item \label{eka1} Vektorin voi kirjoittaa muodossa $\vec{v}=(1,-2,1)$,
+
+\item Matriisin muodossa 
+\[
+A=\begin{bmatrix}
+1 & 3 & 2 & -1 \\
+0 & 1 & 1 & -5 \\
+0 & 0 & 0 & 24 
+\end{bmatrix}.
+\]
+
+
+\item Mitä muuta haluaisit luetella?
+
+\end{enumerate}
+
+\noindent itemize-ympäristö:
+
+\begin{itemize}
+
+\item \label{eka} Vektorin voi kirjoittaa muodossa $\vec{v}=(1,-2,1)$,
+
+\item Matriisin muodossa 
+\[
+A=
+\begin{bmatrix}
+1 & 3 & 2 & -1 \\
+0 & 1 & 1 & -5 \\
+0 & 0 & 0 & 24 
+\end{bmatrix}.
+\]
+
+
+\item Mitä muuta haluaisit luetella?
+
+\end{itemize}
+Enumerate-ympäristöä voi muokata
+
+\section{Tyypillisimpiä virheitä}
+
+\subsection*{Lainausmerkit}
+
+Suomen kielen kohdalla lainausten yhteydessä käytetään merkkejä '' sekä lainausten alkuun että loppuun: ''Tämä on lainaus'' . Nämä löytyvät tavallisesta näppäimistöstä kirjaimen ä oikealta puolelta. Huomaa, erot merkeissä " (shift+2),``, ´´ ja '' .
+
+\subsection*{Todistuksen päättyminen kaavariviin}
+
+Kaavariviin päättyvä todistus-ympäristö heittää todistuksen päättämistä tarkoittavan hautasymbolin turhan alas
+
+\begin{proof}
+\ldots, joten
+\[\lim\limits_{j\to\infty}\int_{\left[a,b\right]}f_j(x)\,dx=\int_{\left[a,b\right]}\lim\limits_{j\to\infty}f_j(x)\,dx.\]
+\end{proof}
+mutta tämän voi korjata lisäämällä todistuksen päättävän kaavarivin sisälle 
+
+\begin{verbatim}
+\qedhere
+\end{verbatim}
+jolloin lopputulos on vähän nätimpi
+\begin{proof}
+\ldots, joten
+\[\lim\limits_{j\to\infty}\int_{\left[a,b\right]}f_j(x)\,dx=\int_{\left[a,b\right]}\lim\limits_{j\to\infty}f_j(x)\,dx.\qedhere\]
+\end{proof}
+
+\subsection*{Matemaattisten operaattoreiden merkinnöt}
+
+Matemaattisia operaattoreita voidaan määritellä dokumentin alussa (ennen varsinaisen dokumentin alkua) komennolla
+
+\begin{verbatim}
+\DeclareMathOperator{komento}{mitä komento tulostaa}    
+\end{verbatim}
+Esimerkiksi komento
+
+\begin{verbatim}
+\ker(T)
+\end{verbatim}
+tuottaa tulosteen $\ker(T)$. (Tämä on valmiiksi määritelty tämän dokumentin paketeissa.) Jos vertaat tätä siihen, että olisi vain kirjoitettu
+
+\begin{verbatim}
+$ker(T)$
+\end{verbatim}
+eli $ker(T)$, niin huomaat eron.
+
+\subsection*{Sisätulomerkki}
+Väärä tapa
+
+\begin{verbatim}
+$<u,v>$    
+\end{verbatim}
+eli $<u,v>$. Oikea tapa on
+
+\begin{verbatim}
+$\langle u,v\rangle$    
+\end{verbatim}
+eli $\langle u,v\rangle$.
+
+\subsection*{Jäännösluokkamerkintä}
+
+Ei kannata keksiä omia merkintöjä, kuten
+
+\begin{verbatim}
+$a= b\;(\text{mod}\, c)$    
+\end{verbatim}
+vaikka tuloste näyttääkin oikealta $a= b\;(\text{mod}\, c)$ jos tähän on jo olemassa valmis komento
+
+\begin{verbatim}
+$a= b \pmod c$,    
+\end{verbatim}
+joka tuottaa saman $a= b \pmod c$.
+
+\subsection*{Kolme pistettä}
+
+Erilaisia luetteloiden jakumisia merkitään kolmella peräkkäisellä pisteellä mutta niitä ei suinkaan kirjoiteta tähän tapaan vaan näihinkin on omat komennot. Esimerkiksi komennot
+
+\begin{verbatim}
+$1+2+3+\cdots$, $1\cdot 2\cdots$ ja $1,2,3,\dots$    
+\end{verbatim}
+tuottavat $1+2+3+\cdots$, $1\cdot 2\cdots$ ja $1,2,3,\dots$ 
+
+\subsection*{Viittaaminen useampaan lähteeseen ja tarkenteen antaminen}
+Useampaan lähteeseen viitataan kirjoittamalla 
+
+\begin{verbatim}
+\cite{Concrete, Johdatus}    
+\end{verbatim}
+joka tulostaa \cite{Concrete, Johdatus}. Tarkenteen voi taas antaa seuraavasti
+
+\begin{verbatim}
+\cite[Theorem 1.24]{Concrete}    
+\end{verbatim}
+joka tulostaa \cite[Theorem 1.24]{Concrete}. Lähdeviittauksissa kannattaa käyttää pakotettua välilyöntiä (matomerkki) eli kirjoittaa
+
+\begin{verbatim}
+Lindelöf~\cite[Lause 1.2]{Johdatus} osoittaa    
+\end{verbatim}
+joka tulostaa: Lindelöf~\cite[Lause 1.2]{Johdatus} osoittaa. Tässä matomerkki vastaa siis välilyöntiä, mutta sellaisessa muodossa, että ladonta \textbf{ei voi tehdä siihen kohtaan rivinvaihtoa}.
+
+\newpage
+
+\section{Merkint\"oj\"a}
+
+\begin{tabbing}
+Merkint\"a\qquad\=  \kill % Mallirivi
+\textit{Merkint\"a} \> \textit{Selitys} \\
+$\mathbb{N}$      \> Luonnollisten lukujen joukko $\{0, 1, 2, 3,\dots\}$ \\
+$\mathbb{Z}_+$    \> Positiivisten kokonaislukujen joukko $\{1, 2, 3,\dots\}$ \\
+$\mathbb{Q}$      \> Rationaalilukujen joukko \\
+$\mathbb{R}$      \> Reaalilukujen joukko \\
+$\mathbb{C}$      \> Kompleksilukujen joukko \\
+$|\alpha|$        \> $\alpha_1+\dots \alpha_n$,
+                     kun $\alpha=(\alpha_1,\dots,\alpha_n) \in\mathbb{N}^n$ \\
+$x^\alpha$        \> $x_1^{\alpha_1}\dots x_n^{\alpha_n}$,
+                     kun $x=(x_1,\dots,x_n) \in\mathbb{R}^n$
+                     ja $\alpha=(\alpha_1,\dots,\alpha_n) \in\mathbb{N}^n$ \\
+$D^\alpha f$      \> $\tfrac{\partial^{\alpha_1+\dots+\alpha_n} f}
+                      {\partial x_1^{\alpha_1}\dots \partial x_n^{\alpha_n}}$,
+                     kun $\alpha=(\alpha_1,\dots,\alpha_n) \in\mathbb{N}^n$
+\end{tabbing}
+
+%\renewcommand{\bibname}{L\"ahdeluettelo}
+\newpage
+\begin{thebibliography}{00}  % Viitteiden lkm < 100
+\selectlanguage{english}
+
+\bibitem{Concrete}
+\textsc{Ronald L. Graham}, \textsc{Donald E. Knuth} ja \textsc{Oren Patashnik}:
+\textit{Concrete Mathematics. A Foundation for Computer Science}.
+toinen laitos, Addison-Wesley, 1994.
+
+\selectlanguage{finnish}
+
+\bibitem{Johdatus}
+\textsc{Ernst Lindel\"of}:
+\textit{Johdatus korkeampaan analyysiin}.
+toinen, korjattu laitos, Mercatorin Kirjapaino Osakeyhti\"o, 1926.
+
+\selectlanguage{english}
+
+\bibitem{manif}
+\textsc{Michael Spivak}:
+\textit{Calculus on manifolds},
+Addison-Wesley, 1965.
+
+\end{thebibliography}
+
+
+\end{document}

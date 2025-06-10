@@ -1,0 +1,61 @@
+\documentclass [12pt, oneside] {smudissertation}
+
+
+\input{settings/custom_packages.tex} % verticle spacing for figures, tables and captions can be adjusted here. Also includes some useful LaTeX packages.
+
+%\setstretch{1.5} %Uncomment and modify this value to change line spacing. Template uses 1.5 by default.
+
+%-----------------------------------------------------------
+%%% Start: About todonotes
+% Todo notes depend on the package todonotes. It is already added to the custom_pakages.tex file
+
+% To hide the list of all the todo notes added to the document
+% comment the command \listoftodos[List of Todo Notes] at the very end of the LaTeX file
+
+% Uncomment next line if you want to keep all the todo note commands in your .tex files but disable them from showing up in the PDF files.
+%\usepackage[disable]{todonotes} %uncomment this to disable notes
+%%% End: About todonotes
+%-----------------------------------------------------------
+
+% To reduce the compiled pdf sizes while edting the document,
+% you may uncomment the \includeonly{filelist} command below.
+% This way only the files included in the list below are compiled
+% and included in the pdf file.
+% Uncommenting the command below will produce a pdf file that consist of preliminary pages and the introduction chapter
+%\includeonly{frontpages/title,chapters/introduction}
+
+\begin{document} %\layout
+
+	\frontmatter   % \frontmatter uses roman numerals for page numbering
+	\include{frontpages/preliminary}
+
+	\makemainmatter % slight tweaks to the native \mainmatter command 
+    \include{chapters/introduction}
+    \include{chapters/guide-notes}
+    \include{chapters/chRegularLook}
+    \include{chapters/chLorem}
+
+	\backmatter % include appendix and bibliography under backmatter. Chapters under \backmatter are not numbered
+    \include{appendix/appA}
+
+%-----------------------------------------------------------
+%   Bibliography goes below.
+%   Check with specific department on the appropriate bibliography style to use.
+%   This dissertation guide includes August 26, 2015 version of IEEEtran bibtex style file.
+%   You can download the latest IEEEtran style (.bst) files from:
+%   http://tug.ctan.org/macros/latex/contrib/IEEEtran/bibtex/
+%-----------------------------------------------------------
+    \nocite{*} %This adds uncited references from your bib file to bibliography
+    \bibliographystyle{bibtex/IEEEtran}
+    \raggedright % do not justify refrences
+    
+    \begin{singlespace} % use single spacing for bibliography
+    \renewcommand{\bibname}{BIBLIOGRAPHY} % Users can change the title here
+    \clearpage % need for \addcontentsline to use the correct page number
+    \phantomsection % Optional. Uses hyperref package. Creates correct ToC links
+    \addcontentsline{toc}{chapter}{\bibname} % Add bib to the Table of Contents
+    \bibliography{bibtex/IEEEabrv,bibtex/mybib} % list .bib files here. Do not add any whitespaces after the comma between two filenames here. Copyright notices have been added to a few sample citations to demonstrate how that can be done.
+    \end{singlespace}
+    
+%\listoftodos[List of Todo Notes] %uncomment this to see a list of all the todo notes in the document	
+\end{document}

@@ -1,0 +1,201 @@
+\NeedsTeXFormat{LaTeX2e}
+\documentclass[a4paper,fontsize=12pt,listof=totoc,bibliography=totoc]{scrbook}
+
+% Add the additional packages and macros that you want to use
+\input{meta/packages}
+
+%For FH Campus Wien master's theses please include the following two commands for title page and declaration of authorship
+%\input{meta/titlepage_master_fh_campus_wien}
+
+%For Uni Vienna master's theses please include the following command 
+%\input{meta/titlepage_master_univie_cts}
+
+% Important update for glossaries, before document 
+\loadglsentries{meta/acronyms.tex}
+\loadglsentries{meta/glossary.tex} 
+\makeglossaries %https://www.overleaf.com/learn/latex/glossaries
+
+\begin{document}
+
+%Start with front matter
+
+% Add your details to this tex file
+%\input{titlepage_details} 
+
+%For FH Campus Wien please include the following declaration of authorship
+%\input{meta/declaration_of_authorship}
+
+
+\chapter*{Acknowledgements}
+Thank you! 
+
+\chapter*{Abstract}
+\chapter*{Zusammenfassung}
+
+	
+\thispagestyle{empty}
+\tableofcontents{}
+\listoftables 
+\listoffigures
+%\listofalgorithms
+%\addcontentsline{toc}{chapter}{List of Algorithms} 
+%\lstlistoflistings
+
+
+%add your chapters here
+\mainmatter{}
+
+\chapter{Introduction}
+This section introduces how to use this template and which format should be used for the master's thesis in Multilingual Technologies. For the University of Vienna, the title page needs to be generated when submitting your thesis on u:space\footnote{\url{https://uspace.univie.ac.at/}}. For the FH Campus Wien, please make sure you that you outcomment the following three commands at the beginning of this file:
+
+\begin{verbatim}
+\input{meta/titlepage_master_fh_campus_wien}
+\input{titlepage_details} 
+\input{meta/declaration_of_authorship}
+\end{verbatim}
+
+and that you add your details to the title page by filling in the titlepage\_details.tex file. 
+
+In LaTex the bibliography is automatically provided for all works you cite in the tex file. However, the bib entries still need to contain \textbf{all required information}. So please make sure that your bib entries in the \textit{bibliography.bib} file are complete.  To cite papers, please use the \citep{jurafskyspeech} command. 
+
+At the University of Vienna master's thesis completed in English \textbf{have to contain a German summary}. So please make sure to complete the English abstract and German Zusammenfassung at the very beginning of this file. Both need to be submitted as part of your thesis. 
+
+
+\chapter{Formatting Guidelines}
+All chapters and subchapters need to be numbered continuously, which you can achieve by using \textit{chapter} for the main chapter and \textit{section} for subchapters. 
+
+\section{Text}
+Each paragraph apart from the ones after a heading should be indented. Fortunately, this is done automatically in LaTex if you introduce a blank line after the paragraph. 
+
+This is a new paragraph. To introduce a literal quote, please use quotation marks of the style ``This is a literal quote'' \citep{lamport94} and make sure to always add the page number where you found the quote. If the quote extends over more than three lines, please use the explicit \textit{quote} environment instead of quotations marks: 
+
+\begin{quote}
+This is of a longer quote that extends over more than three lines and also needs to be equipped with a direct reference as well as page number. \citep[][8]{Goodfellow-et-al-2016}
+\end{quote} 
+
+For bullet lists you can use the environment \textit{itemize}: 
+\begin{itemize}
+    \item This is a first list item 
+    \item And this is a second 
+    \begin{itemize}
+        \item And lists can even be nested
+    \end{itemize}
+\end{itemize}
+
+To introduce a number list, please introduce the environment \textit{enumerate}:
+\begin{enumerate}
+    \item This is the first numbered item 
+    \item This is the second item
+\end{enumerate}
+
+You might also want to introduce equations, for which you should use the environment \textit{equation} and a label so that you can explicitly reference the equation in your text, such as Equation~\ref{eqn:einstein}.
+
+\begin{equation}
+    \label{eqn:einstein}
+     E=mc^2
+\end{equation}
+
+Any websites or URLs should \textbf{never} be simply written as text. Please add them as a bibentry to be referenced in the bibliography. If there is, for some reason, still a need to reference a URL in text, then make sure to use the command \texttt{url} and add it as a footnote as in \footnote{\url{https://www.overleaf.com/learn/latex}}.
+
+\section{Tables and Images}
+The advantage of LaTex is that it allows for continuous numbering of figures and tables and facilitates the layout of figures and tables. 
+
+In line with the institute's guidelines, each figure and table needs to have a caption. For tables the captions need to be \textit{above} the table, as exemplified in Table~\ref{tab:table example}. Please be aware of the fact that the label needs to be introduced after the caption to be able to refer tables in text. Each table and figure has to be referenced in text, e.g. Table~\ref{tab:table example}.
+
+\begin{table}[htb]
+    \centering
+    \caption{Some description of the table}
+	\label{tab:table example}
+    \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Command} & \textbf{Output}\\
+    \hline
+    \verb|{\"a}| & {\"a} \\
+    \verb|{\^e}| & {\^e} \\
+    \verb|{\`i}| & {\`i} \\ 
+    \verb|{\.I}| & {\.I} \\ 
+    \verb|{\o}| & {\o} \\
+    \verb|{\'u}| & {\'u}  \\ 
+    \verb|{\aa}| & {\aa}  \\\hline
+    \end{tabular}
+\end{table}
+
+For any kind of figure, that is, diagrams, pictures, graphical representation, the caption needs to be introduced \textit{below} the figure. For an example, please see Fig.~\ref{fig:figure example}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{figures/logo_uni_wien.png}
+\caption{Some description of the figure}
+\label{fig:figure example}
+\end{figure}
+
+\section{Code}
+To include code in your text, you should use the environment \textit{verb} as in \verb|transformers|.
+
+For a longer block of code, please use the verbatim environment: 
+
+\begin{verbatim}
+Text enclosed inside \texttt{verbatim} environment 
+is printed directly 
+and all \LaTeX{} commands are ignored.
+\end{verbatim}
+
+Alternatively, you can also use the \textit{lstlisting} environment to encode longer blocks of code, which you can use as is or format and color-code as you see fit. 
+
+\begin{lstlisting}[language=Python,caption={Python example}]
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("google-bert/bert-base-cased")
+
+encoded_input = tokenizer("Do not meddle in the affairs of wizards, for they are subtle and quick to anger.")
+print(encoded_input)
+
+\end{lstlisting}
+
+\section{Algorithms}
+When representing algorithms in LaTex it is common to represent them as pseudcode\footnote{See \url{https://www.overleaf.com/learn/latex/Algorithms} for more details.}. Please also make sure to reference each included algorithm explicitly in the text, e.g. Algorithm~\ref{alg:cap}.
+
+\begin{algorithm}
+\caption{An algorithm with caption}\label{alg:cap}
+\begin{algorithmic}
+\State $i \gets 10$
+\If{$i\geq 5$} 
+    \State $i \gets i-1$
+\Else
+    \If{$i\leq 3$}
+        \State $i \gets i+2$
+    \EndIf
+\EndIf 
+\end{algorithmic}
+\end{algorithm}
+
+\section{Acronyms and Glossary}
+
+If you want to use acronyms or a glossary check the page here: \url{https://www.overleaf.com/learn/latex/glossaries}
+
+The \Gls{latex} typesetting markup language is specially suitable 
+for documents that include \gls{maths}. are 
+rendered properly an easily once one gets used to the commands.
+
+Given a set of numbers, there are elementary methods to compute 
+its \acrlong{gcd}, which is abbreviated \acrshort{gcd}. This 
+process is similar to that used for the \acrfull{lcm}.
+
+
+\bibliography{bibliography}
+\bibliographystyle{acl_natbib}
+%\printbibliography
+
+
+\printglossary[type=\acronymtype]
+\printglossary
+
+\cleardoublepage{}
+\pagebreak
+	
+%add your end matter here
+\appendix{}
+
+\chapter{Appendix}
+	
+\end{document}

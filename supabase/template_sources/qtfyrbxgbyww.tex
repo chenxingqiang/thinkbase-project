@@ -1,0 +1,66 @@
+\input{./latex/preamble.tex}
+
+\newcommand*{\mytitle}{\LaTeX-Vorlage für Berichte, Bachelor- oder Masterarbeiten} % Titel
+\newcommand*{\myinstitute}{Hochschue Flensburg} % Institut
+\newcommand*{\myfaculty}{Fachbereich 1: \textit{Musterstudiengang}} % Weitere Hinweise
+\newcommand*{\myauthor}{Max Mustermann} % Autoren
+\newcommand*{\myreporttype}{Abschlussarbeit} % Bericht-Typ
+\newcommand*{\mygraduation}{Master of Engineering} % Vollständige Anschrift
+\newcommand*{\firstexaminer}{Prof. Dr.-Ing. Max Mustermann} % Ort
+\newcommand*{\secondexaminer}{Prof. Dr.-Ing. Maxima Musterfrau} % Ort
+\newcommand*{\mydate}{\today} % Datum
+
+
+% ============= Dokumentbeginn =============
+
+\begin{document}
+	
+% Seiten ohne Kopf- und Fußzeile sowie Seitenzahl
+\pagestyle{empty}
+
+\include{latex/01_titel}	% Einbinden der Titelseite
+\newpage 					% Um Seite nach der Titelseite einzubinden -> bei eigener Titelseite und nicht der Latex-Version erforderlich
+\thispagestyle{empty}
+\quad 
+\newpage
+\pagenumbering{Roman}
+ 
+\cleardoubleoddpage
+
+
+\chapter*{Eidesstattliche Erklärung}
+Ich versichere, dass ich die vorliegende Thesis ohne fremde Hilfe selbstständig verfasst und nur die angegebenen Quellen benutzt habe. \\~\\
+Flensburg, den \today\\[.6cm]
+Max Mustermann\\
+\rule[0.5em]{20em}{0.5pt}
+
+\input{src/Zusammenfassung}
+
+\tableofcontents			%Inhaltsverzeichnis
+\listoffigures				%Verzeichnis aller Bilder
+\listoftables				%Verzeichnis aller Tabellen
+\chapter*{Abkürzungsverzeichnis}
+	\begin{acronym}[4GDH]	% Zur Formatierung hier die längste Abkürzung des Verzeichnisses eintragen
+		\acro{4GDH}{4th Generation District Heating} 	
+	\end{acronym}
+
+\pagestyle{fancy}
+
+\input{src/Einleitung}
+\input{src/Grundlagen}
+\input{src/Hauptteil}
+\input{src/Ergebnisse}
+\input{src/DiskussionderErgebnisse}
+
+%Literaturverzeichnis
+\newpage
+\lhead{}
+\rhead{\leftmark}
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+\bibliography{LiteraturDB}
+
+\appendix
+
+\include{src/anhang}
+
+\end{document}

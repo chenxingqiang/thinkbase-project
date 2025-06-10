@@ -1,14 +1,14 @@
 from typing import List, Union
 from pydantic import BaseModel, Field
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType, ContentBlock
-from agentflow.ell2a.stores import SQLStore
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType, ContentBlock
+from agentflow.ell.stores import SQLStore
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -24,19 +24,19 @@ ell2a.configure({
     }
 })
 
-@ell2a.with_ell2a()
+@ell.with_ell()
 async def create_claim_draft(claim_details: str, claim_type: str, claim_amount: float, 
                        claim_date : str = Field(description="The date of the claim in the format YYYY-MM-DD.")) -> str:
     """Create a claim draft. Returns the claim id created."""
     print("Create claim draft", claim_details, claim_type, claim_amount, claim_date)
     return "claim_id-123234"
 
-@ell2a.with_ell2a()
+@ell.with_ell()
 async def approve_claim(claim_id : str) -> str:
     """Approve a claim"""
     return "approved"
 
-@ell2a.with_ell2a()
+@ell.with_ell()
 async def insurance_claim_chatbot(message_history: List[Message]) -> Message:
     """Process insurance claim chat messages."""
     # Create system message
@@ -47,7 +47,7 @@ async def insurance_claim_chatbot(message_history: List[Message]) -> Message:
     )
     
     # Process the message
-    response = await ell2a.process_message(system_message)
+    response = await ell.process_message(system_message)
     
     # Return the response
     return response

@@ -1,0 +1,125 @@
+\documentclass[a4paper,12pt]{article}
+\author{xxx}
+
+\usepackage[german]{babel}
+\usepackage[]{csquotes}
+\usepackage{titling}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[margin=2.5cm,includeheadfoot, footskip=80pt]{geometry}
+\usepackage[breaklinks]{hyperref}
+\usepackage{blindtext}
+\usepackage[nospace]{varioref}
+\usepackage[backend=biber,style=apa6]{biblatex}
+\usepackage{numprint}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{booktabs}
+\usepackage[justification=centering]{caption}
+\usepackage[titles]{tocloft}
+\usepackage{tabularx}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage{sectsty}
+\sectionfont{\fontsize{14}{16.8}\selectfont}
+\subsectionfont{\fontsize{12}{14.4}\selectfont}
+\usepackage{amsmath}
+\usepackage{pgffor}
+\usepackage[roman]{parnotes}
+\usepackage{xifthen}
+\usepackage{units}
+
+%bib referenc
+\addbibresource{myBib.bib}
+%graphicspath
+\graphicspath{{images/}}
+
+\setlength{\columnsep}{1cm}
+\newlength{\drop}
+
+\fancypagestyle{style1}{
+    \setlength{\headheight}{10pt}
+    \pagestyle{fancy}
+    \fancyhead{}
+    \setlength{\headheight}{2cm}
+    \chead{\includegraphics[]{deckbild.jpeg} \\}
+    %pagefooter
+    \fancyfoot{}
+    \fancyfoot[R]{\thepage}
+}
+\fancypagestyle{Deckblatt}{
+    \setlength{\headheight}{10pt}
+    \pagestyle{fancy}
+    \fancyhead{}
+    \setlength{\headheight}{2cm}
+    \setlength{\headsep}{80pt}
+    \chead{\includegraphics[]{deckbild.jpeg} \\}
+    %pagefooter
+    \fancyfoot{}
+    \fancyfoot[R]{\thepage}
+}
+
+\begin{document}
+
+\thispagestyle{Deckblatt}
+%use different pagestyling
+\pagenumbering{gobble}
+
+%% title page
+\begin{center}
+    \Large {Title der Seminararbeit} \\[3ex]
+    \includegraphics[scale=0.3]{Platzhalter_Logo.png} \\[3ex]
+    \large{Seminararbeit erstellt im Rahmen der Veranstaltung:} \\
+    \large{[XXX]}
+\end{center}
+
+\renewcommand{\arraystretch}{2.5}
+\begin{table}[h]
+    \centering
+    \begin{tabularx}{\textwidth}{l c}
+        Studiengruppe: &  XX\_XX\_XXX \\
+        Name Studierender: & \\
+        Anzahl der Wörter: & \\
+        (inkl. wörtliche Zitate / Fußnoten) & ~ \\
+        Anzahl der Wörter: & \\
+        (exkl. wörtliche Zitate / Fußnoten) & ~ \\
+        Akademischer Gutachter: & \\
+        Abgabedatum: & \\
+    \end{tabularx}
+\end{table}
+
+\newpage
+
+\pagestyle{style1}
+
+\pagenumbering{Roman}
+\setcounter{page}{1}
+
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+%stores roman numbercounter
+\newcounter{preamblecounterstate}
+\setcounter{preamblecounterstate}{\value{page}}
+
+% use arabic numbers for actual content pages
+\pagenumbering{arabic}
+
+%includes pages written in the folder section
+\include{sections/demoSection}
+
+\newpage
+
+% Set page number to Roman for bibliography
+\pagenumbering{Roman}
+
+%reads counter stored earlier
+\setcounter{page}{\value{preamblecounterstate}}
+
+\printbibliography
+\end{document}

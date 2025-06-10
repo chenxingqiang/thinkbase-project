@@ -1,14 +1,14 @@
 import random
-from agentflow.ell2a_integration import ELL2AIntegration
+from agentflow.ell_integration import ELLIntegration
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
-    "store": "./ell2a_logs",
+    "store": "./ell_logs",
     "verbose": True,
     "autocommit": True,
     "model": "gpt-4",
@@ -28,7 +28,7 @@ def get_random_adjective():
 def get_random_punctuation():
     return random.choice(["!", "!!", "!!!"])
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def hello(name: str) -> str:
     """You are a helpful and expressive assistant."""
     adjective = get_random_adjective()

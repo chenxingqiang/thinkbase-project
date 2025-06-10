@@ -1,0 +1,142 @@
+\documentclass[12pt]{report}
+
+% package to activate greek language - the sequence languages appear below is IMPORTANT!!!
+\usepackage[greek,english]{babel}
+\usepackage{varioref}
+%\usepackage{hyperref}
+
+% package to handle graphics
+\usepackage{graphicx}
+% package to handle multiple figures in a minipage
+\usepackage{subfigure}
+% package to extend math capabilities
+\usepackage{amsmath,amssymb,isotope}
+\usepackage[version=3]{mhchem}
+%package to activate XeTeX font manager
+\usepackage{fontspec}
+
+% DOCUMENT LAYOUT
+\usepackage{geometry} 
+\geometry{a4paper, textwidth=5.5in, textheight=8.5in, marginparsep=7pt, marginparwidth=.6in}
+%\geometry{a4paper}
+\setlength\parindent{8mm}
+\setlength\parskip{5mm}
+
+% FONTS
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\usepackage{xcolor}
+\defaultfontfeatures{Mapping=tex-text} % converts LaTeX specials (``quotes'' --- dashes etc.) to unicode
+%\setromanfont [Ligatures={Common}, BoldFont={GFS Artemisia Bold}, ItalicFont={Gentium Italic}]{Gentium}
+%\setmonofont[Scale=0.8]{Monaco} 
+\setmainfont{GFS Artemisia}
+
+% ---- CUSTOM AMPERSAND
+\newcommand{\amper}{{\fontspec[Scale=.95]{Gentium Italic}\selectfont\itshape\&}}
+
+% package to handle line spacing
+\usepackage{setspace}
+
+% HEADINGS
+\usepackage{sectsty} 
+\usepackage[normalem]{ulem} 
+\sectionfont{\rmfamily\mdseries\upshape\Large}
+\subsectionfont{\rmfamily\bfseries\upshape\normalsize} 
+\subsubsectionfont{\rmfamily\mdseries\upshape\normalsize} 
+
+% PDF SETUP
+% ---- FILL IN HERE THE DOC TITLE AND AUTHOR
+\usepackage[driverfallback=dvipdfmx, bookmarks, colorlinks, breaklinks, pdftitle={Theo J. Mertzimekis - A thesis template for UoA students},pdfauthor={tmertzi}]{hyperref}  
+\hypersetup{linkcolor=blue,citecolor=blue,filecolor=black,urlcolor=blue} 
+
+% package for fancy style headers and footers
+\usepackage{fancybox}
+
+
+% redefine bullet symbols and section style
+\renewcommand\thesection{\arabic{section}.}
+\renewcommand{\labelitemi}{$\blacktriangleright$}
+\renewcommand{\labelitemii}{$\bullet$}
+
+% change captions especially for greek language - if the document is in ENGLISH, they should vanish
+\addto\captionsenglish{%
+  \renewcommand\prefacename{Πρόλογος}%
+  \renewcommand\refname{Αναφορές}%
+  \renewcommand\abstractname{Περίληψη}%
+  \renewcommand\bibname{Βιβλιογραφία}%
+  \renewcommand\chaptername{Κεφάλαιο}%
+  \renewcommand\appendixname{Παράρτημα}%
+  \renewcommand\contentsname{Περιεχόμενα}%
+  \renewcommand\listfigurename{Κατάλογος Σχημάτων}%
+  \renewcommand\listtablename{Κατάλογος Πινάκων}%
+  \renewcommand\indexname{Ευρετήριο}%
+  \renewcommand\figurename{Σχήμα}%
+  \renewcommand\tablename{Πίνακας}%
+  \renewcommand\partname{Μέρος}%
+  \renewcommand\enclname{Συνημμένα}%
+  \renewcommand\ccname{Κοινοποίηση}%
+  \renewcommand\headtoname{Προς}%
+  \renewcommand\pagename{Σελίδα}%
+  \renewcommand\seename{βλέπε}%
+  \renewcommand\alsoname{βλέπε επίσης}%
+  \renewcommand\proofname{Απόδειξη}%
+  \renewcommand\glossaryname{Γλωσσάρι}%
+  }
+
+\usepackage{xgreek}
+
+%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%
+
+\begin{document}
+
+\setlanguage{greek} %% this is to activate greek hyphenation
+
+% make title out of \author, \title, \date  specified in the preamble
+\input{thesis_01_titlepage}
+% create a blank page immediately after the cover page
+\include{blank_page}
+
+% This is only meant to include the NuSTRAP group logo in a separate page.
+% Remove it if not interested.
+\include{thesis_02_nustrap}
+
+% include the abstract, written in a separate file called thesis_abstract.tex
+\include{thesis_03_abstract}
+\include{blank_page}
+\include{thesis_04_dedication}
+\include{blank_page}
+
+% Create table of contents - not mandatory
+\tableofcontents
+\include{blank_page}
+
+% Create a list of figures - not mandatory
+%\listoffigures
+
+% include files with content. Changes the names according to your taste.
+\chapter{Εισαγωγή}
+\input{thesis_05_intro}
+
+\chapter{Βιβλιογραφική Ανασκόπηση}
+\input{thesis_06_theory}
+
+\chapter{Πειραματική Διαδικασία}
+\input{thesis_07_experiment}
+
+\chapter{Αποτελέσματα και Ανάλυση}
+\input{thesis_08_results}
+
+\chapter{Συμπεράσματα}
+\input{thesis_09_conclusions}
+
+
+\bibliographystyle{alpha} % bibliography style is alpha:  eg. [Mer02]
+\bibliography{thesis_biblio} % this is the .bib file that holds the bibliography records 
+
+\appendix
+\chapter{Το λογισμικό}
+\input{thesis_appx01_software}
+\chapter{Σύντομο βιογραφικό σημείωμα}
+\input{thesis_appx02_vita}
+
+\end{document}

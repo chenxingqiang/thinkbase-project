@@ -1,0 +1,219 @@
+%%%%%%%%%%%%%%%%%%%%%%
+%This is a Beamer template for UT Austin, but it can easily be adjusted to fit your institution's color scheme.
+
+%This is for compilation in XeLaTeX (adjust for this in the Overleaf menu on the left)! 
+%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[10pt]{beamer} %adjust font size here. I think 12pt is too clunky.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} %for compilation in XeLaTeX
+\usepackage{graphicx}
+
+%global fonts
+\usepackage{kpfonts} %for compilation in XeLaTeX
+\usepackage{fontspec} 
+\setsansfont{Arial} %some other fonts for non-math (font must exist on your local drive). The beamer default is fine, I think.
+%\setsansfont{Comic Sans MS} %I think it looks great
+\usefonttheme[onlymath]{serif} % Use serif font for math equations
+
+%global colors
+\setbeamercolor{background canvas}{bg=gray!25}
+\definecolor{myorange}{RGB}{190,110,0} %adjust RGB triplet to your institution's color
+\setbeamercolor*{structure}{fg=myorange}
+
+%my must-have packages
+\usepackage{amsmath}
+\usepackage{mathabx}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{commath}
+\usepackage{xcolor} %font color
+\usepackage{tkz-euclide} %mathcha.io for figure generation
+\usepackage{braket} %quantum
+\usepackage{cancel}
+\usepackage{hyperref} %links (it seems hidelinks is automatically turned on)
+\usepackage{epigraph} %works well for quotes
+
+%beautiful boxed equations
+\usepackage{empheq}
+\usepackage[most]{tcolorbox}
+\newtcbox{\maybe}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=yellow!65!black,
+    colback=yellow!20, boxrule=1pt,
+    #1}
+\newtcbox{\love}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=pink!75!black,
+    colback=pink!20, boxrule=1pt,
+    #1}
+\newtcbox{\eq}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=blue!65!black,
+    colback=blue!10, boxrule=1pt,
+    #1}
+\newtcbox{\correct}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=green!55!black,
+    colback=green!15, boxrule=1pt,
+    #1}
+
+\newtcbox{\incorrect}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=red!55!black,
+    colback=red!15, boxrule=1pt,
+    #1}
+
+%text boxes: adjust to your preference
+\newtcolorbox{orangetext}[2][% 	
+    enhanced, 
+    breakable,
+    skin first=enhanced,
+    skin middle=enhanced,
+    skin last=enhanced,
+    ]{colframe=orange!65!black,colback=orange!17,fonttitle=\bfseries, boxrule=1pt, colbacktitle=orange!85!black,enhanced,
+attach boxed title to top center={yshift=-2mm},
+  title={#2},#1}
+
+\newtcolorbox{bluetext}[2][%
+    enhanced, 
+    breakable,
+    skin first=enhanced,
+    skin middle=enhanced,
+    skin last=enhanced,
+    ]{colframe=blue!65!black,colback=blue!10,fonttitle=\bfseries, boxrule=1pt, colbacktitle=blue!85!black,enhanced,
+attach boxed title to top center={yshift=-2mm},
+  title={#2},#1}
+
+%User-defined commands (Replace these with your own preferences)
+%Ordering:
+\newcommand{\Order}{\mathcal{O}}
+%vector and tensor symbols:
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\tensor}[1]{\underline{\boldsymbol{#1}}} %may need to change to renewcommand. 
+\renewcommand{\div}{\boldsymbol{\nabla}\cdot}
+\newcommand{\grad}{\boldsymbol{\nabla}} 
+\newcommand{\curl}{\boldsymbol{\nabla}\times}
+\newcommand{\Laplacian}{\nabla^2}
+\newcommand{\dAlambertian}{\Box^2}
+\newcommand{\T}{^{\mathsf{T}}}%transpose
+%even and odd:
+\newcommand{\even}{^{\mathrm{e}}} %even quantity in wavenumber
+\newcommand{\odd}{^{\mathrm{o}}} %odd quantity in wavenumber
+%micros/meso/macro-related subscripts
+\newcommand{\s}{_\mathrm{s}} %scattered quantity subscript
+
+
+
+\title{\Large Title}
+\author{Author Name\footnote{\texttt{author\_email@author\_email\_addres.com}}} 
+\date{Occasion, Location\\ \today}
+
+\begin{document}
+\begin{frame}
+	\maketitle
+\centering \footnotesize{Applied Research Laboratories \& The University of Texas at Austin}\\
+\centering \includegraphics[scale=0.088]{ARL.png}
+%\includegraphics[scale=0.34]{ARL.png}
+\includegraphics[scale=0.1]{Longhorn.png}
+\end{frame}
+
+\begin{frame}{Outline}
+\tableofcontents
+\begin{orangetext}{Objective}
+It is good to identify the main objective(s) of the work. You can use colors to do so.
+\begin{enumerate}%[label=(\alph*)]
+\item We will cover \color{cyan}covers blah blah blah \color{black} 
+\item Then we will see that \color{magenta}blah blah blah blah \color{black} 
+\end{enumerate}
+\end{orangetext}
+\end{frame}
+
+\section{Background}
+\begin{frame}{Background}
+\epigraph{A place for everything,\\and everything in its place}{---Mother}
+\begin{itemize}
+\item I like to include quotes as shown above using \texttt{epigraph}.
+\item Nonlinear terms can be added to right-hand side
+\end{itemize}
+
+\begin{empheq}[box=\correct]{equation*}
+\Laplacian p - \frac{\partial^2 p}{\partial t^2} = \Order({\epsilon^2})
+\end{empheq}
+\end{frame}
+
+\begin{frame}{Background}
+%environment for aligned equations in a box
+\begin{center}
+\begin{tcolorbox}[ams align, width=6.5cm, colback=blue!10, colframe=blue!65!black]
+\div u + \frac{\partial \rho}{\partial t} &= 0 \label{co}\tag*{continuity}\\
+\grad P + \frac{\partial \rho u}{\partial t} &= 0 \label{mo}\tag*{momentum}
+\end{tcolorbox}
+\end{center}
+
+\begin{itemize}
+\item Nonlinearities can be included by using the exact \ref{co} and \ref{mo} equations
+\item Viscosity, heat conduction, and other lossy mechanisms not shown above
+\end{itemize}
+\end{frame}
+
+\section{Development}
+\begin{frame}{Development}
+\begin{itemize}
+\item Parts of equations can also be highlighted:
+\tcbset{highlight math style={enhanced,%<-- needed for the `remember' options
+colframe=red!90!black,colback=red!15,boxsep=0pt}} 
+\begin{align*}
+\tcbhighmath[remember as=fx]{f(x)}
+             &= \int\limits_{1}^{x} \frac{1}{t^2}~dt
+              = \left[ -\frac{1}{t} \right]_{1}^{x}\\
+             &= -\frac{1}{x} + \frac{1}{1}\\
+&= \tcbhighmath[remember,overlay={%
+            \draw[blue,very thick,->] (fx.south) to[bend right] ([yshift=2mm]frame.west);}]
+          {1-\frac{1}{x}.}
+        \end{align*}
+
+\item What is the relationship between QM and acoustics?
+\end{itemize}
+
+\begin{empheq}[box=\maybe]{equation*}
+i\hbar \frac{\partial}{\partial t}\ket{\Psi} = \mathcal{H}\ket{\Psi} 
+\end{empheq}
+\end{frame}
+
+
+\section{Results}
+\begin{frame}{Results}
+\begin{tcbraster}[size=fbox, %other good sizes are fbox, tight, small 
+       colframe=orange!70!black,colback=orange!50!black,
+       fonttitle=\bfseries\ttfamily,center title,drop fuzzy shadow]
+\tcbincludegraphics[title=Lightning bolt]{lightning.jpeg} \tcbincludegraphics{traffic_jam.jpeg} 
+\end{tcbraster}
+\end{frame}
+
+
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+\begin{itemize}
+\item You learned this
+\item And you learned this
+\item But we didn't get to talk about this
+\item Next time we'll talk about this
+\end{itemize}
+
+\vspace{24pt} 
+
+\textbf{Acknowledgements}
+\begin{itemize}
+\item Funding source 1
+\item Funding source 2
+\end{itemize}
+
+\vspace{24pt}
+
+\centering \footnotesize{Applied Research Laboratories \& The University of Texas at Austin}\\
+\centering \includegraphics[scale=0.088]{ARL.png}
+%\includegraphics[scale=0.34]{ARL.png}
+\includegraphics[scale=0.1]{Longhorn.png}
+\end{frame}
+\end{document}

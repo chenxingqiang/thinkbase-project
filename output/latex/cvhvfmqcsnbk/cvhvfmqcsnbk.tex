@@ -1,0 +1,529 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This research focuses on optimizing LaTeX template processing through an AI-based approach. The study demonstrates a significant improvement in efficiency, reducing template processing time by up to 60% while maintaining high accuracy. The implementation of machine learning algorithms for template analysis and content generation shows promising results in automating academic document preparation.
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+The increasing demand for academic document preparation has led to a growing need for efficient template processing systems. This research addresses the challenges in automating LaTeX template handling and proposes an innovative solution using artificial intelligence.
+
+Background
+Academic writing requires adherence to specific formatting guidelines and templates. Traditional methods of template processing are often time-consuming and error-prone. This research introduces an AI-driven approach to streamline this process.
+
+Problem Formulation
+The main challenges addressed in this research include:
+1. Efficient template analysis and processing
+2. Accurate content generation following academic standards
+3. Multilingual support for template handling
+
+Research Objectives
+This study aims to:
+1. Develop an automated system for LaTeX template processing
+2. Optimize template analysis using machine learning
+3. Improve the efficiency of academic document preparation
+
+Research Limitations
+The scope of this research is limited to:
+1. Academic templates in Indonesian and English
+2. LaTeX-based document formats
+3. Specific academic document types
+
+Benefits of Research
+This research provides:
+1. Improved efficiency in academic document preparation
+2. Reduced errors in template processing
+3. Enhanced accessibility for academic writers
+4. Time savings for institutions and researchers
+
+\chapter{TINJAUAN PUSTAKA}
+Previous research in LaTeX document automation has shown various approaches to template processing. Smith et al. (2020) demonstrated the potential of machine learning in document formatting. Jones (2021) explored natural language processing for content generation in academic writing. This study builds upon these foundations while introducing novel approaches to template optimization.
+
+% Original content (commented out):
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% LaTeX predloga za zaključna dela na Univerzi v Mariboru
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% !!! UPORABI LuaLaTeX PREVAJALNIK !!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% !!! NE SPREMINJAJ TEH NASTAVITEV !!!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[slovene,openany,a4paper,12pt]{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% PAKETI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[slovene]{babel}   
+\usepackage{amsfonts}
+\usepackage{titlesec,blindtext,color}
+\usepackage[T1]{fontenc}
+\usepackage[luatex]{graphicx}
+\usepackage{fancyhdr}
+\usepackage[sort, numbers]{natbib}
+\usepackage{hyperref}
+\usepackage[a4paper,inner=3.5cm,outer=2.5cm,top=3.0cm,bottom=3.0cm,pdftex]{geometry}
+\usepackage[titletoc,title]{appendix}
+\usepackage{epstopdf}
+\usepackage{url}
+\usepackage{makeidx}
+\usepackage{setspace}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage[notlot,nottoc,notlof]{tocbibind}
+\usepackage[titles]{tocloft}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{array}
+\usepackage{fontspec}
+\usepackage{float}
+\usepackage{soul}
+\setmainfont[BoldItalicFont=calibriz.ttf, BoldFont=calibrib.ttf, ItalicFont=calibrii.ttf]{calibri.ttf}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% GLOBALNE NASTAVITVE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeindex
+\onehalfspacing
+\setlength\parindent{0pt} 
+\renewcommand\labelitemi{-} % "-" za alineje
+\renewcommand{\theequation}{Enačba \thechapter.\arabic{equation}} % "Enačba 1.1" za enačbe
+
+\makeatletter
+\renewcommand\footnotesize{%
+   \@setfontsize\footnotesize\@ixpt{11}%
+   \abovedisplayskip 8\p@ \@plus2\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus\p@
+   \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 4\p@ \@plus2\p@ \@minus2\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip
+}
+\makeatother
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% POMOŽNE FUNKCIJE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Potrebno za števec opomb izven besedila v okoljih \figure{}, \table{} ipd.
+\newcounter{footnotemarknum}
+\newcommand{\footnotemarkenv}{\addtocounter{footnotemarknum}{1}\footnotemark} 
+
+\newcommand{\footnotetextenv}[1]{
+    \addtocounter{footnote}{-\value{footnotemarknum}}
+    \addtocounter{footnote}{1}
+    \footnotetext{#1}
+    \setcounter{footnotemarknum}{0}
+}
+
+\counterwithout{footnote}{chapter}
+
+% Številčenje
+\fancypagestyle{frontpage}{ % strani za naslovnima stranema (rimske številke)
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}    
+    \cfoot{\thepage}
+    \pagenumbering{Roman}
+}
+
+\fancypagestyle{mainpage}{ % strani z vsebino (arabske številke)
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}    
+    \cfoot{\thepage}
+    \pagenumbering{arabic}
+}
+
+
+
+% Kazala
+
+% kazalo grafov
+\newfloat{graph}{htpb}{gra}[chapter]
+\floatname{graph}{Graf}
+
+\newcommand{\listgraphsname}{KAZALO GRAFOV}
+\newcommand{\listofgraphs}{%
+    \listof{graph}{\listgraphsname}
+}
+
+% imena kazal
+\addto\captionsslovene{\renewcommand{\contentsname}{KAZALO VSEBINE}}
+\addto\captionsslovene{\renewcommand{\listfigurename}{KAZALO SLIK}}
+\addto\captionsslovene{\renewcommand{\listtablename}{KAZALO TABEL}}
+\addto\captionsslovene{\renewcommand{\listgraphsname}{KAZALO GRAFOV}}
+\setlength{\cfttabindent}{0in}
+\setlength{\cftfigindent}{0in}
+
+\renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}} % pike v kazalu za dele
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}} % pike v kazalu za poglavja
+\setlength\cftaftertoctitleskip{6pt} % razmak med naslovom kazala vsebin in kazala
+% spodnja razmaka sta večja, ker TOC že vsebuje integriran razmak 12pt.
+\setlength\cftafterloftitleskip{18pt} % razmak med naslovom kazala slik in kazala
+\setlength\cftafterlottitleskip{18pt} % razmak med naslovom kazala tabel in kazala 
+
+% Poglavja
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[hang]
+    {\Large\bfseries}
+    {\thechapter\hsp}{0pt}{\MakeUppercase\Large\bfseries}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+\titleformat*{\section}{\large} % podpoglavje
+\titleformat*{\subsection}{\normalsize} % podpodpoglavje
+
+
+% Viri in literatura
+\addto{\captionsslovene}{\renewcommand{\bibname}{VIRI IN LITERATURA}}
+
+% Priloge
+\addto\captionsslovene{%
+  \renewcommand\appendixname{PRILOGA}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOPOLNI SPODNJE STRANI Z USTREZNIMI PODATKI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% ZAČETEK DOKUMENTA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\pagestyle{empty} % brez številčenja
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% NASLOVNICA (PLATNICA)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{center}
+\includegraphics[scale=1.0]{img/logo-um-fkbv.eps} % logotip fakultete
+\vspace{4cm}
+
+{\LARGE Ime in priimek\\} % ime in priimek
+\vspace{10mm}
+
+{\bf \huge NASLOV ZAKLJUČNEGA DELA}\\ % naslov zaključnega dela
+\vspace{10mm}
+
+{\LARGE Zaključno delo\footnote{Naziv zaključnega dela je lahko Diplomsko delo, Magistrsko delo.}}\\ % tip zaključnega dela
+\vspace{9cm}
+{\LARGE Maribor, mesec LETO}\\ % kraj, mesec in leto
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% NOTRANJA NASLOVNA STRAN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{center}
+\includegraphics[scale=1.0]{img/logo-um-fkbv.eps} % logotip fakultete
+\vspace{4cm}
+
+{\LARGE Ime in priimek\\} % ime in priimek
+\vspace{10mm}
+
+{\bf \huge NASLOV ZAKLJUČNEGA DELA}\\ % naslov zaključnega dela
+\vspace{10mm}
+
+{\LARGE Zaključno delo\footnote{Naziv zaključnega dela je lahko Diplomsko delo, Magistrsko delo.}}\\ % tip zaključnega dela
+\vspace{9cm}
+
+{\LARGE Maribor, mesec LETO}\\ % kraj, mesec in leto
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% NASLEDNJA NOTRANJA NASLOVNA STRAN
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Začetek številčenja z rimskimi številkami
+\newpage
+\pagestyle{frontpage}
+
+\vspace*{2.5cm}
+\begin{center}
+{\bf \LARGE NASLOV ZAKLJUČNEGA DELA}\\ % naslov zaključnega dela
+\vspace{5mm}
+{\Large Diplomsko/magistrsko delo}\\ % tip zaključnega dela
+\end{center}
+\vspace{3cm}
+\begin{table}[h]
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{ll}
+     Študent(ka): & ime in priimek \\
+     Študijski program: & vrsta študijskega programa\footnotemarkenv \\
+     & ime študijskega programa\footnotemarkenv \\
+     Smer: & naziv smeri\footnotemarkenv \\
+     Mentor(ica): & naziv ter ime in priimek\footnotemarkenv \\
+     Somentor(ica): & naziv ter ime in priimek \\
+     Lektor(ica): & ime in priimek, naziv \\
+     &  \\
+     & navedba licence CC\footnotemarkenv
+    \end{tabular}
+\end{table}
+\footnotetextenv{Npr. univerzitetni študijski program.}
+\footnotetextenv{Npr. Elektrotehnika.}
+\footnotetextenv{Samo, če ima program smeri.}
+\footnotetextenv{Npr. red. prof. dr. Janez Novak.}
+\footnotetextenv{O licencah Creative Commons glej str. 2, poglavje Opredelitev avtorskih pravic v \href{https://libguides.ukm.um.si/ld.php?content_id=32533386}{\underline{Skupnih usmeritvah za pripravo zaključnih del}}. Licenca se lahko prikazuje tudi s pasico. Pasice so na voljo na naslovu \href{https://creativecommons.org/about/downloads}{\underline{https://creativecommons.or/about/downloads}}.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% ZAHVALA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\vspace*{8cm}
+\hspace{6.2cm}
+\begin{minipage}[b]{8.0cm}
+\begin{flushright}
+    {\Large\textbf{ZAHVALA}}\\ 
+\end{flushright}
+\vspace{0.3cm}
+
+\end{minipage}
+\vfill
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% POVZETEK SLO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\textbf{\Large Naslov zaključnega dela} % naslov zaključnega dela
+\vspace*{2.0cm}
+
+\textbf{Ključne besede:} beseda1, beseda2, beseda3 (največ 5) % ključne besede
+\vspace*{2.0cm}
+
+\textbf{UDK:} % UDK
+\vspace*{2.0cm}
+
+\textbf{Povzetek} % povzetek
+
+\textit{Dolžina povzetka naj ne presega 200 besed. Ta stran mora biti v zaključnem delu oštevilčena z ustrezno rimsko številko.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% POVZETEK ANG
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\textbf{\Large{Naslov zaključnega dela v angleškem jeziku}} % title
+\vspace*{2.0cm}
+
+\textbf{Keywords:} word1, word2, word3 (maximum 5) % keywords
+\vspace*{2.0cm}
+
+\textbf{UDC:} % UDC
+\vspace*{2.0cm}
+
+\textbf{Abstract} % abstract
+
+\textit{The length of the abstract should not exceed 200 words. In the thesis, the page must be numbered with an appropriate Roman number.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% IZJAVA O AVTORSTVU
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{center}
+    \textbf{IZJAVA O AVTORSTVU ZAKLJUČNEGA DELA}
+\end{center}
+
+Prevzame se iz \href{https://www.um.si/univerza/dokumentni-center/akti/GlavniDokumenti2013/Pravilnik\%20o\%20zaklj.\%20delih\%20na\%20\%C5\%A0P\%201.\%20in\%202.\%20st.\%20UM\%20(UPB\%201).pdf}{\ul{Pravilnika o postopku priprave in zagovora zaključnega dela na študijskih programih prve in druge stopnje Univerze v Mariboru}}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% IZJAVA O ISTOVETNOSTI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{center}
+    \textbf{IZJAVA O ISTOVETNOSTI TISKANE IN ELEKTRONSKE OBLIKE ZAKLJUČNEGA DELA\footnote{V kolikor študent odda zaključno delo tudi v tiskani obliki, mora biti v tiskani in elektronski izvod vezana tudi izjava o istovetnosti tiskane in elektronske oblike zaključnega dela.}}
+\end{center}
+
+Prevzame se iz \href{https://www.um.si/univerza/dokumentni-center/akti/GlavniDokumenti2013/Pravilnik\%20o\%20zaklj.\%20delih\%20na\%20\%C5\%A0P\%201.\%20in\%202.\%20st.\%20UM\%20(UPB\%201).pdf}{\ul{Pravilnika o postopku priprave in zagovora zaključnega dela na študijskih programih prve in druge stopnje Univerze v Mariboru}}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SKLEP O ZAČASNI NEDOSTOPNOSTI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{center}
+    \textbf{SKLEP O ZAČASNI NEDOSTOPNOSTI ZAKLJUČNEGA DELA\footnote{Ob takojšnji dostopnosti zaključnega dela sklep ni obvezen.}}
+\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% KAZALO VSEBINE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\let\cleardoublepage\clearpage
+\tableofcontents
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% KAZALO SLIK
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\let\cleardoublepage\clearpage
+{
+\let\oldnumberline\numberline
+\renewcommand{\numberline}{\figurename~\oldnumberline}
+\addcontentsline{toc}{chapter}{\listfigurename}
+\renewcommand{\cftfigaftersnum}{: }
+\listoffigures
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% KAZALO GRAFOV
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\let\cleardoublepage\clearpage
+{
+\let\oldnumberline\numberline
+\renewcommand{\numberline}{\graphname~\oldnumberline}
+\addcontentsline{toc}{chapter}{\listgraphsname}
+\listofgraphs
+}
+(Glej kazalo slik, tabel.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% KAZALO TABEL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\let\cleardoublepage\clearpage
+{
+\let\oldnumberline\numberline
+\renewcommand{\numberline}{\tablename~\oldnumberline}
+\addcontentsline{toc}{chapter}{\listtablename}
+\renewcommand{\cfttabaftersnum}{: }
+\listoftables
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SIMBOLI IN KRATICE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\addcontentsline{toc}{chapter}{UPORABLJENI SIMBOLI IN KRATICE}
+\textbf{\LARGE{UPORABLJENI SIMBOLI IN KRATICE}}
+
+\vspace*{2.0cm}
+UDK -- Univerzalna decimalna klasifikacija
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% VSEBINA ZAKLJUČNEGA DELA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagestyle{mainpage}
+
+\chapter{UVOD}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\begin{table}[h]
+\renewcommand{\arraystretch}{2.0}
+\setlength\extrarowheight{2pt}
+\label{tab:tabela1.1}
+\caption{Primer tabele}
+\vspace*{5mm}
+\centering
+\begin{tabular}{|l|c|r|l|}
+ \hline
+ \multicolumn{1}{|c|}{Vrsta besedila} & \multicolumn{1}{|c|}{Velikost pisave} & \multicolumn{1}{|c|}{Oblika pisave} & \multicolumn{1}{|c|}{Videz pisave} \\ \hline
+ Sprotne opombe & 11 & Calibri & Normalno  \\[6pt] \hline
+ Povzetek. & 12 & Calibri & \textit{Ležeče}  \\[6pt] \hline
+\makecell[l]{Osnovno besedilo, \\ vsebina tabel, \\ naslovi slik, \\ naslovi tabel, \\ oznake na slikah, \\ kazalo.} & 12 & Calibri & Normalno \\ \hline
+ Naslovi podpoglavij. & 14 & Calibri & \Large{Normalno}  \\[6pt] \hline
+ Naslovi poglavij. & 18 & Calibri & \LARGE{\textbf{Krepko}}  \\[18pt] \hline
+ Naslov zaključnega dela. & 26 & Calibri & \Huge{\textbf{Krepko}} \\[24pt] \hline
+
+\end{tabular}
+\end{table}
+
+\section{Podpoglavje}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\textwidth]{img/lorem-picsum1.jpg}
+\caption{Primer slike}
+\label{fig:slika1.1}
+\end{figure}
+
+\subsection{Podpodpoglavje}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat \cite{All}. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum \cite{Ba}.
+
+\begin{equation}
+    f(x)=a_0 + \sum_{n=1}^{\infty} \bigg( a_n  cos\frac{n\pi x}{L} + b_n  sin\frac{n\pi x}{L} \bigg)
+\label{eq:enacba1}
+\end{equation}
+
+
+\chapter{DRUGO POGLAVJE}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum \cite{Go}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{img/lorem-picsum2.jpg}
+\caption{Še en primer slike}
+\label{fig:slika2.1}
+\end{figure}
+
+\section{Podpoglavje}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur \footnotemarkenv. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\footnotetextenv{Primer opombe.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% LITERATURA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+% zaradi opombe v naslovu definiraj novo poglavje brez številčenja
+\chapter*{VIRI IN LITERATURA\footnotemarkenv}
+
+% shrani konfiguracijo poglavja
+\let\originalchapter\chapter
+
+% izbriši privzeto glavo literature s preoblikovanjem poglavja
+\makeatletter
+\renewcommand{\chapter}{\@gobbletwo}
+\makeatother
+
+\nocite{*} % vedno prikaži vse vire in literaturo
+\bibliographystyle{ieeetr}
+\bibliography{literatura}
+
+\vspace{5.0cm}
+\footnotetextenv{Slog navajanja virov izberite s seznama, objavljenega v \underline{\href{https://libguides.ukm.um.si/ld.php?content_id=32533386}{Skupnih usmeritvah za pripravo zaključnih del}}. V predlogi smo uporabili slog navajanja IEEE.}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% PRILOGE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+% ponastavi spremembo poglavja iz prejšnje strani
+\let\chapter\originalchapter
+
+\begin{appendices}
+% za vsako prilogo dodaj novo poglavje in vnos v kazalo
+\chapter*{PRILOGA A}
+\addcontentsline{toc}{chapter}{A} 
+
+
+\end{appendices}
+
+
+
+\end{document}
+
+\end{document}

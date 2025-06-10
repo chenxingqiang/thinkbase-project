@@ -1,0 +1,161 @@
+\documentclass[letterpaper]{exam}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[voffset=0.5in,margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{mathptmx}
+\usepackage{stmaryrd}
+\usepackage{mathpartir}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{multicol}
+\usepackage[hidelinks]{hyperref}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{enumitem}
+\usepackage{logicproof}
+\usepackage{tikz}
+\usepackage{fitch}
+% \usepackage{emoji}
+\usepackage{multirow}
+\definecolor{light-gray}{gray}{0.9}
+
+\graphicspath{{../images/}}
+
+\newcommand{\fcal}{\mathcal{F}}
+\newcommand{\zmat}{\mathbb{Z}}
+\newcommand{\true}{\textbf{\textsf{T}}}
+\newcommand{\false}{\textbf{\textsf{F}}}
+\newcommand{\vtwo}{45}
+\newcommand{\replaces}{\,\textbf{::}\,}
+
+\newcommand{\boxd}[2]{
+\fbox{%
+\parbox{#1\textwidth}{\(#2\)}%
+}
+}
+
+\newcommand{\class}{Curso}
+\newcommand{\term}{Escuela de Ciencias Aplicadas e Ingeniería}
+\newcommand{\examnum}{Parcial}
+\newcommand{\examdate}{Fecha}
+\newcommand{\prof}{Profesor}
+\newcommand{\name}{\textbf{Nombre}:\enspace\makebox[2in]{\hrulefill}}
+\newcommand{\timelimit}{1 hora y 20 minutos}
+\renewcommand{\solutiontitle}{\noindent\textbf{Solución:}\par\noindent}
+
+\firstpageheader{\includegraphics[scale=0.3]{logo-eafit.png}}{}{ \term\\\class\, - \examnum\\\prof\\\examdate}
+
+\runningheader{\oddeven{\name}{\class}}{Pág. \thepage\ de \totalnumpages}{\examdate}
+\runningheadrule{}
+
+% Configuración de la tabla de calificación
+\pointpoints{punto}{puntos}
+\bonuspointpoints{bono}{bono}
+\chpword{Puntos}
+\vpword{Puntos}
+\vtword{Total}
+\htword{Total}
+\vsword{Resultado}
+\hsword{Resultado:}
+\vqword{Problema}
+\hqword{Pregunta}
+\chqword{Pregunta}
+\chbpword{Bono}
+\chsword{Puntaje}
+\marginbonuspointname{B}
+\pointsinmargin{}
+\boxedpoints{}
+\setlength\fillinlinelength{1.5in}
+
+\begin{document}
+\noprintanswers{}
+
+\noindent
+\begin{tabular*}{\textwidth}{l @{\extracolsep{\fill}} l @{\extracolsep{6pt}}}
+ \textbf{Nombre completo} & \textbf{Código estudiante o documento de identidad} \\
+ & \\
+ \makebox[3in]{\hrulefill} & \makebox[3in]{\hrulefill}
+% \textbf{Tiempo: \timelimit} & Profesor: & \makebox[2.5in]{\emph{Dr. John Doe}}
+\end{tabular*}
+% \rule[2ex]{\textwidth}{2pt}
+
+% Bloque de instrucciones
+\begin{center}
+\fbox{%
+\parbox{0.98\textwidth}{
+Este parcial contiene \numquestions\, preguntas que corresponden en total a \numpoints\, puntos y \numbonuspoints\, puntos de bono. El valor de cada pregunta se encuentra en un cuadro en el margen izquierdo de cada hoja. El parcial debe resolverse y entregarse individualmente. No está permitido hablar o pedir cosas prestadas de sus compañeros, tampoco el uso de libros, apuntes o aparatos electrónicos. El tiempo disponible para resolver el parcial es \timelimit\, y no se reciben hojas adicionales a las del enunciado.
+}%
+}
+\end{center}
+
+% Tabla de calificaciones
+\begin{center}
+\addpoints{}
+% Puede presentar la tabla de calificación en orientación vertical [v] u horizontal [h]
+\combinedgradetable[h][questions]
+% \gradetable[h][questions]
+
+\footnotesize{Tabla de calificación para uso exclusivo del profesor.}
+\end{center}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{ llll }
+  \toprule
+  \multicolumn{4}{c}{\textbf{Reglas de inferencia}}\\
+  \midrule
+  Modus Ponens (MP) & \inferrule{p \to q \\ p}{q} & Dilema destructivo (DD) & \inferrule{(p \to q) \land(r \to s) \\ \neg q \lor \neg s}{\neg p \lor\neg r} \\\\
+  Modus Tollens (MT) & \inferrule{p \to q \\ \neg q}{\neg p} & Simplificación (S) & \inferrule{p \land q}{p} \\\\
+  Silogismo hipotético (SH) & \inferrule{p \to q \\ q \to r}{p \to r} & Conjunción (C) & \inferrule{p \\ q}{p \land q} \\\\
+  Silogismo disyuntivo (SD) & \inferrule{p \lor q \\ \neg p}{q} & Adición (A) & \inferrule{p}{p \lor q} \\\\
+  Dilema constructivo (DC) & \inferrule{(p \to q) \land(r \to s) \\ p \lor r}{q \lor s} && \\
+  \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{ llll }
+  \toprule
+  \multicolumn{4}{c}{\textbf{Reglas de reemplazo}}\\
+  \midrule
+  Leyes de De Morgan (DM) & \thead{\(\neg (p \lor q) \replaces (\neg p \land \neg q)\)\\ \(\neg (p \land q) \replaces (\neg p \lor \neg q)\)} & Transposición (Trans.) & \((p \to q) \replaces (\neg q \to \neg p)\)\\\\
+  Conmutatividad (Conm.) & \thead{\((p \land q) \replaces (q \land p)\)\\\((p \lor q) \replaces (q \lor p)\)} & Implicación material (IM) & \( (p \to q) \replaces (\neg p \lor q)\) \\\\
+  Asociatividad (Asoc.) & \thead{\((p \land (q \land r)) \replaces ((p \land q) \land r)\)\\\((p \lor (q \lor r)) \replaces ((p \lor q) \lor r) \)} & Equivalencia material (EM) & \thead{\((p \equiv q) \replaces ((p \land q) \lor (\neg p \land \neg q ))\)\\\((p \equiv q) \replaces ((p \to q) \land (q \to p))\)}\\\\
+  Distributividad (Dist.) & \thead{\((p \land (q \lor r)) \replaces ((p \land q) \lor (p \land r))\)\\\((p \lor (q \land r)) \replaces ((p \lor q) \land (p \lor r))\)} & Exportación (Exp.) & \( ((p \land q) \to r) \replaces (p \to (q \to r))\) \\\\
+  Doble Negación (DN) & \(p \replaces \neg \neg p\) & Tautología (Taut.) & \thead{\(p \replaces (p \lor p)\)\\\(p \replaces (p \land p)\)}\\
+  \bottomrule
+  \end{tabular}
+\end{table}
+\newpage
+\begin{questions}
+  \question Pregunta 1.
+    \boxd{0.4}{
+    Cuadro-para-texto-matematico
+    }
+    \begin{parts}
+        \part[15] \emph{Espacio para solución usando líneas punteadas}
+        \fillwithdottedlines{\stretch{1}}
+        \part[15] \emph{Espacio para solución:}
+        \makeemptybox{\stretch{1}}
+    \end{parts}
+    \newpage
+    \question Pregunta 2. Diferente espacio para solución, dejando simplemente espacio en blanco.
+    \begin{parts}
+        \part[5] Parte 1
+        \vspace{\stretch{1}}
+        \part[5] Parte 2.
+        \vspace{\stretch{2}}
+        \bonuspart[7] Parte bono.
+        \vspace{\stretch{3}}
+    \end{parts}
+    \bonusquestion Pregunta bono.
+    \fillwithdottedlines{\stretch{2}}
+\end{questions}  
+\end{document}

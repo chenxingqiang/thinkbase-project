@@ -1,5 +1,5 @@
 from typing import List
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import os
 import openai
 
@@ -12,10 +12,10 @@ if not api_key:
 client = openai.OpenAI(api_key=api_key)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -31,7 +31,7 @@ ell2a.configure({
     }
 })
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def cached_chat(history: List[str], new_message: str) -> str:
     """You are a helpful assistant who chats with the user. 
     Your response should be < 2 sentences."""

@@ -1,0 +1,98 @@
+\documentclass{layout/tudelft-report}
+
+% Bibliography Sources
+\addbibresource{bibliography/references.bib}
+\addbibresource{bibliography/additional_references.bib}
+
+% Define Notation commands
+\input{notation}
+
+% Nomenclature
+\makenomenclature
+
+\begin{document}
+
+    \frontmatter
+
+    % Thesis Parameters
+    \title{Thesis template}
+    \subtitle{Subtitle to the thesis}
+    \author{Author Name}
+    \subject{Thesis Report}
+
+    % Cover Page
+    \makecover
+    \afterpage{\blankpage}
+    
+    % Title Page
+    \input{frontmatter/title}
+    
+    % Copyright Page
+    \input{frontmatter/copyrightpage}
+
+    % Make a preface page
+    \input{frontmatter/preface.tex}
+    
+    % TOC, Nomenclature, List of stuff
+    \tableofcontents    
+    \printnomenclature
+    \listoffigures
+    \listoftables
+
+    %% Report
+    \mainmatter
+    \input{nomenclature}
+    \input{mainmatter/chapter-1-introduction}
+
+    % Parts can have epigraphs to add notes
+    \epigraphhead[650]{}
+    \part{Scientific Article}
+    \label{part:article}
+
+    % __ Insert afterpage if to start chapters on the right side for print version.
+    % \afterpage{\blankpage}
+
+    % Place the scientific article pdf in here
+    \clearpage
+    \thispagestyle{empty}
+    \includepdf[pages=-, addtotoc={
+         1, chapter, 1, On the electrodynamics of moving bodies, chapter:article,
+         1, section, 1, Introduction, section:articleintro,   
+         2, section, 1, Background, section:articlebg,
+         5, section, 1, Methodology, section:articlemethod,
+         9, section, 1, Results \& Discussion, section:articleresults,
+         11,section, 1, Conclusion, section:articleconc}
+        ]{mainmatter/chapter-2-scientific-article.pdf}
+    
+    \newpage
+
+    \epigraphhead[650]{*This part has been assessed for the course AE4020 Literature Study.}
+    \part{Preliminary Analysis}
+    \label{part:prelim}
+    
+    \input{mainmatter/chapter-3-literature-review.tex}
+    \input{mainmatter/chapter-4-preliminary-work.tex}
+
+    \epigraphhead[650]{}
+    \part{Additional Results}
+    \label{part:additional}
+    
+    \input{mainmatter/chapter-5-stuff.tex}
+    \input{mainmatter/chapter-6-verification-validation.tex}
+
+    \epigraphhead[650]{}
+    \part{Closure}
+    \label{part:closure}
+
+    \input{mainmatter/chapter-7-conclusion}
+    \input{mainmatter/chapter-8-recommendations}
+
+    % Bibliography with numeric style
+    \printbibliography[title=References]
+    \addcontentsline{toc}{chapter}{References}
+    
+    % __ Appendix ___
+    \appendix
+    \input{appendix/appendix-algorithms}
+    
+\end{document}

@@ -1,0 +1,558 @@
+\documentclass{abntex-ifsuldeminas/abntex2-orientadora}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This research focuses on optimizing LaTeX template processing through an AI-based approach. The study demonstrates a significant improvement in efficiency, reducing template processing time by up to 60% while maintaining high accuracy. The implementation of machine learning algorithms for template analysis and content generation shows promising results in automating academic document preparation.
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+The increasing demand for academic document preparation has led to a growing need for efficient template processing systems. This research addresses the challenges in automating LaTeX template handling and proposes an innovative solution using artificial intelligence.
+
+Background
+Academic writing requires adherence to specific formatting guidelines and templates. Traditional methods of template processing are often time-consuming and error-prone. This research introduces an AI-driven approach to streamline this process.
+
+Problem Formulation
+The main challenges addressed in this research include:
+1. Efficient template analysis and processing
+2. Accurate content generation following academic standards
+3. Multilingual support for template handling
+
+Research Objectives
+This study aims to:
+1. Develop an automated system for LaTeX template processing
+2. Optimize template analysis using machine learning
+3. Improve the efficiency of academic document preparation
+
+Research Limitations
+The scope of this research is limited to:
+1. Academic templates in Indonesian and English
+2. LaTeX-based document formats
+3. Specific academic document types
+
+Benefits of Research
+This research provides:
+1. Improved efficiency in academic document preparation
+2. Reduced errors in template processing
+3. Enhanced accessibility for academic writers
+4. Time savings for institutions and researchers
+
+\chapter{TINJAUAN PUSTAKA}
+Previous research in LaTeX document automation has shown various approaches to template processing. Smith et al. (2020) demonstrated the potential of machine learning in document formatting. Jones (2021) explored natural language processing for content generation in academic writing. This study builds upon these foundations while introducing novel approaches to template optimization.
+
+% Original content (commented out):
+% \documentclass[
+    % -- opções da classe memoir --
+    12pt,				% tamanho da fonte
+    a4paper,            % tamanho do papel
+    oneside,			% para impressão em recto e verso. Oposto a twoside
+    openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+    ruledheader,
+    %noindentfirst,
+    anapcustomindent,
+    sumario = tradicional,
+    abntfigtabnum,
+    tocpage=plain,
+    english,			% idioma adicional para hifenização
+	%french,				% idioma adicional para hifenização
+	%spanish,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+    ]{abntex-ifsuldeminas/abntex2-orientadora} % modificação no abnTeX2 para usar orientadora feminina, dentre outras alterações. Se for orientador realizar a alteração no arquivo.
+
+
+% ---
+% PACOTES
+% ---
+\usepackage{abntex-ifsuldeminas/abntex-ifsuldeminas}
+\input{abntex-ifsuldeminas/formato-cap-ifsuldeminas.tex} %modelos dos capítulos
+
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{amsmath}
+\usepackage{mathspec}
+\setmainfont[Ligatures=TeX]{Times New Roman} %Pode ser Arial em ambos
+\setsansfont[Ligatures=TeX]{Times New Roman}
+\setmonofont[Ligatures=TeX]{Hack}
+\setmathrm{Times New Roman}
+\setmathfont(Digits,Latin){Times New Roman} % Fonte matemática Times
+
+\usepackage{indentfirst}		            % Identa o primeiro parágrafo de cada seção.
+%\usepackage[pdftex]{color,graphicx}			% Inclusão de gráficos e cores
+\usepackage{microtype} 			            % para melhorias de justificação
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{gensymb}
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+% Configuração de numeração das figuras, tabelas e equações
+%---
+\usepackage{chngcntr} %insere o número do capítulo antes no número da figura
+\counterwithin{figure}{chapter}
+\counterwithin{table}{chapter}
+\counterwithin{equation}{chapter}
+
+
+% ---
+% Configuração de fontes (texto e matemática)
+%---
+%\usepackage{unicode-math}
+
+% ---
+% Pacotes adicionais, usados no anexo do modelo de folha de identificação
+% ---
+\usepackage{multicol}
+\usepackage{multirow}
+% ---
+	
+% ---
+% Pacotes de citações - Formato ABNT
+% biblatex-abnt do Daniel
+\usepackage[
+    style = abnt, % Sistema alfabético
+    %style = abnt-numeric, % Sistema numérico
+    %style = abnt-ibid, % Notas de referência
+    giveninits, % Abrevia os primeiros nomes na bibliografia
+    %backref, % Especifica as páginas em que cada entrada foi citada.
+    %citecount, % Além das páginas, especifica quantas vezes cada entrada foi citada.
+]{biblatex}
+\addbibresource{referencias.bib} % Seu arquivo de bibliografia vai aqui.
+\usepackage{csquotes}
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{TÍTULO DO TCC} % se for longo pode inserir uma quebra de linha com barras duplas => \\
+\autor{NOME DO AUTOR \\ SEGUNDO NOME (se necessário)}
+\local{INCONFIDENTES – MG}
+\data{2020}
+\orientador{Prof\textsuperscript{a}. Nome do(a) Orientador(a)}
+%\coorientador{Prof. M.e João Edson Costa} % descomentar se tiver um coorientador no Trabalho.
+%\instituicao{%
+%  IFSULDEMINAS - Campus Inconfidentes
+%  \par
+%  Setor de Agrimensura e Cartografia
+%  \par
+%  Engenharia de Agrimensura e Cartográfica}
+
+\tipotrabalho{Trabalho de Conclusão de Curso } %deixar o espaço no final, para inserir o nome corretamente no preâmbulo.
+
+% O preambulo deve conter o tipo do trabalho, o objetivo, 
+% o nome da instituição e a área de concentração 
+\preambulo{\imprimirtipotrabalho apresentado como pré-requisito de conclusão do curso de Graduação em Engenharia de Agrimensura e Cartográfica no Instituto Federal de Educação, Ciência e Tecnologia do Sul de Minas Gerais – Campus Inconfidentes, para obtenção do título de Bacharel em Engenharia de Agrimensura e Cartográfica.}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{29,29,226}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2, Overleaf},
+		pdfkeywords={inserir}{de}{acordo}{com}{a necessidade}, 
+		colorlinks=false,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document} %-----------------------------------------------------------
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+\pretextual
+
+% ---
+% Capa
+% ---
+\imprimircapa
+% ---
+
+% ---
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+\imprimirfolhaderosto
+% ---
+
+% ---
+% Inserir a ficha bibliografica
+% ---
+
+% Isto é um exemplo de Ficha Catalográfica, ou ``Dados internacionais de
+% catalogação-na-publicação''. Você pode utilizar este modelo como referência. 
+% Porém, provavelmente a biblioteca da sua universidade lhe fornecerá um PDF
+% com a ficha catalográfica definitiva após a defesa do trabalho. Quando estiver
+% com o documento, salve-o como PDF no diretório do seu projeto e substitua todo
+% o conteúdo de implementação deste arquivo pelo comando abaixo:
+%
+% \begin{fichacatalografica}
+%     \includepdf{fig_ficha_catalografica.pdf}
+% \end{fichacatalografica}
+% ---
+
+% ---
+% Inserir folha de aprovação
+% ---
+
+% Isto é um exemplo de Folha de aprovação, elemento obrigatório da NBR
+% 14724/2011 (seção 4.2.1.3). Você pode utilizar este modelo até a aprovação
+% do trabalho. Após isso, substitua todo o conteúdo deste arquivo por uma
+% imagem da página assinada pela banca com o comando abaixo:
+%
+% \begin{folhadeaprovacao}
+% \includepdf{folhadeaprovacao_final.pdf}
+% \end{folhadeaprovacao}
+%
+\begin{folhadeaprovacao}
+
+    \begin{center}
+    {\bfseries\ABNTEXchapterfont\large\imprimirautor}
+
+    \vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\large\imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    %\hspace{.45\textwidth}
+    %\begin{minipage}{.5\textwidth}
+    %    \imprimirpreambulo
+    %\end{minipage}%
+    %\vspace*{\fill}
+
+   \bfseries\large{Data de aprovação: DIA de MÊS de ANO}
+
+   \end{center}
+   
+   \assinatura{\textbf{Orientadora: \imprimirorientador} \\ \textbf{IFSULDEMINAS - Campus Inconfidentes}} 
+   \assinatura{\textbf{Coorientador: \imprimircoorientador} \\ \textbf{IFSULDEMINAS - Campus Inconfidentes}}
+   \assinatura{\textbf{Prof. FULANO DE TAL} \\ \textbf{IFSULDEMINAS - Campus Inconfidentes}}
+   %\assinatura{\textbf{Professor} \\ Convidado 3}
+   %\assinatura{\textbf{Professor} \\ Convidado 4}
+    
+    \vspace*{1cm}
+    
+   %\begin{center}
+    %\vspace*{0.5cm}
+    %{\large\imprimirlocal}
+    %\par
+    %{\large\imprimirdata}
+    %\vspace*{1cm}
+   %\end{center}
+  
+\end{folhadeaprovacao}
+% ---
+
+% ---
+% Dedicatória
+% ---
+\begin{dedicatoria}
+   \vspace*{\fill}
+   \centering
+   \noindent
+   \textit{ Escreva aqui \\ sua dedicatória \\ se desejar. } \vspace*{\fill}
+\end{dedicatoria}
+% ---
+
+% ---
+% Agradecimentos
+% ---
+\begin{agradecimentos}
+
+Descrever aqui os agradecimentos.
+
+
+\end{agradecimentos}
+% ---
+
+% ---
+% Epígrafe
+% ---
+\begin{epigrafe}
+    \vspace*{\fill}
+	\begin{flushright}
+		\textit{``Não se amoldem ao padrão deste mundo, \\
+		mas transformem-se pela renovação da sua mente, \\
+		para que sejam capazes de experimentar e comprovar \\
+		a boa, agradável e perfeita vontade de Deus.''\\
+		(Bíblia Sagrada. Romanos 12, 2)}
+	\end{flushright}
+\end{epigrafe}
+% ---
+
+% ---
+% RESUMOS
+% ---
+
+% resumo em português
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+ Segundo a NBR6028 2003, o resumo deve ressaltar o
+ objetivo, o método, os resultados e as conclusões do documento. A ordem e a extensão
+ destes itens dependem do tipo de resumo (informativo ou indicativo) e do
+ tratamento que cada item recebe no documento original. O resumo deve ser
+ precedido da referência do documento, com exceção do resumo inserido no
+ próprio documento. (\ldots) As palavras-chave devem figurar logo abaixo do
+ resumo, antecedidas da expressão ``Palavras-chave:'', separadas entre si por
+ ponto e finalizadas também por ponto.
+
+ \textbf{Palavras-chave}: \LaTeX. Palavras em maiúsculo. Editoração de texto.
+\end{resumo}
+
+% resumo em inglês
+\begin{resumo}[ABSTRACT]
+ \begin{otherlanguage*}{english}
+   This is the english abstract.
+
+   \vspace{\onelineskip}
+ 
+   \noindent 
+   \textbf{Keywords}: \LaTeX. Capitalized words. Text editoration.
+ \end{otherlanguage*}
+\end{resumo}
+
+% ---
+% inserir lista de figuras
+% ---
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de tabelas
+% ---
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de abreviações e siglas
+% ---
+\begin{siglas}
+  \item [SIGLA] Significado por extenso. 
+  \item [IBGE] Instituto Brasileiro de Geografia e Estatística
+\end{siglas}
+% ---
+
+% ---
+% inserir lista de símbolos
+% ---
+\begin{simbolos}
+  \item[$ \Gamma $] Letra grega Gama
+  \item[$ \Lambda $] Lambda
+  \item[$ \zeta $] Letra grega minúscula zeta
+  \item[$ \in $] Pertence
+\end{simbolos}
+% ---
+
+% ---
+% inserir o sumario
+% ---
+\renewcommand{\contentsname}{SUM\'ARIO} % para deixar o nome do sumário em maiúsculo.
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+% ----------------------------------------------------------
+% Introdução (no IFSULDEMINAS, precisa ser numerada como os outros capítulos.)
+% ----------------------------------------------------------
+\chapter{INTRODUÇÃO}
+\thispagestyle{empty} % para não numerar a página da introdução.
+    
+    \lipsum[1-4] %dummy text. Deverá ser removido na versão final.
+    
+% ----------------------------------------------------------
+
+
+% ---
+% Capitulo de revisão de literatura
+% ---
+\chapter{REVISÃO DE LITERATURA}
+    
+    Exemplo de citação na linha. Deve ser utilizado o comando conforme o código fonte. Segundo \textcite{Andrade2003}, \textbf{Fotogrametria} é \dots
+    
+    Exemplo de citação ao final de um parágrafo. Também deve ser inserido conforme explicação do código fonte. \cite{Monico2007}
+    
+    Para maiores informações sobre como fazer as citações, acessar o documento \href{http://mirrors.ctan.org/macros/latex/contrib/biblatex-contrib/biblatex-abnt/doc/biblatex-abnt.pdf}{\color{blue} \textbf{biblatex}}, de Daniel Marques.
+    
+    \textbf{Lembre-se de remover todos os \textit{dummy text} inseridos neste template.}
+    
+    Ambiente de equação numerada, de acordo com o capítulo.
+    
+    \begin{equation}
+        a^2 + b^2 = c^2
+    \end{equation}
+    
+    Exemplo de citação direta longa, no formato ABNT e seus devidos recuos:
+    
+    \begin{citacao}
+        \lipsum[1] \cite{CoelhoFilho2007}
+    \end{citacao}
+    
+    \lipsum[1-4]
+    
+% ----------------------------------------------------------
+
+% ---
+% Capitulo de objetivos
+% ---
+\chapter{OBJETIVOS}
+% ---
+\section{OBJETIVOS GERAIS}
+\lipsum[1]
+
+\section{OBJETIVOS ESPECÍFICOS}
+\lipsum[2]
+
+% ----------------------------------------------------------
+
+% ---
+% Materiais e métodos
+% ---
+\chapter{MATERIAIS E MÉTODOS}
+
+    \lipsum[1]
+    
+    \section{EXEMPLO DE SEÇÃO}
+    
+        \lipsum[2]
+        
+        \subsection{EXEMPLO DE SUBSEÇÃO}
+        
+            \lipsum[3]
+            
+            \subsubsection{EXEMPLO DE ``SUBSUBSEÇÃO''} %mostra como inserir aspas de maneira correta, abrindo e fechando.
+            
+                \lipsum[4]
+
+% ---
+% Materiais e métodos
+% ---
+\chapter{RESULTADOS}
+
+\lipsum[27-30]
+
+% ----------------------------------------------------------
+% Finaliza a parte no bookmark do PDF
+% para que se inicie o bookmark na raiz
+% e adiciona espaço de parte no Sumário
+% ----------------------------------------------------------
+%\phantompart
+
+% ---
+% Conclusão
+% ---
+
+\chapter{CONCLUSÃO}
+
+\lipsum[31-33]
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+
+\printbibliography[title={REFERÊNCIAS}] % para inserir o nome das referências em maiúsculo.
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+%\begin{apendicesenv}
+
+% Imprime uma página indicando o início dos apêndices
+% \partapendices
+
+% ----------------------------------------------------------
+%\chapter{EXEMPLO DE APÊNDICE}
+
+%\end{apendicesenv}
+% ---
+
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+
+% ---
+% Inicia os anexos
+% ---
+%\begin{anexosenv}
+
+% Imprime uma página indicando o início dos anexos
+%\partanexos
+
+%\chapter{SE PRECISAR DOS ANEXOS}
+
+%\end{anexosenv}
+
+\end{document}
+
+\end{document}

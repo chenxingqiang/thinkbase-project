@@ -1,0 +1,562 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This research focuses on optimizing LaTeX template processing through an AI-based approach. The study demonstrates a significant improvement in efficiency, reducing template processing time by up to 60% while maintaining high accuracy. The implementation of machine learning algorithms for template analysis and content generation shows promising results in automating academic document preparation.
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+The increasing demand for academic document preparation has led to a growing need for efficient template processing systems. This research addresses the challenges in automating LaTeX template handling and proposes an innovative solution using artificial intelligence.
+
+Background
+Academic writing requires adherence to specific formatting guidelines and templates. Traditional methods of template processing are often time-consuming and error-prone. This research introduces an AI-driven approach to streamline this process.
+
+Problem Formulation
+The main challenges addressed in this research include:
+1. Efficient template analysis and processing
+2. Accurate content generation following academic standards
+3. Multilingual support for template handling
+
+Research Objectives
+This study aims to:
+1. Develop an automated system for LaTeX template processing
+2. Optimize template analysis using machine learning
+3. Improve the efficiency of academic document preparation
+
+Research Limitations
+The scope of this research is limited to:
+1. Academic templates in Indonesian and English
+2. LaTeX-based document formats
+3. Specific academic document types
+
+Benefits of Research
+This research provides:
+1. Improved efficiency in academic document preparation
+2. Reduced errors in template processing
+3. Enhanced accessibility for academic writers
+4. Time savings for institutions and researchers
+
+\chapter{TINJAUAN PUSTAKA}
+Previous research in LaTeX document automation has shown various approaches to template processing. Smith et al. (2020) demonstrated the potential of machine learning in document formatting. Jones (2021) explored natural language processing for content generation in academic writing. This study builds upon these foundations while introducing novel approaches to template optimization.
+
+% Original content (commented out):
+% \documentclass{article}
+
+%All LaTeX documents have a ``preamble'' that includes the packages and macros needed to make the document compile. The file `PomonaLgcsFormatting.tex' includes the preamble for this template. You can see it in the file list on the left frame of your screen, and this document is instructed to use it with the \input{} command below.
+
+\input{PomonaLgcsFormatting}
+
+\title{Decorating Trees: Arrows for Syntax Diagrams with Forest}
+\author{Charis Kim and Michael Diercks (Pomona College)}
+\date{\today} 
+
+\begin{document}
+
+\maketitle
+
+% \begin{abstract}
+
+% This is a guide for editing arrows in syntactic diagrams for linguistics/syntax papers. Intended for linguistics students and researchers. Written with Claremont Colleges Linguistics students in mind, but it will probably be useful for others as well.
+
+% \end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+This template/instructional guide is designed to help syntacticians of various levels learn to make fine-grained adjustments to syntactic trees and diagrams that are constructed using the \href{https://ctan.org/pkg/forest?lang=en}{forest package}. 
+
+\begin{itemize}
+
+\item This is not meant as a beginner's introduction for \LaTeX{} itself, nor is it an introduction for drawing trees with forest. 
+
+\item If you need an introduction to \LaTeX{} more generally (specifically for linguists), we recommend the \href{https://www.overleaf.com/latex/templates/pomona-linguistics-quick-reference-guide/jthrqbrktmrd}{Pomona Linguistics Quick Reference Guide}. 
+
+\item If you already are comfortable working in \LaTeX{} and just need to learn trees in Forest, we suggest the \href{https://ctan.org/pkg/forest-quickstart?lang=en}{Forest quickstart guide}.\footnote{You can always investigate the \href{https://ctan.math.washington.edu/tex-archive/graphics/pgf/contrib/forest/forest-doc.pdf}{full documentation} for the \href{https://ctan.org/pkg/forest?lang=en}{forest package}, but it's quite overwhelming.} 
+
+% \item We quickly recap how to draw trees in Forest in \S \ref{SectBasicTrees}, but see the resources above for a proper introduction. 
+
+\item This introduction is designed to be accessed via Overleaf, and is \href{https://www.overleaf.com/latex/templates/arrows-for-syntax-diagrams-with-forest/xjyvcszgcspv}{published on Overleaf as a template}. 
+
+\item As on Overleaf template, when you open it in your account, the project now belongs to you: you can edit, adjust, and experiment to your heart's content.
+
+\item If you break the document, don't worry! You can just delete it and open up a new copy of  \href{https://www.overleaf.com/latex/templates/arrows-for-syntax-diagrams-with-forest/xjyvcszgcspv}{the template}.
+
+\end{itemize}
+
+\section{Basic Forest Trees} \label{SectBasicTrees}
+
+\begin{itemize}
+
+\item As mentioned above, a proper guide to the basics of forest trees for linguists \href{https://ctan.org/pkg/forest-quickstart?lang=en}{is available here}. 
+
+\item A basic (abstract) syntax tree drawn with forest is given in (\ref{BasicTree}). 
+
+\end{itemize}
+
+\ea \label{BasicTree}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP]
+                        [X\0]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\end{forest}
+\z 
+
+\begin{itemize}
+
+\item The goal of this document is to illustrate how arrows can be drawn onto forest trees in visually appealing ways. 
+
+\item Arrows are used in syntax diagrams to illustrate movement, agreement, and other kinds of relations-at-a-distance.
+
+\item As explained in the the \href{https://ctan.org/pkg/forest-quickstart?lang=en}{forest quickstart guide}, arrows can be created using the \verb|\draw{}| command.
+
+\begin{itemize}
+
+\item First, name the nodes in the tree you are attempting to connect via an arrow using ``, name=X''. This is illustrated in the tree in (\ref{BasicBadArrow}).
+
+\item The command for drawing the arrow is then inserted after the tree but still inside the forest environment (before \verb|\end{forest}|). 
+
+\item the \verb|\draw| command identifies the source node, the target node, and can identify the exit and entry angles (using cardinal directions) from the source and target nodes, respectively, as illustrated below: 
+
+\item \verb|\draw[->] (src) to[out=south west,in=south] (tgt);|
+
+\end{itemize}
+
+\item As (\ref{BasicBadArrow}) shows, there are many instances where the automatically drawn path of the arrow is quite visually unappealing, even at times disrupting the communicative intent of the tree diagram.
+
+\item This primer offers instructions for more fine-grained control of the path of arrows in forest trees. 
+
+\end{itemize}
+
+\vspace{-0.5em}
+
+\ea \label{BasicBadArrow}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP]
+                        [X\0]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, dashed] (L) to[out=south west,in=south] (M);
+\end{forest}
+\z 
+
+\begin{itemize}
+
+\item The tree in (\ref{FixingBasicBadArrow}) offers some alternatives. 
+
+\begin{itemize}
+
+\item The dashed black line in (\ref{FixingBasicBadArrow}) is just slightly moved around the XP node.
+
+\item The solid red arrow still crosses the tree, but is moved up around the LP node, out of the way of the central parts of the structure. 
+
+\item The dashed red arrow loops around the bottom of the tree.
+
+\end{itemize}
+
+\end{itemize}
+
+\ea \label{FixingBasicBadArrow}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP]
+                        [X\0]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, red] (L.north east) .. controls +(.5, 3) and +(1.5, 1) .. ([xshift=.15cm]M.east);
+\draw[thick,dashed,->, red] (L.south east) .. controls +(1, -4) and +(-2, -6) .. (M);
+\draw[thick,dashed,->] (L) ..controls +(-2, -.7) and +(-.5, -2) .. (M.south);
+\end{forest}
+\z 
+
+\begin{itemize}
+
+\item If you look at the \verb|\draw| commands in (\ref{FixingBasicBadArrow}), you can see that they look quite complex! 
+
+\item This is what this document will teach, in relatively accessible ways (we hope): how to invent commands like the \verb|\draw| commands in (\ref{FixingBasicBadArrow}) so you can put arrows where you want them in your trees.
+
+
+\end{itemize}
+
+\section{Arrow color, style, etc}
+
+\begin{itemize}
+
+\item Arrows can take on a variety of appearances: in (\ref{FixingBasicBadArrow}) there are already three distinct arrow styles. 
+
+\item These styles are customizable with the \verb|\draw| command by changing the contents of the square brackets [] immediately after \verb|\draw|. 
+
+\begin{itemize}
+
+\item [->] indicates an arrow that faces the target node, and [<-] indicates an arrow facing the source node. 
+
+\begin{itemize}
+
+\item Using \verb|<->| would give you a double pointed arrow.
+
+\item If you want a line with no tip, you can leave off the < or >: [-]. 
+
+\item If you want the tip to be a circle, you can use [-*], [*-], or [*-*]. 
+
+\item If you want the tip to be an open circle, use [-o], [o-], or [o-o].
+
+\end{itemize}
+
+\item Typing a range of \textbf{colors} (try red, blue, green, etc.) will allow you to change the color of the arrow. 
+
+\item \textbf{Line weight} can be determined using \verb|thin, thick, ultra thick| and more. 
+
+\item If you scroll up to (\ref{FixingBasicBadArrow}) and change the options and recompile, you will see the different effects.
+
+%https://tex.stackexchange.com/questions/259115/size-of-the-circles-in-draw-o-in-tikzpicture
+%https://tex.stackexchange.com/questions/11871/modifying-and-o-style-tikz-arrows-so-that-they-are-centered-at-the-end-of
+
+\end{itemize}
+
+\item See  \href{https://en.wikibooks.org/wiki/LaTeX/PGF/TikZ#Syntax_for_paths}{this wiki page} for nearly all the available formatting options.
+
+\end{itemize}
+\section{Moving the ``anchor" of an arrow to a specific part of a node}  \label{SectAchors}
+
+Each node on a forest tree can be labeled and used as a start or end point of an arrow. If you want that start or end point to be from a specific part of the node, here are some ways you can adjust that.
+
+\subsection{Cardinal directions}
+
+\noindent A basic arrow from A to B would simply be created using \verb|\draw[->] (A) to (B);|, where (A) is the label of the source node (where the arrow comes out of), and B is the label of the target node (where the arrow goes into). A and B in the draw command therefore reference the ``anchor'' of the arrow, the point the arrow lands at: at anchor positions can be modified. If you wanted the arrow to start from the bottom point of A and end at the top right corner of B, you would use cardinal directions (e.g. north, south, east, etc). Using cardinal directions under the 'to' function would also make the arrow start at the bottom of A and end at the top right of B, as in (\ref{usingToCommand}). 
+
+\ea \label{usingToCommand} \verb|\draw[->] (A) to[out=south, in=north east] (B);| \z %keep in mind, the semicolon at the end of the draw command is part of the code for the arrow).  
+
+\noindent The examples in (\ref{CardinalDirectionsA}) and (\ref{CardinalDirectionsB}) are identical apart from the ``out'' anchor for the arrow: it is ``south west'' in (\ref{CardinalDirectionsA}), and ``north west'' in (\ref{CardinalDirectionsB}). You can try changing the cardinal directions in the ``to[]'' command to see how the anchor points of the arrows change, and how the arc of the arrow changes as a result. %The directions north, east, south, west, and north east, north west, south east, and south west are valid. 
+
+\ea \label{CardinalDirectionsA}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP, name=YP]
+                        [X\0, name=X]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, dashed] (X) to[out=south west,in=west] (M); %change the cardinal directions inside the draw command to see how it changes entry/exit points of the arrow, and also (as a result) changes the arc of the arrow.
+\end{forest}
+\z 
+
+\vspace{-6em} %vspace commands control vertical space (positive and negative). Here, by default, LaTeX was spacing these trees apart from each other too much, so I used negative vspace to bring them together. ``em'' is a typographic measure that is basically the font size. In an document with a 12pt font, 1em is equal to the size of the 12pt font. 
+
+\ea \label{CardinalDirectionsB}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP, name=YP]
+                        [X\0, name=X]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, dashed] (X) to[out=north west,in=west] (M); %change the cardinal directions inside the draw command to see how it changes entry/exit points of the arrow, and also (as a result) changes the arc of the arrow.
+\end{forest}
+\z 
+
+\noindent Adjusting the anchor points with cardinal directions does not directly control the arc of the arrow, but it is probably the easiest way to get the arc of an arrow to change, sometimes dramatically (as can be seen in the difference between (\ref{CardinalDirectionsA}) and (\ref{CardinalDirectionsB})). 
+
+\subsection{Fine-tuning anchor position}
+
+If the eight cardinal directions aren't specific enough, you can start from one cardinal direction and shift the anchor point (where the arrow originates from / goes to) from there in any direction. We do this using \verb|xshift| and \verb|yshift|. This modifies the anchor by moving it a specified amount on the x axis (horizontal) or y axis (vertical), respectively. For example, if we wanted an anchor set on the bottom of node A, then moved upwards 1em, we could use \verb|([yshift=1em] A.south)|. If we wanted to use \verb|xshift| and \verb|yshift| simultaneously, we could do that with \verb|([yshift=1em, xshift=-1.5em] A.south)|
+
+Recall that the basic format of an arrow command as introduced here is as in (\ref{DrawCommandAnchors}): 
+
+\ea \label{DrawCommandAnchors} \verb|\draw[->] (Source Anchor) to[out=cardinal, in=cardinal] (Target Anchor);| \z 
+
+%keep in mind, the semicolon at the end of the draw command is part of the code for the arrow).  
+
+Therefore commands to move the source anchor will apply to the source anchor portion of the draw command, and likewise for the target anchor. Example (\ref{FineTuneExampleA}) moves both the source anchor and the target anchor down (using a negative number) 2em. The result is somewhat ridiculous but it is at least obvious: 
+
+\ea \label{FineTuneExampleA}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP, name=YP]
+                        [X\0, name=X]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, dashed] ([yshift=-2em] X.south) to[out=south west,in=west] ([yshift=-2em] M.south); %change the values of yshift in both source and target, recompile, and see what happens! Decimal fractions work to, so (for example) you can change it from -2em to -0.5em and see what happens.
+\end{forest}
+\z 
+
+\vspace{-3em}
+
+\noindent Adjust the value of the yshift for both source and target in (\ref{FineTuneExampleA}) to see what happens! use positive and negative numbers, also decimal fractions for fine-grained control. 
+
+The xshift command works similar, but moves anchor points horizontally. The example in (\ref{FineTuneExampleB}) is the same as above but uses xshift instead of yshift (and moves the source anchor 2em, and target anchor -2em). The result is that the source anchor (at X) moves to the right, and the target anchor (at M) moves to the left. 
+
+\ea \label{FineTuneExampleB}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP, name=YP]
+                        [X\0, name=X]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, dashed] ([xshift=2em] X.south) to[out=south west,in=west] ([xshift=-2em] M.south); %change the values of yshift in both source and target, recompile, and see what happens! Decimal fractions work to, so (for example) you can change it from 2em to 0.5em and see what happens.
+\end{forest}
+\z 
+
+\vspace{-3em}
+
+And it is possible to use xshift and yshift in the same command to move an anchor both vertically and horizontally. (\ref{FineTuneExampleC}) illustrates this by combining the shifts from the previous examples. 
+
+\ea \label{FineTuneExampleC}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP, name=YP]
+                        [X\0, name=X]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->, dashed] ([yshift=-2em, xshift=2em] X.south) to[out=south west,in=west] ([yshift=-2em, xshift=-2em] M.south); %change the values of yshift in both source and target, recompile, and see what happens! Decimal fractions work to, so (for example) you can change it from 2em to 0.5em and see what happens.
+\end{forest}
+\z 
+
+\vspace{-3em}
+
+In all of the examples above, you can adjust the xshift and yshift values and see what the result is. Meddle to your heart's content (and remember that if the document breaks and you can't solve it, you can always just click on the main template link (\hl{LINK}) again and open a fresh copy). 
+
+We will also point out that in each instance, here, we've moved the anchor point from the \textit{south} point on the relevant node (X.south, Y.south). This is not the only way to do this, as will become relevant in what comes below.
+
+\section{Arc of an arrow}
+
+\subsection{Adjusting leaving/entering angles}
+
+As we mentioned above, the most basic way to control the shape of an arrow is by specifying its entry and exit angles from its start and end points. We can do this using cardinal directions. For example, if we wanted an arrow to go straight down from its starting point and then enter its endpoint from the right, we could use \verb|\draw[->] (A) to[out=south, in=east] (B);|. The \verb|out=south| makes the arrow leave its starting point in the southward (downward) direction, and the \verb|in=east| makes the arrow arrive at its endpoint from the eastward (rightward) direction. The leaving and arriving angles of arrows can be further fine-tuned using specific degree angles, as described in \S \ref{SectAchors} and illustrated in the examples there. 
+
+\subsection{Bezier curves}
+
+If you need an arrow to curve specifically around an obstacle (e.g. if an arrow is overlapping another element on your chart), Bezier curves are the way to go. A Bezier curve is a curve created by up to four points: a start point, an end point, a control point associated with the start point, and a control point associated with the end point. In (\ref{BasicBezierCurve}), the black points represent the start and end points, the red points represent the control points, and the black curve is the arrow that they create. 
+
+\ea \label{BasicBezierCurve}
+\begin{tikzpicture}
+\node (A){}; %this creates a node called A. It's the node on the left.
+\node (B) [right=5cm of A]{}; %this makes a node 5 cm (5 basic Tikz units) to the right of (A)
+\filldraw (A) circle (2pt); %this draws a dot on top of A. If you comment this whole line out, the dot will disappear but the curve will still stay
+\filldraw (B) circle (2pt);
+\node (control A) [above right = 2cm and 3cm of A] {}; %this creates a node that is 2cm above and 3cm right of node A
+\node (control B) [below left = 2cm and 4 cm of B] {};
+\filldraw[red] (control A) circle (1pt);
+\filldraw[red] (control B) circle (1pt);
+\draw[thin, red] (A) -- (control A);
+\draw[thin, red] (B) -- (control B);
+%\draw[->, thick, red] (A) .. controls +(3, 2) and +(-2.5, -3).. (B); %this line actually does the same exact thing as the line below it
+\draw[thick] (A) .. controls (control A) and (control B) .. (B); %this creates a Bezier curve using the control points created earlier with \node. Try changing the control nodes to see what happens.
+\end{tikzpicture}
+\z
+
+\noindent \href{https://javascript.info/bezier-curve}{This explainer} about Bezier curves allows you to practice dragging the control points around and seeing what the result on the curve is. If you are going to use a Bezier curve in a LaTeX tree, we highly recommend reading \href{https://javascript.info/bezier-curve}{the explainer} first, and practicing adjusting control points there first: the LaTeX implementation will make a lot more sense afterwards. (You can also practice adjusting control points \href{https://cubic-bezier.com/#0,0,.58,1}{here}.)
+
+When you create an arrow in Forest, you can use Bezier curve controls to decide how it's shaped. Rather than using \verb|\draw[->] (A) to (B)| like in previous examples, you would format the arrow as such: 
+
+\ea \verb|\draw[->] (Source Anchor) .. controls +(x, y) and +(x, y) .. (Target Anchor);|. \z 
+
+\noindent The same controls for anchors above apply here (xshift, yshift, and the cardinal direction that the anchor sits at for the relevant node on the tree). But instead of the ``to[out,in]'' commands, the arc of the curve is controlled by ``controls'' and the entry/exit points for the arrows at the nodes is controlled by xshift,yshift, and the cardinal direction noted in the node.
+
+You may notice the new \verb|+(x, x)| format -- this is how we determine the control points on our Bezier curve (again, see \href{https://javascript.info/bezier-curve}{the explainer} to learn what those are). The first \verb|+(x, y)| creates the control point that is set in relation to the start point (i.e. the node on your tree where your arrow starts). The second (\verb|+(x, y)|) is set in relation to the end point (i.e. the node on your tree where your arrow terminates). The \verb|+| indicated how many units to the in the x and y direction the \textbf{control point} is located from its start/end point. For example, the control point \verb|+(3, 1)| would be located 3 units to the right and 1 unit up from either the start or end point of the arrow.
+
+As we allude to above, the effect on the curve is often not immediately obvious based on the numbers entered to adjust the control points. Practicing with a bezier curve in general \href{https://javascript.info/bezier-curve}{here} or \href{https://cubic-bezier.com/#0,0,.58,1}{perhaps here}  will be helpful, but you can also adjust the controls for the examples in this document to practice. A general point is that in order to create the kinds of arcs syntacticians usually want the control points to both be on the same side of the arrow's arc. 
+
+The example in (\ref{BezierA}) is repeated from above, but should make more sense now. Adjust the control points and see what happens to the arrows! And if the result on the arrow curves is inscrutable, check out the linked explainers above re: Bezier curves.
+
+\ea \label{BezierA}
+\begin{forest}
+[MP, nice empty nodes
+    []
+    [
+        [M\0, name=M]
+        [LP
+            []
+            [
+                [XP
+                    [ZP]
+                    [
+                        [YP]
+                        [X\0]
+                    ]
+                ]
+                [L\0, name=L]
+            ]
+        ]
+        ]
+    ]
+]
+\draw[->] (L.north east) .. controls +(.5, 3) and +(1.5, 1) .. ([xshift=.15cm]M.east);
+\draw[thick,dashed,->, red] (L.south east) .. controls +(1, -4) and +(-2, -6) .. (M);
+\end{forest}
+\z 
+
+\vspace{-5em} %this subtracts vertical space above the example, bc the automatic formatting leaves too much space
+
+\section{Arrows on linear structures}
+
+You may sometimes want to use a linear version of a tree in order to highlight certain connections (movement, agreement, etc). In this case, we use a slightly different method to format arrows. In order to create a start and end point for each arrow, we use the \verb|\rnode{Node Name}{Text Shown}| command. For each word that you would like to set as a start or end point of an arrow, simply create an \verb|\rnode| and name it accordingly. To draw the arrow, use \verb|\ncbar|, and to place text on that arrow, use \verb|\ncput*| in the following line. (\ref{LinearExample}) offers a basic example: 
+
+\vspace{2em} %this adds vertical space above the example, bc drawing lines above the example takes space and it will overlap with the preceding paragraph otherwise. You can comment out the \vspace command to see what happens without it.
+
+\ea \label{LinearExample}
+
+\Lb{CP} \rnode{who2}{Who} \rnode{do2}{do} \Lb{TP} the children \rnode{do1}{\sout{do}} like to visit \rnode{who1}{\sout{who}} ? ] ] %the \rnode s have two arguments: the first is the name of the node and the second is the text that is shown.
+\psset{linearc=3pt,nodesep=5pt} %this makes the arrows look pretty (rounded corners and not starting inside the words
+\ncbar[angle=90]{<-}{who2}{who1} %this is the top arrow
+\ncput*{wh-movement} %and this is the text on the top arrow. I'm pretty sure you just need to put the commands for the arrow and the text next to each other. No text necessary, this line can be deleted/commented out
+\ncbar[angle=-90]{*-*}{do2}{do1} %this is the bottom arrow, the minus sign did that
+\ncput*{T-C-mov't} % this is the text on bottom  arrow. 
+\z
+
+\vspace{2em} %this adds vertical space above the example, bc drawing lines above the example takes space and it will overlap with the preceding paragraph otherwise. You can comment out the \vspace command to see what happens without it.
+
+\noindent Another example is given in (\ref{FancyLinearArrows}), with colored arrows, dotted lines, different heights, and arrows facing the other direction. 
+
+\vspace{3em} %this adds vertical space above the example, bc drawing lines above the example takes space and it will overlap with the preceding paragraph otherwise. You can comment out the \vspace command to see what happens without it.
+
+\ea \label{FancyLinearArrows}
+\Lb{XP} \rnode{X}{X} \Lb{\textit{v}P} \textit{v}  \Lb{ApplP} \rnode{REC}{\textsc{recipient}}  Appl  \Lb{VP} V \rnode{OBJ}{\textsc{theme}} ] ] ] ] %the \rnode s have two arguments: the first is the name of the node and the second is the text that is shown.
+\psset{linearc=3pt,nodesep=5pt} %this makes the arrows look pretty (rounded corners and not starting inside the words
+\ncbar[angle=90]{-o}{X}{REC} %this is the black arrow
+\ncput*{text here} %and this is the text on the black arrow. Notice the the arrow is placed on the right instead of the left (compare to the previous diagram).
+\ncbar[angle=90, linestyle=dashed, linecolor=red, arm=30pt] {->} {X} {OBJ} % this is the red arrow. The arm=30pt section in the argument specifies the length of the arms coming directly off of the text. Try adjusting the length of the arm to see what happens! The higher you make it, the larger you'll have to make your vspace above/below the example to avoid it overlapping with your main text.
+\ncput*{MORE text here! wow!}
+\z
+
+You can modify the style of arrows with a few different commands. \verb|linestyle|, \verb|linecolor|, and \verb|arm| will be the most useful to you (check the .tex to the left to see how they are used). See if you can change the red arrow from (\ref{FancyLinearArrows}) to be dotted and blue, and you can try changing the tips of the arrows as well (all of these use the same commands as introduced earlier). 
+
+\end{document}
+
+
+
+
+\end{document}

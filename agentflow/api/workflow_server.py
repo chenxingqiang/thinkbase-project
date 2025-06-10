@@ -248,17 +248,20 @@ async def execute_workflow_async(request: WorkflowRequest) -> Dict[str, Any]:
                 })
             except Exception as e:
                 task_refs[task_id].update({
-                    "status": "error",
+                    "status": "failed",
                     "error": str(e),
                     "end_time": time.time()
                 })
-                logger.error(f"Error in workflow execution: {e}")
                 
-        asyncio.create_task(execute_and_store())
+        # Create background task
+        background_tasks = BackgroundTasks()
+        background_tasks.add_task(execute_and_store)
         
+        # Return initial response with task ID
         return {
-            "result_ref": task_id,
-            "status": "pending"
+            "status": "pending",
+            "task_id": task_id,
+            "message": "Workflow execution started"
         }
     except Exception as e:
         logger.error(f"Error executing workflow asynchronously: {e}")

@@ -1,0 +1,199 @@
+% This is a document written to introduce students in MATH 2300-04 at FSU to LaTeX and Overleaf.  Any other students are free to use this as well.
+
+% All of this stuff with '%' in front is a comment and ignored by the compiler.
+%
+% The lines before the "\begin{document}" line is called the preamble.
+% This is where you load particular packages you need.
+% Until you are more experienced, or the program says you are missing packages, it is safe to ignore it.
+%
+%----------------------------------
+
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}% Change the margins here if you wish.
+\setlength{\parindent}{0pt} % This is the set the indent length for new paragraphs, change if you want.
+\setlength{\parskip}{5pt} % This sets the distance between paragraphs, which will be used anytime you have a blank line in your LaTeX code.
+\pagenumbering{gobble}% This means the page will not be numbered. You can comment it out if you like page numbers.
+
+
+%These packages allow the most of the common "mathly things"
+\usepackage{amsmath,amsthm,amssymb}
+
+%This package allows you to add graphs or any other images.
+\usepackage{graphicx}
+
+%These are the packages I usually use and needed for this document. There are bajillions of others to do nearly antyhing you want.
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{multicol}
+
+
+%------------------------------------------
+% The stuff you want to edit starts here.
+%------------------------------------------
+\begin{document}
+
+\title{Sample \LaTeX \, Document} % You should make this the title of your project.
+\author{Sarah Wright} % Replace this with your name.
+% \date{} I have this commented out so that the program will use whatever today's date is.  You can specify a particular date (or use this for other info if you need) in the {} or leave the {} empty for no date (or other extra info) to appear in the title
+
+\maketitle % If you don't want a formal title, you can erase this and the bits above.  You will need to find a different way to include the same information.
+
+% Some projects will just be a list of problems, and in that case you may wish to number them:
+
+\begin{enumerate} % This environment numbers "\items" in your list starting at 1. If you want to change the numbering scheme, you can do something like \begin{enumerate}[(a)] and whatever is in the [] will be the form of the "numbers". If you wish to change the number on just a specific item, use \item[1.2.7]
+\item Use the formal definition of the limit of a function at a point to prove that the following holds:
+$$\lim_{x \rightarrow 4} x^2 + x - 5$$
+% Any mathematics will go inside $s. One $ on each side keeps the mathematics inline with the text.  These double $s on each side set the equation on its own line in the center of the page.
+
+
+\begin{proof} % Anything with \begin{} needs a corresponding \end{}.  What goes inside the brackets {} is the environment you're working in.  This is a proof, and the environment tells the compiler to write "Proof" in italics at the start of this work and a box to mark the end.  We won't do many proofs in this calculus class, but still good to know.
+
+Fix an arbitrary $\epsilon > 0$.%Notice the mathematics inside a single pair of $. Most Greek letters are just spelled out with a \ in front; Capitalize if you want the capital Greek letter. 
+
+We wish to determine a $\delta >0$ such that when $0 < |x - 4| < \delta$, it must be true that $|f(x) - 15| < \epsilon$.
+
+\begin{multicols}{2} % This environment allows you to write in columns, which is sometimes handy. It can be a little finicky sometimes, so be careful. The number in the {} is the number of columns you want.
+Choose $\displaystyle{\delta = \min\left\{1, \frac{\epsilon}{10}\right\}}$. % Many things are happening in this single line:
+%
+% \displaystyle{} gives the mathematics inside the brackets the same treatment as the double $$, but keeps it inline with the text.  This is nice for "taller" symbols like fractions, limits, integrals, etc.
+%
+% \left and \right followed by bracketing symbols (, [, <, etc. make the symbol the appropriate size for the mathematics inside. Every \left must be matched with a \right, but the symbols need not match, so $\left(3, 4\right]$ will compile.
+%
+% Since {} are used so often in the code, if you want your compiled document to have {}, you need a \ in front.
+%
+% Fractions are made using \frac{}{}.  The numerator expression is in the first set of braces {} and the denominator in the second.
+
+Now, suppose that $0 < |x - 4| < \delta$.  Then,
+\begin{align*} % Another environment!  align* will keep the & in your work aligned in a vertical column.  This is good for lining up equals signs in long calculations. If you leave out the *, each line will be numbered.  This can be handy for referring back to later.
+|f(x) - 15| & = |(x^2 + x - 5) - 15| \text{, by the definition of $f$,}\\ % The \\ tells the align* environment to move to the next line. Since align forces us into a mathematics environment, we need to specify when we want "regular" text inside align.
+& = |x^2 + x - 15|\\
+& = |(x - 4)(x + 5)|\\
+& = |x - 4||x + 5| \text{, by properties of absolute value,}\\
+& < \delta \cdot |x + 5| \text{, by the assumption $|x - 4| < \delta$,}\\
+& \leq \frac{\epsilon}{10}|x + 5| \text{, since $\delta \leq \frac{\epsilon}{10}$,}\\
+& = \frac{\epsilon}{10} |(x - 4) + 9|\\
+& \leq \frac{\epsilon}{10}\left(|x - 4| + |9|\right) \text{, by properties of absolute value,}\\
+& < \frac{\epsilon}{10}\left(\delta + 9\right) \text{, since $|x - 4| < \delta$,}\\
+& \leq \frac{\epsilon}{10}(1 + 9) \text{, since $\delta \leq 1$,}\\
+& = \left(\frac{\epsilon}{10}\right) (10) = \epsilon
+\end{align*}
+
+\columnbreak % This ends the column. Sometimes this will happen automatically where you want it to, sometimes not.
+
+{\color{blue} %This makes the color of everything that is inside the {} blue (in the compiled pdf on the right).  \LaTeX  knows a list of colors, you can try lots of things or google the list.
+\center{\bf Scratch Work} % \center centers all the stuff inside the {} and \bf makes the text bold face
+\begin{align*} % the \hspace{} here is a hack to move the stuff in this second column over a bit. Delete it and see what happens. You can use \vspace{} or \hspace{} to add vertical or horizontal space to your work.  This doesn't always behave like you might expect because of LaTeX's automatic formatting.
+\hspace{2in}|f(x) - 15| & < \epsilon \\ 
+|(x^2 + x - 5) - (15)| & < \epsilon \\
+|x^2 + x - 20| & < \epsilon \\
+|(x + 5)(x - 4)| & < \epsilon \\
+|(x - 4)|\cdot|(x + 5)| & < \epsilon \\
+|x - 4| & < \frac{\epsilon}{|x + 5|} \\ 
+\end{align*}
+\begin{align*}
+\hspace{1.75in}\delta = 1 \Longrightarrow |x - 4| & < 1\\
+-1 < x - 4 & < 1\\
+8 < x + 5 & < 10\\
+| x + 5| & < 10
+\end{align*}
+}
+\end{multicols}
+All together, this shows that for any $\epsilon >0$, if we choose $\displaystyle{\delta = \min\left\{1, \frac{\epsilon}{10}\right\}}$, then $0 \leq |x - 4| < \delta$ implies that $|f(x) - 15| < \epsilon$.  Thus, $\displaystyle{\lim_{x \rightarrow 4} x^2 + x - 5 = 15}$.
+
+\end{proof}
+
+\newpage % This starts a new page.
+% I happen to not need this here.  LaTeX can be smart enough on its own sometimes.  When I only had one line form the next problem typed in, it appeared at the bottom of the first page, and I didn't like that.  But once I added more, LaTeX moved it itself.
+% Fun fact! When I needed to find this place once I was done typing up my work, and add in the comments, I clicked on the place I wanted to go to in the pdf on the right, and Overleaf brought me to this place in the LaTeX code.  Pretty spiffy.
+
+\item[1.5.15] Evaluate the given limits of the piecewise defined function $f$.
+$$f(x) = \left\{\begin{array}{lcl}
+x^2 - 1 & \text{ if }& x < -1 \\
+x^3 + 1 & \text{ if } & -1 \leq x \leq 1 \\
+x^2 + 1 & \text{ if } & x > 1
+\end{array}\right.$$
+% array is another environment designed for matrices, but it works well for piecewise defined functions as well. The {lcl} I have here tells LaTeX that I want three columns with the first and last aligned to the left, and the middle in the center. Use & to indicate a new column and \\ moves to a new row/line.  Like align, it is a math environment, so you don't need $s but must indicate text.
+
+
+\begin{enumerate} % You can nest enumerate environments for problems or solutions with multiple parts.
+\item $\displaystyle{\lim_{x \rightarrow -1^-} f(x)}$
+
+Since we are evaluating the limit as $x$ approaches -1 from the left, we need to consider the form of the function for values of $x$ that are less than -1, $x^2 - 1$.
+\begin{align*}
+\lim_{x \rightarrow -1^-} f(x) & = \lim_{x \rightarrow -1^-} x^2 - 1\\
+& = (-1)^2 - 1 \text{, by Theorem 2,}\\
+& = 0.
+\end{align*}
+
+\bigskip %This is another way to add vertical space.  There are big, med, and small varieties.
+
+\item $\displaystyle{\lim_{x \rightarrow -1^+} f(x)}$
+
+Since we are evaluating the limit as $x$ approaches -1 from the right, we need to consider the form of the function for values of $x$ that are greater than -1, $x^3 + 1$.
+\begin{align*}
+\lim_{x \rightarrow -1^+} f(x) & = \lim_{x \rightarrow -1^+} x^3 + 1\\
+& = (-1)^3 + 1 \text{, by Theorem 2,}\\
+& = 0.
+\end{align*}
+
+\bigskip
+
+\item $\displaystyle{\lim_{x \rightarrow -1} f(x)}$
+
+Since $\displaystyle{\lim_{x \rightarrow -1^-} f(x) = \lim_{x \rightarrow -1^+} f(x) = 0}$, $\displaystyle{\lim_{x \rightarrow -1} f(x) = 0}$ by Theorem 7.
+
+\bigskip
+
+\item $f(-1)$
+
+When $x = -1$, $f(x) = x^3 + 1$.  So, $f(-1) = (-1)^3 + 1 = 0$.
+
+\bigskip
+
+\item $\displaystyle{\lim_{x \rightarrow 1^-} f(x)}$
+
+Since we are evaluating the limit as $x$ approaches 1 from the left, we need to consider the form of the function for values of $x$ that are less than (but near) 1, $x^3 + 1$.
+\begin{align*}
+\lim_{x \rightarrow 1^-} f(x) & = \lim_{x \rightarrow 1^-} x^3 + 1\\
+& = (1)^3 + 1 \text{, by Theorem 2,}\\
+& = 2.
+\end{align*}
+
+\bigskip
+
+\item $\displaystyle{\lim_{x \rightarrow 1^+} f(x)}$
+
+Since we are evaluating the limit as $x$ approaches 1 from the right, we need to consider the form of the function for values of $x$ that are greater than (but near) 1, $x^2 + 1$.
+\begin{align*}
+\lim_{x \rightarrow 1^-} f(x) & = \lim_{x \rightarrow 1^+} x^2 + 1\\
+& = (1)^2 + 1 \text{, by Theorem 2,}\\
+& = 2.
+\end{align*}
+
+\bigskip
+
+\item $\displaystyle{\lim_{x \rightarrow 1} f(x)}$
+
+Since $\displaystyle{\lim_{x \rightarrow 1^-} f(x) = \lim_{x \rightarrow 1^+} f(x) = 2}$, $\displaystyle{\lim_{x \rightarrow 1} f(x) = 2}$ by Theorem 7.
+
+\bigskip
+
+\item $f(1)$
+
+When $x = 1$, $f(x) = x^3 + 1$.  So, $f(1) = (1)^3 + 1 = 2$.
+
+\end{enumerate}
+
+\vfill % This is yet another way to add vertical space, and there is a similar horizontal option.  It will fill the space, and you can use many of them to spread things out evenly on a page.
+
+To help us visualize all of these limits, a graph of $y = f(x)$ is provided below.
+
+\begin{center}\includegraphics[width = .85\textwidth]{SampleGraph}\end{center}
+% This is how we include pictures in a LaTeX document.  In Overleaf, you need to add this file to the project.  Click on "Project" with the squares in the menu at the top. Choose "Add Files..." and probably upload from your computer. (If you have installed a LaTeX editor on your own machine, then make sure the file you want to include is in the same folder as your .tex document... or look up how to call other folders.)
+% Once the file is part of the project, type the name of the file inside the {}.  You typically do not need the file type .pdf, .jpg, etc. but nothing bad happens when you include it.
+% The [] can be left empty or used to enter a variety of different instructions, most commonly adjustments to the size of the image are here. You can use inches or centimeters or points, LaTeX knows many measurement systems. You can also specify relative lengths, like I have above.  \textwidth is the width of the text in this document, and putting .85 in front shrinks it to 85% of the text width.
+
+\end{enumerate}
+
+
+\end{document}

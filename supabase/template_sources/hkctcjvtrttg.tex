@@ -1,0 +1,340 @@
+% template.tex simple cv document file template for playacv v1.0
+
+%%% Remove the "normalphoto" option if you want an image cropped to a circle instead of a square in the header
+% \documentclass[10pt,a4paper,withhyper]{playacv} % or add document options, e.g. withhyper for hidden urls
+\documentclass[11pt, a4paper, normalphoto, withhyper, ragged2e]{playacv}
+
+% your additional packages
+\usepackage{lipsum}
+
+% Application settings begin here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% it is recommended to copy and re-use the whole content of this file to compile a new application 
+
+%%% your/recipient corporate identity touch                                                                    #0
+\definecolor{RuleColor}{HTML}{2A2A84} % changes lines under chapter titles
+\definecolor{SymbolColor}{HTML}{ee7711} % changes symbols and rated skills colour
+\definecolor{HighlightColor}{HTML}{2A2A84} % changes highlights text colour
+
+% default cv data
+\input{cv}
+%
+\begin{document}
+	
+	% letter and pages options
+	\newcommand{\OnePager}{9} % set to 1 to use your one page cv layout, defined below at the end of the settings
+	
+	% change the letter page layout if you need to
+	\newgeometry{left=1.5cm,right=2cm,top=1.5cm,bottom=1.5cm,columnsep=0.3cm}
+	
+	% optional pages (9,9,9 = print only CV)                                                          #(1)
+	\renewcommand{\OnlyCoverLetter}{9} % set to 1 to print only letter to PDF
+	\renewcommand{\WithCoverLetter}{1} % set to 1 to print letter + CV to PDF
+	\renewcommand{\WithAppendix}{1} % set to 1 to print appendix pages to PDF
+	
+	%%% user specific content settings 
+	\newcommand{\PhD}{9} % example settings defined below for changing to academia applications e.g. education on top
+	
+	%%% recipient information (only needed with cover letter)
+	\renewcommand{\RecipientName}{Joe Hiring} % name (e.g. "Sabrina Hiring")
+	\renewcommand{\Company}{Microsoft Corporation} % company (e.g. "Microsoft Corporation")
+	\renewcommand{\CompanyStreet}{1 Microsoft Way} % company's street address (e.g. "1 Microsoft Way")
+	\renewcommand{\CompanyCity}{Redmond} % company's city (e.g. "Redmond")
+	\renewcommand{\CompanyState}{WA} % company's state prefix (e.g. "WA")
+	\renewcommand{\CompanyZip}{98052} % company's zip code (e.g. "98052")
+	
+	%% cover letter settings
+	\renewcommand{\HeaderWatermark}{1} % set to 1 to include watermark
+	
+	\renewcommand{\Subject}{Application for dream job 12345} % company (e.g. "Microsoft Corporation")
+	
+	\renewcommand{\Body}{
+		{\small
+			\begin{minipage}[!t]{0.725\linewidth}
+				{With \textsl{PlayaCV} you can change the layout and looks of your applications easily, with options to include a cover letter and/or a résumé (and annexes). See \textsl{\bfseries README.md}.\\
+				
+				Set up your own design intuitively for the cover letter and/or cv pages layouts, including options for personalised headers, footers, fonts, symbols and colours.\\
+				
+				Add any cv elements in the cover letter too, if you like. Here on the right you can see an example: a combination of a coloured \textsl{\bfseries cvbox} containing some text, some \textsl{\bfseries cvskill}s and some \textsl{\bfseries cvtag}s, with some \textcolor{HighlightColor}{\bfseries highlights}}
+			\end{minipage}
+			\hfill
+			\begin{minipage}[!t]{0.25\linewidth}
+				\cvbox[flush left] % cvbox text alignment
+				{\textbf{Matching skills:}\\
+					\medskip
+					\cvskill{I can do this\\}{5}
+					\cvskill[1]{My passion\\}{4}
+					\bigskip
+					\cvtag{This soft skill {\color{green}\faCheck}}\\
+					\cvtag[1]{For you {\color{HighlightColor}\faGift}}\\
+					\cvtag{Teamwork {\color{SymbolColor}\faUsers}}\\
+				} % cvbox text
+				{black} % cvbox text colour
+				{LightGrey!5} % cvbox fill colour
+				{.99} % cvbox width in 0..1 \linewidth
+			\end{minipage}
+			\medskip
+		}
+		\begin{itemize}
+			\item this \textsl{\bfseries template.tex} is provided as a starting point for setting up your own applications. Just copy, paste and enjoy!
+			\item input your default data in \textsl{\bfseries cv.tex}. A set of résumé elements is available for editing and inclusion at you discretion
+			\item once set up, just change a few lines in \textsl{\bfseries your.tex} file to compile a taylored application for your desired position
+		\end{itemize}
+		\medskip
+		\lipsum[4-5]
+		\bigskip
+	}
+	
+	% letter \PhD settings example for academia applications
+	\cvsetting{\PhD}{\renewcommand{\WithAbstract}{1}}	
+	%
+	\input{chap/_letter}
+	%
+	
+	%%% CV layout and content settings
+	%%% #1: layout, header, hooter, chapter selection and order                                                #1
+	
+	%%% Change text under name for this application                                                               
+	\renewcommand{\aHeaderQuote}{My first Résumé with \LaTeX{} PlayaCV}
+	
+	% change the cv page layout if you need to
+	\newgeometry{left=1cm,right=1.3cm,top=1.3cm,bottom=1.5cm,columnsep=0.3cm}
+	
+	% header and footer options
+	\renewcommand{\HeaderWatermark}{9}
+	\renewcommand{\bHeaderWatermark}{2}
+	\renewcommand{\cHeaderWatermark}{0.7}
+	\renewcommand{\FooterWatermark}{1}
+	
+	%
+	\input{chap/_cvHeader}
+	%
+	
+	%%% choose what to include and in which order, comment out chapters only if you are sure you'll never use them
+	% chapters to be displayed on the left side, from top to bottom
+	\renewcommand{\LeftColumn}{
+		\input{chap/_Summary}
+		\input{chap/_PersonalInfo}
+		\input{chap/_Trainings}
+		\input{chap/_Skills}
+		\input{chap/_Languages}
+		\input{chap/_SoftSkills}
+		
+		% you can force a page break within a column with \newpage
+		%\newpage
+		\input{chap/_Awards}
+		\input{chap/_Certifications}
+		\input{chap/_References}
+	}
+	
+	% chapters to be displayed on the right side, from top to bottom
+	\renewcommand{\RightColumn}{
+		\input{chap/_Experience}
+		\input{chap/_Education}
+		\input{chap/_Publications}
+		\input{chap/_Projects}
+		\input{chap/_Volunteering}
+		\input{chap/_Hobbies}
+		\input{chap/mychapter}
+	}
+	
+		
+	% Chapters content settings: create your own and include content as you need for this application.       #2	
+	%%% It is suggested to add entries you wish to change often here.
+	%%%
+	%%% Do that by copying the settings defined with \newcommand{cvSetting}... in cv.tex
+	%%% and pasting them here. Using \renewcommand they will be overwritten with your new values.
+	%%% Also, you can combine it with a \MySetting = 1 to print custom content to the cv only if needed, using 
+	%%% \newcommand{\MySetting}{1} % before e.g. a shorter new text for your summary in the Summary chapter, with
+	%%% \cvsetting{\MySetting}{
+	%%% \renewcommand{\aSummary}{My shorter summary text}
+	%%% }
+	
+	%%% chapters for this application, in cv.tex only Experience, Education, Skills and Languages are active by default
+	\renewcommand{\WithSummary}{1}
+    \renewcommand{\WithPersonalInfo}{1}
+	\renewcommand{\WithSoftSkills}{1}
+	\renewcommand{\WithHobbies}{1}
+	
+	%%% personal information for this position
+	\renewcommand{\PersonalInfoSeven}{1}
+	
+	%%% languages for this position
+	\renewcommand{\LanguageFour}{1}
+	\renewcommand{\LanguageFive}{9}
+	\renewcommand{\LanguageSix}{9}
+	
+	%%% skills for this position
+	%\renewcommand{\aSkillOne}{One}
+	%\renewcommand{\bSkillOne}{5}
+	%\renewcommand{\aSkillTwo}{2}
+	%\renewcommand{\bSkillTwo}{4.5}
+	%\renewcommand{\aSkillThree}{3}
+	%\renewcommand{\bSkillThree}{4}
+	%\renewcommand{\aSkillFour}{4}
+	%\renewcommand{\bSkillFour}{3.5}
+	%\renewcommand{\aSkillFive}{5}
+	%\renewcommand{\bSkillFive}{3}
+	
+	\renewcommand{\SkillSix}{9}
+	\renewcommand{\aSkillSix}{6}
+	\renewcommand{\bSkillSix}{2.5}
+	\renewcommand{\SkillSeven}{9}
+	\renewcommand{\aSkillSeven}{\LaTeX}
+	\renewcommand{\bSkillSeven}{3}
+	
+	%%% soft skills for this position, with a 4:6 column ratio max total of ca. 30 char per line 
+	\renewcommand{\SoftSkillOne}{1}
+	\renewcommand{\aSoftSkillOne}{33 characters, }
+	\renewcommand{\SoftSkillTwo}{1}
+	\renewcommand{\aSoftSkillTwo}{27 numbers}
+	\renewcommand{\SoftSkillThree}{1}
+	\renewcommand{\aSoftSkillThree}{max here}
+	\renewcommand{\SoftSkillFive}{1}
+	\renewcommand{\aSoftSkillFive}{bingo!}
+	
+	%%% experiences contents changes
+		\renewcommand{\eExperienceItemsOne}{\cvitems[\fExperienceOne] % highlight option 1..5 or 9
+		{My main responsibilities} % items {1}..{5}
+		{Impressive (highlight below with setting fExperienceOne = 3)}
+		{Another impressive achievement with metrics}{}{}
+	}
+	%{backup item}
+	%{Backup item}
+	%Backup description
+	
+	\renewcommand{\eExperienceItemsTwo}{\cvitems[\fExperienceTwo]
+		{Training of employees}
+		{Concise and relevant task description}
+		{}{}{}
+	}
+	
+	% soft skills and hobbies support a maximum of fifteen elements
+	\renewcommand{\HobbyFour}{9} % set to 1 to get Cooking
+	\renewcommand{\HobbyFifteen}{1} % set to 9 to stop printing Cats
+	
+	% highlights or other changes for this position, copy paste from cv.tex
+	%%% Every last \renewcommand{\CvSetting}{SettingValue} will overwrite the previous setting
+	
+	%%% highlights
+	\renewcommand{\fSkillTwo}{1}
+	\renewcommand{\fSkillFour}{1}
+	\renewcommand{\fSoftSkillThree}{1}
+	\renewcommand{\fReferenceTwo}{1}
+	
+	% user defined settings (for setups you want to reuse above at the top of the settings)
+	
+	% cv \PhD settings for academia application (example)
+	\cvsetting{\PhD}{				
+			\renewcommand{\WithSummary}{1}
+			\renewcommand{\WithAwards}{1}
+			\renewcommand{\WithTrainings}{1}
+			\renewcommand{\WithSoftSkills}{1}
+			\renewcommand{\WithProjects}{1}
+			\renewcommand{\WithReferences}{1}
+			\renewcommand{\WithPublications}{1}
+			\renewcommand{\WithSocial}{1}
+			\renewcommand{\WithHobbies}{1}
+			\renewcommand{\WithAppendix}{1}
+			
+			\renewcommand{\LeftColumn}{
+				\input{chap/_Summary}
+				\input{chap/_Awards}
+				\input{chap/_Skills}
+				\input{chap/_Languages}
+				\input{chap/_Trainings}
+				\input{chap/_SoftSkills}
+				\newpage
+				\input{chap/_References}
+			}
+			
+			% choose chapters to be displayed on the right side, from top to bottom
+			\renewcommand{\RightColumn}{
+				\input{chap/_Education}
+				\input{chap/_Publications}
+				\input{chap/_Experience}
+				\input{chap/_Volunteering}
+				\input{chap/_Projects}
+				\input{chap/_Hobbies}
+			}
+			
+			\renewcommand{\ExperienceThree}{9}
+			\renewcommand{\fExperienceTwo}{9}
+			\renewcommand{\fPublicationTwo}{1}
+	
+	}
+	
+	% setting to shrink cv to one page
+	\cvsetting{\OnePager}{
+		\renewcommand{\WithSoftSkills}{1}
+		\renewcommand{\WithSummary}{1}
+		%\renewcommand{\WithAwards}{1}
+		\renewcommand{\WithTrainings}{1}
+		\renewcommand{\WithSocial}{1}
+		\renewcommand{\LeftColumn}{
+			\input{chap/_Summary}
+			\input{chap/_Trainings}
+			%\input{chap/_Awards}
+			\input{chap/_Skills}
+			\input{chap/_SoftSkills}
+			\input{chap/_Languages}
+		}
+		
+		% Choose chapters to be displayed on the right side, from top to bottom
+		\renewcommand{\RightColumn}{
+			\input{chap/_Experience}
+			\input{chap/_Education}
+			\input{chap/_Volunteering}}
+		
+		% shorten chapters for one pager cv
+		\renewcommand{\ExperienceThree}{9} % do not show experience #3
+		\renewcommand{\eExperienceItemsFour}{
+			\cvitems{Only one item}{}{}{}{}		}
+		\renewcommand{\eSocialItemOne}{9} % no item part for the volunteering #1
+		\renewcommand{\eSocialItemTwo}{9}
+		\renewcommand{\eSocialTwo}{} % empty description for volunteering #2
+		\renewcommand{\SocialItemThree}{9}
+		
+		\renewcommand{\LanguageFour}{1}
+		\renewcommand{\LanguageFive}{9}
+		\renewcommand{\LanguageSix}{9}
+		\renewcommand{\WithFooter}{9}
+		\renewcommand{\WithAppendix}{9}
+	}
+	
+	% End of application settings here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%
+	%% cv body start
+	%
+	% left/right column width ratio, 0.5 = centred
+	\columnratio{\MyColumnRatio}
+	%
+	%
+	% start a 2-column paracol. Both the left and right columns will automatically
+	% break across pages if things get too long.
+	\begin{paracol}{2}
+		
+		%%% you might want to adjust the vertical alignment of the top of the left column here 
+		\vspace{0.0mm}
+		%
+		\LeftColumn
+		%
+		% switch to the right column
+		\switchcolumn
+		
+		%%% you might want to adjust the vertical alignment of the top of the right column here
+		\vspace{0.0mm} 
+		%
+		\RightColumn
+		%
+	%% cv body end 
+	\end{paracol}
+	% 
+	\input{chap/_cvFooter}
+	
+	% change the appendix page layout here if you need to
+	\newgeometry{left=1cm,right=1.3cm,top=1.5cm,bottom=1.5cm,columnsep=0.3cm}
+	%
+	% input appendix
+	\input{chap/_Appendix}
+	%
+\end{document}

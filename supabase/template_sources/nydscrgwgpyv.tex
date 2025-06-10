@@ -1,0 +1,188 @@
+
+\documentclass[letterpaper,12pt]{article}
+
+
+\usepackage{fullpage} % Package to use full page
+\usepackage{parskip} % Package to tweak paragraph skipping
+\usepackage{tikz} % Package for drawing
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{fancyhdr}
+\usepackage{times}
+\usepackage{changepage}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+
+
+
+\title{Why Poisson? Why Exponential?}
+\author{By: L.Z. (Ban Zhuan De Nan Ren)}
+\date{\vspace{-4ex}}
+
+\begin{document}
+
+\maketitle
+%section 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Many experiments consist of observing the occurrence times of random arrivals. Examples include arrivals of customers for service, arrivals of calls at a switch-board, occurrences of floods and other natural and man-made disasters in a given period, and so forth. Though the family of Poisson distributions has been commonly used to model the number of such rare events that occur in a fixed time period, few people understand why it is chosen. I prepare this note to explain the reason behind.
+%section 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Poisson Distribution}
+\theoremstyle{plain}
+\newtheorem{definition}{Definition}
+\begin{definition}[Poisson Distribution]
+A random variable X has the \textit{Poisson Distribution} with mean $\lambda$ if the p.d.f. of X is 
+\begin{equation}
+\begin{aligned}
+f(x|\lambda)= \left\{\begin{matrix}
+\frac{\lambda ^{x}e^{-\lambda}}{x!}& for\, x \in N\\ 
+0 &otherwise
+\end{matrix}\right.
+\label{def:poisson dist}
+\end{aligned}
+\end{equation}\label{eq:1}
+\end{definition}
+\vspace{1pt}
+\theoremstyle{definition}
+\newtheorem{example}{Example}
+\begin{example}[Customer Arrivals]\label{ex:1}
+A store owner believes that customers arrive at his store at a rate of 4.5 customers per hour. He wants to find out the distribution of X, the number of customers who will arrive during a particular one-hour period later in the day. \end{example}
+
+He models customer arrivals in different time periods as \emph {independent} of each other. As a first approximation, he divides the one-hour period into 3600 seconds and thinks of the arrival rate as being 4.5/3600 = 0.00125 per second. He then says that during each second, either 0 or 1 customers will arrive, and the probability of an arrival during any single second is 0.00125. He then tries to use the \textit{Binomial Distribution} with parameters n = 3600 and p = 0.00125 to describe X.
+
+He starts calculating f , the p.m.f. of this binomial distribution, and quickly discovers how cumbersome the calculations are. However, he realizes that the successive values of $f(x)$ are closely related to each other because $f(x)$ changes in a systematic way as x increases. So he computes
+\begin{center}
+\includegraphics[width=0.7\columnwidth]{1}
+\end{center} 
+The last approximation follows the fact that n=3600 is large while p=0.00125 is small. When x is mall (i.e. assume for now we are only interested in x=0,...,30), $(n-x)\rightarrow n$ and $(1-p)\rightarrow 1$.\\
+This approximation suggests defining $\lambda = np$ and approximating $f(x + 1)\approx f(x)\lambda/(x + 1)$for all the values of x that matter.\begin{center}
+\includegraphics[width=0.3\columnwidth]{2}
+\end{center}
+Continue the above pattern yields $f(x)=f(0)\frac{\lambda^{x}}{x!}$. But to obtain a valid p.m.f for X, he needs to make sure that $$\sum_{x=0}^{\infty}f(x)=1 \Rightarrow \sum_{x=0}^{\infty}f(0)\frac{\lambda^{x}}{x!}=1\Rightarrow f(0)=\frac{1}{\sum_{x=0}^{x=\infty}\lambda^{x}/x!}=e^{-\lambda}\Rightarrow f(x)=e^{-\lambda}\frac{\lambda ^{x}}{x!}$$ This is exactly p.m.f of Poisson Distribution \ref{def:poisson dist}
+%section 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{From Binomial to Poisson}
+
+\begin{theorem}[Poisson Approximation of Binomial]\label{theorem:Poisson approx of Bino}
+For $\forall n\in N$ and each $0<p<1$, let $f(x|n,p)$ denote the p.m.f. of the binomial distribution $Binomial(n,p)$. Let $f(x|\lambda)$ denote the p.m.f. of the Poisson distribution with mean $\lambda$. Let $ \{ p_{n} \}_{n=1}^{\infty}$ be a sequence of numbers between 0 and 1 such that $\lim_{n\to\infty} np_{n} = \lambda$. Then
+$$\lim_{n\to\infty}f(x|n,p)=f(x|\lambda)$$
+which says when n goes to infinity, binomial distribution has no difference from Poisson distribution.
+\begin{proof}
+\begin{flalign*}
+X\sim Binomial(n,p)\Rightarrow \lim_{n\to\infty}P(X=k)&=\lim_{n\to\infty}\binom{n}{k}p^{k}(1-p)^{n-k}&\\&=\lim_{n\to\infty}\frac{n(n-1)...(n-(k-1))}{k!}\frac{\lambda ^{k}}{n^{k}}\frac{(1-\frac{\lambda}{n})^{n}}{(1-\frac{\lambda}{n})^{k}}&\\&=\lim_{n\to\infty}\frac{n(n-1)...(n-(k-1))}{n^{k}}\frac{\lambda ^{k}}{k!}\frac{(1-\frac{\lambda}{n})^{n}}{(1-\frac{\lambda}{n})^{k}}&\\&=1\cdot \frac{\lambda ^{k}}{k!} \frac{e^{-\lambda}}{1}
+\end{flalign*}
+\end{proof}
+\end{theorem}
+\section{Why Poisson}
+In example \ref{ex:1}, the division of the one-hour period into 3600 seconds was somewhat arbitrary. The owner could have divided the hour into 7200 half-seconds or 14400 quarter-seconds, etc.
+
+Perhaps the store owner would do better simply modeling the number X of arrivals as a \textit{Poisson} random variable with mean 4.5, rather than choosing an arbitrarily sized time interval to accommodate a tedious binomial calculation.
+
+What if the owner is interested in a half-hour period or a 4-hour and 15-minute period? Is it safe to assume that the number of customers that arrive in a half-hour period has the Poisson distribution with mean 2.25? 
+
+In order to be sure that all of the distributions for the various numbers of arrivals in Example \ref{ex:1} are consistent with each other, the store owner needs to think about \textbf{the overall process of customer arrivals, not just a few isolated time periods}.
+
+To answer all the questions and explain where Poisson distribution comes from (or why Poisson), we need to introduce Poisson Process. 
+
+\subsection{Poisson Process}
+\begin{definition}[Poisson Process]\label{def:Poisson Proc}
+A Poisson process with rate $\lambda$ ($\lambda >0$) per unit time is a process that satisfies the following two properties:
+\begin{itemize}
+\item The number of arrivals in every fixed interval of time of length t has the Poisson distribution with mean $\lambda t$.
+\item The numbers of arrivals in every collection of \emph{disjoint} time intervals are independent.
+\end{itemize}
+\end{definition}
+
+Now under definition \ref{def:Poisson Proc}, we are sure that it is safe to assume that the number of customers that arrive in a half-hour period has the Poisson distribution with mean 2.25. 
+
+\textbf{Generality of Poisson Processes} Not only in terms of counts of arrivals during time intervals, Poisson processes are actually more general. For example, a Poisson process can be used to model occurrences in space as well as time. A Poisson process could be used to model telephone calls arriving at a switchboard, atomic particles emitted from a radioactive source, diseased trees in a forest, or defects on the surface of a manufactured product. The reason for the popularity of the Poisson process model is twofold. \begin{itemize}
+\item First, the model is computationally convenient. \item Second, there is a mathematical justification for the model if one makes \textbf{three plausible assumptions} about how the phenomena occur.
+\end{itemize}
+
+\subsection{Assumptions Underlying the Poisson Process Model}
+Indeed, a Poisson process can be used to model occurrences in \textbf{any region that can be subdivided into arbitrarily small pieces}. There are three assumptions that lead to the Poisson process model.
+\begin{enumerate}
+\item \label{assumption 1}The numbers of occurrences in any collection of disjoint intervals of time must be mutually independent. 
+
+\item \label{assumption 2} The probability of an occurrence during each very short interval of time must be approximately proportional to the length of that interval. 
+
+\item \label{assumption 3} For each very short interval of time, the probability that there will be two or more occurrences in that interval must have a smaller order of magnitude than the probability that there will be just one occurrence. \end{enumerate}
+
+To express the assumptions in mathematical language, let $o(t)$ denote any function of t having the property that \begin{equation}\label{eq:2}
+\lim_{t\to 0}\frac{o(t)}{t}=0
+\end{equation} o(t) is a function that approaches 0 as $t\to 0$, and, furthermore, this function must approach 0 at a rate faster than t itself. An example of such a function is $o(t) =t\alpha$, where $\alpha > 1$.
+
+Having \ref{eq:2}, the second and third assumptions can then be expressed as: $\exists \lambda > 0$ s.t. for every time interval of length t, the probability of at least one occurrence during that interval has the form \begin{equation}
+\lambda t + o(t)
+\label{eq:prob}
+\end{equation}Thus, for every very small value of t, the probability of at least one occurrence during an interval of length t is equal to $\lambda t$ plus a quantity having a \textbf{smaller order of magnitude}.
+
+One not so good consequence of the second assumption is that the process being observed must be stationary over the entire period of observation, that is there can be neither busy intervals nor quiet intervals. But Assumption 2 can be relaxed at the cost of more complicated mathematics.
+
+In symbols, \begin{equation}\label{eq:2+ prob}
+P("there\ are\ two\ or\ more\ occurrences\ in\ a\ time\ interval\ of\ length\ t")= o(t)
+\end{equation}Thus, \textbf{the probability of two or more occurrences in a small interval must be negligible in comparison with the probability of one occurrence in that interval}.
+
+Under the preceding three assumptions, it can be shown that the process will satisfy the definition of a Poisson process with rate $\lambda$.
+\subsection{Why Poisson Distribution}
+\textbf{We will prove that the three assumptions underlying the Poisson process model indeed implies that the number of occurrences has Poisson distribution.}
+
+What we need to show is that, for each t, the number of occurrences during a time interval of length t has the Poisson distribution with mean $\lambda t$. Let X stand for the number of occurrences during a particular time interval of length t. We will use the following fact: $\forall a\in R$, $$\lim_{u\to 0}(1+au+o(u))^{1/u}=e^{a}$$ Follow the following steps to prove.
+
+\begin{proof}
+\begin{enumerate}
+\item For each $n\in N^{+}$, divide the time interval into n disjoint sub-interval of length $t/n$ each. For $i=1,...,n$, let $Y_{i}=1$ if exactly one arrival occurs in the $i th$ sub-interval and 0 otherwise. Let $A_{i}$ be the event that there are two or more occurrences during the $i th$ sub-interval. Let $W_{n}=\sum_{i=1}^{n}Y_{i}$, $A=\cup_{i=1}^{n}A_{i}$. Then the event $\{X=k\}$ has the following split\footnote{De Morgan's Law. Note that Sample Space $\Omega=A\cup A^{c}$.}:
+\begin{equation}\label{eq:3}
+\{ X=k\}=(\{X=k\}\cap A)\cup(\{X=k\}\cap A^{c})=E_{1}\cup E_{2}\end{equation} Where $E_{1}=(\{X=k\} \cap A)$, $E_{2}=(\{X=k\}\cap A^{c})$. But $A^{c}=\cap_{i=1}^{n}A_{i}^{c}$, so $E_{2}$ is just the event that "there are at most one occurrence in each sub-interval and a total of k occurrences in the whole interval", which is $E_{2}=\{W_{n}=k\}$. And $E_{1}\subset A$, $E_{2}\subset A^{c}$ . Since $E_{1}$ and $E_{2}$ are disjoint, we have
+\begin{equation}
+\begin{aligned}
+P(X=k)&=P(E_{1}\cup E_{2})=P(E_{1})+P(E_{2})-P(E_{1}\cap E_{2})\\
+&=P(E_{1})+P(E_{2})=P(E_{1})+P(W_{n}=k)
+\end{aligned}
+\label{eq:4}
+\end{equation}
+\item Since all sub-intervals are disjoint, the events $A_{1},...A_{n}$ are mutually independent (follows assumption \ref{assumption 1}). Since each sub interval has equal length $t/n$, all the events $A_{1},...A_{n}$ have same probability to occur (follows assumption \ref{assumption 2}). So 
+\begin{flalign*}
+&P(A)=1-P(A^{c})=1-P(\cap_{i=1}^{n}A_{i}^{c})=1-(P(A_{1}^{c}))^{n}=1-(1-P(A_{1}))^{n}&
+\end{flalign*}where $P(A_{1})=o(\frac{\lambda t}{n})=\lambda\, o(\frac{t}{n})$, which follows equation \ref{eq:2+ prob} and $\lim_{n\to \infty}\frac{o(\frac{t}{n})}{\frac{t}{n}}=0$, which follows equation \ref{eq:2}
+\begin{flalign*}
+&\therefore \lim_{n\to\infty}P(A)=\lim_{n\to\infty}1-(1-\lambda\, o(\frac{t}{n}))^{n}=1-\lim_{n\to\infty}e^{-\lambda t \frac{o(t/n)}{t/n}}=1-e^{0}=0&\\
+&\therefore E_{1}\subset A\Rightarrow P(E_{1})<=P(A)\Rightarrow \lim_{n\to\infty}P(E_{1})<=\lim_{n\to\infty}P(A)=0\Rightarrow \lim_{n\to\infty}P(E_{1})=0&\\ &\therefore Equation\; \ref{eq:4} \Rightarrow \lim_{n\to \infty}P(X=k)=\lim_{n\to\infty}P(W_{n}=k)&
+\end{flalign*}
+\item Since $Y_{i}\overset{i.i.d.}{\sim}Bernoulli(p_{n})$, where by equation \ref{eq:prob} $p_{n}=\lambda \frac{t}{n}$. $W_{n}=\sum_{i=1}^{n}Y_{i}\sim Binomial(n,p_{n})$. But remember, in Theorem \ref{theorem:Poisson approx of Bino}, we have proved that for binomial distribution \begin{equation}\label{eq:bino}
+\lim_{n\to\infty}P(W_{n}=k)=\frac{(\lim_{n\to\infty} n p_{n})^{k}}{k!}e^{-\lim_{n\to\infty}np_{n}}=\frac{(\lambda t)^{k}}{k!}e^{-\lambda t}
+\end{equation}
+\item Combine The results from step 1$\sim$3, we have 
+\begin{equation}\label{eq:Poisson process}
+\lim_{n\to\infty}P(X=k)=\frac{(\lambda t)^{k}}{k!}e^{-\lambda t}
+\end{equation}
+\end{enumerate}
+\end{proof}
+\section{From Poisson to Exponential}
+Having the above result, now we can think of how exponential comes to the stage. Consider an event E="there are X number of occurrences of a rare event during a given time period of length t". Let T denote the waiting time (sometimes called return period) of this rare event. Then$P(T\leq t)=1-P(T>t)$, but the event that "waiting time is larger than t" ($\{T>t\}$) is just equivalent to the event "there are zero occurrence of event E during this given time period of length t" ($\{X=0\}$). So take k=0 in equation \ref{eq:Poisson process}, we get.
+\begin{equation}\label{eq:9}
+P(T>t)=P(X=0)=e^{-\lambda t}\Rightarrow F_{T}(t)=P(T\leq t)=1-e^{-\lambda t}
+\end{equation}
+I think you have noticed the magic here. What we get in equation \ref{eq:9} is just the \textbf{CDF of Exponential Distribution}.
+Simply take derivative w.r.t. t, you will get PDF of Exponential Distribution.
+\begin{equation}
+f_{T}(t)=\lambda e^{-\lambda t}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

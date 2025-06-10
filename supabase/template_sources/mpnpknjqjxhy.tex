@@ -1,0 +1,142 @@
+\documentclass[oneside]{diretrizes} % Imprimi apenas frente da página.
+
+\usepackage[alf, abnt-emphasize=bf, recuo=0cm, abnt-etal-cite=2, abnt-etal-list=0]{abntex2cite} % Criação de citações seguindo as normas ABNT. Os parâmetros especificam o estilo de citação a ser utilizado.
+\usepackage[utf8]{inputenc} % Permite o uso de caracteres acentuados diretamente no código LaTeX.
+\usepackage[T1]{fontenc} % Define a codificação da fonte para 8 bits, permitindo a correta exibição de caracteres especiais, como acentos.
+\usepackage{graphicx} % Permite a inserção e manipulação de figuras no documento.
+\usepackage{amsmath,amsthm,amsfonts,amssymb,dsfont,mathtools} % Pacotes para aprimorar a formatação e funcionalidade de fórmulas matemáticas, além de fornecer símbolos e fontes específicas para matemática.
+\usepackage{booktabs} % Fornece comandos adicionais para criar tabelas de alta qualidade, com linhas horizontais mais agradáveis e espaçamento apropriado.
+\usepackage{verbatim} % Permite que o texto seja interpretado exatamente como está escrito no documento, sem processamento especial. Útil para exibir código-fonte ou blocos de texto preformatados.
+\usepackage{multirow, array} % Pacotes para trabalhar com tabelas que envolvem a combinação de várias linhas ou colunas.
+\usepackage{indentfirst} % Indenta o primeiro parágrafo de cada seção. É uma prática comum em alguns estilos de formatação.
+\usepackage{microtype} % Melhora a justificação do texto no documento, fazendo pequenos ajustes no espaçamento entre letras e palavras.
+\usepackage[algoruled, portuguese]{algorithm2e} % Permite escrever algoritmos no documento com um estilo agradável, incluindo números de linha e estruturas de controle adequadas.
+\usepackage{float} % Utilizado para criar ambientes "float" como figuras e tabelas, permitindo maior controle de posicionamento.
+\usepackage{times} % Define a fonte do documento como Times.
+\usepackage{afterpage} % Pacote que permite inserir uma página em branco após a página atual.
+\usepackage{tocbibind} % Adiciona entradas para a bibliografia, índice e lista de figuras/tables ao índice do documento.
+\usepackage{leading} % Controla o espaçamento entre linhas.
+\usepackage{hyperref} % Fornece hiperlinks clicáveis no documento PDF gerado. Também é útil para criar referências internas e externas.
+\newcolumntype{A}{>{\centering\arraybackslash}p{1.2cm}} % Define um novo tipo de coluna para tabelas com alinhamento centralizado.
+\usepackage{url} % Permite a formatação e quebra de URLs longas dentro do texto.
+\usepackage[bottom]{footmisc} % Coloca as notas de rodapé na parte inferior da página.
+\usepackage{pdfpages} % Permite a inclusão de páginas de arquivos PDF externos no documento LaTeX.
+\usepackage{pgffor} % Fornece comandos para realizar iterações, como loops, dentro do LaTeX. É útil para tarefas como repetir um bloco de código várias vezes.
+\usepackage{enumitem} % Permite personalizar as listas (itemize, enumerate, description) no LaTeX. Ele oferece uma ampla variedade de opções de formatação e personalização para listas.
+
+%%%%%%%%%%%%%%%%% Incluir o Sudoku %%%%%%%%%%%%%%%%%%
+\usepackage{tikz} %utilizado para a criação de gráficos, diagramas e desenhos vetoriais
+\newcounter{row}
+\newcounter{col}
+
+\newcommand{\setrow}[9]{
+	\setcounter{col}{1}
+	\foreach \n in {#1, #2, #3, #4, #5, #6, #7, #8, #9} {
+		\edef\x{\value{col} - 0.5}
+		\edef\y{9.5 - \value{row}}
+		\node[anchor=center] at (\x, \y) {\n};
+		\stepcounter{col}
+	}
+	\stepcounter{row}
+}
+
+\newcommand{\setrowfor}[9]{
+	\setcounter{col}{1}
+	\foreach \n in {#1, #2, #3, #4} {
+		\edef\x{\value{col} - 0.5}
+		\edef\y{4.5 - \value{row}}
+		\node[anchor=center] at (\x, \y) {\n};
+		\stepcounter{col}
+	}
+	\stepcounter{row}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%para esconder a contagem de números basta colocar o * após o newtheorem, por exemplo \newtheorem*{teo}{Teorema}[] e ficará como Teorema.%
+
+\newtheorem{teo}{Teorema}[]
+\newtheorem{prop}{Proposição}[]
+\newtheorem{lema}{Lema}[]
+\newtheorem{coro}{Corolário}[]
+\theoremstyle{definition}
+\newtheorem{defi}{Definição}[]
+\newtheorem{observacao}{Observação}[]
+\newtheorem{ex}{Exemplo}[]
+\newtheorem{sol}{Solução}[] 
+
+% Inclui o preâmbulo do documento
+\include{01-elementos-pre-textuais/preambulo}
+
+% Define as cores dos links e informações do PDF
+\makeatletter
+\hypersetup{
+    portuguese,
+    colorlinks,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=black,
+    urlcolor=black,
+    breaklinks=true,
+    pdftitle={\@title},
+    pdfauthor={\@author},
+    pdfsubject={\imprimirpreambulo},
+    pdfkeywords={abnt, latex, abntex, abntex2}
+}
+\makeatother
+
+% Redefinição de labels
+\renewcommand{\algorithmautorefname}{Algoritmo}
+\def\equationautorefname~#1\null{Equa\c c\~ao~(#1)\null}
+
+% Cria o índice remissivo
+\makeindex
+
+% Início do documento
+\begin{document}
+
+    % Retira espaço extra obsoleto entre as frases.
+    \frenchspacing
+
+    % Elementos pré textuais
+    \pretextual
+    \include{./01-elementos-pre-textuais/capa}              % Capa
+    \include{./01-elementos-pre-textuais/folhaRosto}        % Folha de rosto
+    \begin{center}
+    
+    \end{center}
+    \include{./01-elementos-pre-textuais/folhaAprovacao}    % Folha de aprovação
+    \include{./01-elementos-pre-textuais/dedicatoria}       % Dedicatória
+    \include{./01-elementos-pre-textuais/agradecimentos}    % Agradecimentos
+    \include{./01-elementos-pre-textuais/epigrafe}          % Epígrafe
+    \include{./01-elementos-pre-textuais/resumoPt}          % Resumo na língua vernácula
+    \include{./01-elementos-pre-textuais/resumoEn}          % Resumo em língua estrangeira
+    \include{./01-elementos-pre-textuais/listaFiguras}      % Lista de figuras
+    \include{./01-elementos-pre-textuais/listaTabelas}      % Lista de tabelas
+   
+    \sumario
+
+    % Elementos textuais
+    \textual
+    \include{./02-elementos-textuais/introducao}            % Introdução
+    \include{./02-elementos-textuais/Cap1}           % Disposições
+    \include{./02-elementos-textuais/Cap2}  			% Estrutura    
+    \include{./02-elementos-textuais/Cap3}           	% Ilustrações
+    \include{./02-elementos-textuais/Conclusões}
+    
+    % Elementos pós textuais
+    \postextual
+    % Referências
+    \include{./03-elementos-pos-textuais/Referências}
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % IMPORTANTE!!! Cada referência deve ter seu nome posto no modelo ``\nocite{nomedareferencia}'', como abaixo.
+    % Além disso, DEVE-SE LEMBRAR DE CITAR CADA REFERÊNCIA NO CORPO DO TEXTO. Por definição, ``Referências''
+    % é uma lista de bibliografias onde se encontram afirmações e indicações de conteúdo do texto, e serve para o leitor
+    % consultar e conferir a existência/veracidade destas afirmações.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \nocite{autor}
+    \nocite{referência}
+    \nocite{internet}
+    \nocite{net}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

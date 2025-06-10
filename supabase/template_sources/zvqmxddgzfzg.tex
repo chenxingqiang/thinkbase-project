@@ -1,0 +1,311 @@
+%########################################
+% Template in latex for classroom assignments and project report
+% 
+%
+% Author: Vishal Sharma
+%
+% Use xelatex compiler 
+%########################################
+
+
+
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[10pt,oneside,fleqn]{article}
+
+
+% Often used text to commands
+\newcommand{\clr}{gray!60}
+\newcommand{\gray}{\textcolor{gray!60}}
+\newcommand{\name}{Vishal Sharma}
+\newcommand{\class}{\gray {CS 7890: Intelligent System}}
+\newcommand{\hwnumber}{\gray {1}}
+\newcommand{\aNum}{A01789836}
+\newcommand{\hw}{\gray {Project }}
+
+
+
+% All packages
+\usepackage{amssymb,amsthm,amsmath,enumerate,fancyhdr,graphicx,tabularx}
+\usepackage{microtype}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{mathpazo}
+\usepackage{mdframed}
+\usepackage{parskip}
+\usepackage{fontspec} 
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usepackage{lipsum}  % generates filler text
+\linespread{1.1} 
+
+
+% FONTS
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont [Ligatures={Common}, Numbers={OldStyle}, Variant=01]{Linux Libertine O}
+%\setmonofont[Scale=0.8]{Monaco}
+\usepackage{fontspec}
+\setmainfont{Linux Libertine O}
+\setsansfont{Linux Biolinum O}
+%\setmonofont{Inconsolata}
+
+% Frame for Problem Statement definition
+\newenvironment{problem}[1]
+{\begin{mdframed}
+		\textbf{\textsc{Project Objectives:}}
+}
+{\end{mdframed}}
+
+
+
+% Environment for Solution definition
+\newenvironment{solution}[1]
+{\textbf{\textsc{Project Goals: }}\\}
+
+
+% header and footer content
+\pagestyle{fancy}
+\lhead{\hw {\hwnumber}}
+\chead{}
+\rhead{\class}
+\cfoot{}
+
+
+% Header line with color gray!60
+\renewcommand{\headrulewidth}{0.0pt}% 2pt header rule
+\setlength{\headsep}{1.5cm}
+
+
+\pgfplotsset{compat=1.16}
+% Document 
+\begin{document}
+
+	% Intro Page Starts
+	\begin{figure}
+		\vspace{80pt}
+		\centering
+		\includegraphics[width=7cm, height=7cm]{./images/logo.png} \\
+		\includegraphics[width=3.2cm, height=2cm]{./images/cs-logo.png} \\
+		\vspace{25pt}
+	\end{figure}
+
+	
+	\centering
+	{
+	\textcolor{black!70}{
+    \large \name\\
+	$0000000$}
+	}
+	\newpage
+	% Define foot name after intro page
+	\lfoot{\gray \name}
+	\rfoot{\gray \thepage}
+	% Intro Page Ends
+
+
+	% Assignment problems
+	\begin{problem}{1}
+		This project has two objectives. The first objective is to train and test four neural networks: one ANN and one ConvNet that classify images and one ANN and one ConvNet that classify audio samples. The second objective is to compare the performance of ANNs and ConvNets on	images and audio samples.
+	\end{problem}
+
+	\raggedright
+	\begin{solution}{}
+		\vspace{10pt}	
+		This project aims at delivering classifiers for two problems \textit{(a)} An image classifier to identify Bee \textit{(b)} An audio classifier to identify sound of Bee, Cricket or Noise. 
+	\end{solution}	
+
+	
+	\subsection*{\textsc{Image Classification}}
+	Given dataset contains total of 50863 images, where 25,444 belongs to images with Bee and 25,419 of images with No Bee, stats of dataset shown below:
+		\begin{center}
+		\begin{tabular}{ c c c c } 			
+			\hline
+			& Bee & No Bee & \textbf{Total} \\ 
+			\hline
+			\textbf{Train} & 19,082 & 19,057 & 38,139 \\  
+			\textbf{Test}  & 6,362 & 6,362 & 12,724\\  
+			\hline
+			&25,444&25,419& \textbf{50,863}\\
+			\hline
+		\end{tabular}
+	\end{center}
+	\textsc{\textbf{Goal}}: Build a binary classifier to identify images containing Bee and No Bee.
+	
+	\subsubsection*{Experimental Setup}
+	Given dataset was used `as is' for training and testing in the experiments, approx. split was  75\% (training) - 25\% (testing). The images were loaded using openCV and no pre-processing was done to the images. All 3 channels (R,G,B) of images were used in the experiment. 
+	
+	\subsubsection*{Using ANN}
+	A Multi Layer Perceptron network was used to build a classifier with 6 fully connected layers of 1024, 1024, 512, 512, 128, 2 neurons as shown in Fig~\ref{ann_images}. Details about activation function used is in code.
+	
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.6\textheight]{./images/ann_images.png} \\
+		\caption{Architechture of ANN used for Image classification}
+		\label{ann_images}
+	\end{figure}
+
+	\textsc{Performance:} Training was done for 500 epochs using Stochastic Gradient Descent (SGD) as optimizer with learning rate of 0.0001.	Figure~\ref{ann_perfm} displays accuracy during training. \\ 
+	
+	\begin{center}
+		Training Accuracy: 98.85\% \\
+		Testing Accuracy: 97.52\% \\
+	\end{center}
+	
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.60\textheight]{./images/bee_ann_images.png} \\
+		\caption{Performance of ANN for Image classification}
+		\label{ann_perfm}
+	\end{figure}
+
+	\subsubsection*{Using CNN}
+	A network using Convolution layers was used to build classifier, network architecture is shown in Fig~\ref{cnn_images}. The \textit{filter\_size} for each convolution was 3 and \textit{number of filters} was 32 and 64 for respective layers, details about activation function used is in code.
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.6\textheight]{./images/cnn_images.png} \\
+		\caption{Architechture of CNN used for Image classification}
+		\label{cnn_images}
+	\end{figure}
+
+
+	\textsc{Performance:} Training was done for 500 epochs using Stochastic Gradient Descent (SGD) as optimizer with learning rate of 0.01. Figure~\ref{cnn_perfm} displays accuracy during training. \\ 
+	
+		
+	\begin{center}
+		Training Accuracy: 100.00\% \\
+		Testing Accuracy: 99.34\% \\
+	\end{center}
+	
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.6\textheight]{./images/bee_cnn_images.png} \\
+		\caption{Performance of CNN for Image classification}
+		\label{cnn_perfm}
+	\end{figure}
+	
+	
+	% Audio Classification 
+	\subsection*{\textsc{Audio Classification}}
+		The objective of this project is to build a multi class classifier to identify sound of a bee, cricket or noise.
+		
+	\subsubsection*{Audio Dataset}
+	
+	Given dataset contains total of 9,914 audio sample, where 3,300 belongs to Bee, 3,500 belongs to Cricket and 3,114 belongs to noise. Each audio sample is approximately about 2 sec long and has 44,100 amplitude samples/sec. Given dataset was merged and experiments were performed on 80\%-20\% split.
+	\begin{center}
+		\captionof{table}{Audio Dataset}
+		\begin{tabular}{ c c c c c } 			
+			\hline
+			& Bee & Cricket & Noise & \textbf{Total} \\ 
+			\hline
+			\textbf{Train} & 2,402 & 3,000 & 2,180 & 7,582 \\  
+			\textbf{Test}  & 898 & 500 & 934 & 2,332\\  
+			\hline
+			&3,300&3,500&3,114& \textbf{9,914}\\
+			\hline
+			\label{audio_data}
+		\end{tabular}
+	\end{center}
+
+
+	\subsubsection*{Audio Data Preprocessing:}	
+
+	Audio dataset given has very high frame rate, on an average every file had 80,000 frames (amplitude/sec). With frames/sec being so high we have a lot of data and it needs some preprocessing. Reduction of audio frame rate and length was performed using interpolation technique. The audio sample was reduced to 15k sample and total length of 22,000 (approximately 1/4 reduction of the given audio).
+
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.6\textheight]{./images/audio_preprocessing.pdf} \\
+		\label{audio_preprocess}
+		\caption{Audio Downsampling}
+	\end{figure}
+
+
+	
+
+	\subsubsection*{Using CNN}
+	
+	\begin{minipage}[t]{0.75\columnwidth}%
+			A network using Convolution layers was used to build classifier, network architecture is shown in Fig~\ref{cnn_audio}. The \textit{number of filters} for both convolution was 64 and \textit{filter\_size} was 10 and 3 for respective layers followed by 3 fully connected layers, details about activation function used is in code. 
+			
+			
+			\vspace{3pt}
+			Max pooling was used after each convolution layer. During training over fitting was observed, to handle that dropout of 50\% (keep) was used after first two fully connected layers and also `L2' regularization was added to both layers. Input length was fixed as 22,000 with 1 channel.
+			
+			
+			\vspace{3pt}
+			During training it was also observed, without downsampling data model was not able to generalize well between bee and noise data. Adding downsampling technique helped the model in generalization. 
+			
+			\vspace{5pt}
+			\textsc{Performance:} Training was done for 500 epochs using Adaptive Moment Estimation (adam) as optimizer with learning rate of 0.0001. Figure~7 displays accuracy during training. \\ 
+				
+			\begin{center}
+				Training Accuracy: 99.88\% \\
+				Testing Accuracy: 99.45\% \\
+			\end{center}
+			
+	\end{minipage}%
+	\begin{minipage}[t]{0.3\columnwidth}%
+		\centering
+		\includegraphics[angle=-90, width=2.3cm]{./images/CNN_Net.pdf} \\
+		\captionof{figure}{CNN for Audio Classification}
+		\label{cnn_audio}
+	\end{minipage}
+
+
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.6\textheight]{./images/bee_cnn_audio.png} \\
+		\label{cnn_audio_per}
+		\caption{Performance of CNN on audio classification}
+	\end{figure}
+
+
+
+
+	
+	
+	
+	\newpage
+	\subsubsection*{Using ANN}
+	\begin{minipage}[t]{0.35\columnwidth}%
+		
+		During initial experiments ANN was not performing good and later after several experiments a Multi Layer Perceptron (MLP) model was build based on intuition of CNN. Where before feeding audio data in network it was max pooled in 3 different layers and output of pooled layers was given input to the fully connected layers as shows in Fig~8. To merge features extracted from different pooling layers output of fully connected layer was merged. 
+		
+		\vspace{5pt}
+		\textsc{Performance:} Training was done for 500 epochs using Adaptive Moment Estimation (adam) as optimizer with learning rate of 0.0005. Figure~9 displays accuracy during training. \\ 
+		\begin{center}
+			Train Accuracy: 91.11\% \\
+			Test Accuracy: 88.25\% \\
+		\end{center}
+		
+	\end{minipage}%
+	\begin{minipage}[t]{0.60\columnwidth}%
+
+			\centering
+			\includegraphics[angle=-90, width=0.4\textheight]{./images/ANN_Net_2.pdf} \\
+			\captionof{figure}{ANN for Audio Classification}
+
+	\end{minipage}%
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.6\textheight]{./images/bee_ann_audio.png} \\
+		\caption{Performance of ANN on audio classification}
+	\end{figure}
+	\begin{figure}[!h]
+		\centering
+		\includegraphics[width=0.65\textheight]{./images/audio_graph.pdf} \\
+		\label{audio_ana}
+		\caption{Sample Bee Audio and expected feature extraction using pooling layers and merging fully connected layers}
+	\end{figure}
+
+	Mentioned by Prof. Kulyukin, Fig~10 shows an attempt to analyze what could be happening when using multi pooling layer, followed by fully connected layer. 
+
+	
+\end{document}
+

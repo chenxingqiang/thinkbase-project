@@ -1,0 +1,40 @@
+\documentclass[a4paper, twoside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\input{chapters/preamble}
+\newcommand{\mytitle}{My Thesis}
+\title{\mytitle} %->->->->-> Check hyperref title <-<-<-<-<-
+\author{Author's \textsc{Name}}
+%\loadglsentries{chapters/glossary}
+
+\begin{document}
+\frontmatter
+	\pagestyle{empty}
+    \input{chapters/titlepage}
+    \input{chapters/coversheet}
+    \listoftodos
+	\input{chapters/epigraph}
+    \tableofcontents \pagestyle{fancy} \markboth{Contents}{Contents}
+    \input{chapters/chapter0}
+
+\mainmatter
+	\fancyhead[RE,LO]{\thesection} % Custom header text
+    \input{chapters/chapter1}
+
+    \newcounter{auxiliary}
+    \setcounter{auxiliary}{\arabic{section}}
+    \appendix
+        \setcounter{section}{\arabic{auxiliary}} %The auxiliary counter solves the issue of section number-skipping in the appendices
+        
+        
+    %\glsaddall[types={definition}]
+    %\printnoidxglossary[sort=letter]
+    %\printnoidxglossary[sort=letter, type=definition]
+    %\printindex  \markboth{Índice Remissivo}{Índice Remissivo}
+
+\backmatter
+    %\nocite{*}
+    \FloatBarrier
+    \printbibliography[heading=bibintoc]
+    
+\end{document}

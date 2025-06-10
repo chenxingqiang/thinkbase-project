@@ -24,7 +24,7 @@ class ValidationResult:
     score: Optional[float] = None
     details: Optional[Dict[str, Any]] = None
     message: Optional[str] = None
-    timestamp: str = None
+    timestamp: Optional[str] = None
     
     def __post_init__(self):
         if self.timestamp is None:
@@ -350,7 +350,8 @@ class ResponseQualityValidator(BaseValidator):
                 vectorizer = TfidfVectorizer()
                 try:
                     tfidf_matrix = vectorizer.fit_transform(sentences)
-                    coherence_scores = cosine_similarity(tfidf_matrix[:-1], tfidf_matrix[1:])
+                    tfidf_array = np.asarray(tfidf_matrix.todense())  # type: ignore
+                    coherence_scores = cosine_similarity(tfidf_array[:-1], tfidf_array[1:])
                     avg_coherence = coherence_scores.mean()
                     
                     min_coherence = criteria.get("min_coherence", 0.3)
@@ -367,7 +368,6 @@ class ResponseQualityValidator(BaseValidator):
             if criteria.get("check_grammar", False):
                 blob = TextBlob(response_text)
                 results["grammar"] = {
-                    "language_detected": blob.detect_language(),
                     "spelling_errors": len(blob.correct().split()) - len(response_text.split())
                 }
                 

@@ -1,0 +1,53 @@
+\documentclass[a4paper,11pt]{article}
+
+\input{preamble.tex}
+
+% page setup
+\geometry{left=2.5cm,textwidth=16.5cm,top=1in, bottom=1in} % , textheight=27cm
+\setlength{\parskip}{6pt} % space between paragraphs
+\doublespacing
+        
+% references
+\hypersetup{citecolor=blue,linkcolor=blue,urlcolor=blue} % [s1]
+
+%% new commands
+\graphicspath{ {./files/}} % standard path for figures
+\newcommand{\tablepath}{files} % [a1]
+    \makeatletter
+    \newcommand{\includetable}[1]{%
+      \@ifundefined{tablepath}{%
+        \InputIfFileExists{#1}{}{}%
+      }{%
+        \InputIfFileExists{\tablepath/#1}{}{\InputIfFileExists{#1}{}{}}%
+      }
+    }
+    \makeatother
+
+
+\begin{document}
+%\input{titlepage.tex}
+\input{titlepageThesis.tex}
+\newpage 
+
+\input{Sections/1-introduction}
+\input{Sections/2-background}
+\input{Sections/3-data}
+\input{Sections/4-methods}
+\input{Sections/5-results}
+\input{Sections/6-conclusion}
+\newpage
+\bibliographystyle{apalike}
+%\bibliography{Archive/references.bib}{} % if references.bib
+\bibliography{bibliographyCiteDrive.bib} % if CiteDrive plug-in
+%\printbibliography
+
+\newpage
+
+\input{Sections/7-figuresAndTables}
+    \include{Sections/8-appendix}
+\end{document}
+
+
+% Notes
+% [a1] creates standard path for tables Source: // https://tex.stackexchange.com/questions/284347/separate-directory-for-tables // https://tex.stackexchange.com/questions/8351/what-do-makeatletter-and-makeatother-do
+% [s1] https://tex.stackexchange.com/questions/246386/changing-color-of-cites-with-hypersetup-not-working

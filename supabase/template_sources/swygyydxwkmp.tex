@@ -1,0 +1,116 @@
+% ===================================================
+%       CONFIGURAÇÕES INICIAIS DO TEMPLATE
+% ===================================================
+% classe do doc e config português
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} % ver https://www.overleaf.com/learn/latex/Portuguese
+
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{ifthen} % uso de ifs do Latex
+
+\usepackage{palatino} % estilo da fonte
+
+\usepackage{geometry} % tamanho do papel e margens globais
+\geometry{
+ a4paper,
+ left=25mm,
+ right=25mm,
+ top=25mm,
+ bottom=30mm
+}
+
+
+% define as varáveis de configuração
+\input{config/configuracoes.tex}
+
+% Configura a língua do relatório técnico 
+\ifthenelse{\boolean{linguaPortuguesa}}
+{ \usepackage[brazil]{babel} } % then
+{ \usepackage[english]{babel} } % else
+
+% Configura o título da seção de referências
+\ifthenelse{\boolean{linguaPortuguesa}}
+{ \newcommand{\nomeSecaoReferencias}{Referências} } % then
+{ \newcommand{\nomeSecaoReferencias}{References} } % else
+
+
+\usepackage{fancyhdr} % formatação direta para cabecalho e rodape
+\pagestyle{fancy}
+
+%formata o estilo da bibliografia nas citações
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{acm}
+
+\fancyhf{} % Cabeçalho deixado explicitamente vazio
+\fancyfoot[C]{\footnotesize{\thepage}} % Rodapé no centro
+
+
+
+% ===================================================
+%       PÁGINA DE TÍTULO DO RELATÓRIO TÉCNICO
+% ===================================================
+
+% gera o cabeçalho da página de título
+% \fancyhead[L]{Relatórios Técnicos do DIA/UNIRIO, No. \numeroRelatorio/\anoPublicacao}
+\fancyhead[L]{SYNERGY 2024}
+\fancyhead[R]{\mesPublicacao, \anoPublicacao}
+
+\renewcommand{\headrulewidth}{0pt}
+
+\setlength{\parskip}{0.6em} % espaçamento entre parágrafos
+
+% Título do relatório
+\title{\textbf{\tituloRelatorio}}
+
+% Autores
+\author{\autoresArtigoComFiliacao}
+
+\date{
+\begin{center}
+
+% Filiação
+\filiacaoAutores
+
+\end{center}
+\vspace{10pt}
+
+% Email dos autores 
+\emailsAutores
+
+}
+
+
+% ===================================================
+% Inicio efetivo do documento 
+% ===================================================
+
+\begin{document}
+\pagestyle{empty}
+
+% \input{capa.tex}
+
+\input{titulo.tex}
+
+\clearpage
+
+\pagestyle{fancy}
+\fancyhead[]{}
+% \tableofcontents{}
+
+\clearpage
+
+\fancyhead[]{}
+\fancyfoot[]{}
+\fancyfoot[R]{\footnotesize{\thepage}}
+\renewcommand{\footrulewidth}{0.2pt} 
+% \fancyfoot[L]{\footnotesize{ReLate-DIA: \tituloRelatorio}}
+\fancyfoot[L]{\footnotesize{SYNERGY 2024: \tituloRelatorio}}
+ 
+ \pagenumbering{arabic}
+
+\input{../conteudo.tex}
+
+\end{document}

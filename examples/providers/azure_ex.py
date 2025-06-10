@@ -2,16 +2,16 @@
 Azure OpenAI example: pip install ell-ai[azure]
 This example demonstrates using Azure OpenAI to generate stories.
 """
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import openai
 import os
 from typing import Optional
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -41,8 +41,8 @@ try:
         api_version="2024-02-15-preview"
     )
 
-    # Configure ELL2A to use the Azure model
-    ell2a.configure({
+    # Configure ELL to use the Azure model
+    ell.configure({
         "model": deployment_name,
         "default_model": deployment_name,
         "client": azure_client
@@ -56,7 +56,7 @@ except ValueError as e:
     print("- AZURE_OPENAI_DEPLOYMENT")
     exit(1)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def write_a_story(about: str) -> str:
     """Write a story about the given topic."""
     return f"Write me a creative and engaging story about {about}!"

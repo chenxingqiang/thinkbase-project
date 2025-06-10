@@ -1,0 +1,654 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{afterpage}
+\usepackage{diagbox}
+\usepackage[UTF8,heading = true]{ctex}
+
+
+%%%% 宏包 %%%%%%%%%%%
+\usepackage{amsmath,amssymb,amsfonts,mathrsfs}
+\usepackage{graphicx}
+\usepackage{ulem}
+\usepackage{pdfpages}
+\usepackage{lipsum}
+\usepackage{booktabs}
+
+\usepackage{array,tabularx,longtable}
+	\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{enumerate }
+
+\usepackage{tikz}
+\usepackage{tikz-qtree,tikz-qtree-compat}
+	\usetikzlibrary{arrows}
+
+\usepackage{siunitx}
+\usepackage{anyfontsize}
+
+%\usepackage{fontspec}
+\usepackage{xeCJK}
+
+%\setCJKmainfont{SimSun.TTC}
+
+\usepackage{pdfpages}
+
+
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{titletoc}
+
+%解决参考文献的问题
+\usepackage[comma]{natbib}
+\setcitestyle{numbers,square}
+
+\usepackage[explicit]{titlesec}
+\titlespacing{\section}{0pt}{0pt plus .0pt }{20pt plus .0pt}
+%\titlespacing{\section*}{0pt}{15pt plus .0pt}{19pt plus .0pt}
+\titlespacing{\subsection}{0pt}{6pt plus .0pt}{6pt plus .0pt}
+
+
+%\renewcommand{heiti}{SimHei.TTF}          % 黑体
+
+
+
+\usepackage{algorithm,algorithmic}%写算法的环境
+
+\usepackage{float}%解决表格与文字分开显示的问题
+
+
+
+\ctexset{
+    %contentsname = {\zihao{3}\heiti\bfseries{目录}},
+%	figurename = {Figure},
+%	tablename = {Table},
+%	bibname = {References},
+    section={
+        name={第,章},
+        format=\bfseries\centering\heiti\zihao{3},
+        numberformat=\bfseries\heiti\zihao{3},
+            },
+    subsection={
+        format=\bfseries\heiti\zihao{4},
+        numberformat=\bfseries\heiti\zihao{4}
+    },
+    subsubsection={
+        format=\bfseries\heiti\zihao{-4}
+    }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%% 页面设置 %%%%%%%%%%
+
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}%用来写代码的库
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+
+%--目录页眉页脚
+
+\fancypagestyle{yemei}
+{
+    \fancyhf{}
+    \fancyhead[C]{\zihao{5}\songti{\nouppercase{\leftmark}}}
+    \fancyfoot[c]{\thepage}
+    \renewcommand{\headrulewidth}{0.5pt}
+    %\renewcommand{\footrulewidth}{1.5pt} %给页脚加上一条横线，在论文中没有使用的价值
+}
+\fancypagestyle{mulu}
+{
+    \fancyhf{}
+    \fancyhead[C]{\zihao{5}\songti{目录}}
+    \renewcommand{\headrulewidth}{0.5pt}
+}
+
+%改变颜色
+
+\usepackage[colorlinks,linkcolor=blue,citecolor=blue,bookmarks=true,bookmarksnumbered=true]{hyperref}
+
+
+% 目录字体设置
+\usepackage{subfigure}
+\usepackage[subfigure]{tocloft}      %必须这么写，否则会报错
+
+\renewcommand{\baselinestretch}{1.2} %调整行距为1.2倍标准行距
+\renewcommand{\cftsecleader}{\cftdotfill{0.6}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{0.6}}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{0.6}}
+\renewcommand{\cftsecfont}{\zihao{-4}\songti}    %设置section条目的字体
+\renewcommand{\cftsubsecfont}{\zihao{-4}\songti} %设置subsection条目的字体
+\renewcommand{\cftsubsubsecfont}{\zihao{-4}\songti} %设置subsection条目的字体
+
+%解决参考文献是蓝色的问题，让参考不显示颜色。
+\hypersetup{
+    %colorlinks=true,
+    %linkcolor=blcak,
+    filecolor=black,      
+    urlcolor=black,
+}
+
+
+\setlength\baselineskip{20pt}%调整正文内容的行距
+\setlength{\headheight}{15pt}
+\let\heiti\relax % 清除旧定义，
+\let\songti\relax
+
+\usepackage{caption}
+
+
+\usepackage{threeparttable}    %给表格添加注释
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+    \bibliographystyle{plainnat}
+    \includepdf{cover.pdf} %调用封面.
+	
+    \renewcommand\thetable{\thesection.\arabic{table}} 
+    \renewcommand\thefigure{\thesection.\arabic{figure}} %解决图表的编号问题
+    
+    \newCJKfontfamily{\heiti}[AutoFakeBold={1.7}]{SimHei.TTF}
+    %\newCJKfontfamily{\songti}[AutoFakeBold={3}]{SimSun.TTC}
+
+	
+    \renewcommand{\figurename}{图}
+    \renewcommand\tablename{表}%将table改成表
+    \captionsetup{labelformat=default,labelsep=default}%将表格加的那个小点取消
+    \renewcommand{\thesubfigure}{\empty}%将subfigure下面的a,b,c给取消掉
+
+
+    %% 中文摘要
+    %\clearpage
+    \fancyhead[C]{\zihao{5}\songti{摘要}}
+    \phantomsection
+    \addcontentsline{toc}{section}{摘要}
+
+    
+    \vspace*{0pt}
+    \centerline{\zihao{3}\heiti\bfseries 摘\quad 要}
+    \vspace*{16pt}
+
+    \linespread{1.4}
+    \zihao{-4} 
+
+    当蜘蛛网无情地查封了我的炉台
+　　  当灰烬的余烟叹息着贫困的悲哀
+　　  我依然固执地铺平失望的灰烬
+　　  用美丽的雪花写下：相信未来
+　　  当我的紫葡萄化为深秋的露水
+　　  当我的鲜花依偎在别人的情怀
+　　  我依然固执地用凝霜的枯藤
+　　  在凄凉的大地上写下：相信未来
+　　  我要用手指那涌向天边的排浪
+　　  我要用手撑那托住太阳的大海
+　　  摇曳着曙光那枝温暖漂亮的笔杆
+　　  用孩子的笔体写下：相信未来
+　　  我之所以坚定地相信未来
+　　  是我相信未来人们的眼睛
+　　  她有拨开历史风尘的睫毛
+　　  她有看透岁月篇章的瞳孔
+　　  不管人们对于我们腐烂的皮肉
+　　  那些迷途的惆怅、失败的苦痛
+　　  是寄予感动的热泪、深切的同情
+　　  还是给以轻蔑的微笑、辛辣的嘲讽
+　　  我坚信人们对于我们的脊骨
+　　  那无数次的探索、迷途、失败和成功
+　　  一定会给予热情、客观、公正的评定
+　　  是的，我焦急地等待着他们的评定
+　　  朋友，坚定地相信未来吧
+　　  相信不屈不挠的努力
+　　  相信战胜死亡的年轻
+　　  相信未来、热爱生命
+
+
+
+    \bigskip
+
+    \noindent{\zihao{-4}\songti \textbf{关键词:}}
+    相信未来，热爱生命
+    \pagenumbering{Roman}%使用罗马字体
+
+
+
+    \newpage
+    \phantomsection\addcontentsline{toc}{section}{Abstract}%将一些非章节加到目录之中
+    \fancyhead[C]{\zihao{5}\songti{Abstract}}
+    \vspace*{0pt}
+    \centerline{\zihao{3}\bfseries Abstract}
+    \vspace*{20pt}
+
+    \linespread{1.4}\zihao{-4}
+    ***************中文摘要的翻译即可****************
+   
+
+    \bigskip
+    \noindent\textbf{\zihao{-4} Keywords:} 
+    believe in yourself always
+
+
+
+    \newpage
+    \setcounter{secnumdepth}{4}%这个是让你的目录在正文中也不显示
+    \setcounter{tocdepth}{2}%设定目录深度为2，即只显示到二级标题为止
+
+    \renewcommand\contentsname{\zihao{3}\heiti\textbf{目\quad 录}}
+  
+    \begin{spacing}{1.7}
+        {\centering\tableofcontents} %列出目录  
+    \end{spacing}
+    \thispagestyle{mulu}
+    \vspace*{16pt}
+	
+
+
+
+
+    \setcounter{page}{0} %将本页记为第0页，重新编号
+    %\thispagestyle{empty}%取消本页的页眉页脚
+
+    \pagestyle{yemei}
+    \newpage
+    \pagenumbering{arabic}%重新设置成为阿拉伯数字
+    \setcounter{page}{1} %将本页记为第1页，重新编号
+
+    \section{绪论}
+    %此命令放在正文，紧跟\section{}命令，手动为页眉添加节标题
+    \markboth{\text{第}\thesection\text{章} \quad 绪论}{\text{第}\thesection\text{章} \quad 绪论}   
+
+    \subsection{研究背景与研究目的}
+    
+        北国风光，千里冰封，万里雪飘。
+      望长城内外，惟余莽莽;大河上下，顿失滔滔。
+     山舞银蛇，原驰蜡象，欲与天公试比高。
+     须晴日，看红装素裹，分外妖娆。
+      江山如此多娇，引无数英雄竞折腰。
+      惜秦皇汉武，略输文采;唐宗宋祖，稍逊风骚。
+     一代天骄，成吉思汗，只识弯弓射大雕。
+     俱往矣，数风流人物，还看今朝。
+    
+
+
+    
+
+    \subsubsection{放自己的标题}
+    $\times \times \times\times \times \times\times \times \times\times \times \times\times \times \times\times \times \times\times \times \times$
+
+    \subsubsection{$\times \times \times\times \times \times$}
+    $\times \times \times\times \times \times\times \times \times\times \times \times\times \times \times\times \times \times\times \times \times$
+
+    \subsection{大括号里面放标题}
+
+    
+
+
+
+
+
+    \newpage
+    \section{公式的编辑方法}
+    %此命令放在正文，紧跟\section{}命令，手动为页眉添加节标题
+    \markboth{\text{第}\thesection\text{章} \quad 公式的编辑方法}{\text{第}\thesection\text{章} \quad 公式的编辑方法}  
+
+
+    \subsection{公式的输入方法}
+    %%%%第一种：$$与$$$$
+    使用美元符号进行行内公式输入：$a^2+b^2=c^2$.%代表是输入行内公式
+
+    使用双美元符号进行行间公式输入：$$a^2+b^2=c^2.$$%代表是输入行间公式
+
+    使用math环境进行行间公式输入：%采用math环境，是行内公式
+    \begin{math}
+        a^2+b^2=c^2.
+    \end{math}
+
+    %%%%第二种：equation环境
+    equation环境下启用自动编号：
+    \begin{equation}%不加星号表示启用自动编号
+        x^3+x^2+x+1=0
+    \end{equation}
+
+    equation*环境下不启用自动编号，手动编号：
+    \begin{equation*}%加星号表示不启用自动编号，使用\tag{}可以实现手动编号
+        x^3+x^2+x+1=0
+        \tag{2.1}
+    \end{equation*}
+
+    \subsection{复杂公式的输入方法}
+    本文只介绍使用equation环境的输入方法，这种方法可以应对大部分复杂公式。例：
+    \begin{equation}
+    \label{f1}%给公式进行赋名，方便后面引用
+        \left\{ %这种方法可以打出左括号
+        \begin{aligned}
+            &\phi _t =-(\phi^3 -g\phi ^2-\epsilon \phi +(1+\Delta  )^2 \phi),\\
+            &\phi(x,y,0)=\phi_0(x,y),\\
+            &\phi (x+L,y,t)=\phi(x,y,t),\\
+            &\phi (x,y+L,t)=\phi (x,y,t),
+        \end{aligned}
+		\right.\tag{2.2}
+    \end{equation}
+
+    如果想要引用上面的公式，可以使用ref命令。例如：公式$(\ref{f1})$是一个复杂的数学公式。
+
+    \subsection{参考文献的引用}
+    如果想要在正文里面引用参考文献，刚可以使用cite命令。例如：参考文献$\cite{ref1}$是一个很重要的文献。在pdf文件中点击可以跳转到对应的参考文献。
+
+
+
+
+
+
+
+
+
+    \newpage
+    \section{图表的使用}
+    在本节中，将具体对图和表的引用进行说明。
+
+    %此命令放在正文，紧跟\section{}命令，手动为页眉添加节标题
+    \markboth{\text{第}\thesection\text{章} \quad 图表的使用}{\text{第}\thesection\text{章} \quad 图表的使用}  
+
+
+    \subsection{图的引用}
+    LaTex提供自己的画图工具包，应该是tikz.这个画出来就是矢量图，但学起来相对复杂一点，故不做介绍。本节只对如何使用标量图进行介绍。
+
+    第一步：把你需要的图片放到和main.tex一个位置。
+
+    第二步：调用图片。第一张图如何调用如下：
+
+    \begin{figure}[htbp]
+        \centering
+        \includegraphics[height=6cm,width=7.5cm]{0.jpg} 
+        \caption{\songti{这是一张图的调用.}}
+        \captionsetup{font={small,bf,stretch=1}}
+        \label{figure1}
+    \end{figure}
+
+    多张图如何调用如下：
+    \begin{figure}[htbp]
+        \centering
+        \subfigure[$T=0$]{
+        \includegraphics[height=4cm,width=4.5cm]{0.jpg} 
+        }
+        \quad
+        \subfigure[$T=10$]{
+        \includegraphics[height=4cm,width=4.5cm]{10.jpg} 
+        }
+        \quad
+        \subfigure[$T=20$]{
+        \includegraphics[height=4cm,width=4.5cm]{20.jpg} 
+        }
+        \caption{\songti{这是多张图的调用}}
+        \captionsetup{font={small,bf,stretch=1}}
+        \label{figure2}
+    \end{figure}
+
+    依然是采用ref命令来引用图。例如：图$\ref{figure1}$是一张图，而图$\ref{figure2}$是多张图。
+    
+
+    \subsection{表的生成}
+    表格在latex中是可以生成的。我们讲3个例子。
+
+    例1：
+    \begin{table}[htbp]
+        \centering
+        \setlength{\tabcolsep}{10mm}
+        \begin{tabular}{ccc}  
+            \hline
+            年份&工资(元)&涨幅\\ \hline
+            $1900$&$10$&--\\ 
+            $2000$&$100$&$1000\%$\\ 
+            $2100$&$1000$&$1000\%$\\  \hline
+        \end{tabular} 
+        \caption{\centering{简单的表格}}
+        \captionsetup{font={small,bf,stretch=1}}
+        \label{table1}
+    \end{table}
+
+
+    例2：带斜线的表
+    \begin{table}[H]
+        \centering
+        \setlength{\tabcolsep}{4mm}
+        \begin{threeparttable}  
+            \begin{tabular}{c|ccccc}  
+                \hline
+                \diagbox{数值格式}{所需时间(s)}{时刻} & $t=20$ &$t=40$ &$t=60$&$t=70$&$t=80$\\ \hline
+                PAVF格式 & $6.4571$ &$17.8073$ &$31.6309$&$38.1617$&$43.9885$\\ \hline
+                AVF格式 & $19.0332$ &$48.5705$ &$78.6096$&$91.5572$&$122.6046$\\ \hline
+            \end{tabular} 
+        \end{threeparttable}
+        \caption{\centering{带斜线的表}}
+        \captionsetup{font={small,bf,stretch=1}}
+        \label{table2}%label一定要写在caption的后面.
+    \end{table}
+
+    例3：带注释的表
+    \begin{table}[H]
+        \centering
+        \setlength{\tabcolsep}{4mm}
+        \begin{threeparttable}  
+            \begin{tabular}{c|ccccc}  
+                \hline
+                \diagbox{数值格式\tnote{*}}{所需时间(s)}{时刻} & $t=20$ &$t=40$ &$t=60$&$t=70$&$t=80$\\ \hline
+                PAVF格式 & $6.4571$ &$17.8073$ &$31.6309$&$38.1617$&$43.9885$\\ \hline
+                AVF格式 & $19.0332$ &$48.5705$ &$78.6096$&$91.5572$&$122.6046$\\ \hline
+            \end{tabular} 
+            \captionsetup{font={small,bf,stretch=1}}
+            \begin{tablenotes}    %这行要添加， 从这开始
+                \footnotesize               %这行要添加
+                \item[*]  统一起见，两种格式均采用迭代算法。     %这行要添加     。
+            \end{tablenotes}            %这行要添加
+        \end{threeparttable}
+        \caption{\centering{带注释的表}}
+        \label{table3}
+    \end{table}
+    更复杂的表格参见网络版本。
+
+    引用表格依然可以采用ref命令。例如：表$\ref{table1}$很简单，表$\ref{table2}$困难一点，表$\ref{table3}$更困难一点。
+
+
+
+
+
+
+
+
+
+    \newpage
+    \section{算法实现}
+    本节写一下算法，算是为计算机和数学的同学多写一点。至于其他的化学流程图，物理动态图请参见网络。
+    %此命令放在正文，紧跟\section{}命令，手动为页眉添加节标题
+    \markboth{\text{第}\thesection\text{章} \quad 算法实现}{\text{第}\thesection\text{章} \quad 算法实现}  
+
+    \begin{algorithm}[!ht]
+        \renewcommand{\algorithmicrequire}{\textbf{输入：}}
+        \renewcommand{\algorithmicensure}{\textbf{输出：}}
+        \caption{算法的名称}
+        \label{power0}
+        \begin{algorithmic}[1] % 控制是否有序号
+            \REQUIRE  给定初值% input 的内容
+            \ENSURE 结果% output 的内容
+            
+            \STATE 系数矩阵;
+            \STATE 右端项; 
+            
+             % for loop
+            \FORALL {$k=1,2,\cdots,Iter$}
+                \STATE $N=N(\widehat{\varPhi}^0,\widehat{\varPhi}^1)$;
+                \STATE $A=A(\widehat{\varPhi}^1)$;
+                \STATE $\widehat{\varPhi}^2=A\backslash N$;
+                \STATE $\widehat{\varPhi}^0=\widehat{\varPhi}^1$;
+                \STATE $\widehat{\varPhi}^1=\widehat{\varPhi}^2$;
+            \ENDFOR
+            
+             %if ... else
+            \IF {$a < 0$}
+                \STATE $y = 2$;
+            \ELSE
+                \STATE $y = 4$;
+            \ENDIF
+            
+            % while 
+            \WHILE {a < 0}
+                \STATE a--;
+            \ENDWHILE
+            
+             do ... while
+            \REPEAT
+                \STATE a--
+            \UNTIL {a < 0}
+            
+            \STATE \textbf{return} $\widehat{\varPhi}^1$.
+        \end{algorithmic}
+    \end{algorithm}
+
+    可以看到的是：里面基础的for,while,if,do……while都有，更多需求可参见网络。
+    
+
+
+
+
+
+
+
+
+
+
+    \newpage
+    %\vspace*{0pt}
+    \section{补充说明}
+    %此命令放在正文，紧跟\section{}命令，手动为页眉添加节标题
+    \markboth{\text{第}\thesection\text{章} \quad 补充说明}{\text{第}\thesection\text{章} \quad 补充说明}  
+
+    下面说一点整篇文章要注意的地方！！！
+
+    \begin{enumerate}[1)]
+    \item 在文篇的开篇，也就是文章的封面，是需要使用者使用word将自己的题目，姓名等填写完成后转成pdf，\textcolor{red}{将其重命名为cover.pdf后上传到与main.tex同一目录后使用的}。封面是可以利用latex打出来的，但使用没有这种方式来的方便。
+    \item 附录中写代码的Untitled\_dedai.m也需要放在与main.tex同一目录。并且，mcode库是处理matlab代码的，对于python,c,java等语言要另做处理，可参考网络。
+    \item 参考文献中的href命令是给文献加超链接的，可以在pdf中直达文献所在位置，方便别人阅读。但如果不需要可以删除。另外，参考文献也可使用bib.tex,那是一种更加规范的格式，但更复杂，可参考网络。
+    \item 在更改标题，也就是更改section的时候，后面的markboth中和section相同的也要一并更改，不然页眉无法正常显示。
+    \end{enumerate}
+
+
+
+
+
+
+    \newpage
+    \section*{附录}
+    \phantomsection
+    \addcontentsline{toc}{section}{附录}
+    \fancyhead[C]{\zihao{5}\songti{附录}}
+    所推导出的迭代算法代码如下：
+    \lstset{
+        caption={迭代算法},
+        aboveskip=0pt,%解决代码和文本之间的间距问题
+    }
+    \lstinputlisting[language=Matlab]{Untitled_dedai.m}
+
+    \textcolor{red}{「如果没有代码可以放点别的，实在不有需要可删除。」}
+
+
+
+    \newpage
+    \section*{参考文献}
+    \phantomsection
+    \addcontentsline{toc}{section}{参考文献}
+    \fancyhead[C]{\zihao{5}\songti{参考文献}}
+    \begingroup  % 去掉thebibliography环境自带的“参考文献”标题
+    \renewcommand{\section}[2]{} 
+
+    \begin{thebibliography}{99}
+        %\addtolength{\itemsep}{-1pt}  % 缩小行距
+        \addtolength{\itemsep}{0em} % 缩小参考文献间的垂直间距
+        \setlength{\itemsep}{0pt}
+        \bibitem{ref1}\href{https://www.sciencedirect.com/science/article/pii/S0893965921003098}{H.G. Lee, A non-iterative and unconditionally energy stable method the Swift–Hohenberg equation with quadratic–cubic nonlinearity[J]. Applied Mathematics Letters, 2021, 123: 107579.}
+        \bibitem{ref2}\href{https://www.sciencedirect.com/science/article/pii/S0893965921000847}{Z.F. Weng, Y.F. Deng, Q.Q. Zhuang, S.Y. Zhai, A fast and efficient numerical algorithm for Swift–Hohenberg equation with a nonlocal nonlinearity[J]. Applied Mathematics Letters, 2021, 118: 107170.}
+
+    \end{thebibliography}
+    
+    \endgroup
+
+
+
+
+    \newpage
+    \section*{致谢}
+    \phantomsection
+    \addcontentsline{toc}{section}{致谢}
+    \fancyhead[C]{\zihao{5}\songti{致谢}}
+    时光飞逝，但韶华犹在，在这最该努力奋斗的时光，成为了无知者迷茫的沃土，成为了堕落者无尽的彷徨。
+    但天下无不散的筵席，不完美的故事也会有终章。
+
+    2023届数学科学学院学子于2023年05月12日完成，感谢您的使用与反馈。如感觉格式和所要求格式有冲突，可进行更改，本科论文格式已上传，一切以指导老师的要求为准。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

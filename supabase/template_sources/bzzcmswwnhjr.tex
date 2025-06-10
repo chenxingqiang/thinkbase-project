@@ -1,0 +1,96 @@
+% Version of the project: v2.99 
+%(explanations are updated)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% !IMPORTANT! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Whoever develops this document while using it, please post the final version of the document and an update list explaining what went wrong in what file/line-what page and how you changed it.
+% Mail address: eapantherea@gmail.com 
+% Please note that your help is very important and greatly appreciated
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% !IMPORTANT! %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Bu döküman Ankara Yıldırım Beyazıt Üniversitesi Fen Bilimleri Enstitüsünün Haziran 2021 kurallarına göre güncellenmiştir. Söz konusu tarihte tez tesliminde kullanılmıştır. Enstitünün resmi şablonu değildir. Tüm sorumluluk kullanan kişiye aittir. Enstitü yazım kuralları sürekli güncellendiği için, değişiklileri takip etmek yazarın sorumluluğundadır. Dökümanda chapterlarda vs. eğer ortaya mesafe farklılığı çıkarsa yazar kontrol etmeli ve vspace{} ile aralığı düzenlemelidir.
+
+%eğer font size ile ilgili sorun var denirse, large,Large vs. yerine \size{} komutu aşağıdakiler uncomment edildikten sonra ilgili yerlere uygulanabilir. Bunları tüm dökümandaki font sizelara uygulayan olursa yukarda bahsedilen mail adresine yapılan tüm değişiklikleri gönderirse müteşekkir olunur.
+%\RequirePackage{fix-cm}
+%\newcommand{\size}[2]{{\fontsize{#1}{0}\selectfont#2}}
+%\newenvironment{sizepar}[2]
+% {\par\fontsize{#1}{#2}\selectfont}
+% {\par}
+%  inside doc .... \size{16pt}{ blah blah}
+
+\documentclass[12pt, fleqn]{aybufbe}
+
+%\usepackage{fontspec}
+%\setmainfont{Times New Roman} % bu pdflatex ile calısmadıgından kullanılamadı, lualatex, xelatex vb. compilerlarla kodu uyumlu hale getirebilirseniz bunun kullanilmasi daha dogru, bu hale getiren lütfen yukarıda belirtilen adrese mail atsın.
+
+\input{packages} % gerekli paketleri ekler. ilave paketleri bu dosya altına ekleyebilirsiniz.
+%\linespread{1.5}
+%\renewcommand{\baselinestretch}{1.5} 
+
+\begin{document}
+%\setcitestyle{square} %apa kullanılacaksa kaldırılmalı
+
+\setlength{\mathindent}{28.45pt}%Denklemleri soldan 1 cm içeriden başlatır.
+
+%%%%% Sınav formu sayfasını seçin
+%\phd % 5 jürili sınav - Doktora
+\msc % 3 jürili sınav - Y. Lisans
+
+%%% Tez bilgileri %%%%%
+\submitdate{September, 2023}
+\exactdate{2023, 20 September}
+\title{THESIS TITLETHESIS TITLETHESIS TITLETHESIS TITLETHESIS TITLETHESIS TE} %türkçesi 0.4_Oz icinde, büyük harf kullanın
+\author{Name Name SURNAME}
+\AUTHOR{NAME NAME SURNAME} % büyük harfle yazar adı 
+\prog{Computer Engineering}
+\dept{Department of Computer Engineering} %dis kapak aybufbe.sty line 152, line 180 da dept name düzeltimi
+
+\director{Prof. Dr. Aaaa AAAA} 
+\supervisor{Prof. Dr. Bbbb BBBBB} 
+\SUPERVISOR{PROF. DR. BBBB BBBBB}% büyük harfle supervisor adı,
+
+%\cosupervisor{Prof. Dr. Aaaa BBBBBB} %cosupervisor varsa bunlar uncomment edilmeli
+%\COSUPERVISOR{PROF. DR. AAAA BBBBBB}
+%\cosprvsr %bu examination result forma cosupervisor ekler, varsa uncomment edilmeli
+
+\firstreader{Prof. Dr. Cccccc CCCCC}
+\secondreader{Prof. Dr. Ddddd DDDDD } %isimler uzun geliyorsa aybufbe.sty line 265 veya 362
+
+\thirdreader{Prof. Dr. Eeeee EEEEE }%msc student bu third ve fourth readerlari bulunmadigi taktirde commente almali
+\fourthreader{Prof. Dr. Ffffff FFFFFF }
+
+\makeatletter
+\let\Author\@author%document icinde refere edebilmek icin
+\let\Submitdate\@submitdate
+\let\Exactdate\@exactdate
+\let\Dept\@dept
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\beforepreface %aybufbe.sty dosyası line 356
+\include{Chapters/0.1_Declaration}
+\include{Chapters/0.2_Acknowledgement}
+\include{Chapters/0.3_Abstract}
+\include{Chapters/0.4_Oz}
+\afterprefaceone %aybufbe.sty dosyası line 407
+\include{Chapters/0.5_Nomenclature}
+\afterprefacetwo %aybufbe.sty dosyası line 418
+%eğer list of figures-tables kısmında figure captionı ile title üst üste binerse aybufbe.sty dosyası 424. line ayarlanmalı, iki haneli sayıdan az sayıda figure-table varsa bahsedilen lineda 1.5em ile ayar yapılırsa daha düzgün görünüm elde edilir
+
+\bookmarksetup{startatroot}
+%%% Bölümler %%%
+\include{Chapters/1_introduction} % Bu şekilde ilave chapter'lar ekleyebilirsiniz mesela alt satirdaki ch2 gibi, chapters kismina kendi .tex dosyanizi olusturup burada refere ederek ekleyin
+\include{Chapters/2_CH2}
+
+
+%\bibliographystyle{apalike_AYBU_FBE} %apa kullanmak isteyenler için bu uncomment, alttaki comment edilmeli, apada citation \citep olarak kullanılır, eger hata alinirsa cache dosyalari temizlenmeli
+\bibliographystyle{AYBU_IEEEtran}
+\phantomsection
+\bibliography{References} %eger bir kurum isminin yazar oldugu bir belge ekliyorsaniz ve kurum ismi ieee formatta soyismi kisaltilmis cikiyorsa, brackets icine almalisiniz Örnek: author = {{World Health Organization}},
+
+\include{Chapters/5_Appendices}
+\include{Chapters/6_CV}%cv dosyasinda kendi fotonuzu ve bilgilerinizi ekleyin, YOKSIS için gönderilecek belgede cv ve alttaki side cover bulunmaması gerekiyormuş.
+\include{Chapters/7_Side_of_Outer_Cover}%side cover page, you may omit this when you don't need
+
+\end{document}
+%aet

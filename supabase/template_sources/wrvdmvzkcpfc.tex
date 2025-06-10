@@ -1,0 +1,123 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[spanish]{babel}             % Español para los nombres
+\usepackage[utf8]{inputenc}             % Codificación de entrada
+\usepackage[T1]{fontenc}                % Codificación de fuente (escribir castellano)
+\usepackage{lmodern}                    % Fuente (la default no es compatible con castellano)
+\usepackage{csquotes}                   % Para comillas y otras anotaciones del castellano
+\usepackage{fancyhdr}                   % Encabezado y Pie de pagina
+\usepackage{tocloft}                    % Puntos en los índices
+
+\usepackage{hyperref}                   % Links y referencias dentro del texto
+\usepackage{acronym}                    % Para incluir las listas de abreviaturas
+\usepackage{multicol}                   % Permite crear espacios con columnas verticales
+\usepackage{parskip}                    % Eliminar sangrado y añadir espacio entre párrafos
+
+\usepackage{graphicx}                   % Para incluir imágenes
+\usepackage{subcaption}                 % Subfiguras
+\usepackage{xcolor}                     % Definir y utilizar colores
+\usepackage{tikz}                       % Dibujar formas, figuras, rectas, intersecciones...
+\usepackage[absolute,overlay]{textpos}  % Posición absoluta para textos
+\usepackage{geometry}                   % Para controlar los márgenes
+
+\usepackage{float}
+
+
+\usepackage[backend=biber, sorting=none]{biblatex} % Referencias (bibliografía / webgrafía)
+\selectlanguage{spanish}                % Seleccionar español
+\bibliography{referencias}              % Incluir el archivo de referencias
+
+% Definición de nombres
+%\printbibliography[title={Bibliografía}]
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} 
+\renewcommand{\spanishtablename}{Tabla}
+\renewcommand{\spanishlisttablename}{Índice de tablas}
+\newcommand{\estudiante}{García, Alan}
+\newcommand{\director}{xxxxx xx, xxxx}
+\newcommand{\grado}{INGENIERÍA XXX}
+\newcommand{\titulo}{PLANTILLA TFG PARA LA ESCUELA DE INGENIERÍA DE BILBAO}
+\newcommand{\portada}{images/protada.png}
+\newcommand{\curso}{2023-2024}
+
+% Definición de Macros
+\newcommand{\aclink}[1]{\hyperlink{acro:#1}{\ac{#1}}} % Enlazar la abreviatura al acrónimo
+
+% Encabezado y Pie de pagina
+\pagestyle{fancy}                       % Estilo de las páginas
+\fancyhf{}
+\fancyhead[L]{Trabajo Fin de Grado}
+\fancyhead[R]{\rightmark}
+\fancyfoot[L]{UPV/EHU}
+\fancyfoot[R]{\thepage}
+\renewcommand{\footrulewidth}{0.4pt} % Línea horizontal en el pie de página
+\setlength{\headheight}{15.5pt}
+
+% Definición de colores
+\definecolor{ehu_blue}{HTML}{376092}
+\definecolor{link_color}{HTML}{36AEB4}
+\definecolor{reference_color}{HTML}{0F3133}
+
+% Configuración de hyperref para diferentes tipos de enlaces
+\hypersetup{
+    colorlinks=true,
+    linkcolor=reference_color,
+    citecolor=reference_color,
+    filecolor=link_color,
+    urlcolor=link_color,
+}
+
+% #########################################################################
+% #                                  TFG                                  #
+% #########################################################################
+\begin{document}
+\include{title} % Incluimos el título
+\newpage
+\input{resumen} % Incluimos el resumen tri-lingüe
+
+% Índices
+\tableofcontents\thispagestyle{empty}\newpage
+\listoffigures\thispagestyle{empty}\newpage
+\listoftables\thispagestyle{empty}\newpage
+
+% Abreviaturas
+\addcontentsline{toc}{section}{Abreviaturas}
+\section*{Abreviaturas}
+\input{abreviaturas}
+
+\section{Introducción}
+En 1983 el autor James Watson descubrió el \aclink{ADN} \cite{watson53}. La <<medicina>> realmente era veneno. El \aclink{ASSI} es el encargado de mostrar en todo momento el estado del \aclink{AS}. Si el \aclink{ASSI} se apaga de forma inesperada, se considerará un estado de emergencia eléctrico.
+El \aclink{USB} es un protocolo de comunicación basado en el protocolo RS232.
+
+En la wikipedia de LaTex \cite{latex_wikibook} puedes encontrar información muy útil para tus documentos.
+
+\subsection{Estudio demográfico}
+En los últimos años, la población mundial ha ido decayendo considerablemente. Tanto es así, que los países más desarrollados, los cuales son a su vez los más envejecidos, están teniendo muchas dificultades para mantener sus sistemas de pensiones. Estos hechos se ven reforzados por los datos del gráfico \ref{fig:envejecimiento} en el que se comparan distintas poblaciones Europeas \footnote{Aguacate con salami}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=5cm, height=3cm]{images/ejemplo.png}
+    \caption{Envejecimiento en Europa}
+    \label{fig:envejecimiento}
+\end{figure}
+
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Nombre} & \textbf{Edad} & \textbf{Género} \\
+        \hline
+        Juan & 25 & Masculino \\
+        María & 30 & Femenino \\
+        Carlos & 22 & Masculino \\
+        Ana & 28 & Femenino \\
+        \hline
+    \end{tabular}
+    \caption{Ejemplo de tabla}
+    \label{tab:ejemplo}
+\end{table}
+\newpage
+¿Qué pasa si sigo escribiendo aquí? En principio debería poner en el encabezado la sección en la que estamos, pero no estoy seguro. Al parecer, funciona perfecto.
+
+\newpage\printbibliography
+\addcontentsline{toc}{section}{Referencias}
+\end{document}

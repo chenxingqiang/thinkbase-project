@@ -1,0 +1,127 @@
+% Header: Here are all packages used and some additional definitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{scrartcl}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{graphicx} % zum Einbinden von Graphiken
+\usepackage[breaklinks=true,colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref} % f. Referenzen
+\usepackage{amsmath,amsthm,amssymb} % Mathematik Umgebung 
+\usepackage{icomma} % Intelligentes Komma, das den richtigen Abstand zwischen Dezimalzahlen als auch in Formeln wählt.
+\usepackage[ngerman]{babel} % Deutsche Bezeichnungen bei Inhaltsangabe etc
+\usepackage[T1]{fontenc}    % andere Schriftsatzkodierung für richtige Silbentrennung bei Umlauten
+\usepackage[locale = DE,space-before-unit=true,per-mode = symbol]{siunitx} % Bessere Einheiten
+\usepackage{booktabs,multirow} % Pakete zur Erstellung von Tabellen
+\usepackage{placeins} % Definiert den Befehl “\FloatBarrier”, der die Ausgabe der davor eingebundenen Bilder erzwingt, befor der Text weiter geht. (Mit vorsicht zu verwenden)
+\usepackage[natbib,abbreviate=true,doi=false,style=numeric-comp,giveninits=true,sorting=none]{biblatex} % Modernes Paket zur Erzeugung von Bibliografien (benötigt biber!)
+\usepackage{csquotes} % Fortgeschrittene Funktionen für Zitate, für die deutsche Form der Anführungszeichen bei Referenzen
+\addbibresource{MyBibliography.bib} % Ort der .bib Datei, die die Datenbank für Literatur/Referenzen enthält.
+
+\graphicspath{{Bilder/}}
+
+\DeclareSIUnit{\dBm}{dBm}
+\DeclareSIUnit[per-mode=reciprocal]\WN{\per\centi\meter}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%
+\titlehead{\includegraphics[width=5cm]{logo.jpg}}
+\title{Titel des Berichts}
+\author{Student Eins\thanks{\href{mailto:Email.Student1@uibk.ac.at}{Email.Student1@uibk.ac.at}}, Student Zwei\thanks{\href{mailto:Email.Student2@uibk.ac.at}{Email.Student2@uibk.ac.at}}\\Gruppe 0}
+\date{\today}
+\maketitle
+\vfill
+\renewcommand\abstractname{Kurzfassung}
+\section*{\abstractname}
+\textit{Wenn man nur 2 Minuten hätte um einem Kollegen/einer Kollegin die Arbeit zu erklären, was soll er/sie davon wissen?}
+\thispagestyle{empty}
+%
+%
+\tableofcontents
+\thispagestyle{empty}
+\cleardoublepage
+\pagenumbering{arabic} 
+\newpage
+%
+%
+\section{Einleitung}
+\label{sec:Einleitung}
+%
+\textit{Worum geht es in dem Versuch? Was ist die Hauptfrage und warum ist sie interessant?}\\
+Im Anhang~\ref{sec:Latex} finden Sie einige Informationen, die hilfreich für den Einstieg in \LaTeX{} sein könnten.
+%
+\section{Grundlagen und Theorie}
+\label{sec:Grundlagen}
+%
+\textit{Was sind die wichtigen physikalischen Grundlagen?}\\
+Tabelle \ref{tab:exapltab} zeigt ein typisches Beispiel für eine Tabelle. In der Legende werden die wesentliche Informationen über die Tabelle gegeben.
+\begin{table}[htbp]
+\centering
+\caption{\label{tab:exapltab} Länge, Breite, und Höhe der Teilchen A bis G. Als Standardabweichungen der Mittelwerte sind die empirische Standardabweichungen gegeben. Da die lateralen Dimensionen von Teilchen D stark vom Mittelwert abweichen, wurde der Mittelwert zusätzlich ohne dieses Teilchen berechnet.}
+\begin{tabular}{cccccc}
+\toprule
+\multicolumn{1}{c}{Teilchen}	& \multicolumn{1}{c}{Länge / \si{\nano\meter}}		& \multicolumn{1}{c}{Breite / \si{\nano\meter}}	& \multicolumn{1}{c}{Höhe / \si{\nano\meter}} \\
+\midrule
+\multirow{1}{*}{A} & $34,5\pm0,4$	& $25,6\pm0,4$	& $4,6\pm0,4$\\
+\multirow{1}{*}{B} & $34,4\pm0,4$	& $28,0\pm0,4$	& $4,0\pm0,4$\\
+\multirow{1}{*}{C} & $31,9\pm0,4$	& $27,4\pm0,4$	& $4,6\pm0,4$\\
+\multirow{1}{*}{D} & $49,1\pm0,4$	& $34,0\pm0,4$	& $4,6\pm0,4$\\
+\multirow{1}{*}{E} & $35,2\pm0,4$	& $26,1\pm0,4$	& $4,9\pm0,4$\\
+\multirow{1}{*}{F} & $27,2\pm0,4$	& $23,6\pm0,4$	& $4,3\pm0,4$\\  
+\multirow{1}{*}{G} & $27,2\pm0,4$	& $23,6\pm0,4$	& $4,3\pm0,4$\\
+\midrule
+\multirow{1}{*}{Mittelwert:} & $35\pm6$	& $28\pm3$		& $4,7\pm0,6$	\\	  
+\multirow{1}{*}{Mittelwert} & \multirow{2}{*}{$33\pm3$}	& \multirow{2}{*}{$27\pm2$}		& \multirow{2}{*}{}	\\	  
+\multirow{1}{*}{ohne Teil.\ D:} & 	& & \\	  
+\bottomrule
+\end{tabular}
+\end{table}
+%
+\section{Aufbau und Methoden}
+\label{sec:ExpAufb}
+%
+\textit{Was würde jemand brauchen, um den Versuch nachzuvollziehen und zu wiederholen?}\\
+Als Beispiel für eine Gleichung ist hier die Formel für das Verhalten eines verkippbaren Interferenz-Filters angegeben. Dabei verschiebt sich die Wellenlänge $\lambda\left(\Phi\right)$ der Filterkante bei größeren Winkeln $\Phi$, unabhängig von der Kipp"=Richtung, zu kürzeren Wellenlängen~\cite{TiltFilter}:
+\begin{equation}
+\lambda\left(\Phi\right)=\lambda\left(0\right)\sqrt{1-\frac{\sin^2\Phi}{n_\text{eff}^2}}\;.
+\label{eq:TiltWel}
+\end{equation}
+$n_\text{eff}$ ist der effektive Brechungsindex.
+%
+\section{Ergebnisse}
+\label{sec:Ergebnisse}
+%
+\textit{Was ist(sind) die gemessene Antwort(en) auf die Hauptfrage(n)?}\\
+Abbildung \ref{fig:examplfig} zeigt ein Beispiel für eine Abbildung in Haupttext.
+\begin{figure}[htb!]
+ \centering
+ \includegraphics[width=0.65\textwidth]{good_example_plot}
+ \caption{\label{fig:examplfig}Ein typischer Graph in einem Bericht. Im Bildunterschrift werden die wesentliche Informationen über den Graph gegeben.
+ }
+\end{figure}
+%
+\section{Schlussfolgerungen}
+\label{sec:Schlussf}
+%
+\textit{Was ist die Endantwort und soll ihr vertraut werden?  Wie hätte man den Versuch anders oder besser durchführen können?}\\
+Die Referenz~\cite{GP1StromSpannung} soll ein Beispiel sein, wie man ein Praktikums"=Skript zitieren sollte. 
+%
+\input{Anhang} % Der Anhang ist in einer externen Datei "Anhang.tex" und wird hier in das Dokument eingefügt.
+
+\printbibliography[]
+\vfill
+\section*{Erklärung}
+
+Hiermit versichern wir, dass der vorliegende Bericht selbständig verfasst wurde und alle notwendigen Quellen und Referenzen angegeben sind.
+
+\begin{tabular}{@{}p{2.5in}p{2.5in}@{}}
+ \\[5\bigskipamount]
+  \dotfill & \dotfill \\
+  Student 1 & Date \\[5\bigskipamount]
+  \dotfill & \dotfill \\
+ Student 2 & Date \\
+  \centering
+  
+\end{tabular}
+
+\end{document}

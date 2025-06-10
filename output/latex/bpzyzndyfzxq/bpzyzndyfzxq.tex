@@ -1,0 +1,257 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% \documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{cite}
+\usepackage[round]{natbib}
+\usepackage{etoolbox}
+\usepackage{lipsum}
+
+% Configuración de la página
+\geometry{top=2.5cm,bottom=2.5cm,left=2cm,right=2cm}
+
+% Configuración del tamaño de los títulos
+\titleformat{\section}{\normalfont\fontsize{14}{16}\bfseries}{\thesection.}{1em}{}
+\titleformat{\subsection}{\normalfont\fontsize{12}{16}\bfseries}{\thesubsection.}{1em}{}
+\titleformat{\subsubsection}{\normalfont\fontsize{11}{16}\bfseries}{\thesubsubsection.}{1em}{}
+
+% Configuración de figuras y tablas
+\renewcommand\spanishtablename{Tabla}
+\captionsetup[table]{labelfont=bf,labelsep=period,justification=centering}
+\captionsetup[figure]{labelfont=bf,labelsep=period,justification=centering}
+
+% Configuración de encabezado y pie de página
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancypagestyle{firstpage}{%
+  \renewcommand{\headrulewidth}{0pt}%
+  \fancyhf{}%
+  \fancyhead[C]{%
+        \small\scshape{1° Congreso Internacional sobre Análisis y Excelencia Editorial en las Revistas Científicas (2024)}%
+  }%
+}
+
+% Configuración de abstract
+\renewenvironment{abstract}
+ {\small
+  \begin{center}
+  \bfseries \abstractname\vspace{-.5em}\vspace{0pt}
+  \end{center}
+  \list{}{%
+    \setlength{\leftmargin}{4mm}% <---------- CHANGE HERE
+    \setlength{\rightmargin}{\leftmargin}%
+  }%
+  \item\relax}
+ {\endlist}
+
+\providecommand{\keywords}[2]
+{
+  \hfill \break
+  \small	
+  \textbf{\textit{#1:}} #2
+}
+
+% Añade esto al preámbulo
+\usepackage{authblk}
+\renewcommand\Authsep{, }
+\renewcommand\Authands{, }
+\renewcommand{\Affilfont}{\fontsize{8}{10}\selectfont\bfseries}
+\renewcommand{\Authfont}{\fontsize{12}{10}\selectfont}
+\setlength{\parskip}{0.5\baselineskip}%
+\setlength\parindent{0pt}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\usepackage{xpatch}
+
+\makeatletter
+\xpatchcmd{\@maketitle}
+  {\@title}
+  {\fontsize{17}{20}\selectfont\bfseries\@title}
+  {}{}
+
+\let\@ssect@ORIG\@ssect
+\let\@runin@ssect\@ssect
+
+\apptocmd{\@runin@ssect}{%
+  \addcontentsline{toc}{subsubsection}{%
+    % Comment out the following line to remove “phantom number” indentation in
+    % the TOC
+    \protect\numberline{}% no number in TOC
+    #5% the title
+  }%
+  \let\@ssect\@ssect@ORIG       % restore the normal \@ssect
+}{}{\FAILED}
+
+\newcommand*{\runinsubsection}{%
+  \let\@ssect\@runin@ssect
+  \@startsection{subsubsection}%
+  {2}% level
+  {\z@}% indentation of heading from the left margin
+  {-3.25ex\@plus -1ex \@minus -.2ex}% absolute value = beforeskip
+  {-0.5em \@plus -.1em}% when negative, opposite = skip to leave right of a
+                       % run-in heading.
+  {\normalfont\large\bfseries}% style
+  *% we want an unnumbered subsection
+}
+  
+\makeatother
+% Modifica esta parte para definir los autores, afiliaciones y correos
+\title{Plantilla de Documento para la Serie de Conferencias}
+\author[1,*]{Nombre1 Apellido1}
+\author[2]{Nombre2 Apellido2}
+\author[1]{Nombre3 Apellido3}
+\affil[1]{Institución1, Dirección, Ciudad, País}
+\affil[2]{Institución1, Dirección, Ciudad, País}
+\affil[*]{Autor correspondiente: mail@servidor.com}
+
+% Título de la cabeceras, reducir en caso que el título sea muy largo
+\newcommand\shorttitle{Plantilla de Documento para la Serie de Conferencias}
+% Autores para las cabeceras - sólo apellidos, et al. si hay más de 3
+\newcommand\authors{N1. Apellido1, N2. Apellido2, \& N3. Apellido3}
+\fancyhf{}
+\renewcommand\headrulewidth{0pt}
+\fancyhead[C]{%
+\ifodd\value{page}
+  \small\scshape\shorttitle
+\else
+  \small\scshape\authors
+\fi }
+
+\fancyhead[R]{\thepage\ifodd\value{page}\else\hfill\fi}
+
+\date{}
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+%\thispagestyle{empty} % Para no numerar la primera página
+
+\begin{abstract}
+Cada artículo deberá comenzar con un resumen de no más de 200 palabras que deberá ser acompañado por una lista de palabras claves (no más de 5) que se vinculen con el contenido del artículo. Sangría de 2 cm antes del texto y 2 cm después del texto. Sin referencias ni fórmulas. Tipografía Times New Roman 10 pt.     
+
+\keywords{Palabras claves}{indicar una lista de hasta cinco palabras clave separadas por punto y coma (;). La inicial de cada una debe estar en mayúscula. En caso de palabras clave compuestas, poner inicial mayúscula solamente en el primer término; p. ej., ``Materiales educativos'' . Tipografía Times New Roman 10 pt. }
+\end{abstract}
+
+\selectlanguage{english}
+\begin{abstract}
+Cada artículo deberá comenzar con un resumen de no más de 200 palabras que deberá ser acompañado por una lista de palabras claves (no más de 5) que se vinculen con el contenido del artículo. Sangría de 2 cm antes del texto y 2 cm después del texto. Sin referencias ni fórmulas. Tipografía Times New Roman 10 pt.     
+
+\keywords{Keywords}{indicar una lista de hasta cinco keywords en inglés separadas por punto y coma (;). La inicial de cada una debe estar en mayúscula. En caso de palabras clave compuestas, poner inicial mayúscula solamente en el primer término; p. ej., ``Engineering sciences'' . Tipografía Times New Roman 10 pt.}
+\end{abstract} 
+
+\selectlanguage{spanish}
+\section{Introducción}
+Los artículos deberán estar escritos en español, en tipografía Times New Roman, con espaciado sencillo, texto justificado y cuerpo de texto a una columna.  
+
+Los párrafos estarán en Times New Roman 10 pt  y  el título de sección en Times New Roman 14 pt.
+
+El título del artículo estará centrado en Times New Roman 18 pt. Debajo del mismo, aparecerán los nombres de los autores (en Times New Roman 12 pt) y las referencias de las instituciones de las que forman parte irán por debajo de ellos, al igual que sus e-mails (en Times New Roman 8 pt).
+
+No deberán tener más de 14 páginas tamaño A4. Las páginas no deberán ser numeradas.
+
+Las referencias a otros documentos deben indicarse con un número entre corchetes por orden de aparición y deberán consignarse al final del artículo. 
+
+Esta sección podrá tener una o más subsecciones tituladas del modo indicado. Las secciones y subsecciones del manuscrito deberán distinguirse claramente siguiendo el estilo presentado en esta plantilla. 
+
+La primera sección del artículo debe ser una introducción que contendrá el análisis general de la problemática y las referencias principales. Se sugiere incluir en la introducción una descripción sintética del aporte del artículo.
+
+La última sección del artículo deben ser las Conclusiones. Puede incluir las líneas de trabajo/investigación a seguir.
+
+\subsection{Título Subsección}
+Texto (Times New Roman, 10 pt). Título de subsección (Times New Roman, 12 pt). 
+
+\lipsum[1]
+
+\subsection{Título Subsección}
+\lipsum[2]
+
+\section{Título Sección}
+Se agregarán tantas secciones (con sus subsecciones) como sea necesario.
+
+\lipsum[3]
+
+\subsection{Título Subsección}
+\lipsum[4]
+
+\subsubsection{Título Subsubsección}
+
+Texto. Título de la subsubsección en 11 pt.
+
+Las \textbf{figuras, tablas y gráficos} se intercalarán en el texto después de su primera mención, indicando su número de orden y título. (Ej: \emph{Figura} \ref{fig:ejemplo}. Título de la figura). 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.4\textwidth]{ejemplo.pdf}
+    \caption{Título de la Figura}
+    \label{fig:ejemplo}
+\end{figure}
+
+En el caso de las tablas (ver \emph{Tabla \ref{tab:ejemplo}}. Tabla de ejemplo), el epígrafe debe colocarse en la parte superior y en las figuras y gráficos al pie. 
+
+\begin{table}[H]
+    \centering
+    \caption{Título de la Tabla de ejemplo}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Columna 1 & Columna 2 & Columna 3 \\
+        \hline
+        Dato 1 & Dato 2 & Dato 3 \\
+        \hline
+    \end{tabular}
+    \label{tab:ejemplo}
+\end{table}
+
+
+\section{Conclusiones}
+
+La última sección del artículo deben ser las Conclusiones. Puede incluir las líneas de trabajo/investigación a seguir. Las referencias deben incluirse al final por orden alfabético~\citep{rastogi2024design, cennini1954craftsman} y así según \cite{quelhas2005modeling}.
+
+\runinsubsection{Agradecimientos.}
+Pueden incluirse brevemente luego de las Conclusiones.
+
+% \bibliographystyle{plain}
+\bibliographystyle{plainnat}
+\bibliography{bibliografia}
+
+\end{document}
+
+\end{document}

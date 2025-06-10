@@ -1,10 +1,10 @@
 from functools import lru_cache
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
-from agentflow.ell2a.stores import SQLStore
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
+from agentflow.ell.stores import SQLStore
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
 CODE_INSTURCTIONS = """
 
@@ -27,7 +27,7 @@ def get_lmp(z=10):
     y = 13
     y = z
 
-    @ell2a.with_ell2a(mode="complex")
+    @ell.with_ell(mode="complex")
     async def write_a_complete_python_class(user_spec: str) -> str:
         """Write a complete Python class based on user specification."""
         # Create system message
@@ -60,10 +60,10 @@ def get_lmp(z=10):
         )
         
         # Process system message
-        await ell2a.process_message(system_message)
+        await ell.process_message(system_message)
         
         # Process user message and get response
-        response = await ell2a.process_message(user_message)
+        response = await ell.process_message(user_message)
         
         # Return the response
         if isinstance(response, Message):
@@ -83,8 +83,8 @@ def get_lmp(z=10):
 
 
 if __name__ == "__main__":
-    # Initialize ELL2A
-    ell2a.configure({
+    # Initialize ELL
+    ell.configure({
         "enabled": True,
         "tracking_enabled": True,
         "store": "./logdir",

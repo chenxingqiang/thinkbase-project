@@ -1,0 +1,680 @@
+%% abtex2-modelo-relatorio-tecnico.tex, v-1.9.2 laurocesar
+%% Copyright 2012-2014 by abnTeX2 group at http://abntex2.googlecode.com/ 
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% 
+%% The Current Maintainer of this work is the abnTeX2 team, led
+%% by Lauro César Araujo. Further information are available on 
+%% http://abntex2.googlecode.com/
+%%
+%% This work consists of the files abntex2-modelo-relatorio-tecnico.tex,
+%% abntex2-modelo-include-comandos and abntex2-modelo-references.bib
+%%
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Relatório Técnico/Acadêmico em conformidade com 
+% ABNT NBR 10719:2011 Informação e documentação - Relatório técnico e/ou
+% científico - Apresentação
+% ------------------------------------------------------------------------ 
+% ------------------------------------------------------------------------
+
+\documentclass[
+% -- opções da classe memoir --
+12pt,				% tamanho da fonte
+openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+oneside,			% para impressão em verso e anverso. Oposto a oneside
+a4paper,			% tamanho do papel. 
+% -- opções da classe abntex2 --
+%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+% -- opções do pacote babel --
+english,			% idioma adicional para hifenização
+french,				% idioma adicional para hifenização
+spanish,			% idioma adicional para hifenização
+brazil				% o último idioma é o principal do documento
+]{abntex2}
+
+% ---
+% Pacotes básicos 
+% ---
+\usepackage{lmodern}				% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}			% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}			% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}				% Usado pela Ficha catalográfica
+\usepackage{indentfirst}			% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}					% Controle das cores
+\usepackage{graphicx}				% Inclusão de gráficos e imagens
+\usepackage{microtype} 				% para melhorias de justificação
+\usepackage{mathtools}				% Matemática
+\usepackage{multirow}				% Tabelas
+\usepackage[table,xcdraw]{xcolor}	% Tabelas (cores)
+
+% ---
+\usepackage{epigraph}
+\usepackage{amssymb}
+\usepackage{subcaption}
+\usepackage[utf8]{inputenc}
+\usepackage[export]{adjustbox}
+\usepackage{wrapfig}
+\usepackage{amsmath}
+\usepackage{pdfpages}
+\usepackage{rotating}
+\usepackage{pdflscape}
+
+
+
+\sloppy
+\clubpenalty=10000 % Para evitar linhas orfas
+\widowpenalty=10000 % Para evitar linhas viuvas
+\hyphenpenalty=10000 % Para não hifenizar
+
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+% ---
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+%\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+\usepackage[alf,abnt-etal-list=0,abnt-etal-cite=6]{abntex2cite}
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+	Nenhuma citação no texto.%
+	\or
+	Citado na página #2.%
+	\else
+	Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Título da Monografia}
+\autor{Nome do Autor}
+\local{São Luís}
+\data{\the\year}
+\orientador{Prof. Dr. Nome do Orientador}
+
+\tipotrabalho{Monografia (Graduação)}
+% O preambulo deve conter o tipo do trabalho, o objetivo, 
+% o nome da instituição e a área de concentração 
+\preambulo{Monografia apresentada ao curso de Ciência da Computação da Universidade Federal do Maranhão, como parte dos requisitos necessários para obtenção do grau de Bacharel em Ciência da Computação.}
+% ---
+
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41, 5, 195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+	%pagebackref=true,
+	pdftitle={\@title}, 
+	pdfauthor={\@author},
+	pdfsubject={\imprimirpreambulo},
+	pdfcreator={LaTeX with abnTeX2},
+	pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+	colorlinks=true,       		% false: boxed links; true: colored links
+	linkcolor=blue,          	% color of internal links
+	filecolor=magenta,      		% color of file links
+	urlcolor=blue,
+	bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+	
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual
+
+% ---
+% Capa
+% ---
+\renewcommand{\imprimircapa}{%
+\begin{capa}%
+\center
+\includegraphics[scale=0.25]{logoufma.png} \\ 
+\vspace{1cm}
+\ABNTEXchapterfont\Large UNIVERSIDADE FEDERAL DO MARANHÃO \\
+\ABNTEXsectionfont\Large Curso de Ciência da Computação \\
+
+\vspace*{5cm}
+
+\begin{center}
+{\ABNTEXsectionfont\Large\imprimirautor} \\
+\vfill
+\ABNTEXchapterfont\bfseries\LARGE\imprimirtitulo
+\end{center}
+\vfill
+\large\imprimirlocal \\
+\large\imprimirdata
+\vspace*{1cm}
+\end{capa}
+}	
+
+\imprimircapa
+
+
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+\imprimirfolhaderosto*
+% ---
+
+
+
+
+
+
+% ---
+% Anverso da folha de rosto:
+% ---
+
+%TODO: Quando pegar a ficha catalográfica no SIGAA
+%\includepdf{ficha_cat.pdf}
+
+% {
+
+%\ABNTEXchapterfont
+%\vspace*{\fill}
+
+%Conforme a ABNT NBR 10719:2011, seção 4.2.1.1.1, o anverso da folha de rosto
+%deve conter:
+%
+%\begin{alineas}
+%  \item nome do órgão ou entidade responsável que solicitou ou gerou o
+%   relatório; 
+%  \item título do projeto, programa ou plano que o relatório está relacionado;
+% \item título do relatório;
+%  \item subtítulo, se houver, deve ser precedido de dois pontos, evidenciando a
+%   sua subordinação ao título. O relatório em vários volumes deve ter um título
+%   geral. Além deste, cada volume pode ter um título específico; 
+%  \item número do volume, se houver mais de um, deve constar em cada folha de
+%   rosto a especificação do respectivo volume, em algarismo arábico; 
+%  \item código de identificação, se houver, recomenda-se que seja formado
+%   pela sigla da instituição, indicação da categoria do relatório, data,
+%   indicação do assunto e número sequencial do relatório na série; 
+%  \item classificação de segurança. Todos os órgãos, privados ou públicos, que
+%   desenvolvam pesquisa de interesse nacional de conteúdo sigiloso, devem
+%    informar a classificação adequada, conforme a legislação em vigor; 
+% \item nome do autor ou autor-entidade. O título e a qualificação ou a função
+%  do autor podem ser incluídos, pois servem para indicar sua autoridade no
+%   assunto. Caso a instituição que solicitou o relatório seja a mesma que o
+%   gerou, suprime-se o nome da instituição no campo de autoria; 
+%  \item local (cidade) da instituição responsável e/ou solicitante; NOTA: No
+%   caso de cidades homônimas, recomenda-se o acréscimo da sigla da unidade da
+%   federação.
+%  \item ano de publicação, de acordo com o calendário universal (gregoriano),
+%  deve ser apresentado em algarismos arábicos.
+%\end{alineas}
+
+%\vspace*{\fill}
+%}
+% ---
+
+
+%TODO: Após obter as assinaturas da banca, comente as linhas abaixo ou retire
+%\includepdf{assinaturas.pdf}
+
+
+\begin{folhadeaprovacao}
+
+  \begin{center}
+    {\ABNTEXchapterfont\large\imprimirautor}
+
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+    \end{minipage}%
+    \vspace*{\fill}
+  \end{center}
+        
+	Trabalho \_\_\_\_\_\_\_\_\_\_ em \imprimirlocal, \today:
+	
+  \assinatura{\textbf{\imprimirorientador} \\ Orientador} 
+  \assinatura{\textbf{Prof. Dr. Primeiro Membro} \\ Examinador}
+  \assinatura{\textbf{Profa. Dra. Segundo Membro} \\ Examinador}
+%   %\assinatura{\textbf{Professor} \\ Convidado 3}
+%   %\assinatura{\textbf{Professor} \\ Convidado 4}
+      
+  \begin{center}
+    \vspace*{0.5cm}
+    {\large\imprimirlocal}
+    \par
+    {\large\imprimirdata}
+    \vspace*{1cm}
+  \end{center}
+  
+\end{folhadeaprovacao}
+
+
+% ---
+% Agradecimentos
+% ---
+\begin{agradecimentos}
+
+Seus agradecimentos.
+
+\end{agradecimentos}
+% ---
+
+
+% Epígrafe
+% ---
+\newpage
+\begin{epigrafe}
+    \vspace*{\fill}
+	\begin{flushright}
+		\textit{"Não fiques em terreno plano. 
+		\\Não subas muito alto. 
+		\\O mais belo olhar sobre o mundo 
+		\\Está a meia encosta."}
+
+Friedrich Nietzsche, em \textit{"A Gaia Ciência" }
+	\end{flushright}
+\end{epigrafe}
+% ---
+
+
+% ---
+% RESUMO
+% ---
+
+% resumo na língua vernácula (obrigatório)
+%\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+O resumo do trabalho.
+	
+%\noindent
+\textbf{Palavras-chave}: boas palavras chave que identifiquem o trabalho.
+
+\end{resumo}
+
+% resumo em inglês
+%	\include{estrutura/resumo_en}
+\begin{resumo}[Abstract]
+	\begin{otherlanguage*}{english}
+	Work abstract.
+
+	\textbf{Keywords}: The best keywords.
+		
+	\end{otherlanguage*}
+\end{resumo}
+
+
+% ---
+\cleardoublepage
+
+% ---
+% inserir lista de ilustrações
+% ---
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+% ---
+
+
+% ---
+% inserir lista de tabelas
+% ---
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+% ---
+
+
+% ---
+% inserir lista de abreviaturas e siglas
+% ---
+\begin{siglas}
+\item[CC] \textit{Ciência da Computação}
+\item[UFMA] \textit{Universidade Federal do Maranhão}
+\end{siglas}
+
+% ---
+
+% ---
+% inserir lista de símbolos
+% ---
+%\begin{simbolos}
+%  \item[$ \in $] Pertence
+%\end{simbolos}
+% ---
+
+% ---
+% inserir o sumario
+% ---
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+	
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+%\addcontentsline{toc}{chapter}{Resumo}
+
+% ----------------------------------------------------------------------------------------------------------------------------
+% Introdução
+% ----------------------------------------------------------------------------------------------------------------------------
+\chapter{Introdução}
+\label{chap:introducao}
+Apresente na introdução o problema, a motivação, a necessidade de seu trabalho e os objetivos. Sugere-se incluir trabalhos relacionados e contribuições.
+
+% ----------------------------------------------------------
+% ROTEIRO
+% ----------------------------------------------------------
+%   1. Introdução
+%       --> falar do problema, vou te passar os artigos. Pode pegar texto de lá
+%       --> objetivos do SILEM
+%       --> contribuições
+
+%       2. Fundamentação teórica
+%	        --> tudo que foi usado no reconhecimento do analógicos
+
+%       3. Metodologia
+%	        --> de maneira simplificada todas as etapas, com os ajustes e parâmetros 
+%	        --> explicar aqui a arquitetura do SILEM, tipo, aquela figura que mostra de onde vem, para onde vai
+
+%       4. Resultados
+%	        --> o sistema em si e os resultados do reconhecimento do analógicos
+%	        --> pequeno estudo de caso de algumas situações
+
+%       5. Conclusões
+
+Algumas dicas no preenchimento da monografia:
+
+Para quebrar um parágrafo, separe eles por uma linha em branco. 
+
+Para referenciar no texto seções ou capítulos, use ref, como em ".... o Capítulo \ref{chap:fundamentacao} apresenta a fundamentação teórica utilizada no trabalho ... ". Lembre-se, os labels dos componentes no texto devem ser únicos!
+
+Para realizar citações, use o comando cite. Quando a citação é indireta, use \cite{associaccao2005abnt}. Quando a citação é direta use \citeonline{associaccao2005abnt}.
+
+Para inserção de figuras, a legenda deve ficar acima, e fonte abaixo. Quando a fonte for o próprio autor, deve-se escrever "Fonte: acervo do autor". Para referencia a figura, use o ref, como " .... Figura \ref{fig:ex1} .... ".
+
+\begin{figure}[ht!]
+\centering
+\caption{Um exemplo de posicionamento de figura.}
+\includegraphics[scale=0.35]{figuras/fig1.png}
+\legend{Fonte: \cite{associaccao2005abnt}.}
+\label{fig:ex1}
+\end{figure}
+
+Uma das formas, em latex, de colocar múltiplas figuras lado a lado é usando o array.
+
+\begin{figure}[ht!]
+\centering
+\caption{Um exemplo de vetor de figuras.}
+$
+\begin{array}{cc}
+     \includegraphics[scale=0.25]{figuras/fig1.png} & 
+     \includegraphics[scale=0.25]{figuras/fig1.png}\\
+     (a) &
+     (b)
+\end{array}
+$
+\legend{Fonte: acervo do autor.}
+\label{fig:ex1}
+\end{figure}
+
+Equações numeradas devem ser inseridas usando o comando equation. Caso precise referenciá-las, use ref, com ".... Equação \ref{eq:r_mim_max} ... "
+
+\begin{equation}
+\centering
+r = (x_{max} - x_{min})G(x) + x_{min} 
+\label{eq:r_mim_max}
+\end{equation}
+
+Tabelas devem sempre ter a legenda na parte acima. Para referenciá-las, use ref, com ".... Tabela \ref{tab:resultados_1} ... "
+
+
+
+\begin{table}[htb]
+		\centering
+		\caption{Resultado do ....}
+		\label{tab:resultados_1}
+		\begin{tabular}{cccc}
+			\hline
+    \textbf{Resultado }& & \textbf{Acertos/Total} & \textbf{Acurácia } \\\hline
+
+	\textbf{Acertou tudo}&    & 245/361 & 67,86\% \\
+	\textbf{Errou 1}     &    & 69/361  & 19,11\% \\
+	\textbf{Errou 2}     &    & 18/361  & 4,98\%  \\
+	\textbf{Errou 3}     &    & 9/361   & 2,49\%  \\
+	\textbf{Errou 4}     &    & 5/361   & 1,38\%  \\
+	\textbf{Errou tudo}  &    & 15/361  & 4,15\%  \\ \hline
+	\end{tabular}
+\end{table}
+
+% ----------------------------------------------------------
+% Trabalhos relacionados
+% ----------------------------------------------------------
+\section{Trabalhos Relacionados}
+\label{sec:relacionados}
+
+Apresente trabalhos que se assemelham ao proposta. Busque identificar diferenças entre os trabalhos e como o seu trabalho se posiciona em relação a estes.
+
+% ----------------------------------------------------------
+% O objetivo do trabalho
+% ----------------------------------------------------------
+\section{Objetivos}
+\label{sec:objetivos}
+O objetivo geral desse trabalho é ....
+
+\subsection{Objetivos Específicos}
+\label{sec:objetivos_especificos}
+
+Destaca-se como objetivos específicos deste trabalho:
+
+\begin{itemize}
+    \item A
+    \item B
+\end{itemize}
+
+\section{Contribuições}
+\label{sec:contrib}
+
+Destaca-se como contribuições deste trabalho:
+
+\begin{itemize}	
+       \item A
+       \item B
+\end{itemize}
+
+\section{Organização do Trabalho}
+\label{sec:organizacao}
+
+Este trabalho está organizado em cinco capítulos, de forma a apresentar o conteúdo mais claramente, conforme os parágrafos a seguir.
+
+Capítulo 1 apresenta ....
+Capítulo 2 aborda os conteúdos de ....
+
+% ----------------------------------------
+% Fim da Introdução
+% ----------------------------------------
+
+% ----------------------------------------
+% Fundamentação Teórica
+% ----------------------------------------
+	
+\chapter{Fundamentação Teórica}
+\label{chap:fundamentacao}
+Apresente todo o referencial teórico utilizado como base para a realização do trabalho.
+
+
+% ---------------------------------------------------
+% Fim da Fundamentação
+% ---------------------------------------------------
+
+\chapter{Metodologia}
+\label{chap:metodologia}
+Apresente e explique em detalhes a metodologia proposta. O nome do capítulo pode variar de acordo com o tema de monografia, mas é neste capítulo que é apresentado o que foi feito.
+
+% ---------------------------------------------------
+% Fim Metodologia
+% ---------------------------------------------------
+
+
+% --------------------------------------------
+% Resultados
+% --------------------------------------------
+\chapter{Resultados}
+\label{chap:resultados}
+Apresente os resultados. Analise e discuta sobre os mesmos. Se possível, apresente estudos de caso.
+
+% --------------------------------------------
+% Fim Resultados
+% --------------------------------------------
+	
+% --------------------------------------------
+% Conclusão
+% --------------------------------------------
+\chapter{Conclusão}
+\label{chap:conclusao}
+
+Aponte na conclusão:
+\begin{itemize}
+    \item Resumo geral do que foi apresentado no trabalho com um esboço dos resultados atingidos;
+    \item Aponte para os objetivos propostos quais foram atingidos e quais não foram;
+    \item Determine o quanto o trabalho apresenta de contribuição para a área
+    \item Para os objetivos não realizados ou opcionais, aponte trabalhos futuros
+\end{itemize}
+
+% --------------------------------------------
+% Fim Conclusão
+% --------------------------------------------
+	
+% ---
+% ---
+\phantompart
+	
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+	
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\bibliography{referencias}
+	
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+%
+% Consulte o manual da classe abntex2 para orientações sobre o glossário.
+%
+%\glossary
+	
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+	
+% ---
+% Inicia os apêndices
+% ---
+%\begin{apendicesenv}
+	
+% Imprime uma página indicando o início dos apêndices
+%\partapendices
+% ----------------------------------------------------------
+%\chapter{Quisque libero justo}
+% ----------------------------------------------------------
+	
+%\lipsum[50]
+	
+% ----------------------------------------------------------
+%\chapter{Nullam elementum urna vel imperdiet sodales elit ipsum pharetra ligulaac pretium ante justo a nulla curabitur tristique arcu eu metus}
+% ----------------------------------------------------------
+%\lipsum[55-57]
+	
+%\end{apendicesenv}
+% ---
+	
+	
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+	
+% ---
+% Inicia os anexos
+% ---
+%	\begin{anexosenv}
+%	
+%	% Imprime uma página indicando o início dos anexos
+%	%\partanexos
+%	
+%	% ---
+%	\chapter{texto}
+%
+%	\end{anexosenv}
+	
+\end{document}

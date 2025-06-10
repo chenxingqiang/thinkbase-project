@@ -1,0 +1,354 @@
+\documentclass[11pt,letterpaper]{article}
+
+%% Paquetes esenciales
+\usepackage[english,spanish,es-tabla]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\graphicspath{{figuras/}}
+\usepackage{geometry}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{hyperref}
+\usepackage[inline]{enumitem}
+\usepackage{minted}
+\usepackage{xcolor}
+\usepackage{abstract}
+
+%% Paquetes alternativos (si no se ocupan, se pueden borrar)
+% \usepackage{booktabs}
+% \usepackage{colortbl}
+% \usepackage{epstopdf}
+% \usepackage{epsfig}
+% \usepackage{multirow}
+% \usepackage{enumerate}
+% \usepackage{longtable}
+% \usepackage{float}
+% \usepackage{multicol}
+% \usepackage{booktabs}
+% \usepackage{wasysym}
+% \usepackage{wrapfig}
+% \usepackage{amsbsy}
+% \usepackage{flushend}
+% \usepackage{url}
+% \usepackage{listings}
+% \usepackage{caption} 
+% \usepackage{lipsum}
+% \usepackage{booktabs} 	% for much better looking tables
+\usepackage{array} 		% for better arrays (eg matrices) in maths
+% \usepackage{paralist} 	% very flexible & customizable lists (eg. enumerate/itemize, etc.)
+% \usepackage{subfigure} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{lipsum}
+% \usepackage[section]{placeins}
+
+%% Definiciones
+% \setlength{\parindent}{0cm}
+\renewcommand\shorthandsspanish{}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\DeclareUnicodeCharacter{00B0}{\degree}
+\renewcommand{\baselinestretch}{1}
+\renewcommand{\listingscaption}{Código programa}
+\definecolor{LightGray}{gray}{0.9}
+\renewcommand{\abstractnamefont}{\normalfont\Large\bfseries}
+\renewcommand{\abstracttextfont}{\normalfont}
+\renewcommand{\absleftindent}{}
+\renewcommand{\absrightindent}{}
+
+
+%%% BIBLIOGRAPHY
+\usepackage[backend=biber, style=apa, maxcitenames=2]{biblatex}
+\addbibresource{referencias.bib}
+
+%%% PAGE DIMENSIONS
+\geometry{top=3cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+%%% DATE
+\usepackage{datetime}
+\newdateformat{monthyeardate}{\monthname[\THEMONTH], \THEYEAR}
+
+%% HYPERLINKS
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    linkcolor=black,
+    urlcolor=black}
+
+%------------------------------------------------------------------------------
+\begin{document}
+
+%% PORTADA
+\begin{titlepage}
+    \begin{figure}[H]
+        \centering
+        \vspace{-1.2cm}
+        \includegraphics[scale=0.55]{logo_universidad.png}\\
+        \vspace{5mm}
+        \Large{Departamento de Obras Civiles}
+    \end{figure}
+    
+    \begin{center}
+        
+        \vspace{5cm}
+        
+        {\Large \textbf{(AGREGAR TÍTULO TESIS)}}\\
+        
+        \vspace{3cm}
+        
+        {Memoria de Título presentada por}
+        \vspace{0.5cm}
+        
+        {\Large{\textbf{(Nombres Apellidos Estudiante)}}} \\
+        \vspace{1.5cm}
+        
+        {como requisito parcial para optar al título de la carrera de}\\
+        \vspace{0.5cm}
+        
+        \textbf{Ingeniería Civil}
+        
+        \vfill
+        {Profesor Guía}\\
+        {(Nombre Profesor Guía)}\\
+        \vspace{0.5cm}
+        \textsc{\monthyeardate\today}\\
+    \end{center}
+    
+    \clearpage
+    \parindent=0mm
+\end{titlepage}
+
+%% HOJA DE FIRMAS
+\begin{titlepage}
+\begin{figure}[H]
+\vspace{-1cm}
+\includegraphics[scale=0.45]{logo_universidad_letras_lateral.png}
+\end{figure}
+
+\vspace{2cm}
+
+\noindent{\Large \sc{TÍTULO DE LA TESIS:}}\\
+\vspace{0.3cm}
+
+\noindent{\Large \textbf{(AGREGAR TÍTULO TESIS)}}\\
+\vspace{1.5cm}
+
+\noindent{\Large \sc{AUTOR:}}\\
+\vspace{0.3cm}
+
+\noindent{\Large \textbf{(NOMBRES APELLIDOS ESTUDIANTE)}}\\
+\vspace{2cm}
+
+\noindent{TRABAJO DE MEMORIA, presentado como requisito parcial para optar al título de la carrera de INGENIERIA CIVIL de la Universidad Técnica Federico Santa María.}\\
+\vspace{1.5cm}
+
+{\large \centering
+\begin{tabular}{L{4cm} C{5.5cm} C{5.5cm}}
+     &  \underline{Nombre} & \underline{Firma} \\[15mm]
+    Profesor Guía & \dotfill & \dotfill \\[15mm]
+    Miembro 1 Comisión & \dotfill & \dotfill \\[15mm]
+    Miembro 2 Comisión & \dotfill & \dotfill
+\end{tabular}
+}
+
+% \noindent{\Large{Nombre Profesor Guía:\hspace{3.5cm}  .............................................................}}
+% \vspace{1.5cm}
+
+% \noindent{\Large{Nombre Miembro 1 Comisión:\hspace{2cm}  .............................................................}}
+% \vspace{1.5cm}
+
+% \noindent{\Large{Nombre Miembro 2 Comisión:\hspace{2cm}  .............................................................}}
+% \vspace{1.5cm}
+
+\vfill
+\begin{flushright}
+    {(Valparaíso/Santiago), Chile, (FECHA DEFENSA)}\\
+\end{flushright}
+\end{titlepage}
+
+\clearpage
+
+
+%% DOCUMENTO
+
+\begin{center}
+    \textsc{\textbf{\LARGE Título de la Memoria}}\\
+        
+    \vspace{10mm}    
+        
+    Nombre Alumno$^1$, Nombre Supervisor$^2$, Nombre Correferente$^1$\\
+    \emph{(se agrega si hay correferente, en el caso de que el supervisor sea externo a la USM)}\\
+    
+    \vspace{5mm}
+    
+    $^1$ Universidad Técnica Federico Santa María\\
+    $^2$ Nombre Institución (Se agrega si el supervisor es externo a la universidad)
+
+    \vspace{5mm}
+    
+\end{center}
+
+\begin{abstract}
+    (Incluir resumen de máximo 250 palabras).
+    \lipsum[1]
+\end{abstract}
+
+\noindent \emph{Palabras claves}: primera, segunda, tercera.
+
+\section{Título 1}
+Este documento es el formato a seguir para el documento de la Memoria. Utilizar el estilo de formato de títulos asignados en cada nivel. El texto entre títulos tiene fuente Computer Modern Roman tamaño 11. Margenes izquierdo, derecho e inferior de 2,5 cm y margen superior de 3 cm.
+
+
+\subsection{Estructura (Utilizar este estilo de subtítulo dentro de cada sección)}
+Utilizar la siguiente estructura para las secciones principales, como por ejemplo: Introducción, Objetivos, Metodología, Resultados, Discusión, Conclusiones y Referencias. Los títulos específicos de cada sección deben fijarse de acuerdo al tema de la memoria en conjunto con el profesor supervisor.\\
+
+La memoria podrá tener una extensión de máximo 30 páginas, sin contar con la portada y hoja de firmas.
+
+\subsection{Citas a las referencias}
+Citar las referencias en formato APA. En el texto los trabajos se citarán con el apellido de los autores y año de publicación en paréntesis. Si la referencia esta entre paréntesis el año se separa por una coma (Utilizar el siguiente formato de viñetas, donde lo requieran):\\
+
+Cita un autor: \parencite{fredlund2006unsaturated}\\
+
+Cita dos autores: \parencite{kramer2017effects}\\
+
+Cita tres o más autores: \parencite{terzaghi1996soil}\\
+
+Ejemplo de cita cuando se incluye la misma como relato del texto: ``Por ejemplo, el estudio de \textcite{yoshimi1989liquefaction} considera que licuefacción del suelo ...'' \\
+
+Para citar las referencias en el texto y listarlas en la sección de Referencias (al final del documento) deben utilizar el archivo \texttt{referencias.bib}. Se sugiere utilizar un administrador de bibliografía como Mendeley (\url{https://www.mendeley.com}) o Zotero (\url{https://www.zotero.org}), y generar el archivo \texttt{referencias.bib} directamente desde la base de datos de bibliografía. 
+
+\section{Título 2}
+\subsection{Tablas y figuras}
+Las tablas y figuras incluidas en todo el documento deben ser enumeradas correlativamente, con título suficientemente auto explicativo. El título de las figuras debe presentarse en su parte inferior; mientras que el de las tablas en su parte superior. Tanto tablas o como figuras deben indicar la fuente de información de la cual han sido obtenidas, salvo cuando sean de autoría propia.
+
+\subsection{Ecuaciones}
+Las ecuaciones también se enumerarán en forma correlativa poniendo su número entre paréntesis justificado a la derecha. Las ecuaciones no debiesen estar insertadas como una imagen.  A continuación de la presentación de la ecuación indique en el texto el significado de los términos que la conforman.
+
+\subsection{Referencias cruzadas}
+Toda tabla, figura o ecuación debe estar citada en la descripción del manuscrito y deben presentarse en el texto en el mismo orden que aparece en el documento. Verifique que estos elementos estén citados en el trabajo en el texto principal como, por ejemplo: “En la Figura \ref{fig: Ejemplo} se observa...” ó “La Figura \ref{fig: Ejemplo} muestra...” ó “la Tabla \ref{fig: Ejemplo} indica...” ó la Ecuación \ref{fig: Ejemplo} determina …” según corresponda, utilizando referencias cruzadas.\\
+
+\clearpage
+
+Ejemplo de figura:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{SWCC.PNG}
+    \caption{Nombre de la figura}
+    \label{fig: Ejemplo}
+\end{figure}
+
+Ejemplo de tabla:
+
+\begin{table}[h]
+  \centering
+  \caption{Nombre de la tabla}
+    \begin{tabular}{p{7.855em}p{7.855em}p{15.5em}}
+    \hline
+    \textbf{Grado PG} & \textbf{Nomenclatura} & \textbf{Aplicación} \\
+    \hline
+    PG 64-16 & PG 64 & Mezcla convencional \\
+    PG 76-16 & PG 76 & Mezcla con asfalto modificado \\
+    PG 88-22 & PG 88 & Mezcla tibia \\
+    \hline
+    \end{tabular}%
+  \label{tab: Ejemplo}%
+\end{table}%
+
+Ejemplo de ecuación:
+
+\begin{equation}
+    |H|=\sqrt{G_1^2+G_2^2}=\sqrt{(\sigma_o/\lambda_o)^2 (\cos^2\phi+\sen^2\phi)}
+    \label{eq: Ejemplo}
+\end{equation}
+
+\noindent donde: $H$ es el resultado en MPa; $G_1$ y $G_2$ son los términos en kN.\\
+
+Se deben definir las abreviaturas y acrónimos que no sean comunes la primera vez que aparecen en el texto, aún si ya se han definido en el resumen.  No utilice notas al pie para indicar el significado de términos o abreviaturas ni citar referencias.
+
+\section{Referencias bibliográficas}
+Esta sección debe ser la última sección del documento. Esta sección no lleva numeración al ser una sección especial (dejar solo Referencias mostrada al final de esta página).\\
+
+Se debe verificar con cuidado que todas las citas colocadas en el texto aparezcan en la lista de referencias de acuerdo al formato APA (para esto, se puede editar los códigos de las citas en \texttt{referencias.bib}). En la lista solo deben aparecer las referencias que fueron utilizadas en el texto principal del trabajo, en las tablas o en las figuras. Esto implica que no deben aparecer referencias que no se citen en el documento, aunque las hayan consultado durante la preparación de la memoria.\\
+
+En esta sección listar en formato APA. Aplique una sangría francesa de 0.5 cm tal como se ilustra en el ejemplo.  Los nombres de los autores citados deben abreviarse poniendo sólo sus iniciales. Algunos ejemplos de cómo citar las referencias se presentan a continuación:
+
+\printbibliography
+
+\clearpage
+
+\appendix
+
+\section{Apéndice 1}
+
+Puede agregar al final de su documento una sección de ápendices si así lo amerita.
+
+\subsection{Subsección}
+
+\lipsum[1]
+
+\section{Apéndice 2}
+
+\begin{listing}[ht]
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+bgcolor=LightGray,
+fontsize=\footnotesize,
+linenos
+]
+{c}
+#include <stdio.h>
+int main() {
+   printf("Hello, World!"); /*printf() outputs the quoted string*/
+   return 0;
+}
+\end{minted}
+\caption{``Hello World'' en lenguaje C}
+\end{listing}
+
+\begin{listing}[ht]
+\begin{minted}
+[
+frame=lines,
+framesep=2mm,
+baselinestretch=1.2,
+bgcolor=LightGray,
+fontsize=\footnotesize,
+linenos
+]
+{python}
+import numpy as np
+    
+def incmatrix(genl1,genl2):
+    m = len(genl1)
+    n = len(genl2)
+    M = None #to become the incidence matrix
+    VT = np.zeros((n*m,1), int)  #dummy variable
+    
+    #compute the bitwise xor matrix
+    M1 = bitxormatrix(genl1)
+    M2 = np.triu(bitxormatrix(genl2),1) 
+
+    for i in range(m-1):
+        for j in range(i+1, m):
+            [r,c] = np.where(M2 == M1[i,j])
+            for k in range(len(r)):
+                VT[(i)*n + r[k]] = 1;
+                VT[(i)*n + c[k]] = 1;
+                VT[(j)*n + r[k]] = 1;
+                VT[(j)*n + c[k]] = 1;
+                
+                if M is None:
+                    M = np.copy(VT)
+                else:
+                    M = np.concatenate((M, VT), 1)
+                
+                VT = np.zeros((n*m,1), int)
+    
+    return M
+\end{minted}
+\caption{Ejemplo de código fuente en lenguaje Python}
+\end{listing}
+
+\end{document}

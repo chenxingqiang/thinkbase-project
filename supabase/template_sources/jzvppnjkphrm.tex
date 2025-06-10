@@ -1,0 +1,579 @@
+\documentclass[a4paper,12pt,twoside,BCOR=10mm]{scrbook}
+
+% UoI MSc thesis template (English) V2.0.1 8.4.2022
+
+% The license of this template is not fully clear, but: This template
+% version is based on an earlier LaTeX template that was once available
+% on a SENS UGLA page where the author and license are unknown.  As
+% that version has obviously been put once online with the intend to be
+% used by students, providing and using it should not be problem.
+
+% Helmut Neukirchen https://uni.hi.is/helmut updated that earlier
+% template using a tikzpicture-based approach for the title page
+% created by Þór Arnar Curtis.
+
+% The included logos are very likely copyrighted by the University of
+% Iceland, but
+% https://zeroheight.com/1b323cfd9/p/20f1e6-theses/b/29a61a
+% states that the document is intended to make it easier for
+% students, staff, and print-shops to format the thesis and ensure a
+% standardised appearance. So providing them here and using them
+% should be legal.
+
+
+% Search below for "MODIFY THESE LINES ONLY": there you can enter your name, thesis title, etc.
+
+% BibLaTeX is assumed for references. While Overleaf does this
+% automatically for you, if you run it locally on the commandline,
+% then you need to run first pdflatex MSc.tex, then biber MSc (without
+% the .tex extension), and then again pdflatex MSc.tex
+
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[icelandic, english]{babel}
+\usepackage{t1enc}
+\usepackage{graphicx}
+\usepackage[intoc]{nomencl}
+\usepackage{enumerate,color}
+\usepackage{url}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\BeforeTOCHead[toc]{\cleardoublepage\pdfbookmark{\contentsname}{toc}} % Add Table of Contents to PDF "bookmark" table of contents
+\usepackage{appendix}
+\usepackage{eso-pic}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[sf,normalsize]{subfigure}
+\usepackage[format=plain,labelformat=simple,labelsep=colon]{caption}
+\usepackage{placeins}
+\usepackage{tabularx}
+
+% Packages used for title page layout
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+% Blue color according to HÍ corporate design
+\convertcolorspec{RGB}{16,9,159}{rgb}\tmphiblue
+\definecolor{hiblue}{rgb}\tmphiblue
+
+
+\setlength{\parskip}{\baselineskip}
+\setlength{\parindent}{0cm}
+\raggedbottom
+
+\setkomafont{captionlabel}{\itshape}
+\setkomafont{caption}{\itshape}
+\setkomafont{section}{\FloatBarrier\Large}
+\setcapwidth{\textwidth}
+%\setcapwidth[l]{\textwidth} % The original template had the [l] which leads to a warning that it gets ignored, so to reduce warnings, removed it.
+\setcapindent{1em}
+
+
+\usepackage{lmodern} % Use Latin Modern (instead of the default Computer Modern that is rendered using a bitmap font).
+\usepackage{fixcmex} % To fix that Latin Modern large symbol math fonts has by default only one size: https://tex.stackexchange.com/a/621536
+% Times new roman font instead of the standard LaTeX fonts: has not been test -- try this on your own risk
+%\usepackage[T1]{fontenc}
+%\usepackage{mathptmx}
+
+
+%%%%%%%%%%%%%%%%% Configurations (Useful defaults, but OK to change %%%%%%%%%%%%%%%%%%%
+\graphicspath{{figs/}} % Figures in directory figs
+
+% Bibliography
+
+% \usepackage[sort&compress,authoryear]{natbib} % Uncoment if you want to used NatBib instead of BibLaTeX (and comment the bitlatex line below)
+
+\usepackage{biblatex}  % BibLaTeX used for references. 
+\usepackage{csquotes} % BibLaTex wants to have context sensitive quotes
+\addbibresource{references.bib} %  Name of *.bib file containing references
+
+
+%%%%%%%%%%% MODIFY THESE LINES ONLY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Some note on advisor(s) vs. thesis committee: At the School of
+% Engineering and Natural Sciences, according to Regulation
+% no. 994-2017
+% https://english.hi.is/university_school_of_engineering_and_natural_sciences/regulation_no_994_2017_on_masters_study_at
+% Article 5., a student has an administrative supervisor who is
+% typically also the academic supervisor, i.e. supervising the thesis.
+% If someone from outside is supervising, than the person becomes the
+% academic supervisor and you have in addition the administrative
+% supervisor from within HÍ.
+% In addition, according to Article 7., there is a Master's degree
+% committee that includes at least two persons, one of which shall be
+% the student’s administrative supervisor.
+% Despite these formally defined roles, it is somewhat a matter of
+% taste whether you list all persons as supervisors or all as just
+% thesis committee or list the one single academic supervisor as
+% supervisor and then all persons (repeating the supervisor's name)
+% as thesis committee.
+% In the settings, that follow here, you can set this and many other settings.
+
+\def\thesisyear{20XX}       					% Year thesis submitted
+\def\thesismonth{XXMarchXX}					% Month thesis submitted, e.g. "December"
+\def\thesisauthor{XXAuthor nameXX}				% Thesis authoreiningaraðferðinni
+\def\thesistitle{XXTitle of the thesis\\ that is often so long that\\ it spans even multiple linesXX} % Title of thesis
+\def\thesissubtitle{XXSubtitle is rarely usedXX}		% Subtitle of thesis (optional)
+\def\thesisshorttitle{XXShort title (ca.\ 50 characters including spaces) if title is too long for spineXX} 	% Optional: if title of thesis is longer than 50 characters, it would not fit on the spine (kjölur) and in this case you, need to provide a short title here for the print shop. Otherwhise: make it empty
+\def\thesiscredits{XX} 						% Credits awarded for the project
+\def\thesissubject{XXComputer ScienceXX}
+\def\thesiskind{XXM.Sc.}					% E.g. M.Sc. or Ph.D. thesis
+\def\thesiskindformal{CCMagister ScientiarumXX}			% E.g. Magister Scientiarum
+\def\thesisschool{XXSchool of Engineering and {Natural Sciences}XX}		% School
+\def\thesisfaculty{XXIndustrial Engineering, Mechanical Engineering and Computer ScienceXX}% Faculty name without "Faculty of" (gets added) 
+\def\thesisaddress{XXDunhagi 5XX}			        % Faculty or school office address street
+\def\thesispostalcode{XX107XX}			                % Faculty or school office zip code
+\def\thesistelephone{525 4000}					% Office telephone
+%\def\thesispublisher{XX}					% Publisher (not used)
+\def\thesissupervisors{XXNN1XX}					% Names of supervisors (split by \\ if more than one).
+\def\thesisnrofsupervisors{1}					% Number of supervisors (to use "Supervisor" vs. "Supervisors")
+\def\thesiscommittee{XXNN1XX \\ XXNN2XX}			% Thesis commitee must include the supervisor(s)
+\def\thesisexaminer{XXNN3XX}				        % Examiner (prófdómari)
+\def\thesisISBN{}           					% Thesis ISBN number (keep empty: not used anymore)
+\def\thesisprinting{}						% Name of printsthop (keep empty if thesis is never printed)
+%\def\thesisprinting{Háskólaprent, Fálkagata 2, 107 Reykjavík}	% Name of printsthop (keep empty if thesis is never printed)
+\def\thesislicense{XXThis thesis may not be copied in any form without author permission.XX} % Set license here (could also be some Creative Commons license)
+%\def\thesiskeywords{Keyword1, Keyword2, Keyword3}		% Keywords (not used anywhere, hence commented out)
+
+%%%%%%%%%%% STOP MODIFYING HERE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%% Next modifications: search for "START MODIFYING HERE AGAIN" below %%%%%%%%%%
+
+% We need this command if someone used \\ in the thesis title
+\newcommand{\removelinebreaks}[1]{%
+  \begingroup\def\\{}#1\endgroup}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\pagenumbering{Alph} % To prevent page numer "1" to be used multiple times, used "A", "B", etc. for the first pages
+\begin{titlepage} % This titlepage environment spans in fact multiple pages
+
+% This is the cover title page. If you go to a print shop, they will
+% ignore it and create their own cover page, i.e. this cover page here
+% is only used by the PDF version that gets electronically archived.
+
+  \thispagestyle{empty}
+  
+  % The banner at top and bottom (using a tikz overlay)
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=north west, inner sep=0pt] at (current page.north west)
+        {\includegraphics[width=\paperwidth]{banner}}; % The top banner (as a PNG) % TODO: A vector graphic would be better
+
+    \node(bottom)[shape=rectangle, fill=hiblue, minimum height=10mm, minimum width=\paperwidth, anchor=south west] at (current page.south west) {}; % The bottom banner (a filled rectangle)
+
+    \node[above=0.4cm of bottom] {
+        \begin{tabular}{c} 
+          \sffamily \small \textcolor{hiblue}{\textbf{\MakeUppercase{Faculty of \thesisfaculty{}}}}
+        \end{tabular}
+    };
+  \end{tikzpicture}
+
+  \enlargethispage{3cm}
+  \vspace*{3.5cm} % Here starts the white space below the top banner
+  
+  % The centering used below is with respect to the page margins which
+  % are not the same on left and right which prevents proper centering
+  % with respect to the tikz centering (and the title page in
+  % general).  Instead, we use a minipage that we shift horizontally
+  % by 2.6 cm.  But minipage sets \parskip to 0, so we need to save
+  % and restore it.  To be able to use vfill/stretch in a minipage,
+  % the height needs to be specified: 20.0 cm.
+  \newlength{\currentparskip}
+  \setlength{\currentparskip}{\parskip}
+  \hspace*{-2.7cm}
+  \begin{minipage}[t][20.0cm]{1.0\paperwidth}
+    \setlength{\parskip}{\currentparskip}
+    \begin{center}
+      \vspace*{ \stretch{1.5} }
+      \huge \sffamily \bfseries \thesistitle{}
+    
+      \normalfont \LARGE \sffamily \thesissubtitle{}
+
+      \vspace{ \stretch{1.0} }
+      \normalfont \Large \sffamily \thesisauthor{}
+
+      \vspace*{ \stretch{2.75} }
+
+      \thesismonth{}~\thesisyear{} % E.g. "March 2022"
+
+      \vspace{ \stretch{0.5} }
+    
+      \normalfont \Large \sffamily {\thesiskind{}~thesis \\
+      in \thesissubject{}}
+
+      \vspace*{ \stretch{1.0} }
+    \end{center}
+  \end{minipage}
+
+  \newpage
+
+  \thispagestyle{empty} \mbox{} % This is the inside page of the cover (cover verso) which remains empty
+
+  \newpage
+
+
+  \thispagestyle{empty} % This is the inner title page
+  \begin{center}
+    \vspace*{ \stretch{0.5} }
+
+    \Large \sffamily \bfseries \thesistitle{}
+    
+    \normalfont \large \sffamily \thesissubtitle{}
+
+    \vspace*{ \stretch{1.0} }
+
+    \sffamily{\thesisauthor{}}
+    
+    \vspace*{ \stretch{1.0} }
+    \normalsize \thesiscredits{}~ECTS thesis submitted in partial fulfillment of a \\
+    \textit{\thesiskindformal{}} degree in \thesissubject{}
+    \large
+    
+    \ifx\thesissupervisors\empty % Only print supervisor part if supervisor names are not empty
+    \else
+      \vspace*{ \stretch{1.0} }
+      \ifnum\thesisnrofsupervisors>1 Supervisors \\
+      \else Supervisor \\
+      \fi
+      \thesissupervisors{}
+    \fi  
+
+    \ifx\thesiscommittee\empty % Only print thesis committee part if committee names are not empty
+    \else
+      \vspace*{ \stretch{0.25} }
+      \thesiskind{}~Committee\\
+      \thesiscommittee{}
+    \fi
+      
+    \ifx\thesisexaminer\empty % Only print examiner part if thesisexaminer is not empty
+    \else
+      \vspace*{ \stretch{0.25} }
+      Examiner \\
+      \thesisexaminer
+    \fi
+      
+    \vspace*{ \stretch{1.0} }
+
+    Faculty of \thesisfaculty \\
+    \thesisschool \\
+    University of Iceland \\
+    Reykjavik, \thesismonth~\thesisyear
+
+    \vspace*{ \stretch{0.5} }
+  \end{center}
+
+  \newpage
+
+  \thispagestyle{empty} % This is the title verso (colophon), i.e. imprint/copyright page
+  \vspace*{\fill}
+  % \setcounter{page}{0} \renewcommand{\baselinestretch}{1.5}\normalsize
+  \sffamily{\removelinebreaks{\thesistitle}} \\
+  \ifx\thesisshorttitle\empty % Show only if shorttitle is provided
+  \else
+  (\sffamily{\thesisshorttitle{}}) \\
+  \fi
+  \sffamily{\removelinebreaks{\thesissubtitle{}}} \\
+
+    
+  \thesiscredits ~ECTS thesis submitted in partial fulfillment of a \thesiskind{}~degree in \thesissubject
+\\ \\
+  Faculty of \thesisfaculty \\
+  \thesisschool \\
+  University of Iceland \\
+  \thesisaddress \\ 
+  \thesispostalcode, Reykjavik 
+  Iceland
+
+  Telephone: \thesistelephone \\ \\ 
+  \vspace*{\lineskip}
+
+  Bibliographic information: \\
+  \thesisauthor{} (\thesisyear{}) \emph{\removelinebreaks{\thesistitle{}}}, \thesiskind{}~thesis, Faculty of \thesisfaculty, University of Iceland.\\
+
+  Copyright \textcopyright~\thesisyear~ \thesisauthor \\
+  \thesislicense{}\\
+
+  \ifx\thesisISBN\empty % Show only if ISBN is provided
+  \else
+  ISBN~\thesisISBN
+  \fi
+  
+  \ifx\thesisprinting\empty % Show only if print shop is provided
+  \else
+  Printing: \thesisprinting \\
+  \fi
+
+
+  Reykjavik, Iceland, \thesismonth~\thesisyear \\
+  
+%%%%%%%%%%% START MODIFYING HERE AGAIN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  \newpage % Dedication page: remove completely if you have no dedication
+
+  \thispagestyle{empty} \mbox{}
+
+  \vfill
+
+  \begin{center}
+    \textit{
+      To all the students who made the wise decision to use \LaTeX. % Replace this by your dedication
+    }
+  \end{center} \vspace*{5cm}
+
+  \vfill 
+
+%%%%%%%%%%%%%%%%%%%%%%%%% If you have no dedication: remove until here %%%%%%%%%%%%%%%%%%%%
+
+\end{titlepage}
+
+\cleardoublepage
+
+\pagenumbering{roman} % Abstract page 
+
+\setcounter{page}{5}
+
+\section*{\huge Abstract}
+English abstract (ca. 250 words).
+
+\vfill \vspace*{1cm}
+
+\section*{\huge Útdráttur}
+Hér kemur útdráttur á íslensku sem er að hámarki 250 orð.
+\vfill
+
+\newpage % Empty page
+
+% The first "chapter" which will start on a new page
+
+%%%%%%%%%%%%%%%%% Preface is rarely used, so you probably want to delete it. %%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{Preface}
+Note that student theses have rarely a preface, so you rather want to delete this page
+
+All English text added by Helmut Neukirchen:
+Most of the Icelandic text in this template seems to be from some
+older generic University of Iceland corporate identity layout
+instruction from some Microsoft Word template -- of course those parts
+specific to Word, can be ignored. For \LaTeX, you can find some
+generic introduction online~\mbox{\cite{lshort,latex-tutorial}}.% We do not want a line break within the references, hence the mbox here. Neither want we a line starting with the references, hence the ~ here.
+
+Also the layout information in the Icelandic text refers to the old
+design from before 2021 -- so this needs to be ignored as well.
+
+Formála má sleppa og skal þá fjarlægja þessa blaðsíðu. Formáli skal hefjast á oddatölu blaðsíðu og nota skal Section Break (Odd Page).
+
+Ekki birtist blaðsíðutal á þessum fyrstu síðum ritgerðarinnar en blaðsíðurnar teljast með og hafa áhrif á blaðsíðutal sem birtist með rómverskum tölum fyrst á efnisyfirliti.
+
+%%%%%%%%%%%%%%%%% Preface ends here. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Table of contents starts automatically on a right-hand side page ("recto").
+% Table of contents, list of figures and tables are automatically generated by the commands below
+\hypersetup{pageanchor=true}
+\tableofcontents
+\listoffigures
+\listoftables
+
+\chapter*{Abbreviations}
+\addcontentsline{toc}{chapter}{Abbreviations}
+\markboth{Abbreviations}{Abbreviations}
+
+Í þessum kafla mega koma fram listar yfir skammstafanir og/eða breytuheiti. Gefið kaflanum nafn við hæfi, t.d.\ Skammstafanir eða Breytuheiti. Þessum kafla má sleppa ef hans er ekki þörf. \\
+
+The section could be titled: Glossary, Variable Names, etc.
+
+If you use acronyms, it is strongly recommended to use a LaTeX
+acronyms package. For example, to use the package \emph{acronym}, add
+in the preamble:
+\begin{verbatim}
+\usepackage{acronym}
+\end{verbatim}
+and then here in this chapter (to create the list of all acronyms), use:
+\begin{verbatim}
+\begin{acronym}[SENS]
+  \acro{SENS}{School of Engineering and Natural Sciences}
+  \acro{UoI}{University of Iceland}
+\end{acronym}
+\end{verbatim}
+In the square bracket above, you need to put the longest acronym, so
+that the list gets proper indentation based on the longest acronym.
+Also note that you need to manually sort here that list.
+
+Then, whereever you use the acronym in your text: \verb|\ac{UoI}|:
+that will automatically expand the acronym at the first use, but use
+only the short version after the first use.  (Use \verb|\acp| if need
+the plural form. \verb|\acl| if you explicitly want to have the long
+form only, \verb|\acf| if you explicitly want to have the full long
+and short form, i.e.\ like first use of \verb|\ac|.)
+
+Use \verb|\acresetall| to forget about earlier usage (=expansion) of
+acronyms, e.g.\ if despite already used in Abstract or Introduction,
+but you want to expand them later once again (starting from, e.g., in
+Foundations chapter): add \verb|\acresetall| at start of Introduction
+chapter (and maybe also again at start of Foundations chapter).
+
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+Í þessum kafla koma fram þakkir til þeirra sem hafa styrkt rannsóknina með fjárframlögum, aðstöðu eða vinnu. t.d.\ styrktarsjóðir, fyrirtæki, leiðbeinendur, og aðrir aðilar sem hafa á einhvern hátt aðstoðað við gerð verkefnisins, þ.m.t.\ vinir og fjölskylda ef við á. Þakkir byrja á oddatölusíðu (hægri síðu).
+
+
+\chapter{General Information}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+Fyrirsögn 1 er kaflaheiti. Feitletrið fyrirsögn 1 í 20 pt Verdana. Hafið 54 pt loftun yfir og byrjið nýja oddatölusíðu (hægri síðu). Hafið 12 pt loftun undir á undan texta og 24 pt loftun undir (samtals) ef beint á undan fyrirsögn 2.
+
+Í stað Verdana má velja sambærilegt steinskriftar (sans serif) letur í allar fyrirsagnir en allar fyrirsagnir skulu þó vera ritaðar með sömu leturgerð.
+
+Meginmálstexti skal skrifaður í Times New Roman, með leturstærð 12 og einföldu línubili. Málsgreinar skulu loftaðar með 0 pt bili að ofan og 12 pt bili að neðan, þar sem fyrirsagnir stilla loftun fyrir neðan sig (og þar með fyrir ofan texta).
+
+Leita skal að XX sem hluta af orði, þar sem það merkir atriði sem höfundur þarf að breyta.
+
+Í stað Times New Roman má velja sambærilegt prentletur (serif). Allt meginmál skal þó ritað með sömu leturgerð. 
+
+Allur texti ritgerðar skal ritaður með einum lit, svörtum. Undantekningar eru leyfðar innan mynda. Ekki nota “hyperlinks” í texta, sem þá verður blár og/eða með undirlínu.
+
+Notast skal við 2,5 cm spássíu fyrir ofan og á ytri hlið (ekki kjalmegin). Við kjölin skal bæta 0,5 cm (Gutter) til að hafa samtals 3,0 cm spássíu. Neðst á blaðsíðu skulu vera 1,5 cm frá neðri brún í blaðsíðutal og spássían skal vera 3,0 cm frá neðri brún blaðsíðu að texta.
+
+Blaðsíður meginmáls byrja að númerast á 1 á fyrstu blaðsíðu fyrsta kafla með arabískum stíl. Blaðsíðutalið er still við ytri brún og neðst á blaðsíðu. Heimildir og viðaukar númerast einnig með sama hætti. Fjöldi blaðsíðna í ritgerð skráist sem blaðsíðunúmer öftustu prentuðu síðu.
+
+Byrja skal fyrirsögn 1 efst á hægri síðu. Hér má hugsa sér að setja stuttan texta sem inngang að kaflanum áður en fyrsti undirkafli byrjar. Það getur hjálpað lesanda að átta sig á inntaki kaflans.
+
+Nota má skáletur í hófi til að draga athygli að texta. Notið feitletur enn sjaldnar. Ekki nota undirstrikaðan texta í ritgerðinni.
+
+Farið sparlega í notkun footnote. Þær skulu vera númeraðar og birtast neðst á þeirri síðu sem fyrst vitnar í þær eða fljótlega þar á eftir.
+
+Númerið og vísið í formúlur eftir venjum fagsviðs.
+
+Velja má inndrátt fyrstu línu málsgreinar um 1 cm í stað 12 pt loftunar á milli málsgreina, en þá þarf að bæta 12 pt við loftun yfir fyrirsögnum sem gera ráð fyrir að 12 pt loftun komi frá lokum málsgreinar. Ekki skal nota bæði inndrátt og loftun.
+
+\section{Heading 2}
+Fyrirsögn 2 er undirfyrirsögn. Feitletrið fyrirsögn 2 í 16 pt Verdana. Hafið samtals 24 pt loftun yfir fyrirsögn 2. Notið 12 pt loftun fyrir neðan fyrirsögn 2.
+
+\subsection{Heading 3}
+Fyrirsögn 3 er síðasta númeraða undirfyrirsögnin. Feitletrið fyrirsögn 3 í 12 pt Verdana með 18 pt loftun yfir samtals þegar texti er fyrir ofan eða fyrirsögn 2. 
+\subsubsection{Heading 4}
+12 pt Verdana, engin kaflanúmer, birtist ekki í efnisyfirliti, 12 pt loftun yfir og 6 pt undir
+
+Fyrirsögn 4 skal ekki númera. Fyrirsögn 4 er rituð í venjulegu 12 pt Verdana og hefur minnst 12 pt loftun yfir ef hún er undir texta, en meiri loftun undir hærri fyrirsögnum sem stýrist af neðri loftunum þeirra fyrirsagna. Notið 6 pt loftun undir fyrirsögn 4.
+Ekki nota fyrirsagnir á lægra útlínu stigi en fyrirsögn 4.
+
+\section{Title page, spine, and back page}
+Ekki skal nota búmerki/logó fyrirtækja, samstarfsaðila eða styrktaraðila á forsíðu/ baksíðu eða annars staðar í ritgerð. Ekki skal setja mynd á forsíðu ritgerðar. 
+
+Í texta er hins vegar skylt og rétt að geta samstarfsaðila og styrktaraðila, það skal gert í kaflanum Þakkir (Acknowledgments) eða í formála.
+
+Á baksíðu er heimilt að setja nafn prentsmiðju, þá miðjað hægri-vinstri á blaðsíðu og miðjað upp-niður innan litaborðans. Nafn prentsmiðju skal ritað með stærst 10 pt Verdana í venjulegu hvítu letri.
+
+Merki Háskóla Íslands á forsíðu skal hafa 4,2 cm þvermál. Það skal staðsetja merkið 4,2 cm frá efri brún. Frá neðri brún merkis skulu minnst vera 3,0 cm í titil ritgerðar.
+
+Loftun fyrir neðan nafn höfundar skal vera 1 cm niður að efstu brún litaborðans.
+
+Megin hluti litaborðans neðst á forsíðu skal spanna 7,7 cm frá neðri brún blaðsíðu í A4-formi, en þó spannar hann lengra bil þar sem táknmynd aðalbyggingar kemur fyrir.
+
+Litaborðinn skal ná yfir kjölinn og baksíðuna, og þar spanna 7,7 cm frá neðri brún blaðsíðu.
+
+Litaborði BS ritgerða er grár litur Háskóla Íslands. Litakóðar litarins eru: CMYK: 0 : 0 : 0 : 70; Pantone: Cool Gray 11 C; RGB: 90 : 91 : 94.
+
+Litaborði meistararitgerða er litur Verkfræði- og náttúruvísindasviðs Háskóla Íslands, appelsínugulur. Litakóðar litarins eru: CMYK:  0 : 75 : 100 : 0; Pantone: 158 C; RGB: 236 : 78 : 34.
+
+Litaborði doktorsritgerða er litur Háskóla Íslands, dökk blár. Litakóðar litarins eru: CMYK: 100 : 57 : 0 : 40; Pantone: 295 C; RGB: 0 : 46 : 85.
+
+Á kjöl ritgerðar skal rita nafn höfundar, stuttan titil ritgerðar (mest 50 slög með bilum) og ártal ritgerðar í einni línu með Verdana letri. Nafn höfundar og stuttur titill ritgerðar koma á hvíta flötinn, en ártalið kemur í hvítu letri á litaborðann.
+
+\section{Thesis and Dissertation Authoring}
+Gæði ritgerðar endurspegla ekki einungis gæði rannsóknarinnar (hermana, líkana, greininga, o.fl.), heldur einnig gæði ritgerðasmíðar. Í síðara samhenginu skipta margir þættir máli, t.d.\ uppbygging og söguflæði, framsetning á hugmyndum og niðurstöðum, málfar og heimildavinna. Því er mikilvægt að nemendur kynni sér hvernig best sé að standa að undirbúningi og skrifum ritgerðar. Nemendur verða að tileinka sér fagmannleg vinnubrögð í heimildaskráningu og tilvísunum í samráði við leiðbeinanda. Hér eru dæmi um tvær bækur sem nemendur geta stuðst við:
+\begin{itemize}
+ \item Friðrík H. Jónsson og Sigurður J. Grétarsson (2007). \textit{Gagnfræðikver fyrir háskólanema}, Háskólaútgáfan, Reykjavík.~\cite{JonssonGretarsson2018}
+ \item Ingibjörg Axelsdóttir og Þórunn Blöndal (2006).  \textit{Handbók um ritun og frágang},  Mál og menning, Reykjavík.~\cite{AxelsdottirBlondal2006}
+\end{itemize}
+
+
+\section{Doctoral Dissertation: Monograph or Paper Collection}
+Doktorsritgerð getur verið hvort sem er í formi ritgerðar eða safns greina sem hafa birst eða  er áætlað að birtist í ritrýndum ritum. 
+
+Ef doktorsritgerðin er greinasafn skal ávallt fylgja inngangur sem setur fram heildstæð markmið, ítarlegt yfirlit og samantekt á verkinu. Mælt er með að í lok ritgerðar, á undan viðaukum, fylgi samantekinn listi yfir heimildir verksins.
+
+Ef einhver greinanna í ritgerðinni hafa meðhöfunda skal framlag doktorsnemans útskýrt sérstaklega í inngangi, sér í lagi krefst það útskýringa ef doktorsneminn er ekki aðalhöfundur greinarinnar. 
+
+Ráðlagt er að greinar þær sem birtast í safninu séu settar í þeim stíl sem hér er lýst fyrir doktorsritgerðir, en séu ekki bein afrit birtra greina, þar sem setning og útlit slíkra greina getur fallið undir vernd höfundarréttar útgáfuaðila. Útgáfuaðilar leyfa almennt að texti greina birtist bæði í grein og doktorsritgerð. Það er á ábyrgð nemanda að kanna slíkt og framfylgja þeim samþykktum sem nemandi hefur fallist á við birtingu greina.
+ 
+\chapter{Lists}
+Bullet list
+Hér á eftir er dæmi um upptalningarlista. Listinn má vera þéttari, þ.e.\ að aðeins sé 0 pt bil á milli atriða, en þó skal hafa 12 pt bil á undan fyrsta atriði listans.
+\begin{itemize}
+ \item Númer 1
+ \item Númer 2
+ \item Númer 3
+\end{itemize}
+Ef fyrsta lína eftir upptalningu er framhald sömu málsgreinar og fyrir ofan skal ekki setja inn viðbótarloftun (eða ef inndráttur er notaður, skal ekki nota inndrátt á slíkri línu). 
+
+\chapter{Figures and tables}\label{ch:figures and tables}
+Þessi kafli sýnir dæmi um notkun mynda, taflna og vísun í þær.
+\section{Figures}
+Myndatexti skal staðsetja undir myndum og skrifast með skáletri.
+Setja skal auða aukalínu fyrir ofan myndir.
+\begin{figure}[!htb]
+\centering
+ \includegraphics[width=0.47\textwidth]{banner.png}
+\caption[Dæmi um myndatexta (fyrir neðan mynd).]{Dæmi um myndatexta (fyrir neðan mynd)} \label{fig:logo}
+\end{figure}
+Mikilvægt er að skilgreina myndir með ,,paragraph format”: “keep with next” til að rjúfa ekki tengsl á milli myndar og myndtexta. Mynd má vera miðjuð og skal þá einnig miðja myndartextann. Letur innan myndar skal vera í steinskrift (sans serif), t.d.\ Verdana, og ekki minna en 10 pt. Tryggið að letur, tákn og línur sjáist skýrt eftir útprentun.
+
+Hægt er að láta númera og merkja myndir sjálfvirkt með því að gera Insert – Reference – Caption – Mynd eða Tafla. Varist að velja hyperlink. 
+
+Vísa má í mynd með því að velja Insert – Reference – Cross-Reference – Mynd eða Tafla. Varist að velja hyperlink og veljið að eins Label og Number. T.d.\ sjá þessa tilvísun í Mynd~\ref{fig:logo} sem dæmi. 
+
+\section{Tables}
+Einnig má númera töflur sjálfkrafa svipað og myndir. Nota skal skáletur í töflutitil. Textinn skal standa fyrir ofan töflu og fylgja töflunni.  Ekki nota tvöfalt línubil eða hafa space before í töflum. Meginreglan við töflugerð er að hafa þær einfaldar og eins fá strik og mögulegt er. Tafla má vera miðjuð á blaðsíðu og skal þá láta töflutitil byrja við vinstri brún töflu.
+
+
+\begin{table}[htb]
+  \centering
+  \caption{Dæmi um töflutexta (fyrir ofan töflu).}
+  \sffamily
+  \begin{tabularx}{0.9\textwidth}{ p{4.0cm}  p{4.0cm}  p{4.0cm} }
+    \hline
+   \textbf{Taflan} \hfill & \textbf{Er} \hfill & \textbf{Eins} \\ \hline
+    Og & Hún & gæti\\
+    Litið & Út & í ritgerð\\ \hline
+  \end{tabularx} \normalfont
+  \label{table:Emissivity}
+\end{table}
+
+Almennt skal ekki nota loftun fyrir neðan texta í töflu, og stylla loftun fyrir neðan á 0 pt.
+Mikilvægt er að skilgreina töflutexta með ,,format paragraph: keep with next og keep lines together” til að rjúfa ekki tengsl á milli töflutexta og töflu. Ef tafla er mjög löng má kljúfa hana á milli blaðsíðna og þá verður að setja (\textit{Framhald}) í aukalínu beint fyrir neðan töfluna, hægri stillt við hægri brún töflu.
+
+Dæmi um sjálfvirka tilvísun í töflu, bara nota Label and Number, ekki nota hyperlink eða caption text. T.d.\ Tafla~\ref{table:Emissivity} sýnir dæmi um töflu.\footnote{If you want the horizontal lines look really nice, use the \emph{booktabs} package that provides commands \texttt{\textbackslash{}toprule}, \texttt{\textbackslash{}midrule}, and \texttt{\textbackslash{}bottomrule}.}
+
+\chapter{Conclusions}
+
+Note that -- in addition to referring to figures and tables as
+demonstrated in Chapter~\ref{ch:figures and tables} by using
+lables -- it is also possible to refer in the same way to chapters and sections.
+
+\printbibliography[ heading=bibintoc, title={References} ]
+
+\appendix
+\renewcommand{\chaptername}{Appendix}
+\chapter{Appendix}
+
+Note that there is no agreed best practise whether References chapter of Appendix chapter is last.
+
+Gagnlegir punktar og ábendingar
+\begin{itemize}
+ \item BS ritgerðir skulu prentaðar í A4.
+ \item Meistararitgerðir skulu prentaðar í A4.
+ \item Útgáfustærð doktorsritgerða er B5.
+\begin{itemize}
+ \item[-] Iðulega er doktorsritgerð unnin í A4 en svo smækkuð við prentun. Mikilvægt er að tryggja að allur texti, m.a. í myndum og töflum, sjáist skýrt eftir smækkun í B5. Því verður að skoða drög af ritgerð eftir smækkun í B5 áður en ritgerðin er prentuð í fjölda eintaka.
+\end{itemize}
+
+\end{itemize}
+
+\begin{itemize}
+ \item Miða skal við að ritgerð sé prentuð báðu megin á blaðsíður og byrja skal alla kafla á hægri síðu opnu.
+ \item Hafa skal samband við prentsmiðju áður en handriti er skilað. Oft vilja þessir aðilar fá ritgerðina á PDF-formi. Hafa skal í huga að litprentun er mun dýrari en svart/hvít prentun. 
+ \item Til eru mismunandi gæði/upplausn á PDF-skjölum. Prentsmiðjur biðja gjarnan um hágæða upplausn / prentunarupplausn sem er meiri en ,,venjuleg” PDF-upplausn sem notuð er við skjöl sem vistuð eru á netinu. Þetta er stillingaratriði áður en PDF-skjal er búið til. Almennt vilja prentsmiðjur hæstu mögulegu upplausn. Einnig vilja prentsmiðjur almennt að allt letur og myndir séu skilgreindar (“Embedded”) innan í PDF skjalinu.
+\end{itemize}
+
+\end{document}

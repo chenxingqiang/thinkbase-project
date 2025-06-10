@@ -1,0 +1,123 @@
+\documentclass[12pt, a4paper,twoside, times, openany]{book}
+\usepackage{fullpage}
+\usepackage{setspace}
+\renewcommand{\baselinestretch}{1.5} 
+
+% Page margin setting
+\usepackage{geometry}
+\geometry{left=4cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+%\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bm} % bold vectors package style
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption} 
+\usepackage{siunitx}
+\usepackage{tocloft}
+
+\usepackage{color,soul,framed}   %highlight text, \hl{text}
+\usepackage{xcolor,soul,framed}
+\colorlet{shadecolor}{yellow}
+
+\DeclareMathOperator{\Tr}{Tr}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{remark}{Remark}[chapter]
+
+
+\renewcommand\listtablename{\vspace{-2.2cm} List of Tables and Figures}
+\renewcommand\listfigurename{\vspace{-1.5cm}}
+
+\newcommand{\lotlabel}{Table}
+\newcommand{\loflabel}{Figure}
+
+
+%\newcommand*{\l@section}{\@dottedtocline{1}{1.5em}{2.3em}}
+\setlength{\cftsecindent}{0em}
+\setlength{\cftsubsecindent}{2em}
+
+
+\setlength{\cftfigindent}{0em}
+\setlength{\cfttabindent}{0cm}
+
+\makeatletter
+\newcommand\listoftablesandfigures{%
+	\chapter*{List of Tables and Figures}%
+	\phantomsection
+	\@starttoc{lot}%
+	\bigskip
+	\@starttoc{lof}}
+\makeatother
+
+\renewcommand{\contentsname}{Table of Contents}
+%\renewcommand{\bibname}{References}
+
+
+\setcounter{tocdepth}{1}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{} %clear all fields
+\fancyhead[RE]{\text{\nouppercase{\leftmark}}}
+\fancyhead[LO]{\text{\nouppercase{\rightmark}}}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\bfseries\boldmath\huge}%
+{\chaptername\ \thechapter}{1em}{}{}
+\titlespacing{\chapter}{0pt}{-8.0ex}{10\wordsep}
+
+%--------------------
+\fancypagestyle{plain}{
+	\fancyhead{} %clear all fields
+	\fancyhead[RE]{}
+	\fancyhead[LO]{}
+	\fancyfoot[C]{\thepage}
+	\renewcommand{\headrulewidth}{0pt}
+	\renewcommand{\footrulewidth}{0pt}
+}
+
+
+\begin{document}
+	
+% normal margin on cover page
+\newgeometry{top=2.5cm,bottom=2.5cm,outer=2.5cm,inner=2.5cm} 
+\thispagestyle{empty}
+\include{./chapters/cover_page}
+
+% restore page margin setting
+\restoregeometry 
+\normalsize
+\doublespacing
+
+\frontmatter
+\include{./chapters/preface_page}
+
+\newpage\thispagestyle{empty}\mbox{}
+\vspace{-2.2cm}
+\tableofcontents
+
+\newpage\thispagestyle{plain}
+\addcontentsline{toc}{chapter}{List of Tables and Figures}
+\renewcommand{\numberline}[1]{\hspace*{0em}\lotlabel~#1\hspace*{1em}}
+\listoftables
+\renewcommand{\numberline}[1]{\hspace*{0em}\loflabel~#1\hspace*{1em}}
+\listoffigures
+
+\mainmatter
+\doublespacing
+\include{./chapters/ch1_intro}
+
+
+\begingroup
+\setstretch{1}
+\bibliographystyle{./references/IEEEtran}
+\bibliography{./references/demo}
+\endgroup
+	
+\end{document}

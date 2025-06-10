@@ -1,0 +1,228 @@
+\documentclass[10pt]{beamer}
+%================================================
+%---------------PACOTES
+%================================================
+\usepackage{appendixnumberbeamer}
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+\usepackage{pgfplots}
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+\renewcommand{\raggedright}{\leftskip=0pt \rightskip=0pt plus 0cm}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{epstopdf}
+\usepackage{pdfpages}
+\usepackage{verbatim}
+\tolerance=1000
+\usepackage[outputdir=build/]{minted}
+\usepackage{xcolor}
+\usepackage[all]{xy}
+\usepackage{times}
+\usepackage{tikz}
+\usepackage{ragged2e}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage[timeinterval=1]{tdclock}
+
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{lipsum}
+\usepackage{ragged2e}
+\newcommand{\jus}{\justifying}
+\apptocmd{\frame}{}{\justifying}{}
+\apptocmd{\block}{}{\justifying}{}
+\apptocmd{\column}{}{\justifying}{}
+\usepackage{enumerate}
+\usepackage{handoutWithNotes}
+%\pgfpagesuselayout{1 on 1 with notes landscape}[a4paper,border shrink=5mm]
+\hypersetup{colorlinks,citecolor=verde,linkcolor=orange,urlcolor=verde}
+\usepackage[alf]{abntex2cite}%Citações padrão ABNT}
+%=============================
+\usetheme[sectionpage=none, subsectionpage=progressbar]{metropolis}
+\usepgfplotslibrary{dateplot}
+\useoutertheme[subsection=false,footline=authortitle]{miniframes}
+\setbeamertemplate{footline}[frame number]%Numerando as Páginas
+\hypersetup{pdfpagemode=FullScreen}%Visualizar em Tela cheia
+\hypersetup{pdfpagelayout=SinglePage}%Layout da pagina
+%-----Definição de novos comandos
+\providecommand{\sin}{} \renewcommand{\sin}{\hspace{2pt}\textrm{sen}}
+\providecommand{\tan}{} \renewcommand{\tan}{\hspace{2pt}\textrm{tg}}
+\setbeamerfont{section in toc}{size=\small}
+\setbeamerfont{subsection in toc}{size=\scriptsize}%\footnotesize
+\setbeamerfont{subsubsection in toc}{size=\scriptsize}
+\AtBeginEnvironment{minted}{\renewcommand{\fcolorbox}[4][]{#4}}
+\AtBeginSection[]{\begin{frame}<beamer>\frametitle{Seção atual}\tableofcontents[currentsection]\end{frame}}
+\LetLtxMacro{\OldIncludegraphics}{\includegraphics}
+\renewcommand{\includegraphics}[2][]{\OldIncludegraphics[height=0.8\textheight,keepaspectratio, #1]{#2}}
+\newcommand{\dis}{\displaystyle}
+\newcommand{\lb}{\left\lbrace}
+\newcommand{\rb}{\right\rbrace}
+%================================================
+%---------------CORES DO TEMPLATE
+%================================================
+\definecolor{verde}{HTML}{008069}
+\definecolor{verdepastel}{HTML}{d8f3dc}
+\definecolor{verdesolution}{HTML}{beff9e}
+\definecolor{vsplbggray}{HTML}{f4f8ff}
+%-----------------------------------------------
+\setbeamercolor{alerted text}{fg=orange}
+\setbeamercolor*{palette primary}{fg=verde!60!black,bg=gray!30!white}
+\setbeamercolor*{palette tertiary}{bg=verde!90,fg=white}
+\setbeamercolor*{palette quaternary}{fg=verde,bg=gray!5!white}
+\setbeamercolor*{sidebar}{fg=black,bg=black}
+\setbeamercolor{progress bar}{fg=verde}%Linha q passa as seções
+\setbeamercolor*{titlelike}{parent=palette primary}
+\setbeamercolor{titlelike}{parent=palette primary,fg=verde}%-Modifica a cor do título
+\setbeamercolor{frametitle}{bg=verdepastel,fg=verde}
+\setbeamercolor{frametitle right}{bg=black}
+\setbeamercolor{background canvas}{bg=white}
+%================================================
+%---------------BLOCOS  
+%================================================
+\setbeamertemplate{blocks}[rounded][shadow]
+\uselanguage{Brazil}
+\languagepath{Brazil}
+\deftranslation[to=Brazil]{Theorem}{Teorema}
+\deftranslation[to=Brazil]{Problem}{Problema:}
+\deftranslation[to=Brazil]{Example}{Solução:}
+\deftranslation[to=Brazil]{Solution}{Solução:}
+\setbeamercolor{block title}{fg=vsplbggray,bg=verde}
+\setbeamercolor{block body}{bg=white}
+\setbeamercolor{block title alerted}{bg=alerted text.fg!20}
+\setbeamercolor{block body alerted}{bg=alerted text.fg!10}
+%----------Problema--------------
+\definecolor{vblock}{HTML}{E30022}
+\BeforeBeginEnvironment{problem}{
+\setbeamercolor{block title}{fg=vblock,bg=red!30!white}
+\setbeamercolor{block body}{fg=vblock, bg=red!15!white}
+}
+\AfterEndEnvironment{problem}{
+ \setbeamercolor{block title}{use=structure,fg=structure.fg,bg=structure.fg!20!bg}
+ \setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!50!bg, fg=black}}
+%----------Solução--------------
+\BeforeBeginEnvironment{solution}{%
+\setbeamercolor{block title}{fg=verde,bg=verdesolution}
+\setbeamercolor{block body}{fg=verde, bg=green!5!white}
+}
+\AfterEndEnvironment{solution}{
+ \setbeamercolor{block title}{use=structure,fg=structure.fg,bg=structure.fg!20!bg}
+ \setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!50!bg, fg=black}
+}
+%----------Exemplo--------------
+\setbeamercolor{block title example}{use=example text,fg=example text.fg,bg=example text.fg!50!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!50!bg}
+%================================================
+%---------------CAPA
+%================================================
+\title{\bfseries Template para o Pipges - UFSCar/USP}
+\subtitle{\textcolor{orange}{Defesa de Doutorado}}
+\date{\textcolor{black}{\today}}
+%\date{\textcolor{brown}{15 de março de 2021}}
+\author{\bf
+Aluna: Milena Nascimento Lima\\
+Orientador (a):  \\
+Co-orientador (a): 
+}
+ \institute{\textcolor{verde}{Programa Interinstitucional de Pós-Graduação em Estatística UFSCar-USP (PIPGEs)}}
+\titlegraphic{
+\begin{picture}(0,0)
+\put(305,-115){\makebox(0,0)[rt]{\includegraphics[width=2.5cm]{images/logo_pipges.png}}}
+\end{picture}
+}
+\begin{document}
+\maketitle
+%================================================
+%---------------Sumário
+%================================================
+\begin{frame}{Sumário}
+\hypersetup{linkcolor=black}
+\setbeamertemplate{section in toc}[sections numbered]
+\tableofcontents
+\end{frame}
+%================================================
+%---------------Elementos Textuais
+%================================================
+\section{Introdução}
+
+\subsection{O problema}
+\begin{frame}{Problema}
+\lipsum[1-1]
+\end{frame}
+
+
+\subsection{Motivação}
+\begin{frame}{Blocos e citações}
+\begin{block}{Como citar?}
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline
+Tipo de citação& Comando &  Resultado    \\ \hline
+Citação ativa &\ citeonline{lamport1994latex}&  \citeonline{lamport1994latex}   \\ \hline
+Citação passiva &cite{lamport1994latex}  &\cite{lamport1994latex}     \\ \hline
+\end{tabular}
+\end{table}
+\end{block}
+%---------Problemas e soluções
+\begin{problem}
+Você pode usar este bloco para abordar determinado problema exitente.
+\end{problem}
+\begin{solution}
+Ideia, solução.
+\end{solution}    
+\end{frame}
+
+\subsection{Objetivos}
+\begin{frame}{Objetivos}
+Escrever no infinitivo.
+\begin{itemize}
+\item Estender ; 
+\item Fazer ;
+\item Mostrar.
+\end{itemize}
+\begin{block}{Objetivos}
+Os objetivos orientarão a apresentação não só da metodologia, mas, sobretudo, dos resultados, da discussão e conclusão, devem ser definidos de forma que facilite a leitura e permita uma avaliação fácil e rápida.
+\end{block}
+\end{frame}
+
+\begin{frame}{New}
+\lipsum[1-1]
+\end{frame}
+
+\section{Revisão da literatura}
+\section{Tópicos de pesquisa}
+\section{Considerações finais}
+\begin{frame}{New}
+\lipsum[1-1]
+\end{frame}
+%================================================
+%---------------Elementos Pós-textuais
+%================================================
+{\setbeamercolor{palette primary}{fg=black, bg=white}
+\begin{frame}[standout]
+ \begin{figure}[H]
+\centering
+\includegraphics[width=1.5\linewidth]{images/gratidao.png}
+\end{figure}
+\end{frame}
+}  
+%================================================
+%----------------BIBLIOGRAFIA
+%================================================
+\section*{Bibliografia}
+\begin{frame}[allowframebreaks]{Referências bibliográficas}
+%\nocite{*}
+\bibliography{bibliografia}
+\end{frame}
+%================================================
+%----------------FIM DO TEMPLATE
+%================================================
+\end{document}

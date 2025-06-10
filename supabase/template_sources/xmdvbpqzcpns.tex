@@ -1,0 +1,190 @@
+% in Anlehnung an https://github.com/derdanu/akad-vorlage
+% Autor: Lukas Lück
+%-------------------------------------------
+% Vorgaben Assignment aus Studienheft SQL301
+%-------------------------------------------
+% Umfang: 8 - 10 Seiten (inkl. Abbildungen und Tabellen, ohne Deckblatt, Gliederung und Literaturverzeichnis, Eidesstattliche Erklaerung)
+% Zeilenabstand: 1,5, Tabellen 1,0 
+% Schriftart: frei
+% Schriftgrad: 11 oder 12 pt
+% Tabellen auch 10pt
+% Silbentrennung ok, auf "Missratene" Trennung achten!
+% Variablen, physikalische Groessen und Funktionszeichen werden kursiv gedruckt.
+% Ränder: links: 4,5 cm, rechts 2,0 cm, oben und unten jeweils 3,0 cm
+% Deckblatt: (Name, Adresse, AKAD-E-Mail-Adresse, Immatrikulationsnummer, Modulbezeichnung, Thema, Abgabedatum, Dozent)
+
+% Reihenfolge (siehe SQL301, S. 71):
+% Titelblatt, ohne Nummerierung
+% Inhaltsverzeichnis (ohne Nummerierung) -> Abbildungsverzeichnis (Nummerierung in Römisch, beginnend mit "III")-> Tabellenverzeichnis -> Abk.-Verzeichniss
+% Textteil, Nummerierung in arabisch, beginnen mit "1"
+% Anhang -> Literaturverzeichnis, Nummerierung in Römisch, folgend auf Römische Nummerierung von Verzeichnissen
+\documentclass[listof=totoc, bibliography=totoc, a4paper, 12pt, numbers=noenddot]{scrartcl}
+\usepackage[ngerman]{babel} % Sprachpaket
+\usepackage{newtxtext,newtxmath} % Konsistente Text- und Mathematikschrift
+\usepackage[onehalfspacing]{setspace} % Zeilenabstand
+\usepackage[]{geometry} % Für Anpassung Seitenränder
+\usepackage[T1]{fontenc} % Bessere Trennung (kann entfernt werden, wenn nicht benötigt)
+\usepackage[utf8]{inputenc} % UTF-8 Unterstützung (kann entfernt werden, wenn nicht benötigt)
+\usepackage{microtype} % "Entspanntere" Umbrüche
+
+% Pakete für Tabellen
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{vcell}
+\usepackage{colortbl}
+\usepackage{hhline}
+\usepackage{float} % Notwendig für figure[h]
+\usepackage[table]{xcolor}
+
+% Pakete für Mathematik
+\usepackage{amsmath} % Erweiterte mathematische Funktionen
+\usepackage{mathtools} % Erweiterung für amsmath
+\usepackage{amsfonts} % Zahlenmengen Zeichen
+\usepackage{bm} % unterstützt bold in Formeln
+
+% Pakete für Grafiken und Beschriftungen
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage[export]{adjustbox}
+
+% Pakete für Kopf- und Fußzeilen
+\usepackage[headsepline=1pt,plainheadsepline, singlespacing=true]{scrlayer-scrpage}         % Erstellung von selbst definierten Kopfzeilen
+\clearpairofpagestyles%\clearscrheadfoot veraltet
+\ohead*{\pagemark}
+\ihead{\headmark}
+\setkomafont{pageheadfoot}{\normalfont}
+
+% Pakete für PDFs
+\usepackage{pdfpages} % Einbinden von PDF-Dateien
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{lscape}
+
+% Paket für Abkürzungsverzeichnis
+\usepackage{acro}
+\acsetup{make-links} % Setup linking with hyperref
+
+% Weitere Einstellungen
+\usepackage{url}
+\usepackage[stable]{footmisc}
+%\usepackage{tocloft} %Zeilenabstand in Verzeichnissen anpassen
+%\usepackage{hyphenat} %Silbentrennung für einzelne Wörter verhindern mit \nohyphens{text}
+
+% Pakete für Literatur + zitieren, authoryear-ibid
+\usepackage[backend=biber, style=authoryear-ibid, autocite=footnote, maxnames=4, ibidpage=true, dashed=false]{biblatex}
+\addbibresource{Verzeichnisse/literatur.bib}
+\usepackage{csquotes} % für Zitate
+
+%% Für Codeblöcke mit Syntax-Highlighting
+%% http://www.ctan.org/tex-archive/macros/latex/contrib/minted/
+%% Einkommentieren fuer Minted Syntax Highlighting
+%\usepackage{minted}
+%\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\input{parameter}
+
+%\input{Einstellungen/arduinoLanguage}
+%\input{Einstellungen/highlighting}
+\usepackage[
+pdftitle={\docTitle},
+pdfsubject={\pdfDescription},
+pdfauthor={\name},
+pdfkeywords={\pdfKeyWords},
+pdfborder={0 0 0},  % Links nicht sichtbar im pdf
+colorlinks = false,
+pdfpagelabels,
+pdfstartview = FitH,
+bookmarksopen = true,
+bookmarksnumbered = true,
+linkcolor = black,
+plainpages = false,
+hypertexnames = false,
+urlcolor = black,
+citecolor = black] {hyperref}
+
+\input{Einstellungen/einstellungen}
+\input{Verzeichnisse/abkuerzungen}
+\input{Verzeichnisse/urls}
+%--------------------------------------------------------------------------------------------------------------------------------
+%                                       Dokument begin
+%--------------------------------------------------------------------------------------------------------------------------------
+\newcounter{savepage} % Zähler für Seitenzahl, für später ab Römischer Nummerierung
+\begin{document}
+    %--------------------------------------------------------------------------------------------------------------------------------
+    %                                       Deckblatt
+    %--------------------------------------------------------------------------------------------------------------------------------
+    \include{Text/01_deckblatt}
+    \newgeometry{left=45mm, right=20mm, top=30mm, bottom=30mm}
+
+    %--------------------------------------------------------------------------------------------------------------------------------
+    %                                       Verzeichnisse
+    %--------------------------------------------------------------------------------------------------------------------------------
+    \begin{spacing}{1.0} % Verzeichnisse werden mit einzeiligem Abstand gesetzt
+
+        % Inhaltsverzeichnis ohne Nummerierung
+        %\pagestyle{ContentHeaderStyle} % Neuen Seitenstil anwenden
+        % Inhaltsverzeichnis
+        \thispagestyle{empty}
+        \pdfbookmark{\contentsname}{toc}
+        \tableofcontents 
+        \newpage
+        
+        % ab hier Nummerierung oben in Römisch, beginnend mit 3
+        \pagenumbering{Roman}
+        \setcounter{page}{3}
+        % Abbildungsverzeichnis, 
+        \listoffigures 
+        \newpage
+        
+        % Tabellenverzeichnis
+        \listoftables 
+        \newpage
+        
+        % Abkürzungsverzeichnis
+        \addcontentsline{toc}{section}{Abkürzungsverzeichnis}
+        \printacronyms[heading=section*, name=Abkürzungsverzeichnis, template=tabular]
+        \newpage
+        
+        % Formelverzeichnis
+        %\listof{Formel}{Formelübersicht}
+        \setcounter{savepage}{\value{page}} %speichert Seitenzahl für spätere folgende Römische Nummerierung
+    \end{spacing} 
+    %-------------------------------------------------------------------------------------------------------------------
+    %                     Ab hier der eigentliche Textteil
+    %-------------------------------------------------------------------------------------------------------------------
+    % ab hier Nummerierung oben in arabisch, beginngend mit 1
+    \pagenumbering{Roman}
+    \setcounter{page}{3}
+    \pagenumbering{arabic}
+    \begin{spacing}{1.5} % Zeilenabstand: 1,5 fuer den Textteil
+    
+        % Einleitung
+        \sloppy%Leerräume dürfen gedehnt werden
+        \pdfbookmark{Kapitel}{kapitel}
+        \include{Text/02_einleitung}
+        
+        % Grundlagen
+        \include{Text/03_grundlagen}
+        
+        % Hauppteil
+        \include{Text/04_hauptteil}
+        
+        % Schluss
+        \include{Text/06_schluss}
+    \end{spacing}
+    %-------------------------------------------------------------------------------------------------------------------
+    %                     Literaturverzeichnis + Anhang
+    %-------------------------------------------------------------------------------------------------------------------
+    % ab hier Römisch, folgend auf Verzeichnisse
+    \pagenumbering{Roman}
+    \setcounter{page}{\value{savepage}}
+    
+    % Anhang, bei Nichtbedarf auskommentieren
+    \include{Verzeichnisse/anhang}
+    
+    % Literaturverzeichnis
+    \printbibliography[title=Literaturverzeichnis]
+    %\printbibliography[keyword=Bilder, heading=subbibliography, title={Bildernachweis}]
+    %\printbibliography[keyword=Teile, heading=subbibliography, title={Nachweis Teileliste}]
+\end{document}

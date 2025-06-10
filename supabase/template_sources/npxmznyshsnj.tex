@@ -1,0 +1,142 @@
+% ---------------------------------------------------------------------------
+% ---------------------------------------------------------------------------
+% Modelo LaTex para preparação do documento final de Monografia TCC
+% O modelo está em conformidade com ABNT NBR
+% Baseado no modelo da Faculdade do Piaui
+
+% ---------------------------------------------------------------------------
+%                               IMPORTANTE
+% ---------------------------------------------------------------------------
+
+% Para editar os dados como Titulo, autor, local e outros, vá até Pasta EXTRAS > Dados.tex.  Basta editar uma única vez, que será salvo em todos os lugares.
+
+
+% ---------------------------------------------------------------------------
+% ---------------------------------------------------------------------------
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,					% tamanho da fonte
+	twoside,					% para impressão em verso e anverso. Oposto a 
+	openany,
+	a4paper,					% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	%chapter=TITLE,			% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,			% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,		% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,	% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,					% idioma adicional para hifenização
+	%french,					% idioma adicional para hifenização
+	%spanish,				% idioma adicional para hifenização
+	brazil					% o último idioma é o principal do documento
+	]{abntex2}
+
+% ---------------------
+% Pacotes OBRIGATÓRIOS
+% ---------------------
+\usepackage{lmodern}				% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}			% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}			% Usado pela Ficha catalográfica
+\usepackage{indentfirst}			% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx,graphicx}	% Inclusão de gráficos
+\usepackage{epsfig,subfig}		% Inclusão de figuras
+\usepackage{microtype} 			% Melhorias de justificação
+% ---------------------
+		
+% ---------------------
+% Pacotes ADICIONAIS
+% ---------------------
+\usepackage{lipsum}						% Geração de dummy text
+\usepackage{amsmath,amssymb,mathrsfs}	% Comandos matemáticos avançados 
+\usepackage{setspace}  					% Para permitir espaçamento simples, 1 1/2 e duplo
+\usepackage{verbatim}					% Para poder usar o ambiente "comment"
+\usepackage{tabularx} 					% Para poder ter tabelas com colunas de largura auto-ajustável
+%\usepackage{afterpage} 					% Para executar um comando depois do fim da página corrente
+\usepackage{url} 						% Para formatar URLs (endereços da Web)
+% ---------------------
+
+% ---------------------
+% Pacotes de CITAÇÕES
+% ---------------------
+\usepackage[brazilian,hyperpageref]{backref}	% Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}				% Citações padrão ABNT (alfa)
+%\usepackage[num]{abntex2cite}				% Citações padrão ABNT (numericas)
+% ---------------------
+
+% Configurações de CITAÇÕES para abntex2
+\include{extras/conf_citacoes}
+
+% Inclusão de dados para CAPA e FOLHA DE ROSTO (título, autor, orientador, etc.)
+\include{extras/dados}
+
+% Inclui Configurações de aparência do PDF Final
+\input{extras/conf_pdf}
+
+% O tamanho da identação do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---------------------
+% Compila o indice
+% ---------------------
+\makeindex
+% ---------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  INICIO DO DOCUMENTO  %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS (Capa, Resumo, Abstract, etc.)
+% ----------------------------------------------------------
+\pretextual
+
+% Capa
+\include{pretextual/capa}
+
+% Inserir Folha de Aprovação
+\input{pretextual/assinaturas}
+
+
+% Inserir o SUMÁRIO
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS (Capítulos)
+% ----------------------------------------------------------
+\textual
+% Elementos textuais com numeração arábica
+\pagenumbering{arabic}
+% Reinicia a contagem do número de páginas
+\setcounter{page}{1}
+
+%vá até a pasta caps e edite o arquivo correto
+\include{caps/introducao}
+\include{caps/justificativa}
+\include{caps/Problema}
+\include{caps/Objetivos}
+\include{caps/fundamentacaoTeoria}
+\include{caps/metodologia}
+\include{caps/cronograma}
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS (Referências, Glossário, Apêndices)
+% ----------------------------------------------------------
+\postextual
+
+% Referências bibliográficas
+\bibliography{bibliografia}
+
+
+\end{document}

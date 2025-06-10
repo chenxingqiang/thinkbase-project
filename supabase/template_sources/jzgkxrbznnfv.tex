@@ -1,0 +1,128 @@
+%----------------------------------------------------------------------------------------
+%
+% A LaTeX-template 
+%
+%----------------------------------------------------------------------------------------
+
+% Settings and document configuration
+
+\documentclass[a4paper,12pt]{article} 
+\usepackage[T1]{fontenc} 
+\usepackage{times} 
+\usepackage[swedish,english]{babel} 
+\usepackage[utf8]{inputenc} 
+\usepackage{dtk-logos} 
+\usepackage{wallpaper} 
+\usepackage[absolute]{textpos} 
+\usepackage[top=2cm, bottom=2.5cm, left=3cm, right=3cm]{geometry} 
+\usepackage[parfill]{parskip} 
+\usepackage{csquotes} 
+\usepackage{float} 
+\usepackage{lipsum} % Used for dummy text. Can be removed.
+
+% Fontsizes for section headings.
+\usepackage{sectsty} 
+\sectionfont{\fontsize{14}{15}\selectfont}
+\subsectionfont{\fontsize{12}{15}\selectfont}
+\subsubsectionfont{\fontsize{12}{15}\selectfont}
+
+%----------------------------------------------------------------------------------------
+%	This part is used for the text box on the title page
+%----------------------------------------------------------------------------------------
+\newsavebox{\mybox}
+\newlength{\mydepth}
+\newlength{\myheight}
+
+\newenvironment{sidebar}%
+{\begin{lrbox}{\mybox}\begin{minipage}{\textwidth}}%
+{\end{minipage}\end{lrbox}%
+ \settodepth{\mydepth}{\usebox{\mybox}}%
+ \settoheight{\myheight}{\usebox{\mybox}}%
+ \addtolength{\myheight}{\mydepth}%
+ \noindent\makebox[0pt]{\hspace{-20pt}\rule[-\mydepth]{1pt}{\myheight}}%
+ \usebox{\mybox}}
+
+%----------------------------------------------------------------------------------------
+%	Title
+%----------------------------------------------------------------------------------------
+\newcommand\BackgroundPic{
+    \put(-2,-3){
+    \includegraphics[keepaspectratio,scale=1.5]{img/su_olivier1.png} % Background image
+    }
+}
+\newcommand\BackgroundPicLogo{
+    \put(15,710){
+    \includegraphics[keepaspectratio,scale=0.2]{img/logo.png} % LNU logo
+    }
+}
+
+\title{
+\vspace{-8cm}
+\begin{sidebar}
+    \vspace{10cm}
+    \normalfont \normalsize
+    \huge Report\\ % Main title
+    \vspace{-1.3cm}
+\end{sidebar}
+\vspace{3cm}
+\begin{flushleft}
+    \huge Assignment 1 % Subtitle
+\end{flushleft}
+\null
+\vfill
+\begin{textblock}{5}(10,13)
+\begin{flushright}
+\begin{minipage}{\textwidth}
+\begin{flushleft} \large
+\emph{Author:} Name \textsc{Last}\\  % Author
+\emph{Email:} \\  % Email
+\emph{Semester:} Autumn 2021\\ % Semester
+\emph{Area:}  \\ % Area
+\emph{Course code:}  % Course
+\end{flushleft}
+\end{minipage}
+\end{flushright}
+\end{textblock}
+}
+
+\date{} % Empty date command. Use \today inside for today's date.
+\author{} % Normally one would use this to define authors. However in this case the title command takes care of everything, so we leave the field empty to get rid of warnings. 
+
+\begin{document}
+
+\pagenumbering{gobble} % Turn off page numbering
+\newgeometry{left=5cm}
+\AddToShipoutPicture*{\BackgroundPic} % Adds the background image to the title page
+\AddToShipoutPicture*{\BackgroundPicLogo} % Adds the logo to the title page
+\maketitle % Prints the title
+\restoregeometry
+\clearpage
+
+\pagenumbering{roman} % Roman page numbering for abstract page
+
+
+%\selectlanguage{english}
+%\begin{abstract}
+%\noindent English abstract.
+%\end{abstract}
+
+\newpage
+
+\pagenumbering{gobble} % Turn off page numbering
+\tableofcontents 
+
+\newpage
+\pagenumbering{arabic} % Turn on page numbering
+
+% Some example sections with dummy text
+\section{Introduction}
+\section{Methods}
+\section{Results}
+\section{Discussion}
+H. Jass proved in \cite{big} that\ldots \ Therefore, as stated in \cite{Creswell2014}, $e = m c^2$.
+
+% Prints your bibliography database xxx.bib
+\bibliographystyle{IEEEtran}
+\bibliography{ref.bib}
+
+\end{document}

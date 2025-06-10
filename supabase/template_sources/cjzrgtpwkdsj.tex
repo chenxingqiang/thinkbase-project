@@ -1,0 +1,281 @@
+
+\documentclass[a4paper,11pt,twoside,headsepline,footsepline]{scrbook}
+
+% ENCODING
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% FONTS
+\usepackage{helvet,times}
+\usepackage{textcomp}
+% LANGUAGES
+\usepackage[ngerman,american]{babel}
+\usepackage[cache=false]{minted}
+
+% c.LatexConfig.shell_escape = "allow"
+% Commands and other Latex3 functionality
+% \usepackage{xifthen}
+\usepackage{xparse}
+
+
+
+% GEOMETRY, PAGE LAYOUT
+% Add showframe to the geometry package to see the page layout
+\usepackage[inner=2.5cm,outer=2cm]{geometry}
+% baselineskip könnte auch 47-50 sein
+\setlength{\textheight}{48\baselineskip}
+\setlength{\headheight}{8mm}
+\setlength{\footskip}{12mm}
+\setlength{\parindent}{0mm}
+\renewcommand{\baselinestretch}{1.5}
+\setlength{\marginparwidth}{8mm}
+\setlength{\marginparsep}{2mm}
+
+
+
+% HEADER, FOOTER
+\usepackage[automark,singlespacing=true]{scrlayer-scrpage}
+% Prevent the fancyhdr package
+\PreventPackageFromLoading{fancyhdr}
+\DeclarePageStyleAlias{fancy}{scrheadings}
+% Change the font size
+%\addtokomafont{pageheadfoot}{\slshape}
+%\addtokomafont{pagehead}{\tiny}
+%\addtokomafont{pagefoot}{\small}
+% Change the content of the header and footer
+\ohead{\leftmark}
+%\ihead{}
+\ofoot{\pagemark}
+%\cfoot{\docauthor}
+\pagestyle{scrheadings}
+
+
+% URLS, HYPERREFS
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+% FOOTNOTES
+\usepackage{footnote}
+
+
+% GRAPHICS, PICTURES, FIGURES
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes}
+\usetikzlibrary{shadows}
+\usetikzlibrary{arrows}
+\usetikzlibrary{fit}
+\usetikzlibrary{matrix}
+% For generating tex files from dot graph files
+% \usepackage{dot2texi}
+% subgraphics, subpictures, subcaptions
+\usepackage{subcaption}
+% Smart diagram - Look at: http://texdoc.net/texmf-dist/doc/latex/smartdiagram/smartdiagram.pdf
+\usepackage{smartdiagram}
+
+% COLORS
+\usepackage{color}
+
+% TOC = TABLE OF CONTENTS
+\usepackage{tocloft}
+% Make dots for parts, chapter and sections in the ToC.
+\renewcommand{\cftpartleader}{\cftdotfill{\cftdotsep}} % for parts
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}} % for chapters
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % for sections
+
+% GLOSSARY
+\usepackage[automake,toc,nonumberlist,acronym,nomain,nopostdot]{glossaries}
+%\GlsSetQuote{+}
+\glsdisablehyper
+\makeglossaries
+
+
+% QUOTES, QUOTATIONS (at the beginning of a chapter)
+\usepackage{csquotes}
+\usepackage{epigraph}
+%\epigraphfontsize{\small\itshape}
+\setlength\epigraphwidth{0.80\textwidth}
+\renewcommand{\epigraphflush}{center}
+\setlength\epigraphrule{0pt}
+
+% CITE, CITING, CITATIONS, BIBLIOGRAPHY, REFERENCES
+%\usepackage{cite}
+%\usepackage{natbib}
+% maxnames,minnames ... If there are more than maxnames, the list of authors is truncated to minnames
+% maxcitenames ... list of authors in the body (citeauthor)
+% maxbibnames ... list of authors in the bibliography
+\usepackage[backend=biber,style=ieee, minbibnames=99,maxbibnames=99,mincitenames=1,maxcitenames=1, giveninits=false]{biblatex}
+\addbibresource{user_data/0_X_literature.bib}
+% Change the format of \citetitle (no quotes, no grqq)
+\DeclareFieldFormat*{citetitle}{#1}
+% Use cleveref to reference sections, chapters, table, ...
+\usepackage{cleveref}
+
+% \usepackage{pygmentize}
+
+% STACKON, STACKS - words above/below words, for crossing out and correcting words
+% \usepackage{stackengine}
+% soul command - strike through, strike out, cross out
+% \usepackage{soul}
+
+
+% WATERMARKS, Add watermark - Preview
+%\usepackage{draftwatermark}
+%\SetWatermarkText{Preview}
+%\SetWatermarkLightness{0.97}
+%\SetWatermarkScale{1}
+
+
+% ITEMIZE, ITEMS, ENUMERATE - change seperation/space between items
+\usepackage{enumitem}
+%\setlength\itemsep{0em}
+\setlist{nosep}
+\usepackage{amssymb}
+
+% FIXES - Adds some fixes for packages that have problems with KOMA-Script
+\usepackage{scrhack}
+
+% LISTINGS - Source code listings
+% Do NOT use listings package - the code listings look ugly.
+% \usepackage{listings}
+% Do use minted!
+%\usepackage[outputdir=out]{minted}
+%\usepackage[outputdir=C:/Users/andre/AppData/Local/Temp]{minted}
+
+\setminted{
+    linenos,
+    numbersep=5pt,
+    xleftmargin=4ex,
+    python3=true,
+    frame=lines,
+    framesep=2mm,
+    %baselinestretch=1.2,
+    bgcolor=gray!5,
+    breaklines=true,
+}
+
+
+% TABLES
+% HLINES, HORIZONTAL LINES - in tabulars and arrays
+\usepackage{hhline}
+% \usepackage{supertabular}
+% Multiple rows
+\usepackage{multirow}
+% Multiple columns
+\usepackage{multicol}
+% array package - for paragraph colum alignment in the middle and bottom
+% \usepackage{array}
+
+
+
+% SETTINGS and DEFINITIONS
+% Include definitions and settings
+\input{static/defs}
+\input{user_data/0_0_settings}
+% Make additional definitions and settings
+\title{\@thesisTitle}
+\author{\@thesisAuthor}
+
+
+% HYPERSETUP
+\hypersetup{
+   pdftitle={\@thesisTitle},
+   pdfauthor={\@thesisAuthor},
+   pdfsubject={\@thesisType},
+   pdflang={eng},
+%   bookmarks=true,
+   bookmarksnumbered=true,
+   breaklinks=true
+}
+
+
+% COLOR DEFINITIONS
+\definecolor{darkblue}{rgb}{0,0.08,0.45}
+
+
+% RENEW COMMANDS
+% TODO: uncomment the next command to remove the marginpar
+%\renewcommand{\marginpar}[2]{}
+
+
+% ACRONYMS, TERMS
+\input{user_data/0_0_glossary}
+
+% TITLEPAGE, FRONTPAGE
+\input{static/titlepage}
+
+% BEGIN DOCUMENT
+\begin{document}
+
+\frontmatter
+
+%\layout
+
+\maketitle
+
+\clearpage
+
+% Import the german or english declaration based on the language.
+\iflanguage{ngerman}{
+    \input{static/0_erklaerung}
+}{}
+\iflanguage{american}{
+    \input{static/0_declaration}
+}{}
+
+\clearpage
+
+% Import both abstracts the german and english one.
+% If you do not want both versions, comment out one of it.
+% If you can speak both languages then write both.
+\input{user_data/0_1_abstract_de}
+
+\input{user_data/0_2_abstract_en}
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+\mainmatter
+
+% Include the user_data files.
+% If you need more files include them here.
+\input{user_data/1_introduction}
+\input{user_data/2_basics}
+\input{user_data/3_relatedwork}
+\input{user_data/4_approach}
+\input{user_data/9_conclusion}
+
+% Include the list of figures, tables and listings.
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{\listfigurename}
+
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+
+\clearpage
+\listoflistings
+
+% Include the glossary.
+% If you do not want it comment it out here.
+\clearpage
+\glsaddall
+\printglossary[style=super,type=\acronymtype]
+
+% Include the bibliography.
+\printbibliography[heading=bibintoc]
+
+%\backmatter
+
+% If there is an appendix like the setup add the following lines
+%\appendix
+%\input{user_data/B_setup}
+
+\end{document}
+

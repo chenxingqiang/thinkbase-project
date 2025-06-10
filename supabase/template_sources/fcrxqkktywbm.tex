@@ -1,0 +1,269 @@
+% Formato de Artículo de "Almanaque Económico" en Español
+
+\documentclass[utf8, twoside,]{article}
+
+%Paquetes bàsicos-----------------------
+\usepackage[utf8]{inputenc}
+\usepackage{standalone}
+\usepackage{pgfplots}
+    \pgfplotsset{compat=1.15}
+\usepackage{tikz}
+\usepackage{import}
+\usepackage{amsmath}
+\usepackage[autostyle=true]{csquotes}
+\usepackage[american,spanish]{babel}
+\usepackage{biblatex-chicago}
+\usepackage{csquotes}
+\usepackage{graphicx}
+\usepackage{setspace} 
+%---------------------------------------
+
+% Directorio de imágenes. Las imágenes deben ir en la carpeta "figs". Las tablas deben ir en la carpeta "tables".
+
+\graphicspath{{figs/}}
+
+%---------------------------------------
+
+% Se crean comandos de palabras clave---
+\providecommand{\keywords}[1]
+{
+  \small	
+  \textbf{\textit{Keywords---}} #1
+}
+
+\providecommand{\pclave}[1]
+{
+  \small	
+  \textbf{\textit{Palabras clave---}} #1
+}
+
+% Establece cómo escribir "editado por" en las citas en español 
+
+\NewBibliographyString{cbyeditor}
+\DefineBibliographyStrings{spanish}{cbyeditor = {editado por}}
+
+%Espaciado doble
+
+\doublespacing
+
+%---------------------------------------
+
+% NO MODIFICAR NADA ANTES DE ESTE PUNTO
+
+%Añade paquetes adicionales aquí--------
+
+
+
+%---------------------------------------
+
+
+%Añade tu bibliografía como archivo .bib 
+
+\addbibresource{mybib.bib} 
+
+
+%--------------DOCUMENTO-----------------
+
+
+\begin{document} %Comienza el documento
+\begin{otherlanguage}{spanish}
+
+%Se añaden los datos del título del artículo
+
+\title{Title1\\ \medskip %titulo en otro idioma en otra línea
+Título1}
+\author{Nombre Apellido, \it{Institución Educativa}}
+\date{}
+
+%Espaciado sencillo para primera página
+
+\begin{singlespace}
+
+
+
+\maketitle %Se crea el tìtulo
+
+
+
+%Se define el nombre de la sección Abstract en inglés
+
+\def\abstractname{{Abstract}}
+
+%Se crea el abstract en inglés
+
+\begin{abstract}
+     \vspace{-0.2cm} %Ajuste de espacio en resumen
+     
+Texto del resumen en inglés
+  
+\end{abstract}
+
+%Se define el nombre de la sección Abstract en español
+
+\def\abstractname{{Resumen}}
+
+%Se crea el abstract en español
+
+\begin{abstract}
+      \vspace{-0.2cm} %Ajuste de espacio en resumen
+      
+Texto del resumen en español
+   
+\end{abstract}
+
+%Se introducen las palabras clave en inglés
+
+\keywords{one, two, three}
+
+%Se introducen las palabras clave en español
+
+\pclave{uno, dos, tres}
+
+%Cerramos el formato de página de Título
+
+
+
+\end{singlespace}
+
+\pagebreak
+
+%Introducción
+
+\section{Introducción}
+
+Texto de la introducción. Ejemplo de uso de citas:
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.\footnote{\cite{fernandez}} Pellentesque tincidunt sit amet magna a ultricies. Praesent ultrices dictum velit, ut luctus sem fermentum a.\footnote{\cite{anton}} Aenean sed ex fringilla nulla mattis cursus. Sed efficitur ligula condimentum purus vestibulum placerat.\footnote{\cite{fernandez}}
+
+
+
+%Cuerpo
+
+\section{Cuerpo}
+  
+Texto del cuerpo. Se puede renombrar el título de esta sección y crear secciones adicionales.
+
+% Ejemplo de imagen. El formate debe ser .eps
+% La imágen de ejemplo fue tomada de https://people.sc.fsu.edu/~jburkardt/data/eps/eps.html
+
+\begin{figure}[ht]
+\includegraphics[]{mathematica.eps}
+\caption{Imagen eps} \label{fig:img1}
+\end{figure}
+
+%Aceptamos gráficas en formato .eps, pero es preferible crear la gráfica en Latex usando el paquete pgfplots o TikZ para mayor consistencia
+
+% Imagen con pgfplots
+
+Agregamos una imágen creada con pgfplots:
+
+
+\begin{figure}[ht]
+\subimport{figs/}{graph.tex}
+\caption{Imagen pgfplots} \label{fig:img2}
+\end{figure}
+
+%Imágen con TikZ
+
+Ejemplo de gráfica usando TikZ
+
+\begin{figure}[ht]
+\subimport{figs/}{graph2.tex}
+\caption{Imagen TikZ} \label{fig:img3}
+\end{figure}
+
+Usa el método más apto para tus necesidades.
+
+También es posible hacer referencia a una imagen o tabla. La Figura \ref{fig:img1}, por ejemplo, es una imagen en formato .eps
+
+
+
+
+
+ %Agregamos una tabla de regresión. Para ver cómo exportar una tabla de regresión de Stata a Latex, consultar la guía en la página web
+ % http://repec.org/bocode/e/estout/esttab.html
+ 
+ Una tabla de regresión
+ 
+ \begin{table}[ht]
+ \subimport{tables/}{reg.tex}
+ \caption{Tabla importada de Stata} \label{table:reg1}
+\end{table}
+
+%Ejemplo de matemáticas
+ 
+ Ejemplo de matemáticas
+ 
+ La matriz de sustitución de Slutsky de 2 bienes es:
+ 
+ \begin{equation}\label{eq:1}
+    \begin{bmatrix}
+ \dfrac{\delta^2e(p.u)}{\delta p_1^2} & \dfrac{\delta^2e(p.u)}{\delta p_2 \delta p_1} \\[2ex]
+ \dfrac{\delta^2e(p.u)}{\delta p_1\delta p_2} & \dfrac{\delta^2e(p.u)}{\delta p_2^2} \\[2ex]
+ \end{bmatrix}
+\end{equation}
+ 
+
+  Y por el Teorema de Shepard sabemos que 
+  
+   \begin{equation}\label{eq:2}
+   \dfrac{\delta e (\vec{p}, u)}{\delta p_i} = x_i^h(\vec{p}, u)
+   \end{equation}
+   
+   Donde $x_i^h(\vec{p}, u))$ es la demanda Hicksiana,
+  
+   Ahora, por \eqref{eq:2}, podemos escribir \eqref{eq:1} como:
+   
+    \begin{equation}
+    \begin{bmatrix}
+ \dfrac{\delta x_1^h(\vec{p}, u)}{\delta p_1} 
+ & \dfrac{\delta x_1^h(\vec{p}, u)}{\delta p_2} \\[2ex]
+ \dfrac{\delta x_2^h(\vec{p}, u)}{\delta p_1} 
+ & \dfrac{\delta x_2^h(\vec{p}, u)}{\delta p_2} \\[2ex]
+ \end{bmatrix}
+\end{equation}
+  
+   La tercera ley de Hicks es:
+   \begin{equation*}
+      \sum_{j=1}^n \dfrac{\delta x_i^h(\vec{p}, u)}{\delta p_j} p_j = 0, \quad i=1,\dots,n
+  \end{equation*}
+  
+  Por lo que
+  
+      \begin{equation*}
+    \begin{bmatrix}
+ \dfrac{\delta x_1^h(\vec{p}, u)}{\delta p_1} 
+ & \dfrac{\delta x_1^h(\vec{p}, u)}{\delta p_2} \\[2ex]
+ \dfrac{\delta x_2^h(\vec{p}, u)}{\delta p_1} 
+ & \dfrac{\delta x_2^h(\vec{p}, u)}{\delta p_2} \\[2ex]
+ \end{bmatrix}
+ \begin{bmatrix}
+ p_1 \\[2ex]
+ p_2 \\[2ex]
+ \end{bmatrix}
+ =
+ \begin{bmatrix}
+ 0 \\[2ex]
+ 0 \\[2ex]
+ \end{bmatrix}
+\end{equation*} 
+ 
+%Conclusiones
+
+\section{Conclusiones}
+
+Texto de las conclusiones.
+
+\pagebreak
+
+%Se define el idioma de la bibliografía
+
+
+\printbibliography %inserta la bibliografía
+\vfill
+
+\end{otherlanguage}
+
+
+\end{document}

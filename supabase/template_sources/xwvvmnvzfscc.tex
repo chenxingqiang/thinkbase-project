@@ -1,0 +1,664 @@
+% Set up the document
+\documentclass[a4paper, 12pt, oneside]{Etuthesis}
+
+% Include any extra LaTeX packages required
+\usepackage[square, numbers, comma, sort&compress]{natbib}  % Use the "Natbib" style for the references in the Bibliography
+\usepackage[turkish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{verbatim}  % Needed for the "comment" environment to make LaTeX comments
+%\usepackage{vector}  % Allows "\bvec{}" and "\buvec{}" for "blackboard" style bold vectors in maths
+\usepackage{mathptmx}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+\usepackage{titlesec}
+\usepackage[format=hang]{caption}% şekil ve çizelgelerde caption'lar aligned
+\usepackage{graphicx}
+\usepackage{chngcntr}
+\usepackage{subfig}
+\usepackage{tabularx}
+\usepackage{floatrow}
+\usepackage{newfloat}
+\usepackage{lscape}
+\usepackage[pass]{geometry}
+\usepackage{multibib}
+
+% Bu satır Kaynakça ile birlikte Kaynaklar kısmını da eklemek için
+% koyuldu. İki farklı kaynakça eklenmesinin nedeni, iki farklı stilde
+% kaynakça kabul edileceğinin gösterilmesi. Tezinizi yazarken bu satır
+% ve SONUÇ ve ÖNERİLER kısmının biraz altındaki \bibliographystylefurther
+% ile başlayan satırlar silinmelidir, buradaki gibi birden fazla kaynakça
+% bölümü kullanılmayacaksa tabii.
+\newcites{further}{Kaynaklar}
+
+% çizelge, şekil ve resim listesinde satırların hizalanması
+\setlength\cfttabindent{0pt}
+\setlength\cftfigindent{0pt}
+
+% resimlerin bulunduğu alt dizin
+\graphicspath{{figures/}}
+
+% başlıklarının numaralandırılması
+\setcounter{secnumdepth}{5}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{}
+\titleformat{\section}
+  {\normalfont\bfseries}{\textbf{\arabic{section}. }}{1pt}{} 
+\titleformat{\subsection}
+  {\normalfont\bfseries}{\textbf{\arabic{section}.\arabic{subsection} }}{1pt}{} 
+\titleformat{\subsubsection}
+  {\normalfont\bfseries}{\textbf{\arabic{section}.\arabic{subsection}.\arabic{subsubsection} }}{1pt}{} 
+\titleformat{\paragraph}
+  {\normalfont\bfseries}{\textbf{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}.\arabic{paragraph} }}{1pt}{}
+\titleformat{\subparagraph}
+  {\normalfont\bfseries}{}{1pt}{} 
+
+\setcounter{tocdepth}{5}
+
+% toc'da chapter numaraları gözükmesin
+\renewcommand\thesection{\arabic{section}}
+% toc'da başlıkdan sonraki boşluğu azalt
+\setlength{\cftaftertoctitleskip}{5pt}
+% toc'da section numberdan sonra nokta koy
+\renewcommand{\cftsecaftersnum}{.}
+% toc'da subparagraph numbering yapma
+\makeatletter
+\renewcommand{\cftsubparapresnum}{\begin{lrbox}{\@tempboxa}}
+\renewcommand{\cftsubparaaftersnum}{\end{lrbox}}
+\makeatother
+% toc'da (sub)section number ile caption 
+% arasındaki boşluğu al
+\makeatletter
+\renewcommand{\numberline}[1]{%
+  \@cftbsnum #1\@cftasnum~\@cftasnumb%
+}
+% toc'da indentation'ları ayarla
+\cftsetindents{section}{0.5in}{0.5in}
+\cftsetindents{subsection}{0.7in}{0.7in}
+\cftsetindents{subsubsection}{0.9in}{0.9in}
+\cftsetindents{paragraph}{1.1in}{1.1in}
+\cftsetindents{subparagraph}{1.3in}{1.3in}
+
+% resim, çizelge ve eşitliklerin numaralandırma
+% formatını düzenler (başa section no ekler)
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\counterwithin{equation}{section}
+
+% Şekil listesinde numaralandırma formatını düzenler
+\newlength\figurelen
+\settowidth\figurelen{Şekil}
+\addtolength\cftfignumwidth{\figurelen}
+\renewcommand\cftfigpresnum{Şekil }
+\renewcommand{\cftfigaftersnum}{:}
+
+% Çizelge listesinde numaralandırma formatını düzenler
+\newlength\tablelen
+\settowidth\tablelen{Çizelge}
+\addtolength\cfttabnumwidth{\tablelen}
+\renewcommand\cfttabpresnum{Çizelge }
+\renewcommand{\cfttabaftersnum}{:}
+
+
+% Liste sayfalarının başlıklarını belirle
+\AtBeginDocument{%
+  \renewcommand\listtablename{\normalsize \vspace{-62pt} \centerline{ÇİZELGE LİSTESİ}}
+  \renewcommand\listfigurename{\normalsize \vspace{-62pt} \centerline{ŞEKİL LİSTESİ}}
+  \renewcommand\contentsname{\normalsize \hspace{32pt} İÇİNDEKİLER}
+  \renewcommand\tablename{Çizelge}
+}
+
+% sayfa numaralarının sayfanın altında olmasını sağlar
+\pagestyle{fancy}
+\fancyhf{}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% indentation yok
+\setlength\parindent{0pt}
+
+% çizelgelerin caption'ları üstte
+\floatsetup[table]{capposition=top}
+
+\begin{document}
+% başlık sayfası bilgileri
+\thesistitle{TEZ BAŞLIĞI}
+\thesistitleeng{THESIS TITLE}	% ingilizce başlık
+\thesistype{0}	% Yüksek Lisans = 0 Doktora = 1
+\thesisauthor{Öğrenci Adı Soyadı}
+\department{Makina Mühendisliği Anabilim Dalı}
+\departmenteng{Department of Mechanical Engineering}	% ingilizce bölüm
+\supervisor{Prof. Dr. Ad SOYAD}
+\thesisdate{Ocak 2015}
+\thesisdateeng{January 2015}	% ingilizce tarih
+\instno{Enstitü No}
+
+% enstitü onayı bilgileri
+\instdirector{Prof.Dr. Adı SOYADI}	% müdür
+\dephead{Prof.Dr. Adı SOYADI}	% anabilimdalı başkanı
+\supap{Prof.Dr. Adı SOYADI}{TOBB Ekonomi ve Teknoloji Üniversitesi} % tez danışmanı
+\cosupap{Prof.Dr. Adı SOYADI}{TOBB Ekonomi ve Teknoloji Üniversitesi} % tez eş danışmanı, yoksa 0 olmalı
+\juryapone{Prof.Dr. Adı SOYADI}{Orta Doğu Teknik Üniversitesi}	% jüri üyeleri
+\juryaptwo{Prof.Dr. Adı SOYADI}{Ankara Üniversitesi}
+\juryapthree{Prof.Dr. Adı SOYADI}{Bilkent Üniversitesi}
+
+% özet sayfası bilgileri
+\turabkeys{Zamanlama analizi, İstatiksel modelleme, Benzetim.}	% türkçe anahtar kelimeler
+\engabkeys{Time analysis, Statistical modelling, Simulation.}	% ingilizce anahtar kelimeler
+
+% teşekkür sayfası bilgileri
+\thanksprof{Prof.Dr. Adı SOYADI}
+\thanksdep{Bilgisayar Mühendisliği}
+
+% GEREKLİ OLMADIKÇA BU KISIMLARI DEĞİŞTİRMEYİNİZ
+\univname{TOBB EKONOMİ VE TEKNOLOJİ ÜNİVERSİTESİ}
+\univnamesmall{TOBB Ekonomi ve Teknoloji Üniversitesi}
+\univnamesmalleng{TOBB University of Economics and Technology}
+\instname{FEN BİLİMLERİ ENSTİTÜSÜ}
+\instnamesmall{Fen Bilimleri Enstitüsü}
+\instnamesmalleng{Institute of Natural and Applied Sciences}
+\dummytypemsmall{Yüksek Lisans}
+\dummytypembig{YÜKSEK LİSANS}
+\dummytypedsmall{Doktora}
+\dummytypedbig{DOKTORA}
+\dummydate{Tarih:}
+\dummydateeng{Date:}
+\dummythes{TEZİ}
+\dummysup{Tez Danışmanı:}
+\dummyinstap{Fen Bilimleri Enstitüsü Onayı}
+\dummyinstdir{Müdür}
+\dummyreqapone{Bu tezin}
+\dummyreqaptwo{derecesinin tüm gereksinimlerini sağladığını onaylarım.}
+\dummydephead{Anabilimdalı Başkanı}
+\dummymidapone{TOBB ETÜ, Fen Bilimleri Enstitüsü'nün ................................... numaralı}
+\dummymidaptwo{öğrencisi}
+\dummymidapthree{'nın ilgili yönetmeliklerin belirlediği gerekli tüm şartları yerine getirdikten sonra hazırladığı}
+\dummymidapfour{başlıklı tezi}
+\dummymidapfive{tarihinde aşağıda imzaları olan jüri tarafından kabul edilmiştir.}
+\dummysupap{Tez Danışmanı:}
+\dummysupapeng{Supervisor:}
+\dummycosupap{Eş Danışman:}
+\dummyjurys{Jüri Üyeleri:}
+\dummythesacktitle{TEZ BİLDİRİMİ}
+\dummythesacktext{Tez içindeki bütün bilgilerin etik davranış ve akademik kurallar çerçevesinde elde edilerek sunulduğunu, alıntı yapılan kaynaklara eksiksiz atıf yapıldığını, referansların tam olarak belirtildiğini ve ayrıca bu tezin TOBB ETÜ Fen Bilimleri Enstitüsü tez yazım kurallarına uygun olarak hazırlandığını bildiririm.}
+\dummythesacksign{İMZA}
+\dummyturaboz{ÖZET}
+\dummyengaboz{ABSTRACT}
+\dummyturabthes{Tezi}
+\dummyengabthesm{Master of Science}
+\dummyengabthesd{Doctor of Philosophy}
+\dummyturabkey{Anahtar Kelimeler:}
+\dummyengabkey{Keywords:}
+\dummythankstitle{TEŞEKKÜR}
+\dummythanksone{Çalışmalarım boyunca değerli yardım ve katkılarıyla beni yönlendiren hocam}
+\dummythankstwo{kıymetli tecrübelerinden faydalandığım TOBB Ekonomi ve Teknoloji Üniversitesi}
+\dummythanksthree{Bölümü öğretim üyelerine ve destekleriyle her zaman yanımda olan aileme ve arkadaşlarıma çok teşekkür ederim.}
+
+\pagenumbering{roman}
+
+\maketitlex
+%\instnobooltrue
+%\maketitlex
+\clearpage
+\setcounter{page}{2}
+\approform
+\thesdec
+
+\addtocontents{toc}{~\hfill\underline{\textbf{Sayfa}}\par}
+\addcontentsline{toc}{section}{\textbf{\tdummyturaboz}}
+
+\begin{turabstract}
+
+Özet hazırlanırken 1.5 satır boşluk bırakılır. Tezlerde özet/abstract 300 kelimeden az olmamak kaydıyla 2 sayfayı geçmemelidir,  Özetlerde tezde ele alınan konu kısaca tanıtılarak, kullanılan yöntemler ve ulaşılan sonuçlar belirtilir.  Özetlerde kaynak, şekil, çizelge ve dipnot kullanılmamalıdır.  ÖZET  birinci dereceden başlık formatında (önce 72, sonra 18 punto aralık bırakılarak ve 1.5 satır aralıklı olarak) yazılmalıdır. ÖZET'in altına tezin türü (Yüksek Lisans veya Doktora)  belirtildikten sonra büyük harflerle sayfa ortalanarak (büyük harflerle) tezin başlığı yazılmaldır.
+
+\end{turabstract}
+
+\addcontentsline{toc}{section}{\textbf{\tdummyengaboz}}
+
+\begin{engabstract}
+
+1.5 line spacing must be set for Abstract. The abstract must have 300 words minimum and span 2 pages. A summary must briefly mention the subject of the thesis, the method(s) used and the conclusions derived. References, figures and tables must not be given in Summary. Below the Abstract, the thesis title in first level title format with capital letters (i.e., 72 pt before and 18 pt after paragraph spacing, and 1.5 line spacing) must be placed. Below the title, the expression must be written horizontally centered.
+
+\end{engabstract}
+
+\addcontentsline{toc}{section}{\textbf{\tdummythankstitle}}
+\thankspage
+
+\newgeometry{left=2cm, right = 3cm}
+\addcontentsline{toc}{section}{\textbf{İÇİNDEKİLER}}
+\tableofcontents
+\newpage
+\restoregeometry
+
+\addcontentsline{toc}{section}{\textbf{ŞEKİL LİSTESİ}}
+\listoffigures
+\vfill
+\newpage
+
+\addcontentsline{toc}{section}{\textbf{ÇİZELGE LİSTESİ}}
+\listoftables
+\vfill
+\newpage
+
+\addcontentsline{toc}{section}{\textbf{KISALTMALAR}}
+\section*{\centerline{KISALTMALAR}}
+\begin{tabular}{ l l }
+ \textbf{CFL} & : Courant-Friedrichs-Lewy kriteri \\ 
+ \textbf{EOS} & : Hal denklemi (Equation of state) \\ 
+ \textbf{FCT} & : Akı-Düzeltmeli Taşınım Algoritması (Flux- Corrected Transport) \\ 
+ \textbf{HB} & : Hidrojen bağları (hydrogen bonds) \\ 
+ \textbf{LCPFCT} & : Laboratory for Computational Physics, Flux- Corrected Transport \\ 
+ \textbf{PIV} & : Parçacık Görüntü Hızölçer (Particle Image Velocimetry) 
+\end{tabular}
+\vfill
+\newpage
+
+\addcontentsline{toc}{section}{\textbf{SEMBOL LİSTESİ}}
+\section*{\centerline{SEMBOL LİSTESİ}}
+\begin{flushleft}
+Bu çalışmada kullanılmış olan simgeler açıklamaları ile birlikte aşağıda sunulmuştur.
+\end{flushleft}
+\begin{tabular}{ l l }
+ \textbf{Simgeler} & \textbf{Açıklama} \\\\
+ c & Ses Hızı \\
+ $c_p$ & Sabit basınçta özgül ısı \\
+ $c_v$ & Sabit hacimde özgül ısı \\
+ E & Toplam Enerji \\ 
+ f & Frekans \\ 
+ h & Isı aktarımı katsayısı \\
+ H & Kapalı alanın yüksekliği \\  
+ k & Isı iletim katsayısı \\ 
+ L & Kapalı alanın uzunluğu \\ 
+ n & Duvar normali \\ 
+ P & Basınç \\
+ q & İdeal gaz sabiti (=8.31439J/molK) \\  
+\end{tabular}
+\vfill	% sayfanın bu noktadan sonraki kısmını boşlukla doldurur
+\newpage	% yeni sayfaya geçer
+
+\addcontentsline{toc}{section}{\textbf{RESİM LİSTESİ}}
+\listofimages
+\vfill
+\newpage
+
+\pagenumbering{arabic}
+{
+\setlength{\parskip}{10pt}
+\section{GİRİŞ}
+
+Isı aktarımının iyileştirilmesi konusunda yapılan çalışmalar birçok mühendislik uygulamasının tasarımında önemli bir yere sahiptir \cite{Reference1}. Bu iyileştirme metodlarından birisi titreşimli akış ile ısı aktarımının etkileşimidir. 
+
+Titreşimli akış ısıl ve mekanik olmak üzere iki farklı yöntem ile oluşturulabilir. Üzerinde çalışılan sistemin sınır sıcaklıklarında oluşturulan ani değişimler ile ısıl olarak titreşimli akış meydana getirilebilmektedir. Akışkanın ani bir şekilde ısıtmaya veya soğutmaya maruz bırakılması akışkanın genleşmesine ve bir basınç dalgası oluşturmasına sebep olur. Bu basınç dalgasına termoakustik dalga denir ve yaklaşık ses hızında hareket eder (2).
+
+\subsection{Tezin Amacı}
+
+Mikro-nano ölçekli mühendislik uygulamaları, biyoakışkanlar, içten yanmalı motorlar, ısı değiştirgeçleri, çipler vb. elektronik cihazlarından ısı atımı konularında artan çalışmalar titreşimli akışın önemini ortaya koymaktadır \cite{Reference2}. Bu çalışmada titreşim kontrollü ısı aktarım tüplerinin tasarımında yol göstermek üzere su dolu, basık, kapalı bir dikdörtgen ortam içerisinde sol duvarın titreşimiyle duran dalga oluşturarak ısı aktarımına etkilerinin incelenmesi amaçlanmaktadır.
+
+\subsection{Literatür Araştırması}
+
+Literatürde mekanik tireşimler ile oluşturulan ses dalgaları ile meydana gelen akustik akış üzerine çalışmalara sıkça rastlanmaktadır. Bu konuda ilk teorik çalışmalar \cite{Reference3} tarafından yapıldı. Lord Rayleigh bir Kundt tüpünde oluşturulan duran dalgalar ile girdapların oluştuğunu ortaya koydu. Daha sonra \citefurther{dalal2005histograms} akustik akış hızını hesaplayabileceği genel bir vortisite denklemi oluşturdu. \citefurther{belongie2000shape} akustik kaynaklı sürekli akışların analizinde kullanılan teorileri çalışmasında özetledi. İki örnekleyici problem üzerine çalıştı. Birincisi tüp içerisinde giden bir düzlem akış diğeri ise birbirini kesen iki düzlem akış üzerinedir. Akustik akış hızlarının ısıl gevşeme veya ısı aktarımı gibi bir sebepten kaynaklanabilecek bir sönüm katsayısına önemli ölçüde dayandığını buldu. Richardson ses alanına maruz bırakılmış yatay bir silindir boyunca ses dalgasının doğal taşınıma etkilerini analitik olarak çalıştı \citefurther{li2010object}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{titre_akis.png}
+    \caption{Titreşimli akış oluşumu}
+\end{figure}
+
+\subsection{Teorik Çalışmalar}
+
+Yaklaşık son bir periyot için hız dağılımları görülmektedir. Ağ yapısı çalışması kapalı ortamın yüksekliğinin en büyük olduğu (H=50 mm) durumda yapılmıştır. Bu çalışmada hesaplama maliyetini de gözeterek 400 x 40 sayıda çözüm ağı kullanılmıştır. Çizelge 1.1?de farklı çözüm ağlarında kapalı ortamın merkezinde hesaplanan hızların sapmaları verilmektedir. y- yönünde dört farklı sayıda, x-yönünde iki farklı sayıda ağ yapısı denenmiştir. 
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|l|}
+ \hline
+ Kolon 1 & Kolon 2 & Kolon 3 & Kolon 4 \\ 
+ \hline
+ Satır 1 & Satır 1 & Satır 1 & Satır 1 \\ 
+ \hline
+ Satır 2 & Satır 2 & Satır 2 & Satır 2 \\
+ \hline
+ Satır 3 & Satır 3 & Satır 3 & Satır 3 \\
+ \hline
+\end{tabular}
+\caption{Çözümün sayısal ağ yapısından bağımsızlığının araştırılması.}
+\end{table}
+
+Yaklaşık son bir periyot için hız dağılımları görülmektedir. Ağ yapısı çalışması kapalı ortamın yüksekliğinin en büyük olduğu (H=50 mm) durumda yapılmıştır. Bu çalışmada hesaplama maliyetini de gözeterek 400 x 40 sayıda çözüm ağı kullanılmıştır. 
+
+\begin{image}
+
+\centering
+\includegraphics{bina.png}
+\caption{Zucchi'nin Milan şehrinde bina yerleştirmesini gösteren resim}
+
+\end{image}
+
+\section{TİTREŞİMLİ AKIŞ İLE ISI AKTARIMININ ETKİLEŞİMİ}
+
+\subsection{Amaç}
+
+Literatürde titreşimli akış ile ısı aktarımının etkileşimini inceleyen deneysel ya da sayısal farklı yöntemlerle yapılan çalışmalar bulunmaktadır. Ancak bu çalışmaların büyük bir kısmında akışkan olarak gazlar esas alınmaktadır. Bu çalışmada kullanılan su gibi sıvı akışkanlar için yapılan çalışmalar oldukça azdır. Ayrıca teorik çalışmalarda önemli ölçüde basitleştirici varsayımlar kullanılmaktadır. Birçok çalışmada akışkan sıkıştırılamaz kabul edilmiştir. Bu durum akustik alanda meydana gelen sıkıştırma ve seyreltme bölgelerini tarif etmekte, ikincil akışları hesaplamakta yetersiz kalmaktadır. 
+
+\subsection{Deneysel Çalışmalar}
+
+Akustik titreşimler ile oluşturulan dalga formunu ve akışkan içerisindeki yayılımını incelemek için matematiksel bir model oluşturulmuştur. Bu model uygun sınır koşulları ile seçilen sayısal yöntem ile çözümlenmiştir.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{ornek_sekil.png}
+    \caption{Problem Geometrisi}
+\end{figure}
+
+Akustik titreşimler kendini tekrar eden sıkıştırma ve genişleme basınç değişimleri ile hareket ederler. Bu titreşimlerle akışkanın etkileşiminin etkili bir şekilde modellenebilmesi için denklemlerin sıkıştırılabilir formunun kullanılması gerekmektedir. Bu çalışmada Navier-Stokes denklemlerinin tam sıkıştırılabilir formu kullanılmıştır.
+
+\subsection{Araştırma Gereksinimleri}
+
+Literatürde titreşimli akış ile ısı aktarımının etkileşimini inceleyen deneysel ya da sayısal farklı yöntemlerle yapılan çalışmalar bulunmaktadır. Ancak bu çalışmaların büyük bir kısmında akışkan olarak gazlar esas alınmaktadır. Bu çalışmada kullanılan su gibi sıvı akışkanlar için yapılan çalışmalar oldukça azdır. Ayrıca teorik çalışmalarda önemli ölçüde basitleştirici varsayımlar kullanılmaktadır. Birçok çalışmada akışkan sıkıştırılamaz kabul edilmiştir. Bu durum akustik alanda meydana gelen sıkıştırma ve seyreltme bölgelerini tarif etmekte, ikincil akışları hesaplamakta yetersiz kalmaktadır.
+
+\section{MATEMATİKSEL MODEL VE SAYISAL YÖNTEM}
+
+\subsection{Amaç}
+
+Akustik titreşimler ile oluşturulan dalga formunu ve akışkan içerisindeki yayılımını incelemek için matematiksel bir model oluşturulmuştur. Bu model uygun sınır koşulları ile seçilen sayısal yöntem ile çözümlenmiştir.
+
+\subsubsection{Temel Denklemler}
+
+Bu çalışmada Navier-Stokes denklemlerinin tam sıkıştırılabilir formu kullanılmıştır. İki boyutlu kartezyen sistemde süreklilik denklemi Eşitlik (3.1), momentum denklemleri Eşitlik (3.2-3.3) ile gösterildiği şekildedir:
+
+\begin{equation} \label{eq:solve}
+x^2 - 5 x + 6 = 0
+\end{equation}
+ 
+\begin{equation}
+x_1 = \frac{5 + \sqrt{25 - 4 \times 6}}{2} = 3
+\end{equation}
+ 
+\begin{equation}
+x_2 = \frac{5 - \sqrt{25 - 4 \times 6}}{2} = 2
+\end{equation}
+
+Parametreler tek tek açıklanmalıdır.
+
+\subsubsection{Hal Denklemi}
+
+Basınç, yoğunluk ve sıcaklık arasındaki ilişkiyi tanımlamak için bir hal denklemine ihtiyaç duyulmaktadır. Burada (=8.31439 ) ideal gaz sabitidir. R / J molK. Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{ornek_sekil.png}
+    \caption{Birden fazla satırlı şekil isimlendirmesinde önemli nokta satırların aynı hizadan başlamasıdır.}
+\end{figure}
+
+Basınç, yoğunluk ve sıcaklık arasındaki ilişkiyi tanımlamak için bir hal denklemine ihtiyaç duyulmaktadır. Burada (=8.31439 ) ideal gaz sabitidir. R / J molK. Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+\subsection{Sayısal Yöntem}
+
+Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+\begin{figure}
+\begin{tabularx}{\linewidth}{@{}cXX@{}}
+\begin{tabular}{cc}
+\subfloat[A]{\includegraphics[width=6cm]{multifig.png}} 
+   & \subfloat[B]{\includegraphics[width=6cm]{multifig.png}}\\
+\subfloat[C]{\includegraphics[width=6cm]{multifig.png}} 
+   & \subfloat[D]{\includegraphics[width=6cm]{multifig.png}}\\
+\end{tabular}
+\end{tabularx}
+\caption{Farklı periyotta (a) $\pi$/2 , (b) $\pi$, (c) 3$\pi$/2 , (d) 2$\pi$ anlarında basınç konturleri. ( periyod aralığı 1500-1600 dir.)}
+\end{figure}
+
+Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+Temel denklemler kontrol hacim tabanlı açık bir sonlu farklar metodu ile çözümlenmiştir. Taşınım terimleri Akı Düzeltmeli Taşınım (FCT) algoritması ile çözümlenirken, iletim terimleri merkezi farklar yöntemiyle ayrıklaştırılarak çözülmüştür.
+
+\subsection{Taşınım Algoritması}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\newpage
+\vfill
+
+\begin{landscape}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{horzfig.png}
+    \caption{Yatay tam sayfa örnek şekil.}
+\end{figure}
+
+\end{landscape}
+
+\newpage
+
+\begin{landscape}
+
+\begin{table}[h]
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+Parametre & Kolon 2 & Kolon 3 & \multicolumn{3}{|c}{Kolon 4}       & \multicolumn{2}{|c|}{Kolon 5} \\ \hline
+Satır 1   &         &         & Alt kolon & Alt kolon & Alt kolon & Alt kolon    & Alt kolon    \\ \hline
+Satır 2   &         &         &           &           &           &              &              \\ \hline
+Satır 3   &         &         &           &           &           &              &              \\ \hline
+Satır 4   &         &         &           &           &           &              &              \\ \hline
+Satır 5   &         &         &           &           &           &              &              \\ \hline
+Satır 6   &         &         &           &           &           &              &              \\ \hline
+Satır 7   &         &         &           &           &           &              &              \\ \hline
+Satır 8   &         &         &           &           &           &              &              \\ \hline
+Satır 9   &         &         &           &           &           &              &              \\ \hline
+Satır 10  &         &         &           &           &           &              &              \\ \hline
+Satır 11  &         &         &           &           &           &              &              \\ \hline
+Satır 12  &         &         &           &           &           &              &              \\ \hline
+Satır 13  &         &         &           &           &           &              &              \\ \hline
+Satır 14  &         &         &           &           &           &              &              \\ \hline
+\end{tabular}
+\caption{Örnek yatay çizelge gösterimi. Yatay sayfada birden fazla satırlı çizelge isimlendirme: önemli nokta satırların  aynı hizadan başlamasıdır.}
+\end{table}
+
+\end{landscape}
+
+\section{GEREKLİ İSE BÖLÜM 4}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subsection{Çalışmanın Amacı}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subsection{İkinci Derece Başlık Nasıl: İlk Harfler Büyük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subsubsection{Üçüncü derece başlık nasıl: ilk harfler büyük diğerleri küçük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\paragraph{Dördüncü derece başlık nasıl: ilk harfler büyük diğerleri küçük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subparagraph{Beşinci derece başlık nasıl: ilk harfler büyük diğerleri küçük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\begin{image}[h]
+    \centering
+    \includegraphics{giyim.png}
+    \caption{Aynı tarzda giyinen insanların resmi.}
+\end{image}
+
+\section{GEREKLİ İSE BÖLÜM 5}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subsection{Çalışmanın Amacı}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subsection{İkinci Derece Başlık Nasıl: İlk Harfler Büyük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subsubsection{Üçüncü derece başlık nasıl: ilk harfler büyük diğerleri küçük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\paragraph{Dördüncü derece başlık nasıl: ilk harfler büyük diğerleri küçük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+\subparagraph{Beşinci derece başlık nasıl: ilk harfler büyük diğerleri küçük}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. Bu algoritma dördüncü mertebe faz doğruluğuna sahip olup, minimum sayısal yayınımla keskin gradyanları çözebilmektedir.
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. 
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|l|}
+ \hline
+ Kolon 1 & Kolon 2 & Kolon 3 & Kolon 4 \\ 
+ \hline
+ Satır 1 & Satır 1 & Satır 1 & Satır 1 \\ 
+ \hline
+ Satır 2 & Satır 2 & Satır 2 & Satır 2 \\
+ \hline
+ Satır 3 & Satır 3 & Satır 3 & Satır 3 \\
+ \hline
+\end{tabular}
+\caption{Beşinci bölümde örnek çizelge.}
+\end{table}
+
+Akı Düzeltmeli Taşınım (FCT) algoritması zamana bağlı, 1-boyutlu, lineer olmayan genel süreklilik denklemini çözmek için geliştirilen yüksek mertebeden, lineer olmayan, monoton, konservatif ve artılık-koruyucu bir algoritmadır \citefurther{hubel1962receptive}. 
+
+\section{SONUÇ VE ÖNERİLER}
+
+Bu çalışmada basık kapalı bir ortamın düşey bir duvarının harmonik olarak titreşiminin kapalı alanın ısıtılan sağ duvarından ısı aktarımına etkileri sayısal olarak incelenmiştir. Bunun için beş farklı parametre çalışılmıştır:???? 
+
+\vfill
+\newpage
+
+%\addcontentsline{toc}{section}{\textbf{Kaynakça}}
+%\bibliographystyle{acm}
+%\bibliography{Etuthesis}
+%\vfill
+%\newpage
+
+\bibliographystyle{acm}
+\bibliographystylefurther{unsrt}
+
+\addcontentsline{toc}{section}{\textbf{Kaynakça}}
+\bibliography{Etuthesis}
+\bibliographyfurther{Etuthesis}
+\vfill
+\newpage
+
+}
+
+\addcontentsline{toc}{section}{\textbf{EKLER}}
+\textbf{EKLER}
+\par\bigskip
+\textbf{EK 1} : Sabitler ve Dönüştürme Faktörleri\par
+\textbf{EK 2} : Fiziksel Faktörler\par
+\vfill
+\newpage
+
+\textbf{EK 1}
+\begin{figure}[h]
+    \centering
+    \includegraphics{ek1.png}
+    \caption{Eş merkezli silindirik borularda yerdeğiştiren akışkanın ısı transferi.}
+\end{figure}
+\vfill
+\newpage
+
+\textbf{EK 2}
+\begin{table}[htb]
+\centering
+\caption{Ekler bölümünde çizelge örneği}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|}
+\hline
+Kolon1 & Kolon2 & Kolon3 & Kolon4 \\ \hline
+Satır1 & Satır1 & Satır1 & Satır1 \\ \hline
+Satır2 & Satır2 & Satır2 & Satır2 \\ \hline
+Satır3 & Satır3 & Satır3 & Satır3 \\ \hline
+\end{tabular}
+\end{table}
+\vfill
+\newpage
+
+
+\addcontentsline{toc}{section}{\textbf{ÖZGEÇMİŞ}}
+\section*{\centerline{ÖZGEÇMİŞ}}
+\begin{flushleft}
+\doublespacing
+\begin{tabular}{ l l }
+
+\textbf{Ad-Soyad} & : \\
+\textbf{Uyruğu} & : \\
+\textbf{Doğum Tarihi ve Yeri} & : \\
+\textbf{E-posta} & : \\
+
+\end{tabular}
+
+\bigskip
+\bigskip
+
+\hspace{6pt}\textbf{ÖĞRENİM DURUMU:}\par
+\medskip
+
+\begin{tabular}{ l l }
+
+\textbf{\textbullet\,\,Lisans} & : Mezuniyet yılı, Üniversite, Fakülte, Bölüm \\
+\textbf{\textbullet\,\,Yüksek Lisans} & : Mezuniyet yılı, Üniversite, Anabilim Dalı, Program \\
+
+\end{tabular}
+
+\bigskip
+\bigskip
+
+\hspace{6pt}\textbf{MESLEKİ DENEYİM VE ÖDÜLLER:}\par
+\medskip
+
+\begin{tabular}{ l l l }
+
+\textbf{Yıl} & \textbf{Yer} & \textbf{Görev} \\
+2006-2007 & Makina ve Kimya Endüstrisi Kurumu & Makine Mühendisi \\
+2007-2012 & BORUSAN & Bakım-Onarım Mühendisi \\
+
+\end{tabular}
+
+\bigskip
+\bigskip
+
+\hspace{6pt}\textbf{YABANCI DİL:} İngilizce, Almanca, Rusça
+
+\bigskip
+\bigskip
+
+\hspace{6pt}\textbf{TEZDEN TÜRETİLEN YAYINLAR, SUNUMLAR VE PATENTLER:}
+
+\singlespace{
+\begin{itemize}
+  \item Duru, C., Aktas, M.K., 2014. Control of heat transfer in a water filled enclosure with a vibrating side wall, Proceedings of CONV-14: International Symposium on Convective Heat and Mass Transfer, June 8-13, Kusadasi, Turkey.  (Sunum örneği)
+  \item Aktas, M. K., Farouk, Bakhtier and Lin, Y., 2005. Heat Transfer Enhancement by Acoustic Streaming in an Enclosure, J. Heat Transfer, 127(12), 1313-1321. (Makale örneği)
+  \item Grover, G. M., 1966. Evaporation-condensation heat transfer device Patent numarası: US3229759 A  (Patent örneği) \ldots
+\end{itemize}
+}
+
+\hspace{6pt}\textbf{DİĞER YAYINLAR, SUNUMLAR VE PATENTLER:}
+
+\singlespace{
+\begin{itemize}
+  \item Oluz, Z., Tuncel, E., Duru, C., Aktaş, M., 2011.  Ambient temperature processable thermosets with high thermal, mechanical and hydrolytic stability based on cyanate esters. International Congress, March 22-24, Antalya, Turkey.
+\end{itemize}
+}
+
+\end{flushleft}
+
+\end{document}

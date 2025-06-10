@@ -1,0 +1,481 @@
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	twoside,			% para impressão em recto e verso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	spanish,			% idioma adicional para hifenização
+	brazil				% o último idioma é o principal do documento
+	]{ufscar}
+	
+\usepackage[utf8]{inputenc}
+\usepackage{relsize}
+\usepackage{lmodern}			% Usa a fonte Latin Modern		
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{pdfpages}
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+
+
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage[flushleft]{threeparttable}
+\usepackage{subcaption}
+%\usepackage{graphicx}
+\usepackage{lscape}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage[table]{xcolor}
+%\usepackage[sectionbib]{bibunits}
+
+% \renewcommand*{\cftchaptername}{CAPÍTULO\space}
+ 
+\definecolor{lightgray2}{RGB}{238,238,238}
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+\newcommand{\textnumero}{
+    N\textsuperscript{\underline{o}}
+}
+
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{TITULO DA DISSERTAÇÃO}
+\autor{Fulano de Tal}
+\local{Cidade-Estado}
+\data{2019}
+\orientador[Orientação]{Prof. Dr. Beltrano de Tal}
+\instituicao{%
+UNIVERSIDADE FEDERAL DE SÃO CARLOS
+  \par
+  PROGRAMA DE PÓS GRADUAÇÃO EM PLANEJAMENTO E USO DE RECURSOS RENOVÁVEIS}
+\tipotrabalho{Dissertação (Mestrado)}
+% O preambulo deve conter o tipo do trabalho, o objetivo, 
+% o nome da instituição e a área de concentração 
+\preambulo{Dissertação apresentada ao Programa de Pós-Graduação em Planejamento e Uso de Recursos Renováveis para obtenção do título de Mestre em Planejamento e Uso de Recursos Renováveis.}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% ---
+% Posiciona figuras e tabelas no topo da página quando adicionadas sozinhas
+% em um página em branco. Ver https://github.com/abntex/abntex2/issues/170
+\makeatletter
+\setlength{\@fptop}{5pt} % Set distance from top of page to first float
+\makeatother
+% ---
+
+% ---
+% Possibilita criação de Quadros e Lista de quadros.
+% Ver https://github.com/abntex/abntex2/issues/176
+%
+\newcommand{\quadroname}{Quadro}
+\newcommand{\listofquadrosname}{Lista de quadros}
+
+\newfloat[chapter]{quadro}{loq}{\quadroname}
+\newlistof{listofquadros}{loq}{\listofquadrosname}
+\newlistentry{quadro}{loq}{0}
+
+% configurações para atender às regras da ABNT
+\setfloatadjustment{quadro}{\centering}
+\counterwithout{quadro}{chapter}
+\renewcommand{\cftquadroname}{\quadroname\space} 
+\renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
+
+\addto\captionsbrazil{%
+  \renewcommand{\partname}{Capítulo}
+}
+
+\setfloatlocations{quadro}{hbtp} % Ver https://github.com/abntex/abntex2/issues/176
+% ---
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual
+
+% ---
+% Capa
+% ---
+\imprimircapa
+% ---
+
+% ---
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+\imprimirfolhaderosto*
+% ---
+
+% ---
+% Inserir a ficha bibliografica
+% ---
+
+% Isto é um exemplo de Ficha Catalográfica, ou ``Dados internacionais de
+% catalogação-na-publicação''. Você pode utilizar este modelo como referência. 
+% Porém, provavelmente a biblioteca da sua universidade lhe fornecerá um PDF
+% com a ficha catalográfica definitiva após a defesa do trabalho. Quando estiver
+% com o documento, salve-o como PDF no diretório do seu projeto e substitua todo
+% o conteúdo de implementação deste arquivo pelo comando abaixo:
+%
+% \begin{fichacatalografica}
+%     \includepdf{fig_ficha_catalografica.pdf}
+% \end{fichacatalografica}
+
+\begin{fichacatalografica}
+
+%%%%%%%%%%%%%%%% ATENCAO %%%%%%%%%%%%%%%%%%%%%%%
+% Apos gerar ficha catalografica remove comentário a linha abaixo e fazer upload do arquivo ficha_catalografica.pdf %	
+
+%\includepdf{ficha_catalografica.pdf}
+
+\end{fichacatalografica}
+% ---
+
+% ---
+
+% ---
+% Inserir folha de aprovação
+% ---
+
+% Isto é um exemplo de Folha de aprovação, elemento obrigatório da NBR
+% 14724/2011 (seção 4.2.1.3). Você pode utilizar este modelo até a aprovação
+% do trabalho. Após isso, substitua todo o conteúdo deste arquivo por uma
+% imagem da página assinada pela banca com o comando abaixo:
+%
+% \begin{folhadeaprovacao}
+% \includepdf{folhadeaprovacao_final.pdf}
+% \end{folhadeaprovacao}
+%
+\begin{folhadeaprovacao}
+
+%%%%%%%%%%%%%%%% ATENCAO %%%%%%%%%%%%%%%%%%%%%%%
+%Remover comentario da linha abaixo e fazer upload do arquivo folha-de-aprovacao.pdf %	
+
+% \includepdf{folha-de-aprovacao.pdf}
+  
+\end{folhadeaprovacao}
+% ---
+
+% ---
+% Dedicatória
+% ---
+\begin{dedicatoria}
+   \vspace*{\fill}
+   \centering
+   \noindent
+   \textit{ Dedico este trabalho a todos os alunos de pós-graduação da UFSCar que queiram utilizar o LaTex.} \vspace*{\fill}
+\end{dedicatoria}
+% ---
+
+% ---
+% Agradecimentos
+% ---
+\begin{agradecimentos}
+Agradecimentos
+
+\end{agradecimentos}
+
+%CAPES
+%O presente trabalho foi realizado com apoio da Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Código de Financiamento 001
+
+% ---
+
+% ---
+% Epígrafe
+% ---
+\begin{epigrafe}
+    \vspace*{\fill}
+	\begin{flushright}
+		\textit{``Toda a obra de um homem, seja em literatura, música, pintura, arquitetura ou em qualquer outra coisa, é sempre um auto-retrato; e quanto mais ele se tentar esconder, mais o seu caráter se revelará, contra a sua vontade.\\
+		(Samuel Butler)}
+	\end{flushright}
+\end{epigrafe}
+% ---
+
+% ---
+% RESUMOS
+% ---
+
+% resumo em português
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+Resumo em Português
+
+ \textbf{Palavras-chave}: LaTex, ABNT, UFSCar.
+\end{resumo}
+
+% resumo em inglês
+\begin{resumo}[Abstract]
+ \begin{otherlanguage*}{english}
+Abstract in English
+
+   \textbf{Keywords}: LaTEX, ABNT, UFSCar
+ \end{otherlanguage*}
+\end{resumo}
+
+% ---
+
+% ---
+% inserir lista de ilustrações
+% ---
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de quadros
+% ---
+\pdfbookmark[0]{\listofquadrosname}{loq}
+\listofquadros*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de tabelas
+% ---
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+% ---
+
+% ---
+% inserir o sumario
+% ---
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+% ----------------------------------------------------------
+% Capitulo 1 - Introdução
+% ----------------------------------------------------------
+
+\chapter{Introdução}
+
+%Exemplos
+
+\section{Exemplo Seção}
+
+\subsection{Exemplo Subseção}
+
+Exemplo de citações: 
+    Autor, Ano: \cite{weberZhang96}
+    Ano: \citeonline{weberZhang96}.
+    
+\textbf{Texto em Negrito}
+
+\emph{Texto em itálico}
+
+Figura:
+\begin{figure}[hbt]
+\centering
+  \includegraphics[scale=0.8]{figures/sample.jpg}
+  \caption{\label{figure:figura1}Legenda figura}
+\end{figure}
+
+Referência a um label, exemplo: na Figura \ref{figure:figura1}.
+
+% Nova página
+\newpage
+
+Itens:
+\begin{itemize}
+    \item Item A
+    \item Item B
+    \item Item C
+\end{itemize}
+
+Equação:
+\begin{equation}
+	\label{eq:equacao1}
+	  A = {\pi}r^2
+\end{equation}
+
+\begin{equation}
+	\label{eq:equacao1}
+	  V = \frac{4{\pi}r^3}{3}
+\end{equation}
+
+Tabela:
+\begin{table}[htp]
+    \centering
+    \caption{Legenda Tabela}
+    \begin{tabular}{c|c|c}
+         \textbf{Col 1} & \textbf{Col 2} & \textbf{Col 3}  \\
+         \hline
+         Linha 1 & Linha 1 & Linha 1  \\ 
+         Linha 2 & Linha 2 & Linha 2  \\ 
+         Linha 3 & Linha 3 & Linha 3  \\ 
+         \hline
+    \end{tabular}
+    
+    \label{tab:tabela1}
+\end{table}
+
+% ----------------------------------------------------------
+
+
+% ----------------------------------------------------------
+% Capitulo 2 - Objetivos
+% ----------------------------------------------------------
+\chapter{Objetivos}
+
+% ----------------------------------------------------------
+% Capítulo N - 
+% ----------------------------------------------------------
+\chapter{Capítulo N}
+
+% ----------------------------------------------------------
+% Capítulo N + 1 - Conclusão
+% ----------------------------------------------------------
+\chapter{Conclusão}
+
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\bibliography{bibliografia}
+
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+%
+% Consulte o manual da classe abntex2 para orientações sobre o glossário.
+%
+%\glossary
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+\begin{apendicesenv}
+
+% Imprime uma página indicando o início dos apêndices
+%\partapendices
+
+% ----------------------------------------------------------
+% Apêndice A
+% ----------------------------------------------------------
+\chapter{Apêndice A}
+\label{apendice:a}
+% Inclui arquivo apendiceA.tex 
+%\input{apendiceA}
+
+% ----------------------------------------------------------
+% Apêndice B
+% ----------------------------------------------------------
+\chapter{Apêndice B}
+\label{apendice:b}
+% Inclui arquivo apendiceB.tex 
+%\input{apendiceB}
+
+\end{apendicesenv}
+% ---
+
+%---------------------------------------------------------------------
+% INDICE REMISSIVO
+%---------------------------------------------------------------------
+\phantompart
+\printindex
+%---------------------------------------------------------------------
+
+\end{document}

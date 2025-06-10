@@ -1,0 +1,190 @@
+\documentclass[a4paper,10pt,reqno]{amsart}
+
+\usepackage[utf8]{inputenc}
+\usepackage[foot]{amsaddr}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,mathrsfs,bm}
+\usepackage[margin=0.95in]{geometry}
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+
+\input{toc-config.tex}
+
+\usepackage{mathtools,enumerate,mathrsfs,graphicx}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+
+\usepackage{latexsym}
+
+
+\definecolor{CommentGreen}{rgb}{0.0,0.4,0.0}
+\definecolor{Background}{rgb}{0.9,1.0,0.85}
+\definecolor{lrow}{rgb}{0.914,0.918,0.922}
+\definecolor{drow}{rgb}{0.725,0.745,0.769}
+
+\usepackage{listings}
+\usepackage{textcomp}
+\lstloadlanguages{Matlab}%
+\lstset{
+    language=Matlab,
+    upquote=true, frame=single,
+    basicstyle=\small\ttfamily,
+    backgroundcolor=\color{Background},
+    keywordstyle=[1]\color{blue}\bfseries,
+    keywordstyle=[2]\color{purple},
+    keywordstyle=[3]\color{black}\bfseries,
+    identifierstyle=,
+    commentstyle=\usefont{T1}{pcr}{m}{sl}\color{CommentGreen}\small,
+    stringstyle=\color{purple},
+    showstringspaces=false, tabsize=5,
+    morekeywords={properties,methods,classdef},
+    morekeywords=[2]{handle},
+    morecomment=[l][\color{blue}]{...},
+    numbers=none, firstnumber=1,
+    numberstyle=\tiny\color{blue},
+    stepnumber=1, xleftmargin=10pt, xrightmargin=10pt
+}
+
+\numberwithin{equation}{section}
+\synctex=1
+
+\hypersetup{
+    unicode=false, pdftoolbar=true, 
+    pdfmenubar=true, pdffitwindow=false, pdfstartview={FitH}, 
+    pdftitle={ELE2024 Coursework}, pdfauthor={A. Author},
+    pdfsubject={ELE2024 coursework}, pdfcreator={A. Author},
+    pdfproducer={ELE2024}, pdfnewwindow=true,
+    colorlinks=true, linkcolor=red,
+    citecolor=blue, filecolor=magenta, urlcolor=cyan
+}
+
+
+% CUSTOM COMMANDS
+\renewcommand{\Re}{\mathbf{re}}
+\renewcommand{\Im}{\mathbf{im}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\lap}{\mathscr{L}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\smallmat}[1]{\left[ \begin{smallmatrix}#1 \end{smallmatrix} \right]}
+
+%opening
+\title[ELE2024 Coursework]{LaTeX template for the ELE2024 coursework}
+
+\author[A. Author]{An Author}
+\author[B. Someone]{Bart Someone}
+
+\address[A. Author and B. Someone]{. Email addresses: \href{mailto:some.author@qub.ac.uk}%
+{some.author@qub.ac.uk} and 
+\href{mailto:a.student@qub.ac.uk}{a.student@qub.ac.uk}.}
+\thanks{Some note goes here. 
+        Version 0.0.1. Last updated:~\today.}
+\begin{document}
+
+\maketitle
+
+
+\section{Part A}
+
+\subsection{Question Q1}\label{sec:q1}
+You may format inline equations using the dollar sign 
+like that $x = 1 = \alpha$ and $y = x^2 - \sqrt{z}$. 
+Equations are like that:
+\begin{align}
+ \label{eq:lti_state_update}
+ x_{k+1} = A x_k + Bu_k.
+\end{align}
+Here is an equation with the Laplace transform
+\begin{equation}
+    \lap \{e^{at}\} = \frac{1}{s-a},
+\end{equation}
+for all complex numbers $s\in\C$ with $\Re(s)>a$.
+The inverse Laplace transform is denoted like this $\lap^{-1}$.
+
+
+
+
+\subsection{Question Q2}
+Refer to other sections as Section~\ref{sec:q1}. An example of a numbered list
+\begin{enumerate}
+ \item first item,
+ \item second item.
+\end{enumerate}
+Links are \href{https://google.com}{like that}. We also have \textbf{boldface}, \textit{italics},
+\emph{emphasised}, \texttt{truetype}, \textsc{Small Caps} and so on.
+Format your MATLAB code as follows:
+\begin{lstlisting}[language=matlab]
+% My code:
+f = @(x) sin(x);
+y = f(0.1);
+\end{lstlisting}
+
+\subsection{More math} Denote the real numbers as $\R$ and the complex numbers
+as $\C$. Example of a limit:
+\begin{equation}
+    z = \lim_{s\to0^+}\frac{s+1}{s^3+s^2-5s+9}.
+\end{equation}
+Another example
+\begin{equation}
+    \lim_{s\to\infty} \frac{s+1}{s^3+s^2-5s+9}.
+\end{equation}
+Example of an integral
+\begin{equation}
+    \int_0^\infty e^{-s\tau}f(\tau)\dd\tau.
+\end{equation}
+Three aligned equations
+\begin{align}
+    a =& 1,
+    \\
+    b =& 2,
+    \\
+    c =& 3.
+\end{align}
+Two aligned equations without equation numbers
+\begin{align*}
+    a =& 1,
+    \\
+    b =& 2.
+\end{align*}
+Mathematical derivations:
+\begin{align}
+    \frac{1}{2+3j} {}={}& \frac{2-3j}{(2+3j)(2-3j)}
+    \notag\\
+    {}={}& \frac{2-3j}{2^2 + 3^2}
+    \notag\\
+    {}={}& \frac{2-3j}{13}
+    \notag\\
+    {}={}&\frac{2}{13} - j\frac{3}{13}.
+\end{align}
+More mathematical derivations:
+\begin{align*}
+ & as + 4 + 2s = b + (8+a)s
+\\
+ \Leftrightarrow{}& (a+2)s + 4 = b + (8+a)s
+\end{align*}
+Boldface math: $\bm{x}$. Vectors:
+\begin{equation}
+\bm{x} = 
+    \begin{bmatrix}
+    x_1
+    \\
+    x_2
+    \\
+    x_3
+    \end{bmatrix}.
+\end{equation}
+Another example: According to Taylor's Theorem:
+\begin{equation}
+    \phi(x) \approx \phi(x_0) + \phi'(x_0)(x-x_0).
+\end{equation}
+
+
+% You can write comments like this
+\begin{figure}
+ \centering
+ \includegraphics[width=0.6\linewidth]{figures/ode45_1.eps}
+ \caption{You may of course include figures in your document. It is best to use vector format graphics such as EPS files.}
+\end{figure}
+
+
+\end{document}

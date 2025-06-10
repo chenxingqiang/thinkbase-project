@@ -1,0 +1,286 @@
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,			% para impressão em verso e anverso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	brazil				% o último idioma é o principal do documento
+	]{abntex2}
+	
+% ---
+% Pacotes básicos 
+% ---
+\usepackage{times}			    % Usa a fonte ADOBE Times			
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}			% Usado pela Ficha catalográfica
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{mathtools}          % para uso de funções matemáticas
+\usepackage{xfrac}              % para usar frações com \
+%\usepackage{multirow}           % Usado para mesclar linhas e colunas de uma tabela
+% ---	
+
+
+% ---
+% Pacotes de citações
+% ---
+%\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf,bibjustif]{abntex2cite}	% Citações padrão ABNT
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+%\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+%% Texto padrão antes do número das páginas
+%\renewcommand{\backref}{}
+%% Define os textos da citação
+%\renewcommand*{\backrefalt}[4]{
+%	\ifcase #1 %
+%		Nenhuma citação no texto.%
+%	\or
+%		Citado na página #2.%
+%	\else
+%		Citado #1 vezes nas páginas #2.%
+%	\fi}%
+% ---
+
+% Fontes dos títulos e seções (no texto e no sumário, respectivamente)
+\renewcommand{\ABNTEXchapterfont}{\bfseries}
+\renewcommand{\ABNTEXchapterfontsize}{\normalsize}
+%
+\renewcommand{\ABNTEXsectionfont}{\normalfont}
+\renewcommand{\ABNTEXsectionfontsize}{\normalsize}
+%
+\renewcommand{\ABNTEXsubsectionfont}{\bfseries}
+\renewcommand{\ABNTEXsubsectionfontsize}{\normalsize}
+%
+\renewcommand{\ABNTEXsubsubsectionfont}{\normalfont}
+\renewcommand{\ABNTEXsubsubsectionfontsize}{\normalsize}
+
+%
+\renewcommand{\cftchapterfont}{\normalfont\bfseries}
+\renewcommand{\cftchapterpagefont}{\normalsize}
+%
+\renewcommand{\cftsectionfont}{\normalfont\uppercase}
+\renewcommand{\cftsectionpagefont}{\normalsize}
+%
+\renewcommand{\cftsubsectionfont}{\normalsize\bfseries}
+\renewcommand{\cftsubsectionpagefont}{\normalsize}
+%
+\renewcommand{\cftsubsubsectionfont}{\normalfont}
+\renewcommand{\cftsubsubsectionpagefont}{\normalsize}
+  
+%Substitui o texto "Referências" por "REFERÊNCIAS" no sumário
+\addto\captionsbrazil{%
+  \renewcommand{\bibname}%
+    {\uppercase{Referências}}%
+}    
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Seu título}
+\autor{Seu nome}
+\local{Cidade}
+\data{Ano}
+\orientador{Prof. Fulano, Dr. Eng.}
+\coorientador{Prof. Beltrano, Dr.}
+\instituicao{Universidade}
+\tipotrabalho{Dissertação (Mestrado)}
+% O preambulo deve conter o tipo do trabalho, o objetivo, 
+% o nome da instituição e a área de concentração 
+\preambulo{Dissertação apresentada ao Programa de x da Universidade y, como requisito para obtenção do grau de Mestre em z.}
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+%	    Coloque suas keyword aqui!!
+		pdfkeywords={keyword 1}{keyword 2}{keyword 3}{keyword 4}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=black,          	% color of internal links
+    	citecolor=black,        		% color of links to bibliography
+    	filecolor=black,      		% color of file links
+		urlcolor=black,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% Cotrole do espaçamento entre o título de um capítulo e o ínicio do seu texto referente
+% NBR 14724:2011 - "Os títulos das seções primárias devem começar em página ímpar (anverso), na parte superior da mancha gráﬁca e ser separados do texto que os sucede por um espaço entre as linhas de 1,5."
+\setlength\afterchapskip{18pt}
+
+\setlength\aftersecskip{18pt}
+
+\setlength\aftersubsecskip{18pt}
+
+\setlength\aftersubsubsecskip{18pt}
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+	
+\begin{document}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+\pretextual
+
+% ---
+% Capa
+% ---
+\renewcommand{\imprimircapa}{
+ \begin{capa}
+  \center
+  \includegraphics[scale=1]{Brasao_UFBA.png}  \\
+  {\bfseries\Large\MakeUppercase\imprimirinstituicao}
+   \\
+  {\bfseries\large\MakeUppercase{Programa x}}
+  \\
+  {\bfseries\large\MakeUppercase{Mestrado em x}}
+   \vfill
+ {\bfseries\large\MakeUppercase\imprimirautor}
+ \vfill
+ {\bfseries\Large\MakeUppercase\imprimirtitulo}
+ \vfill
+ {\large\imprimirlocal}
+ \par
+ {\large\imprimirdata}
+ \vspace*{1cm}
+ \end{capa}
+ }
+\imprimircapa
+% ---
+
+% ---
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+\makeatletter
+\renewcommand{\folhaderostocontent}{
+\begin{center}
+{\large\MakeUppercase\imprimirautor}
+\vspace*{\fill}
+\begin{center}
+\bfseries\Large\MakeUppercase\imprimirtitulo
+\end{center}
+\vspace*{\fill}
+\abntex@ifnotempty{\imprimirpreambulo}{%
+\hspace{.3\textwidth}
+\begin{minipage}{.6\textwidth}
+\SingleSpacing
+\imprimirpreambulo\par
+\vspace*{.5cm}
+}%
+{\imprimirorientadorRotulo~\par\imprimirorientador\par}
+\vspace*{.5cm}
+{\abntex@ifnotempty\imprimircoorientador\imprimircoorientadorRotulo~\par\imprimircoorientador}
+\end{minipage}%
+\vspace*{\fill}
+{\large\imprimirlocal}
+\par
+{\large\imprimirdata}
+\vspace*{1cm}
+\end{center}
+}
+\makeatother
+\imprimirfolhaderosto[Folha de rosto]
+% ---
+
+% --- Resumo em Português --- %
+\noindent
+SOBRENOME, Nome. \imprimirtitulo . Ano. (\imprimirtipotrabalho). Programa de Pós-graduação em x. Universidade y, Cidade, Ano.
+\vspace*{1cm}
+\begin{resumo}[\large\uppercase{Resumo}]
+\vspace*{1cm}
+Seu resumo aqui!
+ \\
+ \\
+ \noindent
+ \textbf{Palavras-chaves}: keyword 1, keyword 2, keyword 3, keyword 4.
+\end{resumo}
+
+% --- Resumo em Inglês --- %
+\noindent
+SOBRENOME, Nome. \imprimirtitulo . Ano. (Type of work). Programa de Pós-graduação em x. Universidade y, Cidade, Ano.
+\vspace*{1cm}
+\begin{resumo}[\large\uppercase{Abstract}]
+\vspace*{1cm}
+Your abstract here!
+ \\
+ \\
+ \noindent
+ \textbf{Palavras-chaves}: keyword 1, keyword 2, keyword 3, keyword 4.
+\end{resumo}
+
+% --- Sumário --- %
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+
+\textual  %Indica que aqui começam os elementos textuais do documento, isso cria, a partir daqui a numeração de páginas!
+
+%Retira indicação de capítulo e seção no cabeçalho da página deixando apenas a numeração de página.
+\pagestyle{simple}
+
+%Sua dissertação aqui!
+%Recomendo criar arquivos para cada capítulo e chamá-los aqui assim: 
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+%\bibliography{refs-dissertacao_v1}
+
+\end{document}

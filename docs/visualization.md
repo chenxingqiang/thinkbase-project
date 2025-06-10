@@ -2,7 +2,7 @@
 
 ## Overview
 
-AgentFlow provides powerful visualization capabilities through integration with ell2a.studio. This guide explains how to use the visualization components to create interactive and real-time visualizations of your agents and workflows.
+AgentFlow provides powerful visualization capabilities through integration with ell.studio. This guide explains how to use the visualization components to create interactive and real-time visualizations of your agents and workflows.
 
 ## Table of Contents
 
@@ -113,7 +113,7 @@ from agentflow.visualization.service import VisualizationService
 
 # Create service
 service = VisualizationService({
-    "api_key": "your_ell2a_studio_api_key",
+    "api_key": "your_ell_studio_api_key",
     "project_id": "your_project_id"
 })
 
@@ -192,9 +192,9 @@ graph = VisualLayout.auto_layout(graph, layout_config)
 
 ## Integration
 
-### ell2a.studio Integration
+### ell.studio Integration
 
-Configure ell2a.studio integration:
+Configure ell.studio integration:
 
 ```python
 from agentflow.visualization.service import EllStudioIntegration

@@ -1,10 +1,10 @@
 """
-RAG (Retrieval-Augmented Generation) example: This example demonstrates using RAG with ELL2A.
+RAG (Retrieval-Augmented Generation) example: This example demonstrates using RAG with ELL.
 Make sure you have the required packages installed:
 pip install scikit-learn openai
 """
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -113,14 +113,14 @@ Please provide a comprehensive and accurate response, focusing on information fr
 async def main():
     # Example documents (knowledge base)
     documents = [
-        "ELL2A is a powerful framework for building AI applications, created by Will.",
-        "Will develops ELL2A while actively sharing updates on X.com.",
-        "ELL2A aims to be the go-to tool for AI development and automation.",
-        "ELL2A supports multiple LLM providers including OpenAI, Anthropic, and local models.",
+        "ELL is a powerful framework for building AI applications, created by Will.",
+        "Will develops ELL while actively sharing updates on X.com.",
+        "ELL aims to be the go-to tool for AI development and automation.",
+        "ELL supports multiple LLM providers including OpenAI, Anthropic, and local models.",
         "The framework includes built-in RAG capabilities for enhanced context awareness.",
-        "ELL2A features easy integration with various vector stores and databases.",
+        "ELL features easy integration with various vector stores and databases.",
         "The framework is designed to be easy to use while maintaining flexibility.",
-        "ELL2A provides robust error handling and logging capabilities.",
+        "ELL provides robust error handling and logging capabilities.",
         "The framework supports async/await for better performance.",
         "Joe Biden is the current President of the United States, elected in 2020.",
         "The United States has a system of checks and balances between branches.",
@@ -133,9 +133,9 @@ async def main():
     
     # Example queries
     queries = [
-        "Tell me about ELL2A and who created it.",
+        "Tell me about ELL and who created it.",
         "Who is the current US President?",
-        "What are the main features and capabilities of ELL2A?"
+        "What are the main features and capabilities of ELL?"
     ]
     
     # Process each query

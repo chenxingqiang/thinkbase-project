@@ -1,0 +1,272 @@
+\documentclass[10pt,A4]{scrartcl}	
+\usepackage[utf8]{inputenc}
+\usepackage{xstring, xifthen}
+\usepackage{fontspec}
+\usepackage[iso,german]{isodate}
+
+% --------------------------------------------------
+
+% some tex-live fonts - choose your own
+
+%\usepackage[defaultsans]{droidsans}
+% \usepackage[default]{comfortaa}
+%\usepackage{cmbright}
+% \usepackage[default]{raleway}
+% \usepackage{bera}
+%\usepackage{fetamont}
+% \usepackage[default]{gillius}
+%\usepackage[light,math]{iwona}
+%\usepackage[thin]{roboto} 
+% \usepackage[charter]{mathdesign}
+%  \def\rmdefault{bch} % not scaled
+%  \def\ttdefault{blg}
+% set font default
+% \usepackage{Staaliches}
+\renewcommand*\familydefault{\sfdefault} 	
+\usepackage[T1]{fontenc}
+
+\setmainfont{Raleway}
+\setmonofont{Bitstream Vera Sans Mono}
+\newfontfamily{\kr}{kr}
+[Extension = .ttf]
+\newfontfamily{\sta}{sta}
+[Extension = .ttf]
+
+\addtokomafont{section}{\sta}
+\addtokomafont{subsection}{\sta}
+\addtokomafont{subsubsection}{\sta}
+
+\makeatletter
+\let\origsection\section
+\renewcommand\section{\@ifstar{\starsection}{\nostarsection}}
+
+\newcommand\nostarsection[1]
+{\sectionprelude\origsection{#1}\sectionpostlude}
+
+\newcommand\starsection[1]
+{\sectionprelude\origsection*{#1}\sectionpostlude}
+
+\newcommand\sectionprelude{%
+  \vspace{1em}
+}
+
+\newcommand\sectionpostlude{%
+  \vspace{-0.9em}
+}
+\makeatother
+
+% ---
+
+\makeatletter
+\let\origsubsection\subsection
+\renewcommand\subsection{\@ifstar{\starsubsection}{\nostarsubsection}}
+
+\newcommand\nostarsubsection[1]
+{\subsectionprelude\origsubsection{#1}\subsectionpostlude}
+
+\newcommand\starsubsection[1]
+{\subsectionprelude\origsubsection*{#1}\subsectionpostlude}
+
+\newcommand\subsectionprelude{%
+  \vspace{1em}
+}
+
+\newcommand\subsectionpostlude{%
+  \vspace{-0.5em}
+}
+\makeatother
+
+
+% more font size definitions
+\usepackage{moresize}
+
+% --------------------------------------------------
+
+\usepackage{fontawesome}
+
+% page outer frames (debug-only)
+% \usepackage{showframe}		
+
+% we use paracol to display breakable two columns
+\usepackage{paracol}
+
+% define page styles using geometry
+\usepackage[a4paper]{geometry}
+
+% remove all possible margins
+\geometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
+
+\usepackage{fancyhdr}
+\pagestyle{empty}
+
+% space between header and content
+% \setlength{\headheight}{0pt}
+
+% indentation is zero
+\setlength{\parindent}{0mm}
+
+% --------------------------------------------------
+
+% extended aligning of tabular cells
+\usepackage{array}
+
+% custom column right-align with fixed width
+% use like p{size} but via x{size}
+\newcolumntype{x}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}}%
+
+% --------------------------------------------------
+
+%for header image
+\usepackage{graphicx}
+
+% use this for floating figures
+% \usepackage{wrapfig}
+% \usepackage{float}
+% \floatstyle{boxed} 
+% \restylefloat{figure}
+
+%for drawing graphics		
+\usepackage{tikz}				
+\usetikzlibrary{shapes, backgrounds,mindmap, trees}
+
+% --------------------------------------------------
+
+\usepackage{transparent}
+\usepackage{xcolor}
+\usepackage{framed}
+
+% primary color
+\definecolor{maincol}{RGB}{ 45, 50, 90 }
+
+% accent color, secondary
+% \definecolor{accentcol}{RGB}{ 250, 150, 10 }
+
+% dark color
+\definecolor{darkcol}{RGB}{ 70, 70, 70 }
+
+% light color
+\definecolor{lightcol}{RGB}{245,245,245}
+
+\usepackage{anyfontsize}
+% Package for links, must be the last package used
+\usepackage[hidelinks]{hyperref}
+
+% returns minipage width minus two times \fboxsep
+% to keep padding included in width calculations
+% can also be used for other boxes / environments
+\newcommand{\mpwidth}{\linewidth-\fboxsep-\fboxsep}
+
+\newcommand{\beam}[2][]{\vspace{4em}\noindent\colorbox{darkcol}
+{\parbox{\dimexpr\textwidth-127\fboxsep\relax}{
+\vspace{1pt}
+\textcolor{white}{
+\rlap{#1} \hfill \llap{#2}
+}
+\vspace{1pt}
+}}\vspace{3pt}}
+
+% --------------------------------------------------
+
+\makeatletter
+\renewcommand{\maketitle}{
+\begin{flushleft}
+    \textbf{\fontsize{30pt}{36pt}\selectfont\bfseries\sta \@title}
+    
+    {\huge \vspace{10pt} \textcolor{darkcol}{\@subtitle}}
+    
+    {\Large \vspace{10pt} \textcolor{darkcol}{\@author, \today}}
+\end{flushleft}
+}
+\makeatother
+
+\makeatletter
+\newcommand{\makelesekarte}[1]{
+\begin{flushleft}
+    \textcolor{darkcol}{\texttt{\huge\bfseries Lesekarte \\ \vspace{5pt} #1}}
+\end{flushleft}
+}
+\makeatother
+
+% --------------------------------------------------
+
+\title{Leckture Template}
+\subtitle{Lecture Subtitle}
+\author{Author}
+
+\begin{document}
+\columnratio{0.31}
+\setlength{\columnsep}{2.2em}
+\setlength{\columnseprule}{4pt}
+\colseprulecolor{lightcol}
+\begin{paracol}{2}
+\begin{leftcolumn}
+
+\makelesekarte{01}
+
+\end{leftcolumn}
+
+\begin{rightcolumn}
+
+\maketitle
+
+\end{rightcolumn}
+\end{paracol}
+
+\begin{center}
+\textcolor{darkcol}{\rule[0.9cm]{19cm}{3pt}}
+\end{center}
+
+\vspace{-25pt}
+
+\begin{paracol}{2}
+
+\begin{leftcolumn}
+
+\vspace{-4em}
+
+\beam[This is the first info box]{}
+First info box content.
+
+\beam[This is the second info box]{1999}
+Second info box contains optional info (eg. year).
+
+\end{leftcolumn}
+
+\begin{rightcolumn}
+
+\vspace{-3em}
+
+\section*{Introduction}
+
+This is an introduction.
+
+\section{First Section}
+
+This is the first section.
+
+\subsection{First Subsection}
+
+This is the first subsection.
+
+\subsection{Second Subsection}
+
+This is the second subsection.
+
+\section{Second Section}
+
+This is the first section.
+
+\subsection{Third Subsection}
+
+This is the third subsection.
+
+\subsection{Fourth Subsection}
+
+This is the fourth subsection.
+
+\end{rightcolumn}
+
+\end{paracol}
+
+\end{document}

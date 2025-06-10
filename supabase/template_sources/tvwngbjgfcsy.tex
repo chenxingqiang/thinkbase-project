@@ -1,0 +1,231 @@
+% Author: Lucas dos Santos Costa
+
+\documentclass[border=3pt]{standalone}
+
+\usepackage{tikz,tikz-3dplot,pgfplots}\pgfplotsset{compat=newest}
+\usetikzlibrary{shapes.geometric,arrows,arrows.meta}
+\usepackage{linearb}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+	\begin{tikzpicture}
+	    \pgfsetfillopacity{1}
+		\begin{axis}[thick,xmin=0,xmax=100,ymin=0,ymax=50,
+		    width=\textwidth,height=0.5\textwidth,xtick=\empty,ytick=\empty]
+		%antenna (Tx)
+			\node[black,scale=3,rotate=0] at (rel axis cs:0.12,0.35){\textlinb{Y}};
+			\filldraw[thick,black] (rel axis cs:0.12,0.5) circle [x radius=0.8mm,
+			y radius=0.8mm];
+			\node[black,rotate=0,scale=0.6] at (rel axis cs:0.12,0.2){\tiny PU (Tx)};			
+		%sensing channel
+			\fill[thick,inner color=green!20,outer color=green,
+			    fill opacity=0.5] (rel axis cs:0.22,0.45) ellipse 
+			    [x radius=1.1cm,y radius=4mm,rotate=90];
+			\node[black,scale=0.35,text width=1.5cm,
+			    text centered,rotate=20] at 
+			    (rel axis cs:0.22,0.44){Sensing channels};
+			\node[black,rotate=0,scale=0.6] at 
+			    (rel axis cs:0.22,0.17){\tiny $\overbrace{\text{Rayleigh + AWGN}}$};
+		%cognitive radios
+			\draw[black,thick,
+			    rounded corners] (rel axis cs: 0.305,0.6) rectangle 
+			        (rel axis cs: 0.35,0.7);
+			\draw[black,thick,
+			    rounded corners] (rel axis cs: 0.305,0.6) rectangle 
+			        (rel axis cs: 0.6,0.7);	
+			\draw[black,thick,
+			    rounded corners] (rel axis cs: 0.305,0.45) rectangle 
+			        (rel axis cs: 0.35,0.55);
+			\draw[black,thick,
+			    rounded corners] (rel axis cs: 0.305,0.45) rectangle 
+			        (rel axis cs: 0.6,0.55);
+			\node[black,scale=1,rotate=0] at 
+			    (rel axis cs:0.4505,0.375){$\vdots$};
+			\draw[black,thick,
+			    rounded corners] (rel axis cs: 0.305,0.2) rectangle 
+			        (rel axis cs: 0.35,0.3);
+			\draw[black,thick,
+			    rounded corners] (rel axis cs: 0.305,0.2) rectangle 
+			        (rel axis cs: 0.6,0.3);			
+			%block information
+				\node[black,rotate=0,
+				    scale=0.4] at 
+				        (rel axis cs: 0.328,0.65){$\text{CR}_{1}$};
+				\node[black,rotate=0,
+				    scale=0.4] at 
+				        (rel axis cs: 0.328,0.5){$\text{CR}_{2}$};
+				\node[black,rotate=0,
+				    scale=0.4] at 
+				        (rel axis cs: 0.328,0.25){$\text{CR}_{M}$};
+			%test statistics
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs: 0.4525,0.65)
+				    {$T_{\text{MED},s}\underset{0}{\overset{1}{\gtrless}}\gamma,\quad s=1,2,\dots,S$};
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs: 0.4525,0.5)
+				    {$T_{\text{MED},s}\underset{0}{\overset{1}{\gtrless}}\gamma,\quad s=1,2,\dots,S$};
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs: 0.4525,0.25)
+				    {$T_{\text{MED},s}\underset{0}{\overset{1}{\gtrless}}\gamma,\quad s=1,2,\dots,S$};
+			%PfaSU,s and PdSUs
+				\draw[black,thick,
+				    rounded corners] (rel axis cs: 0.555,0.6) rectangle 
+				        (rel axis cs: 0.6,0.7);
+				\draw[black,thick,
+				    rounded corners] (rel axis cs: 0.555,0.45) rectangle 
+				        (rel axis cs: 0.6,0.55);
+				\draw[black,thick,
+				    rounded corners] (rel axis cs: 0.555,0.2) rectangle 
+				        (rel axis cs: 0.6,0.3);
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs: 0.577,0.63)
+				    {$P_{\text{dSU,s}}$}; \node[black,rotate=0,scale=0.4] at 
+				    (rel axis cs: 0.577,0.67){$P_{\text{faSU,s}}$};
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs: 0.577,0.48)
+				    {$P_{\text{dSU,s}}$}; \node[black,rotate=0,scale=0.4] at 
+				    (rel axis cs: 0.577,0.52){$P_{\text{faSU,s}}$};
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs: 0.577,0.23)
+				    {$P_{\text{dSU,s}}$}; \node[black,rotate=0,scale=0.4] at 
+				    (rel axis cs: 0.577,0.27){$P_{\text{faSU,s}}$};
+			%
+				\node[black,rotate=0,
+				    scale=0.4] at (rel axis cs:0.4425,0.73)
+				    {SUs (Rx), $m=1,2,\dots,M$};
+		%reporting channel
+			\fill[thick,inner color=green!20,
+			    outer color=green,fill opacity=0.5] (rel axis cs:0.68,0.45) ellipse 
+			        [x radius=1.1cm,y radius=4mm,rotate=90];
+			\node[black,scale=0.35,text width=1.5cm,
+			    text centered,rotate=20] at (rel axis cs:0.68,0.44){Reporting channels};
+			\node[black,rotate=0,
+			    scale=0.6] at (rel axis cs:0.68,0.17)
+			    {\tiny $\overbrace{\text{Rayleigh + Shadowing + AWGN}}$};			
+			\node[black,rotate=0,
+			    scale=0.6] at (rel axis cs:0.66,0.595){\tiny $P_\text{e}$};
+			\node[black,rotate=0,
+			    scale=0.6] at (rel axis cs:0.653,0.475){\tiny $P_\text{e}$};
+			\node[black,rotate=0,
+			    scale=0.6] at (rel axis cs:0.663,0.285){\tiny $P_\text{e}$};
+			\node[black,rotate=-12,
+			    scale=0.4] at (rel axis cs:0.757,0.598)
+			    {\tiny $P'_\text{faSU,s},P'_\text{dSU,s}$};
+			\node[black,rotate=0,
+			    scale=0.4] at (rel axis cs:0.7495,0.53)
+			    {\tiny $P'_\text{faSU,s},P'_\text{dSU,s}$}; 
+			\node[black,rotate=22,
+			    scale=0.4] at (rel axis cs:0.7515,0.451)
+			    {\tiny $P'_\text{faSU,s},P'_\text{dSU,s}$}; 
+		%propagation waves
+			\draw[decorate,
+			    decoration={expanding waves,angle=2,segment length=2,
+			        amplitude=.9,post=lineto,post length=0pt},
+			     line width=0.5pt,opacity=0.7] 
+			     (rel axis cs:0.6,0.65) -- (rel axis cs: 0.785,0.55);
+			\draw[decorate,
+			    decoration={expanding waves,angle=2,segment length=2,
+			        amplitude=.9,post=lineto,post length=0pt},
+			    line width=0.5pt,opacity=0.7] 
+			        (rel axis cs: 0.6,0.5) -- (rel axis cs: 0.785,0.5);
+			\draw[decorate,
+			    decoration={expanding waves,angle=2,segment length=2,
+			        amplitude=.9,post=lineto,post length=0pt},
+			    line width=0.5pt,opacity=0.7] 
+			    (rel axis cs: 0.6,0.27) -- (rel axis cs: 0.785,0.45);
+			\node [scale=0.35,rotate=-12,
+			    opacity=0.7] at (rel axis cs:0.67,0.64)
+			    {$\{\text{Encoded decisions}\}$};
+		%fusion center
+				\filldraw[thick,line width=0.5pt,inner color=green!20,
+				    outer color=green,fill opacity=0.5] 
+				    (rel axis cs:0.818,0.505) circle 
+				    [x radius=3.5mm,y radius=3.5mm,rotate=90];
+				\node[black,scale=1] at (rel axis cs:0.818,0.505){\tiny FC};
+				\draw[-latex,line width=0.5pt] 
+				(rel axis cs:0.85,0.505)--(rel axis cs:0.96,0.505);
+				\node[black,rotate=0,scale=0.5] at 
+				(rel axis cs:0.896,0.53){\tiny $P_\text{faFC,s},P_\text{dFC,s}$}; 
+		%propagation waves
+				\node at (rel axis cs:0.06,0.5) (a) {}; 
+				\node at (rel axis cs: 0.31,0.65) (b) {};
+				\node at (rel axis cs: 0.31,0.5) (c) {};
+				\node at (rel axis cs: 0.31,0.23) (d) {};
+				\draw[decorate,
+				    decoration={expanding waves,angle=2,segment length=2,
+				        amplitude=.9,post=lineto,post length=0pt},
+				    line width=0.5pt,opacity=0.7] 
+				    (rel axis cs:0.12,0.5) -- (rel axis cs: 0.3,0.65);
+				\draw[decorate,
+				    decoration={expanding waves,angle=2,segment length=2,
+				        amplitude=.9,post=lineto,post length=0pt},
+				    line width=0.5pt,opacity=0.7] 
+				    (rel axis cs:0.12,0.5) -- (rel axis cs: 0.3,0.5);
+				\draw[decorate,
+				    decoration={expanding waves,angle=2,segment length=2,
+				        amplitude=.9,post=lineto,post length=0pt},
+				        line width=0.5pt,opacity=0.7] 
+				        (rel axis cs:0.12,0.5) -- (rel axis cs:  0.3,0.25);
+				\node[scale=0.35,rotate=20,opacity=0.7] at 
+				    (rel axis cs:0.21,0.61) {$\{\text{OFDMA subchannels}\}$};
+		%OFDMA sub channels
+				\node[scale=0.6] at (rel axis cs:0.215,0.95) 
+				    {\tiny OFDMA subchannels, $s=1,2,\dots,S$};
+				\node[black,rounded corners=1pt,trapezium, 
+				    trapezium angle=60, minimum width=5mm,
+				    draw,thick,scale=1,line width=0.5pt] at 
+				    (rel axis cs:0.145,0.89) {};
+				\node[black,rotate=0,scale=0.35] at (rel axis cs:0.145,0.89){$1$};
+				\node[black,rounded corners=1pt,trapezium, 
+				    trapezium angle=60, minimum width=5mm,
+				    draw,thick,scale=1,line width=0.5pt] at 
+				    (rel axis cs:0.18,0.89){};
+				\node[black,rotate=0,scale=0.35] at 
+				    (rel axis cs:0.18,0.89){$2$};
+				\node at (rel axis cs:0.214,0.89) {\scriptsize $...$};
+				\node [black,rounded corners=1pt,trapezium, 
+				    trapezium angle=60, minimum width=5mm,
+				    draw,thick,scale=1,line width=0.5pt] at 
+				    (rel axis cs:0.25,0.89){};
+				\node[black,rotate=0,scale=0.35] at 
+				    (rel axis cs:0.25,0.89){$S$};
+				\draw[-,line width=1.1pt,white]
+				    (rel axis cs:0.12,0.863)--(rel axis cs: 0.278,0.863);
+				\node at (rel axis cs:0.10908,0.865) (s1) {}; 
+				\node at (rel axis cs: 0.32,0.865) (s2) {};
+				\draw[-latex,line width=0.59pt](s1)--(s2);				
+				\node[scale=0.5] at (rel axis cs:0.3,0.83) {$f$};				
+		%sub-carriers
+				\node[scale=0.55] at (rel axis cs:0.2524,0.79) 
+				    {\tiny Subcarriers per subchannel};
+				\draw[-{Stealth[length=0.7mm]},line width=0pt]
+				    (rel axis cs:0.234,0.865)--(rel axis cs:0.234,0.89);
+				\draw[-{Stealth[length=0.7mm]},line width=0pt]
+				    (rel axis cs:0.2406,0.865)--(rel axis cs:0.2406,0.89);
+				\node[black,rotate=0,scale=0.5] at 
+				    (rel axis cs:0.252,0.872){$...$};
+				\draw[-{Stealth[length=0.7mm]},line width=0pt]
+				    (rel axis cs:0.266,0.865)--(rel axis cs:0.266,0.89);
+				\node[black,rotate=0,scale=0.55] at 
+				    (rel axis cs:0.2421,0.83){\tiny $k'=\underbrace{1,2,\dots,K'}$};
+		%(top) reporting channels
+				\node [scale=0.4,rotate=0,opacity=1] at 
+				    (rel axis cs:0.65,0.865) 
+				    {$\text{Encoded decisions,}_{m}\in\{0,1\}=
+				    \left\{
+				        \begin{array}
+				        {*{20}{l}}
+				        \text{
+				            line vector with order $1\times nS$ for the 
+				            ($n_\text{R},1,\lfloor(n_\text{R}-1)/2\rfloor$) repetition code
+				            }\\ 
+				            \text{
+				                line vector with order $1\times n$ for the 
+				                ($n_\text{B},\kappa_\text{B},d_\text{B}$) BCH code
+				                }
+				        \end{array}
+				        \right.$};		
+		\end{axis}
+	\end{tikzpicture}
+\end{document}

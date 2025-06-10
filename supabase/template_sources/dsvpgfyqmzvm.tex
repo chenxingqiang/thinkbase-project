@@ -1,0 +1,193 @@
+% beamer class with 4:3 aspect ratio
+%\documentclass{beamer}
+% Beamer class with 16:9 aspect ratio.
+% Note: When 32:18 is specified, the height of the slides remains constant.
+\documentclass[aspectratio=3218]{beamer}
+
+% load all packages
+\input{packages}
+
+% style of the Chair for Electromagnetic Compatibility
+%\usepackage{beamer_emc}
+% style of the Institute for Medical Engineering
+%\usepackage{beamer_imt}
+% style of the Faculty of Electrical Engineering and Information Technology
+%\usepackage{beamer_feit}
+% style of the Otto-von-Guericke-University
+%\usepackage{beamer_ovgu}
+\usepackage{beamer_ovgu_169}
+% style of STIMULATE (Solution Centre for Image Guided Local Therapies)
+%\usepackage{beamer_stimulate}
+
+\title[Short Title]{Title of the Presentation}
+\author{John Doe}
+\institute[Chair for EMC]{
+	Chair for Electromagnetic Compatibility \\
+	Institute for Medical Engineering \\
+	Otto-von-Guericke-University Magdeburg, Germany
+}
+\mode<presentation>{\keywords{Put some keywords here, separated by commas, e.g. Non-Technical Project, Academic Writing}}
+\date[01/01/2023]{Date of the Presentation, e.g. January 1th 2023}
+
+\begin{document}
+
+\begin{frame}
+	\maketitle
+	% \maketitle also works in the article mode
+	% \titlepage only works for presentation
+\end{frame}
+
+\begin{frame}[label=inhalt]{Overview}
+	\tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+% only for the miniframe navigation
+\subsection*{}
+
+\begin{frame}
+	\frametitle<presentation>{Introduction}
+	\begin{block}{Why to give a presentation:}
+		\begin{itemize}
+			\item show the main arguments and results of your work
+			\item produce interest to read the full paper/report
+			\item goal: be educational and also entertaining
+		\end{itemize}
+	\end{block}
+	\begin{block}{Advantages of using \LaTeX ~with the beamer package:}
+		\begin{itemize}
+			\item very easy if the report is already written in \LaTeX
+			\item different themes which are usable in practice
+			\item possibility to create handouts using \emph{beamerarticle}
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\section{Body}
+
+\subsection{Equations}
+
+\begin{frame}
+	\frametitle<presentation>{Equations}
+	\begin{block}{Pythagoras theorem:}
+		\begin{equation}
+			a^2 + b^2 = c^2 \label{eq:pythogoras}
+		\end{equation}	\end{block}
+	\begin{block}{It follows that:}
+		\begin{align}
+			a^2 &= c^2 - b^2 \\
+			b^2 &= c^2 - a^2
+		\end{align} 	
+ 	\end{block}
+\end{frame}
+
+\subsection{Figures}
+
+\begin{frame}
+	\frametitle<presentation>{Figures}
+	\begin{figure}
+		\centering
+			\includegraphics[height=5cm]{unilogo}
+		\caption{Logo of the university.}
+		\label{fig:unilogo}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Plots}
+	\begin{figure}
+		\centering
+			\begin{tikzpicture}
+				\begin{axis}[
+					beamer,
+					xlabel={time, $t$ (in \si{\milli\second})},
+					ylabel={voltage, $u(t)$ (in \si{\volt})},
+					xmin=0,xmax=20,
+					ymin=-350,ymax=350,
+					legend pos=south west,
+					% example how to insert a line by giving a formula directly
+					]
+					\addplot+[
+						domain=0:20,
+						samples=101,
+					] {sin(deg(x*2*pi/20))*sqrt(2)*230};
+					\addlegendentry{sine wave-form};
+					\addplot+[
+						domain=0:20,
+						samples=101,
+					] {cos(deg(x*2*pi/20))*sqrt(2)*230};
+					\addlegendentry{cosine wave-form};
+				\end{axis}
+			\end{tikzpicture}
+		\caption{Harmonic time course of a voltage with a frequency of \SI{50}{\hertz} 
+		and an effective value of \SI{230}{\volt}.}
+		\label{fig:u_t_sinus}
+	\end{figure}
+\end{frame}
+
+\subsection{Tables}
+
+\begin{frame}
+	\frametitle<presentation>{Tables}
+	\begin{table}
+		\centering
+			\begin{tabular}{cc}
+				\toprule
+				variable & meaning \\
+				\midrule
+				$t$ & time \\
+				$U$ & voltage \\
+				\bottomrule
+			\end{tabular}
+		\caption{Example table.}
+		\label{tab:example}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Citations}
+	\begin{block}{Don't use short citations:}
+		\begin{itemize}
+			\item avoid short citations like~[1]
+			\item no one will remember the numbers when the list of references is shown
+			\item use full citations instead
+		\end{itemize}
+	\end{block}
+	\begin{block}{Example for a full citation:}
+		\small\fullcite{hering:technical_reports}
+	\end{block}
+\end{frame}
+
+\section{Conclusion}
+
+% only for the miniframe navigation
+\subsection*{}
+
+\begin{frame}
+	\frametitle<presentation>{Conclusion}
+	\begin{block}{Results:}
+	  \begin{itemize}
+	  	\item summarize the main results of your work
+	  	\item also talk about remaining tasks or problems	  	
+		\end{itemize}
+	\end{block}
+	\begin{block}{Questions:}
+	 \begin{itemize}
+	 	\item save some time for answering question
+	 	\item optionally prepare some extra slides for supposable questions
+	 \end{itemize}
+	\end{block}	
+\end{frame}
+
+% only for the miniframe navigation
+\section*{}
+
+\begin{frame}<beamer>{}
+	\begin{center}
+		Thanks for your attention!
+	\end{center}
+	\begin{center}
+		Are there questions?
+	\end{center}
+\end{frame}
+
+\end{document}

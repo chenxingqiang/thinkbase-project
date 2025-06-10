@@ -1,0 +1,202 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do your customization here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{MTH 213}
+\newcommand{\examdate}{December 2011}
+\newcommand{\academicyear}{2011-2012}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Experimental Mathematics}
+\newcommand{\numberofhours}{2}
+
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\FF}{\mathbb{F}}
+%\DeclareMathOperator{\diam}{diam}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Don't touch anything from here till instructions
+% to candidates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf NANYANG TECHNOLOGICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center}
+\vspace{20truemm}
+
+\noindent \examdate\hspace{55truemm} TIME ALLOWED: \numberofhours\ HOURS
+
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Adjust your instructions here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf FIVE (5)} questions and comprises 
+{\bf FOUR (4)} printed pages.
+
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+
+
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+
+\item This {\bf IS NOT an OPEN BOOK} exam.
+
+\item Candidates may use calculators. However, they should write down systematically the steps in the workings.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% leave this as it is
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% put your exam questions here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\paragraph{Question 1.}\hfill (20 marks)\\
+\begin{enumerate}[(i)]
+    \item Write a function \verb|func1| that takes as input a list of
+    3 numbers $[a_2, a_1, a_0]$ and returns the polynomial $a_2 x^2 + a_1 x
+      + a_0$ which has these numbers as coefficients.\\
+      For example, \verb|func1([1, 2, 3])|  should
+      return \verb|x^2 + 2*x + 3|.
+    \item Write a  function \verb|func2| which accepts a list $[a_{n-1},
+    a_{n-2}, \dots, a_1, a_0]$ for any length $n$, and a number $k\geq 0$
+    and returns the $k$-th derivative of the
+polynomial $a_{n-1} x^{n-1} + a_{n-2} x^{n-2} + \cdots
+    + a_1 x + a_0.$
+\end{enumerate}
+
+
+\bigskip
+\bigskip
+\bigskip
+\paragraph{Question 2.}\hfill (20 marks)\\
+Carol wants to compute the Taylor series of a function $f(x)$ around the
+point $x=1$, up to the $n$-th term. The first term is clearly the value
+$f(1)$. 
+Carol implemented a function \verb|get_taylor_coeff| to compute the
+Taylor coefficients. But this function is giving incorrect answers. Find
+the error(s) in the function and correct the error(s).
+\begin{verbatim}
+# Get the taylor coefficients of the function f(x) upto the
+# k-th term around the point x0. 
+# For k=1, it should return [f(x0)].
+def get_taylor_coeff(f, x0, k):
+    coeffs = []
+    for i in srange(1, k):
+        t(x) = f.derivative(x, i)
+        coeffs.append(t(i))
+    return coeffs
+
+# Example usage of get_taylor_coeff
+f(x) = x^20 - x^4 + 1
+get_taylor_coeff(f, 1, 3)
+\end{verbatim}
+
+
+\bigskip
+\bigskip
+\bigskip
+\newpage 
+
+
+\paragraph{Question 3.}\hfill (20 marks)\\
+Consider the following interpolation problem. Let 
+$$p(x) = a_{n-1} x^{n-1} +  a_{n-2} x^{n-2}
++ \cdots + a_1 x + a_0$$ be a polynomial. The graph of the corresponding
+function $x\mapsto p(x)$ passes through the
+points $(x_0, y_0), (x_1, y_1), \dots, (x_{n-1}, y_{n-1})$.
+\noindent Adam wrote the following Sage code to return the list $[a_{n-1},\dots,a_0]$
+of coefficients of the polynomial $p(x)$.
+Here, \verb|ylist| is the list $[y_0, y_1, \dots, y_{n-1}]$ and
+\verb|xlist| is the list $[x_0, x_1, \dots, x_{n-1}]$.
+\begin{verbatim}
+def get_coeff(xlist, ylist):
+    n = len(xlist)
+    def f(i, j):
+        return xlist[i]^j
+    M = matrix(RDF, n, n, f)
+    yvec = vector(RDF, ylist)
+    return M.solve_right(yvec)
+\end{verbatim}
+\begin{enumerate}[(i)]
+    \item Adam is getting an incorrect answer   from \verb|get_coeff| when he
+    is trying to get the coefficients of a degree two polynomial which
+    passes through the points $(1, 5), (2, 10), (3, 17)$. Find the error(s) in
+    the function \verb|get_coeff| due to which Adam is getting the
+    incorrect answer. Give the corrections.
+    \item Is there any degree 2 polynomial $p(x)$ for which the
+    \emph{incorrect} function \verb|get_coeff| would still give a correct
+    solution? If so, then give an example of such a polynomial. If such
+    a polynomial cannot be obtained, explain why this is the case.
+\end{enumerate}
+
+\bigskip
+\bigskip
+\newpage 
+
+\paragraph{Question 4.}\hfill (20 marks)\\
+Eve decided to compute a certain function using recursion. The function Eve
+wrote is the following: 
+\begin{verbatim}
+def compute(a, b):
+    if a < 0 or b < 0 or a < b:
+        return 0
+    if b == 0:
+        return 1
+    return a*compute(a-1, b-1)/b
+\end{verbatim}
+\begin{enumerate}[(i)]
+    \item What mathematical function is Eve's function \verb|compute()|
+    evaluating?
+    \item Write a non-recursive version of Eve's function \verb|compute()|.
+\end{enumerate}
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+\paragraph{Question 5.}\hfill (20 marks)\\
+Let $\pi$ be a permutation of the set $I=\{0,\dots,n-1\}$.  The {\em orbits} of
+$\pi$ on $I$ are the  equivalence classes of the binary relation $\equiv_{\pi}$ on
+$I$, so that $x\equiv_{\pi} y$ if and only if there exist $i\geq 0$ such that
+$\pi^i(x)=y$. Here $\pi^i$ denotes the $i$-th iteration of $\pi$, i.e.
+$\pi^0(x)=x$, 
+$\pi^1(x)=\pi(x)$, $\pi^2(x)=\pi(\pi(x))$, etc.  Write a Sage function that
+takes $\pi$ as a list of length $n$ of numbers in $I$ and returns the list of
+lengths of the orbits of $\pi$ on $I$.
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center}
+\end{document}

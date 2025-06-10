@@ -1,12 +1,12 @@
 from typing import List
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -15,7 +15,7 @@ ell2a.configure({
 })
 
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def order_t_shirt(size: str, color: str, address: str):
     """Orders a t-shirt with the given specifications"""
     order = {
@@ -28,7 +28,7 @@ async def order_t_shirt(size: str, color: str, address: str):
     return order
 
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def get_order_arrival_date(order_id: str):
     """Gets the arrival date of a t-shirt order"""
     return {
@@ -37,7 +37,7 @@ async def get_order_arrival_date(order_id: str):
     }
 
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def limbo_chat_bot(message_history: List[Message]) -> Message:
     """Process chat messages and return a response in Limbo's kawaii style."""
     system_message = Message(

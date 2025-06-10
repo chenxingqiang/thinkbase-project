@@ -1,0 +1,383 @@
+% 	
+% 	Leiðbeint nám, stytt útgáfa af BS verkefni. Ensk útgáfa.
+%	
+% 	Breyttur kóði frá eftirfarandi hlekk: 
+%		https://ugla.hi.is/kerfi/view/page.php?sid=1432
+% 
+% 	Höfundur breytinga: 
+%		Krista Hannesdóttir (krista.hannesdottir@gmail.com).
+%		Breytingar gefnar út undir GPLv3 leyfi.
+%		Alpha útgáfa.
+%	
+%	Todo: 
+%		Losna við KOMA pakkan.
+%		
+%		
+%
+\documentclass[a4paper, 12pt, twoside]{scrreprt}
+
+% Encoding, íslenskir stafir.
+%\usepackage{ucs}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{t1enc}
+%\usepackage{csquotes} % Vandamál varðandi gæsalappir í heimildaskrá.
+
+\usepackage[intoc]{nomencl}
+\usepackage{enumerate,color}
+\usepackage{url}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\usepackage{appendix}
+\usepackage{eso-pic}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[nottoc]{tocbibind}
+
+\usepackage[format=plain,labelformat=simple,labelsep=colon]{caption}
+\usepackage{placeins}
+
+% Töflur.
+\usepackage{tabularx}
+
+% Teikningar og myndir.
+\usepackage{graphicx}
+\usepackage[sf,normalsize]{subfigure}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{circuitikz}
+\usepackage{tikz,pgffor}
+\usetikzlibrary{calc,through,intersections, matrix}
+\usepackage{tkz-euclide}
+\usetkzobj{all}
+\usepackage{geometry}
+
+% units package
+\usepackage{siunitx}
+\usepackage{cancel}
+
+% Viðbót fyrir heimildaskrá.
+\usepackage[style=ieee, backend=biber]{biblatex} 
+\addbibresource{heimildaskra.bib} % Heimildir eru sóttar úr þessari skrá.
+
+% Configurations
+%\graphicspath{{figs/}}
+
+%\usepackage{fancyhdr}
+ 
+%\pagestyle{fancy}
+%\fancyhf{}
+%\rhead{Share\LaTeX}
+%\lhead{Guides and tutorials}
+%\rfoot{Page \thepage}
+
+
+\setlength{\parskip}{\baselineskip}
+\setlength{\parindent}{0cm}
+\raggedbottom
+% \setkomafont{subsection}{\normalfont\sffamily}
+
+% Eins og templatið á að vera
+% \setkomafont{captionlabel}{\itshape}
+% \setkomafont{caption}{\itshape}
+
+% Mun fallegri lausn << nei, þetta er skammarlegt val
+% \setkomafont{captionlabel}{\itshape}
+% \setkomafont{caption}{\itshape}
+% \setkomafont{section}{\FloatBarrier\Large}
+% \setcapwidth[l]{\textwidth}
+% \setcapindent{1em}
+
+
+% Times new roman
+%\usepackage[T1]{fontenc}
+%\usepackage{mathptmx}
+
+%
+%	Fylla inn upplýsngar um titil, deild og höfund.
+%
+\def\thesisyear{20XX}       					% Árið sem lokaverkefnið var skilað
+\def\thesismonth{XXmánuður}						% Mánuðurinn sem lokaverkefnið var skilað
+\def\thesisauthor{XXhöfundur}					% Höfundur
+\def\thesistitle{XXtitill} 						% Titill
+\def\thesisshorttitle{XXstuttur titill (50 stafir með bilum)} 	% Stuttur titill
+\def\thesiscredits{XXects} 							% ECTS fyrir skýrslu
+\def\thesissubject{XXfag}							% T.d. Mekatróník.
+
+\def\reportcourse{KITXXXG} 	% Námsskeið
+\def\thesisschool{Verkfræði- og náttúruvísindasvið}		% Svið
+\def\thesisfaculty{Rafmagns- og tölvuverkfræðideild}	% Deild
+
+\def\thesisnroftutors{2}						% 1 = eintala, >1 er fleirtala
+\def\thesistutors{XXNN1 \\ XXNN2}					% Leiðbeinendur
+
+\begin{document}
+
+\begin{titlepage}
+\thispagestyle{empty}
+
+\begin{tikzpicture}[remember picture,overlay]
+  \coordinate [above=0cm] (toppoint) at (current page.north);
+  % Merki Háskóla Íslands.
+  \node[anchor=north] (logonator) at ($(toppoint)+(0cm,-4.2cm)$) {
+    \includegraphics[width=4.2cm]{./uilogo}
+    };
+
+  % Titill ritgerðar
+  \node[anchor=north, align=center] (titlenator) at ($(logonator.south)+(0cm,-3.0cm)$) {
+    \huge \sffamily \bfseries \thesistitle
+    };
+
+  \coordinate [above=0cm] (bottompoint) at (current page.south);
+
+  % Staðsetning texta um deild og verkefnagerð
+  \node[anchor=base, 
+  		minimum width=\paperwidth, 
+        align=center] at ($(bottompoint)+(0cm,3.4cm)$)  
+    {
+    \parbox{
+      1\paperwidth
+      }{
+      \centering
+      \bfseries\sffamily \Large 
+      \thesissubject \\
+      \thesisfaculty \\
+	  \thesisschool \\
+	  University of Iceland \\
+	  \thesismonth~\thesisyear
+      }
+    };
+
+  % Nafn höfundar
+  \node[anchor=north, align=center] (authornator) at ($(titlenator.south)+(0cm,-1.0cm)$) {
+    \normalfont \Large \sffamily \thesisauthor
+	};
+    
+  % Nöfn leiðbeinenda
+  \node[anchor=north, align=center] (advisornator) at ($(authornator.south)+(0cm,-1.0cm)$) {
+	\parbox{
+      1\paperwidth
+      }{
+      \centering
+      \sffamily \Large Leiðbeinandi\\
+      \thesistutors
+      }
+    };
+
+  % Nafn höfundar
+  \node[anchor=north, align=center] (authornator) at ($(advisornator.south)+(0cm,-1.0cm)$) {
+    \normalfont \sffamily  \thesiscredits~ECTS project for \reportcourse
+	};
+    
+\end{tikzpicture}
+
+\newpage 
+
+\end{titlepage}
+\pagenumbering{roman}
+
+\setcounter{page}{5}
+\section*{\huge Abstract}
+Útdráttur á ensku sem er að hámarki 250 orð.
+\vfill \vspace*{1cm}
+
+\section*{\huge Útdráttur}
+Hér kemur útdráttur á íslensku sem er að hámarki 250 orð. Reynið að koma útdráttum á eina blaðsíðu en ef tvær blaðsíður eru nauðsynlegar á seinni blaðsíða útdráttar að hefjast á oddatölusíðu (hægri síðu).
+\vfill
+
+\newpage
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\chapter*{Abbreviations}
+\addcontentsline{toc}{chapter}{Abbreviations}
+Í þessum kafla mega koma fram listar yfir skammstafanir og/eða breytuheiti. Gefið kaflanum nafn við hæfi, t.d. Skammstafanir eða Breytuheiti. Þessum kafla má sleppa ef hans er ekki þörf. \\
+
+The section could be titled: Glossary, Variable Names, etc.
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+Í þessum kafla koma fram þakkir til þeirra sem hafa styrkt rannsóknina með fjárframlögum, aðstöðu eða vinnu. T.d. styrktarsjóðir, fyrirtæki, leiðbeinendur, og aðrir aðilar sem hafa á einhvern hátt aðstoðað við gerð verkefnisins, þ.m.t. vinir og fjölskylda ef við á. Þakkir byrja á oddatölusíðu (hægri síðu).
+
+\clearpage
+\chapter{Introduction}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+Ingangur skal vera ítarlegur og gefa yfirsýn yfir það rannsóknasvið sem verkefnið nær til. Þar skal greint frá tilgangi og bakgrunni verkefnisins, skýrt frá stöðu þekkingar á viðkomandi rannsóknasviði, fyrri rannsóknum og samhengi verkefnisins við þær. Þá skal gerð grein fyrir þeim spurningum sem leitast er við að svara með rannsókninni.
+
+\section{Almennar upplýsingar}
+Fyrirsögn 1 er kaflaheiti. Feitletrið fyrirsögn 1 í 20 pt Verdana. Hafið 54 pt loftun yfir og byrjið nýja oddatölusíðu (hægri síðu). Hafið 12 pt loftun undir á undan texta og 24 pt loftun undir (samtals) ef beint á undan fyrirsögn 2.
+
+Í stað Verdana má velja sambærilegt steinskriftar (sans serif) letur í allar fyrirsagnir en allar fyrirsagnir skulu þó vera ritaðar með sömu leturgerð.
+
+Meginmálstexti skal skrifaður í Times New Roman, með leturstærð 12 og einföldu línubili. Málsgreinar skulu loftaðar með 0 pt bili að ofan og 12 pt bili að neðan, þar sem fyrirsagnir stilla loftun fyrir neðan sig (og þar með fyrir ofan texta).
+
+Leita skal að XX sem hluta af orði, þar sem það merkir atriði sem höfundur þarf að breyta.
+
+Í stað Times New Roman má velja sambærilegt prentletur (serif). Allt meginmál skal þó ritað með sömu leturgerð. 
+
+Allur texti ritgerðar skal ritaður með einum lit, svörtum. Undantekningar eru leyfðar innan mynda. Ekki nota “hyperlinks” í texta, sem þá verður blár og/eða með undirlínu.
+
+Notast skal við 2,5 cm spássíu fyrir ofan og á ytri hlið (ekki kjalmegin). Við kjölin skal bæta 0,5 cm (Gutter) til að hafa samtals 3,0 cm spássíu. Neðst á blaðsíðu skulu vera 1,5 cm frá neðri brún í blaðsíðutal og spássían skal vera 3,0 cm frá neðri brún blaðsíðu að texta.
+
+Blaðsíður meginmáls byrja að númerast á 1 á fyrstu blaðsíðu fyrsta kafla með arabískum stíl. Blaðsíðutalið er still við ytri brún og neðst á blaðsíðu. Heimildir og viðaukar númerast einnig með sama hætti. Fjöldi blaðsíðna í ritgerð skráist sem blaðsíðunúmer öftustu prentuðu síðu.
+
+Byrja skal fyrirsögn 1 efst á hægri síðu. Hér má hugsa sér að setja stuttan texta sem inngang að kaflanum áður en fyrsti undirkafli byrjar. Það getur hjálpað lesanda að átta sig á inntaki kaflans.
+
+Nota má skáletur í hófi til að draga athygli að texta. Notið feitletur enn sjaldnar. Ekki nota undirstrikaðan texta í ritgerðinni.
+
+Farið sparlega í notkun footnote. Þær skulu vera númeraðar og birtast neðst á þeirri síðu sem fyrst vitnar í þær eða fljótlega þar á eftir.
+
+Númerið og vísið í formúlur eftir venjum fagsviðs.
+
+Velja má inndrátt fyrstu línu málsgreinar um 1 cm í stað 12 pt loftunar á milli málsgreina, en þá þarf að bæta 12 pt við loftun yfir fyrirsögnum sem gera ráð fyrir að 12 pt loftun komi frá lokum málsgreinar. Ekki skal nota bæði inndrátt og loftun.
+
+\section{Fyrirsögn 2}
+Fyrirsögn 2 er undirfyrirsögn. Feitletrið fyrirsögn 2 í 16 pt Verdana. Hafið samtals 24 pt loftun yfir fyrirsögn 2. Notið 12 pt loftun fyrir neðan fyrirsögn 2.
+
+\subsection{Fyrirsögn 3}
+Fyrirsögn 3 er síðasta númeraða undirfyrirsögnin. Feitletrið fyrirsögn 3 í 12 pt Verdana með 18 pt loftun yfir samtals þegar texti er fyrir ofan eða fyrirsögn 2. 
+\subsubsection{Fyrirsögn 4}
+12 pt Verdana, engin kaflanúmer, birtist ekki í efnisyfirliti, 12 pt loftun yfir og 6 pt undir
+
+Fyrirsögn 4 skal ekki númera. Fyrirsögn 4 er rituð í venjulegu 12 pt Verdana og hefur minnst 12 pt loftun yfir ef hún er undir texta, en meiri loftun undir hærri fyrirsögnum sem stýrist af neðri loftunum þeirra fyrirsagna. Notið 6 pt loftun undir fyrirsögn 4.
+Ekki nota fyrirsagnir á lægra útlínu stigi en fyrirsögn 4.
+
+\section{Um forsíðu, kjöl og baksíðu}
+Ekki skal nota búmerki/logó fyrirtækja, samstarfsaðila eða styrktaraðila á forsíðu/baksíðu eða annars staðar í ritgerð. Ekki skal setja mynd á forsíðu ritgerðar. 
+
+Í texta er hins vegar skylt og rétt að geta samstarfsaðila og styrktaraðila, það skal gert í kaflanum Þakkir (Acknowledgments) eða í formála.
+
+Á baksíðu er heimilt að setja nafn prentsmiðju, þá miðjað hægri-vinstri á blaðsíðu og miðjað upp-niður innan litaborðans. Nafn prentsmiðju skal ritað með stærst 10 pt Verdana í venjulegu hvítu letri.
+
+Merki Háskóla Íslands á forsíðu skal hafa 4,2 cm þvermál. Það skal staðsetja merkið 4,2 cm frá efri brún. Frá neðri brún merkis skulu minnst vera 3,0 cm í titil ritgerðar.
+
+Loftun fyrir neðan nafn höfundar skal vera 1 cm niður að efstu brún litaborðans.
+
+Megin hluti litaborðans neðst á forsíðu skal spanna 7,7 cm frá neðri brún blaðsíðu í A4-formi, en þó spannar hann lengra bil þar sem táknmynd aðalbyggingar kemur fyrir.
+
+Litaborðinn skal ná yfir kjölinn og baksíðuna, og þar spanna 7,7 cm frá neðri brún blaðsíðu.
+
+Litaborði BS ritgerða er grár litur Háskóla Íslands. Litakóðar litarins eru: CMYK: 0 : 0 : 0 : 70; Pantone: Cool Gray 11 C; RGB: 90 : 91 : 94.
+
+Litaborði meistararitgerða er litur Verkfræði- og náttúruvísindasviðs Háskóla Íslands, appelsínugulur. Litakóðar litarins eru: CMYK:  0 : 75 : 100 : 0; Pantone: 158 C; RGB: 236 : 78 : 34.
+
+Litaborði doktorsritgerða er litur Háskóla Íslands, dökk blár. Litakóðar litarins eru: CMYK: 100 : 57 : 0 : 40; Pantone: 295 C; RGB: 0 : 46 : 85.
+
+Á kjöl ritgerðar skal rita nafn höfundar, stuttan titil ritgerðar (mest 50 slög með bilum) og ártal ritgerðar í einni línu með Verdana letri. Nafn höfundar og stuttur titill ritgerðar koma á hvíta flötinn, en ártalið kemur í hvítu letri á litaborðann.
+
+\section{Almennt um ritgerðasmíð}
+Gæði ritgerðar endurspegla ekki einungis gæði rannsóknarinnar (hermana, líkana, greininga, o.fl.), heldur einnig gæði ritgerðasmíðar. Í síðara samhenginu skipta margir þættir máli, t.d. uppbygging og söguflæði, framsetning á hugmyndum og niðurstöðum, málfar og heimildavinna. Því er mikilvægt að nemendur kynni sér hvernig best sé að standa að undirbúningi og skrifum ritgerðar. Nemendur verða að tileinka sér fagmannleg vinnubrögð í heimildaskráningu og tilvísunum í samráði við leiðbeinanda. Hér eru dæmi um tvær bækur sem nemendur geta stuðst við:
+\begin{itemize}
+ \item Friðrík H. Jónsson og Sigurður J. Grétarsson (2007). \textit{Gagnfræðikver fyrir háskólanema}, Háskólaútgáfan, Reykjavík.
+ \item Ingibjörg Axelsdóttir og Þórunn Blöndal (2006).  \textit{Handbók um ritun og frágang},  Mál og menning, Reykjavík.
+\end{itemize}
+Prufu heimildarvísun~\cite{knuth-fa}.
+\section{Doktorsritgerð: Ritgerð eða greinasafn}
+Doktorsritgerð getur verið hvort sem er í formi ritgerðar eða safns greina sem hafa birst eða  er áætlað að birtist í ritrýndum ritum. 
+
+Ef doktorsritgerðin er greinasafn skal ávallt fylgja inngangur sem setur fram heildstæð markmið, ítarlegt yfirlit og samantekt á verkinu. Mælt er með að í lok ritgerðar, á undan viðaukum, fylgi samantekinn listi yfir heimildir verksins.
+
+Ef einhver greinanna í ritgerðinni hafa meðhöfunda skal framlag doktorsnemans útskýrt sérstaklega í inngangi, sér í lagi krefst það útskýringa ef doktorsneminn er ekki aðalhöfundur greinarinnar. 
+
+Ráðlagt er að greinar þær sem birtast í safninu séu settar í þeim stíl sem hér er lýst fyrir doktorsritgerðir, en séu ekki bein afrit birtra greina, þar sem setning og útlit slíkra greina getur fallið undir vernd höfundarréttar útgáfuaðila. Útgáfuaðilar leyfa almennt að texti greina birtist bæði í grein og doktorsritgerð. Það er á ábyrgð nemanda að kanna slíkt og framfylgja þeim samþykktum sem nemandi hefur fallist á við birtingu greina.
+ 
+\chapter{Methods}
+Hér skal greint frá efnivið rannsóknar, efnum sem notuð voru og uppruna þeirra eftir þvi sem við á, þó er ekki nauðsynlegt að geta uppruna efna sem algeng eru á rannsóknastofum í viðkomandi grein. Aðferðum skal lýst þannig að lesandi geti tileinkað sér aðferðina og endurtekið mælingu eða rannsókn með fullnægjandi hætti. Séu aðferðir þegar þekktar skal vísað til heimilda. Ef aðferð er breytt frá því sem lýst hefur verið skal gera skýra grein fyrir breytingunni. Nýrri aðferð skal lýst ítarlega. Þá skal getið tölvuforrita sem notuð eru, til dæmis við tölfræðilega úrvinnslu. Aðferðafræði rannsóknar skal að jafnaði vera í samræmi við það sem venja er á viðkomandi fræðasviði. Ef val á aðferðum getur orkað tvímælis skal það rökstutt.
+
+\section{Listar}
+Hér á eftir er dæmi um upptalningarlista. Listinn má vera þéttari, þ.e. að aðeins sé 0 pt bil á milli atriða, en þó skal hafa 12 pt bil á undan fyrsta atriði listans.
+\begin{itemize}
+ \item Númer 1
+ \item Númer 2
+ \item Númer 3
+\end{itemize}
+Ef fyrsta lína eftir upptalningu er framhald sömu málsgreinar og fyrir ofan skal ekki setja inn viðbótarloftun (eða ef inndráttur er notaður, skal ekki nota inndrátt á slíkri línu). 
+
+\chapter{Myndir og töflur}
+Þessi kafli sýnir dæmi um notkun mynda, taflna og vísun í þær.
+\section{Myndir}
+Myndatexti skal staðsetja undir myndum og skrifast með skáletri.
+Setja skal auða aukalínu fyrir ofan myndir.
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=0.47\textwidth]{uilogo}
+\caption[Dæmi um myndatexta (fyrir neðan mynd).]{Dæmi um myndatexta (fyrir neðan mynd)} \label{fig:Array}
+\end{figure}
+Mikilvægt er að skilgreina myndir með ,,paragraph format”: “keep with next” til að rjúfa ekki tengsl á milli myndar og myndtexta. Mynd má vera miðjuð og skal þá einnig miðja myndartextann. Letur innan myndar skal vera í steinskrift (sans serif), t.d. Verdana, og ekki minna en 10 pt. Tryggið að letur, tákn og línur sjáist skýrt eftir útprentun.
+
+Hægt er að láta númera og merkja myndir sjálfvirkt með því að gera Insert – Reference – Caption – Mynd eða Tafla. Varist að velja hyperlink. 
+
+Vísa má í mynd með því að velja Insert – Reference – Cross-Reference – Mynd eða Tafla. Varist að velja hyperlink og veljið að eins Label og Number. T.d. sjá þessa tilvísun í Mynd 3.1 sem dæmi. 
+
+\section{Töflur}
+Einnig má númera töflur sjálfkrafa svipað og myndir. Nota skal skáletur í töflutitil. Textinn skal standa fyrir ofan töflu og fylgja töflunni.  Ekki nota tvöfalt línubil eða hafa space before í töflum. Meginreglan við töflugerð er að hafa þær einfaldar og eins fá strik og mögulegt er. Tafla má vera miðjuð á blaðsíðu og skal þá láta töflutitil byrja við vinstri brún töflu.
+
+
+\begin{table}[htb]
+\centering
+\caption{Dæmi um töflutexta (fyrir ofan töflu).}
+     \sffamily \begin{tabularx}{1.0\textwidth}{ p{5cm}  p{5cm}  p{5cm} }
+    \hline
+   \textbf{Taflan} \hfill & \textbf{Er} \hfill & \textbf{Eins} \\ \hline
+    Og & Hún & gæti\\
+    Litið & Út & í ritgerð\\ \hline
+    \end{tabularx} \normalfont
+\label{table:Emissivity}
+\end{table}
+
+Almennt skal ekki nota loftun fyrir neðan texta í töflu, og stylla loftun fyrir neðan á 0 pt.
+Mikilvægt er að skilgreina töflutexta með ,,format paragraph: keep with next og keep lines together” til að rjúfa ekki tengsl á milli töflutexta og töflu. Ef tafla er mjög löng má kljúfa hana á milli blaðsíðna og þá verður að setja (\textit{Framhald}) í aukalínu beint fyrir neðan töfluna, hægri stillt við hægri brún töflu.
+
+Dæmi um sjálfvirka tilvísun í töflu, bara nota Label and Number, ekki nota hyperlink eða caption text. T.d. Tafla 3.1 sýnir dæmi um töflu.
+
+\chapter{Results}
+Að jafnaði skal hér einungis greina frá niðurstöðum rannsókna eða mælinga. Í styttri ritgerð, t.d. lokaverkefni til BS-prófs, getur komið til greina að sameina niðurstöður og umræður í einn kafla.
+
+Kappkostað skal að setja niðurstöður fram á skipulegan og skýran hátt, án málalenginga. Einungis skal skýrt frá því sem telja má staðreyndir. Niðurstöður skulu eftir því sem unnt er settar fram í formi taflna eða mynda og innihald þeirra skýrt og meginatriði dregin fram í texta. Myndir og töflur skulu settar inn í texta þar sem um þær er rætt. Myndir skulu vera skýrar og stórar, að jafnaði skeytt inn í skjalið rafrænt. Línurit skulu fullfrágengin þannig að ásar séu skýrt merktir og tákn skýrð. Myndatexti með númeri og heiti myndar skal fylgja neðan við hverja mynd og skal hann vera stuttur en þó lýsa viðfangsefni myndar á fullnægjandi hátt. Sama gildir um töflur, sem skulu vera skýrar og greinargóðar. Texti með númeri og heiti töflu skal fylgja.
+
+\section{Efni sótt frá öðru skjali}
+Dæmi um heimild~\cite{dirac} og líka~\cite{einstein}.
+\input{YtraEfniFyrirInclude}
+
+\chapter{Discussion}
+Í þessum kafla er niðurstöðum gerð skil og þær ræddar og skýrðar. Gerð er grein fyrir einstökum þáttum rannsóknanna, þær skýrðar og settar í samhengi. Gera skal grein fyrir ágöllum og óvissuþáttum eftir því sem við á. Ef við á eru niðurstöður bornar saman við niðurstöður annarra rannsókna og settar fram hugmyndir eða tillögur um frekari rannsóknir.
+
+\chapter{Conclusion}
+Hér eru settar fram í stuttu máli helstu ályktanir sem draga má af niðurstöðum rannsóknarinnar.
+
+
+%
+% Heimildir
+%
+\printbibliography[heading=bibintoc] % Bætir við heimildum og færir í efnisyfirlit
+
+Aðalfyrirsögn heimildaskrár skal birtast í efnisyfirliti, hún skal hafa sama form og fyrirsögn eitt en vera án kaflanúmers. Eins og aðrar aðalfyrirsagnir skulu heimildir byrja á nýrri blaðsíðu og hún skal vera oddatölu (hægri) síða.
+Notið eitt samræmt form á heimildaskrá og tilvitnunum í ritgerðinni. Veljið form á heimildaskrá og tilvitnunum í samráði við leiðbeinanda til þess að venjur fagsviðs verði uppfylltar.
+
+
+% 
+% Viðhengi.
+% 
+\appendix
+\renewcommand{\chaptername}{Appendix}
+\chapter{Appendix}
+Gagnlegir punktar og ábendingar
+\begin{itemize}
+ \item BS ritgerðir skulu prentaðar í A4.
+ \item Meistararitgerðir skulu prentaðar í A4.
+ \item Útgáfustærð doktorsritgerða er B5.
+\begin{itemize}
+ \item[-] Iðulega er doktorsritgerð unnin í A4 en svo smækkuð við prentun. Mikilvægt er að tryggja að allur texti, m.a. í myndum og töflum, sjáist skýrt eftir smækkun í B5. Því verður að skoða drög af ritgerð eftir smækkun í B5 áður en ritgerðin er prentuð í fjölda eintaka.
+\end{itemize}
+
+\end{itemize}
+
+\begin{itemize}
+ \item Miða skal við að ritgerð sé prentuð báðu megin á blaðsíður og byrja skal alla kafla á hægri síðu opnu.
+ \item Hafa skal samband við prentsmiðju áður en handriti er skilað. Oft vilja þessir aðilar fá ritgerðina á PDF-formi. Hafa skal í huga að litprentun er mun dýrari en svart/hvít prentun. 
+ \item Til eru mismunandi gæði/upplausn á PDF-skjölum. Prentsmiðjur biðja gjarnan um hágæða upplausn / prentunarupplausn sem er meiri en ,,venjuleg” PDF-upplausn sem notuð er við skjöl sem vistuð eru á netinu. Þetta er stillingaratriði áður en PDF-skjal er búið til. Almennt vilja prentsmiðjur hæstu mögulegu upplausn. Einnig vilja prentsmiðjur almennt að allt letur og myndir séu skilgreindar (“Embedded”) innan í PDF skjalinu.
+\end{itemize}
+
+\end{document}

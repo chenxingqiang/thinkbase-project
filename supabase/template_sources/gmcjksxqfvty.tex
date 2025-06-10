@@ -1,0 +1,227 @@
+\documentclass[conference]{styles/acmsiggraph}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text.
+\usepackage{fullpage} % changes the margin
+\usepackage{enumitem} % for customizing enumerate tags
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{etoolbox}   % for booleans and much more
+\usepackage{verbatim}   % for the comment environment
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\usepackage{menukeys}
+\usepackage{titlesec}
+\setlength{\parskip}{.8mm}
+\setcounter{MaxMatrixCols}{20}
+
+\title{\huge Homework 5: Solutions \\ \LARGE {CSE 490V: Virtual Reality Systems}}
+\author{\Large Student Name \\ student@uw.edu}
+\pdfauthor{Student Name}
+
+\hypersetup{
+	colorlinks=true,
+	urlcolor=[rgb]{0.97,0,0.30},
+	anchorcolor={0.97,0,0.30},
+	linkcolor=[rgb]{0.97,0,0.30},
+	filecolor=[rgb]{0.97,0,0.30},
+}
+
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ %
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ %
+ label=\fbox{\color{Black}\textbf{OUTPUT}},
+ labelposition=topline,
+ %
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
+
+\titlespacing*{\section}{0pt}{5.5ex plus 1ex minus .2ex}{2ex}
+\titlespacing*{\subsection}{0pt}{3ex}{2ex}
+
+\setcounter{secnumdepth}{4}
+\renewcommand\theparagraph{\thesubsubsection.\arabic{paragraph}}
+\newcommand\subsubsubsection{\paragraph}
+
+% convenient norm symbol
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+% a macro for hiding answers
+\newbool{hideanswers}
+\setbool{hideanswers}{false}
+\newenvironment{answer}{}{}
+\ifbool{hideanswers}{\AtBeginEnvironment{answer}{\comment} %
+\AtEndEnvironment{answer}{\endcomment}}{}
+
+\newcommand{\points}[1]{\hfill \normalfont{(\textit{#1pts})}}
+\newcommand{\pointsin}[1]{\normalfont{(\textit{#1pts})}}
+
+\begin{document}
+\maketitle
+
+\section{Theoretical Part}
+
+%%%%%%%%%%%%%%%%%%
+%   Question #1  %
+%%%%%%%%%%%%%%%%%%
+
+\subsection{Rotation Quaternions \points{5}}
+Given rotation angle $\theta$ and normalized rotation axis $\vec{v} = \left( v_x,\ v_y,\ v_z \right)^T$, i.e., $\norm{\vec{v}} = 1$, show that the corresponding rotation quaternion always has unit length.
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+\textbf{Answer:}
+
+Write your answer to this question here.
+
+\end{answer}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%
+%   Question #2  %
+%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection{3-D Gyro Integration \points{18}}
+%
+Using a gyro that samples at a rate of $f$ = 1~Hz, we have recorded the following four angular velocity measurements $\boldsymbol{\omega}^{(i)}$ = $\left(\omega_{x}^{(i)},\ \omega_{y}^{(i)},\ \omega_{z}^{(i)} \right)^T$ in \textit{sensor coordinates} at successive time steps $i=1,2,3,4$:
+%
+$$\boldsymbol\omega^{(1)}=\begin{pmatrix}
+\frac{\pi}{2} \\ 0 \\ 0
+\end{pmatrix}, \quad
+\boldsymbol\omega^{(2)}=\begin{pmatrix}
+0 \\ 0 \\ -\frac{\pi}{2}
+\end{pmatrix}, \quad
+\boldsymbol\omega^{(3)}=\begin{pmatrix}
+0 \\ -\frac{\pi}{2} \\ 0
+\end{pmatrix}, \quad
+\boldsymbol\omega^{(4)}=\begin{pmatrix}
+0 \\ 0 \\ \frac{\pi}{2}
+\end{pmatrix}, \quad \text{(unit: \textit{rad/s})}.$$
+
+\begin{enumerate}[label=(\roman*)]
+\item For each time step, report the rotation axis and amount of rotation since the previous time step (in degrees) in the following format: rotation around $x$-axis by $-10\degree$. Assume that the angular velocity was constant since the previous measurement. \pointsin{3}
+\item What should the orientation of the gyro be after this sequence of rotations with respect to its starting orientation? Feel free to apply these rotations to your hand or another object to determine the final orientation. \pointsin{5}
+\item
+In class, we discussed how we can use the Taylor expansion to derive a simple integration scheme that keeps track of a single orientation angle in flatland. For this integration scheme, we need an initial condition (i.e., initial orientation $\boldsymbol\theta^{(0)}$) and the length of the time step $\Delta t = 1/f$.
+
+Let's try to apply this method to 3D orientation tracking by integrating each of the three angles as
+$$\begin{pmatrix}
+\theta_x \\ \theta_y \\ \theta_z
+\end{pmatrix}^{(t + \Delta t)} \approx
+\begin{pmatrix}
+\theta_x \\ \theta_y \\ \theta_z
+\end{pmatrix}^{(t)} + \Delta t
+\begin{pmatrix}
+\omega_x \\ \omega_y \\ \omega_z
+\end{pmatrix}^{(t+\Delta t)},$$
+%
+where $\theta_x^{(t)}$, $\theta_y^{(t)}$, and $\theta_z^{(t)}$ are the estimated pitch, yaw, and roll angles at time $t$, and $\omega_x^{(t)}$,  $\omega_y^{(t)}$, and $\omega_z^{(t)}$ are the angular velocity measurements at time $t$. Assuming that the initial condition is $\boldsymbol\theta^{(0)} = \left(0,\ 0,\ 0\right)^T$, calculate and report the three integrated angles at all four time points $\boldsymbol{\theta}^{(t)}$ using the formula above.
+
+Now, the question is if these integrated angles are the Euler angles. To verify this, construct $3 \times 3$ rotation matrices $R^{(t)}$ from each of the integrated angles $\boldsymbol{\theta}^{(t)}$ by assuming that $(\theta_x, \theta_y, \theta_z)$ are pitch, yaw, and roll angles. For constructing the rotation matrix, you can assume that the rotation order is the yaw-pitch-roll order discussed in class, i.e. $R = R_z(-\theta_z) R_x(-\theta_x) R_y(-\theta_y)$.
+
+Does $R^{(4)}$ match your expectation from (ii)? \pointsin{5}
+
+\item If $R^{(4)}$ in (iii) does not match your expectation, briefly explain what went wrong with the proposed 3D integration scheme. \pointsin{5}
+\end{enumerate}
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+\textbf{Answer:}
+
+\begin{enumerate}[label=(\roman*)]
+\item Write your answer to this question here.
+
+\item Write your answer to this question here.
+
+\item Write your answer to this question here.
+
+\item Write your answer to this question here.
+\end{enumerate}
+\end{answer}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Programming Written Deliverables  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Programming Part PDF Deliverables}
+\subsubsection*{2.1.1 Bias Estimation} 
+Report all 6 calibrated bias values in your PDF writeup! Briefly comment on what values one would expect to see for the gyro and accelerometer if these sensors were perfect.
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\subsubsection*{2.1.2 Noise Variance Estimation} 
+Report the noise variance values in your PDF writeup!
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\subsubsection*{2.2.4 Flatland Orientation Tracking Comparison} 
+Take a screenshot of the above methods in action. Include it in your PDF submission along with a brief discussion of the differences you see between the three methods. Also vary the blending parameter \texttt{alphaImuFilter} in \texttt{vrduino.ino} and briefly comment on its effect in your PDF writeup. 
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\subsubsection*{2.4.4 Quaternion-Based Orientation Tracking Algorithm Comparison} 
+Run the visualizer to compare the 3 algorithms above by setting \texttt{streamMode = THREED} in \texttt{vrduino.ino}, or sending `2' to the Teensy. Compare the following cases in your writeup:
+\begin{enumerate}
+\item Quaternions with gyro only vs quaternions with complementary filtering ($\alpha = 0.9$).
+\item Euler angles with accelerometer only vs quaternions with complementary filtering ($\alpha = 0$).
+\end{enumerate}
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\subsubsection*{2.5.3 Head \& Neck Model Discussion} 
+Compare the visual experience of the orientation tracking with and without the head and neck model. Does the motion parallax created by this model improve the experience? Briefly comment on the effectiveness of the head and neck model in your writeup.
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+
+\end{document}

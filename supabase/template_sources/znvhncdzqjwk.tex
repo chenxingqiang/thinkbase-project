@@ -1,0 +1,261 @@
+\documentclass[
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,			% para impressão em verso e anverso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	english,			% idioma adicional para hifenização
+	french,				% idioma adicional para hifenização
+	spanish,			% idioma adicional para hifenização
+	brazil				% o último idioma é o principal do documento
+	]{abntex2}
+	
+\usepackage{lmodern}				% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}			% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}			% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}				% Usado pela Ficha catalográfica
+\usepackage{indentfirst}			% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}					% Controle das cores
+\usepackage{graphicx}				% Inclusão de gráficos e imagens
+\usepackage{microtype}				% para melhorias de justificação
+\usepackage{mathtools}				% Matemática
+\usepackage{multirow}				% Tabelas
+\usepackage[table,xcdraw]{xcolor}	% Tabelas (cores)
+\usepackage{pdfpages}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{imakeidx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{appendix}
+\usepackage{enumerate}
+\usepackage[pngtex]{pict2e}
+
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{corolário}[teorema]{Corolário}
+\newtheorem{definição}[teorema]{Definição}
+\newtheorem{exemplo}[teorema]{Exemplo}
+\newtheorem{proposição}[teorema]{Proposição}
+\newtheorem{observação}[teorema]{Observação}
+\newtheorem{notação}[teorema]{Notação}
+\newtheorem{lema}[teorema]{Lema}
+
+
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{array}
+%\usepackage{gensymb}
+\usepackage{float}
+
+\hyphenpenalty=10000
+
+\usepackage{lipsum}				% para geração de dummy text
+
+\usepackage[
+    backend=biber,
+    style=numeric,
+  ]{biblatex}
+
+ \usepackage{csquotes}
+
+ \addbibresource{bibliography.bib}
+%--------------------------------
+
+\newcommand{\STAB}[1]{\begin{tabular}{@{}c@{}}#1\end{tabular}}
+	
+\titulo{Título da dissertação ou tese}
+\autor{Nome do autor}
+\local{São Luís - MA}
+\data{2023}
+\orientador{Prof. Dr. }
+%\coorientador{Prof. Dr. Anselmo Cardoso de Paiva} %se houver
+
+\tipotrabalho{Dissertação}
+\preambulo{Dissertação apresentada como requisito parcial para obtenção do título de Mestre em Matemática, ao Programa de Pós-Graduação em Matemática, da Universidade Federal do Maranhão.}
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+\makeindex[columns=2, title=Índice Remissivo, intoc, 
+           options= -s examplestyle.ist]
+
+\begin{document}
+
+\selectlanguage{brazil}
+
+\frenchspacing 
+
+% ---
+% Capa
+% ---
+\renewcommand{\imprimircapa}{%
+\begin{capa}%
+\center
+\includegraphics[scale=0.25]{imagens/logoufma.png} \\ 
+\vspace{1cm}
+\ABNTEXchapterfont\Large UNIVERSIDADE FEDERAL DO MARANHÃO \\
+\ABNTEXsectionfont\Large Programa de Pós-Graduação em Matemática \\
+
+\vspace*{5cm}
+
+\begin{center}
+{\ABNTEXsectionfont\Large\imprimirautor} \\
+%\vfill
+\ABNTEXchapterfont\bfseries\LARGE\imprimirtitulo
+\end{center}
+\vfill
+\large\imprimirlocal \\
+\large\imprimirdata
+\vspace*{1cm}
+\end{capa}
+}	
+\imprimircapa
+
+%CASO PRECISE
+%\includepdf[pages={1}]{capa_dissertacao.pdf}
+
+\imprimirfolhaderosto
+
+
+\includepdf[pages={1}]{ficha_esboço.pdf}
+%\includepdf[pages={1}]{assinaturas.pdf}
+
+\begin{folhadeaprovacao}
+
+  \begin{center}
+    {\ABNTEXchapterfont\large\imprimirautor}
+
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+    \end{minipage}%
+    \vspace*{\fill}
+  \end{center}
+        
+  Dissertação de Mestrado. \imprimirlocal, 12 de Maio de 
+  2023:
+
+  \assinatura{\textbf{\imprimirorientador} \\ Orientador\\ Universidade Federal do Maranhão} 
+  %\assinatura{\textbf{\imprimircoorientador} \\ Coorientador\\ Universidade Federal do Maranhão} 
+   
+  \assinatura{\textbf{Prof. Dr. } \\ Examinador Interno \\ Universidade Federal do Maranhão}
+  \assinatura{\textbf{Prof. Dr. } \\ Examinador Externo \\ Universidade de São Paulo - ICMC}
+      
+  \begin{center}
+    \vspace*{0.5cm}
+    {\large\imprimirlocal}
+    \par
+    {\large\imprimirdata}
+    \vspace*{1cm}
+  \end{center}
+  
+\end{folhadeaprovacao}
+
+% ---
+% Dedicatória
+% ---
+\begin{dedicatoria}
+  \vspace*{\fill}
+  %\RaggedRight
+  %\noindent
+  \begin{flushright}
+        \textit{À pequenininha Alice.}
+  \end{flushright}
+  \vspace*{\fill}
+\end{dedicatoria}%
+% ---
+
+% ---
+% Agradecimentos
+% ---
+\begin{agradecimentos}
+Agradeço 
+
+\end{agradecimentos}
+% ---
+
+% ---
+% Epígrafe
+% ---
+\newpage
+\begin{epigrafe}
+   \vspace*{\fill}
+	\begin{flushright}
+		\textit{"A matemática, vista corretamente, possui não 
+  apenas verdade, mas também suprema beleza - uma beleza fria 
+  e austera, como a da escultura."}
+
+    (Bertrand Russell)
+	\end{flushright}
+\end{epigrafe}
+% ---
+
+
+% resumo em português
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+
+\end{resumo}
+
+% resumo em inglês
+\begin{resumo}[Abstract]
+\begin{otherlanguage*}{english}
+
+\end{otherlanguage*}
+\end{resumo}
+
+\cleardoublepage
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+
+
+\input{1_introducao.tex}
+\input{2_relacionados.tex}
+\input{3_referencial.tex}
+\input{appendix.tex}
+
+\appendix
+
+\phantompart
+
+\postextual
+
+\printbibliography
+
+\printindex
+
+\end{document}

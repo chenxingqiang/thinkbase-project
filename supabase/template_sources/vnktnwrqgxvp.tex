@@ -1,0 +1,204 @@
+\documentclass[12pt]{report} % ---- COMPILE WITH XeLaTeX for Unicode!!! ----
+\usepackage[a4paper, top=1in, bottom=1in, left=1.5in, right=1in]{geometry} % Set margins
+\usepackage{setspace} % allows \doublespacing & \singlespacing
+\usepackage{parskip} % enables non-indented paragraphs with a blank line
+
+% enables graphics, all figures and images should be in the /figures/ folder:
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+
+% enhanced maths symbols and syntax:
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{amsthm} % if you need mathematical definitions and theorems
+
+\usepackage[ruled]{algorithm2e} % allow for algorithms in pseudocode
+\usepackage{listings} % allow for source code algorithms/listings
+\lstset{basicstyle=\footnotesize, frame=single, numbers=left} % customise listing style
+
+% Customise chapter headings so they are of the format: 1. Introduction
+\usepackage{titlesec}
+\titleformat{\chapter}[block]
+  {\normalfont\huge\bfseries}{\thechapter.}{1em}{\Huge}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+% Setup bibliography - add file to project named bibliography.bib
+% can create this from Zotero, Mendeley, refworks, etc
+\usepackage{natbib}
+\bibliographystyle{agsm}
+\setcitestyle{authoryear,open={(},close={)}, aysep={,}}
+
+\usepackage{hyperref} % add links to document
+
+\doublespacing
+\begin{document}
+\input{titlepage} % Custom title page, see titlepage.tex for details
+\pagenumbering{roman} % Roman numeral page numbering up to the first page of introduction
+\setcounter{page}{2} % Start at "ii", to count title page as "i"
+
+\chapter*{Abstract} % \chapter* means the chapter is not in the contents or numbered
+Abstract goes here.
+
+\chapter*{Acknowledgements}
+I want to thank...
+
+\tableofcontents
+
+\chapter{Introduction}
+\pagenumbering{arabic} % Introduction starts at page 1.
+
+Introduction goes here. To cite like this:
+
+\cite{johnson_perceptual_2016} showed that...
+
+Use the "\textbackslash cite\{\}" command
+
+\hfill \break
+
+To cite like this:
+
+A recent paper \citep{johnson_perceptual_2016} has shown that...
+
+use the "\textbackslash citep\{\} command
+
+\hfill \break
+
+For papers with exactly three authors, you must use \textbackslash citep*\{\}, like this:
+
+The Deep Learning review article \citep*{lecun_deep_2015} summarised...
+
+
+\chapter{Background}
+
+For an example figure, see Figure \ref{fig:keelelogo}:
+\begin{figure}[h]
+\centering
+\includegraphics[scale = 0.5]{keelelogo} %normally replace scale=
+\caption{The Keele University logo.}
+\label{fig:keelelogo}
+\end{figure}
+
+Example equation:
+\begin{equation} \label{eq:1}
+    \min_{G} \max_{D} \mathcal{L}(D, G) = \mathbb{E}_{\boldsymbol{x} \sim p_{data(\boldsymbol{x})}} \log D(\boldsymbol{x}) + \mathbb{E}_{\boldsymbol{z} \sim p_{\boldsymbol{z}(\boldsymbol{z})}} \log (1-D(G(\boldsymbol{z}))).
+\end{equation}
+
+Example pseudocode algorithm:
+
+\begin{algorithm}[H] \label{alg:1}
+\DontPrintSemicolon % remove this to add semicolons at the end of each line
+ \For{number of training iterations}{
+  Step 1\;
+  Step 2\;
+  Step 3\;
+ }
+ Step 4\;
+ \caption{Training process for Algorithm 1...}
+\end{algorithm}
+\newpage
+Example source code listing:
+\begin{lstlisting}[language=Python, caption=Python example]
+import numpy as np
+ 
+def incmatrix(genl1,genl2):
+    m = len(genl1)
+    n = len(genl2)
+    M = None #to become the incidence matrix
+    VT = np.zeros((n*m,1), int)  #dummy variable
+ 
+    #compute the bitwise xor matrix
+    M1 = bitxormatrix(genl1)
+    M2 = np.triu(bitxormatrix(genl2),1) 
+ 
+    for i in range(m-1):
+        for j in range(i+1, m):
+            [r,c] = np.where(M2 == M1[i,j])
+            for k in range(len(r)):
+                VT[(i)*n + r[k]] = 1;
+                VT[(i)*n + c[k]] = 1;
+                VT[(j)*n + r[k]] = 1;
+                VT[(j)*n + c[k]] = 1;
+ 
+                if M is None:
+                    M = np.copy(VT)
+                else:
+                    M = np.concatenate((M, VT), 1)
+ 
+                VT = np.zeros((n*m,1), int)
+ 
+    return M
+\end{lstlisting}
+
+Example of multiple equations:
+\begin{align} \label{eq:2}
+    \min_{D} \mathcal{L}_{LSGAN}(D) = & \frac{1}{2}\mathbb{E}_{\boldsymbol{x} \sim p_{data(\boldsymbol{x})}} (D(\boldsymbol{x}) - 1)^2 + \frac{1}{2}\mathbb{E}_{\boldsymbol{z} \sim p_{\boldsymbol{z}(\boldsymbol{z})}} (D(G(\boldsymbol{z})))^2
+    \\
+    \min_{G} \mathcal{L}_{LSGAN}(G) = & \frac{1}{2}\mathbb{E}_{\boldsymbol{z} \sim p_{\boldsymbol{z}(\boldsymbol{z})}} (D(G(\boldsymbol{z}))-1)^2.
+\end{align}
+
+Example table:
+\begin{table}[h]
+\begin{tabular}{l | c c c}
+& \textbf{Per-Pixel} & \textbf{Per-Class} &\\
+\textbf{Algorithm} & \textbf{Accuracy} & \textbf{Accuracy} & \textbf{Class IoU}\\\hline
+Algorithm 2 (ours) & \textbf{0.53} & \textbf{0.16} & \textbf{0.11} \\
+Algorithm 2 (original) & 0.42 & 0.12 & 0.08 \\
+Baseline algorithm & 0.49 & 0.13 & 0.10 \\
+\end{tabular}
+\label{tab:tablelabel}
+\caption{Results table for...}
+\end{table}
+
+\section{Section 1}
+
+Insert text here...
+
+\subsection{Subsection 1}
+
+Insert text here...
+
+\section{Section 2}
+
+Insert text here...
+
+\chapter{Main Body 1}
+
+Insert text here...
+
+\section{Section 1}
+
+Insert text here...
+
+\section{Section 2}
+
+Insert text here...
+
+\chapter{Evaluation}
+
+Insert text here...
+
+\section{Testing}
+
+Insert text here...
+
+\section{Experiments and Results}
+
+Insert text here...
+
+\section{Discussion}
+
+Insert text here...
+
+\chapter{Conclusion}
+
+Insert text here...
+
+\bibliography{bibliography.bib}
+
+\appendix
+
+\chapter{Project Plan}
+
+\chapter{Ethics Form}
+
+\end{document}

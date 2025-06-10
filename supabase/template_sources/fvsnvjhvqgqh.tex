@@ -1,0 +1,517 @@
+% compile with XeLaTeX
+% this template was created by salim bou 
+\documentclass[dvipsnames,mathserif]{beamer}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{polyglossia}
+\setdefaultlanguage[numerals=maghrib,locale=algeria]{arabic} % locale=mashriq, libya, algeria, tunisia, morocco, or mauritania  for names of months in \date 
+\setotherlanguage{english}
+\newfontfamily\arabicfont[Script=Arabic]{Amiri}
+\newfontfamily\arabicfontsf[Script=Arabic]{Amiri}
+
+\usetheme{Warsaw}
+%\usecolortheme{crane}
+
+% for RTL liste
+\makeatletter
+\newcommand{\RTListe}{\raggedleft\rightskip\leftm}
+\newcommand{\leftm}{\@totalleftmargin}
+\makeatother
+
+
+
+% RTL frame title
+\setbeamertemplate{frametitle}
+{\vspace*{-1mm}
+  \nointerlineskip
+    \begin{beamercolorbox}[sep=0.3cm,ht=2.2em,wd=\paperwidth]{frametitle}
+        \vbox{}\vskip-2ex%
+        \strut\hskip1ex\insertframetitle\strut
+        \vskip-0.8ex%
+    \end{beamercolorbox}
+}
+
+
+% align subsection in toc
+\makeatletter
+\setbeamertemplate{subsection in toc}
+{\leavevmode\rightskip=5ex%
+  \llap{\raise0.1ex\beamer@usesphere{subsection number projected}{bigsphere}\kern1ex}%
+  \inserttocsubsection\par%
+}
+\makeatother
+
+% RTL triangle for itemize
+\setbeamertemplate{itemize item}{\scriptsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleleft$}} 
+
+%\setbeamertemplate{itemize item}{\rule{4pt}{4pt}}
+
+\defbeamertemplate{enumerate item}{square2}
+{\LR{
+    %
+    \hbox{%
+    \usebeamerfont*{item projected}%
+    \usebeamercolor[bg]{item projected}%
+    \vrule width2.25ex height1.85ex depth.4ex%
+    \hskip-2.25ex%
+    \hbox to2.25ex{%
+      \hfil%
+      {\color{fg}\insertenumlabel}%
+      \hfil}%
+  }%
+}}
+
+\setbeamertemplate{enumerate item}[square2]
+
+\setbeamertemplate{navigation symbols}{}
+
+\begin{document}
+
+\rightskip\rightmargin
+
+\title{الهندسة الفضائية \\
+\textcolor{yellow}{التعامد في الفضاء}}
+
+\author{الأستاذ : سليم بو}
+\institute{المستوى : سنة أولى جذع مشترك علوم وتكنولوجيا}
+\date{\today}
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}{المحتويات}
+\tableofcontents
+\end{frame}
+
+
+
+\section{تعامد المستقيمات في الفضاء}
+\subsection{تعريف}
+\begin{frame}{تعامد المستقيمات في الفضاء}
+
+\begin{exampleblock}{تعريف}
+نقول عن مستقيمين في الفضاء أنهما متعامدان إذا كان المستقيمان الموازيان لهما من نفس النقطة متعامدان
+\end{exampleblock}
+
+\pause
+
+\textcolor{red}{مثال:} 
+ 
+\begin{columns}
+
+\begin{column}{0.4\linewidth}
+
+\begin{tikzpicture}[scale=0.75]
+\coordinate(A)at (0,1);
+\coordinate(B)at (3,0);
+\coordinate(C)at (3,2.5);
+\coordinate(D)at (0,3.5);
+
+\coordinate(E)at (2,2);
+\coordinate(F)at (5,1);
+\coordinate(G)at (5,3.5);
+\coordinate(H)at (2,4.5);
+
+
+\draw[thick](A)--(B)--(C)--(D)--cycle;
+\draw[thick](B)--(F)--(G)--(H)--(D) (G)--(C);
+\draw[dashed](H)--(E)--(F) (E)--(A);
+
+\onslide<3->{\draw[red,very thick]($(H)!-0.3!(G)$)--($(G)!-0.3!(H)$)node[right]{\tiny $(D_2)$}; 
+\draw[blue,very thick]($(B)!-0.3!(C)$)--($(C)!-0.3!(B)$)node[right]{\tiny $(D_1)$}; 
+}
+
+\onslide<4->{\fill[blue](G)circle(2.5pt)node[above right]{\tiny $A$};} 
+
+\onslide<5->{\draw[dashed,blue,very thick]($(F)!-0.3!(G)$)--($(G)!-0.3!(F)$);
+\draw[thick]($(G)!0.3cm!(H)$)--+(0,-0.3)--($(G)!0.3cm!(F)$);
+}
+
+\onslide<7->{\draw[OliveGreen,very thick]($(H)!-0.3!(D)$)--($(D)!-0.3!(H)$)node[above]{\tiny $(D_3)$}; }
+
+\end{tikzpicture}
+
+\end{column}
+
+\begin{column}{0.5\linewidth}
+
+\onslide<6->{
+
+\begin{itemize}\RTListe
+\item
+من النقطة $A$ المستقيم الموازي لـ 
+$(D_1)$ عمودي على المستقيم $(D_2)$ 
+ فالمستقيمان $(D_1)$  و $(D_2)$ متعامدان. 
+\item
+نفس الشيء يمكن قوله عن  المستقيمين 
+$(D_1)$ و $(D_3)$
+\end{itemize}
+
+\vspace{2cm}
+
+}
+
+\end{column}
+
+\end{columns} 
+ 
+\end{frame}
+
+\subsection{خواص}
+
+\begin{frame}{خواص}
+\begin{exampleblock}{}
+\begin{enumerate}\rightskip\leftm
+\item 
+المستقيم العمودي على أحد مستقيمين متوازيين عمودي على الآخر.
+
+\item
+المستقيمان الموازيان لمستقيمين متعامدين متعامدان.
+\end{enumerate}
+\end{exampleblock}
+
+\pause
+
+\begin{columns}
+
+\begin{column}{0.3\linewidth}
+
+\begin{tikzpicture}[scale=0.75]
+\coordinate(A)at (0,0);
+\coordinate(B)at (3,0);
+\coordinate(C)at (3,3);
+\coordinate(D)at (0,3);
+
+\coordinate(E)at (1,1);
+\coordinate(F)at (4,1);
+\coordinate(G)at (4,4);
+\coordinate(H)at (1,4);
+
+
+\draw[thick](A)--(B)--(C)--(D)--cycle;
+\draw[thick](B)--(F)--(G)--(H)--(D) (G)--(C);
+\draw[dashed](H)--(E)--(F) (E)--(A);
+
+\onslide<2->{\draw[red,very thick]($(H)!-0.3!(C)$)node[above]{\tiny $(\Delta_1)$}--($(C)!-0.3!(H)$);
+\draw[red,very thick,dashed]($(E)!-0.3!(B)$)node[above]{\tiny $(\Delta_2)$}--($(B)!-0.3!(E)$);
+\draw[red,very thick](B)--($(B)!-0.3!(E)$);
+}
+
+\onslide<3->{\draw[blue,very thick]($(G)!-0.2!(D)$)node[above]{\tiny $(D)$}--($(D)!-0.2!(G)$);
+\draw[thick](2.2,3.4)--(2.4,3.45)--(2.2,3.55);
+}
+
+\end{tikzpicture}
+\end{column}
+
+\begin{column}{0.65\linewidth}
+
+
+\begin{itemize}\RTListe
+
+\item<2->
+المستقيمان
+ $(\Delta_1)$ و $(\Delta_2)$ متوازيان 
+
+\item<3-> 
+المستقيم 
+$(D)$ عمودي على المستقيم $(\Delta_1)$
+
+\item<4-> 
+ومنه يكون المستقيم
+$(D)$ عمودي على  $(\Delta_2)$ 
+
+\end{itemize}
+\end{column}
+\end{columns}
+
+\end{frame}
+\section{تعامد المستقيمات والمستويات}
+\subsection{تعريف}
+\begin{frame}{تعامد المستقيمات والمستويات}
+\pause
+\begin{exampleblock}{تعريف}
+نقول عن مستقيم أنه عمودي على مستو إذا كان هذا المستقيم عموديا على كلّ مستقيمات هذا المستوي.
+\end{exampleblock}
+ 
+\pause
+ 
+\begin{block}{مبرهنة}
+حتى يكون مستقيم عموديا على مستو يكفي أن يكون عموديا على مستقيمين متقاطعين من ذلك المستوي
+\end{block} 
+ 
+\pause 
+ 
+ \textcolor{red}{مثال:}
+ 
+\begin{columns} 
+\begin{column}{0.35\textwidth}
+\vspace{-3mm}
+\centering
+
+\begin{tikzpicture}[scale=0.5]
+\coordinate(A)at (0,0);
+\coordinate(B)at (3,0);
+\coordinate(C)at (3,3);
+\coordinate(D)at (0,3);
+
+\coordinate(E)at (1,1);
+\coordinate(F)at (4,1);
+\coordinate(G)at (4,4);
+\coordinate(H)at (1,4);
+
+
+\draw[thick](A)--(B)--(C)--(D)--cycle;
+\draw[thick](B)--(F)--(G)--(H)--(D) (G)--(C);
+\draw[dashed](H)--(E)--(F) (E)--(A);
+
+\onslide<2->{
+\foreach \i in{B,F}{\fill[red](\i)circle(2.5pt)node[right,black]{\tiny $\i$};
+}
+\fill[red](A)circle(2.5pt)node[left,black]{\tiny $A$};
+\draw[red,very thick]($(B)!-0.2!(C)$)--($(C)!-0.3!(B)$)node[below left]{\tiny $(\Delta)$};
+\draw[thick](2.7,0)--(2.7,0.3)--(3,0.3);
+\draw[thick](3,0.3)--(3.2,0.55)--(3.2,0.2);
+}
+
+\onslide<6->{\foreach \i in {0.2,0.4,...,2.8} {\draw($(E)+(\i,0)$)--($(A)+(\i,0)$);}}
+
+\end{tikzpicture}
+\end{column}
+\begin{column}{0.6\textwidth}
+\raggedleft
+\only<5->{
+المستقيم $(\Delta)$ عمودي على كل من المستقيمين : 
+$(BA)$ و $(BF)$ ، أي أنه عمودي على المستوي 
+$(ABF)$}
+
+\end{column}
+\end{columns}
+
+\end{frame}
+
+
+\subsection{خواص}
+\begin{frame}{خواص}
+
+\begin{exampleblock}{}
+\begin{enumerate}\rightskip\leftm
+\item<2-> 
+يوجد مستقيم وحيد يشمل نقطة معلومة ويعامد مستو معلوما.
+
+\item<2->
+يوجد مستو وحيد يشمل نقطة معلومة ويعامد مستقيما معلوما.
+
+\vspace{5mm}
+
+\item<3->
+المستويان العموديان على نفس المستقيم متوازيان.
+
+\item<3->
+المستقيمان العموديان على نفس المستوي متوازيان.
+
+\vspace{5mm}
+
+\item<4->
+المستقيم العمودي على أحد مستويين متوازيين عمودي على الآخر.
+
+\item<4->
+المستوي العمودي على أحد مستقيمين متوازيين عمودي على الآخر.
+
+\end{enumerate}
+\end{exampleblock}
+
+\end{frame}
+
+
+
+\section{تعامد المستويات}
+\subsection{تعريف}
+\begin{frame}{تعامد المستويات}
+
+\begin{exampleblock}{تعريف}
+نقول عن مستويين أنهما متعامدان إذا شمل أحدهما  مستقيما عمودي على الآخر.
+\end{exampleblock}
+
+\pause
+
+\textcolor{red}{مثال}
+
+\begin{columns}
+
+\begin{column}{0.35\linewidth}
+
+\begin{tikzpicture}[scale=0.75]
+\coordinate(A)at (0,1);
+\coordinate(B)at (3,0);
+\coordinate(C)at (3,2.5);
+\coordinate(D)at (0,3.5);
+
+\coordinate(E)at (2,2);
+\coordinate(F)at (5,1);
+\coordinate(G)at (5,3.5);
+\coordinate(H)at (2,4.5);
+
+
+\onslide<3>{\fill[red!30](C)--(B)--(F)--(G)--cycle;
+\fill[green!30](C)--(G)--(H)--(D)--cycle;
+}
+
+\onslide<4->{\fill[red!30](C)--(B)--(F)--(G)--cycle;
+\fill[gray!50](A)--(B)--(C)--(D)--cycle;
+}
+
+\draw[thick](A)--(B)--(C)--(D)--cycle;
+\draw[thick](B)--(F)--(G)--(H)--(D) (G)--(C);
+\draw[dashed](H)--(E)--(F) (E)--(A);
+
+
+\foreach \i in{A,B,C,D,E,F,G,H}{\fill[blue](\i)circle(2pt)node[above left]{\tiny $\i$};}
+
+\end{tikzpicture}
+
+\end{column}
+
+\begin{column}{0.6\linewidth}
+
+\raggedleft
+
+\onslide<2->{
+ليكن متوازي المستطيلات 
+$ABCDEFGH$
+}
+
+\begin{itemize}\RTListe
+
+\item<3->
+المستويان 
+$(BCG)$ و $(DCG)$
+ هما مستويان متعامدان 
+
+ 
+\item<4->
+نفس الشيء يمكن قوله عن  المستويين 
+$(BCG)$ و $(ADC)$
+
+\end{itemize}
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+\subsection{خواص}
+\begin{frame}{خواص}
+\begin{exampleblock}{}
+\begin{enumerate}\rightskip\leftm
+
+\item 
+المستوي العمودي على أحد مستويين متوازيين عمودي على الآخر.
+
+\item
+	إذا كان $(P)$ و $(P')$ مستوين متقاطعين وكان كلّ
+            منهما عموديا على مستو ثالث $(Q)$ فإنّ مستقيم 
+            تقاطع المستويين $(P)$ و $(P')$ عمودي على المستوي $(Q)$.
+
+
+\end{enumerate}
+\end{exampleblock}
+\end{frame}
+
+\section{تطبيق}
+
+\setbeamertemplate{enumerate item}[circle]
+
+\begin{frame}{تمرين 47 صفحة 209}
+$ABCD$ 
+رباعي وجوه حيث $AD=DC$ و $AB=BC$ ،
+$M$
+منتصف $[AC]$.
+\begin{enumerate}\RTListe
+
+\item
+بين أن المستقيم $(AC)$ عمودي على المستوي $(BDM)$.
+
+\item
+استنتج أن المستقيم $(AC)$ عمودي على المستقيم $(BD)$.
+
+\end{enumerate}
+
+\pause
+
+\vspace{-5mm}
+
+\begin{columns}
+\begin{column}{0.27\textwidth}
+\begin{tikzpicture}[scale=0.7,equal/.style={fill=red,inner sep=0pt,minimum width=2mm}]
+\coordinate (D) at (0,0);
+\coordinate (C) at (2.5,-1);
+\coordinate (B) at (5,0);
+\coordinate (A) at (2,4);
+\coordinate (M) at ($(A)!0.5!(C)$);
+
+\onslide<5->{\fill[red!20](M)--(D)--(B)--cycle;}
+
+\draw [dashed](B)--(D);
+\draw[thick](D)--(C)--(B)--(A)--cycle (A)--(C);
+
+\foreach \i/\j in {A/above,B/right,C/below,D/left}{\fill[blue](\i)circle (2pt)node[\j]{\tiny $\i$};}
+
+\onslide<4->{
+\fill[red](M)circle(2pt)node[above right]{\tiny $M$};
+\draw[red,thick](B)--(M)--(D);
+\foreach \i in {A,C}{
+\node[equal,rotate=5] at ($(M)!.5!(\i)$){};
+}}
+%
+\onslide<3->{
+\foreach \i in {.5,.52}{\node [equal,rotate=45] at ($ (A)!\i!(B) $) {};}
+\foreach \i in {.5,.54}{\node [equal,rotate=100] at ($ (B)!\i!(C) $) {};}
+\foreach \i in {.48,.5,.52}{\node [equal,rotate=-30] at ($ (A)!\i!(D) $) {};}
+\foreach \i in {.47,.5,.53}{\node [equal,rotate=70] at ($ (D)!\i!(C) $) {};}
+}
+\end{tikzpicture}
+\end{column}
+
+\begin{column}{0.73\textwidth}
+
+\begin{itemize}\RTListe
+\item<6-| alert@6>
+المثلثان
+ $ABC$ و $ADC$
+  متساويا الساقين، والمستقيمان 
+  $(BM)$ و $(DM)$
+   هما متوسطان فيهما وهما أيضا محوران .
+   
+   ومنه فالمستقيم  
+   $(AC)$ عمودي على كل منهما 
+  أي أنه عمودي على المستوي الذي يشملهما  
+  $(BDM)$.
+
+\item<7-| alert@7>
+المستقيم 
+$(AC)$ عمودي على المستوي 
+$(BDM)$ فهو عمودي على كل مستقيماته أي أنه عمودي على المستقيم 
+$(BD)$.
+
+\end{itemize}
+
+\onslide<8->{}
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\end{document}
+
+
+
+
+
+
+
+
+

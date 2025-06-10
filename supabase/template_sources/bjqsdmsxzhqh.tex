@@ -1,0 +1,124 @@
+\documentclass[12pt,openright,twoside]{report}
+\usepackage[a4paper,top=25mm,bottom=25mm,right=25mm,left=25mm,bindingoffset=6mm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[swedish,british]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{pict2e}
+\usepackage{tabu}
+\usepackage{booktabs}
+\usepackage{bookmark,hyperref}
+\usepackage{gensymb}
+\graphicspath{{Figures/}}
+
+%Formatering av rubriker
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{titlesec, blindtext, color}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter}{20pt}{}{}
+\titlespacing*{\chapter}{0pt}{*0}{*3}
+\titlespacing*{\section}{0pt}{*4}{*1}
+\titlespacing*{\subsection}{0pt}{*3}{*0}
+\titlespacing*{\subsubsection}{0pt}{*4}{*1}
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tocloft} %Control the ToC formatting
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+%Formatting of page numbering (Comment to have the number centered)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[RO,LE]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[hang, font=small, labelfont=bf]{caption}
+\usepackage{subcaption}
+\captionsetup{justification   = raggedright,
+              singlelinecheck = false,
+              format = hang}
+
+\usepackage[
+  backend=bibtex,
+  %%%%% For NameYear citation
+  %   style=authoryear,
+  %   citestyle=authoryear-comp,
+  %   sorting=nyt
+  %%%%%
+  %%%%% For Number citation
+  style=numeric,
+  citestyle=numeric,
+  sorting=none,
+  %%%%%
+  maxcitenames=2,maxbibnames=99,
+  natbib]
+{biblatex}
+\addbibresource{References.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DO NOT NEED TO CHANGE BEFORE THIS POINT %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    anchorcolor=black,
+    citecolor=black,
+    urlcolor=black,
+    pdftitle={TITLE},  % Write your title here
+    pdfauthor={Author Name}, % Write your name here
+    }
+
+\title{
+	{\LARGE TITLE}\\ % Write your title here
+    {\large SUBTITLE}\\
+    {\vspace{10mm}}
+    {\includegraphics[width=0.6\textwidth]{Cover_Figure.png}}
+    }
+\author{Author Name} % Write your name here
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\clearpage
+
+\thispagestyle{empty}
+\mbox{}
+\clearpage
+
+\setcounter{page}{1}
+\pagenumbering{Roman}
+
+\include{Abstract}
+\include{Sammanfattning}
+\include{Acknowledgements}
+\include{Notations_and_Symbols}
+
+\cleardoublepage
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table of Contents}
+
+\cleardoublepage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\include{Chapters/Chapter_01}
+\include{Chapters/Chapter_02}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
+
+\appendix
+\titleformat{\chapter}[display]{\Huge\bfseries}{Appendix \thechapter}{10pt}{}{}
+
+\include{Chapters/Appendix_A}
+
+\end{document}

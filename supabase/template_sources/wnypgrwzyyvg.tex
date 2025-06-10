@@ -1,0 +1,503 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{gensymb}
+\usepackage{nameref}
+\usepackage{ragged2e}
+%\usepackage[spanish]{babel}
+
+% Use standard LaTeX font packages
+\usepackage[T1]{fontenc}
+\usepackage[thinlines]{easytable}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+\usepackage{multirow}
+% Use Times New Roman-like fonts
+\usepackage{mathptmx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage[bottom]{footmisc}
+\renewcommand{\footnotesize}{\fontsize{11pt}{13pt}\selectfont}
+
+% BibLaTeX for bibliography
+\usepackage[backend=biber, style=ieee]{biblatex}
+\addbibresource{bibliography.bib}  % Replace with your actual .bib file
+
+\usepackage{titlesec}  % Adjust title format
+\usepackage{setspace}  % Adjust line spacing
+
+% Adjust title format
+\usepackage{titlesec}
+\titleformat{\section}[block]{\bfseries}{\thesection.}{1em}{}
+\titleformat{\subsection}[block]{\bfseries}{\thesubsection.}{1em}{}
+\titleformat{\subsubsection}[block]{\bfseries\itshape}{\thesubsubsection.}{1em}{}
+\titleformat{\part}[block]{\bfseries\centering}{\thepart}{1em}{}
+\titlespacing*{\part}{0pt}{0pt}{0pt}
+
+\usepackage{tocloft}
+\renewcommand{\cftpartfont}{\normalfont}
+\renewcommand{\cftpartpagefont}{\normalfont}
+\setlength{\cftbeforepartskip}{1.5ex}
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+
+%\renewcommand*\contentsname{\ }
+\renewcommand\contentsname{\vspace*{-16pt}}
+\renewcommand{\listfigurename}{\vspace*{-16pt}}
+\renewcommand{\listtablename}{\vspace*{-16pt}}
+
+
+% Adjust the spacing and formatting of dots for \part entries
+\renewcommand{\cftpartdotsep}{\cftdotsep}
+\renewcommand{\cftpartleader}{\cftdotfill{\cftpartdotsep}}
+
+
+\usepackage{pdfpages}
+% Adjust margins and spacing
+\raggedright
+\doublespacing
+\setlength{\parindent}{1.27cm}
+
+\usepackage{indentfirst}
+\usepackage[margin=2.54cm]{geometry}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % Clear header and footer
+\rhead{\thepage} % Right-align page number in header
+\renewcommand{\headrulewidth}{0pt} % Set the header rule thickness to 0 (remove the line)
+
+
+%\newlistof{list_of_figures}{lof}{Lista de figuras}%remove
+\newcounter{apafigcounter}
+\newenvironment{apa_fig}[4]
+{
+\refstepcounter{apafigcounter}% Incrementa el contador 
+\addcontentsline{lof}{figure}{Figura \theapafigcounter: #1 }% Add entry to listofapafig
+\begin{figure}[H]
+\centering
+\textbf{Figura \theapafigcounter: }\\[1ex]
+\textit{#1} \\ \vspace{5mm}
+#2 \\
+
+#3\\
+#4
+}
+{
+\end{figure}
+}
+
+\newcounter{apatablecounter}
+
+\newenvironment{apa_table}[4]
+{
+\refstepcounter{apatablecounter}% Incrementa el contador 
+\addcontentsline{lot}{table}{Tabla \theapatablecounter: #1 }% Add entry to listofapafig
+
+\begin{center}
+\begin{tabular}{c}
+\textbf{Tabla \theapatablecounter: }\\
+\textit{#1} \\ \vspace{5mm}
+#2 \\
+
+#3\\
+#4
+}
+{
+\end{tabular}
+\end{center}
+}
+
+
+%  - - - - - - - - - - - - - - - - - - - - - - - -
+% |             DOCUMENT CONTENTS                 | 
+%  - - - - - - - - - - - - - - - - - - - - - - - -
+
+\begin{document}
+\pagenumbering{goble}
+
+% % % % % PORTADA % % % % %
+\begin{titlepage}
+    \vspace*{\fill}
+    \centering
+    {\bfseries\fontsize{18}{18}\selectfont Título de Manual \par}
+    \vspace{1cm}
+    {\bfseries\fontsize{16}{16}\selectfont Nombre del Proyecto\par}
+    \vspace{2cm}
+    {\fontsize{14}{14}\selectfont Nombre de la herramienta, software o hardware\par}
+    \vspace{2cm}
+    {\fontsize{14}{14}\selectfont Versión X.X\par}
+    \vspace{2cm}
+    {\bfseries\fontsize{14}{14}\selectfont Escrito por:\par}
+    \vspace{0.25cm}
+    {\fontsize{14}{14}\selectfont Nombre de Autor\par}
+    \vspace{2cm}
+    {\fontsize{14}{14}\selectfont Centro para la Transformación Digital Industrial - ESPOL\par}
+    \vspace{0.25cm}
+    {\fontsize{14}{14}\selectfont Guayaquil - Ecuador\par}
+    \vspace{0.25cm}
+    {\fontsize{14}{14}\selectfont Año: 20XX\par}
+    \vspace*{\fill}
+\end{titlepage}
+
+
+% % % % %  ÍNDICES % % % % %
+\part*{Índice general}
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+
+
+\part*{Índice de figuras}
+\listoffigures
+\newpage
+
+
+\part*{Índice de tablas}
+\listoftables
+\newpage
+
+
+% % % % % SECCIONES INDEPENDIENTES % % % % %
+\part*{Sección. Estilo 1.}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\noindent\rule{\textwidth}{1pt}
+\begin{center}
+\begin{tabular}{p{0.5\textwidth}p{0.5\textwidth}}
+     &
+\raggedright Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sed nunc vulputate, gravida urna sed, aliquet risus. Nullam mollis gravida aliquet. Morbi scelerisque sapien vitae fermentum rhoncus. Ut blandit dolor massa, eu auctor ipsum rhoncus nec. Duis mattis pharetra diam in ornare.
+\\
+\cr &
+Nullam leo ipsum, rhoncus et placerat ac, posuere pretium metus. Nunc elit arcu, euismod vitae ante quis, dictum imperdiet ligula. Donec sit amet placerat urna. Phasellus non consectetur lacus. Nulla facilisi.
+\\
+\cr &
+Cras at nulla mauris. Fusce mi nulla, dignissim ornare quam eget, ornare vehicula magna. Quisque vitae ligula ligula. Maecenas pulvinar purus ac risus sagittis, nec tempus felis eleifend.
+\\
+\cr &
+\textbf{Palabras claves:} estilos, plantilla, manual técnico, reportes.
+\\
+\end{tabular}
+\end{center}
+\newpage
+
+
+
+\part*{Sección. Estilo 2.}
+\noindent\rule{\textwidth}{1pt}
+Cras eu nibh turpis. Nunc scelerisque, orci nec condimentum dapibus, diam velit ultrices velit, vitae ornare odio tellus quis purus. In non ullamcorper leo. Suspendisse non leo urna.
+
+Nulla quis tincidunt neque. Suspendisse ac quam faucibus, viverra neque sit amet, dictum tortor. Sed odio ante, aliquam tincidunt leo a, ullamcorper suscipit justo. Donec tincidunt dapibus ornare. Fusce pharetra ornare laoreet. Ut tempor sem vel mollis lacinia. Nunc facilisis lorem at enim euismod sagittis. Quisque in suscipit nunc. Proin et lacus pulvinar, convallis mi a, pulvinar felis. Ut ultricies libero massa. Fusce vitae lorem vel nibh dictum pellentesque eget a magna. 
+
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis ultricies erat lacus, sed accumsan dui mollis ac. Vestibulum a urna et erat lobortis convallis at vitae lorem. Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed hendrerit posuere lacus vel consequat. Etiam nec nulla odio. 
+
+Aenean ullamcorper neque et dapibus fringilla. Nullam dictum ligula a tortor elementum fermentum. In rutrum accumsan dignissim. Morbi auctor neque et neque mattis tincidunt.
+
+\textbf{Palabras claves:} estilos, plantilla, manual técnico, reportes.
+\newpage
+
+
+
+\part*{Sección. Estilo 3.}
+Donec purus nunc, bibendum sed venenatis vitae, finibus vitae sapien. Maecenas porttitor euismod cursus. Etiam gravida nibh vitae enim porta, non mollis tellus mattis. Nullam id bibendum dui, quis tempus erat. Phasellus diam justo, luctus nec pellentesque ac, cursus vel leo. In id arcu vitae ante lobortis sodales a at magna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis ultricies erat lacus, sed accumsan dui mollis ac. Vestibulum a urna et erat lobortis convallis at vitae lorem. Interdum et malesuada fames ac ante ipsum primis in faucibus. 
+
+Sed hendrerit posuere lacus vel consequat. Etiam nec nulla odio. Aenean ullamcorper neque et dapibus fringilla. Nullam dictum ligula a tortor elementum fermentum. In rutrum accumsan dignissim. Morbi auctor neque et neque mattis tincidunt. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut egestas augue. Curabitur vulputate sapien diam, sed facilisis lectus rhoncus vel. Mauris vestibulum malesuada varius. In non placerat sapien, iaculis lobortis lectus. 
+
+Nulla quis tincidunt neque. Suspendisse ac quam faucibus, viverra neque sit amet, dictum tortor. Sed odio ante, aliquam tincidunt leo a, ullamcorper suscipit justo. Donec tincidunt dapibus ornare. Fusce pharetra ornare laoreet. Ut tempor sem vel mollis lacinia. Nunc facilisis lorem at enim euismod sagittis.
+
+\textbf{Palabras claves:} estilos, plantilla, manual técnico, reportes.
+\newpage
+
+
+% % % % % PORTADA DE SECCIÓN % % % % %
+\newpage
+\vspace*{\fill}
+\begin{center} 
+\bfseries\fontsize{18}{18}\selectfont Portada para un capítulo/sección/parte del documento\par
+\vspace{1.5cm}
+\bfseries\fontsize{16}{16}\selectfont Secciones Enumeradas\par
+\addcontentsline{toc}{part}{Secciones Enumeradas}
+\end{center}
+\vspace*{\fill}
+\newpage
+
+
+
+% % % % % SECCIONES ENUMERADAS % % % % %
+\section{Introducción a LaTeX}
+
+\subsection{Estilos básicos de texto}
+
+Hay muchas opciones para estilizar tu texto con LaTeX. Por ejemplo, \textbf{este texto está en negrita}. Mientra que el texto a continuación está italizado: \textit{Nullam quis pretium neque}. También, puedes \underline{subrayar texto}. Si quieres utilizar subíndices y superíndices en tu texto: prueba\textsubscript{subindice} y prueba\textsuperscript{superíndice}.
+
+A lo largo de este documento, se encontrarán otros estilos y elementos que ayudarán en la creación de un reporte o un manual y en la visualización de contenido, muchas veces acompañado con texto de relleno.
+
+Fusce ultricies felis fringilla est tincidunt ultricies. Interdum et malesuada fames ac ante ipsum primis in faucibus. Fusce felis velit, malesuada vitae orci vel, mattis posuere tortor. Sed a dapibus metus. Nullam maximus dui vitae eros condimentum, a accumsan lorem convallis. Maecenas vel libero sodales, porttitor tortor at, porta nisi. Vivamus eu tincidunt augue, ac elementum arcu. Aenean nec faucibus arcu.
+
+\subsection{Ejemplos de citación y notas al pie de página}
+
+Aenean bibendum volutpat nunc et ultricies\footnote{Este es un ejemplo de nota al pie de página}. Praesent molestie tincidunt dui, vel mollis tortor suscipit id. Mauris in faucibus justo. Pellentesque tempus tempus urna, vitae tincidunt est rhoncus id. Fusce malesuada arcu nec fermentum consequat \cite{exampleBook}. Ut ac odio non neque condimentum commodo a sit amet nibh. Phasellus sodales libero eget augue tempus, a tristique ex commodo. Duis ex lorem, porta a magna at, luctus rutrum ligula. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque et posuere turpis, ut bibendum purus\footnote{Este es otro ejemplo}. Etiam tristique eleifend ligula vitae imperdiet \cite{exampleBook} donec ac eros erat. Phasellus iaculis bibendum magna convallis imperdiet.
+
+
+\subsection{Elementos visuales y viñetas} 
+
+\subsubsection{Imágenes} 
+
+Etiam gravida nibh vitae enim porta, non mollis tellus mattis. Nullam id bibendum dui, quis tempus erat. Phasellus diam justo, luctus nec pellentesque ac, cursus vel leo. In id arcu vitae ante lobortis sodales a at magna. Vivamus varius purus pretium, consectetur justo nec, malesuada leo.
+
+% Se inserta una imagen con: título, descripción, créditos y label/ref.
+\begin{apa_fig}
+{Titulo de la imagen}
+{\includegraphics[width=15cm]{images/image1.png}} 
+{\ Breve descripción de la imagen (opcional)}
+{\ Créditos de la imagen. Ej: "Imagen obtenida de \cite{exampleReference}" (opcional)}
+\label{fig_example}
+\end{apa_fig}
+
+En la \textit{figura \ref{fig_example}} quisque in suscipit nunc, proin et lacus pulvinar, convallis mi a, pulvinar felis. Ut ultricies libero massa. Fusce vitae lorem vel nibh dictum pellentesque eget a magna. 
+
+
+% Ejemplo de varias imágenes con un layout de matriz, incluye título, imágenes, descripciones y label/ref.
+\begin{apa_fig}
+{Matriz de imágenes}
+{\begin{tabular}{c c}
+    \includegraphics[width=5cm]{images/1.png}&  
+    \includegraphics[width=5cm]{images/2.png}\\ 
+     (a) & (b)\\
+     \includegraphics[width=5cm]{images/3.png}&  
+     \includegraphics[width=5cm]{images/4.png}\\
+     (c) & (d)\\
+\end{tabular}}
+{\vspace{0.25cm}(a) Descripción de Imagen 1 (b) Descripción de Imagen 2 \\ 
+ \vspace{0.25cm}(c) Descripción de Imagen 3 (d) Descripción de Imagen 4}
+{\ }
+\label{fig_matrix}
+\end{apa_fig}
+
+
+Donec efficitur tempus condimentum. Vivamus congue enim in magna iaculis pellent. Cras sed placerat orci. Nullam consectetur odio ac porta convallis (ver \textit{figura \ref{fig_matrix}}). Fusce aliquet lectus sit amet enim blandit, vel dictum tellus dignissim. Nunc nec diam nec nunc consequat rutrum in vel ex. Maecenas eleifend eget purus sit amet egestas. 
+
+
+\begin{apa_fig}
+{Imágenes de comparación}
+{\begin{tabular}{c c}
+    \includegraphics[width=6cm]{images/before.png} & \includegraphics[width=6cm]{images/after.png} \\
+    (a) & (b) \\
+\end{tabular}} 
+{\ (a) Imagen antes (b) Imagen después }
+{\ }
+\label{fig_compare}
+\end{apa_fig}
+
+
+No olvides referenciar la imagen (\textit{figura \ref{fig_compare}}). Nulla quis metus enim. In vitae pretium nulla. Curabitur nulla risus, dictum at sem quis, scelerisque vehicula purus. Nulla a erat aliquam, pellentesque metus in, dictum ipsum.
+
+\subsubsection{Tablas} 
+
+Nullam leo ipsum, rhoncus et placerat ac, posuere pretium metus. Nunc elit arcu, euismod vitae ante quis, dictum imperdiet ligula. Donec sit amet placerat urna. Phasellus non consectetur lacus. \textit{Tabla \ref{tab_example}} nulla facilisi.
+
+\begin{apa_table}
+{Título de la Tabla}
+{ 
+\begin{tabular}{|p{5cm}|p{5cm}|}
+    \hline
+    \textbf{Característica}  &  \textbf{Valor}   \\
+    \hline
+        Característica 1     & 102.32            \\
+        Característica 2     & 53 cm             \\
+        Característica 3     & Valor 1, valor 2  \\
+        Característica 4     & ABC-452           \\
+    \hline
+\end{tabular}
+}
+{\ Breve descripción de la tabla (opcional)}
+{\ Créditos. Ej: "Obtenida de \cite{exampleReference}" (opcional)}
+\label{tab_example}
+\end{apa_table}
+
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. Aenean lacus ante, luctus vel sem scelerisque, hendrerit varius nibh. Nullam elementum ante orci, id semper dolor efficitur ac. Sed eleifend urna ut erat tempus, vel interdum felis facilisis.
+
+Praesent non accumsan lorem. Phasellus consequat, quam nec malesuada imperdiet, nunc ante cursus ligula, eget pulvinar lacus sapien non felis. Sed porttitor tincidunt maximus. Praesent dignissim sapien diam, vitae porta enim volutpat eget. Ut facilisis erat vel aliquam rhoncus. Suspendisse vulputate risus vel nulla lacinia varius. Donec sagittis tincidunt libero vel placerat. Proin dictum vehicula vestibulum. 
+
+\begin{apa_table}
+{Rango para elementos $A$ y $B$}
+{
+\begin{tabular}{|c|c|}
+     \hline
+     \textbf{Elemento} & \textbf{Rango} \\
+     \hline
+     $\textbf{A}$ & $A\_rango = \{0, 2, 4, ..., 16\}$\\
+     \hline
+     $\textbf{B}$\footnotemark & $B\_rango = \{0, 8, 16, ..., 64\}$\\
+     \hline
+\end{tabular}
+}
+{\ Tabla con una columna de texto resaltado.}
+{\ }
+\label{tab_rangos}
+\end{apa_table}
+
+\footnotetext{Esta es una nota al pie de página para el elemento B en la \textit{Tabla \ref{tab_rangos}}.}
+
+Nulla vestibulum nisi in tristique posuere (ver \textit{Tabla \ref{tab_rangos}}). Vestibulum quis est id lorem gravida ornare ut vel neque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla eros metus, faucibus non tristique eget, viverra venenatis nibh. 
+
+In malesuada quis nibh eget malesuada. Pellentesque lacinia blandit nisl ac dignissim. \textit{Tabla \ref{tab_multiceldas}} phasellus turpis lectus, iaculis ut iaculis et, porttitor nec lorem. Donec congue nibh ut mattis scelerisque. Curabitur eget eleifend velit .
+
+
+\begin{apa_table}
+{\ Agrupando celdas}
+{
+\begin{tabular}{|c|c|c|c|}
+    \hline
+    \multirow{2}{*}{ }  & \multirow{2}{*}{\textbf{Columna 1}} & \multicolumn{2}{c|}{\textbf{Columna 2 \& 3}} \\
+    \cline{3-4}
+                        &             & \textbf{Subcolumna 1}   & \textbf{Subcolumna 2} \\
+    \hline
+    \textbf{Fila 1}     & (1, 1)      & (1, 2)      & (1, 3) \\
+    \hline
+    \textbf{Fila 2}     & \multicolumn{2}{c|}{(2, 1) \& (2, 2)}  & (2, 3) \\
+    \hline
+    \textbf{Fila 3}     & (3, 1)      & (3, 2)      & (3, 3) \\
+    \hline
+    \textbf{Fila 4}     & (4, 1)      & \multicolumn{2}{c|}{(4, 2) \& (4, 3)} \\
+    \hline
+    \textbf{Fila 5}     & (5, 1)      & (5, 2)      & (5, 3) \\
+    \hline
+    \textbf{Total}      & \multicolumn{3}{c|}{Resultado}     \\
+    \hline
+\end{tabular}
+}
+{\ Tabla con celdas que cubren multiples filas y/o columnas.}
+{\ }
+\label{tab_multiceldas}
+\end{apa_table}
+
+
+
+\subsubsection{Ecuaciones} 
+
+\textbf{ Expresiones matemáticas en medio del texto}
+
+Mauris ut erat vestibulum, tempor libero ac, tempor quam. Praesent non accumsan lorem, unc ante cursus ligula, eget pulvinar lacus sapien non felis: \(E = mc^2 \). Sed porttitor tincidunt maximus. Praesent dignissim sapien diam, vitae porta enim volutpat eget. \\[0.5cm]
+
+\textbf{ Visualizar Ecuaciones }
+
+Vivamus eu tincidunt augue, ac elementum arcu. Aenean nec faucibus arcu. En \textit{ ecuación \ref{eq_example1}} , malesuada vitae orci vel, mattis posuere tortor. Sed a dapibus metus. Nullam maximus dui vitae eros condimentum, a accumsan lorem convallis.
+
+\begin{equation}
+\label{eq_example1}
+    f(x) = \int_{-\infty}^{\infty} e^{-x^2} \, dx
+\end{equation}
+
+Aenean convallis augue sit amet dignissim volutpat. Nunc gravida justo urna, tincidunt gravida metus venenatis eu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse non ligula eu tortor venenatis fringilla vel nec mauris. Hacemos referencia a la \textit{ecuación \ref{eq_example2}}:
+
+\begin{equation}
+\label{eq_example2}
+    r_{\text{w}} = r_{\text{a}} \cdot \left(1 - k_1 \cdot r_{\text{a}}^2 - k_2 \cdot r_{\text{a}}^4 - k_3 \cdot r_{\text{a}}^6 - \ldots\right) 
+\end{equation}
+
+Donde $r_{\text{w}}$ es el resultado de (...) y representa (...), $r_{\text{a}}$ es la variable (...), y $k_1, k_2, k_3, ..., k_n$ son los coeficientes de (...). \\[0.5cm]
+
+
+\textbf{ Visualizar Matrices }
+
+En la \textit{ecuación \ref{eq_matriz1}}, $A$ es un ejemplo de una matriz diagonal cuadrada.
+
+\begin{equation}
+\label{eq_matriz1}
+A = \begin{bmatrix}
+    a & 0 & 0 \\
+    0 & b & 0 \\
+    0 & 0 & c
+\end{bmatrix}
+\end{equation}
+
+Explica que significa $a$. Puedes describir las propiedades de la variable $b$, e interpretar $c$ en el contexto adecuado. No olvides citar la fuente correspondiente \cite{exampleConference}.
+
+\begin{equation}
+\label{eq_matriz_griega}
+R = 
+\begin{bmatrix}
+    \cos(\psi)\cos(\theta) & -\sin(\psi)\cos(\phi) + \cos(\psi)\sin(\theta)\sin(\phi) & \sin(\psi)\sin(\phi) + \cos(\psi)\sin(\theta)\cos(\phi) \\
+    \sin(\psi)\cos(\theta) & \cos(\psi)\cos(\phi) + \sin(\psi)\sin(\theta)\sin(\phi) & -\cos(\psi)\sin(\phi) + \sin(\psi)\sin(\theta)\cos(\phi) \\
+    -\sin(\theta) & \cos(\theta)\sin(\phi) & \cos(\theta)\cos(\phi)
+\end{bmatrix}
+\end{equation}
+
+La \textit{ecuación \ref{eq_matriz_griega}} muestra la matriz $R$, la cual expresa operaciones entre las funciones trigonométricas de los ángulos X ($\psi$), Y ($\theta$), Z ($\Phi$), utilizando letras griegas. \\[0.5cm]
+
+
+\textbf{ Otras expresiones matemáticas }
+
+Para utilizar fracciones: \\
+\[
+\frac{a}{b}
+\]
+
+Para visualizar sumatorias: \\
+
+\[
+\sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+\]
+
+Para visualizar integrales: \\
+
+\[
+\int_{0}^{1} x^2 \, dx
+\]
+
+Letras griegas (minúsculas): \\
+\[
+\alpha, \beta, \gamma, \delta, \epsilon, \zeta, \eta, \theta, \iota, \kappa, \lambda, \mu, \nu, \xi, \pi, \rho, \sigma, \tau, \upsilon, \phi, \chi, \psi, \omega
+\]
+
+Letras griegas (mayúsculas): \\
+
+\[
+\Gamma, \Delta, \Theta, \Lambda, \Xi, \Pi, \Sigma, \Upsilon, \Phi, \Psi, \Omega
+\]
+
+Símbolos especiales: \\
+
+\[
+\forall, \exists, \neg, \wedge, \vee, \leftarrow, \rightarrow, \leftrightarrow, \infty, \partial, \nabla, \cdot, \times, \div
+\]
+
+\subsubsection{Lista enumerada} 
+
+\begin{enumerate}
+
+    \item Pellentesque et posuere turpis, ut bibendum purus etiam tristique eleifend ligula vitae imperdiet.
+
+    \item Cras ut neque rutrum, accumsan felis non, facilisis mi, aenean in mauris id nulla mattis faucibus ac a risus. 
+
+    \item Fusce ultricies felis fringilla est tincidunt ultricies Interdum et malesuada. 
+
+\end{enumerate} 
+
+
+\subsubsection{Lista itemizada} 
+
+\begin{itemize} 
+
+    \item Pellentesque et posuere turpis, ut bibendum purus etiam tristique eleifend ligula vitae imperdiet.
+
+    \item Cras ut neque rutrum, accumsan felis non, facilisis mi, aenean in mauris id nulla mattis faucibus ac a risus. 
+
+    \item Suspendisse auctor feugiat tortor sit amet laore ut egestas quam, eu gravida ex. Curabitur nulla metus, pretium at elit non, tincidunt consectetur augue.
+
+    \item Fusce ultricies felis fringilla est tincidunt ultricies Interdum et malesuada. 
+
+\end{itemize} 
+
+
+% % % % % BIBLIOGRAPHY % % % % %
+\newpage
+\section*{\begin{center}
+    Referencias
+\end{center}}
+\printbibliography[heading=none]
+
+\end{document}

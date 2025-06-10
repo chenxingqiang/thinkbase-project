@@ -1,0 +1,193 @@
+% Beamer-Klasse mit 4:3-Seitenverhältnis
+%\documentclass{beamer}
+% Beamer-Klasse mit 16:9-Seitenverhältnis
+% Anmerkung: Bei der Angabe 32:18 bleibt die Höhe der Folien konstant.
+\documentclass[aspectratio=3218]{beamer}
+
+% Pakete laden
+\input{pakete}
+
+% Stil des Lehrstuhls für Elektromagnetische Verträglichkeit laden
+%\usepackage{beamer_emv}
+% Stil des Instituts für Medizintechnik laden
+%\usepackage{beamer_imt}
+% Stil der Fakultät für Elektro- und Informationstechnik laden
+%\usepackage{beamer_feit}
+% Stil der Otto-von-Guericke-Universität laden
+%\usepackage{beamer_ovgu}
+\usepackage{beamer_ovgu_169}
+% Stil des Stimulate e.V. laden
+%\usepackage{beamer_stimulate}
+
+\title[Kurztitel]{Titel der Präsentation}
+\author{Max Mustermann}
+\institute[Lehrstuhl EMV]{
+	Lehrstuhl für Elektromagnetische Verträglichkeit \\
+	Institut für Medizintechnik \\
+	Otto-von-Guericke-Universität, Magdeburg
+}
+\mode<presentation>{\keywords{Schlüsselwörter durch Komma getrennt}}
+\date[01.01.2023]{Datum der Präsentation, \zB 1. Januar 2023}
+
+\begin{document}
+
+\begin{frame}
+	\maketitle
+	% \maketitle funktioniert auch im Article-Modus
+	% \titlepage funktioniert nur bei Präsentationen
+\end{frame}
+
+\begin{frame}[label=inhalt]{Gliederung}
+	\tableofcontents
+\end{frame}
+
+\section{Einleitung}
+
+% nur für die Miniframe-Navigation
+\subsection*{}
+
+\begin{frame}
+	\frametitle<presentation>{Einleitung}
+	\begin{block}{Sinn und Zweck einer Abschlusspräsentation:}
+		\begin{itemize}
+			\item Darstellung der wichtigsten Ergebnisse der Arbeit
+			\item Interesse für die Arbeit/den Bericht zu wecken
+			\item Ziel: lehrreich und unterhaltsam zugleich
+		\end{itemize}
+	\end{block}
+	\begin{block}{Vorteile von \LaTeX\ mit der \textsc{beamer}-Klasse:}
+		\begin{itemize}
+			\item sehr einfach, wenn die Arbeit bereits in \LaTeX\ erstellt wurde
+			\item verschiedene Darstellungsvarianten zur Auswahl
+			\item Handzettel können einfach mit \emph{beamerarticle} erzeugt werden
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\section{Hauptteil}
+
+\subsection{Gleichungen}
+
+\begin{frame}
+	\frametitle<presentation>{Gleichungen}
+	\begin{block}{Satz des Pythagoras:}
+		\begin{equation}
+			a^2 + b^2 = c^2 \label{eq:pythogoras}
+		\end{equation}	\end{block}
+	\begin{block}{Es folgt, dass:}
+		\begin{align}
+			a^2 &= c^2 - b^2 \\
+			b^2 &= c^2 - a^2
+		\end{align} 	
+ 	\end{block}
+\end{frame}
+
+\subsection{Abbildungen}
+
+\begin{frame}
+	\frametitle<presentation>{Abbildungen}
+	\begin{figure}
+		\centering
+			\includegraphics[height=5cm]{bilder/unilogo}
+		\caption{Altes Logo der Universität}
+		\label{fig:unilogo}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Diagramme}
+	\begin{figure}
+		\centering
+			\begin{tikzpicture}
+				\begin{axis}[
+					beamer,
+					xlabel={Zeit, $t$ (in \si{\milli\second})},
+					ylabel={Spannung, $u(t)$ (in \si{\volt})},
+					xmin=0,xmax=20,
+					ymin=-350,ymax=350,
+					legend pos=south west,
+					% Beispiel für das Einbinden einer Linie durch Angabe einer Formel
+					]
+					\addplot+[
+						domain=0:20,
+						samples=101,
+					] {sin(deg(x*2*pi/20))*sqrt(2)*230};
+					\addlegendentry{sinusförmig};
+					\addplot+[
+						domain=0:20,
+						samples=101,
+					] {cos(deg(x*2*pi/20))*sqrt(2)*230};
+					\addlegendentry{cosinusförmig};
+				\end{axis}
+			\end{tikzpicture}
+		\caption{Harmonischer Zeitverlauf einer Spannung mit einer Frequenz von \SI{50}{\hertz} und einem Effektivwert von \SI{230}{\volt}}
+		\label{fig:u_t_sinus}
+	\end{figure}
+\end{frame}
+
+\subsection{Tabellen}
+
+\begin{frame}
+	\frametitle<presentation>{Tabellen}
+	\begin{table}
+		\caption{Beispieltabelle}
+		\label{tab:beispiel}
+		\centering
+			\begin{tabular}{cc}
+				\toprule
+				Variable & Bedeutung \\
+				\midrule
+				$t$ & Zeit \\
+				$U$ & Spannung \\
+				\bottomrule
+			\end{tabular}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Zitate}
+	\begin{block}{Keine Kurzzitate benutzen:}
+		\begin{itemize}
+			\item keine Zitate wie~[1] einfügen
+			\item niemand erinnert sich an die Nummer, wenn das Literaturverzeichnis gezeigt wird
+			\item stattdessen Vollzitate
+		\end{itemize}
+	\end{block}
+	\begin{block}{Beispiel für ein Vollzitat:}
+		\small\fullcite{hering:berichte}
+	\end{block}
+\end{frame}
+
+\section{Zusammenfassung}
+
+% nur für die Miniframe-Navigation
+\subsection*{}
+
+\begin{frame}
+	\frametitle<presentation>{Zusammenfassung}
+	\begin{block}{Ergebnisse:}
+	  \begin{itemize}
+	  	\item Kurzfassung der wichtigsten Ergebnisse
+	  	\item Aufzeigen nicht gelöster Probleme und offener Fragen
+	  	\item eventuell Ausblick auf weitere geplante Forschungsarbeiten
+		\end{itemize}
+	\end{block}
+	\begin{block}{Fragen der Zuhörer:}
+	 \begin{itemize}
+	 	\item genügend Zeit für Fragen einplanen
+	 	\item optional: zusätzliche Folien für wahrscheinliche Fragen
+	 \end{itemize}
+	\end{block}	
+\end{frame}
+
+% nur für die Miniframe-Navigation
+\section*{}
+
+\begin{frame}<beamer>{}
+	\begin{center}
+		Vielen Dank für Ihre Aufmerksamkeit!
+	\end{center}
+	\begin{center}
+		Gibt es Fragen?
+	\end{center}
+\end{frame}
+
+\end{document}

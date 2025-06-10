@@ -1,0 +1,64 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+
+\title{Automatically numbering compounds in chemical schemes}
+
+
+%% Uncomment these lines if you get error about "too many \new..." 
+% \let\tmp\newinsert
+% \let\newinsert\newbox
+\usepackage{chemstyle}
+% \let\newinsert\tmp
+\usepackage{chemnum}
+
+% For positioning the scheme captions at the top.
+\floatsetup[scheme]{position=top}
+
+\begin{document}
+
+\begin{scheme}
+%% hexa.eps has "TMP1" and "TMP2" as the markers
+%% in fact EVERY .eps should start with TMP1, TMP2 etc
+%% for ease of use
+\replacecmpd{first:compound}  %% automatically replace TMP1
+\replacecmpd{second:compound}  %% automatically replace TMP2
+\includegraphics[width=\linewidth]{hexa}
+\caption{This is something!}
+\label{first:chem:scheme}
+\end{scheme}
+
+Compounds \refcmpd{first:compound} and \refcmpd{second:compound} in \ref{first:chem:scheme}. Here's a reference to in-text creation of \cmpd{RareCompound} that we can later refer to.
+
+\vfill
+
+\begin{scheme}
+\replacecmpd{next:compound} %% automatically replace TMP1 BUT the autonumbering counter updates to 3!
+\replacecmpd{last:compound} %% automatically replace TMP2
+\includegraphics[width=\linewidth]{hexa}
+\caption{This is something else!}
+\label{second:chem:scheme}
+\end{scheme}
+
+Compounds \refcmpd{next:compound} and \refcmpd{last:compound} in \ref{second:chem:scheme}. Hey remember \cmpd{RareCompound}? \texttt{chemnum} still remembers it correctly, \emph{and} see how the compound numbering continues throughout the scheme diagrams!
+
+\vfill
+
+%% MANUAL UPDATING THE COMPOUND COUNTER; make sure you know what you're doing!
+\setcounter{cmpdmain}{8} 
+
+\begin{scheme}
+\replacecmpd{jumped:compound} %% automatically replace TMP1 BUT the autonumbering counter updates to 9!
+\replacecmpd{nextjumped:compound} %% automatically replace TMP2
+\includegraphics[width=\linewidth]{hexa}
+\caption{This is again something else!}
+\label{third:chem:scheme}
+\end{scheme}
+
+Compounds \refcmpd{jumped:compound} and \refcmpd{nextjumped:compound} in \ref{third:chem:scheme}. (Yes we manually modified the compound numbering counter after \ref{second:chem:scheme}).
+
+
+
+\end{document}

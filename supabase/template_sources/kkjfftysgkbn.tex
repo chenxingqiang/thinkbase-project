@@ -1,0 +1,234 @@
+%%%% If you get an error about "Argument of \MT@res@a has an extra }", uncomment the following three lines to stop microtype from loading initially
+\makeatletter
+\@namedef{ver@microtype.sty}{9999/12/31}
+\makeatother
+
+\RequirePackage[utf8]{inputenc}
+\documentclass[submission]{jsfds}
+% \usepackage[latin1]{inputenc}
+% \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{amsmath,amsthm} 
+\usepackage{graphicx}
+\usepackage{natbib}
+
+\startlocaldefs
+%insert your own macros 
+\endlocaldefs
+
+% settings to be filled by editor
+%\volume{}
+%\issue{}
+%\pubyear{}
+%\doi{}
+\arxiv{math.PR/00000000} % If available
+
+\setmainlanguageenglish
+\firstpage{1}
+\begin{document}
+\begin{frontmatter}
+
+\title{Authors guide for the J-SFdS documentclass\thanks{Many thanks to Sébastien Mengin (edilibre.net) for adapting the \texttt{imsart} documentclass.}}
+\runtitle{J-SFdS authors guide}
+\alttitle{Guide d'utilisation de la classe \LaTeX{}  du J-SFdS}
+
+\begin{aug}
+  \auteur{%
+  \prenom{Author}
+  \nom{One}%
+    \thanksref{t1}
+    \contact[label=e1]{author.one@math.univ.fr}}
+  \and%
+  \auteur{%
+  \prenom{Author}
+  \nom{Two}%
+  \thanksref{t2}
+  \contact[label=e2]{author.two@stat.univ.edu}}
+  \and%
+  \auteur{%
+    \prenom{Author}
+    \nom{Three}%
+    \thanksref{t2}
+    \contact[label=e3]{author.three@stat.gov}}
+  
+  \affiliation[t1]{laboratory, university, adress.\\ \printcontact{e1}}
+
+  \affiliation[t2]{laboratory, affiliation, adress. \\ 
+  \printcontact{e2} and \printcontact{e3}} 
+  
+  \runauthor{One, Two and Three}
+\end{aug}
+
+\begin{abstract}
+This paper describes the use of the \texttt{jsfds} \LaTeX{} document class and is prepared as a sample
+to illustrate the use of this class written for the Journal of the French Statistical Society. This an adaptation of the public document class \texttt{ imsart}. The abstract should summarize the contents of the paper. It should be clear, descriptive, self-explanatory and not longer than 200
+words. It should also be suitable for publication in abstracting services.
+Please avoid using math formulas as much as possible.
+\end{abstract}
+
+
+\begin{keywords}
+\kwd{users guide}
+\kwd{J-SFdS document class}
+\end{keywords}
+
+\begin{altabstract}
+Cette courte note décrit la classe \LaTeX \texttt{jsfds} et illustre son usage en se présentant sous la
+forme d'un article du Journal de la Société Française de Statistique. Cette classe est une adaptation de la classe publique \texttt{imsart}. Le résumé du contenu de l'article doit être clair, decriptif, auto-suffisant et pas plus long que 200 mots. Il doit aussi être adapté à publication dans les recueil de résumés. Il est préférable d'éviter des formules mathématiques.
+\end{altabstract}
+
+\begin{altkeywords}
+\kwd{mode d'emploi}
+\kwd{classe du J-SFdS}
+\end{altkeywords}
+
+\begin{AMSclass}
+\kwd{35L05}
+\kwd{35L70}
+\end{AMSclass}
+\end{frontmatter}
+
+\section{Introduction}
+This short note describes the jsfds \LaTeX class for authors preparing a compuscript for the Journal of the French Statistical Society. In itself it is an example of the use of the \texttt{jsfds} class. It is assumed that authors have some experience with \LaTeX; if not, they are kindly referred to \cite{lam94}.
+
+\section{About the preamble and the first page}
+Your \LaTeX file contains essentially two parts: the preamble, where you put your personal macros, which is between the \verb+\documentclass+ and the \verb+\begin{document}+ commands, and its body, which is where you put its contents. The body is in turn made of two parts: the top matter and the text. The top matter is where you give the initial data of your paper (authors name, the title, the abstract, etc.).
+
+The template file \verb+jsfds-template-en.tex+ contains a decrition of all the fields you must fill in to obtain a satisfactory result. 
+
+\section{The structure of the \LaTeX file}
+\subsection{Preamble}
+It begins by the classical declarations:
+\begin{verbatim}
+\documentclass[submission]{jsfds}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\end{verbatim}
+in wich you can specify your encoding of special characters: \verb+latin1+ or another one in the following list (\verb+ansinew applemac ascii latin9 utf8+)
+
+A field is defined for introducing your own \LaTeX \;commands:
+\begin{verbatim}
+\startlocaldefs
+% for example
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mbox{\tiny \`eme}}
+\def\1{1\kern-.20em {\rm l}}
+\endlocaldefs
+\end{verbatim}
+A command declares the main langage of the paper, English or French.
+\begin{verbatim}
+\setmainlanguageenglish
+\end{verbatim}
+
+\subsection{Top matter}
+After these two commands:
+\begin{verbatim}
+\begin{document}
+\begin{frontmatter}
+\end{verbatim}
+you can introduce all the required informations describing the top matter of the paper.
+\begin{verbatim}
+\verb+\arxiv{math.PR/00000000}+ %if available, 
+\title{Complete title}
+\runtitle{A short title}
+\alttitle{The French translation of the title}
+\end{verbatim}
+and then the authors in a specified environment with as many \verb+\author+ commands as authors.
+\begin{verbatim}
+\begin{aug}
+  \auteur{%
+  \prenom{Author}
+  \nom{One}
+    \thanksref{t1}
+    \contact[label=e1]{author.one@math.univ.fr}}
+  \and%
+  \auteur{%
+  \prenom{Author}
+  \nom{Two}
+  \thanksref{t2}
+  \contact[label=e2]{author.two@stat.univ.edu}}
+  \and%
+  \auteur{%
+    \prenom{Author}
+    \nom{Three}
+    \thanksref{t2}
+    \contact[label=e3]{author.three@stat.gov}}
+  
+  \affiliation[t1]{laboratory, university, adress.\\ \printcontact{e1}}
+
+  \affiliation[t2]{laboratory, affiliation, adress. \\ 
+  \printcontact{e2} and \printcontact{e3}} 
+  
+  \runauthor{One, Two and Three}
+\end{aug}
+\end{verbatim}
+Introduce the abstracts : 
+\begin{verbatim}
+\begin{abstract}
+% abstract in English
+\end{abstract}
+\begin{altabstract}
+% and its translation in french
+\end{altabstract}
+\end{verbatim}
+Keywords are written in lower cases in English and then in French.
+\begin{verbatim}
+\begin{keywords}
+\mot{first word}%
+\mot{second}%
+\mot{}%
+\end{keywords}
+\begin{altkeywords}
+\mot{premier mot}
+\mot{deuxième}
+\mot{}
+\end{altkeywords}
+\end{verbatim}
+The classical AMS primary and secondary classification subjects.
+\begin{verbatim}
+\begin{AMSclass}
+\kwd{60K35}
+\kwd{}
+\end{AMSclass}
+\end{verbatim}
+This command end the top matter of the paper : 
+\begin{verbatim}
+\end{frontmatter}
+\end{verbatim}
+
+\subsection{Body of the article}
+It is always possible to switch from English text to French one (\verb+\selectlanguage{french}+) and back (\verb+\selectlanguage{english}+) in order to respect specific typographic settings. 
+
+
+\subsection{Including graphics files}
+There are several packages used to include graphics files. For the journal, authors are kindly asked to use the graphicx package by D.P. Carlisle and S.P.Q. Rahtz that is already available in your TEX distribution. A full documentation for including graphics files is detailed by \cite{gooms94}. 
+
+The J-SFdS is an electronic journal based on ``pdf'' files in open access. Since they are generated by the pdf\LaTeX command, please include only ``pdf'' or ``jpeg'' graphic files and not postscript ones.
+
+
+\subsection{Acknowledgements}
+There is an environment \verb+\begin{acknowledgement} ... \end{acknowledgement}+; it may be used immediately before the bibliography to express your acknowledgements.
+\begin{verbatim}
+\begin{acknowledgement}
+The first authors is thankfull ...
+for ... support.
+\end{acknowledgement}
+\end{verbatim}
+Thanks (\verb+\thanks+) are generally reserved for thanking institutions, ``acknowledgements'' for thanking persons.
+
+
+\subsection{Cross references and bibliography}
+Authors should in all cases use the \verb+\label, \ref, \pageref, \cite+ commands . Every numbered part to which one wants to refer to should be labeled with a \verb+\label{...}+, but unreferenced parts (sections, equations) should not have a \verb+\label{...}+.
+ For multiple citations, do not use \verb+\cite{A1}, \cite{A2}+, but \verb+\cite{A1,A2}+ instead.
+
+There are two ways to produce literature references: either using the environment \verb+\thebibliography+ or using \verb+\BibTeX+. Please use a \verb+\BibTeX+ file:
+\begin{verbatim}
+\bibliography{biblio}
+\end{verbatim}
+and not any ``hand-made'' bibliography.
+\bibliography{biblio}
+\end{document}
+
+
+

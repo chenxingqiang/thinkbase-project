@@ -1,0 +1,218 @@
+%% This template is based on the work of Ruben De Smet (https://gitlab.com/rubdos/texlive-vub) and Nick Van Goethem. It is altered further to create a more general template for the Master thesis's report submission within the Master in CyberSecurity program. Modified files (such as brufaceStyle.sty and brufaceMScThesis.tex have been renamed. The others have been left as is on purpose for easy update.)
+%% Further alterations implemented by Jérôme Dossogne
+%% License: LaTeX Project Public License 1.3c
+
+%% According to the Master thesis regulations, the students must hand in a double-sided hard copy version of the Master thesis to each member of the jury + ONE for the secretariat, while also forwarding an electronic version to the faculty Secretariat
+%% The students shall also send a complete electronic archive (source, references, code, documentation) to the project owner before the defense
+%% To save the according PDF's you must type in the following document-classes for the:
+%	- electronic version
+%\documentclass[11pt,notitlepage]{report}
+%	- double-sided (to print) version
+
+\documentclass[11pt,twoside,notitlepage]{report}%report, book, memoir https://ctan.org/pkg/memoir?lang=en
+%% and save/download each run seperately
+\usepackage{styles/cyberSecurityStyle}
+%% you can add other languages by changing or adding them to the babel-package between []
+\usepackage[T1]{fontenc}
+\usepackage[english,french,dutch]{babel}
+\usepackage{helvet} % helvetica font for front page and abstract heading
+\usepackage{amsmath,amssymb} % provides the symbols for mathematical expressions
+\usepackage{siunitx} % provides the SI units
+\usepackage{titlesec} % to adjust the spacing before and after the chapter
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{cite} % regroup multiple citations
+\usepackage{epsfig}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{tablefootnote}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{sectsty}
+\usepackage[titles]{tocloft}
+\setlength{\cftbeforechapskip}{5pt} % reduces the spacing between chapters in the table of content
+\usepackage{lipsum}
+\usepackage[hidelinks,pagebackref=true]{hyperref} % NEED FIX: backref does not display when a citation is on multiple page
+\renewcommand*{\backref}[1]{}
+\renewcommand*{\backrefalt}[4]{[{\tiny%
+    \ifcase #1 Not cited.%
+          \or Cited on page~#2.%
+          \else Cited on pages #2.%
+    \fi%
+    }]}
+\usepackage{url}% for url's in bib
+\usepackage{cleveref}
+\usepackage[acronyms,toc,nonumberlist,nogroupskip,automake,nopostdot]{glossaries}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{soul}
+\def\textBF#1{\sbox\CBox{#1}\resizebox{\wd\CBox}{\ht\CBox}{\textbf{#1}}}
+\usepackage[inline]{enumitem}
+\usepackage{pdfpages}
+\usepackage[tikz]{bclogo}
+\definecolor{bgblue}{RGB}{245,243,253}
+\definecolor{ttblue}{RGB}{1,15,142}
+\definecolor{grey}{RGB}{238,238,238}
+\definecolor{orange}{RGB}{139,60,0}
+
+\sisetup{detect-all}
+
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{14pt}
+\fancyhead[RE]{\rightmark}
+\fancyhead[LO]{\leftmark}
+\fancyhead[LE,RO]{\thepage}
+\fancyfoot[RO]{\begin{picture}(0,0) \put(20,755){\vubtriangle} \end{picture}}
+\fancyfoot[LE]{\begin{picture}(0,0) \put(-33,766){\ulbtriangle} \end{picture}}
+
+\makeatletter
+%%% redefine \eqref to be like the original
+\renewcommand{\eqref}[1]{\textup{\eqreftagform@{\ref{#1}}}}
+\let\eqreftagform@\tagform@
+%%% redefine \tagform@
+\def\tagform@#1{%
+	\maketag@@@{%
+		\if@unit\ensuremath{\left[\thiseq@unit\right]}\quad\fi\global\@unitfalse
+		(\ignorespaces#1\unskip\@@italiccorr)%
+	}%
+}
+\newif\if@unit
+\def\equnit#1{%
+	\gdef\thiseq@unit{#1}%
+	\global\@unittrue
+}
+\makeatother
+
+%% adjusts the spacing above and below the chapter title
+\titleformat{\chapter}[display]{\normalfont\LARGE\bfseries}{\chaptertitlename\ \thechapter}{0pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{0pt}{10pt}
+
+%% redefines the title of \right) he table of contents
+\addto\captionsenglish{% Replace "english" with the language you use
+	\renewcommand{\contentsname}%
+	{Table of Contents}%
+}
+%% ---------------------------------------Title Page---------------------------------------
+\title{<Insert Main Title Here>}
+\subtitle{<Insert Sub Title Here>}
+\author{Author1 \newline Author2}
+%% general information about your promotor(s) and academic year (TO BE COMPLETED)
+\academicYear{Year1 -- Year1}
+\promotor{<Promotor>}
+\projectOwner{<Project Owner>}
+% \coSupervisor{Prof.\ Dr.\ Ir.\ Knows Less}
+%% uncomment the Master program (and its major) to display in the document
+%\masterAndMajor{Master of Science in Architectural Engineering}{}
+%\masterAndMajor{Master of Science in Chemical and Materials Engineering}{major in Materials}
+%\masterAndMajor{Master of Science in Chemical and Materials Engineering}{major in Process Technology}
+%\masterAndMajor{Master of Science in Civil Engineering}{}
+%\masterAndMajor{Master of Science in Electromechanical Engineering}{major in Aeronautics}
+%\masterAndMajor{Master of Science in Electromechanical Engineering}{major in Energy}
+%\masterAndMajor{Master of Science in Electromechanical Engineering}{major in Mechatronics-Construction}
+\masterAndMajor{Master in Cybersecurity}{<Corporate Strategies/System Design>}
+%\masterAndMajor{Master of Science in Electrical Engineering}{}
+
+%% There are two different defined geometries, one for the electronic version, and one for the double-sided print-version (CHOOSE that one you would like to save)
+%	- electronic version
+\geometry{top=2.5cm,bottom=2.25cm,left=3cm,right=3cm}
+%	- double-sided print version
+%\geometry{top=2.5cm,bottom=2.5cm,inner=3.5cm,outer=2.5cm}
+
+%\allsectionsfont{\normalfont\sffamily\bfseries} % applies sans serif font to the headings
+% ----------------- here we make the list of symbols and abbreviations --------------------
+\newglossary[slg]{symbols}{sym}{sbl}{List of Symbols} % create add. symbolslist
+%% here we define the symbol listing environment, DO NOT ALTER !!!
+\glsaddkey{unit}{\glsentrytext{\glslabel}}{\glsentryunit}{\GLsentryunit}{\glsunit}{\Glsunit}{\GLSunit}\glssetnoexpandfield{unit}
+\setlength{\glsdescwidth}{15cm} % sets the width of the glossary environment
+\newglossarystyle{symbunitlong}{%
+	\setglossarystyle{super3col}% base this style on the list style
+	\renewenvironment{theglossary}{% Change the table type --> 3 columns
+		\begin{supertabular}{p{8mm}p{0.8\glsdescwidth}>{\centering\arraybackslash}p{2cm}}}%
+		{\end{supertabular}}%
+	%
+%	\renewcommand*{\glossaryheader}{%  Change the table header
+%		\bfseries Symbol & \bfseries Description & \bfseries Unit \\
+%		\endhead}
+	\renewcommand*{\glossentry}[2]{%  Change the displayed items
+		\glstarget{##1}{\glossentryname{##1}} %
+		& \glossentrydesc{##1}% Description
+		& \glsunit{##1}  \tabularnewline
+	}
+}
+%%-------Here starts the file in which the actual acronyms and symbols are putted in--------
+\input{text/glossary.tex}
+\makeglossaries
+
+%% -------------------Here starts all the basic code for the document-----------------------
+\begin{document}
+
+\maketitle
+
+\pagestyle{empty} 
+
+\input{text/confidentiality.tex}
+
+\clearpage
+%% front matter
+\pagenumbering{Roman} % Roman page numbering for the front matter
+\pagestyle{plain}
+%% here, the files for the abstract are added for the English version (first language) and possible extra native languages (second and third) -- you can comment which ever one is obsolete
+
+\addcontentsline{toc}{chapter}{Abstracts}
+\input{text/abstract/abstract_firstLanguage.tex}
+%\input{text/abstract/abstract_secondLanguage.tex}
+%\input{text/abstract/abstract_thirdLanguage.tex}
+
+\restoregeometry
+
+%% here comes the preface, if desired -- here you can add personal comments and make acknowledgements (comment if you do not need this inside the thesis)
+\setstretch{1.1}
+\input{text/preface.tex}
+\addtocontents{toc}{\bigskip}% perhaps as well
+\input{text/tableOfContents}
+
+
+\newpage
+\addtocontents{toc}{\bigskip}% perhaps as well
+\input{text/chapters/chapter01_introduction}
+
+%\addcontentsline{toc}{part}{State of the Art and requirements}
+\addtocontents{toc}{\bigskip}% perhaps as well
+\input{text/chapters/chapter02_sota}
+%\@endpart
+
+%\addcontentsline{toc}{part}{Contribution}
+% Steps of your Plan-Do-Check-Act (PDCA) cycle
+\addtocontents{toc}{\bigskip}
+% Plan
+\input{text/chapters/chapter03_planning}
+% Do (and Act, includes the corrective measures)
+\input{text/chapters/chapter04_do_experimentation}
+% Check: analyse your result, analyse your methodology, revise your thesis, ...
+\input{text/chapters/chapter05_check_analysis}
+\input{text/chapters/chapter06_check_discussion}
+%\@endpart
+
+\addtocontents{toc}{\bigskip}% perhaps as well
+
+\input{text/chapters/chapter07_conclusions}
+
+
+% \bibliographystyle{vancouver}
+\bibliographystyle{styles/splncs03_2.bst}
+\bibliography{references/bibliography}
+%\printbibliography
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\newpage
+
+\appendix
+\addcontentsline{toc}{part}{Appendices}
+\input{text/appendices/appendix01}
+\input{text/appendices/appendix02_initialProjectProposal}
+\input{text/appendices/appendix03_projectManagement}
+\end{document}          

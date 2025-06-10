@@ -1,0 +1,217 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reporte de prácticas
+% Ingeniería Fotónica
+% Universidad de Guadalajara - CUCEI
+% LaTeX Template
+% Version 0.1 (27/09/20)
+%
+% Original author: Roberto Carlos Barragán Campos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt,letterpaper]{article} 
+\usepackage[utf8]{inputenc} 
+\usepackage[spanish, es-tabla, es-nodecimaldot]{babel} % Formato a español
+\usepackage[T1]{fontenc}    % Permite utilizar otras tipografías
+\usepackage[vmargin=2.5cm,hmargin=2cm]{geometry}
+\usepackage{multicol}   % Unir columnas en tablas y formato a dos columnas
+\usepackage{multirow}   % Unir filas en tablas
+\usepackage{graphicx}   % Necesario para insertar gráficas
+\usepackage{float}      % Corregir ubicación de imágenes y tablas
+%\usepackage{subfigure} % Insertar subfiguras
+%\usepackage{url}       % Hiervínculo a direcciones URL
+\usepackage{listings}
+\usepackage{flushend}
+\usepackage{minted}
+\usepackage[none]{hyphenat} % Permite utilizar el comando \sloppy
+\usepackage[small]{caption}	% Reduce el tamaño de letra utilizado en los pies de figura.
+\usepackage{hyperref}   % Agrega enlaces internos de las secciones, figuras y tablas.
+\usepackage{color}      % Definición de colores
+    \hypersetup{colorlinks=true, linkcolor=[rgb]{0,0,1}, citecolor=[rgb]{0,0,1}}
+\usepackage{xcolor}		% Permite definir un color para utilizarlo dentro del documento.
+    \definecolor{gris}{RGB}{70,70,70}	% Definiendo el color gris
+    \definecolor{negro}{RGB}{40,40,40}		% Definiendo el color negro
+
+%%%%%%%% Modificación de los espacios de los títulos de secciones %%%%%%%%%%
+\usepackage{titlesec}		% Permite reconfigurar  los títulos de las secciones y subsecciones
+\renewcommand\thesection{\Roman{section}}	% Numeración romana en las secciones
+\renewcommand\thesubsection{\Roman{subsection}}		% Numeración romana en las subsecciones
+\titlespacing*{\section}{0pt}{2.5mm}{0mm}	% Espaciado del título {espacio izquierdo}{arriba del título}{abajo del título}
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{}	% Espaciado del título de las secciones
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}				% Espaciado del título de las subsecciones
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Se define un comando \colorhrule para hacer líneas horizontales de color con 3 argumentos: color, largo, ancho.
+\newcommand{\colorhrule}[3]{\begingroup\color{#1}\rule{#2}{#3}\endgroup}
+
+\setlength{\intextsep}{1mm} % Distancia superior e inferior en objetos flotantes
+\setlength{\columnsep}{5mm} % Separación entre columnas del documento
+
+\begin{document}
+\sloppy     % Evita que las palabras se corten al saltar de línea.
+\begin{center}
+\begin{tabular}{cc}
+\multirow{2}{3.5cm}{\includegraphics[width=3cm]{img/udg_color.eps}}	& \huge{\textsc{\textbf{Universidad de Guadalajara}}}\\ %\vspace{5mm}
+ & \scriptsize{\textsc{CENTRO UNIVERSITARIO DE CIENCIAS EXACTAS E INGENIERÍAS}}\\[5mm]
+ & \Large{\textsf{\textbf{Práctica 00. Nombre de la práctica}}}\\
+ & \small{\textsf{Nombre completo de alumno 1 [Código]}}\\ \vspace{5mm}
+ & \small{\textsf{Nombre completo de alumno 2 [Código]}}\\
+ & \small{\textsc{Ingeniería Fotónica $|$ IB128 - Electrónica Integrada}}\\
+ & \today\\
+\end{tabular}
+\end{center}
+	
+
+\begin{center}
+\colorhrule{negro}{16.5cm}{1.2pt}
+\end{center}
+\begin{abstract}
+\noindent El principal propósito del resumen es proporcionar al lector una descripción general de lo realizado y sus resultados. Debe ser breve (150 palabras como máximo) e informativo. Debe proporcionar la información necesaria para que el lector decida si es, o no, de su interés. Es importante que considere que un reporte técnico, debe escribirse de manera impersonal y en pasado, tratando de evitar palabras como \textit{calculé}, \textit{medí}, \textit{observé}; siendo las expresiones correctas \textit{se calculó}, \textit{se midió}, \textit{se observó}. Puede o no incluir resultados, eso queda a consideración del autor o de lo que sea solicitado.
+\end{abstract}
+\begin{center}
+\vspace{-5mm}
+\colorhrule{gris}{16.5cm}{0.7pt}
+\end{center}
+
+\begin{multicols}{2}
+\textsc{Descripción:} \textit{Realizar un descripción breve del tema a tratar. Lo pueden ver como una mención rápida de los conceptos básicos antes de comenzar con los cálculos. Ejemplo:} Los circuitos $RC$ son circuitos pasivos que tienen como característica una constante de tiempo $\tau$, que permite determinar el tiempo de carga del capacitor al exponerse a un escalón de voltaje \cite{book1}. Para comenzar con los cálculos, es necesario determinar una $\tau$ y definir un valor capacitivo o resistivo.\\
+Considerando que los resistores comerciales son más variados que el de los capacitores, es mejor opción definir un valor de capacitancia y dejar como incognita el valor del resistor.
+\section{Cálculos}
+\textit{No limitarse a poner solo los cálculos, explique cual fue el procedimiento y justifiquelo, dando un guía de porque hizo primero tal cálculo o en que se basó para obtener ciertos valores. Esto con el objetivo de que explique su metodología para llegar al resultado. A continuación se expone un ejemplo:}\\
+Se calculó el valor del elemento resistivo requerido, utilizando una constante de tiempo $\tau = 1.5$ s y una capacitancia $C = 4.7$ $\mu$F. Obteniendo el siguiente resultado
+\begin{equation}
+R = \frac{1.5\textup{ s}}{4.7 \: \mu \textup{F}} = 319,149 \: \Omega \approx 330\textup{ k}\Omega \textup{ ,}
+\end{equation}
+por lo que se recalculó la $\tau$ ya que $R$ se aproximó al valor comercial más cercano, obteniendo
+\begin{equation}
+\tau = (330\times 10^{3}\:\Omega)(4.7 \: \mu\textup{F}) = 1.551 \: s \textup{ .}
+\end{equation}  
+Se utilizó el software Scilab para graficar la carga del capacitor con base en los valores determinados, derivando en la siguiente ecuación
+\begin{equation}
+V_C = (5\:V) \left(1 - e^{- \frac{t}{1.551 \:s}}\right) 
+\end{equation}
+donde $t$ corresponde a un vector con valores de 0 a 11 s, que corresponden a un tiempo mayor a 5$\tau$ para poder observar desde carga cero hasta la carga máxima.\\
+La resolución de voltaje de nuestro sistema de medición esta dado por el bit menos significativo que representa un valor discreto de voltaje, como se observa en la siguiente ecuación
+\begin{equation}
+1 \textup{ bit} = \frac{3.3 \: V}{1024 \textup{ bits}} = 3.2 \textup{ mV ,}
+\end{equation}
+donde 3.3 V es el voltaje de referencia y este viene predeterminado por Arduino aunque también puede ser de 5 V. Además, de una resolución de magnitud, el sistema de medición para la carga del capacitor tiene una resolución temporal que se definió mediante el tiempo de adquisición de datos dada por los 100 ms en la programación de Arduino.
+\section{Diagramas}
+El circuito RC muestra un interruptor que vendría siendo un botón de pulso normalmente abierto. También se le puede colocar un segundo botón de pulso en paralelo al capacitor para la descarga del mismo. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=5.5cm]{img/rc.eps}
+\caption{Circuito RC con botones de carga y descarga del capacitor.}
+\label{fig:rc}
+\end{figure}
+El sumador es capaz de sumar voltajes constantes o que varían en el tiempo. Por ejemplo, si se quisiera montar una señal en DC, en V1 se puede dejar un voltaje fijo y en V2 conectar una señal.
+\begin{figure}[H]
+\centering
+\includegraphics[width=7cm]{img/sumador.eps}
+\caption{Circuito sumador con OpAmp.}
+\label{fig:sum}
+\end{figure}
+Se programó la tarjeta de desarrollo Arduino para recibir la información de carga del capacitor a través del puerto serial. 
+
+\section{Resultados}
+El resultado de la carga del capacitor en función del tiempo con un voltaje de alimentación de 3.3V, una resistencia de $330$ k$\Omega$ y un capacitor de 4.7 $\mu$F, se muestra en la Figura \ref{fig:cargaCap}, donde se observa la comparación de la carga de capacitor teórica y la carga del capacitor experimental.\\[1mm]
+\begin{figure}[H]
+\centering
+\includegraphics[width=8.5cm]{img/cargaCap.eps}
+\caption{La línea azul, corresponde al voltaje de carga del capacitor teórico. La línea roja, corresponde a la carga del capacitor experimental.}
+\label{fig:cargaCap}
+\end{figure}
+La constante de tiempo tuvo una error absoluto de 0.3 segundos ya que la respuesta experimental alcanzo el 63.2\% de carga a los 1.8 segundos. Esto corresponde a un 20\% en error relativo porcentual.\\
+El error relativo porcentual máximo, se registro al inicio de la carga del capacitor con un 35\%, que fue disminuyendo con forme se cargaba el capacitor.
+
+\section{Conclusiones}
+\textit{Realizar una conclusión breve en función de los resultados obtenidos. Abordar detalles que se consideren importantes a la hora de la experimentación, ejemplo:} Se comprobó el comportamiento teórico y experimental del circuito $RC$ con errores provocados por las tolerancias de los componentes eléctricos. Para validar de mejor manera este experimento, es necesario utilizar componentes eléctricos de mejor calidad, que presenten una mayor exactitud en sus valores nominales. Además, se debe de recurrir a un mínimo de 10 mediciones para poder obtener una estadística básica del error \cite{book2}.
+
+\begin{thebibliography}{1} % Bibliography - this is intentionally simple in this template
+\bibitem{book1} Charles K. Alexander and Matthew N. O. Sadiku,
+\newblock{\em Fundamentals of Electronic Circuit,} 5th Ed.
+\newblock McGraw-Hill Education (2012),
+\newblock pp 273--277.
+
+\bibitem{book2} Stanley Wolf and Richard F. M. Smith,
+\newblock{\em Guía para mediciones electrónicas,}
+\newblock Prentice-Hall (1992),
+\newblock pp 38--40.
+\end{thebibliography}
+
+\section*{Anexos}
+\textit{En estos apartados se pueden colocar capturas de pantalla, códigos cortos o fotografías, con el único objetivo de aclarar información sustancial para replicar la práctica o experimento. Por ejemplo, si algún detalle solo se pueda apreciar en la implementación, es importante agregar una fotografía, de no ser necesario no incluirla.}
+\subsection{Código de Arduino}
+Dentro del ciclo principal, en el renglón 6 se realiza la lectura del puerto análogico \texttt{A0} obteniendo un valor entre 0 y 1024. En los renglones siguientes de realiza la conversión de bits a voltaje utilizando la resolución calcula anteriormente. Por último, se envía la información de voltaje al puerto de comunicación.
+\begin{minted}[xleftmargin=15pt,linenos]{java}
+//** Lectura de puerto analogico **//
+void setup() {
+  Serial.begin(9600);
+}
+void loop() {
+  int sensorValue = analogRead(A0);
+  float v = sensorValue(3.3/1024.0);
+  Serial.println(v); 
+  delay(200); // Retardo de 200ms
+}
+\end{minted}
+
+\subsection{Código e Scilab}
+Código generado en Scilab para comparar las gráficas teórica y experimental de la carga del capacitor.
+\begin{minted}[xleftmargin=15pt,linenos]{scilab}
+//Generacion de grafica de la carga de
+//un capacitor
+
+//**** Definicion de variables ****//
+Ve = 3.3;
+t = [0:0.2:11];
+C = 47*10^-6
+tau = 1.5;
+ttau = [0:0.1:1.5];
+ttau5 = [0:0.1:tau*5];
+d1 = size(ttau);
+d2 = size(ttau5);
+
+//**** Grafica experimental ****//
+Vdata = read_csv('cargaCap.csv');
+tx = strtod(Vdata(:,1));
+Vcx = strtod(Vdata(:,2));
+
+//**** Evaluacion de funciones ****//
+R = tau/C;
+Vc = Ve*(1-exp(-t/tau));
+Vc_tau = Ve*(1-exp(-tau/tau));
+Vc_tau5 = Ve*(1-exp(-tau/tau));
+Vtau = ones(1,d1(2))*(Vc_tau);
+Vtau5 = ones(1,d2(2))*(Vc_tau5);
+
+ttau1 = tau*(ones(1,d1(2)));
+Vtau1 = [0:Vtau(1)/(d1(2)-1):Vtau(1)];
+ttau2 = 5*tau*(ones(1,d2(2)));
+Vtau2 = [0:Vtau5(1)/(d2(2)-1):Vtau5(1)];
+
+//*** Graficando valores obtenidos ***//
+// Carga del capacitor
+plot(t,Vc,'b','thickness',3)
+e=gce(); p=e.children(1)
+dot1 = datatipCreate(p,[1.5,2.086]);
+
+plot(tx,Vcx,'r','thickness',3)
+e=gce(); p=e.children(1)
+dot2 = datatipCreate(p,[1.76,2.0856]);
+datatipSetOrientation(dot2,"lower right");
+
+//**** Presentacion de la grafica ****//
+xgrid
+title("CARGA DEL CAPACITOR EN FUNCION
+DEL TIEMPO","fontsize",5);
+xlabel("Tiempo [s]","fontsize",4);
+ylabel("Carga del capacitor [V]"...
+,"fontsize",4);
+a=gca();
+a.font_size=3;
+\end{minted}
+\begin{center}
+\textsc{Documento realizado en}\\
+\Large \LaTeX
+\end{center}
+\end{multicols}
+\end{document}

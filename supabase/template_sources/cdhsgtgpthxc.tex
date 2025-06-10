@@ -1,0 +1,1016 @@
+\documentclass{Base}
+\usepackage{framed}
+\usepackage[outerbars]{changebar}
+\begin{document}
+
+
+
+
+
+\chapter{The Binomial Model}\label{bin}
+
+In this chapter we will study, in some detail, the simplest
+possible nontrivial model of a financial market---the binomial model. This
+is a discrete time model, but despite the fact that the main purpose of the
+book concerns continuous time models, the binomial model is well worth
+studying. The model is very easy to understand, almost all important
+concepts which we will study later on already  appear in the binomial case,
+the mathematics required to analyze it is at high school level, and last but
+not least the binomial model is often used in practice.
+
+%  SECTION   %
+
+\section{The One Period Model} \label{opm}
+
+We start with the one period version of the model. In the next
+section we will  (easily) extend the model to an arbitrary number of
+periods.
+
+\subsection{Model Description}\label{md}
+
+Running time is denoted by the letter $t$, and by definition we have two
+points in time, $t=0$ (``today'') and $t=1$ (``tomorrow''). In the model we
+have two assets: a {\bf bond} and a {\bf stock}. At time $t$ the price of a
+bond is denoted by $B_t$, and the price of one share of the stock is denoted
+by $S_t$. Thus we have two price processes $B$ and~$S$.
+\begin{enumerate}[2.]
+\item[1.] The bond price process is deterministic and given by
+\begin{enumerate}[b.]
+\item[a.]This
+is a discrete time model, but despite the fact that the main purpose of the
+book concerns continuous time models, the binomial model is well worth
+studying.
+\item[b.]The model is very easy to understand, almost all important
+concepts which we will study later on already  appear in the binomial case,
+the mathematics required to analyze it is at high school level, and last but
+not least the binomial model is often used in practice.
+\end{enumerate}
+\item[2.]
+The constant $R$ is the spot rate for the period, and we can also interpret
+the existence of the bond as the existence of a bank with $R$ as its rate of
+interest.
+\end{enumerate}
+The stock price process is a stochastic process, and its dynamical behavior
+is described as follows:
+\begin{eqnarray}
+S_0&=&s,\\
+S_1&=&\left\{\begin{array}{@{}c@{}c}
+s \cdot u, &\quad \mbox{with probability $p_u$}.\\
+s \cdot d, &\quad \mbox{with probability $p_d$}.
+\end{array}
+\right.
+\end{eqnarray}
+
+It is often convenient to write this as
+\begin{equation*}
+\left\{\begin{array}{@{}r@{}c@{}l}
+S_0&\,{=}\,&s,\\
+S_1&\,{=}\,&s \cdot Z,
+\end{array}
+\right.
+\end{equation*}
+where $Z$ is a stochastic variable defined as\footnote{We assume that today's stock price $s$ is known,
+constants $u$, $d$, $p_u$ and $p_d$. We assume that $d<u$, and we have of
+course $p_u+p_d=1$.}
+\begin{equation*}
+Z=\left\{\begin{array}{@{}c@{}c}
+u,&\quad \mbox{with probability }p_u.\\
+d,&\quad \mbox{with probability }p_d.
+\end{array}
+\right.
+\end{equation*}
+\begin{itemize}
+\item We\footnote{We assume that $d<u$, and we have of\\[6pt]
+\centerline{$a+b=c$}\\[6pt]
+course $p_u+p_d=1$.} assume that today's stock price $s$ is known, as are the positive
+constants $u$, $d$, $p_u$ and $p_d$. We assume that $d<u$, and we have of
+course $p_u+p_d=1$. We can illustrate the price dynamics using the tree structure
+in Fig.~\ref{binf1}.
+\item We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector $h=(x,y)$.
+\end{itemize}
+%%Figure 1
+
+%\subsubsection{Portfolios and Arbitrage}\label{paa}
+
+
+
+We will study\marginpar{\textbf{For Margin}
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+} the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector $h=(x,y)$. The
+interpretation is that $x$ is the number of bonds we hold in our portfolio,
+whereas $y$ is the number of units of the stock held by us. Note that it is
+quite acceptable for $x$ and $y$ to be positive as well as negative. If, for example,
+$x=3$, this means that we have bought three bonds at time $t=0$. If on the
+other hand $y=-2$, this means that we have sold two shares of the stock at
+time $t=0$. In financial jargon we have a~{\bf long} position in the bond
+and a {\bf short} position in the stock. It is an important assumption of
+the model that short positions are allowed.
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a deterministic
+market value at $t=0$ and a stochastic value at $t=1$.
+
+Everyone wants to make a profit by trading on the market, and in this
+context a so called arbitrage portfolio is a dream come true; this is one
+of the central concepts of the theory
+
+\begin{definition}
+An {\bf arbitrage} portfolio is a portfolio $h$ with the properties
+\begin{eqnarray}
+V_0^h&=&0,\\
+V_1^h&>&0,\quad\mbox{with probability }1.
+\end{eqnarray}
+\end{definition}
+
+\looseness=-1 An arbitrage portfolio is thus basically a
+deterministic money making machine, and we interpret the existence
+of an arbitrage portfolio as equivalent to a serious case of
+mispricing on the market. It is now natural to investigate when a
+given market model is arbitrage free, i.e. when there are no
+arbitrage portfolios.
+
+\begin{proposition}
+The model above is free of arbitrage if and only if the following conditions
+hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{proposition}
+
+
+The condition (\ref{noarb}) has an easy economic interpretation. It simply
+says that the return on the stock is not allowed to dominate the return on
+the bond and vice versa.
+
+Now assume that (\ref{noarb}) is satisfied. To show that this
+implies absence of arbitrage let us consider an arbitrary
+portfolio such that $V_0^h=0$. We thus have $x+ys=0$, i.e.
+$x=-ys$. Using this relation we can write the value of the
+portfolio at $t=1$ as
+\begin{equation*}
+V_1^h= \left\{\begin{array}{@{}c@{}c}
+ys(u-(1+R)),&\quad \mbox{if }Z=u.\\
+ys(d-(1+R)), &\quad \mbox{if }Z=d.
+\end{array}
+\right.
+\end{equation*}
+Assume now that $y>0$. Then $h$ is an arbitrage strategy if and only if we
+have the inequalities
+\begin{eqnarray}
+u&>&1+R,\\
+d&>&1+R,
+\end{eqnarray}
+but this is impossible because of the condition (\ref{noarb}). The case $y<0$ is treated similarly. \endproof
+
+At first glance this result is perhaps only moderately exciting, but we may
+write it in a more suggestive form. To say that (\ref{noarb}) holds is
+equivalent to saying that $1+R$ is a convex combination of $u$ and $d$, i.e.
+\begin{equation*}
+1+R=q_u\cdot u+q_d\cdot d,
+\end{equation*}
+\looseness=-1 where $q_u,q_d\geq 0$ and $q_u+q_d=1$. In particular we see that the weights
+$q_u$ and $q_d$ can be interpreted as probabilities for a new probability
+measure $Q$ with the property $Q(Z=u)=q_u$, $Q(Z=d)=q_d$. Denoting
+expectation w.r.t. this measure by $E^Q$ we now have the following easy
+calculation
+\begin{equation*}
+\frac 1{1+R} Q {S_1}=11+R(q_usu+q_dsd)=\frac 1{1+R}\cdot
+ s(1+R)=s.
+\end{equation*}
+
+We thus have the relation
+\begin{equation*}
+s=\frac 1{1+R} S_1,
+\end{equation*}
+which to an economist is a well-known relation. It is in fact a {\bf risk
+neutral} valuation formula, in the sense that
+it gives today's stock price
+as the discounted expected value of tomorrow's stock price. Of course
+we do not assume that the agents in our market are risk neutral---what we
+have shown is only that if we use the $Q$-probabilities instead of the
+objective probabilities then we have in fact a risk neutral valuation of the
+stock (given absence of arbitrage). A probability measure with this property
+is called a {\bf risk neutral measure}, or alternatively a~{\bf risk adjusted measure} or a
+{\bf martingale measure}. Martingale measures will play a dominant role in the
+sequel so we give a formal definition.
+
+\begin{definition}
+A probability measure $Q$ is called a {\bf martingale measure}
+if the
+following condition holds:
+\begin{equation*}
+S_0=\frac{1}{1+R} S_1.
+\end{equation*}
+\end{definition}
+
+We may now state the condition of no arbitrage in the following way.
+
+For the binomial model it is easy to calculate the martingale probabilities.
+The proof is left to the reader.
+
+\subsection{Contingent Claims}
+\label{bcc}
+
+Let us now assume that the market in the preceding section is arbitrage
+free. We go on to study pricing problems for contingent claims.
+
+\begin{definition}
+A {\bf contingent claim}
+(financial derivative)
+is any stochastic variable $X$ of the form $X=\Phi (Z)$, where $Z$ is the stochastic variable driving the
+stock price process above. \end{definition}
+
+We interpret a given claim $X$ as a contract which pays $X$ SEK to the
+holder of the contract at time $t=1$. See Fig.~\ref{bin_sin1}, where
+the value of the claim at each node is given within the corresponding box.
+The function $\Phi$ is called the
+{\bf contract function}. A typical example would be a European call option
+on the stock with strike price $K$. For this option to be interesting we
+assume that $sd <K<su$. If $S_1 >K$ then we use the option, pay $K$ to get
+the stock and then sell the stock on the market for $su$, thus making a net
+profit of $su-K$. If $S_1<K$ then the option is obviously worthless. In this
+example we thus have
+\begin{equation*}
+X=\left\{\begin{array}{@{}l@{}c}
+su-K, &\quad\mbox{if $Z=u$},\\
+0, &\quad \mbox{if $Z=d$},
+\end{array}
+\right.
+\end{equation*}
+and the contract function is given by
+\begin{eqnarray}
+\Phi(u)&=&su-K,\\
+\Phi(d)&=&0.
+\end{eqnarray}
+
+Our main problem is now to determine the ``fair'' price, if such an object
+exists at all, for a given contingent claim $X$. If we denote the price of $X$ at time $t$ by $X$, then it can be seen that at time $t=1$ the
+problem is easy to solve. In order to avoid arbitrage we must (why?) have
+\begin{equation*}
+X=X,
+\end{equation*}
+and the hard part of the problem is to determine $X$. To attack
+this problem we make a slight detour.
+
+Since we have assumed absence of arbitrage we know that we cannot make
+money out of nothing, but it is interesting to study what we {\bf can}
+achieve on the market.
+
+\begin{definition}
+A given contingent claim $X$ is said to be {\bf reachable}
+if there exists a
+portfolio $h$ such that
+\begin{equation*}
+V_1^h=X,
+\end{equation*}
+with probability $1$. In that case we say that the portfolio $h$ is a
+{\bf hedging} portfolio or a
+{\bf replicating} portfolio. If all claims can be
+replicated we say that the market is {\bf complete}. \end{definition}
+
+
+If a certain claim $X$ is reachable with replicating portfolio~$h$, then,
+from a~financial point of view, there is no difference between holding the
+claim and holding the portfolio. No matter what happens on the stock market,
+the value of the claim at time $t=1$ will be exactly equal to the value of
+the portfolio at $t=1$. Thus the price of the claim should equal the market
+value of the portfolio, and we have the following basic pricing principle.
+
+The word ``reasonable'' above can be given a more precise meaning as in the
+following proposition. We leave the proof to the reader.
+
+We see that in a complete market we can in fact price all contingent claims,
+so it is of great interest to investigate when a given market is complete.
+For the binomial model we have the following result.
+
+\begin{table}[b]
+\processtable{Table caption }{%
+\begin{tabular}{@{}ll@{}}
+\toprule
+Possible cuts & 1--100\,m\\
+\midrule
+Total plasma mass & $10-10-2\,{\rm gm}$\\
+Ion concentration & $10-10\,{\rm m}\,{-3}$\\
+Temperature & 1--40\,keV\\
+Pressure & 0.1--5 atmospheres\\
+Ion thermal velocity & $100\text{--}1000\,{\rm km}\,{\rm s}$\\
+Electron thermal velocity & $0.01c\text{--}0.1c$\\
+Magnetic field & 1--10\,T\\
+Total plasma current & 0.1--7\,MA\\
+\botrule
+\end{tabular}}{Table footnote}
+\end{table}
+
+\begin{proof}
+We fix an arbitrary claim $X$ with contract function $\Phi$, and we want to
+show that there exists a portfolio $h=(x,y)$.
+\end{proof}
+
+\subsection{Risk Neutral Valuation}
+\label{brnv}
+
+Since the binomial model is shown to be complete we can now price any
+contingent claim.
+
+\begin{proposition} \label{rnv1}
+If the binomial model is free of arbitrage, then the
+arbitrage free price of a contingent claim $X$ is given by
+\begin{equation} \label{rnv2}
+X=\frac{1}{1+R} X.
+\end{equation}
+Here the martingale measure $Q$ is uniquely determined by the relation
+\begin{equation}
+\label{rnv3} S_0=\frac{1}{1+R},
+\end{equation}
+and the explicit expression for $q_u$ and $q_d$ are given in Proposition~\ref{opm100}. Furthermore the claim can be replicated using the portfolio
+\begin{eqnarray*}
+x&=&\frac{1}{1+R}\cdot \frac{u\Phi (d) -d \Phi (u)}{u-d},\\[5pt]
+y&=&\frac{1}{s}\cdot \frac{\Phi (u) - \Phi (d)}{u-d}.
+\end{eqnarray*}
+\end{proposition}
+
+We see that the formula (\ref{rnv2}) is a ``risk neutral'' valuation
+formula, and that the probabilities which are used are just those for which
+the stock itself admits a risk neutral valuation. The main economic moral
+can now be summarized.
+
+We end by studying a concrete example.
+
+\begin{example}
+\emph{We set $s=100$, $u=1.2$, $d=0.8$, $p_u=0.6$, $p_d=0.4$ and, for
+computational simplicity, $R=0$. By convention, the monetary unit is the US dollar.
+Thus we have the price dynamics}
+\begin{eqnarray}
+S_0&=&100,\\
+S_1&=&
+\left\{\begin{array}{@{}r@{}c}
+120,&\quad \mbox{{\rm with probability }}0.6.\\
+80,&\quad \mbox{{\rm with probability }}0.4.
+\end{array}
+\right.
+\end{eqnarray}
+\end{example}
+
+\noindent
+If we compute the discounted expected
+value (under the objective probability measure $P$) of tomorrow's price  we get
+assume a constant deterministic short rate of interest $R$, which is
+interpreted as the simple period rate. This means that the bond price
+dynamics are given by
+\begin{eqnarray}
+B_{n+1}&=&(1+R)B_n,\\
+B_0&=&1.
+\end{eqnarray}
+
+We now go on to define the concept of a dynamic portfolio strategy.
+
+\begin{definition}
+A {\bf portfolio strategy} is a stochastic process
+such that $h_t$ is a function of $S_0,S_1, \ldots,S_{t-1}$. For a given
+portfolio strategy $h$ we set $h_0=h_1$ by convention. The
+{\bf value process} corresponding to the portfolio $h$ is defined by
+\begin{equation*}
+V_t^h=x_t(1+R)+y_tS_t.
+\end{equation*}
+\end{definition}
+The condition above is in fact also sufficient for absence of arbitrage, but
+this fact is a little harder to show, and we will prove it later. In any
+case we assume that the condition holds.
+\begin{lemma}
+If the model is free of arbitrage then the following conditions necessarily
+must hold.
+\begin{equation}
+\label{noarb2} d \leq (1+R) \leq u.
+\end{equation}
+\end{lemma}
+It is possible, and not very hard, to give a formal proof of the
+proposition, using mathematical induction.
+\begin{proposition}
+The multiperiod binomial model is complete, i.e. every claim can be
+replicated by  a self-financing portfolio.
+\end{proposition}
+The formal proof will, however,
+look rather messy with lots of indices, so instead we prove the proposition
+for a concrete example, using a binomial tree.
+\begin{example} \label{binexample}
+\emph{We set $T=3$, $S_0=80$, $u=1.5$, $d=0.5$, $p_u=0.6$, $p_d=0.4$ and, for
+computational simplicity, $R=0$.}
+\end{example}
+
+\begin{figure}\includegraphics{fig1}
+\caption{Price dynamics to this end we define a portfolio as a vector
+$h=(x,y)$} \label{binf1}
+\end{figure}
+
+
+\section*{Unlist}
+
+\begin{unlist}
+\item The bond price process is deterministic and given by
+
+\item
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+\end{unlist}
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\section*{Description}
+
+\begin{description}
+\item The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+
+\item
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+\end{description}
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\section*{Verse}
+
+\begin{verse}
+\item The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+
+\item
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+\end{verse}
+
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\section*{Quotation}
+
+\begin{quotation}
+\item The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+
+\item
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+\end{quotation}
+
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\section*{Quote}
+
+\begin{quote}
+\item The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+
+\item
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+\end{quote}
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{theorem}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{theorem}
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{fp}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{fp}
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{corollary}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{corollary}
+
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{assumption}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{assumption}
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{condition}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{condition}
+
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{idea}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{idea}
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{remark}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{remark}
+
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{result}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{result}
+The constant $R$ is the spot rate for the period, and we can also
+interpret the existence of the bond as the existence of a bank
+with $R$ as its rate of interest.
+
+\begin{nota}
+The model above is free of arbitrage if and only if the following
+conditions hold:
+\begin{equation}\label{noarb}
+d \leq (1+R) \leq u.
+\end{equation}
+\end{nota}
+
+\begin{Exercises}
+The constant $R$ is the spot rate for the period, and we can
+also interpret the existence of the bond as the existence of a
+bank with $R$ as its rate of interest.
+\end{Exercises}
+
+\section*{Boxed Text Crossed the Page}
+
+\begin{mibox}
+
+\brule
+
+\cbstart
+
+\vspace*{3pt}
+
+\boxhead{{INVESTIGATION}}
+
+\vspace*{-5.5pt}
+%\invconttrue\begin{investigation}{
+\boxsubhead{Blind Embedding and Linear Correlation Detection}
+
+The embedding algorithm in the system we describe here implements
+a blind embedder. We denote this algorithm by EBLIND, which refers
+to this {\textit{specific}} example of blind embedding rather than
+the generic concept of blind embedding. In fact, there are many
+other algorithms for blind embedding.
+
+\boxindent The detection algorithm uses linear correlation as its
+detection metric. This is a very common detection metric, which is
+discussed further in Section~3.5.
+
+\boxindent To keep things simple, we code only one bit of
+information. Thus, {m} is either\break 1 or 0. We assume that we
+are working with only grayscale images. Most of the algorithms
+presented in this book share these simplifications. Methods of
+encoding more than one bit are discussed in Chapters~4 and~5.
+
+\vspace*{12pt} \setcounter{figure}{9}
+
+%\begin{figure}%9
+\centerline{\fbox{\hbox to 6pc{\vbox to 4pc{\vfill}}}}
+\boxfigcap{Distribution of linear correlations between images and
+a low-pass filtered random noise pattern.\label{fig:dlc-pink}}
+%\end{figure}
+\vspace*{8pt}
+
+watermarked image in Figure~3.8 has significantly worse fidelity
+than that in Figure~3.7, because the human eye is more sensitive
+to low-frequency patterns than to high-frequency patterns.
+
+If a certain claim $X$ is reachable with replicating
+portfolio~$h$, then, from a~financial point of view, there is no
+difference between holding the claim and holding the portfolio. No
+matter what happens on the stock market, the value of the claim at
+time $t=1$ will be exactly equal to the value of the portfolio at
+$t=1$. Thus the price of the claim should equal the market value
+of the portfolio, and we have the following basic pricing
+principle.
+
+If a certain claim $X$ is reachable with replicating
+portfolio~$h$, then, from a~financial point of view, there is no
+difference between holding the claim and holding the portfolio. No
+matter what happens on the stock market, the value of the claim at
+time $t=1$ will be exactly equal to the value of the portfolio at
+$t=1$. Thus the price of the claim should equal the market value
+of the portfolio, and we have the following basic pricing
+principle.
+
+If a certain claim $X$ is reachable with replicating
+portfolio~$h$, then, from a~financial point of view, there is no
+difference between holding the claim and holding the portfolio.
+
+\vspace*{-1.5pt}
+
+\brule
+
+\cbend
+
+
+\end{mibox}
+
+No
+matter what happens on the stock market, the value of the claim at
+time $t=1$ will be exactly equal to the value of the portfolio at
+$t=1$. Thus the price of the claim should equal the market value
+of the portfolio, and we have the following basic pricing
+principle.
+
+The reader may wish to view (or revisit) the animation
+``Inductive and Radiative Coupling'' on the CD.
+
+\boxindent Mathematica is very flexible and most calculations can be carried
+out in more than one way.  Depending on how you think, some
+sequences of calculations may make more sense to you than others,
+even if they are less efficient than the most efficient way to
+perform the desired calculations.
+
+Often, the difference in time
+required for Mathematica to perform equivalent\,--\,but
+different\,--\,calculations is quite small.  For the beginner, we
+think it is wisest to work with familiar calculations first and
+then efficiency.
+
+\begin{exampled}
+Calculate (a)  $121+542$; (b) $3231-9876$; (c)  $(-23)(76)$; (d)
+$(22341)(832748)$ $(387281)$; and (e) $\dfrac{467}{31}$.
+\end{exampled}
+
+\begin{solution}
+These calculations are carried out in the following screen shot.
+In each case, the input is typed  and then evaluated by pressing
+\textbf{Enter}.  In the last case, the \textbf{Basic Math}
+template is used to enter the fraction.
+\end{solution}
+
+Mathematica is very flexible and most calculations can be carried
+out in more than one way.  Depending on how you think, some
+sequences of calculations may make more sense to you than others,
+even if they are less efficient than the most efficient way to
+perform the desired calculations.  Often, the difference in time
+required for Mathematica to perform equivalent\,--\,but
+different\,--\,calculations is quite small.  For the beginner, we
+think it is wisest to work with familiar calculations first and
+then efficiency.
+
+\begin{thenumbibliography}{99}
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options under
+Stochastic Interest Rates.
+{\em Journal of International Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G. (1996).
+{\em Estimating and Interpreting the Yield Curve.} Wiley, Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest Rates: The Martingale Approach.
+{\em Advances in Applied Mathematics} {\bf 10}, 95--129.
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options
+under Stochastic Interest Rates. {\em Journal of International
+Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G.
+(1996). {\em Estimating and Interpreting the Yield Curve.} Wiley,
+Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest
+Rates: The Martingale Approach. {\em Advances in Applied
+Mathematics} {\bf 10}, 95--129.
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options
+under Stochastic Interest Rates. {\em Journal of International
+Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G.
+(1996). {\em Estimating and Interpreting the Yield Curve.} Wiley,
+Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest
+Rates: The Martingale Approach. {\em Advances in Applied
+Mathematics} {\bf 10}, 95--129.
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options
+under Stochastic Interest Rates. {\em Journal of International
+Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G.
+(1996). {\em Estimating and Interpreting the Yield Curve.} Wiley,
+Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest
+Rates: The Martingale Approach. {\em Advances in Applied
+Mathematics} {\bf 10}, 95--129.
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options
+under Stochastic Interest Rates. {\em Journal of International
+Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G.
+(1996). {\em Estimating and Interpreting the Yield Curve.} Wiley,
+Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest
+Rates: The Martingale Approach. {\em Advances in Applied
+Mathematics} {\bf 10}, 95--129.
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options
+under Stochastic Interest Rates. {\em Journal of International
+Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G.
+(1996). {\em Estimating and Interpreting the Yield Curve.} Wiley,
+Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest
+Rates: The Martingale Approach. {\em Advances in Applied
+Mathematics} {\bf 10}, 95--129.
+
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options under
+Stochastic Interest Rates.
+{\em Journal of International Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G. (1996).
+{\em Estimating and Interpreting the Yield Curve.} Wiley, Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest Rates: The Martingale Approach.
+{\em Advances in Applied Mathematics} {\bf 10}, 95--129.
+
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options
+under Stochastic Interest Rates. {\em Journal of International
+Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G.
+(1996). {\em Estimating and Interpreting the Yield Curve.} Wiley,
+Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest
+Rates: The Martingale Approach. {\em Advances in Applied
+Mathematics} {\bf 10}, 95--129.
+
+\end{thenumbibliography}
+
+\begin{theunbibliography}{99}
+\bibitem{AJ}
+Amin, K. \& Jarrow, R.  (1991).  Pricing Foreign Currency Options under
+Stochastic Interest Rates.
+{\em Journal of International Money and Finance} {\bf 10}, 310--329.
+%
+\bibitem{ABD}
+Anderson, N., Breedon, F., Deacon, M., Derry, A. \& Murphy, G. (1996).
+{\em Estimating and Interpreting the Yield Curve.} Wiley, Chichester.
+%
+\bibitem{AD}
+Artzner, P. \& Delbaen, F.  (1989). Term Structure of Interest Rates: The Martingale Approach.
+{\em Advances in Applied Mathematics} {\bf 10}, 95--129.
+\end{theunbibliography}
+
+
+\clearpage
+
+\setcounter{chapter}{0}
+
+\appendix
+
+\chapter{}
+
+We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector
+$h=(x,y)$. The interpretation is that $x$ is the number of bonds
+we hold in our portfolio, whereas $y$ is the number of units of
+the stock held by us. Note that it is quite acceptable for $x$ and
+$y$ to be positive as well as negative. If, for example, $x=3$,
+this means that we have bought three bonds at time $t=0$. If on
+the other hand $y=-2$, this means that we have sold two shares of
+the stock at time $t=0$. In financial jargon we have a~{\bf long}
+position in the bond and a {\bf short} position in the stock. It
+is an important assumption of the model that short positions are
+allowed.
+
+\section{Appendix Head1}
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a
+deterministic market value at $t=0$ and a stochastic value at
+$t=1$.
+
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+
+We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector
+$h=(x,y)$. The interpretation is that $x$ is the number of bonds
+we hold in our portfolio, whereas $y$ is the number of units of
+the stock held by us. Note that it is quite acceptable for $x$ and
+$y$ to be positive as well as negative. If, for example, $x=3$,
+this means that we have bought three bonds at time $t=0$. If on
+the other hand $y=-2$, this means that we have sold two shares of
+the stock at time $t=0$. In financial jargon we have a~{\bf long}
+position in the bond and a {\bf short} position in the stock. It
+is an important assumption of the model that short positions are
+allowed.
+
+\section{Appendix Head2}
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a
+deterministic market value at $t=0$ and a stochastic value at
+$t=1$.
+
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+
+We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector
+$h=(x,y)$. The interpretation is that $x$ is the number of bonds
+we hold in our portfolio, whereas $y$ is the number of units of
+the stock held by us. Note that it is quite acceptable for $x$ and
+$y$ to be positive as well as negative. If, for example, $x=3$,
+this means that we have bought three bonds at time $t=0$. If on
+the other hand $y=-2$, this means that we have sold two shares of
+the stock at time $t=0$. In financial jargon we have a~{\bf long}
+position in the bond and a {\bf short} position in the stock. It
+is an important assumption of the model that short positions are
+allowed.
+
+\chapter{}
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a
+deterministic market value at $t=0$ and a stochastic value at
+$t=1$.
+
+\section{Appendix Head1}
+
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+
+We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector
+$h=(x,y)$. The interpretation is that $x$ is the number of bonds
+we hold in our portfolio, whereas $y$ is the number of units of
+the stock held by us. Note that it is quite acceptable for $x$ and
+$y$ to be positive as well as negative. If, for example, $x=3$,
+this means that we have bought three bonds at time $t=0$. If on
+the other hand $y=-2$, this means that we have sold two shares of
+the stock at time $t=0$. In financial jargon we have a~{\bf long}
+position in the bond and a {\bf short} position in the stock. It
+is an important assumption of the model that short positions are
+allowed.
+
+\section{Appendix Head2}
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a
+deterministic market value at $t=0$ and a stochastic value at
+$t=1$.
+
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+
+We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector
+$h=(x,y)$. The interpretation is that $x$ is the number of bonds
+we hold in our portfolio, whereas $y$ is the number of units of
+the stock held by us. Note that it is quite acceptable for $x$ and
+$y$ to be positive as well as negative. If, for example, $x=3$,
+this means that we have bought three bonds at time $t=0$. If on
+the other hand $y=-2$, this means that we have sold two shares of
+the stock at time $t=0$. In financial jargon we have a~{\bf long}
+position in the bond and a {\bf short} position in the stock. It
+is an important assumption of the model that short positions are
+allowed.
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a
+deterministic market value at $t=0$ and a stochastic value at
+$t=1$.
+
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+
+We will study the behavior of various {\bf portfolios}
+ on the $(B,S)$
+market, and to this end we define a portfolio as a vector
+$h=(x,y)$. The interpretation is that $x$ is the number of bonds
+we hold in our portfolio, whereas $y$ is the number of units of
+the stock held by us. Note that it is quite acceptable for $x$ and
+$y$ to be positive as well as negative. If, for example, $x=3$,
+this means that we have bought three bonds at time $t=0$. If on
+the other hand $y=-2$, this means that we have sold two shares of
+the stock at time $t=0$. In financial jargon we have a~{\bf long}
+position in the bond and a {\bf short} position in the stock. It
+is an important assumption of the model that short positions are
+allowed.
+
+Consider now a fixed portfolio $h=(x,y)$. This portfolio has a
+deterministic market value at $t=0$ and a stochastic value at
+$t=1$.
+
+Everyone wants to make a profit by trading on the market, and in
+this context a so called arbitrage portfolio is a dream come true;
+this is one of the central concepts of the theory.
+
+
+\end{document}

@@ -1,0 +1,148 @@
+% !TEX program = pdflatex+makeindex+bibtex
+% !TEX encoding = UTF-8 Unicode
+% !TEX spellcheck = de_ch
+
+% Created by Simon Schälli
+% History:
+% v1.0 ursprüngliche Version
+% v1.1 2015-10-22 mit Titelbild
+% v1.2 2016-09-30 aufgeräumt
+% v1.3 2016-10-16 Layoutfehler behoben
+% v1.4 2016-10-16 Option für einseitigen Ausdruck hinzugefügt
+% v1.5 2018-10-21 Option für nummerierte Verzeichnisse hinzugefügt
+% v1.6 2019-11-20 Charter und Serifen-Überschriften hinzugefügt
+% v1.7 2019-11-20 Quellenverzeichnis angepasst
+% v1.8 2020-10-20 scrlayer-scrpage statt scrpage2, tabularx für titlehead 
+% v1.9 2020-10-24 added berasans and beramono
+
+%======================================================================%
+%=== Dokument auf häufige Fehler überprüfen                         ===%
+%======================================================================%
+\RequirePackage[l2tabu, orthodox]{nag}
+
+%======================================================================%
+%=== Dokumentklasse wählen                                          ===%
+%======================================================================%
+% \documentclass[a4paper,twoside,openright]{scrreprt} % <- für zweiseitigen Ausdruck
+% \documentclass[a4paper,twoside,openright,bibliography=totocnumbered,listof=totocnumbered]{scrreprt} % <- für nummerierte Verzeichnisse
+\documentclass[a4paper]{scrreprt} % <- für einseitigen Ausdruck
+
+%======================================================================%
+%=== Pakete einbinden                                               ===%
+%======================================================================%
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+
+% % Latin Modern Schriftart
+% \usepackage{lmodern}
+% \usepackage[T1]{fontenc}
+% \usepackage{amssymb} <- zusätzliche Mathesymbole
+
+% Bitstream Charter
+\usepackage[bitstream-charter]{mathdesign} % <- Roman - Bitstream Charter
+\usepackage{berasans}                      % <- Sans serif - Vera Sans
+\usepackage{beramono}                      % <- Typewriter - Vera Mono
+
+% Titel und Überschriften in Serifenschrift
+\setkomafont{sectioning}{\rmfamily\bfseries\boldmath}
+
+% Mathematik-Paket
+\usepackage{amsmath}
+
+% mathematische Buchstaben als Text
+\usepackage{textcomp}
+
+% komfortable Referenzen mit \fref
+\usepackage[german]{fancyref}
+
+% Kopf- und Fusszeilen
+\usepackage[automark,headsepline]{scrlayer-scrpage}
+\ihead[]{\headmark}
+\chead[]{}
+\ohead[]{\pagemark}
+\ifoot[]{}
+\cfoot[\pagemark]{}
+\ofoot[]{}
+\pagestyle{scrheadings}
+
+% Einfügen von Bildern
+\usepackage{graphicx}
+
+% schöne Tabellen
+\usepackage{booktabs}
+
+% Tabellen mit automatischer Spaltenbreite
+\usepackage{tabularx}
+
+% Tabelleninhalt an Dezimalpunkt ausrichten
+\usepackage{dcolumn}
+\makeatletter                     % <- hebt Sonderbedeutung von @ auf
+\newcolumntype{d}[1]{D{.}{.}{#1}} % <- definiert einen neuen Spaltentyp
+\makeatother                      % <- setzt Sonderbedeutung von @ wieder
+
+% Beispieltext
+\usepackage{lipsum}
+
+% Hyperlinks in PDF
+\usepackage{hyperref}
+
+%======================================================================%
+%=== Angaben zum Dokument                                           ===%
+%======================================================================%
+
+\titlehead{\noindent\begin{tabularx}{\linewidth}{@{}lXl@{}}
+Kantonsschule Wattwil && Hans Muster\\
+Fachschaft Physik && Musterweg 42\\
+Näppisuelistrasse 11 && 9999 Nirgendwo\\
+9630 Wattwil
+\end{tabularx}}
+\subject{Maturaarbeit}
+\title{Meine Maturaarbeit}
+\subtitle{Untertitel der Arbeit}
+\author{\texorpdfstring{Hans Muster\\[1cm]\includegraphics[scale=0.2]{figures/matlabgraph}\\[1cm] {\small Betreuer: Lehrer Beispiel}}{Hans Muster}}
+\date{\small xx.xx.20xx}
+%======================================================================%
+%=== PDF Dokumenteinstellungen                                      ===%
+%======================================================================%
+
+\makeatletter
+\hypersetup{
+	pdftitle={\@title},%
+	pdfsubject={\@subject},%
+	pdfauthor={\@author},%
+	pdfkeywords={},%
+	colorlinks,%
+	citecolor=black,%
+	filecolor=black,%
+	linkcolor=black,%
+	urlcolor=black}%
+\makeatother
+
+%======================================================================%
+%=== Beginn des eigentlichen Dokumentes                             ===%
+%======================================================================%
+
+\begin{document}
+
+\maketitle % <- Titel setzen
+\cleardoublepage % <- neue Seite
+\pagenumbering{roman} % <- römische Seitennummerierung
+\tableofcontents % <- Inhaltsverzeichnis
+\cleardoublepage % <- neue Seite
+\pagenumbering{arabic} % <- arabische Seitennummerierung
+
+% Kapitel einbinden:
+\input{chapters/vorwort}
+\input{chapters/einleitung}
+\input{chapters/materialundmethode}
+\input{chapters/ergebnisse}
+\lipsum[1-10]
+\input{chapters/diskussion}
+\input{chapters/schluss}
+
+\appendix % <- Anhang
+% \listoffigures % <- Abbildungsverzeichnis
+% \listoftables  % <- Tabellenverzeichnis
+\input{chapters/quellen} % <- Literaturverzeichnis
+
+\end{document}

@@ -1,0 +1,175 @@
+%%%% This is the general thesis/project report template for most users
+%%%% Make sure you have lualatex installed!!! (package texlive-luaatex)
+\documentclass[showtrims, b5paper]{rubook}
+%% a4paper or b5paper:  paper stock size.
+%%     If A4, show cut lines for the printer.  If b5, no cut lines.
+\usepackage{ruthesis}%% RU Thesis formatting
+
+%% What language is the document in?
+%%  English must always be available for biblatex/biber to work properly
+%%  If you are doing your thesis in Icelandic switch the order
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\setotherlanguage{icelandic}
+
+%%% Setup citations:  pick one format
+%% IEEE Format
+\usepackage[backend=biber,style=ieee]{biblatex}
+%% APA Format
+%\usepackage[style=apa,backend=biber]{biblatex}
+%\DeclareLanguageMapping{english}{english-apa}
+%% Warning:  Icelandic APA has issues because you have to get the grammar right which needs to know if the word is male or female
+%% \parencite{} for parenthesis around the citation
+%% \textcite{} is for when the information is part of a sentence.
+%% \cite{} just puts the name and year
+\addbibresource{references.bib}
+\usepackage{biblatex-IS}%%loads Icelandic translations for things polyglossia missed
+
+%%%%%% Packages and Macros %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{rusignaturepage}%enable this if you need \signaturepage{}
+
+\usepackage{custom}
+%% Commonly-used packages and macros are in custom.sty
+%% Put any additional packages after this line
+%% !!WARNING: The geometry package is incompatible with this template!
+
+\usepackage{lipsum}%provides us with text for testing
+%% usage: \lipsum[STARTNUM-ENDNUM]
+
+\graphicspath{{graphics-cropped/}{graphics/}{./}}
+%% This is a list of folders to search for graphics files to include
+%% for the graphicx package (already loaded).  This may be case-sensitive.
+%% LaTeX will search from left to right in the list, so you can put "cropped" versions
+%% in the graphics-cropped folder to speed up processing.
+
+\PassOptionsToPackage{hidelinks}{hyperref}%disable boxes around links
+\usepackage{hyperref}%This must be the last package loaded
+
+%%%%%%%%%%%%%%%%%Information for the Title page %%%%%%%%%%%%%%%%% 
+
+\title{Thesis and Project Report Template for \theInstitution{}}
+\author{Joseph~T.~Foley and Marcel~Kyas}
+\date{\today}%Generally this is set to the day of the defense
+
+%\DocumentInfo{TYPE}{ABBREVIATION}{DEGREE}{PROGRAM}{ECTS}{School/Department}
+\DocumentInfo{Thesis}{M.Sc.}{Master of Science}{Mechatronics}{30}{Department of Engineering}
+\DocumentDescription{\theDocumentType{} of \theECTS{} ECTS credits
+         submitted to the \theSchool{} at \theInstitution{} in partial fulfillment
+         of the requirements for the degree of \theDegreeLong}
+% Change \DocumentDescription if you need a custom title or if it needs to be in Icelandic
+
+%% PhD only have Thesis Committee with roles.  Examiner is part of committee.
+\SupervisorHeading{Thesis Committee}
+\Supervisors{
+  \personinfo{Superior A. Teacher}{Supervisor}{Professor}{Reykjavik University}{Iceland}
+  \personinfo{Helpful A. Teacher}{Co-advisor}{Assistant Professor}{University of Iceland}{Iceland}
+  \personinfo{Tough E. Questions}{Examiner}{Associate Professor}{Massachusetts Institute of Technology}{USA}
+}
+
+\hyphenation{Jo-seph Fo-ley}
+% If you need to enforce hyphenation in English or Icelandic, put a space separated list in the hyphenation macro.
+
+
+\begin{document}
+%% TODO: get the official cover graphic and have the system fill in the fields for you
+\maketitle{}
+\disableindents{}%frontmatter material mostly doesn't need indents
+\copyrightpage{}
+
+% If this is a PhD, register for an ISSN and ISBN, then:
+% \copyrightpage{ISSN xxxx-yyyy\\ISBN 978-xxxxxxxxxx\\\url{http://hdl.handle.net/1946/xxxx}\\}
+%\signaturepage{} %Generally only for Print copies and needs the rusignaturepage package
+
+%\begin{dedications}% Optional
+%  I dedicate this to my spouse/child/pet/power animal.
+%\end{dedications}
+
+% RUM: "Acknowledgements (optional)"%start numbering
+\tableofcontents{}
+\listoffigures{}
+\listoftables{}
+%% A list of abbreviations is an example of a special list
+%% Other lists may be added, such as lists of algorithms, symbols, theorems, etc.
+%% IN CS PhD, this is sometimes centered.
+\frontmatterhead{List of Symbols}%%RUM: Not mentioned
+%% This list demonstrates the "siunitx" package capabilities
+\begin{tabular}{lll}\toprule
+  Symbol &Description &Value/Units\\\midrule
+  $E$ &Energy &\si{\joule}\\ %New function:  \unit{} in Livetex 2021
+  $m$ &Mass &\si{\gram}\\ %New function:  \unit{} in Livetex 2021
+  $c$ &Speed of Light &\SI{2.99E9}{\meter\per\square\second}\\\bottomrule
+  % New function:  \qty{} in Livetex 2021
+\end{tabular}
+
+\enableindents{}% turn on/off paragraph indents
+\newpage
+\begin{abstract}
+  The goal of this template is to produce electronic output to be uploaded to Skemman that can be later printed out and bound into a professional looking textbook that fits on standard library shelves.
+  It is important to note that A4 paper when bound requires taller shelf spacing, so the B5 paper format was chosen instead.
+  When binding a book, the edges that face outward need to be very smooth to reduce contamination and dust from entering the book when it sits on a shelf; this is why traditionally a larger paper size is cut down to the book size.
+  If your print house expects the stock to be A4, then make sure the rubook has the ``a4paper'' option.
+  If they prefer to deal with preparation themselves from a B5 pdf, then the default ``b5paper'' option is correct.
+  The template is designed to work only with lualatex.
+  
+  The abstract goes here in English or Icelandic.
+  It should be a fairly short summary of the entire document.
+  If you switch to Icelandic mode then abstract will become \'{U}tdr\'{a}ttur
+
+  Keywords / Efnisord:  Keywords, separated, by, commas
+\end{abstract}
+
+
+% RUM: "Acknowledgements (optional)"
+\chapter*{Acknowledgments} 
+\begin{quotation}
+So long, and thanks for all the fish.
+\end{quotation}\sourceatright{Douglas Adams\cite{adams84fish}}
+\vspace{\baselineskip}
+
+This work was funded by \the\year~RANNIS grant ``Survey of man-eating Minke whales'' 1415550.
+Additional equipment was generously donated by the Icelandic Tourism Board.
+
+{\em Acknowledgements are optional; comment this chapter out if they are absent
+  Note that it is important to acknowledge any funding that helped in the work\/}
+%\/ is italic correction at the end of \em and italics
+\clearpage{}
+
+\mainmatter{}
+\aliaspagestyle{chapter}{empty}
+% Don't put page numbers on the chapter changes
+
+%% If you would like to separate chapters into different files, use
+%% \include{chapterfile}
+\part{Getting Started} % Parts optional but useful in longer documents
+\chapter{Instructions}
+\textbf{Is this the right template for you?}
+If you are not a Reykjavik University student, this is probably not for you.
+For everyone else, please read the instructions before getting started.
+It is likely to save you a lot of frustration and errors.
+\input{instructions}%\input{} just adds the code
+\part{Demonstration}
+\include{introduction}%include{} starts a new page
+\section{Another Section}
+\part{The Second Part} % Parts optional but useful in longer documents
+
+\printbibliography{}
+
+%% If appendices are needed, uncomment the following line
+%% and include the appendices in separate files
+\appendix{}%%RUM: "Appendicies (as appropriate)
+\input{code} % as an example, perhaps some of your code
+
+%\backmatter{} % Sections after this don't get numbers
+%% We prefer that all elements be numbered
+
+%%%%%%%%%%%%% SHOW INDEX %%%%%%%%%%%%%%%%%%
+%% Index, optional.  A good idea on longer documents
+\clearforchapter{}
+\printindex{}%%RUM: Not mentioned
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% TeX-engine: luatex
+%%% End:

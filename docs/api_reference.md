@@ -138,8 +138,8 @@ class VisualGraph:
         """Add edge to graph."""
         pass
         
-    def to_ell2a_format(self) -> dict:
-        """Convert to ell2a.studio format."""
+    def to_ell_format(self) -> dict:
+        """Convert to ell.studio format."""
         pass
 
 class VisualNode:

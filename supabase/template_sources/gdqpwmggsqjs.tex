@@ -1,0 +1,209 @@
+%A template intended for use in PhD thesis submissions at Assam University. Replace text in each 'chapter.tex' file and work with the 'maindraft.tex' file as a template. Please note that some non-standard packages may have compatibility issues with the packages I have used (especially the fncychap package).
+%Custom template by Anshuman Baruah distributed under CC-BY 4.0.
+%Email for any issues:anshumanbaruah.du@gmail.com
+
+\documentclass[12pt, a4paper, openright]{book}
+
+%%% Packages
+
+% pagination related
+\usepackage{geometry}
+\usepackage{emptypage}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+% math
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{amsthm}
+%\usepackage{physics}
+%\usepackage{amscd}
+%\usepackage{mathptmx}
+
+% fonts
+%\usepackage{mathpazo}
+\usepackage{amssymb}
+\usepackage{newpxtext,newpxmath}
+
+
+% general utilities
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{pdfpages}
+\usepackage{wrapfig}
+\usepackage{adjustbox}
+
+% chapter header customisation
+\ExpandArgs{cc}\NewCommandCopy{latex@makeschapterhead}{@makeschapterhead}
+
+\usepackage[Glenn]{fncychap}
+% revert
+\ExpandArgs{cc}\RenewCommandCopy{@makeschapterhead}{latex@makeschapterhead}
+
+% captions
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+
+% tables
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{dcolumn}
+
+% bibliography
+\usepackage[backend=biber,bibencoding=utf8, style=numeric-comp, sorting=none]{biblatex}  
+
+% glossaries and indices
+\usepackage[acronym]{glossaries}
+
+% miscellaneous
+\usepackage{lipsum}
+\usepackage{float}
+\DeclareUnicodeCharacter{0301}{\'{e}}
+% HYPERREF (last!)
+\usepackage{hyperref}
+
+%%% Settings related to packages
+
+% geometry
+\geometry{
+  %a4paper,
+  bindingoffset=0.5in,
+  headheight=14.5pt,
+  left=3cm,
+  right=3cm,
+  top=3cm,
+  bottom=3cm,
+  heightrounded,
+}
+
+
+% fncychap
+\ChNameVar{\Large}
+
+% glossaries
+\glsdisablehyper
+\setglossarystyle{listgroup}
+\makeglossaries
+
+% hyperref
+\hypersetup{
+  pdftoolbar=true,
+  pdfmenubar=true,
+  pdffitwindow=false,
+  pdfstartview={FitH},
+  pdfauthor={AB},
+  colorlinks=true,
+  linkcolor=MidnightBlue,
+  citecolor=MidnightBlue,
+}    
+
+%%% FINAL TOUCHES
+\doublespacing
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+
+%%% Bib data
+\addbibresource{Bibliography.bib}
+
+% theorems
+\newtheorem{theorem}{Theorem}
+\newtheorem{principle}{Principle}
+\newtheorem{postulate}{Postulate}
+
+% acronyms
+\newacronym{cmb}{CMB}{cosmic microwave background}
+
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\rule{\textwidth}{0.4pt}
+
+{\Large TITLE\par}
+
+\rule{\textwidth}{0.4pt}
+
+{\small \textit{A dissertation submitted in partial fulfilment of the requirements 
+for the degree of Doctor of Philosophy in Physics}\par}
+
+\vspace{1cm}
+
+\includegraphics[width=.3\textwidth,keepaspectratio]{AUSLogo.png}
+
+\vspace{0.7cm}
+
+{By \\ \large \textbf{AUTHOR}}\\
+Unique Enrolment No.: XXX dated XXX\\
+University Registration No.: XXX of XXX
+
+\vspace{0.7cm}
+
+Under the supervision of \\\textbf{Dr. XXX} \\ XXX
+
+\vspace*{0.5cm}
+
+Department of Physics\\ Albert Einstein School of Physical Sciences \\
+Assam University\\
+Cachar--788011, Assam, India
+
+\end{titlepage}
+
+\chapter*{}
+\input{Chapters/Dedication}
+
+\frontmatter
+
+\chapter*{Acknowledgements}
+\input{Chapters/Acknowledgements}
+
+\chapter*{Abstract}
+\input{Chapters/Abstract}
+\tableofcontents
+\listoffigures
+\listoftables
+
+\printglossary[
+  type=\acronymtype,
+  nonumberlist,
+  title=List of Abbreviations,
+  toctitle=List of Abbreviations
+]
+
+\mainmatter
+
+%% INPUT CHAPTERS HERE
+
+
+\chapter{Introduction}\chaptermark{Introduction}
+\label{chap:one}
+\input{Chapters/Chapter1}
+
+
+\backmatter
+\pagestyle{plain}
+\chapter{Bibliography}
+% % \addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography[heading=none]
+\appendix
+\pagestyle{plain}
+\begin{singlespacing}
+\addcontentsline{toc}{chapter}{Appendices}
+% \chapter*{Appendix A: APPEN A}\label{appenA}
+
+\chapter*{Conferences \& Workshops}
+\addcontentsline{toc}{chapter}{Conferences \& Workshops}
+\input{Chapters/Conferences and Workshps.tex}
+
+\chapter*{List of Publications}
+\addcontentsline{toc}{chapter}{List of Publications}
+\input{Chapters/List of Publications.tex}
+\end{singlespacing}
+
+\end{document}
+
+
+
+

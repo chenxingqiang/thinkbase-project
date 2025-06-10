@@ -1,0 +1,121 @@
+\documentclass[a4paper,12pt,twoside]{extreport}
+
+% set margins
+\usepackage{geometry}
+\geometry{a4paper,top=25mm,inner=35mm,outer=25mm,bottom=25mm}
+\usepackage{changepage}
+
+% set leading to 1.5
+\renewcommand{\baselinestretch}{1.5}
+
+% change bullet points to dashes
+\renewcommand\labelitemi{---}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% bibliography
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{bibliography.bib}
+\usepackage{hyperref}
+
+% algorithms and list of algorithms
+\usepackage{listings}
+\usepackage[center]{caption}
+\DeclareCaptionType{code}[Algorithm][List of Algorithms]
+\lstset{breaklines=true,basicstyle=\ttfamily\scriptsize}
+
+% figures and list of figures
+\usepackage{float}
+\usepackage{graphicx}
+\graphicspath{ {./img/} }
+\usepackage[nottoc]{tocbibind}
+
+% tables
+\floatstyle{plaintop}
+\restylefloat{table}
+
+% other
+\usepackage{titling}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% custom command for printing a date in the format dd.mm.yyyy
+\def\mydate{\leavevmode\hbox{\the\day.\twodigits\month.\twodigits\year}}
+\def\twodigits#1{\ifnum#1<10 0\fi\the#1}
+
+\title{Thesis title}
+\author{Name Surname}
+\date{\L{}\'od\'z, \mydate}
+
+% header and footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% \fancyhead{}
+% \fancyhead[RO,LE]{Thesis Title}
+% \fancyfoot{}
+% \fancyfoot[LE,RO]{\thepage}
+% \fancyfoot[LO,CE]{Chapter \thechapter}
+% \fancyfoot[CO,RE]{Author Name}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% main text
+\begin{document}
+
+% title page
+% to modify the contents of the title page go to titlepage.tex file
+\input{titlepage}
+
+\pagenumbering{gobble}
+\pagenumbering{roman}
+\thispagestyle{plain}
+\null\newpage
+
+\chapter*{Abstract}
+\input{abstract}
+
+\chapter*{Acknowledgements}
+\input{acknowledgements}
+
+\chapter*{}
+\input{dedication}
+
+\tableofcontents
+\pagenumbering{arabic}
+\null\newpage
+
+\chapter{Introduction}
+\input{chapters/chapter1}
+
+\chapter{Chapter2}
+\input{chapters/chapter2}
+
+\chapter{Chapter3}
+\input{chapters/chapter3}
+
+\chapter{Chapter4}
+\input{chapters/chapter4}
+
+\chapter{Conclusions}
+\input{chapters/chapter5}
+
+\appendix
+\chapter{Acronyms and Symbols}
+\input{chapters/appendix_acronyms}
+
+\printbibliography[heading=bibintoc]
+
+\newpage
+\listoffigures
+
+\newpage
+\listofcodes
+
+\newpage
+\listoftables
+
+\end{document}

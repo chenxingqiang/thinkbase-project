@@ -1,0 +1,440 @@
+%% UTFPRCT-TEX, v1.0.6 wmeira on 2021/10/11
+%% Copyright (C) 2020- by William H. T. Meira
+%%
+%% Modified version of project 'utfprpgtex' maintained 
+%% by Luiz E. M. Lima
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in 
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The Current Maintainer of this work is William H. T. Meira.
+%%
+%% This project consists mainly of files: 'utfprct.cls', 'utfprct.tex', 
+%% 'utfprct-dados.tex' 
+%% 
+%% The 'abntex2-alf.bst' and 'abntex2-num.bst' files are slightly
+%% modified versions of the bibtex styles from abntex2 (v.1.9.7)
+%% package to suit NBR6023/2018 (not yet implemented there). 
+%% Complementary, 'abntex2-alf-en.bst' and 'abntex2-num-en.bst' are
+%% english versions of the respective bibtex styles.
+%%
+%% Contribute to improve this project (github repo):
+%% https://github.com/wmeira/utfprct-tex
+
+%% Formato digital (sem folhas em branco): 
+%% 'pretextualoneside': impressão dos elementos pré-textuais começa em qualquer lado da folha (anverso ou verso)
+%% 'oneside': impressão dos elementos textuais e pós-textuais no anverso da folha (sem folhas em branco para o verso)
+
+%% Formato impresso:
+%% 'pretextualtwoside': impressão dos elementos pré-textuais começa sempre no anverso
+%% 'oneside' ou 'twoside': impressão dos elementos textuais e pós-textuais `oneside` (anverso) ou `twoside` (anverso e verso, se mais de 100 páginas)
+
+%% [Note] As legendas devem ser colocadas em cima do elemento (figura, tabela, quadro, algoritmo...) e os  \caption antes de entrar no ambiente. Obrigatoriamente, \fonte deve ser embaixo da elemento. Se for de criação do próprio autor, colocar "Autoria Própria." (Own Authorship.)
+%\begin{figure}[htb]%% Ambiente figure
+%\caption{Exemplo de caption}%% Legenda
+%\label{fig:figura1}%% Rótulo
+%\includegraphics[width=\textwidth]{./CapituloExemplo/figura1}%% Dimensões e localização
+%\fonte{\citet{Larsson2003}.}%% Fonte (quando criado pelo autor, usar Autoria Própria)
+%\end{figure}
+
+%% Classe e opções de documento
+\documentclass[%% Opções
+%% -- Opções da classe MEMOIR --
+  12pt,%% Tamanho da fonte: 10pt, 11pt, 12pt, etc.
+  a4paper,%% Tamanho do papel: a4paper (A4), letterpaper (carta), etc.
+  % fleqn,%% Alinhamento das equações à esquerda (comente para alinhamento centralizado)
+  % leqno,%% Numeração das equações no lado esquerdo (comente para lado direito)
+  oneside,%% IMPRESSÃO dos elementos textuais e pós-textuais: oneside (apenas no anverso) ou twoside (anverso e verso, se mais de 100 p.) (insere páginas em branco).
+%%  
+%% -- Opções da classe ABNTEX2 --
+  sumario = abnt-6027-2012,%% Formatação do sumário: tradicional (estilo tradicional) ou abnt-6027-2012 (norma ABNT 6027-2012)
+  chapter = TITLE,%% Títulos de capítulos em maiúsculas (comente para desabilitar)
+  section = TITLE,%% Títulos de seções secundárias em maiúsculas (comente para desabilitar)
+  % subsection = TITLE,%% Títulos de seções terciárias em maiúsculas (comente para desabilitar)
+  % subsubsection = TITLE,%% Títulos de seções quartenárias em maiúsculas (comente para desabilitar)
+%%  
+%% -- Opções da classe UTFPRCT-TEX --
+  pretextualoneside,%% Impressão dos elementos pré-textuais: pretextualoneside (anverso) ou pretextualtwoside (anverso e verso)
+  fontetimes,%% Fonte do texto: fontetimes (times), fontearial (arial) ou fontecourier (courier), fontemodern (lmodern - default latex). Times and Arial are ABNT recommended
+   %vinculoscoloridos,%% Cores nos vínculos (citações, arquivos, links, url, etc.) (comente para desabilitar). NBR 14724/2011: cor preta (inclusive hyperlinks)
+  semrecuonosumario,%% Remoção do recuo dos itens no sumário (comente para adição do recuo, se estilo tradicional)
+  %inserirbackref,%% Inserir backref na lista de referências (e.g., Citado na página...)
+  usemakeindex,%% Compilação de glossários e índices utilizando makeindex (comente para desabilitar)
+  legendascentralizadas,%% Alinhamento das legendas centralizado (comente para alinhamento à esquerda)
+%%  
+%% -- Opções da folha de aprovação -- 
+%% O mais comum é anexar o PDF do termo de aprovação sem assinaturas. As opções abaixo são para o formato da pós-graduação UTFPR-PG (Ponta Grossa) e podem servir de placeholder para este template.
+  %aprovacaoestiloppg,%% Folha de aprovação do programa de pós-graduação no estilo do PPG (comente para estilo padrão)
+  %pardeassinaturas,%% Assinaturas na folha de aprovação em até duas colunas (comente para em uma única coluna)
+  % linhasdeassinaturas,%% Linhas de assinaturas na folha de aprovação (comente para remover as linhas)
+%%  
+%% -- Opções do pacote babel (hifenização) -- % 
+  %french,%% Idioma adicional para hifenização (suporte parcial)
+  %spanish,%% Idioma adicional para hifenização (suporte parcial)
+  english,%% Idioma adicional para hifenização  (colocar em último para doc. em inglês)  
+  brazil%% Idioma principal do documento (último da lista) 
+]{utfprct}%% Classe utfprct
+
+%%%%%%%%
+% Documento em Inglês: colocar o "english" como último idioma carregado no documentclass, sendo o último a língua principal do documento.
+%%%%%%%%
+
+%%%%%%%%
+%% Configuração dos avisos (warnings)
+%% Comportamento do Tex quando um PDF é incluído e possui uma versão mais nova que a versão mínima especificada em \pdfminorversion. Opções: -1 (no info), 0 (default, warning), 1 (error)
+\pdfinclusionerrorlevel=-1%no warning 
+%\pdfminorversion=5%pdf minor output version (default 5)
+
+%% [Badbox] Underfull e Overfull nível de aviso (filtra o que está abaixo)
+\hbadness=5000%0 até 10000 (max) nível de badness
+\vbadness=1000%0 até 10000 (max) nível de badness
+%\hfuzz=0.01pt%excesso permitido de largura (\hbox)para ser considerado overfull
+%\vfuzz=0.001pt%excesso permitido de altura (\vbox) para ser considerado overfull
+%\overfullrule=10mm%adicionar aviso visual para um badbox
+%%%%%%%%
+
+%%%%%%%%
+%% Pacotes carregados nas classes:
+%%   memoir: abstract, appendix, array, booktabs, ccaption, chngcntr, chngpage, dcolumn, delarray, enumerate, epigraph, framed, ifmtarg, ifpdf, index, makeidx, moreverb, needspace, newﬁle, nextpage, parskip, patchcmd, setspace, shortvrb, showidx, tabularx, titleref, titling, tocbibind, tocloft, verbatim, verse.
+%%   memoir (similares): crop, fancyhdr, geometry, sidecap, subﬁgure, titlesec.
+%%   abntex2: babel, bookmark, calc, enumitem, ifthen, hyperref, textcase.
+%%   utfprct: abntex2cite, ae, algorithmic, amsmath, backref, breakurl, caption, subcaption, cmap, color, eepic, epic, epsfig, etoolbox, fancyhdr, fix-cm, fontenc, glossaries, graphics, graphicx, helvet, hyphenat, indentfirst, inputenc, lastpage, morewrites, nomencl, sfmath, sistyle, substr, times, xtab, pdfpages.
+
+%% Pacotes adicionais (\usepackage[options]{package})
+\usepackage{bigdelim, booktabs, colortbl, longtable, multirow}%% Ferramentas para tabelas
+\usepackage{amssymb, amstext, amsthm, icomma}%% Ferramentas para linguagem matemática
+\usepackage{pifont, textcomp, wasysym}%% Símbolos de texto
+
+% Refinamento tipográfico: diminui badboxes
+\usepackage{microtype}%
+
+%% Comandos personalizados (\newcommand{name}[num]{definition})
+\newcommand{\cpp}{\texttt{C$++$}}%% C++
+\newcommand{\latex}{\LaTeX}%% LaTeX
+\newcommand{\ds}{\displaystyle}%% Tamanho normal das equações
+\newcommand{\bsym}[1]{\boldsymbol{#1}}%% Texto no modo matemático em negrito
+\newcommand{\mr}[1]{\mathrm{#1}}%% Texto no modo matemático normal (não itálico)
+\newcommand{\der}{\mr{d}}%% Operador diferencial
+\newcommand{\deri}[2]{\frac{\der#1}{\der#2}}%% Derivada ordinária
+\newcommand{\derip}[2]{\frac{\partial#1}{\partial#2}}%% Derivada parcial
+\newcommand{\pare}[1]{\left(#1\right)}%% Parênteses
+\newcommand{\colc}[1]{\left[#1\right]}%% Colchetes
+\newcommand{\chav}[1]{\left\lbrace#1\right\rbrace}%% Chaves
+\newcommand{\sen}{\operatorname{sen}}%% Operador seno
+\newcommand{\senh}{\operatorname{senh}}%% Operador seno hiperbólico
+\newcommand{\tg}{\operatorname{tg}}%% Operador tangente
+\newcommand{\tgh}{\operatorname{tgh}}%% Operador tangente hiperbólico  
+\ifthenelse{\equal{\languagename}{english}}{%%
+\newcommand{\nomeequacao}{Equation}
+\newcommand{\nomeequacoes}{Equations}
+}{%default pt
+\newcommand{\nomeequacao}{Equação}
+\newcommand{\nomeequacoes}{Equações}
+}%  
+\newcommand{\seqref}[1]{\nomeequacao~\eqref{#1}}%% Referência de uma única equação
+\newcommand{\meqref}[1]{\nomeequacoes~\eqref{#1}}%% Referência de multiplas equações
+\newcommand{\citep}[1]{\cite{#1}}%% Atalho para citação implícita
+\newcommand{\citet}[1]{\citeonline{#1}}%% Atalho para citação explícita
+\newcommand{\citepa}[1]{(\citeauthor{#1})}%% Atalho para citação implícita (somente autor)
+\newcommand{\citeta}[1]{\citeauthoronline{#1}}%% Atalho para citação explícita (somente autor)
+\newcommand{\citepy}[1]{(\citeyear{#1})}%% Atalho para citação implícita (somente ano)
+\newcommand{\citety}[1]{\citeyear{#1}}%% Atalho para citação explícita (somente ano)
+
+%allow fixed size on collums with text position
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Configuração das entradas
+%%
+
+%% Arquivo de dados do modelo de documento LaTeX para produção de trabalhos acadêmicos da UTFPR
+\input{./utfprct-dados}%% Realize as modificações pertinentes no arquivo "utfprct-dados.tex"
+
+%% Ferramenta para criação de índices
+\makeindex%% Não comente esta linha
+
+%% Ferramenta para criação de glossários
+\makeglossaries%% Não comente esta linha
+
+%% Entradas da lista de abreviaturas, siglas e acrônimos
+\include{./PreTexto/entradas-acronimos}% Comente para remover este item
+
+%% Entradas do glossário
+\include{./PosTexto/entradas-glossario}% Comente para remover este item
+
+%% Ferramenta para criação de nomenclaturas
+\makenomenclature%% Não comente esta linha
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Início do documento
+%%
+\begin{document}%% Não comente esta linha
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Formatação de páginas de elementos pré-textuais
+%%
+\pretextual%% Não comente esta linha
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Capa
+%%
+\incluircapa%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Folha de rosto (comentar para remover pré-textual)
+%%
+%% A descrição da folha de rosto pode ser customizada no 
+%% arquivo de dados ('utfprct-dados.tex) alterando o dado
+%% '\DescricaoDoDocumento'. Colocando o * (asterisco)
+%% insere a ficha catalográfica no verso da folha de rosto
+%%
+%% Licenciamento: a resolução conjunta Nº 01/2020 COGEP-COPPG torna
+%% obrigatório a inclusão de uma das 6 licenças Creative Commons
+%% disponíveis na folha de rosto. Verificar junto ao curso ou 
+%% programa de pós-graduação qual deve ser utilizada no trabalho. 
+%% Por exemplo, o CPGEI aderiu a CC-BY. 
+%%
+%% Opções: CC-BY, CC-BY-SA, CC-BY-ND, CC-BY-NC, CC-BY-NC-SA, CC-BY-NC-ND, Nenhuma
+%%
+\Licenca{CC-BY}
+\incluirfolhaderosto*%% Com ficha catalográfica no verso 
+%\incluirfolhaderosto%% Sem ficha catalográfica no verso
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Ficha catalográfica (comente para remover este item)
+%% A ficha catalográfica é fornecida pela biblioteca em PDF
+%% e deve ser anexada no verso da folha de rosto.
+%%
+%% Comando \incluirfichacatalografica: 
+%% 1) Aceita o path para o PDF (insere a primeira página)
+%% 2) Com argumento 'template' (ou sem argumento), insere-se um template 'utfprct' (placeholder)
+%%
+\incluirfichacatalografica{./PreTexto/ficha_catalografica_exemplo.pdf}%%1
+%\incluirfichacatalografica{template}%%2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Errata
+\include{./PreTexto/errata}%% Comente para remover este item
+
+%% Folha ou Termo de aprovação (comente para remover este item)
+%% A folha de aprovação é entregue ao autor, quando aprovado, após
+%% a defesa e deve ser anexada nos pré-textuais .
+%% 1) Aceita o path para o PDF (insere a primeira página)
+%% 2) Com argumento 'template' (ou sem argumento), insere-se um template 'utfprct', que pode servir de placeholder.
+%%
+\incluirfolhadeaprovacao{./PreTexto/folha_de_aprovacao_exemplo.pdf}%%1
+%\incluirfolhadeaprovacao{template}%2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Dedicatória
+%%
+\include{./PreTexto/dedicatoria}%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Agradecimentos
+%%
+\include{./PreTexto/agradecimentos}%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Epígrafe
+%%
+\include{./PreTexto/epigrafe}%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Resumo
+%%
+\include{./PreTexto/resumo}%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Abstract
+%%
+\include{./PreTexto/abstract}%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lista de algoritmos
+%%
+\incluirlistadealgoritmos%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lista de ilustrações
+%%
+\incluirlistadeilustracoes%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lista de tabelas
+%%
+\incluirlistadetabelas%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lista de abreviaturas, siglas e acrônimos
+%% 
+%%
+%% Modo "glossaries": utiliza o pacote "glossaries" do TeX 
+%%  1) Ordena automaticamente a lista
+%%  2) Apenas os termos referenciados (\gls) são colocados na lista
+%%  3) Referencia de uso na seção 6.11 do Capítulo Exemplo
+%%  4) ATENÇÃO: o arquivo que define qual lista utilizar está 
+%%  definido no preambulo.
+%%  5) Arquivo exemplo: PreTexto/entradas-acronimos.tex 
+%% 		
+%% Modo "file": utiliza os termos definidos no arquivo PreTexto/file-acronimos.tex
+%%  1) Inserção tabular da listas
+%%  2) Controle da ordem de apresentação das listas
+%%  3) Não é preciso referenciar no texto
+%%
+\incluirlistadeacronimos{glossaries}%% Opções: "glossaries" (pacote) ou "file" (arquivo) ou "none" (desabilita)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lista de símbolos
+%% 
+%% Modo "nomencl": utiliza o pacote "nomencl" do TeX
+%%  1) Ordena automaticamente a lista pelo índice e seção
+%%  2) Comandos pré-definidos para as seções definidas
+%%  3) Referência de uso na seção 6.12 do Capítulo Exemplo
+%% Modo "file": utiliza os símbolos definidos no arquivo PreTexto/file-acronimos.tex
+%%  1) Inserção tabular da listas
+%%  2) Liberdade na organização das seções das listas
+%%  3) Controle da ordem de apresentação dentro das listas
+%%
+\incluirlistadesimbolos{nomencl}%% Opções: "nomencl" (pacote) ou "file" (arquivo) ou "none" (desabilita)
+
+%% Pretexto da lista de símbolos (opção pacote nomencl)
+%\renewcommand{\nompreamble}{Nomenclature...}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sumário
+%%
+\incluirsumario%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Formatação de páginas de elementos textuais
+%%
+\textual%% Não comente esta linha
+
+%% Parte
+% \part{Introdução}%% Comente para remover este item
+
+%% Capítulo
+\include{./Capitulo1/capitulo1}%% Comente para remover este item
+
+%% Parte
+% \part{Desenvolvimento}%% Comente para remover este item
+
+%% Capítulo
+\include{./Capitulo2/capitulo2}%% Comente para remover este item
+
+%% Capítulo
+\include{./Capitulo3/capitulo3}%% Comente para remover este item
+
+%% Capítulo
+\include{./Capitulo4/capitulo4}%% Comente para remover este item
+
+%% Parte
+% \part{Conclusão}%% Comente para remover este item
+
+%% Capítulo
+\include{./Capitulo5/capitulo5}%% Comente para remover este item
+
+%% Capítulos após este comando criam marcadores do pdf na raiz
+% \phantompart%% Comente para remover este item
+
+%% Capítulo de exemplo
+\include{./CapituloExemplo/capituloexemplo}%% Comente para remover este item
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Formatação de páginas de elementos pós-textuais
+%%
+\postextual%% Não comente esta linha
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Arquivos de referências
+%%
+\arquivosdereferencias{%% Arquivos bibtex sem a extensão .bib e separados por vírgula - Não comente esta linha
+  ./PosTexto/exemplos-referencias,%% Arquivo de referências - Comente para remover este item (chktex 26 supress warn.)
+  ./PosTexto/referencias%% Arquivo de referências - Comente para remover este item (chktex 26 - supress warn.)
+}%% Não comente esta linha
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Glossário
+%%
+\incluirglossario%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Arquivos de apêndices
+%%
+\begin{arquivosdeapendices}%% Os arquivos de apêndices devem se incluídos neste ambiente - Não comente esta linha
+  \partapendices%% Página de início dos apêndices - Comente para remover este item
+  \include{./PosTexto/apendicea}%% Apêndice - Comente para remover este item
+  \include{./PosTexto/apendiceb}%% Apêndice - Comente para remover este item
+\end{arquivosdeapendices}%% Não comente esta linha
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Arquivos de anexos
+%%
+\begin{arquivosdeanexos}%% Os arquivos de anexos devem se incluídos neste ambiente - Não comente esta linha  
+  \partanexos%% Página de início dos anexos - Comente para remover este item (ver Bug0001)
+  \include{./PosTexto/anexoa}%% Anexo - Comente para remover este item
+%  %\include{./PosTexto/anexob}%% Anexo - Comente para remover este item
+\end{arquivosdeanexos}%% Não comente esta linha
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Índice
+%%
+\incluirindice%% Comente para remover este item
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Fim do documento
+\end{document}%% Não comente esta linha
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

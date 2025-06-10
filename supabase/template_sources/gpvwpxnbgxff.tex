@@ -1,0 +1,229 @@
+\documentclass[a4paper, 12pt]{article} % report for longer pieces
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{helvet} % Load Arial-like font
+\usepackage{graphicx} % for inserting graphs & images
+\usepackage{tocloft} % Package to customize the ToC
+\usepackage{tocbibind} % Automatically adds the lists to the ToC
+\usepackage{ragged2e} % Provides the \justifying command
+\usepackage{indentfirst} % first line indented IF! justified text is on
+\usepackage{parskip}
+\usepackage{sectsty}
+\usepackage{etoolbox} % Include etoolbox for conditional comparison
+
+
+%%%%%%%%%%%%%%%%%%%%%%% DOCUMENT FORMATTING %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Setting the margins
+\geometry{
+  top = 2.5cm,
+  bottom = 2.5cm,
+  left = 3cm, %inner
+  right = 1.5cm %outer
+}
+
+% Section headers in 13pt
+\sectionfont{\fontsize{13pt}{15}\selectfont}
+
+% Subsection headers in 12pt
+\subsectionfont{\fontsize{12pt}{14}\selectfont}
+
+% No space between paragraphs
+\setlength{\parskip}{0\baselineskip} %same {0pt plus 1pt}
+
+% Set line spacing
+\setstretch{1.5} % Change the line spacing to 1.5
+
+% Changing font sizes for ToC, LoF, and LoT
+\renewcommand{\cfttoctitlefont}{\normalfont\bfseries\fontsize{13pt}{15}\selectfont}
+\renewcommand{\cftloftitlefont}{\normalfont\bfseries\fontsize{13pt}{15}\selectfont}
+\renewcommand{\cftlottitlefont}{\normalfont\bfseries\fontsize{13pt}{15}\selectfont}
+
+% Customize space between section number and title
+\makeatletter
+\renewcommand\@seccntformat[1]{%
+  \ifstrequal{#1}{section}{%
+    \csname the#1\endcsname\hspace{1.4em} % Adjust space for sections only
+  }{%
+    \csname the#1\endcsname\hspace{0.6em} % Default spacing for others
+  }}
+
+\makeatother
+
+\begin{document}
+\singlespacing % Ensure single-line spacing
+
+
+% Cover page
+\begin{titlepage}
+    
+    \begin{flushright}
+    \includegraphics[width = 7cm]{images/logo_schriftzug.jpg} % Adjust width as needed
+    \end{flushright}
+    
+    \begin{flushleft}
+    \large
+    Johannes-Gutenberg University Mainz \\
+    Faculty: \\
+    Chair or Institute:  \\
+    Supervisor: \\
+    \end{flushleft}
+    \vspace{2cm} % Adjusted spacing for title block
+    
+    \centering
+    Topic:\\
+    \LARGE
+    \textbf{Main Title: \\
+    \Large
+    Secondary title} \\
+    \vspace{1cm}
+    \large
+    Master's thesis for obtaining the academic degree: \\
+    Add your degree and name of your programm \\
+    \vspace{2cm} % Adjusted spacing for right block
+    
+    \begin{flushleft}
+    \large
+    \begin{tabular}{@{}l@{\hspace{0.5cm}}l} % Adding horizontal space between label and detail
+        Submitted by: & \textbf{Your Name} \\[0.25cm] % Vertical spacing added here
+        Student ID: & 00000000 \\[0.25cm]
+        Address: & Address, \\[0.25cm]
+        & PLZ \\[0.25cm]
+        Telf.: & 00000000000 \\[0.25cm]
+        Email: & uni email \\[0.25cm]
+        & private email
+    \end{tabular}
+    \vspace{2cm}
+    
+    \large
+    Place, date
+    \end{flushleft}
+
+\end{titlepage}
+
+
+% Start Roman numeral page numbering
+\pagenumbering{Roman}
+
+% No page number on the first page
+\thispagestyle{empty}
+
+
+% Acknowledgements & Dedication
+\centering
+\section*{Acknowledgments}
+\begin{flushleft}
+    Special thanks to ...
+\end{flushleft}
+\vspace{3cm}
+
+\section*{Dedication}
+\begin{flushleft}
+   For everyone who contributed to this work. 
+\end{flushleft}
+\newpage
+
+
+% Set the page counter to 3
+\setcounter{page}{3}
+
+% Abstract %
+\section*{Abstract}
+\centering
+\justifying
+\noindent
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam lacinia ultrices felis, et scelerisque velit bibendum vel. In hac habitasse platea dictumst. Praesent sit amet leo et erat vulputate consequat non vitae risus. Curabitur varius, turpis ut varius vestibulum, nisi mi sollicitudin turpis, id ultricies velit lorem a est. Vestibulum auctor consequat libero, a euismod libero fringilla nec. Ut vel varius urna, vitae egestas ligula. Morbi ac nulla eu metus tincidunt suscipit. Curabitur sed lacus et orci interdum consequat et ut eros. Phasellus luctus leo at libero vestibulum, sed volutpat lectus dictum.
+
+\vspace{0.5cm} % Add some vertical space before the signature line
+
+\begin{flushleft}
+    \noindent\rule{\textwidth}{0.4pt} % Create a horizontal line across the page
+\vspace{0.5cm}
+\textbf{Keywords:} Lorem, Ipsum, Dolor, Sit, Amet
+\end{flushleft}
+\newpage
+
+
+% Table of contents
+\pagebreak
+\centering
+\renewcommand{\contentsname}{Table of Contents} % name of the ToC
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % style .....
+\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+\tableofcontents
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}} % or whatever depth you want
+\newpage
+
+% Lists of Figures and Tables
+\listoffigures
+\vspace{2cm}
+
+\listoftables
+\newpage
+
+
+% Appendix Directory
+\section*{Appendix Directory}
+\addcontentsline{toc}{section}{Appendix Directory}
+\newpage
+
+
+% Abbreviations
+\section*{Abbreviations}
+\addcontentsline{toc}{section}{Abbreviations}
+\begin{flushleft}
+    \begin{tabular}{@{}l@{\hspace{0.5cm}}l}
+        ABC & a b c
+    \end{tabular}
+\end{flushleft}
+\vspace{2cm}
+\newpage
+
+
+% Switch to Arabic numeral page numbering
+\clearpage
+\pagenumbering{arabic}
+\raggedright % all left-sided
+% Set line spacing
+\setstretch{1.5}
+
+% All sections
+\input{1. Intro}
+\input{2. LiteratureReview}
+\input{3. Data}
+\input{4. Methodology}
+\input{5. Results}
+\input{6. Robustness}
+\input{7. Discussion}
+\input{8. Conclusion and Recommendations}
+
+
+% Appendices
+\clearpage
+\pagenumbering{Roman}
+% Set specific page number
+\setcounter{page}{8} % Example: start from Roman numeral VIII
+\centering
+\appendix
+\include{Appendix}
+
+
+% Declaration of Authorship
+\centering
+\include{Declaration of Authorship}
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+

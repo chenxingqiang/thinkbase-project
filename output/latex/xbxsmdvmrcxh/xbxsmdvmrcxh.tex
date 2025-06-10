@@ -1,0 +1,147 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% %%%%%%%%%%%%%%%%%%%%%% The Thesis %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%==================== Document Class =======================================%%
+% Document class, adjust for different printing/PDF creation modes
+\documentclass[oneside,a4paper,12pt]{book}
+%\documentclass[twoside,a4paper,11pt,draft]{book}
+
+%%==================== Document Info ========================================%%
+\newcommand{\tname}{Your Name Here}
+\newcommand{\tdegrees}{BE (Hons 1)}  % optional - define to put degree(s) on title page
+% Comment on degrees: Since a thesis is an academic document you probably should
+% put your previous degrees after your name, regardless of where they are from.
+% The convention is that if a degree is not from your current university you
+% should include the abbreviated name of the awarding university. There are
+% lists of standard abbreviations of university names (where?). By convention
+% you do not put the discipline area, only the degree. For example,
+% Tariq Abuhahsim BSc (Uni Name), MSc (Uni Name)
+\newcommand{\ttitle}{Your Long Thesis Title Goes Here and May Extend Over Two Lines}
+\newcommand{\tdoctype}{PhD Thesis}
+\newcommand{\tdepartment}{Australian Centre for Field Robotics}
+\newcommand{\tschool}{School of Aerospace, Mechanical and Mechatronic Engineering}
+\newcommand{\tinstitution}{The University of Sydney}
+\newcommand{\tdegree}{Doctor of Philosophy}
+\newcommand{\tdateSubmitted}{28 March 2013}
+\newcommand{\tmonthAndYearSubmitted}{March 2013}
+% Define the following two when you are creating the final post-examination version
+\newcommand{\tdateRevised}{22 July 2013}
+\newcommand{\tmonthAndYearRevised}{July 2013}
+\newcommand{\tkeywords}{your, keywords, go, here}
+
+%%==================== Citation and Reference Style =========================%%
+% Choose a reference style from: {apa-like, ieee} or adjust natbib and
+% bibliography settings yourself if you prefer something else.
+\newcommand{\tReferenceStyle}{ieee}
+
+%%==================== Included Packages ====================================%%
+% If you need to include extra packages, put them into this file; you may want
+% or need to remove some packages from the list if conflicts arise from those
+% you add.
+\input{LaTeX/packages}
+
+%%==================== Document Layout ======================================%%
+% This defines a variety of internal latex whitespace lengths (line spacing,
+% margins, magic numbers for automatic layout of floating environments). You
+% may need to modify this slightly depending on how you're binding the
+% document, and whether you print single or double sided.
+\input{LaTeX/layout}
+
+%%==================== Local Package Includes ===============================%%
+% Some macros and environment definitions that are used in the template are in
+% here. Add your own, either by modifying commands.tex or \input{}ing your own
+% tex file.
+\input{LaTeX/commands}
+
+%%==================== Document Start =======================================%%
+% Document starts here! Everything before this is just configuration...
+\begin{document}
+
+%%==================== Setup for Headers for Chapters =======================%%
+% Chapter headers are slightly different from the headers in the front matter.
+\pagestyle{fancyplain}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\lhead[\fancyplain{}{\thepage}]{\fancyplain{}{\nouppercase\rightmark}}
+\rhead[\fancyplain{}{\nouppercase\leftmark}]{\fancyplain{}{\thepage}} \cfoot{}
+
+%%==================== Front Matter =========================================%%
+% Everything prior to chapter 1
+\include{FrontMatter/FrontMatter}
+
+%%==================== Chapters =============================================%%
+% Adjust the file names below to point to the main chapter .tex file for each
+% chapter, and don't forget to update the relative paths inside the files
+% within chapters as you rename directories! All paths are relative to the
+% location of THIS file, Thesis.tex.
+\include{ChapterIntro/Intro}						% Chapter 1
+\include{ChapterLiteratureReview/LiteratureReview}	% Chapter 2
+\include{ChapterPerception/Perception}				% Chapter 3
+\include{ChapterEstimation/Estimation}				% Chapter 4
+\include{ChapterExperiments/Experiments}			% Chapter 5
+\include{ChapterConclusion/Conclusion}				% Chapter 6
+
+%%==================== List of References ===================================%%
+% Note that the List of References goes after the chapters but before the
+% appendices. A Bibliography can contain references that are general
+% background reading and are not cited in the text. A References or List of
+% References section must contain only references that are cited in the text.
+% Change to "Bibliography" in commands.tex if you wish and if appropriate.
+\cleardoublepage
+
+\begin{singlespace}
+
+    \phantomsection
+    \addcontentsline{toc}{chapter}{List of References}  % or "Bibliography"
+
+    % acfrplainnat is a slightly modified version of plainnat from the natbib package.
+    % I (AH) removed URLs from the output, since this seems unnecessary or a poorly
+    % used field, and adjusted 'misc' to make more sense for the way I used it.
+
+    % Bibliography styles supported by this template are apa-like (default) and ieee
+    \ifthenelse{\equal{\tReferenceStyle}{ieee}}
+        {\bibliographystyle{BibTeX/acfrplainnat}}    % IEEE-like style (or use plainnat)
+        {\bibliographystyle{BibTeX/apalike}}         % APA-like style (or use apalikeAkkaNat)
+
+    \begin{raggedright}     % because you often get ugly whitespace if justified...
+        \bibliography{BibTeX/library,BibTeX/comprehensive}
+    \end{raggedright}
+
+\end{singlespace}
+
+%%==================== Appendices ===========================================%%
+% Appendices are almost exactly the same as chapters; the only difference is
+% that they come after the \appendix command below.
+\appendix 		% Switches from 'Chapter #' to 'Appendix X' chapter titles
+\include{AppendixSomething/Something}
+
+\end{document}
+
+
+\end{document}

@@ -1,0 +1,593 @@
+\documentclass{tufte-handout}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+
+
+
+\title[JOST \LaTeX\ Template] %short margin title should not be more than half width of page
+{\LaTeX\ Template for the Journal of Systems Thinking} % [header short title] {Full title}
+
+
+%\subsection{Typefaces}\label{sec:typefaces} %If the Palatino, \textsf{Helvetica}, and \texttt{Bera Mono} typefaces are installed, this style will use them automatically.  Otherwise, we'll fall back on the Computer Modern typefaces.
+
+
+%\author{\noindent{Author 1}\\[3mm] \noindent{Author2}\\[3mm]}
+
+%\author{
+%\and
+%  {Derek Cabrera \thanks{dog}}
+%\and
+%  Laura Cabrera
+%}
+%\author[The Tufte-LaTeX Developers]{Author}
+%\date{28 March 2010} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+
+\usepackage{graphicx} % allow embedded images
+  \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+  \graphicspath{{graphics/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+  \fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% START JoST ADDITIONS %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{comment}
+\usepackage{latexsym}
+\usepackage[utf8]{inputenc}
+%\usepackage{csquotes}
+\usepackage{longtable}
+\usepackage{cancel}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows,matrix,positioning,fit,external,calc,tikzmark,arrows.meta,backgrounds}
+\usepackage{tikz-network}
+\usepackage{tikzpagenodes}
+\usepackage{eso-pic}
+%\tikzexternalize[prefix=tikz/]
+%\usepackage{siunitx}
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{xspace}
+\usepackage{hologo}
+\usepackage{tabularx}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{fdsymbol}
+\usepackage{etex}
+\usepackage{graphicx}
+\usepackage{stackengine}
+\stackMath
+
+
+
+
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\makeatletter
+\tikzset{
+  prefix after node/.style={
+    prefix after command={\pgfextra{#1}}
+  },
+  /semifill/ang/.store in=\semi@ang,
+  /semifill/ang=0,
+  semifill/.style={
+    circle, draw,
+    prefix after node={
+      \typeout{aaa \semi@ang}
+      \let\nodename\tikz@last@fig@name
+      \fill[/semifill/.cd, /semifill/.search also={/tikz}, #1]
+        let \p1 = (\nodename.north), \p2 = (\nodename.center) in
+        let \n1 = {\y1 - \y2} in
+        (\nodename.\semi@ang) arc [radius=\n1, start angle=\semi@ang, delta angle=180];
+    },
+  }
+}
+\makeatother
+%\numberwithin{equation}{section}
+
+\makeatletter
+\newcommand{\lrarrow}{\mathrel{\mathpalette\lrarrow@\relax}}
+\newcommand{\lrarrow@}[2]{%
+  \vcenter{\hbox{\ooalign{%
+    $\m@th#1\mkern6mu\rightarrow$\cr
+    \noalign{\vskip1pt}
+    $\m@th#1\leftarrow\mkern6mu$\cr
+  }}}%
+}
+\makeatother
+
+\newcommand\xtab[1][1cm]{\hspace*{#1}} % create \xtab
+
+
+\definecolor{hlyellow}{RGB}{255, 251, 100}
+\definecolor{hlyellow2}{RGB}{210, 251, 80}
+\definecolor{hlblue}{RGB}{95, 170, 255}
+\newcommand{\hlc}[2][yellow]{ {\sethlcolor{#1} \hl{#2}} }
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\extrafloats{100}
+
+\definecolor{colorS}{RGB}{255,255,255}
+\definecolor{colorI}{RGB}{0,255,255}
+\tikzset{
+S/.style={circle,draw=black!50,fill=colorS!30,thick, minimum size=2mm, inner sep = 0mm},
+I/.style={circle,draw=black!50,fill=colorI!20,thick, minimum size=2mm, inner sep = 0mm},
+BigCirc/.style={circle,draw=black!50,thick,inner sep=0pt,minimum size=0pt, inner sep = 0mm},
+pics/circles/.style args={#1#2#3#4}{
+  code={
+   \node [#1,minimum size=2mm] (#1#2#3#4top) at (0,0.25) {};
+   \node [#2,minimum size=2mm] (#1#2#3#4left) at (-0.2165,-0.125) {};
+   \node [#3,minimum size=2mm] (#1#2#3#4right) at (0.2165,-0.125) {};
+   \node [#4,minimum size=2mm] (#1#2#3#4center) at (0,0) {};
+   \draw (#1#2#3#4top) -- (#1#2#3#4center) -- (#1#2#3#4left) (#1#2#3#4center) -- (#1#2#3#4right);
+    \node[BigCirc, fit = (#1#2#3#4left)(#1#2#3#4top)(#1#2#3#4right)] (circ) at (#1#2#3#4center) {};
+   }
+  }
+}
+
+\pgfmathsetmacro{\xA}{1.5}
+\pgfmathsetmacro{\xB}{3}
+\pgfmathsetmacro{\xC}{3.35}
+\pgfmathsetmacro{\yA}{1.2}
+\pgfmathsetmacro{\yB}{2.05}
+\pgfmathsetmacro{\yC}{2.9}
+
+\newcommand\Vtextvisiblespace[1][.3em]{%
+  \mbox{\kern.06em\vrule height.3ex}%
+  \vbox{\hrule width#1}%
+  \hbox{\vrule height.3ex}}
+
+
+\newcommand{\emptyfig}{\includegraphics[width=.3\textwidth]{example-image-a}}  % stops overlap of objects in sidebar
+
+
+
+%%% END JoST ADDITIONS %%%%%%%
+
+
+
+\begin{document}
+
+%%%%%%%%%%% Header and Footer %%%%%%%%%%%%%%%%%%
+\fancyfoot[CE,CO]{\flushright  \smallcaps{Journal of Systems Thinking} \hspace{2mm} \includegraphics[width=6mm]{images/jostlogo.png}}
+\fancyhead[CE,CO]{\flushleft \smallcaps{\today}}
+
+\maketitle % this prints the handout title, author, and date
+
+%%%%%%%%%%% Start Author Section %%%%%%%%%%%%%%%%%%
+Derek Cabrera\textsuperscript{a,b,c,d,e,@,*}\marginnote{\\\textsuperscript{a}{\scriptsize Cornell University}\\\textsuperscript{b}{\scriptsize Jeb E. Brooks School of Public Policy}\\\textsuperscript{c}{\scriptsize Cornell Institute for Public Affairs}\\\textsuperscript{d}{\scriptsize SC Johnson College of Business}\\\textsuperscript{e}{\scriptsize Cabrera Research Lab}\\\textsuperscript{@}{\scriptsize Correspondence: cabrera@cornell.edu}\\{\textsuperscript{*}\scriptsize Authors contributed equally to this work.}}  Second Author\textsuperscript{a,b,c,d,e,*}  Third Author\textsuperscript{a,e,*}
+%%%%%%%%%%% End Author Section %%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+\noindent
+\newthought{Abstract: }Write your abstract first and then write it again last. Your abstract should grab your reader's attention and also tell them what the paper is about in plain English. Avoid using jargon, undefined terms, or acronyms in your abstract; if you must, define them. Write your abstract before your paper in order to structure your thinking and then rewrite it when you are finished with your paper to make sure it is tight, clean, and accurately portrays what the paper is about. Include only what is absolutely necessary. Tell the reader what you set out to do, what you did, and the results and conclusions. Keep it brief. This abstract is 121 words long, but yours should not exceed 200 words. JOST uses the Tufte \LaTeX\ document style.\marginnote[-4\baselineskip]{\scriptsize \textbf{Cite this paper:} Cabrera, D., Cabrera, L., Cabrera, E. (2021) \textit{\LaTeX  \hspace{.5mm} Template for the Journal of Systems Thinking}. Journal of Systems Thinking. (Issue).}
+
+ 
+\end{abstract}
+%\printclassoptions
+\noindent\rule{5in}{0.4pt}
+
+
+\section{Introduction to the Journal of Systems Thinking (JoST)}\label{sec:Introduction}
+
+\newthought{The Journal of Systems Thinking (JoST)} (ISSN 2767-3847) is a rolling, online-only, open-access, free-to-publish, double-blind peer-reviewed journal dedicated to basic scientific research, innovation, and public understanding in the areas of Systems Thinking (cognitive complexity), Systems Mapping (visual complexity), Systems Leadership (organizational complexity), and Systems Science (ontological complexity). 
+
+\textit{"A rolling, online-only, open-access, free-to-publish, double-blind peer-reviewed journal?"} Now that is a mouthful. But each one of those descriptors is an important part of what makes JoST special in an age where academic publishing is in real need of an innovation reboot.
+\begin{itemize}
+    \item \textbf{rolling}: This means papers are published as they are accepted, thereby increasing the speed of academic publication
+    \item \textbf{online-only}: This means that there's no print version, decreasing costs and reducing waste.
+    \item \textbf{open-access}: This means it will be open to ALL people, not behind expensive firewalls and libraries. Any person in the entire world can read it.
+    \item \textbf{free-to-publish}: This is a big one. It costs authors nothing to publish, in an age where journals are charging upwards of $6k-$10k to publish a single paper!
+    \item \textbf{double-blind}: means that the author and the reviewer are blind to each other's identity 
+    \item \textbf{peer-reviewed}: this means that the author's research is scrutinized by peer experts in the same field.
+\end{itemize}
+
+This list shows JoST is at the cutting-edge of scientific publishing. But, JoST also sets a vision to be at the cutting-edge of science. 
+
+\subsection{Because Science is Civilization} \label{sec:Science is Civilization}
+
+\newthought{Science is the best thing we humans have} going for us, but it is not absent of problems. JoST attempts to address some of these problems by being hybrid style publication that balances: 
+
+\begin{itemize}
+    \item \textbf{A hybrid of quality and speed}: JoST will not sacrifice the validity, fidelity, and veracity of scientific pursuit but it will focus on developing systems and policies that increase the speed of publication. We do this through a combination of: rolling, online publication, utilizing preprints, and streamlining processes.
+
+    \item \textbf{A hybrid of quality and accessibility}: JoST balances the accessibility of authors and readers by being open-access (articles are available free to the general public) and free-to-publish (authors are not charged for publication), but it also sets a high-bar for quality and academic integrity. We are committed to removing all access-barriers to scientific publication, including those that have to do with readability and relevance. 
+
+    \item \textbf{A hybrid of heuristic-value and public understanding}: JoST explicitly recognizes the deep ecological cycle between basic scientific research, innovation and invention, and public understanding. JoST believes that the general public can and must understand science in order to support it (financially and in other ways) and that this requires public engagement, involvement, and accessibility in science. JoST calls, reviews, edits, and publishes with both scientists and the widest possible general public audience in mind. Authors are asked to limit jargon, explain technical terms, utilize multiple modalities of explanation (written word, data, images, metaphor, storytelling, structure, summaries, etc.). JoST requires an abstract, practical implications statement, and public understanding statement for each of its published articles. 
+
+    \item \textbf{A hybrid of theory with practice}: JoST does not accept the division between “theory or practice” and is fond of the adage, “there’s nothing more practical than a good theory.” JoST does not divide theory and practice in theory or in practice. We accept deeply theoretical papers that bring together research from many realms (e.g., literature reviews, type 1 and 2 meta analyses, etc.) as well as practitioner-style papers (e.g., cases studies, etc.) and experimental designs.  In all cases, the editors and reviewers of JoST will look for papers that are grounded both theoretically and in practice.
+
+    \item \textbf{A hybrid of method-choice with condition of knowledge (aka, 'science')}: JoST is singly committed to publishing defensible scientific work product. At the same time, it defines scientific work in a scientific way—according to how science actually occurs in real life. By today’s publishing standards that focus near-solely on quantitative experimental designs, neither Darwin, Einstein, nor Goodall, would be published. Thus, JoST uses a framework that considers appropriate match between chosen methodology and the current condition of knowledge (see \href{https://cdn2.hubspot.net/hubfs/7421276/CRL\%20Public\%20Resources\%20Folder/KMMM_JOAST_20_5.pdf}{K-MMM paper} and K-MMM Model in Figure \ref{fig:kmmm}). This means, for example, that when knowledge is extremely low about a phenomena, the method of choice is usually not a controlled, randomized, experiment (if nothing else because one would scarcely know what to control for). This means JoST is not a pre-biased ‘quant’ or ‘qual’ or ‘mixed’ journal but instead a scientific journal that seeks submissions that are not only scientifically valid but methodologically appropriate to the condition of knowledge about a given phenomena. Thus, we publish papers with the following methodologies: literature reviews, observation, case studies, survey methods, quasi-experimental, modeling, and experimental methods, randomized controlled designs, type 1 and 2 meta analyses, and theory building. 
+\end{itemize}
+
+% Use figure* for images spanning pagewidth
+\begin{figure*}%[\sidecaptionrelwidth]
+\centering
+\includegraphics[width=1\linewidth]{images/kmmm.png}
+\caption{This legend is placed at the side of the figure that spans beyond one column, rather than below it.}\label{fig:kmmm}
+\end{figure*}
+
+In other words, JoST holds true to the original ideals of science, without all the pomp and circumstance of academia. To be published in JoST, you need to write well, do good research, show evidence for what you claim, and make it accessible to a common reader.
+
+\subsection{Topics and Types of JoST Articles}\label{sec:topics and types} 
+
+In an effort to increase the speed of academic publishing, JoST publishes peer-reviewed articles on a rolling basis based on the year and month of the publication. See the \href{https://journalofsystemsthinking.org/index.php/jost/about}{JoST website About section} for an updated list of Topics. 
+
+ From time to time, JoST sponsors both invited and open-response Special Issues which may take several forms. See the \href{https://journalofsystemsthinking.org/index.php/jost/about}{JoST website About section} for an updated list of Article Types.
+
+\begin{itemize}
+\item \textbf{Special interest or topical focus issues}: These types of special issues allow us to zoom into and penetrate in detail a particular area or topic.
+
+\item \textbf{Special issues that tackle the big questions and heated debates in the field}: The field needs more focused, incremental dialogue on the big challenges. 
+
+\item \textbf{Read and respond issues (usu. based on a seminal work)}: We are especially fond of read-response issues because they provide a focused snapshot of important issues with evidence-based dialogue and decrease the degree to which systems thinking becomes a 'network of a thousand isolated nodes.'
+
+\item \textbf{Special issues focused on a 'Systems X'}: Systems thinking is being applied to many fields both as a lens and an integrating force. These types of special issues allow us to focus on what's taking place in a particular field (X) in which systems thinking is being applied (e.g., systems engineering, systems evaluation, systems education, systems leadership, etc.)
+\end{itemize}
+
+
+
+\section{Author Guidelines and Recommendations}\label{sec:author-recs} 
+\newthought{This template acts as a guide} for laying out your paper as well as offering some tips on how to write your paper. The \textit{requirements} for submission to the Journal of Systems Thinking (JoST) include:
+
+\begin{enumerate}
+\item I understand that the submission must follow the rules below or it will be rejected \textit{before} it reaches peer-review.
+\item I have edited my paper for basic spelling, grammar and readability before you submitting it.
+\item I have read the \href{https://journalofsystemsthinking.org/index.php/jost/about/submissions#authorGuidelines}{Author Guidelines}.
+\item I used either the Docx or \LaTeX\ template
+\item My paper is under 10,000 words (not including references). I must have editorial pre-approval for submissions over 10,000 words.
+\item My submission includes a “Significance and Public Understanding” statement that explains the paper's value to a particular audience and any implications it has for the general public. This statement should be written in plain English.
+\item My citations are in the proper \Verb|plainnat NatBib| bibliography style. I can also provide a BibTex file of all my citations should my paper be accepted for publication.
+\item I have all permissions (in writing) to use any images/figures for which I do not personally own the copyright.
+\end{enumerate}
+
+In addition to the requirements, enumerated above, for all submissions, we strongly suggest the following. A paper consisting only of written words ignores what we now know about the brain and learning. Imagery and the structure provided by thoughtful headings and hierarchy can add significantly to your paper's readability and to public understanding of science. Thus, we suggest that you: (a) Use an abundance of high-quality images to re-communicate points made in text. (b) Use examples, metaphors, and rich-imagery to ground your more abstract, theoretical ideas. (c) If you need to explain something extremely technical, do so using whatever technical terminology (not jargon) is necessary. But, also consider adding a sentence that summarizes what you’re saying in simple terms as well. (d) Try to design headers so that reading them alone tells a stepwise story. Use the structure of the paper (headers and levels) to communicate your point. Ask yourself if reading through the headers of your paper follows a logical thread and tells the story. We recommend that your paper thoughtfully uses up to three hierarchical levels:
+
+\begin{itemize}
+   \item  \textbf{Section} (use the \verb|\section{}| command)
+   \begin{itemize}
+     \item  \textbf{SubSection} (use the \verb|\subsection{}| command)
+   \end{itemize}
+ \end{itemize}
+
+
+(e) Consider the importance of repetition and summarizing and use the 3-part \href{Write your first and then write it last.   Your abstractshould grab your reader and also tell them what the paper is about.Write it first to structure your thinking and then rewrite it whenyou are finished with your paper to make sure it is tight and clean.Include only what is absolutely necessary. Tell the reader what youset out to do, what you did, and the results and conclusions. Keepit brief. Don’t exceed 300 words.}{tell 'em} structure: (1) tell ‘em what you're going to tell 'em (pre-summarize), (2) tell ‘em (rich detail and meat of paper), (3) tell ‘em what you told 'em (post summarize). 
+
+\begin{itemize}
+\item  \textbf{Introduction} (top bun): Tell 'em what you're going to tell 'em
+\item  \textbf{Middle} (meat): Tell 'em
+\item  \textbf{Conclusion} (bottom bun): Tell 'em what you told 'em
+\end{itemize}
+
+\section{A Note About the \LaTeX\ Environment}\label{sec:latex-note} 
+\newthought{\LaTeX\ is a powerful environment} and programs like Overleaf make it relatively easy to use. But like anything powerful, it takes some time to learn and some patience along the way. With a bit of practice, you can layout documents in exquisite detail and match professional publishing standards. Staff at JoST, however, cannot help you with your \LaTeX\ questions or problems. For help with \LaTeX\ visit \href{https://www.overleaf.com/learn}{Overleaf's Help Documentation}. If you are not afraid of the slightly technical LaTeX environment and want to be a good academic citizen, you help JoST immensely by submitting your paper in LaTeX because it cuts down on paid layout fees which we cover out of the goodness of our hearts. JoST intends to be a free journal and any work that authors can do on the front end is immensely helpful. Of course, if you are not comfortable with the LaTeX environment, we are happy to do the layout for you.
+
+
+\subsection{Sidenotes}\label{sec:sidenotes}
+One of the most prominent and distinctive features of this style is the extensive use of sidenotes.  Sidenotes can be used when you want to add some verbiage to an idea without belabouring or distracting\sidenote[][-10\baselineskip]{You don't want to distract the reader but you also don't want to leave the reader wondering about the veracity of your claims. Sidenotes can also be used effectively to add additional detail that is either tangential or supportive but not central to the main point or thrust of the paragraph.}. There is a wide margin to provide ample room for sidenotes and small figures. If you'd like to place ancillary information in the margin without the sidenote mark (the superscript number), you can use the \Verb|\marginnote| command.\marginnote[-4\baselineskip]{This is a margin note.  Notice that there isn't a number preceding the note, and there is no number in the main text where this note was written. Also notice in the code that \texttt{[-4\textbackslash baselineskip]} was placed in the note. This moves the note up (-) or down (+).} The specification of the \Verb|\sidenote| command is:
+\begin{docspec}
+  \doccmd{sidenote[\docopt{number}][\docopt{offset}]\{\docarg{Sidenote text.}\}}
+\end{docspec}
+
+Any \Verb|\footnote|s will automatically be converted to sidenotes.\footnote{This is a sidenote that was entered using the \texttt{\textbackslash footnote} command.}  
+Both the \docopt{number} and \docopt{offset} arguments are optional.  If you provide a \docopt{number} argument, then that number will be used as the sidenote number.  It will change of the number of the current sidenote only and will not affect the numbering sequence of subsequent sidenotes. Sometimes a sidenote may run over the top of other text or graphics in the
+margin space.  If this happens, you can adjust the vertical position of the sidenote by providing a dimension in the \docopt{offset} argument.  Some examples of valid dimensions are:
+\begin{docspec}
+  \ttfamily 1.0in \qquad 2.54cm \qquad 254mm \qquad 6\Verb|\baselineskip|
+\end{docspec}
+If the dimension is positive it will push the sidenote down the page; if the dimension is negative, it will move the sidenote up the page.
+
+While both the \docopt{number} and \docopt{offset} arguments are optional, they must be provided in order.  To adjust the vertical position of the sidenote while leaving the sidenote number alone, use the following syntax:
+\begin{docspec}
+  \doccmd{sidenote[][\docopt{offset}]\{\docarg{Sidenote text.}\}}
+\end{docspec}
+The empty brackets tell the \Verb|\sidenote| command to use the default sidenote number.
+
+If you \emph{only} want to change the sidenote number, however, you may completely omit the \docopt{offset} argument:
+\begin{docspec}
+  \doccmd{sidenote[\docopt{number}]\{\docarg{Sidenote text.}\}}
+\end{docspec}
+
+The \Verb|\marginnote| command has a similar \docarg{offset} argument:
+\begin{docspec}
+  \doccmd{marginnote[\docopt{offset}]\{\docarg{Margin note text.}\}}
+\end{docspec}
+
+
+
+
+
+
+
+\section{Figures, Tables, Equations, and More}\label{sec:figures-and-tables}
+
+\newthought{JoST encourages the use of images,} tables, equations, and other visual-tactile media that support text. Your image might be metaphorical, as in Figure \ref{fig:elephant} that illustrates the one crux of systems thinking—that people see things differently. Be sure to reference images in the text so readers can follow using the \verb|\ref{fig:elephant}| code that matches the name you give to the \verb|\label{fig:elephant}| in the image code. Either way, best practice is to use high resolution \verb |PDF| images. 
+
+\begin{marginfigure}[-18\baselineskip]
+\includegraphics[width=1\linewidth]{images/elephant.jpg}
+  \caption{This is a margin figure of rich imagery tied to metaphor. (\url{https://en.wikipedia.org/wiki/Blind_men_and_an_elephant}).}
+  \label{fig:elephant}
+    %\zsavepos{pos:normaltab}
+\end{marginfigure}
+
+%You may want to include network diagrams in your paper as in Figure \ref{fig:marginfig3}. For this the \verb|{tikzpicture}| package is a powerful tool.
+
+%\begin{marginfigure}[0\baselineskip]
+%\begin{tikzpicture}[->,>=stealth',shorten >=0.5pt,auto,node distance=1.8cm,
+%                    thin,main node/.style={circle,draw,font=\sffamily\scriptsize\bfseries}]
+%
+%  \node[draw,circle,minimum size=1cm] (A) {$A_i$};
+%  \node[draw,circle,minimum size=1cm] (B) [right of=A] {$\neg{A}_o$};
+
+%  \path[every node/.style={font=\sffamily\scriptsize}]
+%    (A) edge [bend right] node[below left] {$\overrightarrow{A}_a$} (B)
+%        edge [bend right] node[below right] {$\neg{\overleftarrow{A}}_r$} (B)
+%    (B) edge [bend right] node[above left] {$\overrightarrow{A}_r$} (A)
+%        edge [bend right] node[above right] {$\neg{\overleftarrow{A}}_a$} (A)
+%\end{tikzpicture}
+%  \caption{A Tikzpicture Network Element}
+%  \label{fig:marginfig3}
+%\end{marginfigure}
+
+Images and graphics play an integral role in Tufte's work. In addition to the standard \docenv{figure} and \docenv{tabular} environments, this style provides special figure and table environments for full-width floats. 
+
+Full page--width figures and tables may be placed in \docenv{figure*} or \docenv{table*} environments.  To place figures or tables in the margin, use the \docenv{marginfigure} or \docenv{margintable} environments as follows
+(see figure~\ref{fig:marginfig}):
+
+\begin{marginfigure}[10\baselineskip]
+  \includegraphics[width=\linewidth]{images/helix.pdf}
+  \caption{This is a margin figure.  The helix is defined by 
+    $x = \cos(2\pi z)$, $y = \sin(2\pi z)$, and $z = [0, 2.7]$.  The figure was
+    drawn using Asymptote (\url{http://asymptote.sf.net/}).}
+  \label{fig:marginfig}
+\end{marginfigure}
+
+\begin{Verbatim}
+\begin{marginfigure}
+  \includegraphics{helix}
+  \caption{This is a margin figure.}
+\end{marginfigure}
+\end{Verbatim}
+
+The \docenv{marginfigure} and \docenv{margintable} environments accept an optional parameter \docopt{offset} that adjusts the vertical position of the figure or table.  See the ``\nameref{sec:sidenotes}'' section above for examples.  The specifications are:
+\begin{docspec}
+  \doccmd{begin\{marginfigure\}[\docopt{offset}]}\\
+  \qquad\ldots\\
+  \doccmd{end\{marginfigure\}}\\
+  \mbox{}\\
+  \doccmd{begin\{margintable\}[\docopt{offset}]}\\
+  \qquad\ldots\\
+  \doccmd{end\{margintable\}}\\
+\end{docspec}
+
+Figure~\ref{fig:fullfig} is an example of the \Verb|figure*|
+environment and figure~\ref{fig:textfig} is an example of the normal \Verb|figure| environment.
+
+\begin{figure*}[ht]
+  \includegraphics[width=\linewidth]{images/sine.pdf}%
+  \caption{This graph shows $y = \sin x$ from about $x = [-10, 10]$.
+  \emph{Notice that this figure takes up the full page width.}}%
+  \label{fig:fullfig}%
+\end{figure*}
+
+\begin{figure}[ht]
+  \includegraphics{images/hilbertcurves.pdf}
+%  \checkparity This is an \pageparity\ page.%
+  \caption{Hilbert curves of various degrees $n$.
+  \emph{Notice that this figure only takes up the main textblock width.}}
+  \label{fig:textfig}
+  %\zsavepos{pos:textfig}
+  \setfloatalignment{b}
+\end{figure}
+
+\section{Tables} 
+\newthought{You may also want to use tables} as in Table \ref{table:1} to support the narrative of the text. Keep your tables clean and tight and avoid using lots of bold lines or borders that are not necessary. 
+
+\begin{margintable}[0\baselineskip]
+  \centering
+  \fontfamily{ppl}\selectfont
+  \begin{tabular}{ll}
+    \toprule
+    Margin & Length \\
+    \midrule
+    Paper width & \unit[8\nicefrac{1}{2}]{inches} \\
+    Paper height & \unit[11]{inches} \\
+    Textblock width & \unit[6\nicefrac{1}{2}]{inches} \\
+    Textblock/sidenote gutter & \unit[\nicefrac{3}{8}]{inches} \\
+    Sidenote width & \unit[2]{inches} \\
+    \bottomrule
+  \end{tabular}
+  \vspace{1mm}
+  \caption{Here are the dimensions of the various margins used in the Tufte-handout class.}
+  \label{tab:normaltab}
+  %\zsavepos{pos:normaltab}
+\end{margintable}
+
+Again, be sure to reference tables in the text so readers can follow using the \verb|\ref{table:1}| code that matches the name you give to the \verb|\label{table:1}| in the table code. Tables can be simple or complex. For more on Tables in \LaTeX\ consult the \href{https://www.overleaf.com/learn/latex/Tables}{Overleaf Tables Help page}.
+
+Table~\ref{tab:normaltab} shows a table created with the \docpkg{booktabs} package.  Notice the lack of vertical rules---they serve only to clutter the table's data.
+
+
+
+\begin{table}[ht]
+\centering
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{2}
+  \fontfamily{ppl}\selectfont
+\begin{tabular}{ l  c  r c l} \toprule
+\textbf{Pattern} \textbf{($\mathbb{P}$)}& \textbf{=} & \textbf{Element1} ($e_1$)    & \textit{\textbf{coimplies}} & \textbf{Element2} ($e_2$)\\
+ \midrule
+Distinctions ($D$)& = & identity ($i$)    & $\leftrightarrow$ & other ($o$)\\
+
+Systems ($S$)& = & part ($p$)        & $\leftrightarrow$ & whole ($w$)\\
+Relationships ($R$)& = & action ($a$)      & $\leftrightarrow$ & reaction ($r$)\\
+Perspectives ($P$)& = & point ($\rho$)    & $\leftrightarrow$ & view ($v$)\\
+\bottomrule
+\end{tabular}
+\caption{Universal Patterns and Elements of Systems Thinking}
+\label{table:1}
+\end{table}
+
+Alternatively you may want to use \verb|\multicolumn| or \verb|\multirow| commands to create a table that skips rows or columns (See Table \ref{table:SMstudy}).  Or a table that spans multiple columns on the page (See Table \ref{table:elements}).
+
+\begin{table}[ht]
+\centering
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{p{1in}|p{2.8in}} 
+\hline
+\textbf{What People Tend to Do} & \textbf{What People Tend Not to Do} \\ \hline
+\multirow{2}{1in}{Make identities ($D^i$)} & Rarely consider the other ($D_o$) \\ %\cline{2-2}
+& Rarely challenge or validate the identities ($D_{o}^{i}$) they make \\ \hline
+
+\multirow{3}{1in}{Make part-whole systems ($S_{w}^{p}$)} & Rarely challenge the way, or consider alternative ways, that parts are organized into wholes ($S(P)$) \\ %\cline{2-2}
+& Rarely think $+1$ and $-1$ from the level they are thinking about ($w=p$ or $p=w$) \\ %\cline{2-2}
+& Rarely relate the parts of the whole ($p \xLeftrightarrow[]{R}p$) \\ \hline
+\multirow{2}{1in}{Occasionally relate things ($R$)} & Almost never distinguish their relationships ($RD$) or zoom into them and add parts ($RDS$)\\ %\cline{2-2}
+ & Sometimes look for the \textit{direct} cause ($R$), but rarely think in webs of causality ($S$ of $R$s)\\ \hline
+\multirow{3}{1in}{Take only their own Perspective ($P$) [implicitly]} & Almost never take explicit perspectives ($P_{v}^{\rho}$)  \\ %\cline{2-2}
+&Rarely take multiple perspectives ($n*P_{v}^{\rho}$) \\ %\cline{2-2}
+& Rarely take conceptual perspectives ($C_{\rho}$) \\ \hline
+\end{tabular}
+\vspace{3mm}
+\caption{What People Do and Don't Do in Systems Mapping (N=34,398)}
+\label{table:SMstudy}
+\end{table}
+
+
+
+
+
+\begin{table*}
+\centering
+\footnotesize
+  \fontfamily{ppl}\selectfont
+\begin{tabular} {M{15mm}M{15mm} M{15mm}M{15mm}M{15mm}M{15mm}M{15mm}M{15mm}M{15mm}} \toprule
+
+ELEMENTS &\textbf{identity} & \textbf{other} & \textbf{part} & \textbf{whole} & \textbf{action} & \textbf{reaction} & \textbf{point} & \textbf{view}\\\midrule
+  
+\textbf{identity} &  & An other is predictably an identity & A part is predictably an identity & A whole is predictably an identity & An action is predictably an identity & A reaction is predictably an identity & A point is predictably an identity & A view is predictably an identity\\
+
+\textbf{other} & An identity is predictably an other &  & A part is predictably an other & A whole is predictably an other & An action is predictably an other & A reaction is predictably an other & A point is predictably an other & A view is predictably an other\\
+
+\textbf{part} & An identity is predictably a part & An other is predictably a part   && A whole is predictably a part &  An action is predictably a part & A reaction is predictably a part & A point is predictably a part & A view is predictably a part\\
+   
+\textbf{whole} & An identity is predictably a whole & An other is predictably a whole & A part is predictably a whole &  & An action is predictably a whole & A reaction is predictably a whole & A point is predictably a whole & A view is predictably a whole\\
+
+\textbf{action} & An identity is predictably an action & An other is predictably an action & A part is predictably an action & A whole is predictably an action &  & A reaction is predictably an action & A point is predictably an action & A view is predictably an action\\
+
+\textbf{reaction} & An identity is predictably a reaction & An other is predictably a reaction & A part is predictably a reaction & A whole is predictably a reaction & An action is predictably a reaction &  & A point is predictably a reaction & A view is predictably a reaction\\
+ 
+\textbf{point} & An identity is predictably a point & An other is predictably a point & A part is predictably a point & A whole is predictably a point & An action is predictably a point & A reaction is predictably a point &  & A view is predictably a point\\
+
+\textbf{view} & An identity is predictably a view & An other is predictably a view & A part is predictably a view & A whole is predictably a view & An action is predictably a view & A reaction is predictably a view & A point is predictably  a view & \\
+ \bottomrule
+\end{tabular}
+\caption{Structural Predictions of 2-Element Combinations at Element Level}
+\label{table:elements}
+\end{table*}
+
+
+\subsection{Math Equations}\label{sec:math} 
+Use math equations both as inline text using the \verb|$| before and after text with or without the \verb|\mathbb| command. You can use this for single symbols/variables like $\mathbb{F}$ or $F$ or $x$ or smaller inline equations like ${2+2=4}$. Or use the \verb|\begin{equation}| command for larger equations like the ones below:
+
+\begin{equation}
+f(x)=\sum_{i=1}^{n}\left(i-\frac{1}{2i}\right)
+\end{equation}
+
+This coding makes it so your equations are numbered and can be referenced (See Equation \ref{eq:example}) in text. See \href{https://ctan.math.utah.edu/ctan/tex-archive/obsolete/info/math/voss/mathmode/Mathmode.pdf}{this document} for help with \LaTeX\ maths. 
+
+\begin{equation}
+f(x)=\prod_{i=1}^{n}\left(i-\frac{1}{2i}\right)
+\label{eq:example}
+\end{equation}
+
+
+
+
+\section{Words and Typography}\label{sec:typography}
+
+\subsection{Word Count}\label{sec:word-count} 
+\newthought{Your submission should not exceed 10,000 words.} If you want to submit a paper longer than 10,000 words please explain why it is necesary in your cover letter. In Overleaf \LaTeX\ you can see the word count without counting the \LaTeX\ code by Recompiling your paper and then clicking in the Overleaf menu in the upper left hand corner and clicking word count. See instruction \href{https://www.overleaf.com/learn/how-to/Is_there_a_way_to_run_a_word_count_that_doesn't_include_LaTeX_commands\%3F}{here}. As an example, this paper is 2368 words and is just under 4 pages so a 10,000 word paper will be approximately 12 pages long in this \LaTeX\ format.
+
+
+
+\subsection{Letterspacing} \label{sec:letterspacing}
+This document class includes two new commands and some improvements on existing commands for letterspacing. When setting strings of \allcaps{ALL CAPS} or \smallcaps{small caps}, the letter\-spacing---that is, the spacing between the letters---should be increased slightly.\cite{Bringhurst2005}  The \Verb|\allcaps| command has proper letterspacing for strings of \allcaps{FULL CAPITAL LETTERS}, and the \Verb|\smallcaps| command has letterspacing for \smallcaps{small capital letters}.  These commands will also automatically convert the case of the text to upper- or lowercase, respectively. The \Verb|\textsc| command has also been redefined to include letterspacing.  The case of the \Verb|\textsc| argument is left as is, however.  This allows one to use both uppercase and lowercase letters: \textsc{The Initial Letters Of The Words In This Sentence Are Capitalized.}
+
+
+\subsection{Full-width text blocks}\label{sec:textblocks}
+
+In addition to the new float types, there is a \docenv{fullwidth}
+environment that stretches across the main text block and the sidenotes
+area.
+
+\begin{Verbatim}
+\begin{fullwidth}
+Lorem ipsum dolor sit amet...
+\end{fullwidth}
+\end{Verbatim}
+
+If you want to highlight some text, indent it, and justify it you can use the following code to do it. 
+
+\begin{docspec}
+  \doccmd{For text that stands alone like this...}
+\end{docspec}
+
+Or, if you want to indent some text without numerating or bulleting, you can use \Verb|\indent |:\\
+
+\indent Indented text without a bullet.\\
+\indent Indented text without a bullet.\\
+
+\begin{fullwidth}
+\small\itshape\lipsum[1]
+\end{fullwidth}
+
+\section{Inline Citations and References}\label{sec:citations} 
+\newthought{If you use a citation manager} like PaperPile that can export your selected citations as BibTex, citing your paper and creating a bibliography can be a breeze. Simply grab all your citations and create a BibTex file. Cut and paste this BibTex into the file in this template called \verb|jost-bib.bib|. If you do this first, then while you are typing you can reference a paper simply by beginning to type the \verb|\cite{}| command and programs like Overleaf \LaTeX\ editor will autocomplete and give you options and then you will end up with an inline citation like this one \cite{Cabrera2015-stms}. From there, Overleaf will automatically create your bibliography.
+
+References are placed alongside their citations as sidenotes, as well.  This can be accomplished using the normal \Verb|\cite| command.\sidenote{The first paragraph of this document includes a citation.} The complete list of references may also be printed automatically by using the \Verb|\bibliography| command.  (See the end of this document for an example.)  If you do not want to print a bibliography at the end of your document, use the \Verb|\nobibliography| command in its place.  
+
+To enter multiple citations at one location,\cite{Tufte2006,Tufte1990} you can
+provide a list of keys separated by commas and the same optional vertical offset argument: \Verb|\cite{Tufte2006,Tufte1990}|.  
+\begin{docspec}
+  \doccmd{cite[\docopt{offset}]\{\docarg{bibkey1,bibkey2,\ldots}\}}
+\end{docspec}
+
+
+\section{More Documentation}\label{sec:more-doc}
+For more documentation on the Tufte-\LaTeX{} document classes (including commands not
+mentioned in this handout), please see the sample book. The website for the Tufte-\LaTeX\ packages is located at \url{https://github.com/Tufte-LaTeX/tufte-latex}.  On our website, you'll find links to our \smallcaps{svn} repository, mailing lists, bug tracker, and documentation.
+
+
+\bibliography{jost-bib}
+\bibliographystyle{plainnat}
+
+
+
+\end{document}

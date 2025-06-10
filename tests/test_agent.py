@@ -27,7 +27,7 @@ from agentflow.core.workflow_types import (
 from agentflow.core.workflow_engine import WorkflowEngine
 from agentflow.core.workflow_executor import WorkflowExecutor
 from agentflow.core.exceptions import WorkflowExecutionError
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType, assistant, user
+from agentflow.ell.types.message import Message, MessageRole, MessageType, assistant, user
 from agentflow.core.isa.isa_manager import ISAManager
 from agentflow.core.isa.instruction_selector import InstructionSelector
 from agentflow.core.isa.instruction import Instruction
@@ -66,8 +66,8 @@ def event_loop():
         loop.close()
 
 @pytest.fixture(scope="function")
-def mock_ell2a():
-    """Create a mock ELL2A integration."""
+def mock_ell():
+    """Create a mock ELL integration."""
     mock = AsyncMock()
     mock.process_message.return_value = Message(
         role=MessageRole.ASSISTANT,
@@ -119,7 +119,7 @@ def mock_metrics_manager():
     return mock
 
 @pytest.fixture(scope="function")
-async def agent(mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def agent(mock_ell, mock_isa_manager, mock_instruction_selector):
     """Create a test agent."""
     workflow_cfg = WorkflowConfig(
         id=str(uuid.uuid4()),
@@ -172,7 +172,7 @@ async def agent(mock_ell2a, mock_isa_manager, mock_instruction_selector):
         workflow=workflow_cfg.model_dump()
     )
     agent = Agent(config=agent_config)
-    agent._ell2a = mock_ell2a
+    agent._ell = mock_ell
     agent._isa_manager = mock_isa_manager
     agent._instruction_selector = mock_instruction_selector
     await agent.initialize()

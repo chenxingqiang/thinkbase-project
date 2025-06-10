@@ -1,0 +1,186 @@
+
+%--------------- Personalize your document here ---------------
+
+\author{Author \\ mail@host.pt} % Enter your name
+%\newcommand{\studentID}{c.alexandracorreia@ua.pt} % enter your student ID
+\newcommand{\supervisorone}{Supervisor \#1} % Enter your supervisor's name
+\newcommand{\supervisortwo}{Supervisor \#2}% Leave it empty or enter your second supervisor's name 
+\newcommand{\department}{MAP-i}
+\newcommand{\exam}{Ph.D. Research Proposal}
+
+\title{Title} %Enter the title of your report 
+\date{September 2022} % insert a specific date	
+
+%--------------------------------------------------------------
+
+% This document was adapted from the
+% TEMPLATE FOR PHYS250 WORKSHEET created by Alastair McLean
+% URL: https://www.overleaf.com/latex/templates/phys250-worksheet-template/xxftvfhmwqdt
+
+% Jefferson Silveira
+% Email: 19jdls1@queensu.ca
+% Last update: 09-Jun-2021
+% If you have any questions or concerns, do not hesitate to contact me.
+%--------------------------------------------------------------
+
+\documentclass[a4paper,12pt]{report}
+\usepackage[left=30mm,top=30mm,right=30mm,bottom=30mm]{geometry}
+\usepackage{etoolbox} %required for cover page
+\usepackage{booktabs}
+\usepackage[usestackEOL]{stackengine}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[capitalise]{cleveref}
+\usepackage{enumitem,kantlipsum}
+\usepackage{amssymb}
+\usepackage[square,numbers,sort]{natbib}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}
+\usepackage{minted}
+\usemintedstyle{emacs}
+
+\usepackage{lscape}
+\usepackage{longtable}
+\usepackage{boldline}
+
+
+
+
+\usepackage[nolist,nohyperlinks]{acronym}
+\usepackage[acronym,nonumberlist]{glossaries}
+
+
+\makeglossaries
+
+%example
+%\newacronym{iot}{IoT}{Internet of Things}
+
+
+\glsaddall
+
+\renewcommand{\listingscaption}{Algorithm}
+\renewcommand{\listoflistingscaption}{List of Algorithms}
+
+
+\bibliographystyle{unsrtnat}
+
+
+\hypersetup{
+    colorlinks,
+    linkcolor={black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
+
+\linespread{1}
+
+\newtheorem{theorem}{Theorem}[section]
+\graphicspath{{figures/}}	
+
+%----------------------------------TITLE PAGE -----------------------------------
+\makeatletter
+\def\maketitle{
+  \begin{center}\leavevmode
+       \normalfont
+       \includegraphics[width=0.35\columnwidth]{mapi}
+       \vskip 4.5cm   
+       \textsc{\large \department}\\
+       \vskip 1.5cm
+       \rule{\linewidth}{0.2 mm} \\
+       {\large \exam}\\[1 cm]
+       {\huge \bfseries \@title \par}
+       \vspace{1cm}
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	 
+	\begin{minipage}[t]{0.45\textwidth}
+		\begin{flushleft} \large
+			\emph{Author:}\\
+			\@author\\
+			%Student ID: \studentID
+		\end{flushleft}
+	\end{minipage}
+	\begin{minipage}[t]{0.45\textwidth}
+	    \begin{flushright} \large
+			\ifdefempty{\supervisortwo}{\emph{Supervisor:\\}}{\emph{Supervisors:\\}}
+			\supervisorone\\
+			\ifdefempty{\supervisortwo}{}{\supervisortwo\\}
+		\end{flushright}
+	\end{minipage}
+	\vfill
+	{\Large \@date\par}
+   \end{center}
+   %\vfill
+   %\null
+   \cleardoublepage
+  }
+\makeatother
+
+
+%-------------------------------- ENDTITLE PAGE ----------------------------------
+
+\begin{document}
+
+\pagenumbering{gobble}% Remove page numbers (and reset to 1)
+
+\maketitle
+
+\begin{abstract}
+    abstract
+\end{abstract}
+\newpage
+
+\tableofcontents
+\newpage
+%\listoffigures
+%\newpage
+%\listoftables
+%\newpage
+%\listofalgorithms % List of algorithms in pseudocode format
+%\newpage
+%\listoflistings % List of algorithms in code format
+%\newpage
+
+
+\thispagestyle{empty}
+\printglossaries
+\newpage
+
+\thispagestyle{empty}
+\listoffigures
+\listoftables
+\newpage
+
+\pagenumbering{arabic}% Arabic page numbers (and reset to 1)
+
+% To have definition style
+\newtheorem{definition}{Definition}[section]
+
+% This is how you can organize your document
+\input{chapters/chapter1}
+\input{chapters/chapter2}
+\input{chapters/chapter3}
+\input{chapters/chapter4}
+\input{chapters/chapter5}
+
+
+
+%If you came here because you want your references in a new page, uncomment the following line
+
+%\clearpage % If you want the references in a separate page
+\typeout{}
+\bibliography{refs}
+
+%\clearpage % If you want the appendix in a separate page
+%\appendix
+%\input{sections/appendix}
+
+\end{document}

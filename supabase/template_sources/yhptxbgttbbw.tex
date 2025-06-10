@@ -1,0 +1,125 @@
+\documentclass[12pt]{report}
+% Tablas e imagenes en espaniol
+\usepackage[spanish,es-tabla]{babel}
+\input{0-preamble.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Datos del documento 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\PROYECTO}{PROYECTO}                        % Nombre del proyecto
+\newcommand{\NOMBRE}{Plan de trabajo}                   % Nombre del documento
+\newcommand{\VERSION}{201125}                           % Version
+\newcommand{\IDDOC}{SPPS1-080101-001-A}                                  % Version
+
+% Resumen
+\newcommand{\RESUMEN}{Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras suscipit, nisl in cursus maximus, tellus neque feugiat augue, vestibulum aliquam purus sapien vitae magna. Integer quis mi dictum, condimentum justo nec, gravida metus. Donec varius mauris placerat, pretium erat et, dapibus lorem. Sed pellentesque urna lectus. Vivamus tempus lorem in mauris aliquet efficitur. Vivamus in ex quis ante fringilla molestie. Etiam eu orci luctus, finibus mauris vel, sagittis odio.}
+\newcommand{\KEYWORDS}{Primera, Segunda, Tercera}       % Palabras clave
+
+% Logos
+\newcommand{\LOGOUNIDAD}{figs/logo-ufm.png}             % Logo unidad
+\newcommand{\SUBGERENCIA}{Subgerencia de formación}     % Subgerencia
+\newcommand{\GERENCIA}{Gerencia de coordinación}        % Logo unidad
+\newcommand{\LOGOLEFT}{figs/logo-conae.png}               % Logo izquierda (conae)
+%\newcommand{\LOGOCENTER}{figs/logo-conae.png}           % Logo centro
+\newcommand{\LOGORIGHT}{figs/logo-ministerio.png}       % Logo derecha (ministerio)
+
+
+% Autores y afiliación
+\author[*]{Francisco Nemiña}
+\affil[*]{Unidad de Formación Masiva}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Configuración del documento 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Profundidad de secciones en el índice
+\setcounter{tocdepth}{2}
+
+% Descomentar para draft
+% \usepackage{draftwatermark}
+% \SetWatermarkLightness{0.9}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Primer página
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Titulo
+\IfLanguageName{spanish}{%
+\title{{\vspace{1cm}\includegraphics[height=1.5cm]{\LOGOUNIDAD}}\\ {\large \bf \SUBGERENCIA} \\ {\large \bf \GERENCIA}\\[2cm] {\large Documento:} \\ \PROYECTO \\ {\large \NOMBRE - versión \VERSION}}
+}{
+\title{{\vspace{1cm}\includegraphics[height=1.5cm]{\LOGOUNIDAD}}\\ {\large \bf \SUBGERENCIA} \\ {\large \bf \GERENCIA}\\[2cm] {\large Document:} \\ \PROYECTO \\ {\large \NOMBRE - versión \VERSION}}
+}
+
+
+
+\date{\begin{flushleft} \vspace{5.6cm}ID: \texttt{\IDDOC} \end{flushleft}}
+% Logod
+\ifx\LOGOCENTER\undefined
+\titlepic{\vfill \includegraphics[height=1.5cm]{\LOGOLEFT}\hfill\includegraphics[height=1.5cm]{\LOGORIGHT}}
+\else
+\titlepic{\vfill \includegraphics[height=1.5cm]{\LOGOLEFT}\hfill\includegraphics[height=1.5cm]{\LOGOCENTER}\hspace{0.5cm}\includegraphics[height=1.5cm]{\LOGORIGHT}}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Configuracion páginas
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\headheight}{46pt}
+\vskip-2.0cm
+\ifx\LOGOCENTER\undefined
+\rhead{\includegraphics[height=1.2cm]{\LOGORIGHT}}
+\lhead{\includegraphics[height=1.2cm]{\LOGOLEFT}}
+\else
+\rhead{\includegraphics[height=1.2cm]{\LOGOCENTER}\hspace{0.4cm}\includegraphics[height=1.2cm]{\LOGORIGHT}}
+%\chead{}
+\lhead{\includegraphics[height=1.2cm]{\LOGOLEFT}}
+\fi
+\renewcommand{\headrulewidth}{2pt}% 2pt header rule
+\renewcommand{\headrule}{\vskip-0.1cm\hskip-2.54cm \hbox to\pagewidth{%
+\color{azul-conae}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrulewidth}{0pt}% No footer rule
+
+\lfoot{\texttt{\IDDOC} - \PROYECTO - \NOMBRE}
+\cfoot{}
+\rfoot{\thepage}
+
+\addtolength{\voffset}{-2cm}
+\addtolength{\headsep}{0.5cm}
+\addtolength{\textheight}{1cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Documento
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+\titlepage
+
+\input{0-changelog}
+
+\tableofcontents
+
+\chapter{Introducción}
+\input{1-introduccion}
+
+\chapter{Descripción del \emph{PROYECTO}}
+\input{2-descripcion}
+
+\chapter{WBS (Work Breakdown Structure) – Estructura de desglose de trabajo}
+\input{3-wbs}
+
+\chapter{Organización del Proyecto}
+\input{4-organizacion}
+
+\chapter{Recursos Necesarios}
+\input{5-recursos}
+
+\chapter{Cronograma}
+\input{6-cronograma}
+
+\chapter{Definición de paquetes de trabajo}
+Se desprenden de la WBS (los paquetes de trabajo se destacan en anaranjado)
+\input{7-etapa1}
+\input{7-etapa2}
+\input{7-etapa3}
+
+\nocite{*}
+\printbibliography
+
+\end{document}

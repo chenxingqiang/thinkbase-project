@@ -1,0 +1,169 @@
+\documentclass{IQ_Thesis}%Inicia el tipo de documento, tamaño de letra, tamaño de papel, doble cara, tipo artículo.
+
+
+\title{Título del reporte}%Título del documento, no necesariamente se desplega.
+\author{Nombre del autor}%Nombre del autor del documento, no necesariamente se desplega.
+\date{Fecha}%Fecha de cuando se realiza el documento, no necesariamente se desplega.
+
+% In your preamble 
+ 
+\makeatletter
+\newcommand*{\addFileDependency}[1]{% argument=file name and extension
+  \typeout{(#1)}
+  \@addtofilelist{#1}
+  \IfFileExists{#1}{}{\typeout{No file #1.}}
+}
+\makeatother
+ 
+\newcommand*{\myexternaldocument}[1]{%
+    \externaldocument{#1}%
+    \addFileDependency{#1.tex}%
+    \addFileDependency{#1.aux}%
+}
+% In your preamble
+ 
+\myexternaldocument{D._METHODOLOGY/METHOD.tex}
+%-----------INICIO DEL DOCUMENTO-----------%
+\begin{document}%Inicia el documento.
+\thispagestyle{empty}%Elimina número de página.
+
+%-----------PORTADA-----------%
+\subfile{A._COVER/PAGE}
+
+
+%-----------RESUMEN-----------%
+\myresume{0}{RESUMEN}%Inicia resumen
+\subfile{B._RESUME/ABSTRACT}
+
+
+%-----------ÍNDICE-----------%
+%Los cuadros rojos que se observan en el pdf son hipervínculos que se añaden al fdp al compilarlo.
+\blankpage
+\begin{center}
+\centering{\tableofcontents}%Tabla de contenidos.
+\end{center}
+
+%-----------ÍNDICE DE CUADROS-----------%
+\blankpage
+\begin{center}
+\listoftables
+\end{center}
+\newpage
+\thispagestyle{empty}
+%-----------ÍNDICE DE FIGURAS-----------%
+\begin{center}
+\listoffigures
+\end{center}
+
+
+
+
+
+
+%----------MARCO TEÓRICO----------%
+
+\myfundaments{1}{CAPÍTULO 1 \newline INTRODUCCIÓN}
+\pagenumbering{arabic}%Numeración arábiga.
+\setcounter{page}{1}%Iniciar en 1.
+
+\subfile{C._FUNDAMENTS/CAP_I}
+\subfile{C._FUNDAMENTS/CAP_II}
+\subfile{C._FUNDAMENTS/CAP_III}
+\subfile{C._FUNDAMENTS/CAP_IV}
+%\subfile{C._FUNDAMENTS/CAP_V}
+
+
+
+%----------METODOLOGÍA----------%
+\mymethod{5}{METODOLOGÍA EXPERIMENTAL}
+\subfile{D._METHODOLOGY/METHOD}
+  		
+%----------ANÁLISIS DE RESULTADOS----------%
+\myresults{6}{ANÁLISIS DE RESULTADOS}
+\subfile{E._RESULTS/ANALYSIS}
+
+
+
+
+%----------CONCLUSIONES Y RECOMENDACIONES----------%
+\myconclusions{7}{CONCLUSIONES Y RECOMENDACIONES}
+\subfile{F._CONCLUSIONS/RECOMENDATIONS}
+
+
+
+
+%----------NOMENCLATURA----------%
+\subfile{G._NOMENCLATURE/SYMBOLS}
+\pagestyle{fancy}
+\printnomenclature[20 mm]
+\pagestyle{fancy}
+
+
+%----------BLIBLIOGRAFÍA----------%
+\pagestyle{fancy}
+\bibliographystyle{apalike-es}%Tipo de referenciado.
+\bibliography{Referencias.bib}%Invoca al documento de ese nombre.
+%El ambiente no permite desplegar referencias sin haber sido citadas con antelación.
+\pagestyle{fancy}
+
+
+
+
+
+
+
+
+
+
+%----------APÉNDICES----------%
+\myappendix{9}{APÉNDICES}
+\pagestyle{fancy}
+\subfile{H._DATA/EXPERIMENTAL}
+
+%----------ANEXOS----------%
+\myannexed{10}{ANEXOS}
+\subfile{I._APPENDIX/ANNEXED}
+\clearpage
+%----------GOALS CHECK LIST----------%
+%\subfile{J._CHECK_LIST/GOALS}
+
+\end{document}
+%----------ANTIGUA NOMENCLATURA----------%
+%\begin{table}[!hbt]
+%		\begin{center}
+%		\begin{tabularx}{140mm}{X l l}%Tabularx permite adaptar las columnas con X al ancho especificado haciéndolas más grandes o más pequeñas.
+        
+%----------Mayúsculas----------%
+%$A$&Área normal a la dirección del fluido &m$^{2}$ \\
+%$E$&Energía & J\\
+
+%&&\\ %Fila vacía en la Tabla
+%----------Minúsculas----------%
+%$c$&Diferencia longitudinal de alambre fusible& m\\
+%$e$&Correción energética por alambre fusible & J\\
+
+%&&\\
+%----------Griegas----------%
+%$\alpha$&Correción de energía cinética& adim\\
+%$\epsilon$&Emisividad& adim\\
+%&&\\ %Fila vacía en la Tabla
+%\textbf{Subíndices}&\\
+
+%$\infty$&Indica muy lejano\\
+%$+$&Indica adición de reactivo o mezcla\\
+
+%&\\
+%\textbf{Superíndices}&\\
+%$\cdot$&Indica por unidad de tiempo\\
+%$\rightarrow$&Indica cantidad vectorial\\
+
+%	\end{tabularx}
+%		\end{center}
+%	\end{table}
+
+
+
+
+
+
+

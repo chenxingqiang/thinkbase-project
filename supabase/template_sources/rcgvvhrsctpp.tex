@@ -1,0 +1,314 @@
+% LaTeX rebuttal letter example. 
+\documentclass[12pt, review, authoryear]{elsarticle}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{framed} % to add frames around comments
+\usepackage{color, soul}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable, theorems}
+\renewcommand\thesubsection{\alph{subsection})}
+
+\usepackage{setspace}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\bfseries}{\thesection}{1em}{\setstretch{0.1}}
+\titleformat{\subsection}{\normalfont\itshape}{\color{blue} \thesubsection}{0.5em}{\setstretch{0.1}}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+\usepackage{newtxmath}
+\usepackage{subfigure}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{colortbl}
+
+\gdef\ie{\textit{i.e.}}
+\gdef\eg{\textit{e.g.}}
+\gdef\etc{\textit{etc}}
+\gdef\etal{\textit{et al.}~}
+\gdef\rl{\mathrm{R}\text{-}\ell_2}
+\gdef\problem{the \textit{intra-clip confusion} and \textit{inter-clip incoherence} problems}
+
+\newcommand{\hltwo}[1]{{\sethlcolor{myhlcolortwo}\hl{#1}}}
+
+\definecolor{myhlcolor}{rgb}{1, 1, 0}
+\definecolor{myhlcolortwo}{rgb}{1, 1, 0}
+\definecolor{myhlcolor}{rgb}{1, 1, 1}
+
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage[ruled]{algorithm2e} % Algorithm
+\usepackage{color,xcolor}
+\newcommand{\mycommfont}[1]{\footnotesize\ttfamily\color{green!65!blue}{#1}}
+\SetCommentSty{mycommfont}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+\gdef\ie{\textit{i.e.}}
+\gdef\eg{\textit{e.g.}}
+\gdef\etc{\textit{etc}}
+\gdef\etal{\textit{et al.~}}
+\usepackage{xifthen}
+% define counters for reviewers and their points
+\newcounter{reviewer}
+\setcounter{reviewer}{0}
+\newcounter{point}[reviewer]
+\setcounter{point}{0}
+
+\definecolor{matlabblue}{rgb}{0,0.4470,0.7410}
+\definecolor{matlabred}{rgb}{0.8500,0.3250,0.0980}
+\definecolor{matlabyellow}{rgb}{0.9290,0.6940,0.1250}
+\definecolor{matlabpurple}{rgb}{0.4940,0.1840,0.5560}
+\definecolor{matlabgreen}{rgb}{0.4660,0.6740,0.1880}
+\definecolor{matlabcyan}{rgb}{0.3010,0.7450,0.9330}
+\definecolor{matlabmagenta}{rgb}{0.6350,0.0780,0.1840}
+
+% This refines the format of how the reviewer/point reference will appear.
+\renewcommand{\thepoint}{P\,\thereviewer.\arabic{point}} 
+
+% command declarations for reviewer points and our responses
+\newcommand{\reviewersection}{\stepcounter{reviewer} 
+				\bigskip \bigskip \hrule
+                \subsection*{\bfseries To Reviewer \thereviewer} 
+                \addcontentsline{toc}{subsection}{To Reviewer \thereviewer} 
+                \bigskip \hrule \bigskip}
+
+\newenvironment{point}
+   {\refstepcounter{point} \bigskip \noindent {\textbf{Reviewer~Point~\thepoint} } ---\ \color{blue}}
+   {\par}
+
+\newenvironment{revision}[2][]
+   {\vspace{0.2cm} \begin{tcolorbox}[breakable, enhanced, colback = yellow, 
+   title = Revision \thepoint \  #2,#1,
+   colbacktitle = red!85!black, colframe = red!75!black
+   ]\normalfont}
+   {\par\end{tcolorbox}}
+
+\newcommand{\shortpoint}[1]{\refstepcounter{point}  \bigskip \noindent 
+	{\textbf{Reviewer~Point~\thepoint} } ---~#1\par }
+
+\newenvironment{reply}
+   {\medskip \noindent \textbf{Reply}:\ \begin{sf}}
+   {\medskip \end{sf}}
+
+\newcommand{\shortreply}[2][]{\medskip \noindent \begin{sf}\textbf{Reply}:\  #2
+	\ifthenelse{\equal{#1}{}}{}{ \hfill \footnotesize (#1)}%
+	\medskip \end{sf}}
+
+% Line & Page
+% \newcommand{\linepage}[2]{
+% \par \rightline{\textbf{Line #1, Page #2}}
+% }
+\newcommand{\linepage}[2]{
+\par \rightline{\textbf{Page #2}}
+}
+
+\newcommand{\footlabel}[2]{%
+    \addtocounter{footnote}{1}%
+    \footnotetext[\thefootnote]{%
+        \addtocounter{footnote}{-1}%
+        \refstepcounter{footnote}\label{#1}%
+        #2%
+    }%
+    $^{\ref{#1}}$%
+}
+
+% \newcommand{\footref}[1]{%
+%     $^{\ref{#1}}$%
+% }
+
+\usepackage[misc]{ifsym}
+\usepackage{bbding}
+
+\def\mycoauthor{The Authors} 
+\def\mytitle{Article Title Here} % title
+\def\myarticleno{Article Number: }
+\def\mydate{\today} % date
+
+\def\myauthor{
+Author 1 \footlabel{buaa}{XX University}, Author 2 \footref{buaa}, Author 3 \footlabel{durham}{XX University}, and Author 4 \footref{buaa}$^,$ \Envelope} 
+
+\usepackage[colorlinks, 
+	bookmarks=True,
+	linkcolor = red,
+	anchorcolor = blue,
+	citecolor = green,
+	CJKbookmarks = True
+]{hyperref}
+\makeatletter
+\AtBeginDocument{\def\@citecolor{cyan}}
+\AtBeginDocument{\def\@urlcolor{magenta}}
+\AtBeginDocument{\def\@linkcolor{blue}}
+\makeatother
+\usepackage[nameinlink]{cleveref}
+\crefname{algocf}{alg.}{algs.}
+\Crefname{line}{Algorithm}{Algorithms}
+\crefformat{footnote}{#2\footnotemark[#1]#3}
+\begin{document}
+\setulcolor{blue} 
+\setstcolor{red} 
+\sethlcolor{yellow} 
+
+\begin{titlepage}
+\noindent \textbf{\myarticleno} \\
+\mytitle \\
+\myauthor
+\begin{center}
+  \vspace{1cm}
+
+  \Large \textbf{Response to Editors \& Reviewers}
+
+  \vspace{1cm}
+\end{center}
+
+\begin{tcolorbox}[breakable, title = To editors and reviewers]
+Dear editors and reviewers:
+\bigskip
+
+\quad Our sincere thanks go out to the editors and reviewers who reviewed our manuscript and provided constructive comments that significantly improved it. 
+
+\quad We have made detailed revisions in response to comments and suggestions made by editors and reviewers, and the main changes are summarized below:
+\begin{itemize}
+	\item \ul{Summarize the main revision points here;}
+	\item \ul{Summarize the main revision points here;}
+	\item \ul{Summarize the main revision points here.}
+\end{itemize}
+\bigskip
+
+Best regards, \\
+\mycoauthor \\
+\mydate
+\end{tcolorbox}
+
+\end{titlepage}
+
+% 目录
+\tableofcontents
+\newpage
+
+
+% 说明
+\noindent Dear all:
+
+~\\
+\indent Thanks again for reviewing and processing our manuscript, particularly for your constructive comments and valuable suggestions. Following these comments and suggestions, we have revised the manuscript. The following is a point-by-point response to editors and reviewers, in which we first quote the comments and then reply with how we have revised the manuscript to accommodate the changes. We use \begin{sf}black sans serif font\end{sf} for our responses and \textcolor{blue}{blue} for comments to facilitate cross-referencing. The revised manuscript highlights the revision with \hl{yellow shading}.
+
+~\\
+\noindent Best regards,
+
+\noindent \mycoauthor
+
+\noindent \mydate
+
+
+
+\newpage
+
+\section{To Editor-in-Chief}
+
+
+\subsection{Editor’s Decision Letter}
+
+If necessary, put the decision letter here.
+
+
+\subsection{Response to Editor-in-Chief}
+\noindent Dear editor-in-chief: 
+
+Thank you for your valuable comments. We have completed all the
+problems in the article according to your requirements, and hope it can satisfy the demand.
+
+\begin{enumerate}
+  \item Summarize solutions to the concerns raised by the editor.
+\end{enumerate}
+
+\noindent Best regards,
+
+\noindent XXX
+
+\noindent \mydate
+
+\section{To Associate Editor}
+\subsection{Associate Editor’s Comments}
+
+If necessary, put the comments raised by the associate editor here.
+
+
+\subsection{Response to Associate Editor}
+\noindent Dear associate editor:
+
+Thank you for your valuable comments. We have revised the paper and provided a point-to-point response to the comments raised by the reviewers in the following according to your requirements.
+
+\begin{enumerate}
+  \item Summarize solutions to the concerns raised by the editor.
+\end{enumerate}
+
+
+\noindent \mycoauthor
+
+\noindent \mydate
+
+
+\section{Response to Reviewers}
+\noindent Dear Reviewers:
+
+Again, we would like to express our gratitude to you for your time and effort in reviewing and processing our manuscript, especially for providing constructive comments and valuable suggestions for significantly improving the manuscript. Following these comments and suggestions, we have changed the revised manuscript. A point-by-point reply to the reviewer's comments is given below, where in each case we quote the referee’s comments and then explain how we have revised the paper to accommodate the revisions requested. 
+For easy cross-referencing, the comments are \textcolor{blue}{marked in blue} while we use the \begin{sf}black sans serif font\end{sf} for our responses. Meanwhile, the contents in the revised paper are \hl{highlighted by yellow shading}.
+
+\noindent \mycoauthor
+
+\noindent \mydate
+
+
+% \setcounter{reviewer}{1}
+\reviewersection
+
+\textcolor{blue}{Thank you for responding to my comments, however, I do not see the changes in the document related to your responses.}
+
+\begin{reply}
+  Again, we thank and admire you for your thorough and rigorous reviews. We have revised and reviewed the manuscript based on your thoughtful comments.
+\end{reply}
+
+% Point one description 
+\begin{point}
+Put the comment here.
+\end{point}
+% Our reply
+\begin{reply}
+Thanks for this careful comment, we apologize for not updating here. The updated ones are as follows:
+
+\begin{revision}{}
+Put the revised content here.
+\end{revision}
+
+\end{reply}
+
+% reviewer 2
+\reviewersection
+
+\textcolor{blue}{Thank you for responding to my comments, however, I do not see the changes in the document related to your responses.}
+
+\begin{reply}
+  Again, we thank and admire you for your thorough and rigorous reviews. We have revised and reviewed the manuscript based on your thoughtful comments.
+\end{reply}
+
+% Point one description 
+\begin{point}
+Put the comment here.
+\end{point}
+% Our reply
+\begin{reply}
+Thanks for this careful comment, we apologize for not updating here. The updated ones are as follows:
+
+\begin{revision}{}
+Put the revised content here.
+\end{revision}
+
+\end{reply}
+
+\bibliographystyle{model5-names}
+% \bibliographystyle{IEEEtran}
+\bibliography{mylib}
+
+\end{document}

@@ -1,0 +1,74 @@
+%   SETUP%
+\documentclass[a4paper,11pt,oneside,titlepage]{book}
+\input{Include/Settings/Settings}
+
+\begin{document}
+%   FRONT MATTER                                            %
+\frontmatter 	   % Begin Roman style (i, ii, iii, iv...) page numbering
+\pagestyle{empty}  % No headers or footers for the following pages
+
+%   TITLE PAGE
+\input{Include/Frontmatter/Titlepage} 
+\clearpage
+%   QUOTE (OPTIONAL)
+\input{Include/Frontmatter/Quote}
+\newpage
+%   ABSTRACT
+\afterpage{\null\thispagestyle{empty}\clearpage} % Blank page
+\input{Include/Frontmatter/Abstract} 
+\begin{singlespace}
+ \tableofcontents 	
+ \addcontentsline{toc}{chapter}{\listfigurename}
+ \listoffigures
+ \addcontentsline{toc}{chapter}{\listtablename}
+ \listoftables
+% \renewcommand{\lstlistlistingname}{List of Code}
+% \addcontentsline{toc}{chapter}{\lstlistlistingname} 
+% \lstlistoflistings
+
+%   NOMENCLATURE AND ACRONYMS
+ \printnomenclature
+ \printglossaries
+\end{singlespace}
+
+
+
+%   MAIN MATTER
+\mainmatter	  % Begin normal, numeric (1,2,3...) page numbering
+\clearpage
+% ------ set page style fancy with the follow 
+\pagestyle{fancy} 
+\renewcommand{\chaptermark}[1]{\markright{\chaptername\ \thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}}
+\lhead{} 
+\chead{}                   
+\rhead{\slshape \rightmark} 
+\lfoot{Name}
+\cfoot{} 
+\rfoot{\thepage}          
+\renewcommand{\headrulewidth}{0.4pt} 
+\renewcommand{\footrulewidth}{0.4pt} 
+
+
+%   CHAPTERS
+\input{Include/Chapters/Introduction}
+
+
+%   BACK MATTER
+%   BIBLIOGRAPHY
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{Include/Backmatter/Bibliography}
+
+
+%   APPENDIX
+\cleardoublepage
+\appendix % to tell LaTeX that the following chapters are appendices
+\input{Include/Backmatter/Appendix/Appendix_A}
+
+%   ACKNOWLEDGEMENTS
+\cleardoublepage
+\pagenumbering{gobble}
+\input{Include/Backmatter/Acknowledgement}
+
+\end{document} 

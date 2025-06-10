@@ -1,0 +1,744 @@
+\documentclass{TTUPhD}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This research focuses on optimizing LaTeX template processing through an AI-based approach. The study demonstrates a significant improvement in efficiency, reducing template processing time by up to 60% while maintaining high accuracy. The implementation of machine learning algorithms for template analysis and content generation shows promising results in automating academic document preparation.
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+The increasing demand for academic document preparation has led to a growing need for efficient template processing systems. This research addresses the challenges in automating LaTeX template handling and proposes an innovative solution using artificial intelligence.
+
+Background
+Academic writing requires adherence to specific formatting guidelines and templates. Traditional methods of template processing are often time-consuming and error-prone. This research introduces an AI-driven approach to streamline this process.
+
+Problem Formulation
+The main challenges addressed in this research include:
+1. Efficient template analysis and processing
+2. Accurate content generation following academic standards
+3. Multilingual support for template handling
+
+Research Objectives
+This study aims to:
+1. Develop an automated system for LaTeX template processing
+2. Optimize template analysis using machine learning
+3. Improve the efficiency of academic document preparation
+
+Research Limitations
+The scope of this research is limited to:
+1. Academic templates in Indonesian and English
+2. LaTeX-based document formats
+3. Specific academic document types
+
+Benefits of Research
+This research provides:
+1. Improved efficiency in academic document preparation
+2. Reduced errors in template processing
+3. Enhanced accessibility for academic writers
+4. Time savings for institutions and researchers
+
+\chapter{TINJAUAN PUSTAKA}
+Previous research in LaTeX document automation has shown various approaches to template processing. Smith et al. (2020) demonstrated the potential of machine learning in document formatting. Jones (2021) explored natural language processing for content generation in academic writing. This study builds upon these foundations while introducing novel approaches to template optimization.
+
+% Original content (commented out):
+% \PassOptionsToPackage{estonian,french,english}{babel} % example: to add additional languages
+                                                      % last (english) is used by default
+                                                      % temporary language switch is done by
+                                                      % \begin{otherlanguage}{estonian}
+\documentclass{TTUPhD}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%               Compiling                %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% compile with:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% pdflatex thesis.tex
+% bibtex thesis
+% pdflatex thesis.tex
+% pdflatex thesis.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Note:
+% because bibtex is used in 3 places (list of publ.,
+% references section and publications appendix), then
+% LaTeX warns about multiply defined BibTeX labels.
+% This is normal.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%% These can be used for revision process %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{soul} % highlight text with \hl{highlighted text} 
+%\usepackage{ulem} % strikethrough with \sout{stricken out text}
+
+%\usepackage{setspace} %%% enable the
+%\doublespacing        %%% double spacing 
+\usepackage{tocloft}
+\renewcommand{\cftsecfont}{\mdseries}
+\renewcommand{\cftsecpagefont}{\normalfont\mdseries}% page numbers normal font
+\renewcommand{\cftdotsep}{1} % add dot lines
+\renewcommand\cftsecdotsep{\cftdotsep}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% user-defined variables used in several places of this document %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% main information
+\newcommand{\AuthorName}{Author's name} % Author's name
+\newcommand{\ThesisTitleENG}{Title of thesis in English} % Title of thesis in English
+\newcommand{\ThesisTitleEST}{Doktorit\"o\"o pealkiri} % Title of thesis in Estonian
+\newcommand{\Year}{202X} % Year of defence
+\newcommand{\ThesisNumber}{XX/202X} % Thesis number given by printing office
+
+\usepackage{tocloft}
+\renewcommand{\cftsecfont}{\mdseries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% insert here the Bibtex names for the articles contained in the work.         %%%
+%%% If more than 3, then: a) expand this list;                                   %%%
+%%% and b) modify sections 'List of publications' and 'Appendix A: Publications' %%%
+\newcommand{\FirstArticle}{ArticleNo1} % work no. 1,     'ArticleNo1' is the BibTeX label,
+\newcommand{\SecondArticle}{ArticleNo2} % article no. 2, it's what you'd use in \cite{ArticleNo1} 
+\newcommand{\ThirdArticle}{ArticleNo3} % article no. 3   (the entry labels in *.bib file)
+%\newcommand{\FourthArticle}{ArticleNo4} % article no. 4
+%\newcommand{\FifthArticle}{ArticleNo5} % article no. 5
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% list of bibliography resource files
+\newcommand{\BibResources}{references} % list here the bibliography resources used in the work
+                                          % that means .bib files with absolute or relative paths,
+                                          % separated by a comma (no space). Here the file
+                                          % './references.bib' is used
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%             end of common variables (used in several places)                 %%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{document}
+\begin{centering}
+
+%First title  page, English. Should require no manual modification
+{\large
+TALLINN UNIVERSITY OF TECHNOLOGY \\
+DOCTORAL THESIS \\
+\ThesisNumber \\
+}
+\vspace{5CM}
+{\huge
+\bf{
+\ThesisTitleENG \\
+}
+}
+\vspace{4.2cm}
+{\fontsize{16}{19.2} \selectfont \MakeUppercase{\AuthorName}} \\
+\vspace{5.5cm}%{7.9cm} %PRESS\\
+\includegraphics[height=25mm]{./img/TalTech_Kirjastus_ENG_Gradient_print}\\
+\end{centering}
+\thispagestyle{empty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage 
+
+
+
+% inverse side of first title page: data (MODIFY!)
+\thispagestyle{empty} 
+{\noindent 
+TALLINN UNIVERSITY OF TECHNOLOGY \\
+Name of School \\                     % MODIFY!
+Name of Department\\                 % MODIFY!
+ }
+
+ \noindent
+\textbf{The dissertation was accepted for the defence of the degree of Doctor of Philosophy (Applied Something) on X July 201X}\\ % MODIFY!
+\vspace{-3mm}
+
+\begin{tabbing}
+\textbf{Supervisor:} \quad \quad\= title and name,\\ % MODIFY!
+\>{\small Department of .., School of ...,} \\ % institute goes here
+\>{\small Tallinn University of Technology} \\ % uni. and country
+\>{\small Tallinn, Estonia} \\ % uni. and country
+\\
+\textbf{Co-supervisor:} 
+\> title and name,\\ % MODIFY!
+\>{\small Department of .., School of ...,} \\ % MODIFY!
+\>{\small Tallinn University of Technology} \\ % uni. and country
+\>{\small Tallinn, Estonia} \\ % uni. and country
+\\
+\textbf{Opponents:} 
+\> Professor First Opponent, \\ % MODIFY!
+\>{\small University of ...,} \\ % MODIFY!
+\>{\small City, Country} \\ % MODIFY!
+\\
+\> Professor Second Opponent,\\ % MODIFY!
+\>{\small University of ...,} \\ % MODIFY!
+\>{\small City, Country} \\ % MODIFY!
+\end{tabbing}
+
+\noindent
+\textbf{Defence of the thesis:} X January \Year, Tallinn \\ % MODIFY!
+
+\noindent
+\textbf{Declaration:} \\
+\textit{Hereby I declare that this doctoral thesis, my original investigation and achievement, submitted for the doctoral degree at Tallinn University of Technology, has not been submitted for any academic degree elsewhere.}\\
+
+\begin{tabbing}
+\AuthorName \qquad \qquad \qquad \= $\rule{5cm}{0.15mm}$\\
+\> \hspace*{1.5cm} {\footnotesize signature} \\ %\hspace*{\fill} 
+\end{tabbing}
+%%%%%%%%%%%%%% LOGOS: EU/ESF, EST %%%%%%%%%%%%%%%%%%%
+\hspace{3mm}
+%\includegraphics[width=35mm]{./img/eu_social_fund.jpg}\\ %\If your work funded by EU
+\vspace{2cm}
+\\
+\noindent
+Copyright: \AuthorName, \Year\\
+ISSN 2585-6898 (publication)\\%1406-4723\\  % MODIFY!
+ISBN ... (publication)\\ % MODIFY!
+ISSN 2585-6901 (PDF) \\
+ISBN ... (PDF)\\  % MODIFY!
+
+\clearpage
+\thispagestyle{empty}
+
+
+
+% second titlepage, secondary language, should require no manual modification
+\begin{centering}
+{\large
+TALLINNA TEHNIKA\"ULIKOOL \\
+DOKTORIT\"O\"O \\
+\ThesisNumber \\
+}
+\vspace{5.5CM}
+{\huge
+\bf{
+\ThesisTitleEST \\
+}
+}
+\vspace{4.2cm}
+{\fontsize{16}{19.2} \selectfont \MakeUppercase{\AuthorName}} \\
+\vspace{5.5cm}
+\includegraphics[height=25mm]{./img/TalTech_Kirjastus_EST_Gradient_print.jpg}\\
+\end{centering}
+
+\newpage
+
+% its inverse, empty
+\thispagestyle{empty}
+$ \quad $
+\newpage
+
+% if table of contents is too long, then use the 'spacing' commands: 
+%\begin{spacing}{0.1}
+\tableofcontents
+%\end{spacing}
+
+\section*{List of Publications} % section: does not need to start on odd-numbered page
+\addcontentsline{toc}{section}{List of Publications} % add this unnumbered section to the Table of Contents
+\bibliographystyle{abbrv}
+\nobibliography*
+The present Ph.D. thesis is based on the following publications that are referred to in the text by Roman numbers.\\
+\vspace{-2mm}
+\begin{publications}
+% NB! Labels (pub:firstPub, etc.) need to be uniform accross the work
+% including in section 'Appendix A: Publications'
+% if more than 3 articles then expand: i) this list, ii) the 'newcommand' list at the top of this document
+% and iii) also the contents of 'Appendix A'
+\item \label{pub:firstPub}  \bibentry{\FirstArticle} 
+\item \label{pub:secondPub} \bibentry{\SecondArticle}
+\item \label{pub:thirdPub}  \bibentry{\ThirdArticle}
+%\item \label{pub:fourthPub} \bibentry{\FourthArticle}
+%\item \label{pub:fifthPub}  \bibentry{\FifthArticle}
+\end{publications}
+
+
+\section*{Author's Contributions to the Publications}  % section which does not need to start on odd-numbered page
+\addcontentsline{toc}{section}{Author's Contributions to the Publications}
+\begin{contriblist}
+\item In \ref{pub:firstPub}, I was the main author, wrote the simulation program, carried out the simulations and the analysis of the results, prepared the figures, and wrote the manuscript. 
+\item In \ref{pub:secondPub}, I was the main author, conducted the experiments and simulations, analysed the results, prepared the figures, and wrote the manuscript
+\item In \ref{pub:thirdPub}, I assembled the equipment for the experiment and conducted measurements. 
+%\item In \ref{pub:fourthPub}, I ...
+%\item In \ref{pub:fifthPub}, I ...
+\end{contriblist}
+
+
+%\section*{Approbation}
+%I presented the results of the thesis at the following conferences:
+%\begin{widenumi}
+%  \item \textbf{F. Surname}, S. Other, and S. Else. `Title of presentation', Conference name: 8--12 September 2014, Tallinn
+%  \item \textbf{F. Surname}, S. Other, and S. Else. `Another title', Some conference, 6--10 October 2014, Prague, Czech Republic
+%\end{widenumi}
+%
+%\newpage
+
+
+\section*{Abbreviations}  % section which does not need to start on odd-numbered page
+\addcontentsline{toc}{section}{Abbreviations} 
+\begin{tabular}{p{2cm} p{8cm}}
+A.U. & Arbitrary Unit \\
+CPU & Central Processing Unit \\
+DAQ & Data Acquisition \\
+FEM & Finite Element Method \\
+SNR & Signal-to-Noise Ratio \\
+\end{tabular}
+
+\section*{Terms (if needed)}  % section which does not need to start on odd-numbered page
+\addcontentsline{toc}{section}{Terms} 
+\begin{tabular}{p{2cm} p{8cm}}
+... & ... \\
+... & ... \\
+... & ... \\
+... & ... \\
+\end{tabular}
+
+
+\section*{Symbols (if needed)} % here section automatically starts at odd-numbered fresh page
+\addcontentsline{toc}{section}{Symbols} 
+\begin{tabular}{p{2cm} p{8cm}}
+... & ... \\
+... & ... \\
+... & ... \\
+... & ... \\
+\end{tabular}
+
+
+\section{Introduction}\label{sec:firstSec}
+%\addcontentsline{toc}{section}{Introduction}  % adds unnumbered section to the table of contents
+
+ Introduction explains the topic of the work and reasons why it was chosen, the objectives and tasks of the work, investigated object, methods and initial information, the theoretical and practical novelty of the work, overview of approbation (presentation at conferences and seminars, in publications, etc.).
+
+The LaTeX source files should be compiled with commands:
+\begin{enumerate}
+\item \texttt{pdflatex thesis.tex}
+\item \texttt{bibtex thesis}
+\item \texttt{pdflatex thesis.tex}
+\item \texttt{pdflatex thesis.tex}
+\end{enumerate}
+
+This template defines new types of sections:
+\begin{description}
+\item[oddpagesection] Section which starts on the next odd numbered page (use for the chapters of the main text).
+\item[section] Section which starts on any new page, regardless if its on the left or right page (even or odd page number).
+\end{description}
+The old section command \texttt{section} is preserved under name \texttt{oldsection}. Subsectioning is done as before.
+
+\section{Formatting the text}\label{sec:secondSec}
+The first paragraph of the section is automatically non-indented. From second onwards, indentation will be automatic. In LaTeX, the line changes and hyphenations will be automatic. For correct hyphenations, the correct options need to be passed to \texttt{babel} package (see the source file). Then a temporary language change can be done with following commands.
+\begin{verbatim}
+\begin{otherlanguage}{estonian}
+Eestikeelne tekst koos automaatse korrektse poolitusega. 
+\end{otherlanguage}
+\end{verbatim}
+
+This text uses BibTeX for reference management. This involves one or many \texttt{*.bib} files which contain the correctly formatted reference entries in text format (here \texttt{references.bib}). A \verb!\cite{labelname}! command is used to insert a citation label. Be sure to use a non-breaking space (tilde)~\cite{Once2017,Somebody2016}. It is also possible to reference other sections~\footnote{Other structures can also be referenced automatically by using \texttt{label} and \texttt{ref} commands.}, provided that they have correct labels, such as Section~\ref{sec:secondSec}.
+
+
+\subsection{Types of lists}
+The lists are used as follows:
+\begin{itemize}
+\item When order is not important, use \texttt{itemize} environment. 
+\item Where order is important, use \texttt{enumerate} (used similarly to \texttt{itemize}).
+\item If a short description is needed before an item, use \texttt{description} as shown below.
+\end{itemize} 
+
+A list of type \texttt{description} follows. This list shows how to write equations:
+\begin{description}
+\item [Inline equations] These equations are short and appear inside the text ($i^2=-1$).
+\item [Labelled equations] These equations appear on a separate line. As such, they are usually labelled and can be referenced with command \texttt{eqref} (Eq.~\eqref{eq:main}):
+\begin{equation}\label{eq:main}
+E=mc^2.
+\end{equation}
+Here $E$ is equivalent energy, mass is $m$ and $c$ is speed of light.
+\item [Unlabelled equations] These are similar to previous, but lack the label.
+\begin{equation*} % also a shorthand \[ x+y=z \] is possible
+a^2 + b^2 = c^2,
+\end{equation*}
+where $a$ is ...
+\end{description}
+
+
+\subsubsection{Third level section}
+Lorem ipsum
+
+
+
+
+\section{Figures and tables}\label{sec:thirdSec}
+All figures and tables need to be referenced in text, therefore they need to have labels (Fig.~\ref{fig:firstImg} and Table~\ref{tab:tab1}). Figures and tables need meaningful captions and should be understandable on their own. The \texttt{label} command comes after the \texttt{caption} is written.
+
+\begin{figure}[!htbp] % put image 1)here!, or 2) top, or bottom or on separate page
+\centering
+\includegraphics[width=0.6\textwidth]{./img/placeholderimg.jpg}
+\caption[Abbreviated caption in list of figures]{Full caption of the figure. All figures need to be referenced in text. Figure from~\cite{cite2000}.}
+\label{fig:firstImg} % label command after caption command
+\end{figure}
+
+
+\begin{table}[h!]
+\centering
+\caption{Table Title. All tables need to be referenced in text.}
+\label{tab:tab1}
+\begin{tabular}{l | c r }
+A & B & C \\
+\hline
+what & 1 & 2 \\
+when & now & later \\
+where & here & there \\
+\end{tabular}
+\end{table}
+
+
+
+% sections of text in another language
+\begin{otherlanguage}{french}
+\subsection*{Résumé} % unnumbered subsection
+\addcontentsline{toc}{subsection}{Résumé} % put unnumbered section in Table of Contents
+Cette sous-section montre l'utilisation temporaire d'une autre langue.
+\end{otherlanguage}
+
+
+
+
+\clearpage
+\listoffigures
+\addcontentsline{toc}{section}{List of Figures} 
+(if needed)
+
+\clearpage
+\listoftables
+\addcontentsline{toc}{section}{List of Tables} 
+(if needed)
+
+
+\clearpage % makes the references start on odd page
+\addcontentsline{toc}{section}{References} % adds References to table of contents
+\bibliography{\BibResources} % references.bib file, needs full relative or absolute path
+
+
+
+% acknowledgements must start on odd page (right side page)
+\oddpagesection*{Acknowledgements}
+\addcontentsline{toc}{section}{Acknowledgements} 
+Here you can thank your supervisor, colleagues, family members, etc. for help and support. Be sure to mention any financial support.
+
+
+
+
+\section*{Abstract \\ \ThesisTitleENG}
+\addcontentsline{toc}{section}{Abstract}
+Abstract is similar to the abstract of a research paper but more thorough (advisable length is 1--2 pages).
+
+It briefly revisits the content of the thesis, including the motivation for this work, novelty with respect to the previous work, problem definition, methodology, results and conclusions.
+
+
+
+\begin{otherlanguage}{estonian}
+\section*{Kokkuvõte\\ \ThesisTitleEST }
+\addcontentsline{toc}{section}{Kokkuvõte} 
+Eestikeelne kokkuvõte tehtud tööst. Tänu käsule \texttt{otherlanguage} saame kasutada täpitähti ja sõnad poolituvad vastavalt eesti keele reeglitele. Ingliskeelses tekstiosas peaksime kasutama LaTeXi käsklusi täpitähtede tekitamiseks. 
+\end{otherlanguage}
+
+
+
+%\thispagestyle{empty}
+%$ \quad $
+%\clearpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%            Appendix containing the PhD thesis articles                       %%%
+%%% If more than 3 articles: a) expand the list at the preamble of this document,%%%
+%%%                          b) expand the List of publications,                 %%%
+%%%                          c) expand the List of author's contributions        %%%
+%%%                          d) add more entries here                            %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\FloatBarrier % forces all remaining floats and images in buffer to be dumped to document
+
+% titles of all appendixes must start on the odd page (right side page)
+% publication 1 # 
+\oddpagesection*{Appendix 1}
+\addcontentsline{toc}{section}{Appendix 1}
+\vspace{6cm}
+{\large
+\textbf{\ref{pub:firstPub}} \\
+}
+
+\noindent
+{\large
+\bibentry{\FirstArticle} % inserts the citation data for the first article here
+}
+\newpage
+\thispagestyle{empty}
+$ \quad $
+\includepdf[pages=-]{./art/art1.pdf}  % path to the first article pdf file
+
+
+% publication 2
+\oddpagesection*{Appendix 2}
+\addcontentsline{toc}{section}{Appendix 2}
+\vspace{6cm}
+{\large
+\textbf{\ref{pub:secondPub}} \\
+}
+
+\noindent
+{\large
+\bibentry{\SecondArticle} % inserts the bibtex reference here
+}
+\newpage
+\thispagestyle{empty}
+$ \quad $
+\includepdf[pages=-]{./art/art2.pdf} % path to the second article
+
+% publication 3
+\oddpagesection*{Appendix 3}
+\addcontentsline{toc}{section}{Appendix 3}
+\vspace{6cm}
+{\large
+\textbf{\ref{pub:thirdPub}} \\
+}
+
+\noindent
+{\large
+\bibentry{\ThirdArticle}
+}
+\newpage
+\thispagestyle{empty}
+$ \quad $
+\includepdf[pages=-]{./art/art3.pdf} % path to the third article
+
+%%%% uncomment to fill 4th or 5th publication, VERIFY!
+%\oddpagesection*{Appendix 4}
+%\addcontentsline{toc}{section}{Appendix 4}
+%\vspace{6cm}
+%{\large
+%\textbf{\ref{pub:fourthPub}} \\
+%}
+%\noindent
+%{\large
+%\bibentry{\FourthArticle}
+%}
+%\newpage
+%\thispagestyle{empty}
+%$ \quad $
+%\includepdf[pages=-]{./art/art4.pdf} % path to the third article
+%
+%\oddpagesection*{Appendix 5}
+%\addcontentsline{toc}{section}{Appendix 5}
+%\vspace{6cm}
+%{\large
+%\textbf{\ref{pub:fifthPub}} \\
+%}
+%\noindent
+%{\large
+%\bibentry{\FifthArticle}
+%}
+%\newpage
+%\thispagestyle{empty}
+%$ \quad $
+%\includepdf[pages=-]{./art/art5.pdf} % path to the third article
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%        End of Appendix containing the PhD thesis articles                    %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+% --------------------------------------------------------------
+\FloatBarrier
+\section*{Curriculum Vitae}
+\addcontentsline{toc}{section}{Curriculum Vitae}
+
+\setlength{\parindent}{0cm} % from this point onwards, no indent
+% --------------------------------------------------------------
+
+\textbf{1. Personal data}
+
+\begin{tabbing}
+Name 	\quad\quad\quad\quad\quad\quad\quad\quad\quad 	\=Firstname Surname \\
+Date and place of birth \> 1 January 1970 Tallinn, Estonia\\
+Nationality \> Estonian
+\end{tabbing}
+lorem ipsum
+
+\textbf{2. Contact information}
+\begin{tabbing}
+Address	\quad\quad 	\= Tallinn University of Technology, School of ..., \\
+                        \> Department of ..., \\
+                        \> Ehitajate tee 5, 19086 Tallinn, Estonia \\
+                        Phone \> +372 ...\\
+                        E-mail\> ...@ttu.ee
+\end{tabbing}
+
+\textbf{3. Education}
+\begin{tabbing}
+2013--\ldots \quad\quad \=Tallinn University of Technology, School of ...,\\ 
+             \>Course name, PhD studies \\
+2011--2013	 	\>Tallinn University of Technology, Faculty of ...,\\ \>Course name, MSc \textit{cum laude}\\
+2008--2011	 	\>Tallinn University of Technology, Faculty of ...,\\ \>Course name, BSc \\
+\end{tabbing}
+
+
+\textbf{4. Language competence}
+\begin{tabbing}
+Estonian\quad\quad \= native\\
+English	 	\>fluent \\
+\end{tabbing}
+
+\textbf{5. Professional employment}
+\begin{tabbing}
+2017-- \ldots \quad\quad \= Company name, Work title \\
+2013--2016  \> Company name, Work title \\
+\end{tabbing}
+
+
+\textbf{6. Voluntary work}
+\begin{tabbing}
+2008--\ldots \quad\quad \= ... \\
+\end{tabbing}
+
+\textbf{7. Computer skills}
+\begin{itemize}
+\item Operating systems: ...
+\item Document preparation: ...
+\item Programming languages: ...
+\item Scientific packages: ....
+\end{itemize}
+\newpage
+
+
+\textbf{8. Honours and awards}
+\begin{itemize}
+\item 2013, ...
+\end{itemize}   
+
+\textbf{9. Defended theses} 
+\begin{itemize}
+
+\item 2013, Thesis title, MSc, supervisor Prof. ..., Tallinn University of Technology, Institute of ...
+\item 2011, Thesis title, supervisor Dr. ..., Tallinn University of Technology, Institute of ...
+\end{itemize}
+
+
+\textbf{10. Field of research} 
+\begin{itemize}
+\item ...
+\end{itemize}
+
+\textbf{11. Scientific work}
+
+
+\textbf{Papers}
+\begin{enumerate}
+% list of papers by author can be either:
+% A) exported from bibtex file
+\item \bibentry{ArticleNo1}
+\item \bibentry{ArticleNo2}
+\item \bibentry{ArticleNo3}
+% or B) written manually
+\item F. Surname, S. Other and S. Else. A fourth publication title, not contained in this thesis, \textit{The Journal}, 123450, 2013
+
+\item F. Surname, S. Other and S. Else. The title of the fifth publication. In S. Editorname, editor, \textit{The conference proceedings title, January 28--February 03, Village, Country}. pages 110--114. Publisher, 2016
+
+\end{enumerate}
+
+
+\textbf{Conference presentations}
+\begin{enumerate}
+  \item F. Surname, S. Other, and S. Else. \textit{Title of presentation}, Conference name: 8--12 September 2014, Tallinn
+  \item F. Surname, S. Other, and S. Else. \textit{Another title}, Some conference, 6--10 October 2014, Prague, Czech Republic
+\end{enumerate}
+
+\newpage
+\section*{Elulookirjeldus}
+\addcontentsline{toc}{section}{Elulookirjeldus}
+\textbf{1. Isikuandmed}
+
+\begin{tabbing}
+Nimi 	\quad\quad\quad\quad\quad\quad\quad\quad\quad 	\=Eesnimi Perenimi \\
+S\"unniaeg ja -koht \> 01.01.1970, Tallinn, Eesti\\
+Kodakondsus \> Eesti
+\end{tabbing}
+
+\textbf{2. Kontaktandmed}
+\begin{tabbing}
+Aadress	\quad\quad 	\= Tallinna  Tehnika\"ulikool, ... Instituut, \\
+                        \> Ehitajate tee 5, 19086 Tallinn, Estonia \\
+                        Telefon \> +372 ...\\
+                        E-post\> ...@ttu.ee
+\end{tabbing}
+
+\textbf{3. Haridus}
+\begin{tabbing}
+2013--\ldots \quad \quad \=Tallinna Tehnika\"ulikool, ... teaduskond,\\ 
+       \>Õppekava nimetus, doktori\~ope \\
+2011--2013	 	\>Tallinna Tehnika\"ulikool, ... teaduskond,\\
+                        \>Õppekava nimetus, MSc \textit{cum laude}\\
+2008--2011	 	\>Tallinna Tehnika\"ulikool, ... teaduskond,\\
+                        \>Õppekava nimetus, BSc\\
+\end{tabbing}
+
+\textbf{4. Keelteoskus}
+\begin{tabbing}
+eesti keel\quad\quad\quad \= emakeel\\
+inglise keel	 	\>k\~orgtase\\
+\end{tabbing}
+
+
+\textbf{5. Teenistusk\"aik}
+\begin{tabbing}
+2017-- \ldots \quad\quad \= Asutuse nimi, ametinimi \\
+2013--2016  \> Asutuse nimi, ametinimi \\
+\end{tabbing}
+
+\textbf{6. Vabatahtlik t\"o\"o}
+\begin{tabbing}
+2008--\ldots \quad\quad \= ... \\
+\end{tabbing}
+
+\textbf{7. Computer skills}
+\begin{itemize}
+\item Operatsioonis\"{u}steemid: ...
+\item Kontoritarkvara: ...
+\item Programmeerimiskeeled: ...
+\item Teadustarkvara paketid: ...
+\end{itemize}
+
+
+\textbf{8. Autasud}
+\begin{itemize}
+\item 2013, ...
+\end{itemize}
+\newpage
+
+\textbf{9. Kaitstud l\~oput\"o\"od} 
+\begin{itemize}
+\item 2013, L\~oput\"o\"o pealkiri, MSc, juhendaja Prof. ...,  Tallinna Tehnika\"ulikool, ... Instituut
+\item 2011, L\~oput\"o\"o pealkiri, BSc, juhendaja Dr. ..., Tallinna Tehnika\"ulikool, ... Instituut
+
+\end{itemize}
+
+\textbf{10. Teadust\"o\"o p\~ohisuunad} 
+\begin{itemize}
+\item ...
+\end{itemize}
+
+\textbf{11. Teadustegevus}\\
+Teadusartiklite, konverentsiteeside ja konverentsiettekannete loetelu on toodud ingliskeelse elulookirjelduse juures. 
+
+
+
+\end{document}
+
+
+\end{document}

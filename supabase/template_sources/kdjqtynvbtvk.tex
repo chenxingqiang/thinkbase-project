@@ -1,0 +1,225 @@
+\documentclass[conference]{styles/acmsiggraph}
+
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text.
+\usepackage{fullpage} % changes the margin
+\usepackage{enumitem} % for customizing enumerate tags
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{etoolbox}   % for booleans and much more
+\usepackage{verbatim}   % for the comment environment
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\usepackage{menukeys}
+\usepackage{titlesec}
+\setlength{\parskip}{.8mm}
+\usepackage{siunitx}
+
+\title{\huge Homework 3: Solutions \\ \LARGE {CSE 490V: Virtual Reality Systems}}
+\author{\Large Student Name \\ student@uw.edu}
+\pdfauthor{Student Name}
+
+\hypersetup{
+	colorlinks=true,
+	urlcolor=[rgb]{0.97,0,0.30},
+	anchorcolor={0.97,0,0.30},
+	linkcolor=[rgb]{0.97,0,0.30},
+	filecolor=[rgb]{0.97,0,0.30},
+}
+
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ %
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ %
+ label=\fbox{\color{Black}\textbf{OUTPUT}},
+ labelposition=topline,
+ %
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
+
+% convenient norm symbol
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\titlespacing*{\section}{0pt}{5.5ex plus 1ex minus .2ex}{2ex}
+\titlespacing*{\subsection}{0pt}{3ex}{2ex}
+
+\setcounter{secnumdepth}{4}
+\renewcommand\theparagraph{\thesubsubsection.\arabic{paragraph}}
+\newcommand\subsubsubsection{\paragraph}
+
+\setlength{\parskip}{0.5em}
+
+% a macro for hiding answers
+\newbool{hideanswers}
+\setbool{hideanswers}{false}
+\newenvironment{answer}{}{}
+\ifbool{hideanswers}{\AtBeginEnvironment{answer}{\comment} %
+\AtEndEnvironment{answer}{\endcomment}}{}
+
+\newcommand{\points}[1]{\hfill \normalfont{(\textit{#1pts})}}
+\newcommand{\pointsin}[1]{\normalfont{(\textit{#1pts})}}
+
+\begin{document}
+\maketitle
+
+\section{Theoretical Part}
+\begin{enumerate}[label=(\roman*)]
+%%%%%%%%
+%  Q1  %
+%%%%%%%%
+\item \textbf{(Vergence)} Vergence refers to an oculomotor process in the human visual system where the eyes rotate in their sockets as we fixate on objects at different depths. The purpose of vergence is to keep the fixated object on the foveas of both eyes. To achieve this, the eyes will be almost parallel when we fixate on an object that is far away, and they rotate inwards when we fixate on an object close by.
+
+In Figure~\ref{fig:vergence}, the eyes fixate on $\vec{p_1}$ but there is also another point $\vec{p_2}$ in the scene that the eyes could alternatively fixate.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{imgs/1_q}
+\caption{An illustration of the eyes fixating on point $p_{1,2}$, resulting in vergence angle $\theta_{1,2}$. The origin, $o$, is placed at the midpoint of the two eyes.}
+\label{fig:vergence}
+\end{figure}
+
+\begin{enumerate}[label=(\alph*)]
+\item Given $\vec{p_1}$ = $(200, -500)$~mm, $\vec{p_2}$ = $(-200, -250)$~mm, and an interpupillary distance of $ipd$ = 64~mm, compute the vergence angles $\theta_1$ and $\theta_2$, which correspond to the eyes fixating on $\vec{p_1}$ and $\vec{p_2}$, respectively. For this question, we neglect the finite diameter of the eyeballs and only consider their centers. \pointsin{5}
+\item Derive a parametric representation (i.e., a formula) that models the set of points $\vec{p_i}$ = ($x_i$, $z_i$) with the same vergence angle as $p_1$. Express the relation as a function of $x_i$ (i.e., $z_i = f(x_i)$). Plot this curve and label the coordinates of: the location of the eyes, the points on the curve that are farthest to the left and right, and the point farthest from the eyes in the $z$ direction. \pointsin{5}
+
+\textbf{Hint:} This is called the horopter, look it up online for more information. You might find the following trigonometric identity useful: $\tan^{-1}(x) + \tan^{-1}(y) = \tan^{-1}(\frac{x+y}{1-xy})$.
+\end{enumerate}
+
+%%%%%%%%
+%  Q2  %
+%%%%%%%%
+\item \textbf{(Retinal Blur)} Accommodation is another oculomotor process. Here, the eye changes its focal power by deforming the crystalline lens via the ciliary muscles. This mechanism ensures that the fixated object is focused on the retina. Inevitably, this means that objects at other distances appear blurred. The accommodation state of both eyes is usually linked. Given an eye accommodated at point $\vec{p_3}$ and given the following parameters:
+\begin{itemize}
+\item diameter of the eye $D_e$ = 24~mm
+\item pupil size $S_e$ = 5mm
+\item distance from $\vec{p_3}$ to lens $d_3$ = 1000~mm
+\item distance from $\vec{p_4}$ to lens $d_4$ = 500~mm
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.7]{imgs/2_q}
+\caption{The eye is accommodated at a distance $d_3$ focusing on point $p_3$. Points that are closer or farther away will be blurred on the retina. The diameter of the blur circle on the retina is called circle of confusion.}
+\label{fig:coc}
+\end{figure}
+
+\begin{enumerate}[label=(\alph*)]
+\item Compute the focal length of the lens using the Gaussian thin lens equation. \pointsin{5}
+\item Assuming the eye is accommodating at point $\vec{p_3}$, compute the diameter of the blurred point $\vec{p_4}'$ on the retina (i.e., the circle of confusion) in~mm. \pointsin{5}
+\end{enumerate}
+
+%%%%%%%%
+%  Q3  %
+%%%%%%%%
+\item \textbf{(Visual Acuity)} In vision science, the size of the retinal projection of an object is usually defined as the visual angle it subtends (see Fig.~\ref{fig:visualangle}). An object's visual angle, measured in degrees, can be calculated via the equation listed in Figure~\ref{fig:visualangle}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{imgs/3_q.png}
+\caption{To model the size of the retinal image of an object, we usually use degrees of visual angle as a metric.}
+\label{fig:visualangle}
+\end{figure}
+
+
+Visual acuity, or sharpness of vision, can be defined as the number of ``cycles'' from bright to dark that are perceivable within one degree of visual angle; this is called cycles per degree or cpd. You can think of this as the number of line pairs (pairs of black and white lines) one can distinguish clearly in one degree of visual angle. A related concept to visual acuity is the minimum angle of resolution, or MAR, which is the smallest angle between two points that can be resolved. The MAR, given in degrees (per cycle), is the reciprocal of acuity. On average, humans resolve around 30~cpd (i.e., 20/20 vision), although some can distinguish as many as 40--50 cpd. For reference, most VR displays today only support an acuity of around 5 cpd.
+
+Apple claims that its retina displays have a pixel density higher than what a human can perceive. Is that true? Let's take a look at the screen in a 3rd generation 13.3'' MacBook Pro. It has a resolution of $2560\times1600$ pixels. Assuming square pixels and a viewing distance of \SI{50}{\centi\meter}, what is the visual angle of one pixel? What is the maximum acuity (in cpd) that the display can support at this distance? Is it higher or lower than the 30 cpd that humans can perceive? \pointsin{5}
+
+%%%%%%%%
+%  Q4  %
+%%%%%%%%
+\item \textbf{(Eccentricity and Visual Acuity)} As discussed in class, the distribution of photoreceptors on the retina is not uniform. The density of the cones is much higher in the fovea than in the periphery of the visual field, which results in visual acuity decreasing rapidly away from the fovea. It turns out that a simple linear model is quite accurate in modeling this falloff. The linear model matches both anatomical data (e.g., photoreceptor density) as well as performance on low-level vision tasks. This model is defined as
+%
+$$\omega = m \theta_e + \omega_0$$
+%
+where $\omega$ is the MAR in degrees (per cycle), $\theta_e$ is the eccentricity angle in degrees, $\omega_0$ is the smallest resolvable angle in degrees (per cycle), and $m$ is the MAR slope. For this question, you may assume $m$ = 0.0275, $\omega_0$ = $\frac{1}{48}\degree$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.7]{imgs/4_q}
+\caption{The distance of a point's retinal projection to the fovea is called eccentricity, here denoted as $\theta_e$, and measured in degrees.}
+\label{fig:eccentricity}
+\end{figure}
+
+\begin{enumerate}[label=(\alph*)]
+\item Given a point $\vec{p_5}$ at the location $x = 400$~mm and $y = 300$~mm, what is the eccentricity of this point on the retina when the eye looks down the $x$ axis? \pointsin{5}
+\item What is the highest frequency (in cpd) that one would be able to resolve at that eccentricity? \pointsin{5}
+\end{enumerate}
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+\textbf{Answer:}
+\begin{enumerate}[label=(\roman*)]
+%%%%%%%%
+%  Q1  %
+%%%%%%%%
+\item \begin{enumerate}[label=(\alph*)]
+\item Write your answer to this question here.
+
+\item Write your answer to this question here.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{imgs/teapots.png}
+\caption{Place your horopter plot here.}
+\label{fig:horopter}
+\end{figure}
+\end{enumerate}
+
+
+%%%%%%%%
+%  Q2  %
+%%%%%%%%
+\item \begin{enumerate}[label=(\alph*)]
+\item Write your answer to this question here.
+
+\item Write your answer to this question here.
+\end{enumerate}
+
+%%%%%%%%
+%  Q3  %
+%%%%%%%%
+\item Write your answer to this question here.
+
+%%%%%%%%
+%  Q4  %
+%%%%%%%%
+\item \begin{enumerate}[label=(\alph*)]
+\item Write your answer to this question here.
+\item Write your answer to this question here.
+\end{enumerate}
+\end{enumerate}
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\newpage
+\section{Programming Part PDF Deliverables}
+\subsubsubsection*{2.4.4 Anaglyph Perceptual Question} 
+A different way of doing anaglyph rendering is by assigning the red color channel of the left image directly to the red color channel of the output, and the green and blue color channels of the right image directly to the green and blue color channels of the output. One advantage of this method is potentially gaining back some color lost by converting the images to grayscale. However, there is a drawback to such a method. What is it?  Think of some scenes, specically how the colors might impact the output. \pointsin{5}
+
+\begin{answer}
+\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\end{document}

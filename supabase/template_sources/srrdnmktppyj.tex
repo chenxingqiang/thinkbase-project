@@ -1,0 +1,448 @@
+\documentclass[12pt]{report}
+
+\usepackage{ifpdf}
+\newif\ifpdf\ifx\pdfoutput\undefined\pdffalse\else\pdfoutput=1\pdftrue\fi
+\newcommand{\pdfgraphics}{\ifpdf\DeclareGraphicsExtensions{.pdf,.jpg}\fi} %Esto sirve para que de manera alternativa puedan utilizarse figuras en pdf o jpg
+
+\usepackage[spanish,mexico]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage[dvipsnames,pdftex]{color}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\setlength{\oddsidemargin}{0in}
+ \setlength{\textwidth}{6in}
+ \setlength{\topmargin}{0in}
+ \setlength{\voffset}{-0.5in}
+ \setlength{\hoffset}{0.5in}
+ \setlength{\textheight}{9in}
+ \setlength{\textwidth}{6in}
+ \setlength{\topskip}{0in}
+ \setlength{\parskip}{2ex}
+ \renewcommand{\baselinestretch}{1}
+
+%%% comandos definidos por el usuario
+\newcommand{\chm}{\mathrm}
+\newcommand{\eqrx}{\rightleftharpoons}
+\newcommand{\rx}[1]{\stackrel{\!\!#1}{\rightarrow}}
+\newcommand{\rrx}[2]{\:\stackrel{\!\!#1}{_{\stackrel{\textstyle \eqrx}{\scriptstyle #2}}}\:}
+\newcommand{\dpar}[3]{\left(\frac{\partial#1}{\partial#2}\right)\!\!\!\raisebox{-3ex}{\footnotesize\textit #3}}	
+\newcommand{\dpart}[3]{\left(\frac{\partial#1}{\partial#2}\right)_#3}	
+\newcommand{\sbs}{_\chm}
+\newcommand{\dbar}{\makebox[5pt]{ }\makebox[0pt]{$^-$}\!\!\!d}
+\newcommand{\degree}{$^\circ$}
+\newcommand{\corr}[1]{\textcolor[named]{Red}{#1}}  %%% este comando es para cambiar a rojo el color del texto
+
+
+
+
+\begin{document}
+\setcounter{page}{1}
+\pagenumbering{roman}
+\thispagestyle{empty}
+\begin{center}
+INSTITUTO TECNOLÓGICO Y DE ESTUDIOS SUPERIORES\\
+ DE MONTERREY\\[0.75cm]
+DEPARTAMENTO DE QUÍMICA\\[0.8in]
+\end{center}
+\begin{figure}[h]
+\begin{center}
+
+\includegraphics[height=5.5 cm]{escudo1.jpg}
+\vspace{0cm}
+\end{center}
+\end{figure}
+\vspace{1cm}
+\begin{center}
+TITULO DE LA TESIS\\[4mm]
+POR\\[4mm]
+NOMBRE DEL ALUMNO\\[1cm]
+\small PROYECTO DE INVESTIGACIÓN PRESENTADO COMO REQUISITO PARCIAL PARA OPTAR AL TÍTULO DE LICENCIADO EN CIENCIAS QUÍMICAS
+\vfill
+MONTERREY, N.L. \hfill DICIEMBRE 2015
+\end{center}
+\newpage
+\thispagestyle{empty}
+\begin{center}
+TITULO DE LA TESIS\\[1.3cm]
+POR\\[0.3cm]
+NOMBRE DEL ALUMNO\\[0.3cm]
+\small HA SIDO APROBADO\\[0.3cm]
+\small DICIEMBRE 2015\\[0.7cm]
+\end{center}
+\begin{flushleft}
+COMITÉ EVALUADOR:\\[0.3cm]
+\end{flushleft}
+\begin{tabular}{c@{\hspace{0.5in}}c}
+\rule[1pt]{2.3in}{1pt}&\rule[1pt]{2.3in}{1pt}\\
+Dr.Marcelo Videa Vargas, Asesor & Sinodal 1\\[1.5cm]
+\rule[1pt]{2.3in}{1pt}&\rule[1pt]{2.3in}{1pt}\\
+Sinodal 2 & Sinodal 3\\[1cm]
+\end{tabular}
+\\[0.7cm]
+ACEPTADO:\\
+\begin{center}
+\begin{tabular}{c}
+\rule[1pt]{4 in}{1pt}\\
+Dra. Laura Romero Robles\\
+Directora de Licenciado en Ciencias Químicas e\\ Ingeniería en Nanotecnología y Ciencias Químicas\\[2.5cm]
+\rule[1pt]{4 in}{1pt}\\
+M.C.~Luz María Gutiérrez Maldonado\\
+Directora del Departamento de Química\\ 
+\end{tabular}
+\end{center}
+\vfill
+\newpage
+\begin{center}
+{\Large \bf{RESUMEN}}
+\end{center}
+\newpage
+\begin{center}
+{\Large  \bf{AGRADECIMIENTOS}}
+\end{center}
+\newpage
+\begin{center}
+{\Large  \bf{DEDICATORIA}}
+\end{center}
+\newpage
+\tableofcontents
+\newpage
+\listoftables
+\addcontentsline{toc}{chapter}{Índice de Tablas} %%% Para introducir una línea en el índice
+\listoffigures
+\addcontentsline{toc}{chapter}{Índice de Figuras}
+
+\chapter{Introducción}
+\pagenumbering{arabic} %%% esto es para regresar el modo de numeración a numeración arábiga
+\setcounter{page}{1}  %%% empezamos en página 1
+\thispagestyle{empty}  %%%% la primera página no va enumerada
+
+
+\section{Descripción del uso de La\TeX}
+
+La\TeX\ es un programa para edición electrónica de textos que es sumamente versátil e inicialmente diseñada para textos científicos, aunque ahora su uso se expande desde la incorporación de caracteres de distintos alfabetos hasta la producción de partituras musicales. 
+
+Su origen se basa en \TeX \footnote{Se pronuncia Tej}, que es uno de los lenguajes de programación para la edición de textos más poderosos en cuanto a versatilidad y calidad se refiere. Fue creado por Donald E.~Knuth. De acuerdo a Helmut Kopka, \LaTeXe\ es un programa a nivel de cajista más que a nivel de autor de textos \cite{Kopka}, como lo es Microsoft Word, por lo que permite desarrollar textos a la medida del usuario sin odiosas imposiciones.
+
+\subsection{Elaboración de un documento con \LaTeX}
+
+Para iniciar la elaboración de un documento con \LaTeXe\ hay que declarar en la primera línea de código el tipo de documento que se desea realizar:
+
+\begin{verbatim}
+\documentclass[12pt,letterpaper]{article}
+\end{verbatim}
+%
+\subsubsection*{Clases de documentos}
+\noindent Las clases de documentos pueden ser: {\sf article, report, book, letter, slides}, etc. y proporcionan el formato al documento. Entre corchetes se declaran las opciones de la clase del documento, como tamaño de letra, idioma para separación de palabras, número de columnas, etc. A continuación se presentan algunas de las opciones, donde se resalta el valor default.
+
+\begin{itemize}
+\item tamaño de letra: {\sffamily 10pt, 11pt, {\bfseries 12pt}}
+\item tamaño de hoja: {\sffamily a4paper, {\bfseries letterpaper}, legalpaper, executivepaper}
+\item orientación de la hoja: {\sffamily {\bfseries portrait}, landscape}
+\item idioma del documento: {\sffamily german, greek, {\bfseries english}, spanish}
+\item columnas de texto: {\sffamily {\bfseries onecolumn}, twocolumn}
+\item numeración de ecuaciones (a la derecha o a la izquierda): {\sffamily {\bfseries reqno}, leqno} 
+\end{itemize}
+
+\subsubsection*{Declaración de paquetes}
+\noindent Una vez declarado el texto debe procederse a la especificación de los paquetes que se utilizarán para la edición del documento. De manera general, el comando es:
+\begin{verbatim}
+\usepackage[opciones]{nombre}
+\end{verbatim}
+
+A continuación, una lista de los paquetes más usados:
+
+\begin{itemize}
+\item {\sf babel} Babel que sirve para separar correctamente las palabras de multitud de idiomas. Los nombres en español, para capítulo, sección, figura, tabla, etc. y uso de puntuación se encuentran en el archivo \verb|spanish.ldf|. A veces es necesario modificar este documento para obtener el formato más adecuado.
+\item {\sf inputenc} Este paquete permite la poner acentos y tildes directamente durante la elaboración del archivo {\sf .tex}. Utilizar la opción {\sf latin1} 
+\item {\sf graphix} Este paquete maneja gráficas. Las opciones {\sf dvips} y {\sf pdftex} deben declararse para producir archivos en formato PS o PDF.
+\item {\sf color} Este paquete permite el uso de colores para el texto. Las opciones {\sf dvipsnames} y {\sf pdftex} deben declararse para producir archivos en formato PS o PDF.
+\item {\sf hyperref} Este paquete produce ligas electrónicas dentro del documento PDF. Las opciones más importantes son {\sf pdftex} y {\sf colorlinks=true}.
+\end{itemize}
+
+En la web pueden encontrarse muchos paquetes desarrollados en función de la necesidad específica de un usuario y que los hacen disponibles en general.
+
+\subsubsection*{Formato de página}
+La definición de los parámetros esenciales para el formato de una página son:
+
+\begin{verbatim}
+ \setlength{\voffset}{-1in}         %% desplazamiento superior
+ \setlength{\hoffset}{0.5in}        %% desplazamiento lateral
+ \setlength{\textheight}{9.5in}     %% alto del texto
+ \setlength{\textwidth}{6in}        %% ancho del texto
+ \setlength{\parskip}{2ex}          %% separación entre párrafos
+ \renewcommand{\baselinestretch}{1} %% sep. relativa entre líneas 
+\end{verbatim}
+
+\subsubsection{Comandos definidos por el usuario}
+
+\noindent Cada usuario puede definir sus propios comandos, ya sea renombrando comandos existentes o generando nuevos comandos a partir de la combinación de los ya existentes. Debe cuidarse no seleccionar un nombre ya existente para el comando que se quiere crear.
+
+\begin{verbatim}  
+\newcommand{\comand}[n]{\comand_1{#1}\comand_2{#2}..\comand_m{#n}}
+\end{verbatim}
+%
+Algunos ejemplos son:
+
+\begin{verbatim}
+%%% estos comandos son para ambiente matemático
+\newcommand{\chm}{\mathrm} 
+
+%%% para escribir fórmulas químicas en ambiente matemático
+\newcommand{\sbs}{_\chm}
+
+%%% doble flecha
+\newcommand{\eqrx}{\rightleftharpoons} 
+
+\newcommand{\rrx}[2]{\:\stackrel{\!\!#1}{_{\stackrel{\textstyle 
+   \eqrx}{\scriptstyle #2}}}\:}
+
+%%% una flecha con texto encima
+\newcommand{\rx}[1]{\stackrel{\!\!#1}{\rightarrow}} 
+
+ %%% Escribe el superíndice o para grados
+\newcommand{\degree}{$^\circ$}  
+
+ %%% este comando es para cambiar a rojo el color del texto
+\newcommand{\corr}[1]{\textcolor[named]{Red}{#1}} 
+\end{verbatim}
+
+\subsubsection{Información para el título del documento}
+\noindent Existen comandos para generar una portada para un documento con el título del trabajo, nombre del autor o autores, afiliación, fecha de elaboración, etc.
+
+\begin{verbatim}
+\title{Título} Insertar el título del documento. 
+\author{autor1\thanks{afil. autor1}, autor2\thanks{afil. autor2},...} 
+\date o bien,
+\date{texto del usuario}
+\end{verbatim}
+
+Para que el título se integre al documento hay que declararlo utilizando el comento \verb|\maketitle|.
+
+\subsubsection{Inicio del documento}
+\noindent El desarrollo del texto se hace en el ambiente
+
+\begin{verbatim}
+\begin{document}
+...
+\end{document}
+\end{verbatim}
+
+\subsubsection{División del documento}
+\noindent Un documento puede dividirse en partes, capítulos, secciones, subsecciones, etc. dependiendo del nivel de información que quiere identificarse.
+
+Los niveles se declaran de la siguiente manera:
+\begin{itemize}
+\item \verb|\part| Parte. Principalmente se utiliza en la edición de libros.
+\item \verb|\chapter{título}| Capítulo se utiliza en la edición de libros o reportes. 
+\item \verb|\section{título}|
+\item \verb|\subsection{título}|
+\item \verb|\subsubsection{título}|
+\end{itemize}
+Cada uno de estos niveles se enumeran automaticamente. Si se desea omitir la numertación entonces el comando debe ir segudo de asterisco: \verb|\subsubsection*{título}|.
+
+\section{Elementos de un documento}
+\subsection{Cómo escribir fórmulas matemáticas}
+\noindent Las fórmulas matemáticas pueden escribirse como parte del texto o de manera separada. Cuando se incorporan en el texto se escribe entre \$. Por ejemplo, \verb|$a^2-b^2=(a+b)(a-b)$| produce $a^2-b^2=(a+b)(a-b)$.
+
+Para escribir una fórmula separada del texto se puede escribir en un ambiente designado por los comandos \verb|\[...\]|. La ecuación se centrará pero se  enumerará
+\[ a+b=c\]
+Puede también declararse de la siguiente manera:
+\begin{verbatim}
+\begin{equation}
+\label{eq:frac}
+y = \frac{x+a}{x-a} 
++ \left(\frac{1}{4\pi t}\right)\!e^{\displaystyle -\frac{x}{4Dt}}
+\end{equation}
+\end{verbatim}
+%
+que produce:
+\begin{equation}
+\label{eq:frac}
+y = \frac{x+a}{x-a} + \left(\frac{1}{4\pi t}\right)\!e^{\displaystyle -\frac{x}{4Dt}}
+\end{equation}
+%
+Otro ambiente es \verb|eqnarray| que se utiliza para escribir un sistema de ecuaciones o una derivación:
+
+\begin{eqnarray}
+y &=& (a+b)^2 \nonumber\\ 
+&=& a^2 + 2ab + b^2
+\end{eqnarray}
+%
+donde los símbolos \verb|&...&| se utilizan para alinear las ecuaciones.
+
+Las funciones que representan alguna propiedad de un sistema deben italizarse, esto se logra escribiéndolas en ambiente matemático. Por ejemplo: $\Delta H$, $P$, etc. Los operadores no se italizan, $\cos x$, $\ln K$ y esto se logra declarándolos como comandos, es decir \verb|$\cos x$, $\ln K$|.
+
+
+\subsection{Cómo escribir fórmulas y ecuaciones químicas}
+
+Las fórmulas químicas se escriben en el ambiente para fórmulas matemáticas. Sin embargo, los símbolos de los elementos no se italizan, por lo que es necesario utilizar el comando \verb|\mathrm{...}| o bien el comando definido por el usuario usuario \verb|\chm{...}| para obtener el formato correcto. De esta manera \verb|$\chm{Cu_2(OH)_2CO_3}$| produce $\chm{Cu_2(OH)_2CO_3}$.
+
+\noindent Una ecuación química se escribe de la siguiente forma
+\begin{verbatim}
+\[\chm{^{238}_{\:\:92}U + ^4_2\!\alpha}
+   \rx{}\chm{^{234}_{\:\:90}Th + ^1_1\!p}\]
+\end{verbatim}
+que produce
+\[\chm{^{238}_{\:\:92}U + ^4_2\!\alpha}\rx{}\chm{^{234}_{\:\:90}Th + ^1_1\!p}\]
+
+\noindent Para algunas reacciones químicas es importante mayor información
+\begin{verbatim}
+\[\chm{CH_3CHO}\rx{k_1}\chm{CH_3CO + H\cdot}\]
+\end{verbatim}
+que produce
+\[\chm{CH_3CHO}\rx{k_1}\chm{CH_3CO + H\cdot}\]
+
+\begin{verbatim}
+\[\chm{N_2O_5}\rrx{k_1}{k_{-1}}\chm{NO_2 + NO_3}\]
+\end{verbatim}
+que produce
+\[\chm{N_2O_5}\rrx{k_1}{k_{-1}}\chm{NO_2 + NO_3}\]
+
+\subsection{Cómo insertar figuras}
+\noindent Las figuras que se anexan a un documento de LaTeX pueden estar en formato {\sf eps, png, jpg} y {\sf pdf}. Generalmente es mejor hacer una gráfica al menos del doble del tamaño de cómo aparecerá en el documento para asegurar la posibilidad de ampliación si pérdida de resolución. Es importante utilizar tamaño de letra grande de tal forma que si la figura se reduce el tamaño de letra no sea menor de 10 pts ya con la reducción.
+
+Una figura puede insertarse directamente de la siguiente forma:
+
+\begin{verbatim}
+\includegraphics[height=3cm, keepaspectratio]{figura.pdf}
+\end{verbatim}
+%
+o bien en un ambiente flotante de figura
+\begin{verbatim}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[height=3cm,keepaspectratio]{figura.pdf}
+\end{center}
+\caption{\label{fig:ejemplo} Pie de figura.}
+\end{figure}
+\end{verbatim}
+%
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[height=3cm,keepaspectratio]{Imagemaker.pdf}
+\end{center}
+\caption{\label{fig:ejemplo} Pie de figura.}
+\end{figure}
+%
+La posición de la figura y la página en que ésta aparezca la definirá el programa para favorecer párrafos sin cortes. Esta posición se puede ajustar también con indicadores de posición, {\sf t, b, h} para ubicar la figura en la parte superior de la página, en la parte inferior, o en el lugar donde se declara, respectivamente. En el ejemplo se utiliza \verb|[h!]|. El signo de admiración enfatiza que se respete la posición para la figura
+
+Pueden tambien crearse algunas figuras sencillas y combinarse con texto en el ambiente \verb|picture|.
+
+\hspace{1cm}\begin{minipage}{4cm}
+\begin{picture}(30,40)
+\put(5,15){\circle{15}}
+\put(-15,10){$\phi_2$}
+\put(35,15){\circle{15}}
+\put(45,10){$\phi_3$}
+\put(20,41){\circle{15}}
+\put(18,52){$\phi_1$}
+\end{picture}
+\end{minipage}
+\hfill
+\begin{minipage}{10cm}
+\begin{verbatim}
+\begin{picture}(30,40)
+\put(5,15){\circle{6}}
+\put(10,13){$\phi_2$}
+\put(25,15){\circle{6}}
+\put(30,13){$\phi_3$}
+\put(15,29.82){\circle{6}}
+\put(20,27.82){$\phi_1$}
+\end{picture}
+\end{verbatim}
+
+\end{minipage}
+\subsection{Cómo insertar tablas}
+\noindent El ambiente para insertar tablas es \verb|\begin{tabular}..\end{tabular}|, mientras que el ambiente flotante es \verb|\begin{table}..\end{table}|.
+
+El número de columnas se declara entre llaves y al mismo tiempo se especifica la alineación de la columna que puede ser ajustada a la izquierda (l), a la derecha (r) o centrada (c). El caracter | sirve para trazar líneas verticales en la tabla, mientras que el comando \verb|\hline| permite trazar líneas horizontales.
+
+
+\begin{verbatim}
+\begin{tabular}{l|rr} 
+C$_\chm{2}$ & E & C$_2$ \\
+\hline
+A & 1 & 1 \\
+B & 1 & $-1$ \\
+\end{tabular}
+\end{verbatim}
+
+\begin{tabular}{l|rr} 
+C$_\chm{2}$ & E & C$_2$ \\
+\hline
+A & 1 & 1 \\
+B & 1 & $-1$ \\
+\end{tabular}
+
+
+\begin{table}[h]
+\caption{Algunas propiedades macroscópicas y microscópicas para una substancia pura.}
+\begin{center}
+\label{prop}
+\begin{tabular}{|l|l|} %%%% las lineas | hacen el lineado vertical. l es ajustado a la izquierda, r a la derecha y c centrado.
+\hline  %%%% esto hace el lieado horizontal
+&\\[-4mm]
+\bf Propiedades Macroscópicas & \bf Propiedades Microscópicas \\
+&\\[-4mm]
+\hline
+&\\[-4mm]
+cantidad de materia $(n)$& número de partículas $(N)$\\ %%% en una tabla pueden insertarse fórmulas y figuras
+volumen $(V)$& masa $(m_i)$\\ 
+temperatura $(T)$ & posiciones $(x_1,y_1,z_1,\dots,x_N,y_N,z_N)$\\
+presión $(P)$& velocidades $(v_{x,1},v_{y,1},v_{z,1},\dots,v_{x,N},v_{y,N},v_{z,N})$\\
+densidad $(\rho)$& momento ($\bar p_i=m\times \bar v_i)$\\
+energía interna $(U)$& energía cinética $(\epsilon_{K,i})$\\
+entalpía $(H)$& grados de libertad: translacionales,\\
+energía libre $(G)$ & \hspace{18.7ex} rotacionales,\\
+entropía $(S)$ & \hspace{18.7ex} vibracionales,\\
+capacidad calorífica $(C)$ & \hspace{18.7ex} electrónicos,\\
+constante dieléctrica $(\epsilon)$ & \hspace{18.7ex} nucleares\\
+índice de refracción $(n\sbs{D})$& interacciones intermoleculares\\
+coeficiente de expansión $(\alpha)$ & momento dipolar $(\mu)$\\
+compresibilidad $(\kappa_T)$ &\\
+tensión superficial &\\
+viscosidad $(\eta)$&\\[1mm]
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\chapter{Ajustes cuando el documento está en Español}
+Cuando se selecciona el paquete {\sf Babel} es importante considerar que los títulos y estilo correspondientes al idioma se encuentran en un archivo de definiciones con extensión {\sf .ldf}. En la distribución MIK\TeX\ los archivos de definición están en \begin{verbatim}\tex\generic\babel\end{verbatim}
+
+Cuando se selecciona Español, es importante saber que hay varias opciones que permiten elegir el uso de coma o punto decimal o bien si se utilizará la palabra `Tabla' en vez del español ibérico `Cuadro'. Algunas opciones para modificar el uso del paqueto babel se muestran a continuación:
+
+\begin{verbatim}
+\usepackage[spanish,mexico]{babel} 
+\end{verbatim}
+
+%\chapter*{Bibliografía}
+\begin{thebibliography}{99}  %%%este es un contador para el número de bibliografías utilizados.
+\addcontentsline{toc}{chapter}{Bibliograf\'{\i}a} %%% Para introducir la bibliografía en el índice.
+\bibitem{Rahman}{Rahman,Aminur y Doe, Hidekazu; ``Ion transfer of tetraalkylammonium cations at an interface between 
+frozen aqueous solution and 1,2-dichloroethane".{\em{Journal of Electroanalytical Chemistry}} {\bfseries 424},159,(1997).}
+\bibitem{Martins}{Martins, M.C., Pereira, C.M., Girault,H.H y Silva, F.; ``Specific adsorption of tetraalkylammonium 
+cations on the 1,2-dichloroethane/water interface".{\em{Electrochimica Acta}} {\bfseries 50},135,(2004).}
+\bibitem{Ding}{Ding, Zhifeng. ``Spectroelectrochemistry and photoelectrochemistry of charge transfer at liquid/liquid
+interfaces". {\em {Tesis, EPFL,}}(1999).}
+\bibitem{IR}{Princeton Applied Research. \em{Technical Note 101}}
+\bibitem{Beni}{Beni V., Ghita M. y Arrigan D. ``Cyclic and pulse voltammetric study of dopamine at the interface between
+two inmiscible electrolyte solutions". {\em{Biosensors \& Biolectronics}} {\bfseries 20}, 2097, (2005).}
+\bibitem{Samec2}{Samec Z., Lhotsky A., Jänchenová H., y Marecek, V. ``Interfacial tension and impedance measurements
+of interfaces between two inmiscible electrolyte solutions". {\em{Journal of Electroanalytical Chemistry}} {\bfseries
+43}, 47, (2000).}
+\bibitem{Day}{Day R.A. y Underwood A.L. {\textit{Química Analítica Cuantitativa}},5ºed. Prentice-Hall, México, 1998. 45-48.}    
+\bibitem{Aoki}{Aoki K., Maeda K. y Osteryoung J. ``Characterization of Nernstian square-wave voltammograms". {\em{
+Journal of Electroanalytical Chemistry.}}{\bfseries 272}, 17, (1989).} 
+\bibitem{Hefter}{Hefter G., Marcus Y. y Waghorne W.E. ``Enthalpies and Entropies of Transfer of Electrolytes and Ions from
+Water to Mixed Aqueous Organic Solvents". {\em{Chemical Reviews.}}{\bfseries 102}, 2773, (2002).} 
+\bibitem{Osakai}{Osakai T., Ogawa H., Ozeki T. y Girault H. ``Determination of the Entropy of Ion Transfer between Two
+Inmiscible Liquids using the Water/Oil/Water Thermocouple".{\em{Journal of Physical Chemistry B}} {\bfseries 107}, 9829, (2003).}
+
+\end{thebibliography}
+
+
+
+
+\end{document}

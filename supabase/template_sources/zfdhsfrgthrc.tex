@@ -1,0 +1,292 @@
+\documentclass[a4paper, 10pt, oneside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.5cm, bindingoffset=1cm]{geometry}
+\linespread{1.25}
+\usepackage[backend=biber, sorting=none]{biblatex}
+\usepackage{xurl}
+\addbibresource{bib.bib}
+\usepackage{float}
+\usepackage{csquotes}
+\usepackage{subfig}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\setlength{\parindent}{1cm}
+
+\usepackage{footnote}
+\makesavenoteenv{tabular}
+\makesavenoteenv{table}
+
+\pagestyle{fancy}
+\makeatletter
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+\fancyhf{}
+\fancyhead[L]{\textbf{\leftmark}}
+\fancyhead[R]{\textbf{\@title}}
+\fancyfoot[L]{\@author}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{v1.0}
+\makeatother
+
+\fancypagestyle{noheader}{%
+    \renewcommand{\headrulewidth}{0pt}
+    \fancyhead{}
+}
+
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+\usepackage[Conny]{fncychap}
+\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{noheader}}{}{}
+
+%%%%%%%%%%%%%%%%%%%
+% CUSTOM PACKAGES %
+%%%%%%%%%%%%%%%%%%%
+
+\usepackage{lipsum} % Only for expert users
+\usepackage[table,xcdraw]{xcolor} % Wonderful colored table cells
+\usepackage{rotating} % For sideways figures
+\usepackage{tabularx} % For beautiful tables
+\usepackage{multirow} % For tables with merged row
+\usepackage{arydshln} % For tables with dashed lines
+\usepackage[shortlabels]{enumitem} % For custom enumerations
+\usepackage{eurosym} % For the € symbol
+\usepackage[acronym,toc]{glossaries} % To define acronyms
+\usepackage{nameref} % To get section names 
+\usepackage[super]{nth} % To use ordinal numbers
+\usepackage{lastpage} % To get the total number of pages
+
+\usepackage{xspace} % To define abbreviations
+\newcommand*{\eg}{e.g.\@\xspace}
+\newcommand*{\ie}{i.e.\@\xspace}
+\newcommand*{\etc}{etc.\@\xspace}
+\newcommand*{\phd}{Ph.D.\@\xspace}
+\newcommand*{\prof}{Prof.\@\xspace}
+\newcommand*{\dr}{Dr.\@\xspace}
+
+\usepackage[per-mode=symbol]{siunitx} % Per unità di misura
+\DeclareSIUnit{\EUR}{\text{\officialeuro}} % Valuta EUR
+
+\usepackage{pifont} % Per simboli di check o cross
+\newcommand{\cmark}{\text{\ding{51}}} % check
+\newcommand{\xmark}{\text{\ding{55}}} % cross
+
+\newcommand{\cptref}[1]{Chapter~\ref{#1}}
+\newcommand{\secref}[1]{Section~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+
+\usepackage[nodayofweek]{datetime}
+\newdateformat{specialdate}{\THEYEAR/\twodigit{\THEMONTH}/\twodigit{\THEDAY}}
+
+% Acronimi
+\makeglossaries
+\newacronym{pmp}{PMP}{Project Management Plan}
+\newacronym{fmrp}{FMRP}{Funding and Management of Research Projects}
+
+\title{Project Management Plan}
+\author{Vincenzo Petrone}
+\newdate{issuedate}{12}{02}{2023}
+\date{\displaydate{issuedate}}
+  
+\begin{document}
+
+% Frontespizio
+\frontmatter
+\makeatletter
+\begin{titlepage}
+    \begin{center}
+        {\scshape \LARGE University of Salerno}\\
+        \vspace{10mm}
+        % Dipartimento
+    	{\large \bf Department of Information Engineering, Electrical Engineering \\ and Applied Mathematics }\\
+    \end{center}
+
+    % Logo
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.35\textwidth]{logo_unisa}
+    \end{figure}
+    
+    \begin{center}
+        % Corso di Dottorato
+    	{\Large \bf \phd program in Information Engineering \\ Funding and Management of Research Projects }\\
+    	\vspace{15mm}
+    	% TitoloT
+        {\LARGE \bf \@title} \\
+        \vspace{3mm}
+        {\large \bf The coolest title for your \phd research plan}\\
+    	\vspace{3mm}
+    \end{center}
+    
+    \vspace{15mm}
+    \noindent
+    \begin{minipage}[t]{0.4\textwidth}
+        % Lecturer
+    	{\normalsize \bf Lecturer: \\ \prof XXX \\ \prof YYY }
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.4\textwidth}\raggedleft
+        % Student
+    	{\normalsize \bf Student: \\ \@author \\ ID 0123456789}
+    \end{minipage}
+
+    \vspace{15mm}
+    \noindent
+    \begin{minipage}[t]{0.4\textwidth}
+        % Date of Issue
+    	{\normalsize \bf Date of issue: \\ \@date }
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.4\textwidth}\raggedleft
+        % Baseline version number
+    	{\normalsize \bf Baseline version number: \\ 0001}
+    \end{minipage}    
+    
+    \vspace*{\fill}
+    
+    % Anno Accademico
+    \centering{\scshape \large{ Academic Year 2022/2023 }}
+
+\end{titlepage}
+\makeatother
+
+\chapter*{Change History} \label{sec:change-history}
+\addcontentsline{toc}{chapter}{Change History}
+\input{tables/change-history.tex}
+\clearpage
+
+\chapter*{Preface} \label{sec:preface}
+\addcontentsline{toc}{chapter}{Preface}
+
+\noindent This document serves as template of the \acrfull{pmp} for the \phd course \acrfull{fmrp}; reference books: \cite{project_management_institute_guide_2017,schwalbe_information_2014}. Note that it is intended for the Academic Year 2022/2023; the author is not responsible for any misuse should the course's regulations change in the future.
+
+\noindent Feel free to reuse this template for your \acrshort{pmp}, and good luck for your \acrlong{fmrp} exam!
+
+\noindent Here are the rules: do not panic, stay hydrated, and have fun!
+
+\tableofcontents
+\clearpage
+\sloppy
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
+\listoffigures
+\addcontentsline{toc}{chapter}{\listfigurename}
+\clearpage
+
+\listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+\clearpage
+
+% Corpo del documento
+\mainmatter
+
+\chapter{Project Overview}
+\lipsum[1]
+
+\section{Research Plan} \label{sec:purpose-scope-and-objectives}
+
+\subsection{Scope}
+\lipsum[1]
+
+\subsection{Purpose}
+\lipsum[1]
+
+\subsection{Objectives}
+\lipsum[1]
+
+\section{Assumptions and Constraints} \label{sec:assumptions-and-constraints}
+\lipsum[1]
+
+\subsection{Personnel}
+\lipsum[1]
+
+\subsection{Timing}
+\lipsum[1]
+
+\subsection{Budget} \label{sec:budget}
+\lipsum[1]
+
+\section{Activities and Deliverables} \label{sec:activities-and-deliverables}
+\lipsum[1]
+
+\chapter{Project Context}
+\lipsum[1]
+
+\section{Process Model} \label{sec:process-model}
+\lipsum[1]
+
+\section{Process Improvement Plan} \label{sec:process-improvement-plan}
+\lipsum[1]
+
+\section{Product Acceptance Plan} \label{sec:product-acceptance-plan}
+\lipsum[1]
+
+\section{Infrastructure, tools and methods} \label{sec:infrastructure-tools-and-methods}
+\lipsum[1]
+
+\section{Project Organization} \label{sec:project-organization}
+\lipsum[1]
+
+\chapter{Project Planning} \label{cpt:project-planning}
+\lipsum[1]
+
+\section{Work Activities} \label{sec:work-activities}
+\lipsum[1]
+
+\section{Time Allocation} \label{sec:time-allocation}
+\lipsum[1]
+
+\chapter{Project Assessment and Control} \label{cpt:project-assessment-and-control}
+\lipsum[1]
+
+\section{Requirements Management Plan}
+\lipsum[1]
+
+\section{Scope Change Control Plan}
+\lipsum[1]
+
+\section{Schedule Control Plan}
+\lipsum[1]
+
+\section{Budget Control Plan}
+\lipsum[1]
+
+\section{Quality Assurance Plan}
+\lipsum[1]
+
+\section{Dissemination Plan}
+
+\subsection{Scientific dissemination}
+\lipsum[1]
+
+\subsection{General-purpose dissemination}
+\lipsum[1]
+
+\chapter{Supporting Process Plans}
+\lipsum[1]
+
+\section{Risk Management} \label{sec:risk-management}
+\lipsum[1]
+
+\subsection{Negative risks}
+\lipsum[1]
+
+\subsection{Positive risks}
+\lipsum[1]
+
+\section{Cost Management} \label{sec:cost-management}
+\lipsum[1]
+
+\clearpage
+\printglossary[type=\acronymtype]
+
+\clearpage
+\printbibliography[
+heading=bibintoc,
+title={References}
+]
+\clearpage
+
+\end{document}

@@ -1,0 +1,221 @@
+% UQ QOL/EQUS Poster format
+% Forked from: https://www.overleaf.com/project/618cc965bcbc81513871601f
+% Credit: Ali Furkan Kalay
+% See: https://github.com/alfurka/gemini-uq
+% Forked from
+% https://rev.cs.uchicago.edu/k4rtik/gemini-uccs
+% which is forked from
+% https://github.com/anishathalye/gemini
+
+
+\documentclass[final]{beamer}
+
+% ====================
+% Packages
+% ====================
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[orientation=portrait,size=a0,scale=1.0]{beamerposter} % Current dimensions A0, put in your poster dimensions
+\usetheme{gemini}
+\usecolortheme{uchicago}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\newcommand{\blu}{\color{blue}}
+\usepackage{DejaVuSans}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Column environment setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% If you have N columns, choose \sepwidth and \colwidth such that
+% (N+1)*\sepwidth + N*\colwidth = \paperwidth
+% Follow structure to create difference column environments. 
+\newlength{\sepwidthA} % Seperation distance between comulumns type A
+\newlength{\colwidthA} % collumn width type A
+\setlength{\sepwidthA}{0.25\paperwidth}
+\setlength{\colwidthA}{0.5\paperwidth}
+
+\newcommand{\separatorcolumnA}{\begin{column}{\sepwidthA}\end{column}}
+
+% Second column environment. 
+\newlength{\sepwidthB}
+\newlength{\colwidthB}
+\setlength{\sepwidthB}{0.0666\paperwidth}
+\setlength{\colwidthB}{0.4\paperwidth}
+
+\newcommand{\separatorcolumnB}{\begin{column}{\sepwidthB}\end{column}}
+
+% You can also use these column commands to create columns inside columns and for creating new column formatting. 
+% You can also have non even columns by creating more column environments or specifying the width when beginning a column environment. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{\VeryHuge{Centered Title}}
+\author{\textbf{Presenting Author}, Author Two and Author Three}
+\institute[shortinst]{Author Institution, Place of Institution}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Poster footer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\footercontent{
+\href{mailto:Presenting.Author@AwsomePoster.com}{Presenting.Author@AwsomePoster.com} % this is a clickable link
+  \hfill
+  Conference Name \hfill
+  {Poster Number: \#} }
+% (can be left out to remove footer)  
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Logo placements (optional)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\addtobeamertemplate{headline}{}
+{
+    %\begin{tikzpicture}[remember picture,overlay] % Solid header bar
+    \begin{tikzpicture}[remember picture,overlay,line width=\arrayrulewidth] % gradient header bar
+      % UQ Reverse Logo 
+      \node [anchor=north west, inner sep=3cm] at ([xshift=0cm,yshift=1.0cm]current page.north west)
+      {\includegraphics[height=6.0cm]{logos/UQlockup-Reverse-cmyk.eps}}; 
+      % Logo 1, replace with custom logo
+      \node [anchor=north east, inner sep=3cm] at ([xshift=0.0cm,yshift=2.0cm]current page.north east)
+      {\includegraphics[height=8.0cm]{logos/Logo-Right.png}}; 
+      % Extra logo 2
+      \node [anchor=north east, inner sep=3cm] at ([xshift=1.0cm,yshift=-10.0cm]current page.north east)
+      {\includegraphics[height=6.0cm]{logos/UQlockup-Purple-cmyk.eps}};
+      %  Extra logo 3, or a QR Code
+      \node [anchor=north west, inner sep=3cm] at ([xshift=-1.0cm,yshift=-10.0cm]current page.north west)
+      {\includegraphics[height=7.0cm]{Figures/ChristopherGBaker_URL.eps}}; 
+    \end{tikzpicture}
+}
+
+% ====================
+% Body
+% ====================
+
+\begin{frame}[t]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Section 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{columns}[t]
+    \separatorcolumnA
+    \begin{column}{\colwidthA}
+
+        \begin{block}{Introduce graphical abstract, pose research question}
+            \begin{figure}
+                \centering
+                \includegraphics[width=1.0\textwidth]{logos/UQ_Logo_Gudelines_Sheet.pdf}
+            \end{figure}
+        \end{block}
+    
+    \end{column}
+
+    \separatorcolumnA
+\end{columns}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Section 2 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{columns}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Section 2 column 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\separatorcolumnB
+
+    \begin{column}[T]{\colwidthB}
+
+        \begin{block}{Block with a diagram/figure}
+
+        Here is a diagram of a star drawn in tikz.
+
+        \begin{figure}
+            \centering
+                \begin{tikzpicture}[scale=8]
+                \draw[step=0.25cm,color=gray] (-1,-1) grid (1,1);
+                \draw (1,0) -- (0.2,0.2) -- (0,1) -- (-0.2,0.2) -- (-1,0)
+                -- (-0.2,-0.2) -- (0,-1) -- (0.2,-0.2) -- cycle;
+                \end{tikzpicture}
+            \caption{A figure caption. If needed for data or reference}
+        \end{figure}
+    \end{block}
+    
+    \begin{block}{Block with nested columns}
+        \begin{column}{0.3\colwidthB}
+            \begin{itemize}
+                \item Keep text information clear and concise
+                \item Include some math as well: $ F = ma $
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.7\colwidthB}
+            \begin{figure}
+            \centering
+                \includegraphics[width=0.9\textwidth]{logos/UQ_Secondary_Colour_Palette.PNG}
+            \end{figure}
+        \end{column}
+    \end{block}
+
+    \begin{alertblock}{Highlighted Block}
+        Use highlighting to bring attention to a key section or result, can also be used to reduce contrast with images on white background. 
+    \end{alertblock}
+        
+\end{column}
+\separatorcolumnB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Section 2 column 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{column}[T]{\colwidthB}
+
+    \begin{block}{Block With a Table}
+    A table in a block for torturing your audience. 
+        \begin{table}
+            \centering
+                \begin{tabular}{c c c c}
+                \toprule
+                \textbf{ Colour } & \textbf{ Red } & \textbf{ Green } & \textbf{ Blue } \\
+                \midrule
+                UQ Purple & 81 & 36 & 122 \\
+                White & 255 & 255 & 255 \\
+                Black & 0 & 0 & 0 \\
+                \bottomrule
+            \end{tabular}
+            \caption{A table caption.}
+        \end{table}
+    \end{block}
+
+  
+
+    \begin{block}{QR code for linking online resources}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.7\textwidth]{Figures/WouldYouLikeToKnowMore.jpg}
+        \end{figure}
+\begin{column}[T]{0.6\colwidthB}
+      This QR code goes to my Awesome poster online for your convenience. Also use it to check out our publications and other research. 
+\end{column}
+\begin{column}[T]{0.4\colwidthB}
+    \begin{figure}
+      \centering
+      \includegraphics[width=0.5\textwidth]{Figures/ChristopherGBaker_URL.eps}
+      \captionsetup{labelformat=empty}
+        \caption{\href{https://www.christophergbaker.com}{\textbf{\blu{Clickable link to URL}}}}
+     \end{figure}
+\end{column}
+\end{block}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{block}{References}
+
+\nocite{*}
+\bibliography{poster}% Produces the bibliography via BibTeX.
+\bibliographystyle{plain}
+\end{block} 
+
+\end{column}
+\separatorcolumnB
+\end{columns}
+\end{frame}
+\end{document}

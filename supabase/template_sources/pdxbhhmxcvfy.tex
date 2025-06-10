@@ -1,0 +1,68 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Minimalist Easy to use Pretty Article format for book reports 
+% Author: Sean_Rai (September 2018)
+% Description: This is a simple but pretty looking article format. Use this to write book reports, or articles for homework, or nice looking reminders. This format is targeted towards people who are new to LaTeX, don't want to fight with it, but just want a nice looking article at the end. 
+% IMPORTANT: Make sure to clock in the gear icon on top, go to Gear settings and click XeLateX as the Latex Engine
+% To add an image JUST use \imageins{filename}{number}{figure caption}{figurelabel}, where the number is how big you want the image to be. 1 stretches the image to cover the width of the page. I recommend 0.75-0.9. For example: \imageins{report}{0.9}{A pretty looking graph}{label1}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+\setlength{\parskip}{1.5em}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fontspec}                            	%Used to install new fonts
+\newfontfamily{\rivenfont}{Riven.ttf}            	%This is a modified form of the Riven font. Original Designer: Michael Bower. Free for personal use.
+\newfontfamily{\geosansfont}{GeosansLight.ttf}   	%This is the Geo sans Light font. Free for personal use.
+\newfontfamily{\queensparkfont}{QUEENS_I.TTF}    	%This is the Queens park italic font. Free for personal use.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{caption}								%Used to change the captions of the figure to italic and install custom fonts done in the next line which can be seen in captionsetup
+\DeclareCaptionFont{it}{\queensparkfont \fontsize{14pt}{16pt}\selectfont}
+\DeclareCaptionLabelFormat{newfigname}{Fig.#2 }		%Used to change the figure caption labels to be 'Fig.'
+\captionsetup{font={it},labelformat={newfigname},labelsep={none},textformat={period}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{titlesec}								%Used to introduce those nice centered large headings
+\titleformat{\section}{\geosansfont \fontsize{40pt}{42pt}\selectfont \centering }{}{0em}{\vspace{0.25em}} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[left=1in,right=1.15in,top=1.25in,bottom=1.15in]{geometry}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fancyhdr}								%Used for the page numbers			
+\fancypagestyle{followingpage}{%
+\fancyhf{} 
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+}
+\pagestyle{followingpage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{lipsum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  DECLARATION OF NEW COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\newcommand{\imageins}[4]{\begin{figure}[!ht]		%Take the hardwork from using images. Let this command do the work for you. Insert images by just using this command \imageins{filename}{width as a ratio of total text width of the page}{caption name}{label name for referring in articles}		
+    \centering
+    \includegraphics[width=#2\textwidth]{#1}
+    \caption{#3}
+    \label{#4}
+    \vspace{0.5em}
+\end{figure}}
+%
+\newcommand{\finpara}{\char"2020}
+%
+\renewcommand{\normalsize}{\fontsize{16pt}{19pt}\rivenfont} 	%resetting the default font and fontsize
+%
+\pagenumbering{arabic} %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREDOCUMENT CODE DONE! BEGIN DOCUMENT CONTENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\section{Minimalist looking pretty heading}
+\imageins{report}{0.9}{A pretty looking graph}{label1}
+\lipsum[1-4]
+\finpara
+
+\end{document}

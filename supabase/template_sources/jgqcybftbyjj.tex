@@ -1,0 +1,121 @@
+\documentclass[
+   11pt,                        % Schriftgröße
+   ngerman,                     % für Umlaute, Silbentrennung etc.
+   a4paper,                     % Papierformat
+   oneside,                     % einseitiges Dokument (muss zum drucken auf twoside geändert werden) 
+   % openright,                 % Ungerade Seiten als Kapitelanfang (setzen wenn gedruckt werden soll)
+   titlepage,                   % es wird eine Titelseite verwendet
+   parskip=half,                % Abstand zwischen Absätzen (halbe Zeile)
+   headings=normal,             % Größe der Überschriften verkleinern
+   bibliography=totoc,          % Literaturverzeichnis im Inhaltsverzeichnis
+   index=totoc,                 % Index im Inhaltsverzeichnis aufführen
+   listof=totoc,                % Verzeichnisse im Inhaltsverzeichnis aufführen
+   final,                       % Status des Dokuments (final/draft)
+   numbers=noenddot,			% Kein Punkt hinter den Kapitelnummerierungen
+   cleardoublepage=plain		% Plain sorgt dafür das Seitenzahlen noch auf leeren Seiten stehen
+]{scrreprt}
+%
+%--Packages-------------------------------------------------------------------%
+%
+\input{Config/Packages}
+%
+%--Index----------------------------------------------------------------------%
+%
+\makeindex
+%
+%--Pfad zum Literaturverzeichnis----------------------------------------------%
+%
+\addbibresource{Verzeichnisse/Literatur.bib}
+%
+%--Meta-Informationen---------------------------------------------------------%
+%
+\newcommand{\titel}{Titel}
+\newcommand{\untertitel}{Untertitel}
+\newcommand{\art}{Art der Arbeit}
+\newcommand{\fachgebiet}{Fachgebiet}
+\newcommand{\autor}{Autor}
+\newcommand{\studienbereich}{Studienbereich}
+\newcommand{\matrikelnr}{Matrikelnummer}
+\newcommand{\erstgutachter}{Erstprüfer}
+\newcommand{\zweitgutachter}{Zweitprüfer}
+\newcommand{\datum}{\today}
+\newcommand{\ort}{Ort}
+%
+%--Kopf- und Fußzeilen, Seitenränder etc--------------------------------------%
+%
+\input{Config/Seitenstil}
+%
+%-----------------------------------------------------------------------------%
+%
+\begin{document}
+%
+%--Deckblatt------------------------------------------------------------------%
+%
+\thispagestyle{plain}
+%
+\input{Sonstiges/Titelblatt}
+%
+%\myemptypage % setzen wenn zweiseitig gedruckt werden soll
+%
+%--Seitenzahl aus für Zusammenfassung-----------------------------------------%
+%
+\pagenumbering{gobble}
+%
+%---Abstract------------------------------------------------------------------%
+%
+\input{Inhalt/Zusammenfassung}
+\clearpage{\thispagestyle{plain}\cleardoublepage}     
+%
+%--Seitenzahl groß Römisch für alle Verzeichnisse-----------------------------%
+%
+\pagenumbering{Roman}
+%
+%--Verzeichnisse--------------------------------------------------------------%
+%
+\tableofcontents                                      % Inhaltsverzeichnis
+\listoffigures                                        % Abbildungsverzeichnis
+\listoftables                                         % Tabellenverzeichnis
+\lstlistoflistings                                    % Listings (Programmcode)
+\input{Verzeichnisse/Abkuerzungsverzeichnis}          % Abkkürzungsverzeichnis
+\input{Verzeichnisse/Symbolverzeichnis}               % Symbolverzeichnis
+%
+\clearpage{\thispagestyle{plain}\cleardoublepage}   
+%
+%--arabische Seitenzahlen im Hauptteil ---------------------------------------%
+%
+\pagenumbering{arabic}
+%
+%--Inhalt---------------------------------------------------------------------%
+%
+\input{Inhalt/Einleitung}
+%
+\input{Inhalt/Aufgabenstellung}
+%
+\input{Inhalt/Grundlagen}
+%
+\input{Inhalt/Hauptteil}
+%
+\input{Inhalt/Ausblick}
+%
+\clearpage{\thispagestyle{plain}\cleardoublepage}   
+%
+%--kleine römische Seitenzahlen für den Rest----------------------------------%
+%
+\pagenumbering{roman}
+%
+%--Literaturverzeichnis-------------------------------------------------------%
+%
+\printbibliography
+%
+%--Anhang---------------------------------------------------------------------%
+%
+\input{Verzeichnisse/Anhang}
+%
+%--Selbständigkeitserklärung--------------------------------------------------%
+%
+\input{Sonstiges/Erklaerung}
+%
+%-----------------------------------------------------------------------------%
+%
+\end{document}
+%

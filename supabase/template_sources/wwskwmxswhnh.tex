@@ -1,0 +1,179 @@
+%\documentclass[BTech]{iitddiss}
+\documentclass[PhD]{iitddiss}
+%\documentclass[MS]{iitddiss}
+% \documentclass[MTech]{iitddiss}
+% \documentclass[Dual]{iitddiss}
+% \documentclass[Other]{iitddiss}
+% IF YOU USE THE OTHER OPTION, THEN YOU MUST FILL OUT THE PROGRAM OPTION BELOW TOO
+%\program{My Fancy Degree}
+% \usepackage{times}
+\usepackage{t1enc}
+
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref} % hyperlinks for references.
+\usepackage{amsmath} % easier math formulae, align, subequations \ldots
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc,xcolor}
+\usepackage[round]{natbib}
+
+\addto\captionsenglish{\renewcommand{\bibname}{References}}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Fortran,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2
+}
+\usepackage{longtable}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{comment}
+
+
+\usepackage{etoolbox} % <--- added
+\AtBeginEnvironment{enumerate}{\linespread{1.5}\selectfont}% <--- added
+\AtBeginEnvironment{itemize}{\linespread{1.5}\selectfont}% <--- added
+
+\usepackage{enumitem}
+\usepackage{datetime}
+\newdateformat{monthyeardate}{%
+  \monthname[\THEMONTH], \THEYEAR}
+
+
+\usepackage{sectsty}
+\sectionfont{\fontsize{12}{15}\selectfont}
+\subsectionfont{\fontsize{12}{15}\selectfont}
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]{\bfseries\centering}{\Large Chapter \thechapter}{1em}{\Large}
+%\titlespacing*{\chapter}{0pt}{0pt}{0pt}
+
+\usepackage{caption}
+\captionsetup[table]{font={stretch=1.2}}     %% change 1.2 as you like
+\captionsetup[figure]{font={stretch=1.2}}
+
+
+\usepackage{fancyhdr}
+\linespread{2}
+ 
+
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+\fancyhf{}
+
+\rhead{\fancyplain{}{\thepage}} % predefined ()
+\lhead{\fancyplain{}{\rightmark}} % 1. sectionname, 1.1 subsection name etc
+%\cfoot{\textcopyright \text{ } \the\year, \emph{Indian Institute of Technology Delhi}}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\usepackage{subfiles}
+%\providecommand{\main}{.} % relative path to master.tex
+%\providecommand{\cwd}{.} % path of the current directory wrt master
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title page
+
+\title{Some thesis title on rail tracks}
+
+\author{Test Guy}
+\advisor{Prof. Some Name, IIT Delhi\\
+       Prof. Some Name1, IIT Kanpur }
+\entrynumber{2022CEZ3242}
+\department{Civil Engineering}
+
+
+%\nocite{*}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Non-Content pages
+\input{nonindex/certificate}% Certificate
+\input{nonindex/acknowledgements}% Acknowledgements
+%\includepdf[pages=-]{nonindex/hindi_abstract.pdf}
+\input{nonindex/abstract}
+\input{nonindex/abstract_hindi}% Acknowledgements
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of contents etc.
+\begin{singlespace}
+\tableofcontents
+\thispagestyle{empty}
+
+\listoffigures
+\addcontentsline{toc}{chapter}{List of figures}
+\listoftables
+\addcontentsline{toc}{chapter}{List of tables}
+
+
+
+\end{singlespace}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\input{nonindex/abrv}% Abbreviations
+\input{nonindex/notations}% Notations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagebreak
+\clearpage
+
+% The main text will follow from this point so set the page numbering
+% to arabic from here on.
+\pagenumbering{arabic}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction.
+\include{all_chapters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendices.
+
+%\appendix
+
+%\chapter{VDLOAD fortran subroutine for ML case}
+
+%\input{parts/appnd/apnd_1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography.
+
+\begin{singlespace}
+
+\bibliographystyle{plainnat}
+\bibliography{refer.bib}
+\addcontentsline{toc}{chapter}{References}
+%\newpage
+%\input{nonindex/biodata}
+\end{singlespace}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% List of papers
+
+\begin{singlespace}
+
+\input{parts/papers/papers}
+\end{singlespace}
+
+
+
+\end{document}

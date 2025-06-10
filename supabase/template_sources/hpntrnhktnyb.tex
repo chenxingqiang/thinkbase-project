@@ -1,0 +1,212 @@
+% Unofficial International Conference on Travel Behavior Research (IATBR) Conference template
+% Based on the proposed Word template available at:
+%https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fiatbr2024.univie.ac.at%2Ffileadmin%2Fuser_upload%2Fk_iatbr2024%2Fiatbr2024_template_example.docx&wdOrigin=BROWSELINK
+
+% This template is unofficial, free, and comes with ABSOLUTELY NO WARRANTY. You are welcome to redistribute it.
+
+% Version 1.0
+% Santiago Álvarez-Ossorio Martinez, Technical University of Munich, Chair of Traffic Engineering and Control
+%   1.0   - August 2023
+
+\documentclass[12pt]{article}
+
+% Required Packages
+\usepackage{fancyhdr} % Headers and footers
+\usepackage{xcolor, soul} % Colors + Highlighting using \hl{}
+\usepackage{lipsum} % To generate dummy text
+\usepackage{times} % Times New Roman Font
+\usepackage[left=3cm, right=3cm, top=2.5cm, bottom=2.5cm]{geometry} % Page dimensions
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{orcidlink} % To inclue the ORCID link and logo
+\usepackage{amsmath} % For formulae
+\usepackage{array} % For table styling
+\usepackage{tabularx}
+\sethlcolor{yellow}
+
+% For tables (optional)
+\usepackage{longtable}
+\usepackage{dcolumn}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+% Typesetting-quality tables, rules in tables (\toprule, \midrule)
+\RequirePackage{booktabs}
+% tables (after hyperref):
+\RequirePackage{tabularx}
+\RequirePackage{xparse}
+\RequirePackage{totcount}
+\usepackage{parskip}
+\usepackage{hyperref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% TEMPLATE AND FORMATING %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% For APA citation style
+% \usepackage[style=apa, backend=biber, sorting=nyt]{biblatex}
+% \DeclareLanguageMapping{english}{english-apa} % required for biblatex-apa
+% \addbibresource{references.bib} % Linking to the .bib file
+
+% uniquelist=false -> + Info in https://tex.stackexchange.com/questions/121625/biblatex-modify-maxcitenames-to-work-in-three-cases -> Used to avoid having more than one author name in the citation when there are several cited papers that share some (but not all) authors.
+\usepackage[maxcitenames=1, mincitenames=1, authordate,bibencoding=auto,strict,backend=biber,natbib, dashed=false,uniquelist=false]{biblatex-chicago}
+
+\addbibresource{references.bib} % Linking to the .bib file
+
+% For Custom IATBR citation style
+% Define custom citation commands
+\DeclareCiteCommand{\citeintext}
+  {\boolfalse{citetracker}%
+   \boolfalse{pagetracker}%
+   \usebibmacro{prenote}}
+  {\ifciteindex
+     {\indexnames{labelname}}
+     {}%
+   \printnames{labelname}%
+   \setunit{\nameyeardelim}%
+   (\usebibmacro{citeyear})}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+\renewbibmacro*{in:}{} % Removes "In:"
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X} % For custom centered cells in tabularx
+
+% Set page style to fancy and clear all headers/footers
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt} % Removes the line below the header
+
+% Adjust distance of the header from the top of the page
+\setlength{\headsep}{1.25cm}
+
+% Adjust the footskip value for page numbering distance from the bottom
+\setlength{\footskip}{1.0cm}
+
+\setlength\parindent{0pt} % To avoid indenting og the first line of each paragraph that doesn't immediately follow a section heading (IATBR word template does not have such indentation)
+
+% Header with the conference name in gray
+\chead{{\color[HTML]{C0C0C0}\fontsize{12}{14}\selectfont 17th International Conference on Travel Behaviour Research\\ July 14 - 18, 2024 – Vienna, Austria
+}}
+
+% Page numbering in gray
+\cfoot{{\color[HTML]{C0C0C0}\thepage}}
+
+% Title, Author, and Affiliation Definitions
+\newcommand{\doctitle}[1]{{\centering \fontsize{14}{16}\selectfont \textbf{#1} \par}}
+\newcommand{\docauthor}[1]{{\centering \fontsize{12}{14}\selectfont \textbf{#1} \par}}
+\newcommand{\docaffiliation}[1]{{\centering \fontsize{11}{13}\selectfont #1 \par}}
+
+\newcommand{\dockeywords}[1]{{\fontsize{12}{14}\selectfont \textbf{Keywords :} #1 \par}}
+
+
+% Redefine section to follow the required format with an indentation
+\makeatletter
+\renewcommand\section{\@startsection {section}{1}{1em}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\normalfont\fontsize{12}{14}\bfseries}}
+\renewcommand{\thesection}{\arabic{section}.}
+
+\renewcommand\subsection{\@startsection {subsection}{2}{1em}%
+                                   {-3.25ex \@plus -1ex \@minus -.2ex}%
+                                   {1.5ex \@plus .2ex}%
+                                   {\normalfont\fontsize{12}{14}\bfseries}}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% CONTENT OF THE PAPER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% Title, Author, and Affiliation
+\doctitle{Title}
+\hfill\break%
+\docauthor{Author Name\textsuperscript{1} \orcidlink{INCLUDE ORCID NUMBER HERE},\
+           Author Name\textsuperscript{2} \orcidlink{INCLUDE ORCID NUMBER HERE},\
+           Author Name\textsuperscript{3} \orcidlink{INCLUDE ORCID NUMBER HERE} % Add more authors if needed
+           }
+\docaffiliation{\textsuperscript{1}Affiliation, City, Country, email\\ 
+                \textsuperscript{2}Affiliation, City, Country, email\\
+                \textsuperscript{3}Affiliation, City, Country, email}
+\hfill\break%
+\dockeywords{keyword 1, keyword 2, keyword 3} % 3 to 5 keywords
+
+% Sample sections and content
+\section{Introduction}
+This unofficial IATBR 24 \LaTeX~template replicates the suggested Word template provided in \href{https://iatbr2024.univie.ac.at/abstract-submission/}{the conference's website}. An example of an in-text citation could be \citet{Garrow2009}. Multiple in-text citations are supported, as \citet{Bierlaire2003,Koppelman2005}. Parenthetical citations are also possible~\citep{Bierlaire2003}.
+
+\lipsum[1] % Dummy text for content
+
+\subsection{Subsection in Introduction Section}
+
+\lipsum[7-9]
+
+It is very easy to include Equations and to reference them. For example, \textbf{Equation}~\textbf{\ref{eq:probchoice}} represents the probability of an observed sequence of choices for individual $n$ in an MMNL model.
+
+\vspace{-1ex}
+
+\begin{flalign}
+  P_{n}(\Omega) &= \int_{\beta} \prod_{t=1}^{T} \prod_{m=1}^{M} P_{n,m,t} \left( i^{*}_{n,m,t}  | \beta \right) f\left(  \beta | \Omega \right) \label{eq:probchoice}\\
+  LL(\Omega) &= \sum_{n=1}^{N} ln \left( \int_{\beta} \left[ \prod_{t=1}^{T} \prod_{m=1}^{M} P_{n,m,t} \left( i^{*}_{n,m,t}  | \beta \right) \right] \left(\beta|\Omega \right) d\beta \right) \label{eq:loglik} \\
+  F &= ma && \label{eq:newton}
+  \end{flalign}
+
+%\vspace{2ex} % To have a slightly larger space till the next paragraph
+
+\lipsum[5]
+
+\section{Background}
+
+We can reference figures easily. For example \textbf{Figure}~\textbf{\ref{fig:example}} represents a Gian Grouper fish.
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Figs/Georgia_Aquarium_-_Giant_Grouper_edit.jpg}
+  \captionsetup{font=it}
+  \caption{Example. CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0, via Wikimedia Commons}
+  \label{fig:example}
+  % Figure from: https://upload.wikimedia.org/wikipedia/commons/2/23/Georgia_Aquarium_-_Giant_Grouper_edit.jpg
+\end{figure}
+
+\lipsum[2-3]
+
+\section{Methodology}
+\lipsum[5-6]. Finally, it is also possible to generate a table such as \textbf{Table~\ref{tab:example}}.
+
+\begin{table}[h]
+    \centering
+    \captionsetup{font=it}
+    \caption{Sample Table}
+    \label{tab:example}
+    \begin{tabularx}{\textwidth}{|Y|Y|Y|}
+    \hline
+    \textbf{Ullamcorper} & \textbf{Cursus} & \textbf{Rhoncus} \\
+    \hline
+    Entry 1 & Entry 2 & Entry 3 \\
+    \hline
+    Entry 4 & Entry 5 & Entry 6 \\
+    \hline
+    \end{tabularx}
+\end{table}
+
+\lipsum[7]
+
+\section*{Acknowledgments}
+Include acknowledgments (if any)
+
+% Print the bibliography (references)
+
+
+% \bibliographystyle{plain} % Choose your preferred bibliography style
+% \bibliography{references.bib}
+
+% The citation style does not exactly correspond to the suggested one in the IATBR Word template, but it is quite similar
+% Unrelevant fields (ISBN, url, etc) must be manually removed/commented from the references.bib file.
+
+\clearpage % To force all figures before references
+\printbibliography % For APA or IATBR custom citation style
+
+\end{document}

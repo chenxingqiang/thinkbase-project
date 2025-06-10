@@ -1,0 +1,64 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{jigsaw}
+\usepackage{geometry}
+\geometry{landscape,top=0.5cm,bottom=0.5cm,left=0.5cm,right=0.5cm}
+\pagestyle{empty}
+\usepackage{csvsimple}
+\begin{document}
+{\centering Associer les pièces par quatre comme dans l'exemple de gauche pour former six raisonnements (on n'écrira que les numéros des pièces).
+
+Le texte d'une pièce peut être lu à l'envers.
+
+Pour chaque raisonnement, tracer une figure à main levée.
+
+}
+
+\vspace{1cm}
+\begin{tikzpicture}
+\def\sc{3}
+\def\xshift{-5}
+\begin{scope}[xshift=\xshift cm,yshift=-\sc*0 cm,scale=\sc]
+ \piece{-1}{0}{0}{0}
+ \draw (0.5,0.5) node[text width=\sc cm,align=center] {
+
+};
+\end{scope}
+\begin{scope}[xshift=\xshift cm,yshift=-\sc*1 cm,scale=\sc]
+ \piece{-1}{0}{1}{0}
+ \draw (0.5,0.5) node[text width=\sc cm,align=center] {
+
+};
+\end{scope}
+\begin{scope}[xshift=\xshift cm,yshift=-\sc*2 cm,scale=\sc]
+ \piece{1}{0}{1}{0}
+ \draw (0.5,0.5) node[text width=\sc cm,align=center] {
+
+};
+\end{scope}
+\begin{scope}[xshift=\xshift cm,yshift=-\sc*3 cm,scale=\sc]
+ \piece{0}{0}{-1}{0}
+ \draw (0.5,0.5) node[text width=\sc cm,align=center] {
+
+};
+\end{scope}
+\def\sc{3}
+\def\ecart{4}
+\csvreader{./pieces.csv}{1=\numli,2=\numcol,3=\enbas,4=\adroite,5=\enhaut,6=\agauche,7=\phrase}{
+\begin{scope}[xshift=\numcol*\ecart cm,yshift=-\numli*\ecart cm,scale=\sc]
+ \piece{\enbas}{\adroite}{\enhaut}{\agauche}
+ \draw (0.5,0.5) node[text width=\sc cm,align=center] {
+\phrase
+};
+\draw (0.15,0.12) node {\Huge \thecsvrow};
+\end{scope}
+}
+\end{tikzpicture}
+\end{document}

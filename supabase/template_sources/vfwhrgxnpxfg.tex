@@ -1,0 +1,79 @@
+% !Mode:: "TeX:UTF-8"
+%% encoding: UTF-8
+%% 首先读取模板的配置
+%\documentclass[12pt,openright]{book}
+% \documentclass[12pt,openright,oneside]{book} % 
+
+\include{config/headinfo-new}
+
+\begin{document}
+
+%% 确保zhspacing需要的符号定义没有被其他宏包改掉
+\def\lq{`}\def\rq{'}
+% \zhspacing
+
+%% 读入作者的信息
+\include{author}
+
+%% 加入pdf文件的关键字，\pdfkeywords必须在\maketitle之前才有效
+\pdfkeywords{1，2}
+
+%% 生成a4封面、原创性声明、著作权使用声明
+\maketitle
+
+%% 正文默认使用小四，字号的定义在 config/headcommon.tex中
+%\xiaosi
+%% 读入中英文摘要
+% \onehalfspacing
+
+\include{abstracts/cnabstract}
+\let\cleardoublepage\clearpage %去掉每章节之后的空白页
+\include{abstracts/enabstract}
+%% 生成中英文目录
+
+%\begin{spacing}{1.5}
+\tableofcontents
+%\end{spacing}
+
+% %% 以数字风格开始正文页码
+\pagenumbering{arabic}
+
+% %% 读入各章节
+%设置字体和行距（小四，1.5倍行距）
+\xiaosi
+% \onehalfspacing
+% \include{chapters/notations}
+
+% 页眉
+\pagestyle{fancy}
+\fancyhead[CE]{\makebox[\textwidth][c]{\hfill\small\songti 输入文章标题作为偶数页页眉 \hfill}}
+\fancyhead[CO]{\hfill\small\songti\leftmark\hfill}%奇数页页眉为每一章的标题
+%清除所有页眉页脚
+\cfoot {\thepage}
+%\fancyhead[LO, RE]{其他信息}
+%\fancyhead[CE]{\makebox[\textwidth][c]{\hfill\small\songti\XMUT@value@title\hfill}}% 偶数页
+
+\include{chapters/1.Introduction}
+\include{chapters/2.literature}
+\include{chapters/3.model-data}
+\include{chapters/4.empirical-results}
+\include{chapters/5.discussion}
+\include{chapters/6.summary}
+
+% %% 参考文献
+%\bibliographystyle{reference/xmuthesis2}
+\bibliographystyle{reference/gbt7714-numerical-xmu} 
+\bibliography{./reference/reference}
+% %% 发表的论文
+
+% %% 最后致谢一下
+\onehalfspacing
+%\include{appendix/thanks}
+\include{appendix/thanks-audit} %盲审
+
+{\thispagestyle{empty}
+%	\include{appendix/publications-audit} % 盲审
+		\include{appendix/publications}
+}
+
+\end{document}

@@ -34,12 +34,12 @@ import os
 import openai
 from typing import List
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 from pydantic import BaseModel, Field
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
 def get_env_var(name: str) -> str:
     """Get an environment variable or raise an error if it's not set."""
@@ -61,8 +61,8 @@ except ValueError as e:
     print("- OPENAI_API_KEY")
     exit(1)
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -106,7 +106,7 @@ async def wikipedia_page_content(wiki_page_url: str) -> str:
     result = subprocess.run(cmd, shell=True, capture_output=True)
     return result.stdout.decode('ISO-8859-1')[:65536]
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def search_and_suggest_page(query: str) -> WikiSearchResult:
     """Search Wikipedia and suggest the most relevant page."""
     try:
@@ -173,7 +173,7 @@ You must respond in this exact format (including the curly braces):
             explanation=f"Error searching Wikipedia: {str(e)}"
         )
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def answer_query(query: str, page_url: str) -> WikiAnswer:
     """Read a Wikipedia page and answer the query."""
     try:
@@ -280,19 +280,19 @@ if __name__ == "__main__":
 
 # This script does the following:
 #
-# 1. Defines two tools: `search_wikipedia` and `wikipedia_page_content` using the `@ell2a.tool()` decorator.
+# 1. Defines two tools: `search_wikipedia` and `wikipedia_page_content` using the `@ell.tool()` decorator.
 #    These tools use the `lynx` command-line browser to fetch search results and page content from Wikipedia.
 #
-# 2. Implements two complex functions using the `@ell2a.complex` decorator:
+# 2. Implements two complex functions using the `@ell.complex` decorator:
 #    - `search_wikipedia_and_suggest_page_to_read`: Searches Wikipedia and suggests a page URL.
 #    - `answer_query_by_reading_wikipedia_page`: Reads a Wikipedia page and answers the user's query.
 #
-# 3. The `main` function sets up argument parsing, initializes ell2a with the appropriate verbosity, and manages the
+# 3. The `main` function sets up argument parsing, initializes ell with the appropriate verbosity, and manages the
 #    interaction loop using `loop_llm_and_tools` to process the query and fetch results.
 #
 # 4. The script supports two levels of verbosity:
 #    - With `-v`, it prints progress information to stderr.
-#    - With `-vv`, it also enables verbosity for ell2a.init.
+#    - With `-vv`, it also enables verbosity for ell.init.
 #
 # 5. Finally, it prints the intermediate URL result and the final answer based on the Wikipedia page content.
 #

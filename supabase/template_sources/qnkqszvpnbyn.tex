@@ -1,0 +1,170 @@
+\documentclass[12pt, a4paper, onecolumn, oneside, final]{report}
+\usepackage[utf8]{inputenc}
+%\usepackage{fontspec}
+%\setmainfont{Times New Roman}
+%%%%
+\usepackage{tocbibind} %%% untuk memasukkan bibliography pada daftar isi
+%
+%%%%%%  adding image %%%
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\newcommand{\pic}{Gambar}
+%%%%
+\usepackage{setspace} % pengaturan line spacing 
+%%%%%% 
+\usepackage[paper=a4paper,headheight=0pt,left=4cm,top=4cm,right=3cm,bottom=3cm]{geometry}
+\usepackage[font=footnotesize,format=plain,labelfont=bf,up,textfont=up]{caption} 
+\captionsetup{labelsep=space}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{bm}
+%%%%%
+\usepackage{pslatex} % untuk menggunakan font times new roman
+%%%%%%
+\usepackage{fancyhdr}
+%%%%%%% Pengaturan header dan footer dalam dokumen.
+\fancyhf{} 
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.0pt}
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\addtolength{\topmargin}{-2pt}
+%%%%%%%% pengaturan tabel dan gambar
+\usepackage{float}
+  \floatplacement{figure}{H}
+  \floatplacement{table}{H}
+%%%%%%%%  
+\usepackage{pdfpages} %% untuk memasukkan pdf pada dokumen 
+%%%%%%% Konfigurasi Daftar Pustaka
+\usepackage{natbib}
+\setcitestyle{citesep={;}, aysep={,}} % tambah semikolon dan koma di sitasi
+\renewcommand\harvardyearleft{ \unskip } % remove parantheses di dapus
+\renewcommand\harvardyearright[1]{.} % remove parantheses di dapus
+%%%%%
+\usepackage[bahasai]{babel} % Paket bahasa indonesia dan inggris
+%%%%%%
+%%%%%% konfigurasi setiap subbab
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\fontsize{12}{12}\bfseries}
+  {\thesection}
+  {1em}
+  {} 
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{12}\bfseries}
+  {\thesubsection}
+  {1em}
+  {} 
+%%%%%%% Konfigurasi untuk tajuk bab %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\def\@makechapterhead#1{%
+  %%%%\vspace*{50\p@}% %%% removed! % <----------------- Space from top of page to Chapter #
+  {\parindent \z@ \centering \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \large\bfseries \MakeUppercase{\@chapapp}\space \thechapter % <--- uppercase
+        \par\nobreak
+        \vskip 5\p@ %<-------------- Space between Chapter # and title
+    \fi
+    \interlinepenalty\@M
+    \large \bfseries #1\par\nobreak
+    \vskip 30\p@
+  }}
+%
+\def\@makeschapterhead#1{% % format tulisan "daftar isi" 
+  %%%%%\vspace*{50\p@}% %%% removed! % <----------------- Space from top of page to Chapter #
+  {\parindent \z@ \centering
+    \normalfont
+    \interlinepenalty\@M
+    \large\bfseries \MakeUppercase  #1\par\nobreak
+    \vskip 30\p@
+ }}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{indentfirst} % Indentasi paragraf pertama
+\setlength{\parindent}{1.2cm}
+%%%%%%%%%%%%%%%%%%%%%%%%Paket untuk menggambar senyawa kimia%%%%
+\usepackage{chemfig}
+\usepackage[version=4]{mhchem}
+\usepackage{chemnum}
+\makeatletter
+\def\Hv@scale{0.65}
+\makeatother
+\DeclareMathAlphabet{\foo}{OT1}{phv}{m}{n}
+\renewcommand*\printatom[1]{\ensuremath{\foo{#1}}}
+\makeatother
+\setchemfig{double bond sep = 0.20700 em,  % 'Bond Spacing' 
+            fixed length = false,    % 'Fixed Length'
+            bond offset = 0.18265 em, % 'Margin Width'
+            bond style={line width=0.50pt},
+            atom sep = 1.2 em}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[hidelinks]{hyperref}
+%%%%%Table of Contents typography%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[titles]{tocloft}
+\newlength\mylength
+\renewcommand\cftchappresnum{\chaptername~}
+\settowidth\mylength{\cftchappresnum\cftchapaftersnum\quad}
+\addtolength\cftchapnumwidth{2.3em}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%Paket untuk pengaturan tabel%%%%%%%%%%
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{colortbl}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%Paket untuk penulisan Satuan Internasional%%%
+\usepackage{siunitx}
+\DeclareSIUnit{\Molar}{M}
+\DeclareSIUnit{\calorie}{cal}
+\DeclareSIUnit{\Calorie}{\kilo\calorie}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%-----KONTEN PENELITIAN-----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\singlespacing
+\input{front/judul}
+
+\pagenumbering{roman} %Gunakan penomoran romawi
+
+\setcounter{page}{1}
+\singlespacing
+
+\chapter*{LEMBAR PERSETUJUAN}
+\input{chapters/Pengesahan}
+
+\chapter*{ABSTRAK}
+\input{chapters/abstrak}
+
+\chapter*{ABSTRACT}
+\input{chapters/abstract}
+
+\singlespacing
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+
+\pagenumbering{arabic} %Gunakan penomoran arab
+\doublespacing
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand{\thesection}{\arabic{chapter}.\arabic{section}}
+\renewcommand{\thefigure}{\arabic{chapter}.\arabic{figure}}
+\renewcommand{\thetable}{\arabic{chapter}.\arabic{table}}
+\chapter{PENDAHULUAN} 
+\input{chapters/Bab-1-Pendahuluan} 
+
+\chapter{KAJIAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS}
+\input{chapters/Bab-2-Pustaka}
+
+\chapter{METODOLOGI}
+\input{chapters/Bab-3-Metodologi}
+
+\chapter{HASIL DAN PEMBAHASAN}
+\input{chapters/Bab-4-Hasil-dan-Pembahasan}
+
+\chapter{KESIMPULAN DAN SARAN}
+\input{chapters/Bab-5-Simpulan-dan-Saran}
+%%%%%%%%%-----DAFTAR PUSTAKA-------%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\singlespacing
+\bibliographystyle{mydcu-rev} %% modifikasi gaya sitasi dari dcu
+\renewcommand{\bibname}{Daftar Pustaka} % ubah "bibliography" menjadi "Daftar Pustaka" 
+\bibliography{contoh_pustaka}
+
+\end{document}

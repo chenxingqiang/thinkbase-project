@@ -7,14 +7,14 @@ import numpy as np
 import signal
 import sys
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -52,7 +52,7 @@ def image_to_ascii(image: Image.Image) -> str:
     ascii_art = '\n'.join(''.join(ascii_chars[int(pixel)] for pixel in row) for row in normalized)
     return ascii_art
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def describe_activity(image: Image.Image) -> ActivityDescription:
     """Describe what's happening in the image."""
     try:

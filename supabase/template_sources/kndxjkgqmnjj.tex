@@ -1,0 +1,513 @@
+%
+%\title{University of Technology Sydney (UTS) Thesis Template}
+% This is not the official template of UTS. 
+% This template is made freely available with only intention to help fellow researchers.
+% I, Chandranath Adak, invested/wasted too much time for creating a proper template. Therefore, I am sharing this to save time of my peers and juniors.  
+%
+%
+\RequirePackage[l2tabu]{nag}
+%
+% File: memoirthesis.tex
+% Author: Dr. Chandranath Adak (email: Chandranath.Adak@student.uts.edu.au)
+%
+% Description: Contains the thesis template using memoir class.
+\documentclass[a4paper,12pt,leqno,openbib]{memoir} %add 'draft' to turn draft option on (see below)
+\usepackage{epigraph}
+\epigraphfontsize{\small\itshape}
+\setlength\epigraphwidth{8cm}
+\setlength\epigraphrule{0pt}
+
+
+\usepackage{datetime}
+\usepackage{ifpdf}
+\ifpdf
+\pdfinfo{
+   /Author (Author's name)
+   /Title (PhD Thesis)
+   /Keywords (One; Two;Three)
+   /CreationDate (D:\pdfdate)
+}
+\fi
+% When draft option is on. 
+\ifdraftdoc 
+	\usepackage{draftwatermark}				%Sets watermarks up.
+	\SetWatermarkScale{0.3}
+	\SetWatermarkText{\bf Draft: \today}
+\fi
+%
+% Declare figure/table as a subfloat.
+\newsubfloat{figure}
+\newsubfloat{table}
+% Better page layout for A4 paper, see memoir manual.
+\settrimmedsize{297mm}{210mm}{*}
+\setlength{\trimtop}{0pt} 
+\setlength{\trimedge}{\stockwidth} 
+\addtolength{\trimedge}{-\paperwidth} 
+\settypeblocksize{634pt}{448.13pt}{*} 
+\setulmargins{4cm}{*}{*} 
+\setlrmargins{*}{*}{1.5} 
+\setmarginnotes{17pt}{51pt}{\onelineskip} 
+\setheadfoot{\onelineskip}{2\onelineskip} 
+\setheaderspaces{*}{2\onelineskip}{*} 
+\checkandfixthelayout
+%
+\frenchspacing
+% Font with math support: New Century Schoolbook
+\usepackage{fouriernc}
+\usepackage[T1]{fontenc}
+
+\usepackage{calligra}
+% \usepackage{emerald}
+\usepackage{frcursive}
+\usepackage{multirow}
+
+\usepackage{array}
+\usepackage{lipsum}
+% \usepackage[T1]{fontenc}
+
+%==================PR
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{color}
+\usepackage{epsf}
+\usepackage{psfrag}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{textcomp}
+\usepackage{comment}
+\usepackage{footnote}
+%\usepackage{hyperref}
+%\usepackage{tablefootnote}
+\usepackage[flushleft]{threeparttable}
+\usepackage{paralist}
+\usepackage{mdwlist}
+\usepackage{amssymb}
+%\usepackage{amsmath}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{alltt}
+\usepackage{balance}
+%\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{epstopdf}
+%\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+\usepackage{float}
+\usepackage{booktabs}
+% \usepackage{lineno}
+\usepackage{slashbox}
+\usepackage[table]{xcolor}
+%\usepackage{array}
+\usepackage{boldline}
+
+%\usepackage{tikz}
+\usepackage{lipsum}
+
+
+
+%============================================PR
+
+
+
+
+\OnehalfSpacing 
+%
+% Sets numbering division level
+\setsecnumdepth{subsection} 
+\maxsecnumdepth{subsubsection}
+%
+\usepackage{calc,soul,fourier}
+\makeatletter 
+\newlength\dlf@normtxtw 
+\setlength\dlf@normtxtw{\textwidth} 
+\newsavebox{\feline@chapter} 
+\newcommand\feline@chapter@marker[1][4cm]{%
+	\sbox\feline@chapter{% 
+		\resizebox{!}{#1}{\fboxsep=1pt%
+			\colorbox{gray}{\color{white}\thechapter}% 
+		}}%
+		\rotatebox{90}{% 
+			\resizebox{%
+				\heightof{\usebox{\feline@chapter}}+\depthof{\usebox{\feline@chapter}}}% 
+			{!}{\scshape\so\@chapapp}}\quad%
+		\raisebox{\depthof{\usebox{\feline@chapter}}}{\usebox{\feline@chapter}}%
+} 
+\newcommand\feline@chm[1][4cm]{%
+	\sbox\feline@chapter{\feline@chapter@marker[#1]}% 
+	\makebox[0pt][c]{% aka \rlap
+		\makebox[1cm][r]{\usebox\feline@chapter}%
+	}}
+\makechapterstyle{daleifmodif}{
+	\renewcommand\chapnamefont{\normalfont\Large\scshape\raggedleft\so} 
+	\renewcommand\chaptitlefont{\normalfont\Large\bfseries\scshape} 
+	\renewcommand\chapternamenum{} \renewcommand\printchaptername{} 
+	\renewcommand\printchapternum{\null\hfill\feline@chm[2.5cm]\par} 
+	\renewcommand\afterchapternum{\par\vskip\midchapskip} 
+	\renewcommand\printchaptertitle[1]{\color{gray}\chaptitlefont\raggedleft ##1\par}
+} 
+\makeatother 
+\chapterstyle{daleifmodif}
+%
+\makepagestyle{myvf} 
+\makeoddfoot{myvf}{}{\thepage}{} 
+\makeevenfoot{myvf}{}{\thepage}{} 
+\makeheadrule{myvf}{\textwidth}{\normalrulethickness} 
+\makeevenhead{myvf}{\small\textsc{\leftmark}}{}{} 
+\makeoddhead{myvf}{}{}{\small\textsc{\rightmark}}
+\pagestyle{myvf}
+%
+\newcommand{\clearemptydoublepage}{\newpage{\thispagestyle{empty}\cleardoublepage}}
+%
+%
+% Creates indexes for Table of Contents, List of Figures, List of Tables and Index
+\makeindex
+\usepackage{import}
+
+% Add other packages needed for chapters here. For example:
+\usepackage{lipsum}					%Needed to create dummy text
+\usepackage{amsfonts} 					%Calls Amer. Math. Soc. (AMS) fonts
+\usepackage[centertags]{amsmath}			%Writes maths centred down
+\usepackage{stmaryrd}					%New AMS symbols
+\usepackage{amssymb}					%Calls AMS symbols
+\usepackage{amsthm}					%Calls AMS theorem environment
+\usepackage{newlfont}					%Helpful package for fonts and symbols
+\usepackage{layouts}					%Layout diagrams
+\usepackage{graphicx}					%Calls figure environment
+\usepackage{longtable,rotating}			%Long tab environments including rotation. 
+\usepackage[applemac]{inputenc}			%Needed to encode non-english characters 
+									%directly for mac
+\usepackage{colortbl}					%Makes coloured tables
+\usepackage{wasysym}					%More math symbols
+\usepackage{mathrsfs}					%Even more math symbols
+\usepackage{float}						%Helps to place figures, tables, etc. 
+\usepackage{verbatim}					%Permits pre-formated text insertion
+\usepackage{upgreek }					%Calls other kind of greek alphabet
+\usepackage{latexsym}					%Extra symbols
+\usepackage[square,numbers,
+		     sort&compress]{natbib}		%Calls bibliography commands 
+\usepackage{url}						%Supports url commands
+\usepackage{etex}						%eTeXÕs extended support for counters
+\usepackage{fixltx2e}					%Eliminates some in felicities of the 
+									%original LaTeX kernel
+\usepackage[spanish,english]{babel}		%For languages characters and hyphenation
+\usepackage{color}                    				%Creates coloured text and background
+\usepackage[colorlinks=true,
+		     allcolors=black]{hyperref}              %Creates hyperlinks in cross references
+\usepackage{memhfixc}					%Must be used on memoir document 
+									%class after hyperref
+\usepackage{enumerate}					%For enumeration counter
+\usepackage{footnote}					%For footnotes
+\usepackage{microtype}					%Makes pdf look better.
+\usepackage{rotfloat}					%For rotating and float environments as tables, 
+									%figures, etc. 
+\usepackage{alltt}						%LaTeX commands are not disabled in 
+									%verbatim-like environment
+\usepackage[version=0.96]{pgf}			%PGF/TikZ is a tandem of languages for producing vector graphics from a 
+\usepackage{tikz}						%geometric/algebraic description.
+
+
+%==================PR
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{color}
+\usepackage{epsf}
+\usepackage{psfrag}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{textcomp}
+\usepackage{comment}
+\usepackage{footnote}
+%\usepackage{hyperref}
+\usepackage{tablefootnote}
+\usepackage[flushleft]{threeparttable}
+\usepackage{paralist}
+\usepackage{mdwlist}
+\usepackage{amssymb}
+%\usepackage{amsmath}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{alltt}
+\usepackage{balance}
+%\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{epstopdf}
+%\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+\usepackage{float}
+\usepackage{booktabs}
+% \usepackage{lineno}
+\usepackage{slashbox}
+\usepackage[table]{xcolor}
+%\usepackage{array}
+\usepackage{boldline}
+%\usepackage{quotchap}
+
+\usepackage[most]{tcolorbox}
+
+
+% \definecolor{lightgray1}{gray}{0.97}
+\usepackage{dblfloatfix}
+%\usepackage[dvipsnames]{xcolor}
+
+
+%\definecolor{LimeGreen1}{RGB}{0,174,0}
+
+
+\usetikzlibrary{arrows,shapes,snakes,
+		       automata,backgrounds,
+		       petri,topaths}				%To use diverse features from tikz		
+%							
+%Reduce widows  (the last line of a paragraph at the start of a page) and orphans 
+% (the first line of paragraph at the end of a page)
+\widowpenalty=1000
+\clubpenalty=1000
+%
+% New command definitions for my thesis
+%
+\newcommand{\keywords}[1]{\par\noindent{\small{\bf Keywords:} #1}} %Defines keywords small section
+\newcommand{\parcial}[2]{\frac{\partial#1}{\partial#2}}                             %Defines a partial operator
+\newcommand{\vectorr}[1]{\mathbf{#1}}                                                        %Defines a bold vector
+\newcommand{\vecol}[2]{\left(                                                                         %Defines a column vector
+	\begin{array}{c} 
+		\displaystyle#1 \\
+		\displaystyle#2
+	\end{array}\right)}
+\newcommand{\mados}[4]{\left(                                                                       %Defines a 2x2 matrix
+	\begin{array}{cc}
+		\displaystyle#1 &\displaystyle #2 \\
+		\displaystyle#3 & \displaystyle#4
+	\end{array}\right)}
+\newcommand{\pgftextcircled}[1]{                                                                    %Defines encircled text
+    \setbox0=\hbox{#1}%
+    \dimen0\wd0%
+    \divide\dimen0 by 2%
+    \begin{tikzpicture}[baseline=(a.base)]%
+        \useasboundingbox (-\the\dimen0,0pt) rectangle (\the\dimen0,1pt);
+        \node[circle,draw,outer sep=0pt,inner sep=0.1ex] (a) {#1};
+    \end{tikzpicture}
+}
+\newcommand{\range}[1]{\textnormal{range }#1}                                             %Defines range operator
+\newcommand{\innerp}[2]{\left\langle#1,#2\right\rangle}                                 %Defines inner product
+\newcommand{\prom}[1]{\left\langle#1\right\rangle}                                         %Defines average operator
+\newcommand{\tra}[1]{\textnormal{tra} \: #1}                                                       %Defines trace operator
+\newcommand{\sign}[1]{\textnormal{sign\,}#1}                                                   %Defines sign operator
+\newcommand{\sech}[1]{\textnormal{sech} #1}                                                  %Defines sech
+\newcommand{\diag}[1]{\textnormal{diag} #1}                                                    %Defines diag operator
+\newcommand{\arcsech}[1]{\textnormal{arcsech} #1}                                       %Defines arcsech
+\newcommand{\arctanh}[1]{\textnormal{arctanh} #1}                                         %Defines arctanh
+%Change tombstone symbol
+\newcommand{\blackged}{\hfill$\blacksquare$}
+\newcommand{\whiteged}{\hfill$\square$}
+\newcounter{proofcount}
+\renewenvironment{proof}[1][\proofname.]{\par
+ \ifnum \theproofcount>0 \pushQED{\whiteged} \else \pushQED{\blackged} \fi%
+ \refstepcounter{proofcount}
+ \normalfont 
+ \trivlist
+ \item[\hskip\labelsep
+       \itshape
+   {\bf\em #1}]\ignorespaces
+}{%
+ \addtocounter{proofcount}{-1}
+ \popQED\endtrivlist
+}
+%
+%
+% New definition of square root:
+% it renames \sqrt as \oldsqrt
+\let\oldsqrt\sqrt
+% it defines the new \sqrt in terms of the old one
+\def\sqrt{\mathpalette\DHLhksqrt}
+\def\DHLhksqrt#1#2{%
+\setbox0=\hbox{$#1\oldsqrt{#2\,}$}\dimen0=\ht0
+\advance\dimen0-0.2\ht0
+\setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+{\box0\lower0.4pt\box2}}
+%
+% My caption style
+\newcommand{\mycaption}[2][\@empty]{
+	\captionnamefont{\scshape} 
+	\changecaptionwidth
+	\captionwidth{0.9\linewidth}
+	\captiondelim{.\:} 
+	\indentcaption{0.75cm}
+	\captionstyle[\centering]{}
+	\setlength{\belowcaptionskip}{10pt}
+	\ifx \@empty#1 \caption{#2}\else \caption[#1]{#2}
+}
+%
+% My subcaption style
+\newcommand{\mysubcaption}[2][\@empty]{
+	\subcaptionsize{\small}
+	\hangsubcaption
+	\subcaptionlabelfont{\rmfamily}
+	\sidecapstyle{\raggedright}
+	\setlength{\belowcaptionskip}{10pt}
+	\ifx \@empty#1 \subcaption{#2}\else \subcaption[#1]{#2}
+}
+%
+%An initial of the very first character of the content
+\usepackage{lettrine}
+\newcommand{\initial}[1]{%
+	\lettrine[lines=3,lhang=0.33,nindent=0em]{
+		\color{gray}
+     		{\textsc{#1}}}{}}
+%
+% Theorem styles used in my thesis
+%
+\theoremstyle{plain}
+\newtheorem{theo}{Theorem}[chapter]
+\theoremstyle{plain}
+\newtheorem{prop}{Proposition}[chapter]
+\theoremstyle{plain}
+\theoremstyle{definition}
+\newtheorem{dfn}{Definition}[chapter]
+\theoremstyle{plain}
+\newtheorem{lema}{Lemma}[chapter]
+\theoremstyle{plain}
+\newtheorem{cor}{Corollary}[chapter]
+\theoremstyle{plain}
+\newtheorem{resu}{Result}[chapter]
+%
+% Hyphenation for some words
+%
+\hyphenation{res-pec-tively}
+\hyphenation{mono-ti-ca-lly}
+\hyphenation{hypo-the-sis}
+\hyphenation{para-me-ters}
+\hyphenation{sol-va-bi-li-ty}
+%
+%
+
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+\usepackage{pbsi}
+
+% \let\svthefootnote\thefootnote
+
+\begin{document}
+% UoB guidlines:
+%
+% Preliminary pages
+% 
+% The five preliminary pages must be the Title Page, Abstract, Dedication
+% and Acknowledgements, Author's Declaration and Table of Contents.
+% These should be single-sided.
+% 
+% Table of contents, list of tables and illustrative material
+% 
+% The table of contents must list, with page numbers, all chapters,
+ % sections and subsections, the list of references, bibliography, list of
+% abbreviations and appendices. The list of tables and illustrations
+% should follow the table of contents, listing with page numbers the
+% tables, photographs, diagrams, etc., in the order in which they appear
+% in the text.
+% 
+\frontmatter
+\pagenumbering{roman}
+%
+\input{frontmatter/title}
+%\clearemptydoublepage
+%
+\input{frontmatter/abstract}
+%\import{frontmatter/}{abstract.tex}
+\clearemptydoublepage
+%
+\input{frontmatter/declaration}
+\clearemptydoublepage
+%
+\input{frontmatter/dedication}
+\clearemptydoublepage
+%
+\input{frontmatter/acknowledgment}
+\clearemptydoublepage
+%
+\input{frontmatter/pubs} %====Publications
+\clearemptydoublepage
+%
+% \input{frontmatter/abstract}
+% \clearemptydoublepage
+%
+% \addcontentsline{toc}{chapter}{Abstract}
+%
+\renewcommand{\contentsname}{Table of Contents}
+\maxtocdepth{subsection}
+\tableofcontents*
+%\addtocontents{toc}{\par\nobreak \mbox{}\hfill{\bf Page}\par\nobreak} % written in Abstract
+\clearemptydoublepage
+%
+%\addcontentsline{toc}{chapter}{Abstract}
+%
+\listoffigures
+\addtocontents{lof}
+{\par\nobreak\textbf{{\scshape Figure} \hfill Page}\par\nobreak}
+\clearemptydoublepage
+%
+\listoftables
+\addtocontents{lot}
+{\par\nobreak\textbf{{\scshape Table} \hfill Page}\par\nobreak}
+\clearemptydoublepage
+%
+% The bulk of the document is delegated to these chapter files in
+% subdirectories.
+\mainmatter
+%
+\import{chapters/}{chap01.tex} %Intro
+%\import{chapters/chapter01/}{chap01.tex}
+\clearemptydoublepage
+%
+\part{~~Part ~I}
+\import{chapters/}{chap02.tex} 
+\clearemptydoublepage
+%
+\import{chapters/}{chap03.tex} 
+\clearemptydoublepage
+%
+\import{chapters/}{chap04.tex}     
+\clearemptydoublepage
+%
+\import{chapters/}{chap05.tex} 
+\clearemptydoublepage
+%
+\part{~~Part ~II}
+\import{chapters/}{chap06.tex} 
+\clearemptydoublepage
+%
+\import{chapters/}{chap07.tex} 
+\clearemptydoublepage
+%
+\import{chapters/}{chap08.tex}
+\clearemptydoublepage
+%
+\part{~~Part ~III}
+\import{chapters/}{chap09.tex}
+\clearemptydoublepage
+%
+\import{chapters/}{chap10.tex}
+\clearemptydoublepage
+%
+
+
+
+
+
+
+% And the appendix goes here
+\appendix
+\import{chapters/appendices/}{app0A.tex}
+\clearemptydoublepage
+
+
+\backmatter
+\bibliographystyle{siam}
+\refstepcounter{chapter}
+\bibliography{thesisbiblio}
+\clearemptydoublepage
+%
+%   
+\end{document}

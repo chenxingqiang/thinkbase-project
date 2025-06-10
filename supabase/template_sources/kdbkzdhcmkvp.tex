@@ -1,0 +1,225 @@
+\documentclass[10pt]{beamer}
+\usetheme[
+%%% options passed to the outer theme
+%    hidetitle,           % hide the (short) title in the sidebar
+%    hideauthor,          % hide the (short) author in the sidebar
+%    hideinstitute,       % hide the (short) institute in the bottom of the sidebar
+%    shownavsym,          % show the navigation symbols
+%    width=2cm,           % width of the sidebar (default is 2 cm)
+%    hideothersubsections,% hide all subsections but the subsections in the current section
+%    hideallsubsections,  % hide all subsections
+%    left                % right of left position of sidebar (default is right)
+  ]{Namkeen}
+  
+% If you want to change the colors of the various elements in the theme, edit and uncomment the following lines
+% Change the bar and sidebar colors:
+%\setbeamercolor{Aalborg}{fg=red!20,bg=red}
+%\setbeamercolor{sidebar}{bg=red!20}
+% Change the color of the structural elements:
+%\setbeamercolor{structure}{fg=red}
+% Change the frame title text color:
+%\setbeamercolor{frametitle}{fg=blue}
+% Change the normal text color background:
+%\setbeamercolor{normal text}{bg=gray!10}
+% ... and you can of course change a lot more - see the beamer user manual.
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+\usepackage{helvet}
+% colored hyperlinks
+\newcommand{\chref}[2]{%
+  \href{#1}{{\usebeamercolor[bg]{Namkeen}#2}}%
+}
+
+\title[Apprentissage Automatique Supervisé]% optional, use only with long paper titles
+{Titre: Apprentissage Automatique Supervisé}
+
+\subtitle{Sous-Titre: Machine à Vecteur de Suppor (SVM) }  % could also be a conference name
+
+\date{\today}
+
+\author[IVIA-AF] % optional, use only with lots of authors
+{
+  Elaboré par : 
+  L'Association IVIA-AF\\ 
+  \chref{mailto:infos@ivia-af-ai}{{\tt infos@ivia-af-ai}}
+}
+% - Give the names in the same order as they appear in the paper.
+% - Use the \inst{?} command only if the authors have different
+%   affiliation. See the beamer manual for an example
+
+\institute[
+  {\includegraphics[width=0.80\columnwidth]{images/ivia.jpg}}\\ %insert a company, department or university logo
+  
+] % optional - is placed in the bottom of the sidebar on every slide
+{% is placed on the bottom of the title page
+   Email : \texttt{infos@ivia-af-ai} \\  
+  Site Web :  \texttt{http://www.ivia-af.ai/}\\
+  Github : \texttt{https://github.com/IVIA-AF}
+  
+  
+  %there must be an empty line above this line - otherwise some unwanted space is added between the university and the country (I do not know why;( )
+}
+
+% specify the logo in the top right/left of the slide
+\pgfdeclareimage[height=0.7cm]{mainlogo}{images/ivia.jpg} % placed in the upper left/right corner
+\logo{\pgfuseimage{mainlogo}}
+
+% specify a logo on the titlepage (you can specify additional logos an include them in 
+% institute command below
+\pgfdeclareimage[height=0.8cm]{titlepagelogo}{images/ivia.jpg} % placed on the title page
+%\pgfdeclareimage[height=1.5cm]{titlepagelogo2}{images/logo} % placed on the title page
+\titlegraphic{% is placed on the bottom of the title page
+  \pgfuseimage{titlepagelogo}
+%  \hspace{1cm}\pgfuseimage{titlepagelogo2}
+}
+
+\begin{document}
+% the titlepage %\wavesbg
+{
+\begin{frame}[plain,noframenumbering] % the plain option removes the sidebar and header from the title page
+  \titlepage
+\end{frame}}
+%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Don't change this
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Plan}{}
+\tableofcontents
+\end{frame}}
+%%%%%%%%%%%%%%%%
+
+\section{Introduction} 
+\subsection*{Apprentissage Supervis\'e}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% list of the themes and options
+% Don't change this
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Introduction} %frame's name
+%\item \textcolor{red}
+\begin{itemize}
+\item Consid\'erons les donn\'ees suivantes $D = \{x_{i},y_{i}\}^{n}_{i=1},$ avec $x_{i} \in \mathbb{R}^{d}$ et $y_{i} \in \{ \pm 1\} $. 
+\item L'objectif en \textcolor{red}{apprentissage supervis\'e} est de reconstruire une certaine fonction  inconnue \textcolor{red}{f} de telle sorte que: 
+\textcolor{green!10!blue}{	
+\begin{equation}
+y \approx f(x), \quad x\in \mathbb{R}^{n\times d}.
+\end{equation}}
+\pause
+ \item En \textcolor{red}{apprentissage supervis\'e}, nous avons des algorithmes de \textcolor{red}{classification} et de \textcolor{red}{r\'egression}
+ \item Comme algorithmes de classification, nous avons la r\'egression logistique, KNN, \textcolor{blue}{Machine \`a vecteurs de Support}
+ \end{itemize}
+ \end{frame}}
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Introduction}{Suite}
+ \begin{itemize}
+\item Use item
+\end{itemize}
+\end{frame}}
+%%%%%%%%%%%%%%%%
+\section{Machine \`a vecteurs de Support (SVM)}
+\subsection*{Probl\`eme}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% list of the themes and options
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Problème}
+  Consid\'erons la figure ....
+\begin{itemize}
+	\item On constate de la figure (ajouter ref)  qu'on peut s\'eparer nos donn\'ees en \textcolor{red}{deux classes}.
+	\item Pour s\'eparer ces donn\'ees, il y'a une multitude de droites que nous pouvons utiliser. 
+\end{itemize}
+\end{frame}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% list of the themes and options
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Calcul de la Marge}
+\begin{frame}{Marge}
+  \begin{block}{La formulation}
+  \begin{itemize}
+     \item \textcolor{red}{Marge}: Elle est donn\'ee par:
+     \textcolor{green!10!blue}{	
+		\begin{equation}
+		2\frac{ \mid \omega^{T}x_{i}+b \mid}{\mid\mid w \mid\mid}, \quad \text{avec}\quad \mid \omega^{T}x_{i}+b \mid=1.
+		\end{equation}}
+	\item Donc la \textcolor{red}{marge} \'equivaut \`a:
+	\textcolor{green!10!blue}{	
+		\begin{equation}
+		\frac{2}{\mid\mid w \mid\mid}, \quad \text{avec}\quad \mid \omega^{T}x_{i}+b \mid=1.
+		\end{equation}}
+  \end{itemize}
+  \end{block}
+\end{frame}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% list of the themes and options
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Marge }{}
+  \begin{block}{Exemple}
+    \begin{enumerate}
+      \item To do 
+      \item Add 
+      \item You can use this {\tt <dirstruct>} in your test\\
+    {\tt <somewhere>\textbackslash texmf}\\
+    \end{enumerate}
+  \end{block}
+\end{frame}}
+%%%%%%%%%%%%%%%%
+\section{Feedback}
+\subsection{Contact Information}
+% contact information
+{\setbeamercolor{nust}{fg=green!50,bg=yellow}
+ \setbeamercolor{sidebar}{bg=green!10}
+ \setbeamercolor{structure}{fg=blue}
+ \setbeamercolor{frametitle}{use=structure,fg=structure.fg}
+ \setbeamercolor{normal text}{bg=white!20}
+\begin{frame}{Feedback}{Contact Information}
+Si vous avez de commentaires ou suggestions sur notre mod\`ele de pr\'esentation, n'h\'esitez pas \`a nous contacter. Vous pouvez voir nos contacts ci-dessous.
+  \begin{center}
+    \insertauthor\\
+    \chref{https://github.com/IVIA-AF}{https://github.com/IVIA-AF}\\
+    AMMI\\
+    African Institute for Mathematical Sciences
+  \end{center}
+\end{frame}}
+%%%%%%%%%%%%%%%%
+
+{%\wavesbg%
+\begin{frame}[plain,noframenumbering]%
+  \finalpage{Merci pour avoir utilis\'e ce mod\`ele}
+\end{frame}}
+%%%%%%%%%%%%%%%%
+\end{document}

@@ -1,0 +1,159 @@
+\documentclass[a4paper,12pt]{book}
+
+% Maths symbols
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{siunitx}
+% Music symbols (double sharp)
+\usepackage{pifont}
+% Figures, tables and captions
+\usepackage{graphicx}
+\usepackage{lscape}
+\usepackage[font=sf]{caption} % Changes font of captions.
+\usepackage{dpfloat} % Ability to place figure on even or odd page using \begin{leftfullpage}
+ \usepackage{longtable}
+% Numbering lines in verbatim
+\usepackage{fancyvrb}
+% Appendices
+\usepackage{appendix}
+% References
+\usepackage{natbib}
+\bibpunct{(}{)}{;}{a}{,}{,}
+% Editorial
+\usepackage{color}
+% \definecolor{viva}{rgb}{.54,.17,.89}
+\definecolor{blue}{rgb}{0,0,0}
+% To take out Tom's colour-coded edits
+\definecolor{supervisor1}{rgb}{1,0.2,0.2}
+
+% Aesthetic, control of margins, headers, etc.
+\usepackage{fancyhdr,layout}
+\oddsidemargin 1.6 cm
+\evensidemargin 0.4 cm
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\addtolength{\headheight}{14.5pt}
+\setlength{\footskip}{0in}
+\renewcommand{\footruleskip}{0pt}
+\fancypagestyle{plain}{%
+ \fancyhead{}
+ \renewcommand{\headrulewidth}{0pt}
+}
+% Control of chapter headings
+\usepackage[Bjornstrup]{fncychap}
+% Place chapter heading only 0 pt down page, instead of 50 pt.
+\makeatletter
+\renewcommand*{\@makechapterhead}[1]{%
+  \vspace*{0\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter%%%%% Fix for frontmatter, mainmatter, and backmatter 040920
+        \DOCH
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \if@mainmatter%%%%% Fix for frontmatter, mainmatter, and backmatter 060424
+      \DOTI{#1}%
+    \else%
+      \DOTIS{#1}%
+    \fi
+  }}
+% For the case \chapter*:
+\renewcommand*{\@makeschapterhead}[1]{%
+  \vspace*{0\p@}%
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \DOTIS{#1}
+    \vskip 40\p@
+  }}
+\makeatother
+
+% Declare some custom functions.
+\DeclareMathOperator*{\conc}{conc}
+\DeclareMathOperator*{\TEC}{TEC}
+\DeclareMathOperator*{\MTP}{MTP}
+% vector?
+
+% Double spacing
+%\linespread{2} % Double spacing
+\usepackage{setspace}
+
+% \includeonly{secondfile} % Useful for printing only named chapter but retaining external refs.
+
+% A new command, just for the title page
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+% Navigation
+\usepackage[pdftex]{hyperref}
+
+\begin{document}
+
+\frontmatter
+% A double sharp and double flat symbol.
+\newcommand{\doublesharp}{\raisebox{.01em}{\kern-.19em\scalebox{.6}{\rotatebox[origin=c]{45}{\ding{67}}}}\kern-.1em}
+\newcommand{\doubleflat}{{\small\mbox{\ensuremath{\flat}}}\hspace{-0.055cm}\ensuremath{\flat}}
+% A roman d for integrals.
+\newcommand{\ud}{\,\mathrm{d}}
+% A black square for the end of definitions.
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+\input{"Title\space page/draft"}
+
+\input{"Abstract/draft"}
+\input{"Acknowledgements/draft"}
+\input{"Related\space publications/draft"}
+
+\tableofcontents
+% Include list of tables (and in table of contents)
+\newpage
+\phantomsection \label{listoftab}
+\addcontentsline{toc}{chapter}{List of tables}
+\listoftables
+% Include list of figures (and in table of contents)
+\newpage
+\phantomsection \label{listoffig}
+\addcontentsline{toc}{chapter}{List of figures}
+\listoffigures
+
+\mainmatter
+% Make "double-spaced"
+\setstretch{1.6}
+\input{"Introduction/draft"}
+
+\input{"Music\space representations/draft"}
+\input{"Discovery\space of\space patterns\space in\space music/draft"}
+\input{"Evaluation/draft"}
+\input{"Conclusions\space and\space future\space work/draft"}
+
+\appendix
+\appendixpage
+\addappheadtotoc
+\input{"Mathematical\space definitions/draft"}
+
+\backmatter
+\setstretch{1}
+%\include{"Bibliography/draft"}
+% Change title of bibliography to References
+\renewcommand\bibname{References}
+% Make sure "references" is in the header
+\fancyhead[RE]{\bfseries References}
+% Place it in the table of contents
+\newpage
+\phantomsection \label{refs}
+\addcontentsline{toc}{chapter}{References}
+% Declare style
+\bibliographystyle{plainnat}
+% \bibliographystyle{plain}
+\bibliography{Bibliography/bibliography.bib}
+
+\end{document}

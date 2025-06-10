@@ -16,11 +16,11 @@
 #        An example of how to make simple code convenient to switch between
 #        different verbosity levels from the command line, e.g. for this script:
 #        * `-v`  prints progress information to stderr.
-#        * `-vv` also enables verbosity for ell2a.init.
+#        * `-vv` also enables verbosity for ell.init.
 
-from agentflow.ell2a import ELL
-from agentflow.ell2a.types.message import Message, MessageRole
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell import ELL
+from agentflow.ell.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
 import argparse
 import sys
 from typing import List
@@ -40,7 +40,7 @@ VERBOSE = False
 WINNING_NUMBER = 12  # Hardcoded winning number
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
 # Get OpenAI API key
 api_key = os.getenv("OPENAI_API_KEY")
@@ -50,8 +50,8 @@ if not api_key:
 # Create OpenAI client
 client = openai.OpenAI(api_key=api_key)
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -67,14 +67,14 @@ ell2a.configure({
     }
 })
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def buy_lottery_ticket(number: int = Field(description="Number to play in the lottery (0-16).")) -> str:
     """Buy a lottery ticket with the given number."""
     if VERBOSE:
         sys.stderr.write(f"Calling tool: buy_lottery_ticket({number})\n")
     return f"Bought lottery ticket with number {number}"
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def check_lottery_result(number: int = Field(description="Number to check against the lottery result.")) -> str:
     """Check if the given number wins the lottery."""
     if VERBOSE:
@@ -84,7 +84,7 @@ async def check_lottery_result(number: int = Field(description="Number to check 
     else:
         return "Sorry, your number did not win. Try again!"
 
-@ell2a.with_ell2a(mode="complex")
+@ell.with_ell(mode="complex")
 async def play_lottery(message_history: List[Message]) -> List[Message]:
     if VERBOSE:
         last_msg = message_history[-1].content

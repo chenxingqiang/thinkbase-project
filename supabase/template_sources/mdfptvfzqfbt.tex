@@ -1,0 +1,260 @@
+\documentclass[midd]{thesis}
+
+\input{shared}  
+ 
+
+\addbibresource{sampleThesis.bib}
+\addbibresource{sampleBetterBib.bib}
+
+\title {Your Title Goes Here}
+
+\author {Your name}
+\adviser {Professor xxx}
+
+\begin{document}
+
+\maketitle
+\pagenumbering{roman}
+ 
+\begin{abstract} 
+Your abstract goes here. 
+\end{abstract}
+
+\begin{acknowledgements}
+Your acknowledgements go here. 
+
+\end{acknowledgements}
+
+\contentspage
+\tablelistpage   % comment this out if you don't have any tables
+\figurelistpage
+
+
+
+\normalspacing \setcounter{page}{1} \pagenumbering{arabic}
+
+\chapter{Introduction}
+\label{sec:intro}
+
+\subsubsection{Motivation}
+Explain why what you are investigating is important.
+
+\subsubsection{Previous work}
+Explain how what you did relates to previous work. You should reference and describe previous work, but avoid going too far down rabbit holes that are unrelated to the present thesis. You can cite using either a plain citation command to produce a number~\cite{aiw} or by using \texttt{\textbackslash textcite} to discuss a text by name, like \textcite{aiw}. 
+
+
+
+\subsubsection{Your work}
+Briefly explain your results
+
+\chapter{Background}
+\label{sec:background}
+
+Describe background information that is necessary for a moderately experienced computer scientist (think your professors) to understand your thesis.
+
+\section{Notation}
+Explain relevant notation. For example:
+Let $[N]=\{1,2,\dots, N\}$.
+
+\section{Probability}
+\begin{theorem}[Hoeffding's Inequality]\label{thm:hoeffding}
+    Consider independent random variables $X_1,\dots,X_n$ where for each variable $X_i$, we have $0\leq X_i\leq 1$. Let $\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$.
+    \begin{equation}
+        \textrm{Pr}\left(\bar{X}-E[\bar{X}]\geq t\right)\leq e^{-2nt^2}.
+    \end{equation}
+\end{theorem}
+
+
+\Cref{thm:hoeffding} gives us an example of referring to a labeled object using the \texttt{\textbackslash Cref} macro. 
+
+
+
+\chapter{Your Work Part 1}
+\label{sec:Work1}
+I first analyzed the graph shown in \cref{fig:myfig}. You can see details of this analysis in \cref{app:simulation}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{graph.png}
+\caption{A non-planar graph.}
+\label{fig:myfig}
+\end{figure}
+
+To study this process, I used the \cref{algocf:small}.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}{.7\linewidth}
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{Input}
+    \SetKwInOut{Output}{Output}
+    \Input{Array $A$ of integers of length $n$}
+    \Output{Array containing sorted elements of $A$}
+    \For{$k=2$ \KwTo $n$}
+    {
+        \For{$j=k$ \KwTo $2$}
+        {
+            \eIf{$A[j]<A[j-1]$}
+            {
+                Swap $A[j]$ and $A[j-1]$\;
+            }
+            {Break\;}
+        }
+    }
+    return $A$;
+    
+    \caption{\texttt{InsertionSort}$(A)$}\label{algocf:small}
+\end{algorithm}
+\end{minipage}
+\end{figure}
+
+I proved the following Lemma:
+
+\begin{lemma}
+Soy yo.
+\end{lemma}
+
+I used this lemma to prove the following theorem:
+
+\begin{restatable}{theorem}{anyG}\label{thm:any-G}
+Fix any $\kappa>1$ and $\lambda>0$. For any family of connected graphs $G$ and
+$X\subseteq \{0,1\}^{E(G)}$ such that $\forall x\in X$, either
+$\lambda_2(G(x))\geq \lambda$, or $G(x)$ has at least $\kappa$
+components, $\textsc{conn}_{G,X}$ can be solved in bounded error in time
+$
+\widetilde{O}\left(\sqrt{\frac{nd_{\mathrm{avg}}(G)}{\kappa\lambda_2(G)}}\left(\mathsf{S}+\sqrt{\frac{d_{\max}(G)}{\lambda}}\mathsf{U}\right)\right).
+$
+\end{restatable}
+
+I discuss the idea of the proof here. The full proof can be found in \cref{app:simulation}.
+
+
+\chapter{Your Work Part 2}
+
+\chapter{Conclusion}
+\label{sec:conclude}
+In this thesis, I have addressed the question...
+
+\section{Open Problems}
+There are many areas in which one could continue this work...
+
+
+
+\appendix
+\chapter{Details of Code, Proofs, etc.}
+\label{app:simulation}
+You might have some code:
+
+\begin{lstlisting}[language=matlab]
+function swap=swapmat(n,q1,q2)
+// Creates a matrix that swaps qubits 
+// q1 and q2 of an n qubit system
+
+// The new swap matrix will be stored in swap
+swap=eye(2^n);
+
+for i=1:2^n
+    index=i;
+    if indexswap>index
+        swap(indexswap,:)=test(index,:);
+        swap(index,:)=test(indexswap,:);
+    end
+end
+end
+\end{lstlisting}
+
+We now prove \cref{thm:any-G}, restated here for convenience:
+\anyG*
+\begin{proof}
+The complexity of generating $g$ is $\mathsf{Init}=O(\mathsf{S}+\mathsf{U}+\log n)$, and the initial state has overlap at least $\varepsilon = \Omega\left(\frac{\kappa\lambda_2(G)}{nd_{\mathrm{avg}}}\right)$ with any unit vector in $\ker A(x)\cap \mathrm{row}(A)$. Plugging these values into the expression in Eq. 6 gives (neglecting polylogarithmic factors)
+\begin{equation*}
+O\left(\frac{1}{\sqrt{\varepsilon}}\left(\mathsf{Init}+\sqrt{\frac{d_{\max}(G)}{\lambda}}\mathsf{U}\right)\right)
+=\widetilde{O}\left(\sqrt{\frac{nd_{\mathrm{avg}}}{\kappa\lambda_2(G)}}\left(\mathsf{S}+\sqrt{\frac{d_{\max}(G)}{\lambda}}\mathsf{U}\right)\right).\qedhere
+\end{equation*}
+\end{proof}
+
+\chapter{Notes on Writing}
+\label{app:writing}
+
+\section{Expectations}
+\label{sec:thesis_expectations}
+The thesis should
+\begin{itemize}
+    \item Demonstrate your understanding in your own words. Plagiarism is unacceptable. See \cref{sec:Plag}. 
+    \item Be correct.
+    \item Be written for your audience: professors in the department who are not experts in this area. You should keep your audience in mind when deciding how much background material to include, how much context to provide, and your use of field-specific terminology, notation, etc..
+    \item Demonstrate high-quality scientific writing (see \cref{app:bestPractices}):
+    \begin{itemize}
+        \item Overall structure is coherent
+        \item Writing is clear
+        \item Minimal use of ``weasel words" and other imprecise writing. 
+        \item Minimal typos
+    \end{itemize}
+    \item Cite references appropriately
+    \item Be an appropriate length. Your thesis should be between 20 and 50 pages, excluding figures, appendices, and bibliography. (Extensions or retractions may be granted by your advisor.)
+\end{itemize}
+
+\section{Plagiarism}
+\label{sec:Plag}
+As much as possible, the thesis should be in your own words. Prior results must be cited. Additionally, any material taken from a source, whether verbatim or paraphrased, must include a citation. If you copy text word for word you must use quotation marks to indicate that it is not your own writing. However, it is relatively rare to use quotations in scientific writing, so please do this sparingly.
+
+You should also determine your own structure at the paragraph level. A paraphrasing that mimics point by point the sentences in a source is not acceptable.
+For the expository parts of your thesis, we suggest gathering the information and then expressing the ideas in your own words. 
+
+Generative language models like ChatGPT may be used for brainstorming, but their words should not appear anywhere in your thesis. 
+
+\section{Best Practices}
+\label{app:bestPractices}
+
+Good scientific writing is good writing and everything you have learned in other classes still applies. Some points of particular emphasis for scientific writing:
+
+\begin{itemize}
+    \item You are telling a results-oriented story, not a time-oriented story. In other words, you should structure your thesis in order to maximize clarity and impact, not based on what you did first.
+    \item Great papers have great figures. One way to write your thesis is to first create figures, and then write your story based on the figures.
+\end{itemize}
+
+Some more views on technical reading and writing you might find helpful
+\begin{itemize}
+    \item Philip Fong, ``How to Read a CS Research Paper" \url{http://www2.cs.uregina.ca/~pwlfong/CS499/reading-paper.pdf}
+    \item Matt Might, Weasel Words (and passive voice) \url{http://matt.might.net/articles/shell-scripts-for-passive-voice-weasel-words-duplicates/}
+\end{itemize}
+
+\section{Writing FAQ}
+\label{sec:FAQ}
+
+\begin{description}
+\item [I or We?] Don't say ``We implemented ...'' when it was just you. Instead say ``I implemented ...''.  It is fine to say ``we'' when it includes the reader: ``We now examine ...''
+\item[Can we use the active voice, e.g. say ``I did X..."?] Yes! Technical writing typically uses active voice. That said, you will encounter different views on active vs. passive voice so make sure to find out the expectations of other faculty or the conventions in your subfield.
+\item[What tense do I use?] If you look at \cref{sec:Work1} you will see the text is a combination of present and past depending on whether you are explaining something to the reader (present), or describing something you did (past). For example, you may write:  ``This thesis examines three questions.  We first investigate...'' Or: ``I ran three experiments.''
+\item[I am seeing weird characters, e.g. many ``?''s, in my LaTeX document. What is happening?] Be careful when copying from a WYSIWYG editor, like Word, into your {\LaTeX} source. Word will replace certain punctuation, like double quotes, and combinations of letters, like ``ff'', into different character codes for fancy versions of those characters that {\LaTeX} can't render. Make sure you copy over plain text.
+\item[How do I cite a GitHub repository (and URLs more generally)?] You can cite a URL as a {\tt @misc} BibTex entry~\cite{HammerLab2017}, e.g.
+\begin{verbatim}
+@misc{HammerLab2017,
+    author = {HammerLab},
+    title = {pileup.js},
+    url = {https://github.com/hammerlab/pileup.js/},
+    lastchecked = {2017-02-06},
+    year = {2017}
+}
+\end{verbatim}
+
+\item[How do I cite a stack exchange posting?] Again use a {\tt @misc} Bibtex entry~\cite{KothariTCSSE}
+\begin{verbatim}
+@MISC{KothariTCSSE,
+    TITLE = {Open problems on the frontiers of {TCS}},
+    AUTHOR = {Robin Kothari (https://cstheory.stackexchange.com/users/206/robin-kothari)},
+    HOWPUBLISHED = {Theoretical Computer Science Stack Exchange},
+    URL = {https://cstheory.stackexchange.com/q/1015}
+}
+\end{verbatim}
+
+
+
+\end{description}
+
+
+\printbibliography
+
+
+\end{document}
+ 

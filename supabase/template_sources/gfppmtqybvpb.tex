@@ -1,0 +1,279 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[10pt,aspectratio=169,]{beamer}
+\setbeamercovered{transparent=10}
+\usetheme[
+%  showheader,
+%  red,
+  purple,
+%  gray,
+%  graytitle,
+  colorblocks,
+%  noframetitlerule,
+]{Verona}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lipsum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Mac上使用如下命令声明隶书字体，windows也有相关方式，大家可自行修改
+%\providecommand{\lishu}{\CJKfamily{zhli}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{multicol}
+\usepackage{tikz}
+\usetikzlibrary{fadings}
+%
+%\setbeamertemplate{sections/subsections in toc}[ball]
+\usepackage{xeCJK}
+\usepackage{ctex, hyperref}
+\usepackage{fontspec} 
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usefonttheme{professionalfonts}
+\def\mathfamilydefault{\rmdefault}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{bm}
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{listings} 
+\setbeamertemplate{section in toc}{\hspace*{1em}\inserttocsectionnumber.~\inserttocsection\par}
+\setbeamertemplate{subsection in toc}{\hspace*{2em}\inserttocsectionnumber.\inserttocsubsectionnumber.~\inserttocsubsection\par}
+\setbeamerfont{subsection in toc}{size=\small}
+\AtBeginSection[]{
+	\begin{frame}%
+        \begin{multicols}{2}%分列两栏的目录
+		    \frametitle{Outline}%
+		    \kaishu{\textbf{\tableofcontents[currentsection]}}
+        \end{multicols}
+	\end{frame}
+}
+%\AtBeginSubsection[]{%
+%	\begin{frame}%
+%		\frametitle{Outline}%
+%		\textbf{\tableofcontents[currentsection, currentsubsection]} %
+%	\end{frame}%
+%}
+\title{大标题}
+\subtitle{副标题}
+\author[Carpenter Cheung]{姓名}
+\mail{\url{邮箱地址}}
+\institute[Nanjing normal university]{指导老师: xxx老师\\强化培养学院\\南京师范大学}
+\date{\today}
+\titlegraphic[width=3cm]{nnu_big_logo}{}
+
+
+% 配置 listings 包的一些基本样式
+\lstset{
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue},
+	stringstyle=\color{red},
+	commentstyle=\color{green},
+	morecomment=[l][\color{magenta}]{\#},
+	frame=single,
+	breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ----------- 标题页 ------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{document}
+
+\maketitle
+
+%%% define code
+%\defverbatim[colored]\lstI{
+%	\begin{lstlisting}[language=C++,basicstyle=\ttfamily,keywordstyle=\color{red}]
+%	int main() {
+%	// Define variables at the beginning
+%	// of the block, as in C:
+%	CStash intStash, stringStash;
+%	int i;
+%	char* cp;
+%	ifstream in;
+%	string line;
+%	[...]
+%	\end{lstlisting}
+%}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ----------- FRAME ------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{简介}
+\subsection{研究背景}
+\begin{frame}[c]{简介}
+	\framesubtitle{研究背景}
+\begin{block}{研究背景及场景}
+\begin{itemize}
+	\item ABC
+\end{itemize}
+\end{block}
+
+\begin{block}{研究现状}
+	\begin{itemize}
+	\item 123456
+	\end{itemize}
+\end{block}
+\songti{如果你并不是很中意阴影, 圆角, 颜色等设置, try to change them!}
+\end{frame}	
+
+%\begin{exampleblock}{Example Block}
+%	Content of an example block
+%\end{exampleblock}
+%
+%\begin{alertblock}{Alert block}
+%	Content of an alert block
+%\end{alertblock}
+
+\subsection{研究目标}
+\begin{frame}[c]{简介}
+	\framesubtitle{研究目标}
+	\begin{block}{研究目标}
+		\begin{enumerate}
+			\item enumerate是圆形的.
+		\end{enumerate}
+	\end{block}
+	
+	\begin{alertblock}{挑战}
+		\begin{itemize}
+            \item itemize是三角形.
+        \end{itemize}
+	\end{alertblock}
+	%\begin{exampleblock}{Example Block}
+	%	Content of an example block
+	%\end{exampleblock}
+	%
+	%\begin{alertblock}{Alert block}
+	%	Content of an alert block
+	%\end{alertblock}
+	
+\end{frame}	
+
+\section{研究方法}
+
+\begin{frame}{研究方法}
+	\framesubtitle{模型}
+	\begin{equation*}
+		J(\theta) = \mathbb{E}_{\pi_\theta}[G_t] = \sum_{s\in\mathcal{S}} d^\pi (s)V^\pi(s)=\sum_{s\in\mathcal{S}} d^\pi(s)\sum_{a\in\mathcal{A}}\pi_\theta(a|s)Q^\pi(s,a)
+	\end{equation*}
+	
+	\begin{align}
+		Q_\mathrm{target}&=r+\gamma Q^\pi(s^\prime, \pi_\theta(s^\prime)+\epsilon)\\
+		\epsilon&\sim\mathrm{clip}(\mathcal{N}(0, \sigma), -c, c)\nonumber
+	\end{align}
+\end{frame}
+
+\begin{frame}{模型}
+	\begin{alertblock}{编号多行公式}
+		% Taken from Mathmode.tex
+		\begin{multline}
+			A=\lim_{n\rightarrow\infty}\Delta x\left(a^{2}+\left(a^{2}+2a\Delta x+\left(\Delta x\right)^{2}\right)\right.\label{eq:reset}\\
+			+\left(a^{2}+2\cdot2a\Delta x+2^{2}\left(\Delta x\right)^{2}\right)\\
+			+\left(a^{2}+2\cdot3a\Delta x+3^{2}\left(\Delta x\right)^{2}\right)\\
+			+\ldots\\
+			\left.+\left(a^{2}+2\cdot(n-1)a\Delta x+(n-1)^{2}\left(\Delta x\right)^{2}\right)\right)\\
+			=\frac{1}{3}\left(b^{3}-a^{3}\right)
+		\end{multline}
+	\end{alertblock}
+\end{frame}
+
+\begin{frame}{算法(pseudocode)}
+\begin{algorithm}[H]
+    \caption{Simulation-optimization heuristic}\label{algorithm}
+    \KwData{current period $t$, initial inventory $I_{t-1}$, initial capital $B_{t-1}$, demand samples}
+    \KwResult{Optimal order quantity $Q^{\ast}_{t}$}
+    $r\leftarrow t$\;
+    $\Delta B^{\ast}\leftarrow -\infty$\;
+    \While{$\Delta B\leq \Delta B^{\ast}$ and $r\leq T$}{$Q\leftarrow\arg\max_{Q\geq 0}\Delta B^{Q}_{t,r}(I_{t-1},B_{t-1})$\;
+    $\Delta B\leftarrow \Delta B^{Q}_{t,r}(I_{t-1},B_{t-1})/(r-t+1)$\;
+    \If{$\Delta B\geq \Delta B^{\ast}$}{$Q^{\ast}\leftarrow Q$\;
+    $\Delta B^{\ast}\leftarrow \Delta B$\;}
+    $r\leftarrow r+1$\;}
+\end{algorithm}
+\end{frame}
+
+\begin{frame}{算法(pseudocode)}
+    \begin{itemize}[<+->]
+        \item \kaishu{关于使用algorithm2e还是algpseudocode, 仁者乐山, 智者乐水.}
+        \item \songti{本文选用的是algorithm2e.}
+        \item \fangsong{好处是灵活性足够好, 很紧凑, 有线条.}
+        \item \heiti{坏处是太乱了!!}
+        \item \kaishu{\textbf{\color{red} 关于如何插入如matlab, python, cpp等代码, 请自行google之. 已添加listings包并进行了初步设定.}}
+    \end{itemize}
+\end{frame}
+    
+\begin{frame}{字体选择}
+    \kaishu{这是楷体. }\pause
+
+    \songti{这是宋体. }\pause
+
+    \heiti{这是黑体. }\pause
+
+    \fangsong{这是仿宋. }\pause
+
+    \songti{这些是自带的中文字体, 若想用其余字体, 请自行搜寻. 事实上, 这是trivial的. }
+\end{frame}
+
+\section{应用与结果分析}
+\begin{frame}{模型}
+	\begin{itemize}
+		\item \songti{\LaTeX 广泛用于学术界，期刊会议论文模板}
+	\end{itemize}
+	%% 表格演示
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{c|c}
+			Microsoft\textsuperscript{\textregistered}  Word & \LaTeX \\
+			\hline
+			\kaishu{文字处理工具} & \fangsong{专业排版软件} \\
+			\kaishu{容易上手，简单直观} & \fangsong{容易上手} \\
+			\kaishu{所见即所得} & \fangsong{所见即所想，所想即所得} \\
+			\kaishu{高级功能不易掌握} & \fangsong{进阶难，但一般用不到} \\
+			\kaishu{处理长文档需要丰富经验} & \fangsong{和短文档处理基本无异} \\
+			\kaishu{花费大量时间调格式} & \fangsong{无需担心格式，专心作者内容} \\
+			\kaishu{公式排版差强人意} & \fangsong{尤其擅长公式排版} \\
+			\kaishu{二进制格式，兼容性差} & \fangsong{文本文件，易读、稳定} \\
+			\kaishu{付费商业许可} & \fangsong{自由免费使用} \\
+		\end{tabular}
+	\end{table}
+
+\end{frame}
+
+\section{总结与期望}
+\begin{frame}{总结与期望}
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=0.3\linewidth]{nnu_big_logo.jpeg}
+		\caption{图片实例}
+		\label{fig:1}
+	\end{figure}
+    
+    \centering \songti{像素太低了!!!!!}
+\end{frame}
+
+{
+    \setbeamercolor{background canvas}{bg=nnucolor}
+\begin{frame}[plain]
+	\vfill
+	\centering
+	{
+		\centering \color{white} \Large {\textbf{\kaishu {感谢各位老师的倾听!\\恳请各位老师批评指正!}}}
+        
+	}
+	\vfill
+	\begin{figure}
+		\begin{center}
+            \includegraphics[width=5cm]{nnunew.jpg}
+        \end{center}
+	\end{figure}
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=7cm]{nnu1.png}
+        \end{center}
+	\end{figure}
+\end{frame}
+}
+\end{document}

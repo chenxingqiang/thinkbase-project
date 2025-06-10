@@ -1,0 +1,250 @@
+\documentclass[12pt,a4paper,oneside,onecolumn]{book}
+\usepackage[utf8x]{inputenc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% remove unnecessary warnings
+\usepackage{silence}
+\WarningFilter{caption}{Unknown document class}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tell babel to not use hyphenation for Hebrew
+\makeatletter\let\l@hebrew\l@nohyphenation\makeatother
+% Add Hebrew:
+\usepackage[hebrew,english]{babel}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set page numbering with no headers (according to guidelines):
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{}
+\chead{\thepage}
+\rhead{}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\pagestyle{fancy}}
+\setlength{\headheight}{15pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sub-figures/tables parenthesis:
+
+% For parenthesis in sub-figure reference
+\usepackage[labelformat=simple]{subcaption}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+
+% For parenthesis before sub-table caption
+\renewcommand\thesubtable{(\alph{subtable})}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Misc packages:
+
+\usepackage{textcomp} %loaded before "gensymb" to avoid annoying warnings
+\usepackage{gensymb} %Degree symbol
+\usepackage{mathtools} %cases*
+\usepackage{amssymb} %Math letters
+\usepackage[shortlabels]{enumitem}
+\usepackage[multiple]{footmisc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%theorem, corollary and lemma definitions:
+
+\usepackage[amsmath, thmmarks]{ntheorem}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{assumption}[theorem]{Assumption}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%proof definition:
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\itshape}
+\theorembodyfont{\normalfont}
+\theoremseparator{.}
+\theoremsymbol{\ensuremath{\square}}
+\newtheorem{proof}{Proof}
+
+% Change back to default values - needed to repeat assumptions
+\theoremstyle{plain}
+\theoremheaderfont{\normalfont\bfseries}
+\theorembodyfont{\itshape}
+\theoremseparator{}
+\theoremsymbol{}
+
+\usepackage{chngcntr}
+\counterwithin{theorem}{chapter}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Misc:
+\DeclareMathOperator*{\argmax}{arg\,max}
+\usepackage[ruled,vlined,algochapter]{algorithm2e}
+\usepackage{csquotes}
+
+% Show numbers also for subsubsection
+\setcounter{secnumdepth}{4}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bibliography:
+
+\usepackage[numbers,sort,compress,square]{natbib}
+\bibliographystyle{bibliography/unsrtnat_adjusted_for_bgu_thesis}
+
+% \bibliographystyle{unsrtnat}
+
+%add bib to toc
+\usepackage[nottoc]{tocbibind}
+
+%add command for citation with possessive apostrophe
+\newcommand\citepossessive [1]{\citeauthor{#1}'s\ \cite{#1}}
+
+%Natbib cites cannot be broken to two lines 
+\makeatletter
+\def\NAT@spacechar{~}% NEW
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% paragraph settings:
+\setlength{\parindent}{0pt}
+\setlength{\parskip} {5pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% drawing and graphics:
+\usepackage{tikz}
+\usetikzlibrary{matrix,positioning}
+
+\usepackage{float} %Not sure it will be needed
+
+\usepackage{graphicx}
+\graphicspath{ {content/images/} }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{titling}
+\usepackage[titletoc]{appendix}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Not included since 'hyperref' and 'bookmark' are too problematic with Hebrew
+% \usepackage[hidelinks]{hyperref}
+% \usepackage{bookmark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% cleveref:
+\usepackage[capitalise]{cleveref}
+%Workaround for babel and cleveref (for citing few equations)
+\makeatletter
+\def\@@number#1{#1}
+\makeatother
+
+\Crefname{observation}{Observation}{Observations}
+\Crefname{assumption}{Assumption}{Assumptions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%For Hebrew table of contents: (\addcontentsline is used to add section and subsections to the Hebrew toc. For some reason, the page number is reversed only for chapter, thus we use \addtocontents for them)
+\makeatletter
+\newcommand\hebrewtableofcontents{%
+  \selectlanguage{hebrew}%
+  \section*{\contentsname
+    \@mkboth{%
+      \MakeUppercase\contentsname}{\MakeUppercase\contentsname}}%
+ \@starttoc{tocheb}%
+  \selectlanguage{english}%
+ }
+\makeatother
+
+\PrerenderUnicode{א}
+
+\newcommand{\onlythesecnum}{\arabic{section}}
+\newcommand{\onlythesubsecnum}{\arabic{subsection}}
+
+\newcommand{\chapnumforhebrewtoc}{\thechapter}
+\newcommand{\secnumforhebrewtoc}{\onlythesecnum.\thechapter}
+\newcommand{\subsecnumforhebrewtoc}{\onlythesubsecnum.\onlythesecnum.\thechapter}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%set spacing between lines
+\usepackage{setspace}
+\doublespacing
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Title and names for the article
+\newcommand{\thesistitle}{\textbf{Thesis Title}}
+\newcommand{\thesistitlehe}{\textbf{כותרת בעברית של התזה}}
+
+\newcommand{\thesisauthorname}{\textbf{Author’s name}}
+\newcommand{\thesisauthornamehe}{\textbf{שם המחבר}}
+
+\newcommand{\thesissupervisername}{\textbf{Supervisor's name}}
+\newcommand{\thesissupervisernamehe}{\textbf{שם המנחה}}
+
+\newcommand{\thesismonth}{\textbf{Month}}
+\newcommand{\thesismonthhe}{\textbf{חודש}}
+\newcommand{\thesisyear}{\textbf{Year}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\include{Main_pages/cover_page}
+\include{Main_pages/title_page}
+
+\frontmatter
+
+\include{Main_pages/abstract}
+\include{Main_pages/acknowledgements}
+
+\tableofcontents
+\clearpage
+
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{}{רשימת איורים}}{{\beginL\thepage\endL}}}
+\listoffigures
+\clearpage
+
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{}{רשימת טבלאות}}{{\beginL\thepage\endL}}}
+\listoftables
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\mainmatter
+
+\chapter{Introduction}
+\label{chapter:intro}
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{\chapnumforhebrewtoc}{מבוא}}{{\beginL\thepage\endL}}}
+\input{content/introduction/introduction}
+
+\chapter{Related Work}
+\label{chapter:related_work}
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{\chapnumforhebrewtoc}{סקירת ספרות}}{{\beginL\thepage\endL}}}
+\input{content/related_work/related_work}
+
+\chapter{Experimental Results}
+\label{chapter:experiments}
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{\chapnumforhebrewtoc}{תוצאות ניסוייות}}{{\beginL\thepage\endL}}}
+\input{content/experiments/experiments}
+
+\chapter{Discussion and Conclusions}
+\label{chapter:discussion_and_conclusions}
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{\chapnumforhebrewtoc}{דיון ומסקנות}}{{\beginL\thepage\endL}}}
+\input{content/discussion_and_conclusions/discussion_and_conclusions}
+
+\begin{appendices}
+
+\chapter{Some title for apendix A}
+\label[appendix]{appendix:numerically_distinguished_comp}
+\addtocontents{tocheb}{\contentsline{chapter}{\protect\numberline{נספח א}{\quad\qquadדרישת תאימות  כלשהי}}{{\beginL\thepage\endL}}}
+\input{content/appendixs/appendix_a}
+
+\end{appendices}
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
+\addtocontents{tocheb}{\contentsline{chapter}{{ביבליוגרפיה}}{{\beginL\thepage\endL}}}
+\bibliography{bibliography/thesis}
+
+\clearpage
+% no page numbering from now on
+\pagenumbering{gobble} 
+\hebrewtableofcontents
+
+\include{Main_pages/abstract_heb}
+\include{Main_pages/cover_heb}
+
+\end{document}

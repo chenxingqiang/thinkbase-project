@@ -1,0 +1,164 @@
+\documentclass[11pt,onside]{article}
+\usepackage[a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lipsum}
+\usepackage{bm}
+\usepackage{upgreek}
+
+\usepackage{amsmath}
+% mathtools for: Aboxed (put box on last equation in align envirenment)
+\usepackage{microtype} %improves the spacing between words and letters
+
+%% COLOR DEFINITIONS
+
+\usepackage[svgnames]{xcolor} % Enabling mixing colors and color's call by 'svgnames'
+
+\definecolor{MyColor1}{rgb}{0.2,0.4,0.6} %mix personal color
+\newcommand{\textb}{\color{Black} \usefont{OT1}{lmss}{m}{n}}
+\newcommand{\blue}{\color{MyColor1} \usefont{OT1}{lmss}{m}{n}}
+\newcommand{\blueb}{\color{MyColor1} \usefont{OT1}{lmss}{b}{n}}
+\newcommand{\red}{\color{LightCoral} \usefont{OT1}{lmss}{m}{n}}
+\newcommand{\green}{\color{Turquoise} \usefont{OT1}{lmss}{m}{n}}
+
+\DeclareMathOperator{\trace}{trace}
+\DeclareMathOperator{\diag}{diag}
+
+%% FONTS AND COLORS
+
+%    SECTIONS
+
+\usepackage{titlesec}
+\usepackage{sectsty}
+%%%%%%%%%%%%%%%%%%%%%%%%
+%set section/subsections HEADINGS font and color
+\sectionfont{\color{MyColor1}}  % sets colour of sections
+\subsectionfont{\color{MyColor1}}  % sets colour of sections
+
+%set section enumerator to arabic number (see footnotes markings alternatives)
+\renewcommand\thesection{\arabic{section}.} %define sections numbering
+\renewcommand\thesubsection{\thesection\arabic{subsection}} %subsec.num.
+
+%define new section style
+\newcommand{\mysection}{
+\titleformat{\section} [runin] {\usefont{OT1}{lmss}{b}{n}\color{MyColor1}} 
+{\thesection} {3pt} {} } 
+
+
+%	CAPTIONS
+\usepackage{caption}
+\usepackage{subcaption}
+%%%%%%%%%%%%%%%%%%%%%%%%
+\captionsetup[figure]{labelfont={color=Turquoise}}
+
+
+%		!!!EQUATION (ARRAY) --> USING ALIGN INSTEAD
+%using amsmath package to redefine eq. numeration (1.1, 1.2, ...) 
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+
+
+
+\makeatletter
+\let\reftagform@=\tagform@
+\def\tagform@#1{\maketag@@@{(\ignorespaces\textcolor{red}{#1}\unskip\@@italiccorr)}}
+\renewcommand{\eqref}[1]{\textup{\reftagform@{\ref{#1}}}}
+\makeatother
+\usepackage{hyperref}
+\hypersetup{colorlinks=true}
+
+% For labeling top of page on every page but first one:
+\usepackage{fancyhdr}
+
+% PREPARE TITLE:
+\title{\blue Class Title Goes Here \\
+\blueb Homework Number}
+\author{Your Name Goes Here}
+\date{Date Goes Here} % You can set the date automatically by replacing "date goes here" with "\today"
+
+\renewcommand{\rmdefault}{phv} % Arial Font
+\renewcommand{\sfdefault}{phv} % Arial Font
+
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[CO,CE]{{\small{{\bf{Homework Number}} - Class Name - Semester - Your Name}}}
+ 
+
+
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+\begin{description}
+\item[1-(c)] A matrix $\bm{W}$ is in the subgradient if it satisfies:
+\begin{align*}
+\trace\{(\bm{Y}-\bm{X})^\top\bm{M}\}\leq \|\bm{Y}\|_{2,1}-\|\bm{X}\|_{2,1}.
+\end{align*}
+This can be rewritten as:
+\begin{align}
+\label{eq:necessary}
+\sum_{j=1}^n(\bm{Y}_{.,j}-\bm{X}_{.,j})^\top\bm{M}_{.,j}\leq \sum_{j=1}^n\|\bm{Y}_{.,j}\|_2-\sum_{i=1}^n\|\bm{X}_{.,j}\|_2.
+\end{align}
+The previous equation tells us that if $\bm{M}_{.,j}$ for $j=1,\dots,n$ are in the subgradients of $\|\bm{X}_{.,j}\|_2$ for $j=1,\dots,n$ respectively then $\bm{M}$ is in the subgradient of $\|\bm{X}\|_{2,1}$. However, this is only a {\it{sufficient}} condition. To prove it is also {\it{necessary}}, observe that if $\bm{M}$ is in the subgradient of $\|\bm{X}\|_{2,1}$ then it satisfies eqn. (\ref{eq:necessary}). Next, since the equation is supposed to hold for all $\bm{Y}$, we can take $\bm{Y}_{.,j}=\bm{0}$ everywhere except for $j=k$. Then, eqn. (\ref{eq:necessary}) becomes:
+\begin{align*}
+(\bm{Y}_{.,k}-\bm{X}_{.,k})^\top\bm{M}_{.,k}\leq \|\bm{Y}_{.,k}\|_2-\|\bm{X}_{.,k}\|_2
+\end{align*}
+so that $\bm{M}_{.,k}$ is in the subgradient of $\|\bm{X}_{.,k}\|_2$. Since this must hold for $k=1,\dots,n$, using problem 1(b) we conclude:
+\begin{align*}
+(\partial\|\bm{X}\|_{2,1})_{.,j}=\begin{cases} \frac{\bm{X}_{.,j}}{\|\bm{X}_{.,j}\|_2} &\mbox{if } \bm{X}_{.,j}\neq \bm{0} \\
+\{\bm{M}_{.,j}:\|\bm{M}_{.,j}\|_2\leq 1\} & \mbox{if } \bm{X}_{.,j}=\bm{0} \end{cases},
+\end{align*}
+Equivalently:
+\begin{align*}
+(\partial\|\bm{X}\|_{2,1})_{i,j}=\begin{cases} \frac{\bm{X}_{i,j}}{\|\bm{X}_{.,j}\|_2} &\mbox{if } \bm{X}_{.,j}\neq \bm{0} \\
+\{\bm{M}_{i,j}:\|\bm{M}_{.,j}\|_2\leq 1\} & \mbox{if } \bm{X}_{.,j}=\bm{0} \end{cases}.
+\end{align*}
+as desired. Note: the homework uses $\bm{W}$ instead of $\bm{M}$.\\
+
+\item[1-(d)] If we wish to minimize the objective function we first observe that the function is convex. In fact, it is {\it{strictly convex}} because the term $\|\bm{X}-\bm{A}\|_F^2$ is strictly convex in $\bm{A}$ and, as we have shown in 1(b), $\|\bm{A}\|_{2,1}$ is convex in $\bm{A}$. Furthermore, the sum of a strictly convex function and a convex function is again a strictly convex function. Therefore, our objective function has a {\underline{unique solution}}. Next, observe that the subgradient of our objective function is:
+\begin{align*}
+-(\bm{X}-\bm{A})+\uptau\partial\|\bm{A}\|_{2,1}.
+\end{align*}
+By part 1(c) we can further write the subgradient as:
+\begin{align*}
+-(\bm{X}-\bm{A})+\uptau\bm{M}
+\end{align*}
+where:
+\begin{align}
+\label{eq:subo}
+\bm{M}_{.,j}=\begin{cases} \frac{\bm{A}_{i,j}}{\|\bm{A}_{.,j}\|_2} &\mbox{if } \bm{A}_{.,j}\neq \bm{0} \\
+\{\bm{M}_{i,j}:\|\bm{M}_{.,j}\|_2\leq 1\} & \mbox{if } \bm{A}_{.,j}=\bm{0} \end{cases}.
+\end{align}
+Recall that a matrix $\bm{A}^\ast$ is a minimizer of our objective function if the subgradient of the objective function at $\bm{A}^\ast$ contains the matrix $\bm{0}$. This can be written as:
+\begin{align}
+\label{eq:sat}
+\uptau\bm{M}=(\bm{X}-\bm{A}^\ast)
+\end{align}
+for some matrix $\bm{M}$ defined by eqn. (\ref{eq:subo}). Now, since we have already shown the objective function has a unique minimizer, all we must do is plug in the suggested solution for $\bm{A}^\ast$ and see if it satisfies eqn. (\ref{eq:sat}). Plugging in:
+\begin{align*}
+(\bm{X}-\bm{A}^\ast)_{.,j}&=[\bm{X}-\bm{X}\mathcal{S}_{\uptau}(\diag(\bm{x}))\diag(\bm{x})^{-1}]_{.,j}\\
+&=\begin{cases} \uptau\frac{\bm{X}_{.,j}}{\|\bm{X}_{.,j}\|_2}&\mbox{if } \|\bm{X}_{.,j}\|_2>\uptau \\
+\bm{X}_{.,j}& \mbox{if } \|\bm{X}_{.,j}\|_2\leq \uptau
+\end{cases}.
+\end{align*}
+if we assume $\uptau>0$. Now, observe that:
+\begin{align*}
+\|\bm{X}_{.,j}\|_2\leq \uptau \Rightarrow \bm{A}^\ast_{.,j}=\bm{0} \Rightarrow \|\uptau\bm{M}_{.,j}\|_2\leq \uptau
+\end{align*}
+subject to $\|\bm{M}_{.,j}\|_2\leq 1$. Consequently, we can take $\uptau\bm{M}_{.,j}=\bm{X}_{.,j}$ whenever $\|\bm{X}_{.,j}\|_2\leq \uptau$. In the other case, we have:
+\begin{align*}
+\|\bm{X}_{.,j}\|_2> \uptau\Rightarrow\bm{A}^\ast_{.,j}\neq\bm{0} \Rightarrow \uptau\bm{M}_{.,j}=\uptau\frac{\bm{X}_{.,j}}{\|\bm{X}_{.,j}\|_2},
+\end{align*}
+this shows that if we take:
+\begin{align*}
+\uptau\bm{M}_{.,j}=\begin{cases} \uptau\frac{\bm{X}_{.,j}}{\|\bm{X}_{.,j}\|_2}&\mbox{if } \|\bm{X}_{.,j}\|_2>\uptau \\
+\bm{X}_{.,j}& \mbox{if } \|\bm{X}_{.,j}\|_2\leq \uptau
+\end{cases},
+\end{align*}
+then eqn. (\ref{eq:sat}) is satisfied. Therefore, $\bm{A}^\ast=\bm{X}\mathcal{S}_{\uptau}(\diag(\bm{x}))\diag(\bm{x})^{-1}$ is the unique solution to our optimization problem.\\
+\end{description}
+
+
+
+
+
+\end{document}

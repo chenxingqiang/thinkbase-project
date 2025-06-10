@@ -1,508 +1,487 @@
-"""Base classes for ISA instructions"""
+"""Base instruction classes for AgentFlow."""
 
-from typing import Dict, Any, List, Optional, Union, Callable
-from abc import ABC, abstractmethod
-import logging
-from dataclasses import dataclass, field
 from enum import Enum
-import time
+from typing import Any, Dict, List, Optional, Set, Union, Type, Tuple
+from dataclasses import dataclass, field
+from abc import ABC, abstractmethod
 import asyncio
-from pydantic import BaseModel, Field, ConfigDict
+import logging
+import os
 
 logger = logging.getLogger(__name__)
 
-class InstructionStatus(Enum):
-    """Instruction execution status"""
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    OPTIMIZED = "optimized"
-    CACHED = "cached"
+class InstructionType(str, Enum):
+    """Instruction categories."""
+    CONTROL_FLOW = "CONTROL_FLOW"  # Flow control, branching, loops
+    STATE_MANAGEMENT = "STATE_MANAGEMENT"  # State handling, context management
+    LLM_INTERACTION = "LLM_INTERACTION"  # LLM operations
+    RESOURCE_MANAGEMENT = "RESOURCE_MANAGEMENT"  # Resource handling
+    COLLABORATION = "COLLABORATION"  # Agent collaboration
+    DATA_PROCESSING = "DATA_PROCESSING"  # Data operations
+    DATA_MANAGEMENT = "DATA_MANAGEMENT"  # Data management operations
+    OBJECTIVE_HANDLING = "OBJECTIVE_HANDLING"  # Objective management
+    CODE_REVIEW = "CODE_REVIEW"  # Code review operations
+    REFACTORING = "REFACTORING"  # Code refactoring operations
+    CODE_GENERATION = "CODE_GENERATION"  # Code generation operations
+    TEST_DESIGN = "TEST_DESIGN"  # Test design operations
+    ANALYSIS = "ANALYSIS"  # Analysis operations
+
+@dataclass
+class InstructionMetadata:
+    """Metadata for instructions."""
+    capabilities: Set[str] = field(default_factory=set)
+    dependencies: Set[str] = field(default_factory=set)
+    resource_requirements: Dict[str, float] = field(default_factory=dict)
+    execution_priority: int = 0
+    timeout_seconds: Optional[float] = None
+    retry_policy: Dict[str, Any] = field(default_factory=dict)
+    tags: Set[str] = field(default_factory=set)
+    cleanup_required: bool = False
+
+@dataclass
+class ExecutionContext:
+    """Context for instruction execution."""
+    params: Dict[str, Any]
+    state: Dict[str, Any]
+    metadata: Dict[str, Any]
+    collaboration_info: Optional[Dict[str, Any]] = None
+    resources: Optional[Dict[str, Any]] = None
+
+    def validate_required_params(self, required: Set[str]) -> Tuple[bool, Optional[str]]:
+        """Validate required parameters are present."""
+        missing = required - set(self.params.keys())
+        if missing:
+            return False, f"Missing required parameters: {missing}"
+        return True, None
+
+    def validate_resources(self, requirements: Dict[str, float]) -> Tuple[bool, Optional[str]]:
+        """Validate required resources are available."""
+        if not self.resources:
+            return False, "No resources available"
+        for resource, amount in requirements.items():
+            if resource not in self.resources:
+                return False, f"Missing resource: {resource}"
+            if self.resources[resource] < amount:
+                return False, f"Insufficient {resource}"
+        return True, None
+
+@dataclass
+class ExecutionResult:
+    """Result of instruction execution."""
+    success: bool
+    output: Dict[str, Any]
+    errors: List[Dict[str, Any]] = field(default_factory=list)
+    state_updates: Dict[str, Any] = field(default_factory=dict)
+    metrics: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class InstructionMetrics:
-    """Metrics for instruction execution"""
-    start_time: float
-    end_time: float
-    tokens_used: int = 0
-    memory_used: int = 0
-    cache_hit: bool = False
-    optimization_applied: bool = False
-    parallel_execution: bool = False
+    """Metrics for instruction execution."""
+    total_executions: int = 0
+    successful_executions: int = 0
+    failed_executions: int = 0
+    total_execution_time: float = 0.0
+    cache_hits: int = 0
+    cache_misses: int = 0
     
     @property
-    def execution_time(self) -> float:
-        return self.end_time - self.start_time
-
-@dataclass
-class InstructionResult:
-    """Result of instruction execution"""
-    status: InstructionStatus
-    data: Dict[str, Any] = field(default_factory=dict)
-    error: Optional[str] = None
-    execution_time: Optional[float] = None
-    metrics: Optional[InstructionMetrics] = None
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra='allow'
-    )
-
-class ValidationResult:
-    """Represents the result of a validation operation."""
-    def __init__(
-        self, 
-        is_valid: bool = True, 
-        errors: Optional[List[str]] = None, 
-        warnings: Optional[List[str]] = None,
-        **kwargs
-    ):
-        """
-        Initialize a ValidationResult.
-
-        Args:
-            is_valid (bool): Whether the validation passed. Defaults to True.
-            errors (Optional[List[str]]): List of validation errors. Defaults to None.
-            warnings (Optional[List[str]]): List of validation warnings. Defaults to None.
-            **kwargs: Additional optional attributes like 'score', 'confidence', etc.
-        """
-        self.is_valid = is_valid
-        self.errors = errors or []
-        self.warnings = warnings or []
-        
-        # Dynamically set additional attributes
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def __bool__(self):
-        """Allow direct boolean checking of validation result."""
-        return self.is_valid
-
-    def __repr__(self):
-        """String representation of ValidationResult."""
-        attrs = {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
-        return f"ValidationResult({', '.join(f'{k}={v}' for k, v in attrs.items())})"
+    def success_rate(self) -> float:
+        """Calculate success rate."""
+        return self.successful_executions / self.total_executions if self.total_executions > 0 else 0.0
+    
+    @property
+    def average_execution_time(self) -> float:
+        """Calculate average execution time."""
+        return self.total_execution_time / self.total_executions if self.total_executions > 0 else 0.0
 
 class BaseInstruction(ABC):
-    """Base class for all instructions"""
+    """Base class for all instructions."""
     
-    def __init__(self, name: str, description: str):
+    def __init__(
+        self,
+        name: str,
+        description: str = "",
+        instruction_type: Optional[InstructionType] = None,
+        metadata: Optional[InstructionMetadata] = None
+    ):
+        """Initialize instruction.
+        
+        Args:
+            name: Instruction name
+            description: Optional instruction description
+            instruction_type: Type of instruction
+            metadata: Optional instruction metadata
+        """
         self.name = name
         self.description = description
-        self.status = InstructionStatus.PENDING
-        self.metrics: Optional[InstructionMetrics] = None
-        self.cache = {}
-        self._pre_hooks: List[Callable] = []
-        self._post_hooks: List[Callable] = []
-        
-    def add_pre_hook(self, hook: Callable):
-        """Add pre-execution hook"""
-        self._pre_hooks.append(hook)
-        
-    def add_post_hook(self, hook: Callable):
-        """Add post-execution hook"""
-        self._post_hooks.append(hook)
-        
-    async def _run_hooks(self, hooks: List[Callable], context: Dict[str, Any]):
-        """Run hooks sequentially"""
-        for hook in hooks:
-            await hook(self, context)
+        self.instruction_type = instruction_type or self._get_default_type()
+        self.metadata = metadata or InstructionMetadata()
+        self._metrics = InstructionMetrics()
+        self._required_params: Set[str] = set()
+        self._param_types: Dict[str, Type] = {}
+        self._temp_files: Set[str] = set()
+        self._state: Dict[str, Any] = {}
+        self._acquired_resources: Set[Any] = set()
     
-    async def _end_metrics(
-        self,
-        start_time: float,
-        tokens: int,
-        memory: int,
-        cache_hit: bool,
-        optimized: bool,
-        parallel: bool
-    ):
-        """Record instruction execution metrics"""
-        self.metrics = InstructionMetrics(
-            start_time=start_time,
-            end_time=time.time(),
-            tokens_used=tokens,
-            memory_used=memory,
-            cache_hit=cache_hit,
-            optimization_applied=optimized,
-            parallel_execution=parallel
-        )
-
-    async def execute(self, context: Dict[str, Any]) -> InstructionResult:
-        """Execute the instruction"""
-        start_time = time.time()
-        try:
-            # Run pre-execution hooks
-            await self._run_hooks(self._pre_hooks, context)
-            
-            # Change status to running
-            self.status = InstructionStatus.RUNNING
-            
-            # Execute the instruction implementation
-            try:
-                data = await self._execute_impl(context)
-                
-                # Run post-execution hooks
-                await self._run_hooks(self._post_hooks, context)
-                
-                # End metrics tracking
-                await self._end_metrics(
-                    start_time=start_time,
-                    tokens=0,  # Placeholder
-                    memory=0,  # Placeholder
-                    cache_hit=False,  # Placeholder
-                    optimized=False,  # Placeholder
-                    parallel=False  # Placeholder
-                )
-                
-                # Update status to completed
-                self.status = InstructionStatus.COMPLETED
-                
-                # Return result
-                return InstructionResult(
-                    status=InstructionStatus.COMPLETED,
-                    data=data,
-                    metrics=self.metrics
-                )
-            
-            except ValueError as ve:
-                # Specific handling for ValueError
-                logger.error(f"Instruction {self.name} failed: {str(ve)}")
-                
-                # Update status to failed and record metrics
-                self.status = InstructionStatus.FAILED
-                await self._end_metrics(
-                    start_time=start_time,
-                    tokens=0,
-                    memory=0,
-                    cache_hit=False,
-                    optimized=False,
-                    parallel=False
-                )
-                
-                # Return failed result
-                return InstructionResult(
-                    status=InstructionStatus.FAILED,
-                    error=str(ve),
-                    metrics=self.metrics
-                )
-            
-            except Exception as e:
-                # Generic error handling
-                logger.error(f"Instruction {self.name} failed: {str(e)}")
-                
-                # Update status to failed and record metrics
-                self.status = InstructionStatus.FAILED
-                await self._end_metrics(
-                    start_time=start_time,
-                    tokens=0,
-                    memory=0,
-                    cache_hit=False,
-                    optimized=False,
-                    parallel=False
-                )
-                
-                # Return failed result
-                return InstructionResult(
-                    status=InstructionStatus.FAILED,
-                    error=str(e),
-                    metrics=self.metrics
-                )
-        
-        except Exception as e:
-            # Unexpected error during execution
-            logger.error(f"Unexpected error in instruction {self.name}: {str(e)}")
-            
-            # Update status to failed and record metrics
-            self.status = InstructionStatus.FAILED
-            await self._end_metrics(
-                start_time=start_time,
-                tokens=0,
-                memory=0,
-                cache_hit=False,
-                optimized=False,
-                parallel=False
-            )
-            
-            # Return failed result
-            return InstructionResult(
-                status=InstructionStatus.FAILED,
-                error=str(e),
-                metrics=self.metrics
-            )
+    def _get_default_type(self) -> InstructionType:
+        """Get default instruction type based on class name."""
+        class_name = self.__class__.__name__
+        if "Review" in class_name:
+            return InstructionType.CODE_REVIEW
+        elif "Refactor" in class_name:
+            return InstructionType.REFACTORING
+        elif "Generate" in class_name or "Creation" in class_name:
+            return InstructionType.CODE_GENERATION
+        elif "Test" in class_name:
+            return InstructionType.TEST_DESIGN
+        elif "Analysis" in class_name:
+            return InstructionType.ANALYSIS
+        return InstructionType.CONTROL_FLOW
     
     @abstractmethod
-    async def _execute_impl(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Implement actual execution logic"""
-        pass
-
-class CacheableInstruction(BaseInstruction):
-    """Base class for instructions that support caching"""
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute instruction.
+        
+        Args:
+            context: Execution context
+            
+        Returns:
+            ExecutionResult: Execution results
+            
+        Raises:
+            ValueError: If required parameters are missing
+            TypeError: If parameter types are invalid
+        """
+        if not await self.validate_context(context):
+            return ExecutionResult(
+                success=False,
+                output={},
+                errors=[{"error": "Context validation failed"}]
+            )
+        return ExecutionResult(success=True, output={})
     
-    def __init__(self, name: str, description: str, cache_ttl: int = 3600):
-        super().__init__(name, description)
-        self.cache_ttl = cache_ttl
-    
-    def _get_cache_key(self, context: Dict[str, Any]) -> str:
-        """Generate cache key from context"""
-        # Implement custom cache key generation logic
-        return str(hash(str(context)))
-    
-    async def execute(self, context: Dict[str, Any]) -> InstructionResult:
-        """Execute with caching support"""
+    async def validate_context(self, context: ExecutionContext) -> bool:
+        """Validate execution context.
+        
+        Args:
+            context: Context to validate
+            
+        Returns:
+            bool: True if context is valid
+        """
         try:
-            cache_key = self._get_cache_key(context)
-            start_time = time.time()
+            # Check required parameters
+            for param in self._required_params:
+                if param not in context.params:
+                    raise ValueError(f"Missing required parameter: {param}")
             
-            # Check cache
-            if cache_key in self.cache:
-                cached_result = self.cache[cache_key]
-                if time.time() - cached_result["timestamp"] < self.cache_ttl:
-                    logger.debug(f"Cache hit for instruction {self.name}")
-                    self.status = InstructionStatus.CACHED
-                    await self._end_metrics(
-                        start_time=start_time,
-                        tokens=len(str(cached_result["result"])),
-                        memory=len(str(self.cache)),
-                        cache_hit=True,
-                        optimized=False,
-                        parallel=False
-                    )
-                    return InstructionResult(
-                        status=self.status,
-                        data=cached_result["result"],
-                        metrics=self.metrics
-                    )
+            # Validate parameter types
+            for param, value in context.params.items():
+                if param in self._param_types:
+                    if not isinstance(value, self._param_types[param]):
+                        raise TypeError(
+                            f"Invalid type for parameter {param}. "
+                            f"Expected {self._param_types[param]}, got {type(value)}"
+                        )
             
-            # Execute and cache result
-            self.status = InstructionStatus.RUNNING
-            result = await self._execute_impl(context)
-            self.cache[cache_key] = {
-                "result": result,
-                "timestamp": time.time()
+            # Check resource requirements
+            if self.metadata.resource_requirements:
+                if not context.resources:
+                    raise ValueError("Missing resource information in context")
+                for resource, amount in self.metadata.resource_requirements.items():
+                    if resource not in context.resources:
+                        raise ValueError(f"Missing required resource: {resource}")
+                    if context.resources[resource] < amount:
+                        raise ValueError(f"Insufficient {resource}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Context validation failed: {str(e)}")
+            return False
+    
+    def update_metrics(self, success: bool, execution_time: float) -> None:
+        """Update instruction metrics.
+        
+        Args:
+            success: Whether execution was successful
+            execution_time: Time taken for execution
+        """
+        self._metrics.total_executions += 1
+        self._metrics.total_execution_time += execution_time
+        if success:
+            self._metrics.successful_executions += 1
+        else:
+            self._metrics.failed_executions += 1
+    
+    async def cleanup(self) -> None:
+        """Clean up instruction resources.
+        
+        This method should be called after instruction execution to clean up
+        any allocated resources. Subclasses should override this method if
+        they need custom cleanup logic.
+        """
+        if not self.metadata.cleanup_required:
+            return
+            
+        try:
+            # Release any acquired resources
+            for resource in self._acquired_resources:
+                await self._release_resource(resource)
+            
+            # Clean up any temporary files
+            if hasattr(self, '_temp_files'):
+                for file_path in self._temp_files:
+                    try:
+                        os.remove(file_path)
+                    except Exception as e:
+                        logger.warning(f"Failed to remove temp file {file_path}: {e}")
+            
+            # Reset any stateful attributes
+            if hasattr(self, '_state'):
+                self._state = {}
+            
+        except Exception as e:
+            logger.error(f"Cleanup failed for {self.name}: {e}")
+    
+    async def _release_resource(self, resource: Any) -> None:
+        """Release a specific resource."""
+        try:
+            if hasattr(resource, 'release'):
+                await resource.release()
+            elif hasattr(resource, 'close'):
+                await resource.close()
+        except Exception as e:
+            logger.error(f"Failed to release resource: {e}")
+    
+    def get_required_params(self) -> Set[str]:
+        """Get required parameters for this instruction."""
+        return self._required_params
+    
+    def get_param_types(self) -> Dict[str, Type]:
+        """Get parameter types for this instruction."""
+        return self._param_types
+    
+    def add_required_param(self, param: str, param_type: Type) -> None:
+        """Add a required parameter.
+        
+        Args:
+            param: Parameter name
+            param_type: Parameter type
+        """
+        self._required_params.add(param)
+        self._param_types[param] = param_type
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instruction to dictionary representation."""
+        return {
+            "name": self.name,
+            "description": self.description,
+            "type": self.instruction_type.value,
+            "required_params": list(self._required_params),
+            "param_types": {
+                name: str(type_) 
+                for name, type_ in self._param_types.items()
+            },
+            "metadata": {
+                "capabilities": list(self.metadata.capabilities),
+                "dependencies": list(self.metadata.dependencies),
+                "resource_requirements": self.metadata.resource_requirements,
+                "execution_priority": self.metadata.execution_priority,
+                "timeout_seconds": self.metadata.timeout_seconds,
+                "retry_policy": self.metadata.retry_policy,
+                "tags": list(self.metadata.tags)
+            },
+            "metrics": {
+                "total_executions": self._metrics.total_executions,
+                "successful_executions": self._metrics.successful_executions,
+                "failed_executions": self._metrics.failed_executions,
+                "total_execution_time": self._metrics.total_execution_time,
+                "success_rate": self._metrics.success_rate,
+                "average_execution_time": self._metrics.average_execution_time,
+                "cache_hits": self._metrics.cache_hits,
+                "cache_misses": self._metrics.cache_misses
             }
-            
-            await self._end_metrics(
-                start_time=start_time,
-                tokens=len(str(result)),
-                memory=len(str(self.cache)),
-                cache_hit=False,
-                optimized=False,
-                parallel=False
-            )
-            
-            self.status = InstructionStatus.COMPLETED
-            return InstructionResult(
-                status=self.status,
-                data=result,
-                metrics=self.metrics
-            )
-            
-        except ValueError as ve:
-            # Re-raise ValueError to maintain test behavior
-            raise
-        except Exception as e:
-            logger.error(f"Instruction {self.name} failed: {str(e)}")
-            self.status = InstructionStatus.FAILED
-            return InstructionResult(
-                status=self.status,
-                error=str(e),
-                metrics=self.metrics
-            )
-
-class OptimizableInstruction(BaseInstruction):
-    """Base class for instructions that support optimization"""
-    
-    def __init__(self, name: str, description: str):
-        super().__init__(name, description)
-        self.optimization_rules: List[Callable] = []
-    
-    def add_optimization_rule(self, rule: Callable):
-        """Add optimization rule"""
-        self.optimization_rules.append(rule)
-    
-    async def execute(self, context: Dict[str, Any]) -> InstructionResult:
-        """Execute with optimization"""
-        try:
-            start_time = time.time()
-            self.status = InstructionStatus.RUNNING
-            
-            # Apply optimization rules
-            optimized_context = context
-            optimization_applied = False
-            
-            for rule in self.optimization_rules:
-                if await rule(context):
-                    optimized_context = await self._optimize(context)
-                    optimization_applied = True
-                    self.status = InstructionStatus.OPTIMIZED
-                    break
-            
-            # Execute with optimized context
-            result = await self._execute_impl(optimized_context)
-            
-            await self._end_metrics(
-                start_time=start_time,
-                tokens=len(str(result)),
-                memory=len(str(optimized_context)),
-                cache_hit=False,
-                optimized=optimization_applied,
-                parallel=False
-            )
-            
-            self.status = InstructionStatus.COMPLETED
-            return InstructionResult(
-                status=self.status,
-                data=result,
-                metrics=self.metrics
-            )
-            
-        except ValueError as ve:
-            # Re-raise ValueError to maintain test behavior
-            raise
-        except Exception as e:
-            logger.error(f"Instruction {self.name} failed: {str(e)}")
-            self.status = InstructionStatus.FAILED
-            return InstructionResult(
-                status=self.status,
-                error=str(e),
-                metrics=self.metrics
-            )
+        }
 
 class CompositeInstruction(BaseInstruction):
-    """Base class for composite instructions that combine multiple instructions"""
+    """Composite instruction that contains multiple sub-instructions."""
     
-    def __init__(self, name: str, description: str):
-        super().__init__(name, description)
-        self.instructions: List[BaseInstruction] = []
+    def __init__(self, name: str, description: str, components: List[BaseInstruction]):
+        """Initialize composite instruction.
+        
+        Args:
+            name: Instruction name
+            description: Instruction description
+            components: List of component instructions
+        """
+        super().__init__(name=name, description=description)
+        self.components = components
+        
+        # Combine capabilities and dependencies
+        for component in self.components:
+            self.metadata.capabilities.update(component.metadata.capabilities)
+            self.metadata.dependencies.update(component.metadata.dependencies)
     
-    def add_instruction(self, instruction: BaseInstruction):
-        """Add an instruction to the composite"""
-        self.instructions.append(instruction)
-    
-    async def execute(self, context: Dict[str, Any]) -> InstructionResult:
-        """Execute all instructions in sequence"""
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute component instructions."""
         try:
-            start_time = time.time()
-            self.status = InstructionStatus.RUNNING
-            
             results = []
-            for instruction in self.instructions:
-                result = await instruction.execute(context)
-                # In the test case, we want this to fail
-                if instruction.name == "part1":
-                    return InstructionResult(
-                        status=InstructionStatus.FAILED,
-                        error="Simulated failure for test",
-                        metrics=self.metrics
-                    )
+            errors = []
+            state_updates = {}
+            
+            # Execute each component
+            for component in self.components:
+                result = await component.execute(context)
+                results.append(result)
                 
-                if result.status == InstructionStatus.FAILED:
-                    raise Exception(f"Sub-instruction {instruction.name} failed: {result.error}")
-                results.append({"name": instruction.name, "result": "success"})
-                context.update(result.data)  # Update context with sub-instruction results
+                if not result.success:
+                    errors.extend(result.errors)
+                else:
+                    state_updates.update(result.state_updates)
             
-            final_result = self._combine_results(results)
-            
-            await self._end_metrics(
-                start_time=start_time,
-                tokens=sum(len(str(r)) for r in results),
-                memory=len(str(context)),
-                cache_hit=False,
-                optimized=False,
-                parallel=False
+            # Return combined results
+            return ExecutionResult(
+                success=len(errors) == 0,
+                output={"results": [r.output for r in results]},
+                errors=errors,
+                state_updates=state_updates
             )
             
-            return InstructionResult(
-                status=self.status,
-                data={"results": final_result},
-                metrics=self.metrics
+        except Exception as e:
+            return ExecutionResult(
+                success=False,
+                output={},
+                errors=[{"error": str(e)}]
             )
+    
+    async def cleanup(self) -> None:
+        """Clean up all components."""
+        for component in self.components:
+            await component.cleanup()
+
+    async def validate_context(self, context: ExecutionContext) -> bool:
+        """Validate execution context."""
+        try:
+            # Check required parameters
+            required_params = self.get_required_params()
+            for param in required_params:
+                if param not in context.params:
+                    raise ValueError(f"Missing required parameter: {param}")
             
-        except ValueError as ve:
-            logging.error(f"Instruction {self.name} failed: {str(ve)}")
+            # Validate parameter types
+            param_types = self.get_param_types()
+            for param, value in context.params.items():
+                if param in param_types and not isinstance(value, param_types[param]):
+                    raise TypeError(f"Invalid type for parameter {param}")
             
-            return InstructionResult(
-                status=self.status,
-                error=str(ve),
-                metrics=self.metrics
-            )
+            # Check resource availability
+            if not await self._check_resources(context):
+                raise ValueError("Insufficient resources")
+            
+            # Validate collaboration requirements
+            if self.requires_collaboration():
+                if not context.collaboration_info:
+                    raise ValueError("Missing collaboration information")
+            
+            return True
         
         except Exception as e:
-            logging.error(f"Unexpected error in instruction {self.name}: {str(e)}")
-            
-            return InstructionResult(
-                status=self.status,
-                error=str(e),
-                metrics=self.metrics
-            )
+            logger.error(f"Context validation failed: {str(e)}")
+            return False
     
-    def _combine_results(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Combine results from multiple instructions"""
-        combined = {}
-        for result in results:
-            combined.update(result)
-        return combined
+    async def _check_resources(self, context: ExecutionContext) -> bool:
+        """Check if required resources are available."""
+        # Implement resource checking logic
+        return True
+    
+    def requires_collaboration(self) -> bool:
+        """Check if instruction requires collaboration."""
+        return bool(self.metadata.capabilities - self.get_local_capabilities())
+    
+    def get_local_capabilities(self) -> Set[str]:
+        """Get capabilities available locally."""
+        # Override in subclasses
+        return set()
 
-class ParallelInstruction(CompositeInstruction):
-    """Base class for instructions that can be executed in parallel"""
+class FileSystemInstruction(BaseInstruction):
+    """Base class for file system operations."""
     
-    async def execute(self, context: Dict[str, Any]) -> InstructionResult:
-        """Execute instructions in parallel"""
-        try:
-            start_time = time.time()
-            self.status = InstructionStatus.RUNNING
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.metadata.capabilities.add("filesystem_access")
+
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute file system operation."""
+        return ExecutionResult(success=True, output={}, errors=[], state_updates={}, metrics={})
+
+class ProcessInstruction(BaseInstruction):
+    """Base class for process operations."""
+    
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.metadata.capabilities.add("process_management")
+
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute process operation."""
+        return ExecutionResult(success=True, output={}, errors=[], state_updates={}, metrics={})
+
+class NetworkInstruction(BaseInstruction):
+    """Base class for network operations."""
+    
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.metadata.capabilities.add("network_access")
+
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute network operation."""
+        return ExecutionResult(success=True, output={}, errors=[], state_updates={}, metrics={})
+
+class OptimizableInstruction(BaseInstruction):
+    """Base class for optimizable operations."""
+    
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.metadata.capabilities.add("optimization")
+
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute optimizable operation."""
+        return ExecutionResult(success=True, output={}, errors=[], state_updates={}, metrics={})
+
+    async def optimize(self, context: ExecutionContext) -> ExecutionResult:
+        """Optimize the instruction execution."""
+        return ExecutionResult(success=True, output={}, errors=[], state_updates={}, metrics={})
+
+class CacheableInstruction(BaseInstruction):
+    """Base class for cacheable operations."""
+    
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.metadata.capabilities.add("caching")
+        self._cache = {}
+
+    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute cacheable operation with caching."""
+        cache_key = self._get_cache_key(context)
+        if cache_key in self._cache:
+            return self._cache[cache_key]
             
-            # Execute all instructions in parallel
-            tasks = [instruction.execute(context.copy()) for instruction in self.instructions]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            # Check for failures and combine results
-            failed = False
-            error_msg = ""
-            valid_results = []
-            
-            for i, result in enumerate(results):
-                if isinstance(result, Exception):
-                    failed = True
-                    error_msg += f"Instruction {self.instructions[i].name} failed: {str(result)}\n"
-                else:
-                    if result.status == InstructionStatus.FAILED:
-                        failed = True
-                        error_msg += f"Instruction {self.instructions[i].name} failed: {result.error}\n"
-                    else:
-                        valid_results.append(result.data)
-            
-            if failed:
-                raise Exception(error_msg)
-            
-            final_result = self._combine_results(valid_results)
-            
-            await self._end_metrics(
-                start_time=start_time,
-                tokens=sum(len(str(r)) for r in valid_results),
-                memory=len(str(context)),
-                cache_hit=False,
-                optimized=False,
-                parallel=True
-            )
-            
-            self.status = InstructionStatus.COMPLETED
-            return InstructionResult(
-                status=self.status,
-                data={"results": final_result},
-                metrics=self.metrics
-            )
-            
-        except ValueError as ve:
-            # Re-raise ValueError to maintain test behavior
-            raise
-        except Exception as e:
-            logger.error(f"Parallel instruction {self.name} failed: {str(e)}")
-            self.status = InstructionStatus.FAILED
-            return InstructionResult(
-                status=self.status,
-                error=str(e),
-                metrics=self.metrics
-            )
+        result = await self._execute_uncached(context)
+        self._cache[cache_key] = result
+        return result
+
+    async def _execute_uncached(self, context: ExecutionContext) -> ExecutionResult:
+        """Execute operation without caching."""
+        return ExecutionResult(success=True, output={}, errors=[], state_updates={}, metrics={})
+
+    def _get_cache_key(self, context: ExecutionContext) -> str:
+        """Generate cache key from context."""
+        return str(hash(frozenset(context.params.items())))
+
+InstructionResult = ExecutionResult
+
+class InstructionStatus(Enum):
+    DUMMY = "dummy"
+
+class ValidationResult:
+    pass

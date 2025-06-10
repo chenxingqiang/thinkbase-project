@@ -1,0 +1,117 @@
+
+% Estructura del proyecto:
+%
+% main.tex :  El documento principal donde está la configuración y donde se insertan el resto de documentos.
+% main.bib :  Archivo donde está la bibliografía en formato .bib
+% chapters/. : La carpeta donde están los archivos .tex de los capítulos que insertamos en main.tex con el comando \input{chapters/capitulo}.
+% documents/. : La carpeta donde están algunos documentos como la Cubierta, la Portada, la Acreditación del supervisor y la Contraportada.
+% images/. : La carpeta donde están todas las imágenes.
+
+%------------------- Configuración -------------------------------------
+\documentclass[12pt,table]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel} % Idioma, inglés por defecto
+% Ejemplo con formato B5 (no es obligatorio), ajustar márgenes y formato a conveniencia
+\usepackage[b5paper,top=40mm, inner=30mm, outer=20mm, bottom=30mm]{geometry} 
+\setlength{\parindent}{0pt} % \parindent es la sangria que queremos a principio de párrafo. Puesto a 0pt por defecto.
+ % Customización de los headers y footers con fancyhdr https://es.overleaf.com/learn/latex/Headers_and_footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[LE,RO]{\thepage}
+}
+\setlength{\headheight}{15pt} % headheight, separación del encabezado respecto al borde superior de la página
+\usepackage{mathtools} % PAquetes para fuentes y símbolos matemáticos
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{caption} % Paquete para definir la distancia entre el caption y la tabla
+\captionsetup[table]{skip=10pt} % 10pt por defecto
+\usepackage{pdfpages} % Paquete para insertar PDFs como la cubierta.
+% Configuramos las referencias con biblatex y biber.
+% Ejemplo: Bibliografia separada para cada capitulo, estilo de la American Chemical Society, sin DOI, ISBN, URL, etc y con iniciales + apellido para el nombre de los autores
+\usepackage[backend=biber,style=chem-acs,refsection=chapter,style=numeric,bibencoding=utf8,doi=false,isbn=false,url=false,eprint=false,date=year,giveninits=true]{biblatex}
+\addbibresource{main.bib} % Definimos el archivo .bib donde está la bibliografía
+\usepackage{graphicx} % Paquete obligatorio ara insertar imágenes
+\usepackage{csquotes}
+\usepackage[colorlinks=false,citecolor=black,linkcolor=black,filecolor=black,urlcolor=black]{hyperref} % Referencias en color negro
+\graphicspath{ {images/} } % Definimos el directorio matriz donde están las imágenes
+
+% Ir añadiendo los nuevos paquetes que necesitemos aquí
+
+\usepackage{lipsum} % BORRAR Es para generar el texto de prueba Lorem Ipsum
+
+% ---------------------- Fin de la configuración -------------------------------------------
+
+% Comienzo del documento
+\begin{document}
+
+% Cubierta
+\includepdf[pages={1}]{documents/B5_coberta_CDEgen2017.pdf} 
+
+%Pagina en blanco
+\clearpage
+\thispagestyle{empty}
+\null
+\newpage
+
+% Portada
+\input{documents/portada}
+
+% Pagina en blanco
+\clearpage
+\thispagestyle{empty}
+\null
+\newpage
+
+% Acreditacion
+\input{documents/acreditacio}
+
+%Pagina en blanco
+\clearpage
+\thispagestyle{empty}
+\null
+\newpage
+
+% Sin header ni footer para los agradecimientos
+\fancyfoot{}
+\fancyhead{}
+
+\chapter*{Acknowledgements} % Agradecimientos
+\pagenumbering{Roman} % Paginas en numeros romanos para el prólogo 
+\input{chapters/acknowledgements} % Archivo .tex de los agradecimientos
+
+\tableofcontents % Indice
+
+\fancyfoot[LE,RO]{\thepage} % Pie de pagina, posición del numero de pagina, Left Even (Izda en pares pares) Right Odd (dcha en impares)
+
+% Resumen de la tesis
+\chapter*{Overview of the thesis}
+\input{chapters/overview}
+
+% Cuerpo de la tesis, cambiar nombre de los capitulos y de los archivos a conveniencia
+\chapter{Introduction}
+\pagenumbering{arabic} % Paginas en numeros arabigos para el cuerpo de la tesis
+\fancyhead[LE]{Chapter \thechapter. Introduction} % Encabezado de pagina, titulo del capitulo a la izda en paginas pares 
+\input{chapters/introduction}
+\fancyhead{} % Limpia el encabezado para el siguiente capitulo
+
+\chapter{Methodology}
+\fancyhead[LE]{Chapter \thechapter. Methodology}
+\input{chapters/methodology}
+\fancyhead{}
+
+\chapter{Results}
+\fancyhead[LE]{Chapter \thechapter. Results}
+\input{chapters/results}
+\fancyhead{}
+
+\chapter{Conclusions}
+\fancyhead[LE]{Chapter \thechapter. Conclusions}
+\input{chapters/conclusions}
+
+\thispagestyle{empty}
+\null
+\newpage
+\includepdf[pages={1}]{documents/B5_contra.pdf} 
+\end{document}

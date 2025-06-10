@@ -1,0 +1,180 @@
+\documentclass[12pt, oneside]{book}
+\usepackage[letterpaper, left=1in, right=1in, top=1in, bottom=1in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{plain}
+\fancyhf{}
+% \rhead{\thepage}
+% \lhead{\leftmark}
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
+% \pagestyle{headings}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{lipsum}
+% \usepackage{fmtcount} % for textual representation of numbers
+\titleformat{\chapter}[display] 
+{\normalfont\huge\bfseries}{\chaptertitlename~\thechapter}{30pt}{\Huge}   
+\usepackage{enumitem}
+\usepackage{makecell}
+\usepackage{float}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{booktabs, multirow} % for borders and merged ranges
+\usepackage{tocloft}
+\usepackage{tocbibind}
+\usepackage{setspace}
+\usepackage[utf8]{inputenc}
+\usepackage[bookmarks=true, hidelinks]{hyperref}
+\usepackage[
+backend=bibtex,
+style=numeric,
+sorting=none
+]{biblatex}
+% \usepackage{natbib}
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{5}
+\bibliography{Reference}
+\usepackage{titlesec}
+\titlespacing*{\chapter}{0pt}{-30pt}{30pt}
+
+
+% Packages 
+\usepackage{graphics}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{appendix}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage{lipsum}  
+
+
+
+
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchappresnum}{Chapter }
+\renewcommand{\cftchapaftersnum}{:}
+\renewcommand\cftchapafterpnum{\vskip 1pt}
+\renewcommand{\cftchapnumwidth}{1em}
+\renewcommand{\cftchapdotsep}{\cftdotsep}
+\renewcommand\cftchappagefont{\mdseries}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftchapdotsep}}
+
+\let\svthefootnote\thefootnote
+\newcommand\freefootnote[1]{%
+  \let\thefootnote\relax%
+  \footnotetext{#1}%
+  \let\thefootnote\svthefootnote%
+}
+
+\doublespacing
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Additional Material
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Title Page
+%========================================
+\input{Additional/TitlePage.tex}
+\currentpdfbookmark{Title Page}{TitlePage}
+
+
+% Copywright page (optional)
+% ========================================
+% \pagenumbering{roman}
+% \setcounter{page}{2}
+% \input{Additional/Copyright.tex}
+
+% Dedication page (optional)
+%========================================
+% \input{Additional/Dedication.tex}
+\clearpage
+
+
+% Acknowledgements Page (optional)
+%========================================
+\pagenumbering{roman} % Uncomment if Copyright page is not in use
+\addcontentsline{toc}{chapter}{Acknowledgments}
+\setcounter{page}{2} % Uncomment if Copyright page is not in use
+\input{Additional/Acknowledgements.tex}
+\clearpage
+
+% Table of Contents
+%========================================
+%\pagenumbering{roman} % Uncomment if Copyright and Acknowledgements are not in use
+%\setcounter{page}{2} % Uncomment if Copyright and Acknowledgements are not in use
+\renewcommand\contentsname{Table of Contents}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}
+\begin{singlespace}
+    \setlength\cftbeforetabskip{\baselineskip}
+    \tableofcontents
+\end{singlespace}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\clearpage
+
+% \currentpdfbookmark{Table of Contents}{TOC}
+
+
+% List of figures and tables
+%========================================
+% \addcontentsline{toc}{chapter}{List of Tables}
+\begin{singlespace}
+    \setlength\cftbeforetabskip{\baselineskip}
+    \listoftables
+\end{singlespace}
+\clearpage
+
+% \addcontentsline{toc}{chapter}{List of Figures}
+\begin{singlespace}
+    \setlength\cftbeforefigskip{\baselineskip}
+    \listoffigures
+\end{singlespace}
+\clearpage
+
+
+% Abstract
+%=========================================
+\input{Additional/Abstract.tex}
+\clearpage
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Main Content
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% resume page numbering for rest of document
+\pagenumbering{arabic}
+\setcounter{page}{1} % set the page number appropriately
+
+% Chapter 1
+\input{MainContent/Chapter1.tex}
+
+% Chapter 2
+\input{MainContent/Chapter2.tex}
+
+% Chapter 3
+\input{MainContent/Chapter3.tex}
+
+% Chapter 4
+\input{MainContent/Chapter4.tex}
+
+% Chapter 5
+\input{MainContent/Chapter5.tex}
+\clearpage
+
+% % Appendices
+% \input{MainContent/Appendix.tex}
+
+
+% Reference
+%========================================
+\addcontentsline{toc}{chapter}{Bibliography}
+\begin{singlespace}
+    \setlength\bibitemsep{\baselineskip}
+    \printbibliography[title={Bibliography}]
+\end{singlespace}
+
+\end{document}

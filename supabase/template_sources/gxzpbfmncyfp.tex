@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+% two packages needed for the nutrition label
+\usepackage{xparse}
+\usepackage{booktabs}
+% this allows for the easy resize box
+\usepackage{graphicx}
+% for links
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue
+}
+
+% These commands create shortcuts for the nutrition label
+% Modified from: https://tex.stackexchange.com/questions/118600/how-can-i-create-a-nutrition-facts-label
+\newlength{\NFwidth}
+\setlength{\NFwidth}{4.5in}
+
+\NewDocumentCommand{\NFelement}{mmm}{\normalsize\textbf{#1} #2\hfill #3}
+\NewDocumentCommand{\NFline}{O{l}m}{\footnotesize\makebox[\NFwidth][#1]{#2}}
+
+\NewDocumentCommand{\NFentry}{sm}{%
+  \makebox[.5\NFwidth][l]{\normalsize
+    \IfBooleanT{#1}{\makebox[0pt][r]{\textbullet\ }}%
+    #2}\ignorespaces}
+\NewDocumentCommand{\NFtext}{+m}
+ {\parbox{\NFwidth}{\raggedright#1}}
+
+\newcommand{\NFtitle}{\multicolumn{1}{c}{\huge\bfseries Dataset Facts}}
+
+\newcommand{\NFRULE}{\midrule[5pt]}
+\newcommand{\NFRule}{\midrule[2pt]}
+\newcommand{\NFrule}{\midrule}
+
+
+
+
+\title{Data Card Nutrition Label Template}
+\author{Jack Bandy}
+
+\begin{document}
+
+
+
+
+\begin{figure}
+    \centering
+    % easily resize however you like!
+    \resizebox{11cm}{!}{
+    
+    % For organization, I like to keep the actual card in a separate file:
+    \input{Card}
+    
+    }
+    
+    \caption{A data card styled after nutrition labels. Created for the \href{https://arxiv.org/abs/2105.05241}{retrospective BookCorpus datasheet}, with help from \href{https://tex.stackexchange.com/questions/118600/how-can-i-create-a-nutrition-facts-label}{Stack Exchange}. See \href{https://arxiv.org/abs/1803.09010}{Gebru et al.} for guidance on creating complete datasheets for datasets.}
+    \label{fig:data_card}
+\end{figure}
+
+
+
+
+\end{document}

@@ -1,0 +1,107 @@
+% Graduate thesis BSU Format
+% Kasper van Wijk (original author)
+% Dylan Mikesell (current maintainer)
+
+% if you don't want two-sided printing, erase the twoside option
+% from the following line:
+\documentclass[12pt]{report}
+
+% custom file for BSU style by TDM, 2019:
+\usepackage{BSUthesis}
+% \usepackage{acro}
+% probably a good idea for the nomenclature entries:
+% \acsetup{first-style=short}
+
+\newcommand\inputfile[1]{%
+    \InputIfFileExists{#1}{}{\typeout{No file #1.}}%
+} % this command keep latexmk from erroring when \input is missing
+
+%------------------------------------------------------------------------------
+% For abbreviations
+\makeglossaries
+\loadglsentries{abbreviations}
+%------------------------------------------------------------------------------
+% For symbols and nomenclature 
+\makenomenclature
+\input{nomenclature} % input the name of nomenclature/symbol file
+%------------------------------------------------------------------------------
+\begin{document}
+%------------------------------------------------------------------------------
+% bunch of fields to enter:
+%------------------------------------------------------------------------------
+\author{T. Dylan Mikesell}
+%------------------------------------------------------------------------------
+\degree{Doctor of Philosophy}
+% \degreetype{Doctor of Philosophy}
+%------------------------------------------------------------------------------
+\discipline{Geophysics}
+%------------------------------------------------------------------------------
+\title{Template for a BSU Graduate Thesis} % use correct capitalization
+%------------------------------------------------------------------------------
+\advisor{Dylan Mikesell}{Ph.D.}
+\committeeMemberA{Jeffrey B. Johnson}{Ph.D.}
+\committeeMemberB{Karen Viskupic}{Ph.D.}
+%------------------------------------------------------------------------------
+\dean{Tammi Vacha-Haase}{Dean of the Graduate College}
+%------------------------------------------------------------------------------
+% insert month and year of your thesis, only:
+\date{\today}
+\oralexamdate{25 October 2017}
+%------------------------------------------------------------------------------
+% optional external member: 
+% \extmember{Dr. Jane Doe}{Doctor of Experimental Philosophy}{University of Chicago}
+%------------------------------------------------------------------------------
+\maketitle
+%------------------------------------------------------------------------------
+\makecopyright
+%------------------------------------------------------------------------------
+\submittalsheet
+%------------------------------------------------------------------------------
+\setcounter{page}{4}
+\input dedication
+%------------------------------------------------------------------------------
+\input acknowledgment
+%------------------------------------------------------------------------------
+\input autobiographics
+%------------------------------------------------------------------------------
+\input abstract
+%------------------------------------------------------------------------------
+% \cleardoublepage
+\tableofcontents
+%------------------------------------------------------------------------------
+\cleardoublepage
+\addcontentsline{toc}{chapter}{List of figures} 
+\listoffigures
+%------------------------------------------------------------------------------
+\cleardoublepage
+\addcontentsline{toc}{chapter}{List of tables} 
+\listoftables
+%------------------------------------------------------------------------------
+% print abbreviations
+\printglossary[title={List of abbreviations},type=\acronymtype]
+%------------------------------------------------------------------------------
+% print symbols
+\cleardoublepage
+\renewcommand{\nomname}{List of symbols} % Change TOC name from Nomenclature to List of symbols
+\markboth{\nomname}{\nomname}% maybe with \MakeUppercase
+\printnomenclature
+%------------------------------------------------------------------------------
+% start of main text (reset pagenumbers, etc.):
+%------------------------------------------------------------------------------
+\begintext
+%------------------------------------------------------------------------------
+\input chapter_1_introduction
+%------------------------------------------------------------------------------
+\input chapter_2
+%------------------------------------------------------------------------------
+% bibliography:
+\addcontentsline{toc}{chapter}{References} 
+\bibliography{example}
+\bibliographystyle{authordate1}
+%------------------------------------------------------------------------------
+% \cleardoublepage
+\addcontentsline{toc}{chapter}{Appendices}
+\appendix
+\input appendix
+%------------------------------------------------------------------------------
+\end{document}

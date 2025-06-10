@@ -2,16 +2,16 @@
 Ollama example: This example demonstrates using Ollama to generate stories.
 Make sure you have Ollama running locally (http://localhost:11434).
 """
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import openai
 import os
 from typing import Optional
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",

@@ -1,0 +1,106 @@
+\documentclass{compusofia}
+
+\usepackage{biblatex}
+\addbibresource{main.bib} % Añada sus referencias en formato BibTeX.
+\graphicspath{ {./imagenes/} }
+
+\renewenvironment{abstract}{{\color{colorprincipal}\textbf{RESUMEN }}}{}
+
+%% Aquí reemplace el texto por el nombre de su artículo
+\newcommand{\nombrearticulo}{Nombre de su artículo}
+
+%% Aquí reemplace el texto por su nombre
+\newcommand{\nombreautor}{Su nombre}
+
+%% Aquí escriba una breve biografía de usted (aparecera al final del artículo).
+\newcommand{\descripcionautor}{Su breve biografía.}
+
+\title{\color{colorprincipal} \nombrearticulo}
+\author{\nombreautor}
+\rhead{\textbf{\nombreautor}}
+\lhead{\textbf{\nombrearticulo}}
+\lfoot{\color{colorprincipal}\textbf{Compusofía}}
+\rfoot{página \thepage}
+\providecommand{\keywords}[1]{\textbf{\color{colorprincipal}\textit{Palabras claves:}} #1}
+
+\begin{document}
+
+\maketitle
+
+% Aquí puede reemplazar el texto con el resumen de su artículo.
+% No se olvide añadir las palabras claves según las permitidas en el documento de pauta.
+\begin{abstract}
+Plantilla básica para escribir un artículo en la revista  Compusofía\cite{DBLP:books/sp/Turner18}\footnote{Un ejemplo para añadir una referencia. Y, a su vez, para añadir una nota a pie de página.}.
+\end{abstract} \par
+\keywords{clave1, clave2}
+
+\section{Introducción}
+
+\section{Código}
+A continuación se presenta un ejemplo para añadir código\footnote{El paquete usado es Listing, más información en: \url{https://www.overleaf.com/learn/latex/Code_listing}.}:
+
+%Código
+\begin{lstlisting}[language=Python]
+def merge_list(left, right):
+    if not left or not right:
+        return left + right
+    else:
+        fa = left[0]
+        fb = right[0]
+    if fa < fb:
+        return [fa] + merge_list(left[1:], right)
+    else:
+        return [fb] + merge_list(left, right[1:])
+    
+def msort(lst):
+    if len(lst) <= 1:
+        return lst
+    else:
+        middle = round(len(lst) / 2)
+        left = lst[:middle]
+        right = lst[-(len(lst) - middle):]
+        return merge_list(msort(left), msort(right))
+    
+print(msort([9, 2, 1, 8, 3]))
+# [1, 2, 3, 8, 9]
+\end{lstlisting}
+
+\section{Otros elementos}
+En este apartado se presenta un ejemplo de una tabla y de una figura.
+
+%Tabla
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{| r | c |}\hline
+            Algoritmo & Complejidad (peor caso) \\ \hline
+            quicksort &  $O(n^2)$ \\
+            merge sort &  $O(n\thinspace log\thinspace n)$  \\
+            selection sort & $O(n^2)$ \\ \hline
+            \end{tabular}
+            \caption{Algoritmos de ordenamiento.}
+        \label{tab:algoritmos}
+    \end{center}
+\end{table}
+
+% Imagen
+\begin{figure}[H]
+\includegraphics[scale=1]{quicksort}
+\centering
+
+\caption{Algoritmo Quicksort.}
+
+\end{figure}
+
+% Aquí van las secciones de su artículo.
+
+\section{Conclusión}
+Fin.
+
+\printbibliography
+
+\section*{Sobre el autor}
+\begin{description}
+    \item[\nombreautor] \descripcionautor  
+\end{description}
+  
+\end{document}

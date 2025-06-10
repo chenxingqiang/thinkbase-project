@@ -1,0 +1,496 @@
+%------------------------------------------------------%
+%------------------------------------------------------%
+%    Modelo de Projeto de TCC - TADS - PI 1 ( IFMS-NA) % 
+% NÃO ALTERE OU APAGUE ESSAS INFORMAÇÕES
+% ELAS SÃO A CONFIGURAÇÃO DO SEU ARQUIVO.
+%-------------------------------------------------------
+%-------------------------------------------------------
+
+
+\documentclass[
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar 
+	twoside,			% para impressão em verso e anverso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	%normalfigtabnum,
+	%pnumromarab,
+	% Opções da classe abntex2
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculasa
+	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
+	% Opções do pacote babel
+	english,			% idioma adicional para hifenização
+    spanish,			% idioma adicional para hifenização
+	brazil,				% o último idioma é o principal do documento
+]{abntex2}
+
+% ----------------------------------------------------------------
+%                           PACOTES
+% ----------------------------------------------------------------
+
+		
+
+\usepackage[utf8]{inputenc}		% O pacote inputenc é usado para que seja possível escrever textos acentuados em determinado padrão de codificação. No caso, abnTEX2 utiliza a codificação UTF8. Consulte detalhes do pacote em <http://www.ctan.org/pkg/inputenc>.
+\usepackage[T1]{fontenc}		% O pacote fontenc controla a codificação das fontes usadas para impressão do documento. Consulte detalhes do pacote em <http://www.ctan.org/pkg/fontenc>.
+\usepackage{times}
+\usepackage{lastpage}			% Usado pela Ficha catalográfica
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{xcolor,colortbl}	% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{hyperref}           % pacote para adicionar links internos
+\usepackage{subfig}
+\usepackage{epigraph}
+%\usepackage[authoryear,round,longnamesfirst]{natbib}
+\usepackage{url}
+\usepackage{placeins}
+\usepackage{multirow}
+\usepackage[figuresright]{rotating}
+\usepackage{chemfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{bigints}
+\usepackage{listings}
+\usepackage{etoolbox}
+\usepackage[final]{pdfpages}
+\usepackage{bigstrut}
+\usepackage{acronym}
+\usepackage{longtable}
+\usepackage{verbatim}          % pacote para adicionar comentarios em bloco
+\usepackage{hypernat}
+%\usepackage{titlesec}          % para permitir a alteracao em titulos
+
+%-----------------------------------------------------
+%-----------------------------------------------------
+%	FLOATS: TABLES, FIGURES E CAPTIONS: CONFIGURAÇÕES
+%-----------------------------------------------------
+
+\usepackage{tabularx} % Better tables
+\setlength{\extrarowheight}{3pt} % Increase table row height
+\newcommand{\tableheadline}[1]{\multicolumn{1}{c}{\spacedlowsmallcaps{#1}}}
+\newcommand{\myfloatalign}{\centering} % To be used with each float for alignment
+\usepackage{caption}
+\captionsetup{format=hang,font=small}
+\usepackage{subfig}
+
+%----------------------------------------------------
+%	LIST ENUMERATION
+%----------------------------------------------------
+
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\theenumii}{\theenumi.\arabic{enumii}.}
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+% ---
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf,abnt-emphasize=bf]{abntex2cite}  % Citações padrão ABNT
+
+% ------------------------------------------------------
+%             CONFIGURAÇÕES DOS PACOTES
+% ------------------------------------------------------
+
+% ---
+% Configurações do pacote backref
+%
+% Para desativar, tire o comentário de \begin{comment} e \end{comment} das próximas linhas e comente a linha \usepackage[brazilian,hyperpageref]{backref}
+% acima.
+% ---
+
+%\begin{comment}
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{}
+%\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+ \renewcommand*{\backrefalt}[4]{
+% 	\ifcase #1 %
+% 	Nenhuma citação no texto.%
+% 	\or
+% 	Citado na página #2.%
+% 	\else
+% 	Citado #1 vezes nas páginas #2.%
+% 	\fi}%
+}
+% ---
+%\end{comment}
+
+
+% listagens
+\definecolor{corComentario}{RGB}{150,150,150}
+\definecolor{corString}{RGB}{206,123,0}
+\definecolor{corPalavraChave}{RGB}{0,0,230}
+
+\lstset{
+	numbers=left,
+	stepnumber=1,
+	firstnumber=1,
+	numberstyle=\footnotesize,
+	extendedchars=true,
+	breaklines=true,
+	lineskip=0pt,
+	frame=tb,
+	basicstyle=\ttfamily\footnotesize,
+	showstringspaces=false,
+	stringstyle=\color{corString},
+	commentstyle=\color{corComentario},
+	keywordstyle=\color{corPalavraChave}
+}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\newcommand{\ano}[1]{\def \oano {#1}}
+\newcommand{\imprimirano}{\oano}
+
+\newcommand{\mes}[1]{\def \omes {#1}}
+\newcommand{\imprimirmes}{\omes}
+
+\newcommand{\subtitulo}[1]{\def \osubtitulo {#1}}
+\newcommand{\imprimirsubtitulo}{\osubtitulo}
+
+\newcommand{\area}[1]{\def \aarea {#1}}
+\newcommand{\imprimirarea}{\aarea}
+
+\renewcommand{\coorientador}[1]{\def \ocoorientador {#1}}
+\renewcommand{\imprimircoorientador}{\ocoorientador}
+
+\newcommand{\grau}[1]{\def \ograu {#1}}
+\newcommand{\imprimirgrau}{\ograu}
+
+\newcommand{\curso}[1]{\def \ocurso {#1}}
+\newcommand{\imprimircurso}{\ocurso}
+
+\usepackage{edicoes}
+
+%--------------------------------------------
+%----------------Não Alterar-----------------
+\curso{TECNOLOGIA EM ANÁLISE E DESENVOLVIMENTO DE SISTEMAS}
+\grau{Tecnólogo em Análise e Desenvolvimento de Sistemas}
+\tipotrabalho{Trabalho de Conclusão de Curso}
+\local{NOVA ANDRADINA - MS}
+\instituicao{%
+	INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DE MATO GROSSO DO SUL
+	CÂMPUS NOVA ANDRADINA
+}
+\preambulo{\imprimirtipotrabalho\ apresentado ao Instituto Federal de Educação, Ciência e Tecnologia de Mato Grosso do Sul – Câmpus Nova Andradina – como um dos requisitos para a obtenção do título de \imprimirgrau.\\
+}
+
+% ---
+
+% ---
+% Configurações de aparência do PDF final
+% ---
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+	%pagebackref=true,
+	pdftitle={\@title}, 
+	pdfauthor={\@author},
+	pdfsubject={\imprimirpreambulo},
+	pdfcreator={Nome Completo},
+	pdfkeywords={Palavra chave 1}{Palavra chave 2}{Palavra chave 3}{Palavra chave n}, 
+	colorlinks=true,       		% false: boxed links; true: colored links
+	linkcolor=black,          	% color of internal links
+	citecolor=black,       		% color of links to bibliography
+	filecolor=black,      		% color of file links
+	urlcolor=blue,
+	bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% ---
+% Comandos do autor
+% ---
+% para ajustar o tamanho da fonte no cabeçalho
+
+% Agradecimentos
+\renewenvironment{agradecimentos}[1][\agradecimentosname]{%
+    %\ABNTEXchapterfont{\large{#1}}
+   \pretextualchapter{\large{#1}}
+  }{\PRIVATEclearpageifneeded}
+% ---
+
+\renewenvironment{resumo}[1][\resumoname]{%
+   \PRIVATEbookmarkthis{#1}
+   \renewcommand{\abstractnamefont}{\chaptitlefont}
+   \renewcommand{\abstractname}{\ABNTEXchapterupperifneeded{\large{#1}}}
+   \begin{abstract}
+  }{\end{abstract}\PRIVATEclearpageifneeded}
+
+% comando para inserir autor e ano
+\newcommand{\citeauthorandyear}[1]{\citeauthoronline{#1} (\citeyear{#1})}
+
+% ---
+% Novo list of (listings) para Quadros
+% ---
+
+\newcommand{\quadroname}{Quadro}
+\newcommand{\listofquadrosname}{Lista de Quadros}
+
+\newfloat[chapter]{quadro}{loq}{\quadroname}
+\newlistof{listofquadros}{loq}{\listofquadrosname}
+\newlistentry{quadro}{loq}{0}
+
+% configurações para atender às regras da ABNT
+\setfloatadjustment{quadro}{\centering}
+\counterwithout{quadro}{chapter}
+\renewcommand{\cftquadroname}{\quadroname\space} 
+\renewcommand*{\cftquadroaftersnum}{\hfill--\hfill}
+
+% Configuração de posicionamento padrão:
+\setfloatlocations{quadro}{hbtp}
+
+% ---
+% Fontes padroes de part, chapter, section, subsection e subsubsection
+\renewcommand{\ABNTEXchapterfont}{\large\bfseries}
+\renewcommand{\ABNTEXchapterfontsize}{\large}
+
+\renewcommand{\ABNTEXpartfont}{\normalfont}
+\renewcommand{\ABNTEXpartfontsize}{\ABNTEXchapterfontsize}
+
+\renewcommand{\ABNTEXsectionfont}{\normalfont\MakeUppercase}
+\renewcommand{\ABNTEXsectionfontsize}{\Large}
+
+\renewcommand{\ABNTEXsubsectionfont}{\normalfont\bfseries}
+\renewcommand{\ABNTEXsubsectionfontsize}{\normalsize}
+
+\renewcommand{\ABNTEXsubsubsectionfont}{\normalfont\bfseries}
+\renewcommand{\ABNTEXsubsubsectionfontsize}{\normalsize\bfseries}
+
+\renewcommand{\ABNTEXsubsubsubsectionfont}{\normalfont}
+\renewcommand{\ABNTEXsubsubsubsectionfontsize}{\normalsize}
+% ---
+
+
+
+
+% ------------------------------------------------------------
+%           Espaçamentos entre linhas e parágrafos 
+% ------------------------------------------------------------
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% indicando o caminha das imagens para todo o documento.
+\graphicspath{ {imagens/} }
+
+% ---------------------------------------------------------
+%                   Compila o indice
+% ---------------------------------------------------------
+
+% Você pode customizar o nível de divisões que o sumário pode listar com a macro \settocdepth{hnome da subdivisãoi}, sendo nome da subdivisão UM dos valores: chapter, part, section, subsection, subsubsection
+\settocdepth{subsection}
+
+\makeindex
+% ---
+
+%===========================================
+%                 CABEÇALHO
+%===========================================
+
+%%criar um novo estilo de cabeçalhos e rodapés
+\makepagestyle{meuestilo}
+  %%cabeçalhos
+  \makeevenhead{meuestilo} %%pagina par
+     {\thepage}         % esquerda
+     {}         % centro
+     {} % direita
+  \makeoddhead{meuestilo} %%pagina ímpar ou com oneside
+     {} % esquerda
+     {}         % centro
+     {\thepage}         % direita
+  %\makeheadrule{meuestilo}{\textwidth}{\normalrulethickness} %linha
+  %% rodapé
+  %\makeevenfoot{meuestilo}
+     %{rodapé par à esquerda} %%pagina par
+     %{centro \thepage}
+     %{\thepage} 
+  %\makeoddfoot{meuestilo} %%pagina ímpar ou com oneside
+     %{rodapé ímpar/onside à esquerda}
+     %{centro \thepage}
+     %{\thepage}
+
+
+%===========================================
+%               FIM CABEÇALHO
+%===========================================
+
+
+% ------------------------------------------------------
+%                 INÍCIO DO DOCUMENTO
+% ------------------------------------------------------
+\begin{document}
+
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+%\pagestyle{plain}
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ---------------------------------------------------
+%   INSERIR PÁGINAS DOS ELEMENTOS PRÉ-TEXTUAIS
+% -----------------------------------------------------
+% \pretextual
+
+% ---
+% CapA
+%\imprimircapa
+\input{Pre_textual/Capa}
+% ---
+% Folha de rosto
+%\imprimirfolhaderosto*
+\input{Pre_textual/FolhaDeRosto}
+% ---
+% Inserir a ficha catalográfica
+% --- para ficha, retire o % da linha de baixo.
+%\input{Pre_textual/FichaCatalografica}
+
+% Inserir folha de aprovação
+% --- para inserir a folha de aprovação retire o % da linha de baixo.
+%\input{Pre_textual/FolhaDeAprovacao}
+% ---
+% Dedicatória
+% --- para inserir dedicatória, retire o % da linha de baixo.
+% \input{Pre_textual/Dedicatoria}
+% ---
+% Agradecimentos
+\input{Pre_textual/Agradecimentos}
+% ---
+% Epígrafe
+% --- para inserir Epígrafe, retire o % da linha de baixo
+% \input{Pre_textual/Epigrafe}
+% ---
+% Resumos
+\input{Pre_textual/Resumo}
+\input{Pre_textual/Abstract}
+% ---
+% inserir lista de ilustrações
+% ---
+\renewcommand{\listfigurename}{\large{Lista de figuras}}
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*  % O * remove esse item do indice
+\cleardoublepage
+% ---
+% inserir lista de tabelas
+% ---
+\renewcommand{\listtablename}{\large{Lista de Tabelas}}
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+% ---
+% ---
+% inserir lista de quadros
+% --- Para inserir lista de quadros, tire o % da linha de baixo
+% \pdfbookmark[0]{\listofquadrosname}{loq}
+% \listofquadros*
+% \cleardoublepage
+% ---
+% inserir lista de abreviaturas e siglas
+% --- para inserir lista de Abreviaturas e Siglas, retire o % da linha de baixo
+% \input{Pre_textual/ListaSiglas}
+
+
+%*******************************************************
+%                Acronimos
+%*******************************************************
+    %\phantomsection 
+    %\refstepcounter{dummy}
+    %\pdfbookmark[1]{Acronyms}{acronyms}
+    %\markboth{\spacedlowsmallcaps{Acronyms}}{\spacedlowsmallcaps{Acronyms}}
+    %\chapter*{\large{Acrônimos}}
+    %\begin{acronym}[UML]
+        %\acro{XXX}{nome aqui}
+    %\end{acronym} 
+    
+    %\cleardoublepage
+% ---
+
+% ---
+% inserir lista de símbolos
+% ---
+% \input{Pre_textual/ListaSimbolos}
+% ---
+
+% ------------------------------------
+% INSERIR SUMÁRIO
+% -----------------------------------
+\renewcommand{\contentsname}{\large{SUMÁRIO}}
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+% ----------------------------------------------
+%             ELEMENTOS TEXTUAIS
+%           INSERIR NOVOS ARQUIVOS
+% ----------------------------------------------
+% cada um desses comandos a baixo montam uma seção de capítulos do nosso documentos na hora da compilação.
+% note que eles foram chamados com a ordem que eles aparecerão no documento final. Ideal é que no momento da criação, sejam renomeados de maneira lógica, numerando o capítulo e a seção.
+
+\textual
+\pagestyle{meuestilo}
+\input{Capitulos/Cap01-Introducao}
+\input{Capitulos/Cap02-Objetivos}
+\input{Capitulos/Cap03-Referencial}
+\input{Capitulos/Cap04-Metodologia}
+\input{Capitulos/Cap05-Resultados}
+\input{Capitulos/Cap06-Conclusoes}
+\input{Capitulos/Cap07-Cronograma}
+
+% ----------------------------------------------
+%         Referências bibliográficas
+% ----------------------------------------------
+
+%\bibliographystyle{plain}
+\bibliography{referencias}
+
+% ----------------------------------------------
+%            ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------
+\postextual
+
+% -----------------------------------------------
+%                  Glossário
+% -----------------------------------------------
+%
+% Consulte o manual da classe abntex2 para orientações sobre o glossário.
+%%\glossary
+
+% ------------------------------------------------
+% Apêndices
+% ------------------------------------------------
+\input{Pos_textual/ApendiceA}
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+\input{Pos_textual/AnexoA}
+%-----------------------------------------------------------
+% ÍNDICE REMISSIVO
+%-----------------------------------------------------------
+
+%\phantompart
+
+% \printindex
+
+\end{document}

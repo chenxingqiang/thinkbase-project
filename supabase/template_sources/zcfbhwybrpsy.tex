@@ -1,0 +1,170 @@
+\documentclass[letterpaper]{article}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{epigraph}
+\usepackage{lipsum}
+\usepackage[spanish]{babel}
+
+\renewcommand\epigraphflush{flushright}
+\renewcommand\epigraphsize{\normalsize}
+\setlength\epigraphwidth{0.7\textwidth}
+
+\definecolor{titlepagecolor}{cmyk}{1,.60,0,.40}
+
+\DeclareFixedFont{\titlefont}{T1}{ppl}{b}{it}{0.5in}
+
+\makeatletter                       
+\def\printauthor{%                  
+    {\large \@author}}              
+\makeatother
+\author{%
+    Autor 1  \\
+    Autor 2  \\
+    Autor 3  \\
+    Autor 4  \\
+    \texttt{email1@example.com}
+    }
+
+% The following code is borrowed from: https://tex.stackexchange.com/a/86310/10898
+
+\newcommand\titlepagedecoration{%
+\begin{tikzpicture}[remember picture,overlay,shorten >= -10pt]
+
+\node[inner sep=0pt] (UAF) at (2,0.5) {\includegraphics[width=.25\textwidth]{UAF}};
+\node[inner sep=0pt] (UAF) at (-15,20) {\includegraphics[width=.25\textwidth]{uaz}};
+
+\coordinate (aux1) at ([yshift=-15pt]current page.north east);
+\coordinate (aux2) at ([yshift=-410pt]current page.north east);
+\coordinate (aux3) at ([xshift=-4.5cm]current page.north east);
+\coordinate (aux4) at ([yshift=-150pt]current page.north east);
+
+\begin{scope}[titlepagecolor!40,line width=12pt,rounded corners=12pt]
+\draw
+  (aux1) -- coordinate (a)
+  ++(225:5) --
+  ++(-45:5.1) coordinate (b);
+\draw[shorten <= -10pt]
+  (aux3) --
+  (a) --
+  (aux1);
+\draw[opacity=0.6,titlepagecolor,shorten <= -10pt]
+  (b) --
+  ++(225:2.2) --
+  ++(-45:2.2);
+\end{scope}
+\draw[titlepagecolor,line width=8pt,rounded corners=8pt,shorten <= -10pt]
+  (aux4) --
+  ++(225:0.8) --
+  ++(-45:0.8);
+\begin{scope}[titlepagecolor!70,line width=6pt,rounded corners=8pt]
+\draw[shorten <= -10pt]
+  (aux2) --
+  ++(225:3) coordinate[pos=0.45] (c) --
+  ++(-45:3.1);
+\draw
+  (aux2) --
+  (c) --
+  ++(135:2.5) --
+  ++(45:2.5) --
+  ++(-45:2.5) coordinate[pos=0.3] (d);   
+\draw 
+  (d) -- +(45:1);
+\end{scope}
+\end{tikzpicture}%
+}
+
+\begin{document}
+\begin{titlepage}
+
+\noindent
+\Huge Reporte de laboratorio:\\ nombre del experimento
+\epigraph{Resumen:\\ \lipsum[1] }%
+
+\null\vfill
+\vspace*{1cm}
+\noindent
+\hfill
+\begin{minipage}{0.35\linewidth}
+    \begin{flushright}
+        \printauthor
+    \end{flushright}
+\end{minipage}
+%
+\begin{minipage}{0.02\linewidth}
+    \rule{1pt}{125pt}
+\end{minipage}
+\titlepagedecoration
+\end{titlepage}
+
+\newpage
+
+\section{Introducción / Marco teórico}
+
+\subsection{Subtema}
+El subtema trata sobre lo que significa ser una ecuación numerada como la siguiente:
+\begin{equation}\label{sch}
+       \frac{\hbar^2}{2m}\nabla^2\Psi + V(\mathbf{r})\Psi = -i\hbar \frac{\partial\Psi}{\partial t}
+\end{equation}
+pero también podemos tener ecuaciones no numeradas como
+\begin{equation*}
+    ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} 
+    + \sigma^2\left[ d\theta^2 
+    + \sin^2\theta d\phi^2 \right] \right)
+\end{equation*}
+y podemos hacer referencia a cualquiera de ellas usando su etiqueta (label). Por ejemplo, 
+refiriéndose a la ec. (\ref{sch}).
+
+También podemos tener ecuaciones agrupadas y alineadas
+\begin{equation}
+\begin{aligned} 
+2x - 5y &=  8 \\ 
+3x + 9y &=  -12.
+\end{aligned}
+\end{equation}
+
+o ecuaciones agrupadas por un corchete
+\begin{equation}
+\begin{cases}
+\begin{aligned} 
+2x - 5y &=  8 \\ 
+3x + 9y &=  -12.
+\end{aligned}
+\end{cases}
+\end{equation}
+
+\subsubsection{Subsubtema }
+
+\section{Procedimiento experimental}
+
+\subsection{Material}
+
+\begin{enumerate}
+    \item Objeto 1
+    \begin{itemize}
+        \item Parte a
+        \item Parte b
+    \end{itemize}
+    \item Objeto 2
+    \item Objeto 3
+\end{enumerate}
+
+\subsection{Experimento 1}
+
+\subsection{Experimento 2}
+
+\section{Resultados}
+
+\subsection{Resultados experimento 1}
+
+\subsection{Resultados experimento 2}
+
+\section{Análisis y discusión}
+
+\subsection{Cuestionario}
+
+\section{Conclusiones}
+
+\section{Bibliografia}
+
+
+\end{document}

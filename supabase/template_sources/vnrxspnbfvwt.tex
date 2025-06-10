@@ -1,0 +1,156 @@
+\documentclass[10pt, conference]{IHMTC2023}
+\usepackage[top=1.50cm, bottom=1.50cm, left=1.884cm, right=1.884cm, includehead, includefoot, heightrounded]{geometry}
+\usepackage{fancyhdr} % To use headers
+\usepackage{graphicx} %To use graphics package
+\usepackage[textfont=bf, font = normalsize]{caption} %To use bold and normal size font for table and figure captions
+\usepackage{floatrow} %To have table captions above the table
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+%\usepackage[sort&compress,numbers]{natbib}
+%\usepackage{natbib}
+%\setcitestyle{numbers,square,citesep={,}}
+\usepackage[square,numbers,sort&compress]{natbib}
+\floatstyle{plaintop} %To have table captions above the table
+\restylefloat{table} %To have table captions above the table
+\usepackage{subfigure} % To use subfigures
+ \floatsetup{font = normalsize} %Size of font in tables
+   
+   
+%\renewcommand{\thesection}{\arabic{section}}
+%\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+%\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+
+
+   
+    
+\rhead{
+	\sffamily\fontsize{9}{11}\selectfont
+	\vspace{-0.5cm}
+	\textbf{Proceedings of the 27th National and 5th International ISHMT - ASTFE Heat and Mass Transfer Conference\\ December 14-17, 2023, IIT Patna, Patna-801106, Bihar, India} \\ \vspace{0.15cm}
+	\large{\textbf{IHMTC2023-XX-YYY}}}
+
+\renewcommand{\headrulewidth}{0pt}
+
+\makeatletter
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\p@subsection}{}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\renewcommand{\p@subsubsection}{}
+\makeatother
+
+\begin{document}
+
+\title{\LARGE{ \bf The Title of a Sample Paper for IHMTC 2023 prepared using LaTex}\vspace{-9mm}}
+\author{\textbf{Author A\textsuperscript{1}, Author B\textsuperscript{1}, Author C\textsuperscript{2}, and Author D\textsuperscript{3}}\\
+\textsuperscript{1}\small{Department of Mechanical Engineering, IIT Patna, Patna-801106, India }\\
+\textsuperscript{2} \small{Department of Chemical and Biochemical Engineering, IIT Patna, Patna-801106, India }\\
+\textsuperscript{3} \small{Department of Civil Engineering, IIT Patna, Patna-801106, India }}
+
+\maketitle
+\thispagestyle{fancy} 
+\pagestyle{plain} % To suppress headers but still include page numbers from second page on
+
+\noindent \textbf{ABSTRACT}
+
+Write your abstract here. Limit the abstract within 250 to 300 words.    
+\\\\
+\noindent
+\textbf{Keywords:} Insert 3-4 keywords that categorize the work\\
+
+\section{{\textbf{INTRODUCTION}}}
+
+Write your introduction section here in 10 point Times New Roman. The introduction part should give the necessary background / motivation behind the work. The citations of others’ work may be bracketed  \cite{Gsell2017,Panton2009} appropriately \cite{Pascal2000}. 
+
+\section{\textbf{LITERATURE REVIEW AND OBJECTIVE}}\label{sec2}
+This subsection should contain the literature review and the objective of the work undertaken Write text matter here in. Necessary citations may be bracketed \cite{Panton2009,raj2013wettability,prasanna2020analysis,suman2015performance,Pascal2000} appropriately. 
+
+
+\section{\textbf{MATERIALS AND METHODS}}
+Write your texts here. This part should contain the necessary matters related to computational, experimental and analytical investigations. All Figures / Tables are to be cited within the texts. The Figure/Table captions must be written as indicated here. The Figure caption should appear at the bottom of the Figure, while the Table caption should appear on top of the Table. This is the standard practice.
+
+
+\begin{eqnarray}
+\frac{\partial u_i}{\partial x_i}&=&0 \label{eq1} \\ 
+\frac{\partial u_i}{\partial t} + \frac{\partial (u_i u_j)}{\partial x_j} &=& -\frac{\partial p}{\partial x_i} + \sqrt{\frac{Pr}{Ra}}\frac{\partial^2 u_i}{\partial x_j \partial x_j} + \delta_{iy}\theta \label{eq2} \\ 
+\frac{\partial \theta}{\partial t} + \frac{\partial (u_j \theta)}{\partial x_j} &=& 
+\sqrt{\frac{1}{RaPr}}\frac{\partial^2 \theta}{\partial x_j \partial x_j} 
+\label{eq3}
+\end{eqnarray}
+where, $x_i (i=1,2, 3)$ represent the spatial coordinates ($x,y,z$) with $y$ being the vertical direction, $u_i(u, v,w)$ are the velocity components, $p$ the pressure and  $\theta$ the normalized temperature ($\theta=(T-T_C)/(T_H-T_C)$) with $T$ is the instantaneous temperature and $T_H$, $T_C$ are, respectively, the temperature of the hot and cold plates. We have used  $H,~\sqrt{g \alpha \Delta T H}$ and $~(T_H-T_C)$  as the scales for normalization of length, velocity and temperature, respectively. Equations \ref{eq1}-\ref{eq3} are discretized using finite volume framework. The same could be written as finite volume framework is used to discretize Eqs. \ref{eq1}-\ref{eq3}. No-slip condition is implemented for all the velocity components on the walls, while for temperature, isothermal condition is applied on the horizontal walls and no-flux (adiabatic) conditions is applied on the vertical walls. Hence, at the top and bottom solid walls, the temperature takes specified values (0 and 1).
+
+\subsection{\textbf{Validation}}\label{sec2p1}
+The simulation details are given in the Table~\ref{table2}. To validate our code we computed the Nusselt numbers through three different ways \cite{Panton2009}: (a) using the mean heat flux at the horizontal surfaces near the hot and bottom plates ($Nu_S$), (b) using the heat dissipation ($Nu_{\epsilon_T}={(RaPr)}^{1/2}<\epsilon_T>_{global}$), and (c) using the viscous dissipation ($Nu_{\epsilon_u}={(RaPr)}^{1/2}<\epsilon_u>_{global}+1$).
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figure1.eps}
+\caption{Variations of the percentage volume occupied by the plume and the background in the cubic cell with $Ra$ for different threshold value $\delta$.}
+\label{figure1}
+\end{figure} 
+
+\section{\textbf{RESULTS AND DISCUSSION}}\label{sec3}
+All the figures and Tables should be referred in order of their appearances. Figure \ref{figure1} should be written if it appears at the start of a sentence, while Fig. \ref{figure1} is the correct way otherwise. However, Table \ref{table2} should appear in full irrespective of its position. The validation were presented in Sec.~\ref{sec2p1}.
+
+Discussion of the results is to be written here. All Figures are to be cited within the text. Results obtained may be compared with the published data wherever applicable/possible through necessary citations in bracketed form \cite{krishna2012integrative,prasanna2020analysis}.  
+
+In RBC one of the central theme of the turbulent research is to get the scalings for the dissipation rates and further establish its connection with the nature of heat transport in the turbulent state \cite{Pascal2000}. A plume can be defined in the region where there is strong correlation between the vertical velocity ($w$) and the temperature fluctuations defined as  $\theta(\textbf{x},t)=T(\textbf{x},t)-\langle T(z)\rangle_{A,t}$ where, $<.>_{A,t}$ is the averaged over horizontal plane and the time, exists. 
+
+\begin{table}
+\centering
+\caption{The values of the fitting parameters}%\vspace{-10pt}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$\delta(\%)$   & $A_{pl}$ & $\beta_{pl}$& $A_{bg}$ &$\beta_{bg}$  \\ 
+\hline
+ $0$&$0.138$  &$-0.197$ &$0.553$ & $-0.269$\\
+$0.1$&$0.115$  &$-0.198$ &$0.838$ &$-0.279$ \\
+$1$&$0.072$  &$-0.182$ &$0.919$ &$-0.287$ \\
+$5$&$0.033$  &$-0.144$ &$0.531$ &$-0.265$\\
+$10$&$0.02$  &$-0.118$ &$0.377$ &$-0.248$\\
+\hline
+\end{tabular}
+\label{table2}
+\end{table}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figure2.eps}
+\caption{Variations of the contribution of the plumes and the background to the heat dissipation rates with the Rayleigh number.}
+\label{fig:3}
+\end{figure} 
+All the references that appear in the section ``REFERENCES" should be cited appropriately in the text. 
+
+\section{\textbf{CONCLUSIONS}}\label{sec4}
+The key findings of the work are to be placed here. The conclusion part should be qualitative and quantitative. 
+
+\vspace{0.5cm}
+\noindent
+\section*{\textbf{ACKNOWLEDGEMENTS}}
+If the authors want to acknowledge any person, institute, or facilities, it may be done here. 
+
+\vspace{0.5cm}
+ \noindent
+\section*{\textbf{NOMENCLATURE}}
+\begin{tabular}{ccc}
+$A$ & Frontal area of rotor & [m$^2$]\\
+$Re$ & Reynolds number & -- \\
+$\epsilon$ & Dissipation & --
+\end{tabular}
+
+\bibliographystyle{amsplain}
+\bibliography{IHMTC2023}
+
+\newpage
+\vspace{0.5cm}
+\noindent
+\textbf{Notes to Author(s)}\\
+\begin{itemize}
+\item{The page limit of a paper is restricted to a maximum of 6 pages.} \\
+\item{In each section, sub-sectioning if required, can be done appropriately.} \\ 
+\item{Once the paper is compiled, remove all the instructions, if any, in this template.} \\ 
+\item{Also remove this part of Notes to Author(s).} \\
+\end{itemize}
+
+\end{document}

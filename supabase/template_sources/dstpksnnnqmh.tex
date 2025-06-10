@@ -1,0 +1,892 @@
+%%%
+%%% DO NOT EDIT - Applicants do not (usually) need to touch this file
+%%%
+
+%%%
+%%% Application form template for XC50
+%%%
+%%% 2021/12/14 Takashi Ito (revised for the 2022 application)
+%%% 2021/06/15 Takashi Ito (substantially revised again)
+%%% 2020/06/10 Takashi Ito (substantially revised)
+%%% 2020/02/28 Kaori Kano  (slightly revised)
+%%% 2020/02/08 Takashi Ito (initial draft)
+%%%
+
+\documentclass[11pt,a4j]{jarticle}
+
+%%% Abbreviations for journals - recommendation by Tomoya Takiwaki
+\usepackage{aas_macros}
+
+%\pagestyle{plain}
+
+% Format version of the template files
+%\def\formversion{2021--04--01--cfca}
+%\def\formversion{2021--10--01--cfca}
+%\def\formversion{2022--04--01--cfca}
+ \def\formversion{2022--04--01--cfca (2)}
+
+% Definition of the colors for the remarks
+\def\remarkcolor{blue}
+\def\noneedcolor{red}
+
+% Do not touch
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\setlength{\textheight}{250mm}
+\setlength{\topmargin}{-15mm}
+
+% In future this may be changed...
+\def\スパコン{XC50}
+
+% Vertical spacing
+\def\vspaceplussmall{\vspace{0.3\baselineskip}}
+\def\vspaceminussmall{\vspace{-0.3\baselineskip}}
+\def\vspaceforexamples{\vspace{0.36\baselineskip}}
+
+% For you to include EPS figures...
+\usepackage{graphicx}
+%\usepackage[dvipdfmx]{graphicx} % If you need, use the option
+
+% We always need some fun...
+\usepackage{color}
+
+% Hope most users' environment has them...
+\usepackage{url}
+
+%%%
+%%% When you include DOI entries in your *.bib file, you may need to uncommenet the following lines, provided your environment is ready - do it at your own risk.
+%%%
+%\usepackage{xcolor}
+%\usepackage[dvipdfmx]{hyperref}
+%\hypersetup{
+%    colorlinks,
+%    linkcolor={red!50!black},
+%    citecolor={blue!50!black},
+%    urlcolor={blue!80!black}
+%}
+
+% See for detail: https://www.okomeda.net/wp/434/
+\usepackage{fancyhdr} 
+\pagestyle{fancy} 
+%\lhead[pageeven]{pageodd}
+%\chead[pageeven]{pageodd}
+\rhead[]{\color[gray]{0.5}{\footnotesize {\formversion}}}
+%\lfoot[pageeven]{pageodd}
+\cfoot[]{\thepage}
+%\rfoot[pageeven]{pageodd}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Comment multiple lines
+\long\def\comment#1{}
+
+%%%
+%%% Flag for the English version
+%%%
+\newif\ifEnglishform
+%\Englishformtrue
+ \Englishformfalse
+
+%%%
+%%% Definition of the if structures
+%%%
+\newif\iffinalform
+%\finalformtrue
+ \finalformfalse
+
+%%%
+%%% When you use BibTeX
+%%%
+\newif\ifUseBibTeX
+%\UseBibTeXtrue
+ \UseBibTeXfalse
+
+%%%
+%%% Definition of categories
+%%%
+\newif\ifXCS
+%\XCStrue
+ \XCSfalse
+
+\newif\ifXCA
+%\XCAtrue
+ \XCAfalse
+
+\newif\ifXCB
+%\XCBtrue
+ \XCBfalse
+
+\newif\ifXCMD
+%\XCMDtrue
+ \XCMDfalse
+
+\newif\ifXCTrial
+%\XCTrialtrue
+ \XCTrialfalse
+
+\newif\ifGPPC
+%\GPPCtrue
+ \GPPCfalse
+
+\newif\ifGPU
+%\GPUtrue
+ \GPUfalse
+
+\newif\ifSPC %iwasaki
+%\SPCtrue
+ \SPCfalse
+
+% User's choice
+\input{parameters}
+
+% Which category this document is for
+\ifXCS
+  \def\カテゴリ{XC--S}
+\fi
+\ifXCA
+  \def\カテゴリ{XC--A}
+\fi
+\ifXCB
+  \def\カテゴリ{XC--B}
+\fi
+\ifXCMD
+  \def\カテゴリ{XC--MD}
+\fi
+\ifXCTrial
+  \def\カテゴリ{XC--Trial}
+\fi
+\ifGPPC
+  \ifEnglishform
+    \def\カテゴリ{General-Purpose PC farm}
+  \else
+    \def\カテゴリ{計算サーバ}
+  \fi
+\fi
+\ifGPU
+  \ifEnglishform
+    \def\カテゴリ{GPU cluster}
+  \else
+    \def\カテゴリ{GPUクラスタ}
+  \fi
+\fi
+\ifSPC %iwasaki
+  \ifEnglishform
+    \def\カテゴリ{Small Parallel Computers}
+  \else
+    \def\カテゴリ{中規模サーバ}
+  \fi
+\fi
+
+\ifEnglishform
+  \def\nopageexeed{(The amount of description should not exceed one page)}
+\else
+  \def\nopageexeed{(記載はこのページの範囲を超えないようにしてください)}
+\fi
+
+%%%
+%%% When you use BibTeX for citing previous literature
+%%%
+\ifUseBibTeX
+  \usepackage[numbers]{natbib} % or whatever you like
+ %\usepackage{natbib}          % or whatever you like
+  \setlength{\bibsep}{-1.6pt}
+  % Changing the figure variable and \refname in the English form
+  \ifEnglishform
+    \makeatletter
+    \def\fnum@figure{Figure\ \thefigure}
+    \makeatother
+    \renewcommand{\refname}{\normalsize References cited in Sections \ref{sec:objective}--\ref{sec:codeprep}}
+    \renewcommand{\refname}{}  % Remove the ref section title
+  \else
+    %%% Not necessary to redefine it in the Japanese version
+    %\renewcommand{\refname}{\normalsize 第\ref{sec:objective}--\ref{sec:codeprep}節で引用された文献}
+    \renewcommand{\refname}{}  % Remove the ref section title
+  \fi
+\else
+  % Do not use BibTeX
+\fi
+
+%%% End of the BibTeX part
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\vspace*{-2\baselineskip}
+\begin{center}
+\ifEnglishform
+   {\huge {\textbf{{\カテゴリ} application form}}}
+\else
+   {\huge {\textbf{{\カテゴリ} 利用申請書}}}
+\fi
+\end{center}
+
+%%%
+%%% 研究目的
+%%%
+\iffinalform
+% Do nothing
+\else
+  \ifXCS
+    \ifEnglishform
+      \textcolor{\remarkcolor}{\small This application form is for the large-scale execution category of XC50 (XC--S). You cannot use it for applications in normal categories (XC--A, XC--B, XC--MD, XC--Trial).}
+    \else
+      \textcolor{\remarkcolor}{\small 本申請書はXC50の大規模実行カテゴリ(XC--S)へ申請するためのものです。通常のカテゴリ(XC--A, XC--B, XC--MD, XC--Trial)への申請には使えませんので、ご注意ください。}
+    \fi % End of \ifEnglishform
+  \else
+    \ifGPPC
+      \ifEnglishform
+        \textcolor{\remarkcolor}{\small This application form is exclusively for the General-Purpose PC farm. You cannot use it to apply for the other categories such as XC50 or GPU.}
+      \else
+        \textcolor{\remarkcolor}{\small 本申請書は{\カテゴリ}へ申請するためのものです。XC50やGPUなど他カテゴリへの申請には使えませんので、ご注意ください。}
+      \fi % End of \ifEnglishform
+    \else
+      \ifGPU
+        \ifEnglishform
+          \textcolor{\remarkcolor}{\small This application form is exclusively for the GPU system. You cannot use it to apply for the other categories such as XC50 or the General-Purpose PC farm.}
+        \else
+          \textcolor{\remarkcolor}{\small 本申請書は{\カテゴリ}へ申請するためのものです。XC50や計算サーバなど他カテゴリへの申請には使えませんので、ご注意ください。}
+        \fi % End of \ifEnglishform
+      \else
+        \ifSPC
+          \ifEnglishform
+              \textcolor{\remarkcolor}{\small This application form is exclusively for {\カテゴリ}. You cannot use it to apply for the other categories such as XC50 or the General-Purpose PC farm.}
+          \else
+            \textcolor{\remarkcolor}{\small 本申請書は{\カテゴリ}へ申請するためのものです。XC50や計算サーバなど他カテゴリへの申請には使えませんので、ご注意ください。}
+          \fi % End of \ifEnglishform
+        \else
+          \ifEnglishform
+            \textcolor{\remarkcolor}{\small This application form is for the regular categories of XC50 (XC--A, XC--B, XC--MD, and XC--Trial). You cannot use it to apply for the category XC--S.}
+          \else
+            \textcolor{\remarkcolor}{\small 本申請書はXC50の通常のカテゴリ(XC--A, XC--B, XC--MD, XC--Trial)へ申請するためのものです。カテゴリXC--Sへの申請には使えませんので、ご注意ください。}
+          \fi % End of \ifEnglishform
+        \fi % End if \ifSPC
+      \fi % End of \ifGPU
+    \fi % End of \ifGPPC
+  \fi % End of \ifXCS
+\fi % End of \iffinalform
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifEnglishform
+  \section{Significance and objective of your research\label{sec:objective}}
+\else
+  \section{研究の意義と目的\label{sec:objective}}
+\fi
+
+\iffinalform
+  \input{1-objective}
+\else
+  \ifEnglishform
+    \textcolor{\remarkcolor}{\small Describe the significance and objective of your research. Clarify the background, scientific goal, and originality of your approach.
+}
+    \textcolor{\remarkcolor}{\small \\ \hspace*{1em}
+Provide the bibliographic information for the references cited in Section \ref{sec:objective}, \ref{sec:method}, \ref{sec:codeprep} in Section \ref{sec:citedreference}.
+The format of the bibliography and how to cite them in the text should follow the AAS Journals.
+Examples of in-text citations:
+``There are several TNOs with perihelion distance greater than 45 au that have clearly experienced planetary scattering \citep{bannister2017}, and we need to examine the results of a larger range of observations to verify them \citep[e.g.][]{boe2019,grav2011}.''
+The above examples show citations by reference number, but citations in author$+$year format such as ``(\citeauthor{grav2011} \citeyear{grav2011}; \citeauthor{boe2019} \citeyear{boe2019})'' are also acceptable.
+}
+\textcolor{\remarkcolor}{\small \\ \hspace*{1em}
+The {\LaTeX} version of the application form requires \textsc{Bib}{\TeX} in order to create the list of references
+(note that you will need to prepare the necessary environment to run \textsc{Bib}{\TeX}).
+Follow the instructions in the \texttt{00READMEe.txt} file.
+Make sure that the amount of text does not exceed the page limit for each section.
+}
+% \textcolor{\remarkcolor}{\small \\ \hspace*{1em}
+% When you cite references, include (embed) the bibliographic information in the text. This is all the same in the following sections.
+% Example of citations: ``There are several TNOs with perihelion distance greater than 45 au that have clearly experienced planetary scattering (Bannister et al. 2017, AJ, 153, 262).''
+% You may also use the number reference system (i.e. inline citation is numbered as [1] or [2,~4]), and all reference sources are listed somewhere in p. \pageref{sec:objective}--\pageref{sec:codeprep}.
+% The {\LaTeX} version of the application file allows you to use \textsc{Bib}{\TeX} for this purpose.
+% Follow the instructions in the file \texttt{00READMEe.txt}
+% (but you must prepare your own environment for \textsc{Bib}{\TeX}).
+% Be sure that the amount of information in each section does not exceed the page limit.
+% }
+  \else
+    \textcolor{\remarkcolor}{\small 研究の意義や目的を具体的かつ分かりやすくまとめてください。その際には研究の学術的な背景、今回の研究で明らかにしようとしている点、特色（独自性）が分かるように記載してください。}
+    \ifGPPC
+    % Do nothing for GP-PC
+    \else
+      \ifGPU
+      % Do nothing for GPU
+      \else % Otherwise (XC50), do things
+        \textcolor{\remarkcolor}{\small また、CfCAホームページ上の{\スパコン}募集要項 \url{https://www.cfca.nao.ac.jp/xc50application} にある「6. 審査」の内容も参考にしてください。}
+      \fi % End of \ifGPU
+    \fi % End if \ifGPPC
+    \textcolor{\remarkcolor}{\small \\ \hspace*{1em}
+第\ref{sec:objective}, \ref{sec:method}, \ref{sec:codeprep}節で引用した文献の書誌情報を第\ref{sec:citedreference}節に記してください。
+文中での引用方法と文献一覧 (書誌情報) の形式はAAS Journalsに準じます。
+文中での引用の例：
+「近点距離が45 auを超えるTNOには明らかに惑星散乱を経験した天体が幾つも含まれており \citep{bannister2017}、
+  それらの実証のためにはより広範囲にわたる観測結果を精査する必要がある \citep[例.][]{boe2019,grav2011}。」
+上記の例は文献番号による引用ですが、
+``\citeauthor{bannister2017} (\citeyear{bannister2017})''や
+``(\citeauthor{grav2011} \citeyear{grav2011}; \citeauthor{boe2019}  \citeyear{boe2019})'' といった著者名$+$刊行年形式の引用でも構いません。
+}
+\textcolor{\remarkcolor}{\small \\ \hspace*{1em}
+{\LaTeX}版の申請書では文献引用のために\textsc{Bib}{\TeX}が必要です (但し\textsc{Bib}{\TeX}の動作環境は各人でご準備ください)。
+\texttt{00READMEj.txt}ファイル内の指示に従って記載を行ってください。
+この場合も、各節の記載量がそれぞれのページ数制限を超えないよう留意してください。
+}
+  \fi % End if \ifEnglishform
+  \vfill
+  \begin{flushright}
+  \textcolor{\remarkcolor}{\small \nopageexeed}
+  \end{flushright}
+\fi % End of %iffinalform
+
+%%%
+%%% Dealing with page number excess
+%%%
+\def\npagemax{1}
+\def\seclabelname{\ref{sec:objective}}
+% Common to all the sections
+\ifnum\value{page}>\npagemax%
+  \vspace{1.0\baselineskip}
+  \noindent
+  \ifEnglishform
+    \textcolor{red}{\textbf{\Large \fbox{Error!} Section {\seclabelname} exceeds the page limit (up to p.~{\npagemax}).}}
+    \typeout{===ERROR===}
+    \typeout{===ERROR=== Section \seclabelname exceeds the page limit (up to p.\npagemax).}
+    \typeout{===ERROR===}
+  \else
+    \textcolor{red}{\textbf{\Large \fbox{警告} 第{\seclabelname}節がページ数の上限(p.~{\npagemax}まで)を超えています。(\thepage)}}
+    \typeout{===警告===}
+    \typeout{===警告=== 第\seclabelname 節がページ数の上限(p.\npagemax まで)を超えています。}
+    \typeout{===警告===}
+  \fi
+\else
+  % No problem in the page number limitation...
+\fi
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifEnglishform
+  \section{Research plan and methods\label{sec:method}}
+\else
+  \section{研究計画と方法\label{sec:method}}
+\fi
+
+\iffinalform
+  \input{2-method}
+\else
+  \ifEnglishform
+    \textcolor{\remarkcolor}{\small Summarize your research plan and methods here. Describe the specific outcomes that you expect to achieve during this fiscal year (ending in March). If there are any new or unique perspectives on your research methods, specify them as well.
+The format of the citation must follow the instruction specified in Section \ref{sec:objective}.
+}
+  \else
+    \textcolor{\remarkcolor}{\small 研究計画と方法を具体的に記してください。その際には本年度中の達成が期待される具体的な成果を分かりやすく述べてください。もし研究方法に新しい視点や独自性があれば、それも明記してください。
+文献引用の形式は第\ref{sec:objective}節の説明に記した通りです。}
+  \fi % End of \ifEnglishform
+  \vfill
+  \begin{flushright}
+  \textcolor{\remarkcolor}{\small \nopageexeed}
+  \end{flushright}
+\fi % End of \iffinalform
+
+%%%
+%%% Dealing with page number excess
+%%%
+\def\npagemax{2}
+\def\seclabelname{\ref{sec:method}}
+% Common to all the sections
+\ifnum\value{page}>\npagemax%
+  \vspace{1.0\baselineskip}
+  \noindent
+  \ifEnglishform
+    \textcolor{red}{\textbf{\Large \fbox{Error!} Section {\seclabelname} exceeds the page limit (up to p.~{\npagemax}).}}
+    \typeout{===ERROR===}
+    \typeout{===ERROR=== Section \seclabelname exceeds the page limit (up to p.\npagemax).}
+    \typeout{===ERROR===}
+  \else
+    \textcolor{red}{\textbf{\Large \fbox{警告} 第{\seclabelname}節がページ数の上限(p.~{\npagemax}まで)を超えています。(\thepage)}}
+    \typeout{===警告===}
+    \typeout{===警告=== 第\seclabelname 節がページ数の上限(p.\npagemax まで)を超えています。}
+    \typeout{===警告===}
+  \fi
+\else
+  % No problem in the page number limitation...
+\fi
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifEnglishform
+  \section{Preparation of computational code\label{sec:codeprep}}
+\else
+  \section{計算コードの準備状況\label{sec:codeprep}}
+\fi
+
+\iffinalform
+% Do nothing
+\else
+  \ifEnglishform
+    \textcolor{\remarkcolor}{({\S}\ref{ssec:codedevel} and {\S}\ref{ssec:requiredres} combined, do not exceed one page.)}
+  \else
+    \textcolor{\remarkcolor}{({\S}\ref{ssec:codedevel}と{\S}\ref{ssec:requiredres}を合わせて1ページ以内)}
+  \fi
+\fi
+
+%%%
+%%% 3.1
+%%%
+\ifEnglishform
+  \subsection{Development and optimization of computational codes\label{ssec:codedevel}}
+\else
+  \subsection{計算コードの開発と最適化状況\label{ssec:codedevel}}
+\fi
+
+\def\myfirstcaseO{%
+\ifEnglishform
+  \textcolor{\noneedcolor}{\fbox{Applications in {\カテゴリ} do not require any descriptions of this section.}}
+\else
+  \textcolor{\noneedcolor}{\fbox{このカテゴリ({\カテゴリ})への申請では本節へ記載は不要です}}
+\fi
+} % End of \def\myfirstcaseO{%
+
+\def\mysecondcaseO{%
+\ifEnglishform
+  \textcolor{\remarkcolor}{\small Describe the current status of the development and optimization of your numerical code.
+If you are a former user of the computers at CfCA, you need to clarify that the numerical code is expected to run efficiently on this system by showing the scalability of the code.
+Particularly when you apply for XC--A or XC--S, you need to show the scalability of at least up to 1,000 cores.
+The format of the citation must follow the instruction specified in Section \ref{sec:objective}.
+}
+\else
+  \textcolor{\remarkcolor}{\small 計算コードの開発と最適化の状況を具体的に記してください。
+過去にCfCAの共同利用計算機を利用した経験があればその状況も含めてください。
+スケーラビリティ等の実測値を用い、効率の良い計算が実施可能であることを示してください。
+特にXC--AまたはXC--Sに申請する場合は、1000並列以上を用いた場合のスケーラビリティを示してください。
+文献引用の形式は第\ref{sec:objective}節の説明に記した通りです。}
+\fi
+} % End of \def\mysecondcaseO{%
+
+\ifXCS
+  \iffinalform
+    \input{3-1-codedevel}
+  \else
+    \mysecondcaseO
+  \fi
+\fi
+\ifXCA
+  \iffinalform
+    \input{3-1-codedevel}
+  \else
+    \mysecondcaseO
+  \fi
+\fi
+\ifXCB
+  \iffinalform
+    \input{3-1-codedevel}
+  \else
+    \mysecondcaseO
+  \fi
+\fi
+\ifXCMD
+  \iffinalform
+    \input{3-1-codedevel}
+  \else
+    \mysecondcaseO
+  \fi
+\fi
+\ifXCTrial
+    \myfirstcaseO
+\fi
+\ifGPPC
+    \myfirstcaseO
+\fi
+\ifGPU
+    \myfirstcaseO
+\fi
+\ifSPC
+    \myfirstcaseO
+\fi
+
+%%%
+%%% 3.2
+%%%
+\ifEnglishform
+  \subsection{Estimate of the amount of required computing resources\label{ssec:requiredres}}
+\else
+  \subsection{必要な計算資源の見込み\label{ssec:requiredres}}
+\fi
+
+\def\myfirstcaseO{%
+\ifEnglishform
+  \textcolor{\noneedcolor}{\fbox{Applications in {\カテゴリ} do not require any descriptions of this section.}}
+\else
+  \textcolor{\noneedcolor}{\fbox{このカテゴリ({\カテゴリ})への申請では本節へ記載は不要です}}
+\fi
+} % End of \def\myfirstcaseO{%
+
+%%%
+%%% Along the request from Tomoya Takiwaki on June 18, 2021 (ref. #10066)
+%%%
+\def\reqresourceXC{%
+\ifEnglishform
+  \textcolor{\remarkcolor}{\small %
+Describe the estimated amount of computing resources required to carry out your proposal (number of nodes, number of CPU cores, amount of memory, the time required for one model calculation, the total computation time for all the model calculations, etc.). ``k'' denotes 1,000 (ex. 200 k $= 200,000$) in what follows. 
+\vspaceforexamples
+\\
+\hspace*{1em}Example:    ``It takes 1 week to execute a run of our simulation using 10 nodes. We will execute \\
+\hspace*{1em}\hspace*{4.6em} 5 runs. This results in a total computation time of 8.4 k nodes hours.'' 
+\vspaceforexamples
+\\
+% In the applications for XC--S, XC--A (including XC--B$+$), XC--B, XC--MD and XC--Trial, 
+\hspace*{1em}
+Note that you should describe the total computation time in the unit of k nodes hours.
+% Here ``k'' denotes 1,000 (ex. 200 k $= 200,000$).
+The past operation statistics of XC50 suggests that the appropriate total computation time per year for a user in the XC--A category is 150--700 k nodes hours (which is roughly equivalent to 2--10\% of the total computational resource of XC50), and it is 80--400 k nodes hours for a user in the XC--B$+$ category (roughly equivalent to 1--5\% of the total computational resource of XC50).
+}
+\else
+\textcolor{\remarkcolor}{
+%\renewcommand{\baselinestretch}{1.0}
+申請課題を実行するのに必要となる計算資源の見込み(ノード数・CPUコア数・メモリ量・ひとつのモデル計算に要する時間・全モデル分の総計算時間、など)を以下のような書式で記してください。
+なお以下で``k''は1,000を意味します (例. 200 k $= 200,000$)。 
+\vspaceforexamples
+\\
+\hspace*{1em}(例)          計算の1モデルを実行するにはXC50の10ノードを用いて1週間を要する。5モデルの \\
+\hspace*{1em}\hspace*{2em} 実施による総計算時間は8.4 k nodes hoursになる。
+\vspaceforexamples
+\\
+% XC--S, XC--A (含むXC--B$+$), XC--B, XC--MD, XC--Trialへの申請では、
+\hspace*{1em}
+ここで総計算時間の数値はノード時間積 (単位k nodes hours) の形で記入することに注意してください。これまでの運用統計情報によるとXC--A利用者の適正なノード時間積は通年で一名あたり150--700 k nodes hoursであり (これはXC50の計算資源全量のおよそ2--10{\%}に相当します)、XC--B$+$のそれは80--400 k nodes hoursです (XC50の計算資源全量のおよそ1--5{\%}に相当)。
+}
+\fi
+} % End of \def\reqresourceXC{%
+
+
+\def\reqresourceOTHER{%
+\ifEnglishform
+  \textcolor{\remarkcolor}{\small %
+Describe the estimated amount of computing resources required to carry out your proposal (number of nodes, number of CPU cores, amount of memory, the time required for one model calculation, the total computation time for all the model calculations, etc.).
+}
+\else
+  \textcolor{\remarkcolor}{\small %
+申請課題を実行するのに必要となる計算資源の見込み(ノード数・CPUコア数・メモリ量・ひとつのモデル計算に要する時間・全モデル分の総計算時間、など)を記してください。}
+\fi % End of \ifEnglishform
+} % End of \def\reqresourceOTHER{%
+
+%\iffinalform
+%  \input{3-2-requiredres}
+%\else
+
+\iffinalform
+  \input{3-2-requiredres}
+\else
+{\small
+  \ifXCS
+    \reqresourceXC
+  \fi
+  \ifXCA
+    \reqresourceXC
+  \fi
+  \ifXCB
+    \reqresourceXC
+  \fi
+  \ifXCMD
+    \reqresourceXC
+  \fi
+  \ifXCTrial
+    \reqresourceXC
+  \fi
+  \ifGPPC
+    \reqresourceOTHER
+  \fi
+  \ifGPU
+    \reqresourceOTHER
+  \fi
+  \ifSPC
+    \reqresourceOTHER
+  \fi
+}
+\fi
+
+%  \ifEnglishform
+%    \textcolor{\remarkcolor}{\small %
+%Describe the estimated amount of computing resources required to carry out your proposal (number of nodes, number of CPU cores, amount of memory, the time required for one model calculation, the total calculation time for all the model calculations, etc.).}
+%
+%Describe the estimated amount of computing resources required to carry out your proposal (number of nodes, number of CPU cores, amount of memory, the time required for one model calculation, the total calculation time for all the model calculations, etc.).
+%Example: ``It takes 1 week to execute a run of our simulation using 10 nodes. We will execute 5 runs. This results in a total computation time of 8.4 k nodes hours.''
+%Here ``k'' denotes 1,000 (ex. 200 k $= 200,000$).
+%}
+%
+%  \else
+%    \textcolor{\remarkcolor}{\small %
+%申請課題を実行するのに必要となる計算資源の見込み(ノード数・CPUコア数・メモリ量・ひとつのモデル計算に要する時間・全モデル分の総計算時間、など)を記してください。}
+%  \fi % End of \ifEnglishform
+%
+%申請課題を実行するのに必要となる計算資源の見込み(ノード数・腐コア数・メモリ量・ひとつのモデル計算に要する時間・全モデル分の総計算時間など)を以下のような書式で記してください。(例)「計算の1モデルを実行するにはXC50の10ノードを用いて1週間を要する。5モデルの実施による総計算時間は8.4 k nodes hoursになる。」ここで``k''は1,000を意味します (例. 200 k $= 200,000$)。
+
+% Addition of the \addedbyTakiwaki part
+%   \ifXCS
+%     \addedbyTakiwaki
+%   \fi
+%   \ifXCA
+%     \addedbyTakiwaki
+%   \fi
+%   \ifXCB
+%     \addedbyTakiwaki
+%   \fi
+%   \ifXCMD
+%     \addedbyTakiwaki
+%   \fi
+%   \ifXCTrial
+%     \addedbyTakiwaki
+%   \fi
+% 
+%   \vfill
+%   \begin{flushright}
+%   \textcolor{\remarkcolor}{\small \nopageexeed}
+%   \end{flushright}
+% \fi % End of \iffinalform
+
+%%%
+%%% Dealing with page number excess
+%%%
+\def\npagemax{3}
+\def\seclabelname{\ref{sec:codeprep}}
+% Common to all the sections
+\ifnum\value{page}>\npagemax%
+  \vspace{1.0\baselineskip}
+  \noindent
+  \ifEnglishform
+    \textcolor{red}{\textbf{\Large \fbox{Error!} Section {\seclabelname} exceeds the page limit (up to p.~{\npagemax}).}}
+    \typeout{===ERROR===}
+    \typeout{===ERROR=== Section \seclabelname exceeds the page limit (up to p.\npagemax).}
+    \typeout{===ERROR===}
+  \else
+    \textcolor{red}{\textbf{\Large \fbox{警告} 第{\seclabelname}節がページ数の上限(p.~{\npagemax}まで)を超えています。(\thepage)}}
+    \typeout{===警告===}
+    \typeout{===警告=== 第\seclabelname 節がページ数の上限(p.\npagemax まで)を超えています。}
+    \typeout{===警告===}
+  \fi
+\else
+  % No problem in the page number limitation...
+\fi
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifEnglishform
+ %\section{Cited referenes\label{sec:citedreference}}
+  \section{References cited in Sections \ref{sec:objective}--\ref{sec:codeprep}\label{sec:citedreference}}
+\else
+  \section{第\ref{sec:objective}--\ref{sec:codeprep}節で引用された文献\label{sec:citedreference}}
+\fi
+
+\iffinalform
+% \vspace{-1.5\baselineskip}
+  \bibliographystyle{aasjournal}
+  \input{4-citedrefs}
+\else
+  \ifEnglishform
+\textcolor{\remarkcolor}{%
+List the references cited in Sections \ref{sec:objective}--\ref{sec:codeprep}.
+Your own research achievement must be listed in Section \ref{sec:pastwork}.
+However, if any of them are cited in Sections \ref{sec:objective}--\ref{sec:codeprep}, they should also be listed in this section.
+Bibliographic information must be complete, and at least include the author name, journal (book) name, volume number (if journal), page number (or article id), and publication year.
+You may want to add the paper title and DOI of the publication.
+}
+  \else
+\textcolor{\remarkcolor}{%
+ここには第\ref{sec:objective}節から第\ref{sec:codeprep}節の記載に於いて引用した文献を記してください。
+申請者自身の従来の研究成果は第\ref{sec:pastwork}節に記入して頂きますが、それらのうち第\ref{sec:objective}--\ref{sec:codeprep}節で引用されているものは本節にも記す必要があります。
+文献の書誌情報には少なくとも以下を含んでください： 著者名、雑誌名 (または書籍名)、巻号 (雑誌の場合)、ページ番号、出版年。
+論文のタイトルやDOIを含んでも構いません。
+}
+  \fi
+%%% Common to EN and JP in the example description
+  \vspace{-3.0\baselineskip}     % Do you want to change it?
+  \bibliographystyle{aasjournal}
+  \textcolor{\remarkcolor}{
+  \bibliography{bibsamples}%
+  }
+
+  \vfill
+  \begin{flushright}
+  \textcolor{\remarkcolor}{\small \nopageexeed}
+  \end{flushright}
+\fi
+
+%%%
+%%% Dealing with page number excess
+%%%
+\def\npagemax{4}
+\def\seclabelname{\ref{sec:citedreference}}
+% Common to all the sections
+\ifnum\value{page}>\npagemax%
+  \vspace{1.0\baselineskip}
+  \noindent
+  \ifEnglishform
+    \textcolor{red}{\textbf{\Large \fbox{Error!} Section {\seclabelname} exceeds the page limit (up to p.~{\npagemax}).}}
+    \typeout{===ERROR===}
+    \typeout{===ERROR=== Section \seclabelname exceeds the page limit (up to p.\npagemax).}
+    \typeout{===ERROR===}
+  \else
+    \textcolor{red}{\textbf{\Large \fbox{警告} 第{\seclabelname}節がページ数の上限(p.~{\npagemax}まで)を超えています。(\thepage)}}
+    \typeout{===警告===}
+    \typeout{===警告=== 第\seclabelname 節がページ数の上限(p.\npagemax まで)を超えています。}
+    \typeout{===警告===}
+  \fi
+\else
+  % No problem in the page number limitation...
+\fi
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifEnglishform
+  \section{Research results you have achieved so far\label{sec:pastwork}}
+\else
+  \section{これまでの研究成果\label{sec:pastwork}}
+\fi
+
+\iffinalform
+% \input{4-achievement}
+\else
+  \ifEnglishform
+    \textcolor{\remarkcolor}{\small If you have previous experience of using CfCA's open-use computational facilities, list the publications resulting from the activity.
+\begin{itemize}
+  \setlength{\itemsep}{-2pt}
+  \item List only the publications of \underline{\textbf{your own research results.}}
+  Do not bring references from other people's research that you cited in Sections \ref{sec:objective}, \ref{sec:method}, or \ref{sec:codeprep}.
+  \item List separately the results you have obtained primarily through the use of CfCA's open-use computing facilities (Section \ref{pastusecfca}) and those obtained through the use of computing facilities at other institutions (Section \ref{pastuseother}).
+  \item Provide as much detail as possible on the bibliographic information in the literature. Do not abbreviate the volume number or page numbers. % You may want to add DOI if you think you need.
+  \item Include the specific names of the equipment and resources you used.
+  \item The applicant's name should be written in bold in the list of authors.
+  \item Use ``et al.'' or other abbreviations as appropriate when there are many authors.
+\end{itemize}
+Here are some examples.}
+  \else
+    \textcolor{\remarkcolor}{\small 過去にCfCAの共同利用計算機や他機関の計算機設備等を利用した経験があれば、その成果による出版物を列挙してください。以下は注意事項です。
+\begin{itemize}
+  \setlength{\itemsep}{-2pt}
+  \item ここに記すべきものは\underline{\textbf{申請者本人による研究成果}}です。第\ref{sec:objective}, \ref{sec:method}, \ref{sec:codeprep}節で引用された他研究者による先行研究の文献ではありません。
+  \item CfCAの共同利用計算機を主に利用して得られた成果(第\ref{pastusecfca}節)と他機関の計算機設備等を利用して得られた成果(第\ref{pastuseother}節)を別個に記してください。
+  \item 文献の書誌情報はなるべく詳しく記し、巻号ページ数も略さずに記載してください。 % DOIを付加して頂いても構いません。
+  \item 利用した機材・資源の具体的な名称も書き入れてください。
+  \item 著者一覧内で申請者本人の氏名は太字(ゴシック・ボールド体)で表記してください。
+  \item 著者数が多い場合には``et al.''等を用いて適切に縮約してください。
+\end{itemize}
+以下は記入例です。}
+  \fi % End of \ifEnglishform
+\fi % End of \iffinalform
+
+  \ifEnglishform
+    \subsection{Publications achieved through the use of CfCA's facilities\label{pastusecfca}}
+  \else
+    \subsection{CfCAの共同利用計算機を利用した成果\label{pastusecfca}}
+  \fi % End of \ifEnglishform
+  \iffinalform
+    \input{5-1-pastuse_cfca}
+  \else
+    \begin{itemize}
+    \setlength{\itemsep}{-2pt}
+    \item \textcolor{\remarkcolor}{\textbf{Iwasaki, K.}, Tomida, K., Inoue, T., Inutsuka, S. (2019) The early stage of molecular cloud formation by compression of two-phase atomic gases.\ \textit{The Astrophysical Journal,\/} volume 873, 6. (XC30, XC50)} % \textsf{10.3847/1538-4357/ab02ff}
+    \item \textcolor{\remarkcolor}{Takasao, S., Tomida, K., \textbf{Iwasaki, K.}, Suzuki, T. K. (2019) Giant protostellar flares: Accretion-driven accumulation and reconnection-driven ejection of magnetic flux in protostars. \textit{The Astrophysical Journal,\/} volume 878, L10. (XC30, XC50)} % \textsf{10.3847/2041-8213/ab22bb}
+    \item \textcolor{\remarkcolor}{Tsukamoto, Y., \textbf{Iwasaki, K.}, et al. (2015) Bimodality of circumstellar disk evolution induced by the hall current. \textit{The Astrophysical Journal,\/} volume 810, L26. (XC30)} % 10.1088/2041-8205/810/2/L26
+    \end{itemize}
+  \fi % End of \iffinalform
+
+  \ifEnglishform
+    \subsection{Publications achieved through the use of other facilities\label{pastuseother}}
+  \else
+    \subsection{他機関の計算機設備等を利用した成果\label{pastuseother}}
+  \fi % End of \ifEnglishform
+  \iffinalform
+    \input{5-2-pastuse_other}
+  \else
+    \begin{itemize}
+    \setlength{\itemsep}{-2pt}
+    \item \textcolor{\remarkcolor}{\textbf{Iwasaki, K.} (2015) Minimizing dispersive errors in smoothed particle magnetohydrodynamics for strongly magnetized medium. \textit{Journal of Computational Physics,\/} volume 302, 359. (JCAHPC/Oakforest-PACS)} % \textsf{10.1016/j.jcp.2015.09.022}
+    \end{itemize}
+%
+  \vfill
+  \begin{flushright}
+  \textcolor{\remarkcolor}{\small \nopageexeed}
+  \end{flushright}
+%
+  \fi % End of \iffinalform
+
+% \iffinalform
+%   % Do nothing
+% \else
+%   \vfill
+%   \begin{flushright}
+%   \textcolor{\remarkcolor}{\small \nopageexeed}
+%   \end{flushright}
+% \fi % End of \iffinalform
+
+%%%
+%%% Dealing with page number excess
+%%%
+\def\npagemax{5}
+\def\seclabelname{\ref{sec:pastwork}}
+% Common to all the sections
+\ifnum\value{page}>\npagemax%
+  \vspace{1.0\baselineskip}
+  \noindent
+  \ifEnglishform
+    \textcolor{red}{\textbf{\Large \fbox{Error!} Section {\seclabelname} exceeds the page limit (up to p.~{\npagemax}).}}
+    \typeout{===ERROR===}
+    \typeout{===ERROR=== Section \seclabelname exceeds the page limit (up to p.\npagemax).}
+    \typeout{===ERROR===}
+  \else
+    \textcolor{red}{\textbf{\Large \fbox{警告} 第{\seclabelname}節がページ数の上限(p.~{\npagemax}まで)を超えています。(\thepage)}}
+    \typeout{===警告===}
+    \typeout{===警告=== 第\seclabelname 節がページ数の上限(p.\npagemax まで)を超えています。}
+    \typeout{===警告===}
+  \fi
+\else
+  % No problem in the page number limitation...
+\fi
+
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifXCS
+  \setcounter{section}{5}  % Set it by hands!
+  \ifEnglishform
+    \section{The date when you wish to run your jobs\label{sec:preferredsched}}
+  \else
+    \section{ジョブの実行を希望する日程\label{sec:preferredsched}}
+  \fi
+
+  \iffinalform
+   \input{6-schedule}
+  \else
+    \ifEnglishform
+      \textcolor{\remarkcolor}{\small Indicate the dates on which you want to carry out the simulations if this application is adopted.}
+    \else
+      \textcolor{\remarkcolor}{\small 本申請が採択された場合に、計算を実施する希望日程を記してください。}
+    \fi
+    \vfill
+    \begin{flushright}
+    \textcolor{\remarkcolor}{\small \nopageexeed}
+    \end{flushright}
+  \fi % End of iffinalform
+
+%%%
+%%% Dealing with page number excess
+%%%
+\def\npagemax{6}
+\def\seclabelname{\ref{sec:preferredsched}}
+% Common to all the sections
+\ifnum\value{page}>\npagemax%
+  \vspace{1.0\baselineskip}
+  \noindent
+  \ifEnglishform
+    \textcolor{red}{\textbf{\Large \fbox{Error!} Section {\seclabelname} exceeds the page limit (up to p.~{\npagemax}).}}
+    \typeout{===ERROR===}
+    \typeout{===ERROR=== Section \seclabelname exceeds the page limit (up to p.\npagemax).}
+    \typeout{===ERROR===}
+  \else
+    \textcolor{red}{\textbf{\Large \fbox{警告} 第{\seclabelname}節がページ数の上限(p.~{\npagemax}まで)を超えています。(\thepage)}}
+    \typeout{===警告===}
+    \typeout{===警告=== 第\seclabelname 節がページ数の上限(p.\npagemax まで)を超えています。}
+    \typeout{===警告===}
+  \fi
+\else
+  % No problem in the page number limitation...
+\fi
+
+\fi % End of ifXCS
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

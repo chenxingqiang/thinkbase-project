@@ -1,0 +1,681 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% 
+%		Bonjour à tous bande de cycliste!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Consigne sur un doc de partage
+%NE PAS SUPPRIMER CE QUE VOUS MODIFIER SUR LA PARTIE D'UN AUTRE
+%utilisé ce symbol "%" pour mettre en commentaire la phrase ou l'expression 
+%que vous avez modifié!!! 
+
+%%%%%%%%e plus, grâce aux condensateurs utilisé sur notre carte électronique, les LED continuent d’éclairer pendant 10 secondes après l'arrêt du vélo, ce qui permet au cycliste de continuer à être vu sur une route mal éclairé lorsqu'il s'arrête tem%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt]{article} %This is a special class provided by the KOMA script, which does a lot of adjustments to adapt the standard LaTeX classes to european habits, change to [a4paper,12pt,twoside] for doublesided layout
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb} %packages inutiles pour le traitement de texte.
+\usepackage{graphicx} % package à utiliser uniquement pour insérer des photos --> pas utile ici.
+\usepackage{hyperref} % utile si tu veux créer des hyperliens...
+\hypersetup{pdfstartview = {XYZ null null 1.00}} % pour avoir un zoom de 100% sur la liseuse PDF, c'est plus agréable !
+\usepackage[hmargin=2cm,vmargin=3cm]{geometry} % hmargin et vmargin permettent de régler les marges horizontales et verticales directement.
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{eurosym}
+\pagestyle{fancy}
+
+%\setlength{\parindent}{0cm}
+%\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\newcommand{\hsp}{\hspace{20pt}}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{sffamily}
+  \begin{center}
+
+    % Upper part of the page. The '~' is needed because \\
+    % only works if a paragraph has started.
+    \begin{figure}[th]
+	\includegraphics[width=5cm]{Logo_ens.jpg}\hfill
+	\includegraphics[width=5cm]{saphire.jpg}
+	\end{figure}  	
+    \vspace{1cm}
+    \textsc{\LARGE Saphire-201 : PROJET PLURIDISCIPLINAIRE}\\[2cm]
+
+  %  \textsc{\Large }\\[1.5cm]
+
+    % Title
+    \HRule \\[0.4cm]
+    { \huge \bfseries P10 : G\'EN\'EBIKE \\[0.4cm] }
+
+    \HRule \\[2cm]
+    \includegraphics[width=5cm]{IMG_0668.JPG}
+    \\[1cm]
+
+    % Author and supervisor
+    \begin{minipage}{0.4\textwidth}
+      \begin{flushleft} \large
+      %{\Large\bf\sf A.Bulteau, B.Kerléguer, M.Louart, T.Loridant, V.Perrin}
+		\emph{Equipe :} \\        
+        \textsc{Bulteau Antoine}\\
+        \textsc{Kerléguer Baptise}\\
+        \textsc{Louart Maelic}\\
+        \textsc{Loridant Thomas}\\
+        \textsc{Perrin Vivien}\\
+      \end{flushleft}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+      \begin{flushright} \large
+        \emph{Encadrants :} \\ 
+        \textsc{M.Ojeda}\\
+        \textsc{M.Roger}
+      \end{flushright}
+    \end{minipage}
+
+    \vfill
+
+    % Bottom of the page
+    {\large Promotion 2015 - 2016}
+
+  \end{center}
+  \end{sffamily}
+\end{titlepage}
+\newpage
+
+%HEADER
+\renewcommand{\headrulewidth}{1pt}
+\fancyhead[H]{\thepage}
+\fancyhead[L]{\includegraphics[scale=0.15]{Logo_ens.jpg}}
+\fancyhead[R]{\includegraphics[scale=0.2]{saphire.jpg}}
+\fancyfoot[C]{Rapport PS10-Génébike}
+{\ \vspace{-1cm}}
+\begin{flushright}
+\section*{Remerciement}
+Nous souhaitons adresser nos remerciements aux personnes qui nous ont apporté leur aide
+et qui ont contribué à la réalisation de notre projet.\\
+Nous remercions tout d’abord Monsieur Javier Ojeda pour ses conseils, son soutien et pour
+nous avoir encadrés tout au long du projet.\\
+Nous remercions également Monsieur Christian Roger pour nous avoir conseillé et aidé pour la fabrication de nos pièces.
+\vspace{-0.5cm}
+\newpage
+\end{flushright}
+\tableofcontents
+\newpage
+
+
+
+\section{Présentation}
+La majeure partie des accidents de route impliquant un vélo ont lieux la nuit à cause d’un manque de luminosité. C'est pourquoi, beaucoup de cyclistes, utilisent sur leur vélo, des lampes alimentées par un générateur électrique qui doit être mobile.
+Un de ces  générateurs  électriques les plus utilisé est la dynamo qui est très appréciée car : elle a une durée de vie très longue, peut fournir une puissance électrique importante et est beaucoup moins lourde qu'une batterie.\\
+Il  existe différents type de dynamo. La plus connue est la dynamo «bouteille» (en référence à sa forme) dont le rotor se pose directement sur la roue pour être entrainé en rotation.
+Bien que cette dynamo soit économique et facile à mettre en place, son fonctionnement présente  de nombreux inconvénients : il est bruyant, détériore la roue, présente un mauvais rendement  et dépend des conditions météorologiques.
+L’autre type de dynamo existant, «la dynamo moyeu», se place, comme son nom l'indique, directement dans le moyeu de la roue. Ainsi, l’énergie électrique est directement crée par la rotation de la roue. Cela présente de nombreux avantages: il n'y a pas de frottements et le fonctionnement ne dépend pas des intempéries. Cependant, cette dynamo nécessite une utilisation importante de fer aussi bien pour améliorer sa résistance mécanique que pour canaliser le champ magnétique et ainsi augmenter l'amplitude de la tension délivrée. Cette dynamo est donc relativement lourde et c'est pourquoi elle a été longtemps abandonnée et pas développée.
+
+Ainsi, ce projet, s'inscrivant dans la continuité des travaux d'étudiants de la promotion précédente, vise à réaliser une dynamo moyeu pour vélo en utilisant le moins de fer possible.\\
+L'enjeu est donc ici de trouver une géomètrie permettant d'utiliser moins de matériaux ferromagnètique. Ceci permettra si nous y parvenons, de diminuer la masse de la génératrice mais aussi de réduire son impact écologique. Cependant, il faut que la génératrice conçue reste compétitive avec les modèles disponibles sur le marché en terme de performances et de coût.\\ Ces différents critères nous ont permis, en se basant sur les dynamos du marché, d'établir un cahier des charges détaillé pour concevoir notre génératrice GeneBike.
+%
+
+\subsection{Analyse du projet de l'année précèdente}
+Un groupe de la promotion precédente a travaillé sur le même projet et produit un prototype de dynamo moyeu. Nous avons analysé leur prototype afin de nous en inspirer, d'améliorer les performances et de réaliser un produit final.
+{\large \bf Analyse de la structure magnétique}\\
+
+Une structure inversée (rotor à l'extérieur et stator au centre) à flux radial a été choisie. Le bobinage est présent sur le stator pour simplifier la récupération de l’énergie à travers les fils de cuivre qui, dans cette configuration, restent fixes pendant le fonctionnement de la dynamo. Afin de créer un champ magnétique réalisant une boucle passant par les bobines, des aimants ont été fixés sur le rotor de manière à ce que deux aimants adjacents aient leurs pôles inversés. Le champ magnétique,en bouclant, crée un flux à travers les bobines qui varie et produit une tension lorsque le rotor est en rotation.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.4]{shemas_magn_tique.png}
+\end{figure}
+
+ La canalisation des lignes de champ n'est possible que si les matériaux contenus dans la structure ont une perméabilité magnétique élevée(>50). C'est pourquoi ils ont choisi d'insérer des plaques de fer dans le rotor et stator réalisés en composite dans le but d'augmenter cette perméabilité. Le schéma ci-dessous illustre cette solution.
+ 
+ \begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{sh_mas_rotor.png}
+ \caption{scémas structure magnétique}
+\end{figure}
+En bleu et violet : les aimants, une couleur par sens d'aimantation.
+
+En gris : Fer
+
+En vert : Stator
+
+En orange : Bobine
+\bigskip
+
+\underline{\textbf{ Inconvénients de cette structure magnétique :}}
+\begin{itemize}
+\item Couple de détente trop élevé. En effet en utilisant des plaques de Fer et en les positionnant comme sur la photo, on a une variation de la réluctance magnétique en fonction de l'angle de rotation. Cette variation, associée à la présence d'aimants, crée un couple résistant appelé couple de détente. Ici ce couple de détente était trop important, pour le contrer le cycliste devait développer le même couple que s'il montait une pente à 5 \%.
+\item 	Puissance fournie trop faible. En effet, la puissance fournie par cette génératrice est très inférieure à la puissance fournie par la dynamo shimano qui est une dynamo moyeu proposée sur le marché. En effet, à 22km/h, la dynamo shimano délivre 3W à une charge de 12 ohms alors que la dynamo fabriqué pendant ce projet ne produit que 0,6W dans les mêmes conditions.
+
+\end{itemize}
+    
+Nous allons donc nous ateler à concevoir  un circuit magnètique réduisant les variations de réluctance pour reduire le couple de détente de notre machine. Nous allons aussi essayer de concevoir cette stucture magnétique afin de pouvoir fournir une plus grande puissance électrique\\
+
+
+{\large \bf Analyse de la structure mécanique}\\
+
+Afin d’avoir un générateur performant, le modèle mécanique a principalement été dicté par la contrainte de résistance et par l’architecture électromagnétique du générateur.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.4]{sch_ma_m_canique.png}
+\end{figure}
+
+L’architecture choisie est isostatique et démontable. Le moyeu tournant (le rotor) est en liaison pivot, par le biais d’un montage de roulement, avec l’axe tubulaire qui est solidaire de la fourche (le stator). De nombreuses pièces viennent s’ajouter dans ce montage, notamment pour répondre à des critères magnétiques.
+L'axe tubulaire a été réalisé en acier INOX afin de résister aux actions mécaniques subies par le vélo et aux agressions de l'environnement. Il a aussi été choisi d'usiner le rotor et stator en prototypage rapide en polymère car cette usinage est très rapide et permet d'usiner des formes complexes.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.3]{rotors.png}
+\caption{photo du rotor à droite et du stator à gauche}
+\end{figure}
+\bigskip
+
+\underline{\textbf{Inconvénient de cette structure mécanique:}}
+\begin{itemize}
+\item Résistance mécanique insuffisante pour supporter l'effort exercé par les rayons.
+\end{itemize}
+
+\textbf{Nous allons donc fabriquer le rotor dans un matériau plus solide que le polymère.}
+
+\subsection{Analyse fonctionnel}
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{bete_a_corne.png}
+\end{figure}L'objectif de la dynamo est de transformer l'énergie mécanique fournie par le pédalage de l'utilisateur en énergie électrique. \\
+Ce système doit s'adapter à un vélo standard de ville sans géner l'utilisateur.\\
+Nous avons redéfini le cahier des charges à partir de celui de l'année précédente et des problèmes rencontrés l'an passé. \\
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.5]{pieuvre.png}
+\end{figure}
+
+
+\begin{tabular}{|l|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{Fonction}  & Critères et valeurs & Niveaux \\
+\hline
+FP 1 & Alimenter un système électriquement & 6V, 1.5W & Minimum \\
+\hline
+FP 2 & Eclairage de la route & 60 Lux à 1m & Strict \\
+\hline FC 1 & S'adapter aux rayon de la roue avant & 36 rayons & Stict \\
+\hline FC 2 & S'adapter à la fourche & Espacement 80mm & Maximum \\
+\hline FC 3 & Transmettre une énergie par un système électrique & courant continu & Strict \\
+\hline FC 4 & Ne pas augmenter l'effort de pédalage & quelques mN.m & Maximum \\
+\hline
+FC 5 & Garder une luminosité lors d'un arrêt & 5s & Minimum \\
+\hline
+FC 6 & Plaire à l'usager & Esthétisme &   \\
+\hline
+\end{tabular}
+\subsection{Fast}
+
+Le diagramme FAST présentant les différentes solutions envisagées au cours de ce projet.
+\begin{figure}[!h]
+\includegraphics[scale=0.65]{Fast.png}
+\end{figure}
+\section {Etude magnétique}
+
+\subsection{Méthode d'étude}
+
+
+
+\t Etant donné le fait que la condition principale du cahier des charges soit que notre génératrice fournisse une tension de 6V à vide, la méthode d'étude suivie fût de d'abord concevoir une géomètrie du circuit magnétique et puis de simuler ses performances en vérifiant que cette condition principale serait vérifiée pour valider ou non cette géomètrie. Pour les simulations des différents circuits magnétiques envisagés au long de nos travaux, nous avons décidé d'utiliser le logiciel ANSYS Maxwell permettant de modéliser des circuits magnétiques 3D.  
+
+\subsection{Hypothèses d'étude}
+
+
+\t Pour réaliser l'étude des différentes géométries envisagées et concevoir notre génératrice nous avons fait l'hypothèse simplificatrice que :
+\begin{itemize}
+\item La variation du flux dans une spire en fonction de l'angle du rotor par rapport au stator est considérée comme sinusoïdale.
+\end{itemize}
+
+\subsection{Critère de choix}
+\t Les critères pemettant de valider ou non l'utilisation du circuit magnétique étudié sont :
+
+\begin{itemize}
+\item Placer un maximum d'aimants permanents
+\item Flux assez important pour permettre d'atteindre 6V à vide avec un nombre de spires par bobine raisonnable
+\item Placer les bobines dans la géomètrie
+\item Couple de détente le plus faible possible.
+\end{itemize}
+
+\subsection{Machine à flux axial}
+
+\t Dans un premier temps nous avons choisi d'étudier une géométrie de type machine à flux axial (dont la géométrie typique est présentée ci-dessous) pour notre génératrice. En effet, ce type de géométrie possède plusieurs avantages :
+
+\begin{itemize}
+\item Masse faible
+\item Facilité d'usinage
+\item Possibilité de ne pas utiliser de fer
+\item Absence de couple de détente.
+\end{itemize}
+
+\t Le premier élément à déterminer est le nombre d'aimant NdFeB à utiliser. Ce nombre doit être le plus grand possible pour augmenter le nombre de paires de pôles. Cependant si nous utilisons trop d'aimants ceux-ci seront trop proches les uns des autres et nous verrons apparaître des lignes de champs reliant les aimants juxtaposés, il y aura un court-circuit magnétique. Pour les dimensions de la génératrice, et les aimants choisis, nous pouvons observer avec les simulations que le nombre d'aimants maximal utilisable est de 18. 
+Le nombre d'aimants étant déterminé, on peut simuler la géométrie pour différentes valeurs de l'espace entre les aimants. On voit que cet espace doit être minimiser pour avoir le flux le plus grand possible au centre des aimants. Cependant même en réduisant au maximum cet espace en tenant compte de l'épaisseur du stator utilisée et des limites mécaniques le flux obtenu est trop faible pour permettre d'atteindre une tension de 6V à vide en utilisant un nombre raisonnable de spires par bobine.
+
+\subsection{Machine à flux radial}
+\t Nous avons donc décider de choisir une géométrie à flux radial pour concevoir notre génératrice. Cette géométrie nécessite l'utilisation de matériau ferromagnétique pour canalisé le flux magnétique. Il faudra donc être vigilant au couple de détente qui peut devenir important lors d'utilisation de matériau ferromagnétique.\\
+
+Dans un premier temps nous avons décidé d'étudier une solution utilisant une couronne de fer comme stator dans laquelle nous pratiquerons des extrusions pour venir y loger les spires des bobines. Un dessin avec Maxwell de la géométrie est présentée ci-dessous :
+\begin{figure}[h]
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=9cm]{stator_axial2.png}
+	\caption{Représentation de la première géométrie à flux radial envisagée}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=9cm]{stator_axial_simu.png}
+	\caption{Représentation de la première géométrie à flux radial envisagée}
+	\end{center}
+\end{minipage}
+\end{figure}
+
+\t Là encore le premier élément à déterminer est le nombre d'aimant à utiliser. Nous avons ici aussi choisit d'utiliser 18 aimants car compte tenu de leur disposition et de leurs dimensions, le phénomène de court-circuit magnétique n'est alors pas observé. De plus le nombre d'aimants est aussi limité par le coût de production de notre génératrice, en effet il faut que cette dernière soit compétitive avec les autres génératrices déjà présentes sur le marché.\\
+
+La simulation avec Maxwell fournit les résultats suivants :
+\begin{itemize}
+\item Flux maximal par spire par bobine : \(8.7.10^{-5}\)Wb
+\item Couple de détente maximal : 0.48 Nm
+\end{itemize}
+Ce couple de détente est très satisfaisant. En effet, il peut être compensé en exerçant un effort de seulement 1,7N à l'extremité de la roue.\\
+Nous pouvons ainsi déterminer le nombre de spires par bobines nécessaire pour atteindre une tension d'amplitude 6V en fonctionnement nominal à vide :\\
+\begin{displaymath}
+\centering
+U=\frac{N^2}{2}\cdot M.\Phi.\omega\ 
+\end{displaymath}
+\\
+Où :\\
+\begin{itemize}
+\item N : Nombre d'aimants
+\item $\Phi$ : flux par spire par bobine en Wb
+\item $\omega$ : vitesse de rotation mécanique en rad/s
+\item M : Nombre de spires par bobine.
+\end{itemize}
+\t Ici on obtient donc en résolvant cette équation M=30 ce qui est correct .
+Cependant le bobinage de cette machine n'étant pas facilement industrialisable et le stator nécessitant une masse importante de fer, nous avons étudié une dernière solution.\\
+Pour cette solution, nous avons décidé d'utiliser des portes-bobines en aluminium pour ne pas induire de couple de détente trop important comme ce fut le cas l'année dernière et réduire la masse de notre génératrice. Le dessin de cette géométrie sous Maxwell est présentée ci-dessous :
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.7]{Stator_final.png}
+\caption{Représentation de la géométrie utilisant les porte-bobines avec Maxwell }
+\end{figure}
+
+\t L'encastrement des portes-bobines dans le stator sera assuré par le biais de queues d'arronde dont les dimensions ne génèrent pas de discontinuités importantes du matériau ferromagnétique et ainsi ne devraient pas générer de couple de détente trop important.
+\\Les résultats fournis par la simulation sont les suivants:
+\begin{itemize}
+\item Le flux par spire par bobine moyen mesuré est d'environ 0,562.\(10^{-4}\) Wb
+\item Le couple de détente a une valeur maximale de  0.2 Nm
+\end{itemize}
+\t Ces résultats sont sastisfaisants du point de vue de notre cahier des charges.
+En effet en utilisant la même démarche que précédemment nous constatons qu'il faudra utiliser 49 spires par bobines pour atteindre une tension à vide d'amplitude 6V. Il faudra donc concevoir les portes-bobines en conséquence. Comparée à la géomètrie précédente, cette géomètrie n'est pas avantageuse du point de vue des pertes ohmiques de notre génératrice mais elle permet de reduire la masse de cette dernière c'est pourquoi nous avons choisi de réaliser également cette structure.\\
+
+Nous aurions pu envisager d'utiliser plus d'aimants pour réduire le nombre de spires par bobine et donc les chutes de tension ohmiques lors de l'utilisation en charge de la génératrice, cependant nous avons constaté qu'il n'est pas possible de disposer plus que 18 porte-bobines sur le pourtour du stator. Ainsi nous ne nous sommes pas intéressés à cette solution.
+
+\section{Détermination de la section des fils de cuivre du bobinage}
+
+\t Dans son utilisation nominale, notre génératrice doit fournir 1,5W avec une tension à ses bornes de 6V,en considérant une charge résitive, l'ordre de grandeur du courant circulant dans les spires est alors de 0,25A. Sachant que la densité de courant maximale acceptable dans un fil de cuivre sans refroidissement extérieur est : D =$5A/mm^2$\\
+
+
+Grâce à la densité de courant, D, défini auparavant, nous pouvons déterminer la section minimale des câbles: 0,05mm$^2$. Ce qui nous impose un rayon minimum de 0,126mm. Nous avons choisi d'utiliser un câble de section 0,13mm, connaissant la résistivité du cuivre et la longueur de câble, nous avons pu déterminer que la résistance était d'environ 15 $\Omega$.
+
+\section{Etude théorique de la puissance fournie par la génératrice}
+
+L'étude du circuit magnétique final ainsi que le choix des câbles de cuivre nous permet d'étudier la puissance théorique de la génératrice en fonction de la vitesse de rotation mécanique et de la charge à ses bornes. Cette étude va nous permettre de savoir s'il est possible ou non d'atteindre une puissance de 1.5W pour des vitesses courantes d'utilisation du vélo.\\
+
+Pour connaître la puissance fournie par la génératrice en fonction de la vitesse de rotation, nous avons décidé, tout d'abord, de se placer dans le cas le plus favorable où la charge est identique à la résistance interne de la génératrice.\\
+
+Puisque notre génératrice ne sera pas utilisée à de très grande fréquence électrique on peut négliger les chutes de tension dues à l'inductance propre de la génératrice devant les chutes de tension ohmiques. En effet, l'inductance des bobines est faible puisque les portes-bobines sont en aluminium.\\
+
+Dans le cadre de ces hypohèses on obtient la courbe de puissance suivante pour notre génératrice.\\
+
+%La résistance interne peut être calculée puisque nous connaissons le type de fils utilisés pour réaliser les bobines. On obtient une résistance interne théorique de 15 Ohms dans notre cas.\\
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.7]{Puissance_th_o_1.png}
+\caption{Représentation de la puissance fournie par la génératrice en fonction de la vitesse du vélo pour une charge identique à la résistance interne de la génératrice: }
+\end{figure}
+
+On constate ainsi que théoriquement la génératrice peut fournir une puissance de 1.5 W pour des vitesses aux alentours de 25 km/h. Ainsi elle vérifie le critère de puissance du cahier des charges.\\
+\section{Etude de la partie électronique}
+
+\subsection{Présentation}
+
+\t L'objectif est de trouver une électronique adaptée permettant de répondre au critère FP 2 et permettant de ne pas avoir de scintillement au niveau de l'éclairage. De plus, l'éclairage devra respecter le critère FC5. \\
+
+Pour répondre à la problématique liée à la continuité de l'éclairage, nous avons choisi de redresser la tension et de la lisser. Pour redresser la tension, nous avions trois possibilités  :
+
+\begin{itemize}
+\item Un pont simple alternance,
+\item Un pont double alternance.
+\end{itemize}
+
+\t Pour dessiner et simuler les différents montages, nous avons utilisé le logiciel LTSpice.
+
+\t Dans chacun de ces montages, la chute de tension est de l'ordre de 0.7V par diode. Sachant que notre génératrice fournit une tension de 6V dans son fonctionnement nominal, nous ne pouvons pas négliger ces chutes de tensions. De plus, il faut prendre en compte la chute de tension produite par la résistance du bobinage. Ainsi nous devrons utiliser un montage permettant d'amplifier la tension après redressement pour pouvoir alimenter les diodes d'éclairage.\\
+
+	Pour lisser la tension il est nécessaire d'utiliser des condensateurs. Nous avons ici choisi d'utiliser des supercondensateurs qui permettront à la fois de lisser la tension en sortie de notre étage de redressement et de maintenir l’alimentation des LED après l'arrêt du cycliste pendant quelques secondes grâce à leur grande capacité. Un montage RC aurait été plus performant en terme de lissage de la tension, cependant nous devons minimiser les pertes d'énergie dans notre circuit, pour transmettre un maximum d'énergie à la charge. Il n'est donc pas enviseagle d'utiliser une résistance.
+
+
+\subsection{Etude et simulation des solutions envisagées}
+
+\t {\large \bf Dimmensionnement des supercondensateurs}\\
+
+
+\t Premièrement, nous avons choisi de dimensionner les supercondensateurs permettant le redressement de la tension. Le supercondensateur en sortie de l'étage de redressement permet de réduire l'ondulation de la tension de sortie, en effet un condensateur est une source dynamique de tension : il stocke l'énergie quand la tension à ses bornes croît et la restitue quand celle-ci décroît . \\
+    %j'ai pas les données vous pouvez le faire?
+
+    Nous souhaitons que l'éclairage dure au minimum 36 secondes, pour une puissance de 1.5W et sous une tension de 6V. Nous obtenons donc une valeur de capacité minimum : 3 F. \\
+    
+    Nous avons choisit de traviller avec des supercondensateurs dont la capacité est de 1 F. Toutefois, les condensateurs ont une tension limite admissible à leurs bornes de 2.7V. Comme nous travaillons à 6V, pour respecter cette contrainte, nous devrions en mettre trois en série, puis en mettre 9 lignes en parallèle. \\
+    
+    De par un soucis de taille, nous avons donc décidé de n'en mettre que deux lignes parallèle de 3 condensateurs séries. Ce qui nous permet de déterminer le temps de maintien de l'éclairage qui sera de : 8s.\\
+    
+Il était ensuite nécessaire de vérifier que pour une tension d'entrée de 6V, la tension de sortie après les étapes de redressement et de lissage était suffisante à l'alimentation de l'éclairage.\\
+
+Nous constatons alors que la tension de sortie est alors insuffisante pour assurer l'éclairage. Pour pallier à cette problèmatique, nous avons choisi d'utiliser un montage amplificateur de tension, nommé Joule Thief qui ne sera pas étudié en détail du fait de sa complexité : les phénomènes mis en jeu sont fortement non-linéaire. L'avantage de ce circuit est qu'il n'est pas nécessaire de générer de signal de commande, ce dernier étant généré par un circuit auto-oscillant.\\
+%(Il serait judicieux d'expliquer les conséquence et le nom de "cette boite noir"\\
+
+%(utilise la bibliothèque wrapfigure comme j'ai fais pour insérer les images dans le TXT)
+
+{\large \bf Première solution envisagée : pont Simple Alternance} \\
+\vspace{0.2cm}
+\begin{figure}[H]
+\begin{minipage}[c]{.45\linewidth}
+\begin{center}
+\includegraphics[width=5cm]{PSA.png}
+\caption{Schéma du pont simple alternance}
+\end{center}
+\end{minipage}
+\begin{minipage}[c]{.45\linewidth}
+\begin{center}
+\includegraphics[width=5cm]{alimsa.png}
+\caption{Tension aux bornes de la LED en prenant en compte le transitoire}
+\end{center}
+\end{minipage}
+\end{figure}
+\begin{figure}[h]
+\begin{center}
+\begin{minipage}[c]{.45\linewidth}
+\includegraphics[width=7cm]{Courbe_SA.png}
+\caption{Zoom sur la tension aux bornes de la LED}
+\end{minipage}
+\end{center}
+\end{figure}
+
+    
+
+\t Aux bornes de la diode, en régime permanent, nous remarquons que l'amplitude de la tension est de 5V, nous avons donc pu augmenter l'amplitude de la tension - elle a été multipliée par 5 -. De plus, nous remarquons aussi que la tension est périodique et possède une période de 46$\mu{s}$, ce qui coreespond à une fréquence de 22kHz. Ainsi, l'oeil humain n'étant pas sensible aux fréquences supérieures à 30Hz, l'éclairement semblera continu.\\
+
+
+
+L'un des inconvénients de ce pont est que nous perdons au moins la moitié de la puissance, en effet, une alternance sur deux n'est pas utilisée, nous avions donc pensé à utiliser deux ponts simples alternances, un pour alimenter l'éclairage à l'avant et un pour alimenter l'éclairage arrière.\\
+
+
+Enfin, nous avons choisi d'étudier un pont double alternance permettant de récupérer l'ensemble de la puissance fournie par la génératrice. Ce système augmente les chutes de tensions par rapport à un pont simple alternance.\\
+
+
+{\large \bf Deuxième solution envisagée : Pont double alternance} \\
+\vspace{0.2cm}
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.9]{da.png}
+\caption{Schéma du pont double alternance}
+
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.6]{dacourbe.png}
+\caption{Tension aux bornes de la LED}
+
+\end{figure}
+
+\t Le premier constat est équivalent au pont simple alternance : la tension est amplifiée avec un coefficient de ?? entre l'entrée et la sortie. La fréquence du signal est toujours très importante devant 30Hz. De plus, ce montage permet d'utiliser l'énergie des alternances positives et négatives du pont. Nous pensions de prime abord que ce montage, de par la plus grande valeur des chutes de tensions, ne serait pas intéressant. Or, grâce au montage Joule Thief, cet inconvénient n'est plus une problèmatique. Pour finir, ce pont possède un régime transitoire moins long que son prédécesseur.\\
+
+Nous utiliserons ce circuit pour alimenter notre éclairage.
+
+\subsection{Conception de la carte électronique }
+
+\begin{figure}[!ht]
+\vspace{-0.8cm}
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=8cm]{Heagle.png}
+	\caption{Carte électronique définie sous Eagle}
+	\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=5cm]{boitier.png}
+	\caption{photo du boitier}
+	\end{center}
+\end{minipage}
+\end{figure}
+
+   \t Nous avons choisi d'utiliser le logiciel Eagle afin de définir le circuit électrique qui sera imprimé sur une carte électronique. Ce logiciel permet aussi de minimiser l'espace utilisé par l'électronique de puissance.
+Une fois le circuit imprimé sur la carte, nous avons soudé tous les composants électroniques, puis nous avons fixé cette carte sur un boîtier.\\
+
+
+\subsection{Validation du modèle}
+
+%(Photo mesure luminosité)
+	Pour valider les résultats de la simulation, nous avons procédé par étape. La première étape consiste à utiliser une source de tension continue de 2V simulant la tension fournie par la génératrice après l'étage de redressement et de lissage en considérant les chutes ohmiques égal à 4V, afin de mesurer la luminosité produite et vérifier le bon fonctionnement du surtenseur de tension. 
+    %Puis, la seconde étape consiste à simuler le fonctionnement de la génératrice en utilisant la dynamo shimano et de mesurer la tension aux bornes de la LED, ainsi qu'à voir s'il y a un clignotement.\\
+
+	La première étape est concluante. En effet, nous obtenons une luminosité de 60lux à 1m, et nous mesurons une tension aux bornes de la LED d'environt 5V, cette tension est suffisante pour l'alimentation d'un groupe de LED.\\
+    
+La seconde étape est aussi, concluante, et nous obtenons les résultats suivants :
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.4]{Courbe_r_elle.png}
+\caption{Allure de la tension aux bornes de la LED}
+
+\end{figure}
+
+\t Nous constatons que la tension moyenne est d'environ 3.5V, et que la fréquence est supérieure à 20kHz, d'où l'oeil humain n'est pas capable de percevoir le clignotement.\\
+
+Enfin, après avoir bloqué la roue, nous mesurons le temps de maintien de l'éclairage et nous trouvons un temps légèrement supérieur à 10s.
+
+%Nous avons mesurer et observer la luminosité produite par les LED de notre carte électronique. Concernant la mesure de la luminosité, %nous avons alimenté notre carte électronique avec une tension continue de 6V, cette tension correspond à l'amplitude récupérée en sortie de la génératrice. et utilisé un luxmètre.
+%nous utilisons une alimentation continue 6V sur notre carte électronique, correspondant à l'amplitude récupérée en sortie de notre génératrice. Puis, nous utilisons un luxmètre pour mesurer la luminosité émise par la LED. 
+%Puis, nous nous mettons dans les conditions réelles d'utilisation de notre circuit à l'aide de la dynamo Shymano. \\
+%Quant à l'observation nous avons alimenté notre carte électronique par la dynamo shimano losque la vitesse de rotation de la roue correspondait à une vitesse de déplacement de 15 km/h (allure moyenne d'un cycliste). Le fait d'utiliser la dynamo shimano et non la dynamo que nous avons conçue ne pose pas de problème car l'amplitude et la fréquence de la tension de sortie sont trés voisines dans les deux cas. Nous obtenons donc une bonne approche qualitative de l'éclairement.
+
+
+%Les résultats sont positifs : le scintillement est inexistant et la luminosité est de 60 lux à 1 mètre ce qui remplit les critères imposés par le cahier des charges. De plus, grâce aux condensateurs utilisés sur notre carte électronique, les LED continuent d’éclairer pendant 10 secondes après l'arrêt du vélo, ce qui permet au cycliste de continuer à être vu sur une route mal éclairée lorsqu'il s'arrête temporairement. Exemple : lors d'un arrêt au STOP. 
+
+
+%Teste avec le prototype
+
+%Partie méca
+
+
+\section{Conception du moyeu}
+\subsection{Normes}
+Dans un premier temps, il a fallu faire une recherche élargie sur la connaissance des normes associées à un moyeu de vélo, afin d'éviter tout problème d'incompatibilité et de rendre notre modèle le plus standard possible. Voici une liste des normes qu'il a fallu prendre en compte  lors de la conception :
+\begin{itemize}
+\item Le rayon et la longueur maximal de notre moyeu
+\item La longueur d'entraxe de la fourche étant de 110mm
+\item Le filtage sous la norme BSC (British Standard Cycle).
+\item Le nombre de rayons
+\end{itemize}
+
+\subsection{Choix des cotations}
+En appliquant les normes, on constate qu'on n'a pas de liste de différentes dimensions de moyeu, ainsi la conception du moyeu va reposer essentiellement sur ces critères : 
+\begin{itemize}
+\item Les résultats expérimentaux de l'étude magnétique
+\item Effort axial de 3000N sur l'axe du moyeu
+\item Le respect des normes (BSC) d'un moyeu de roue avant 
+\item L'usinabilité des pièces
+\item Minimiser la masse du système.
+\end{itemize}
+Il faut savoir que la dimension des rayons n'est pas à prendre en compte dans la modélisation car il existe des abaques pour la dimmention des rayons en fonction :
+\begin{itemize}
+\item Du nombre de rayons
+\item De la dimension de la jante de la roue
+\item Des paramètres du moyeu
+\item Du type de montage, c'est à dire, si on fait un deux ou trois croisement.
+\end{itemize}
+
+
+\subsection{Choix des matériaux} 
+\t Grâce à l'analyse des travaux de l'année précédente, nous avons décidé de ne pas reproduire l'erreur d'utiliser l'impression 3D pour l'ensemble de nos pièces. Ces pièces ne pouvaient pas supporter les contraintes exercées par les rayons. Nous avons décidé d'utiliser des matériaux beaucoup plus résistants tels que la contrainte apliquée sur le moyeu ne déforme aucunes pièces. Voici la liste des matériaux présents dans l'assemblage :
+\begin{itemize}
+\item Acier d'usage général et inox
+\item Aluminium standard
+\item plastique du type ABS (Acrylonitrile butadiène styrène)
+\item Acier spécifique pour les roulements : 100 Cr 6
+\end{itemize}
+L'acier est utilisé pour former les pièces subissant les contraintes les plus importantes .Des feuilles de fer seront également utilisée pour fermer les lignes de champ magnétique et maintenir les aimants fixes par rapport au rotor. L'aluminium est utilisé pour les autres pièces subissants des contraintes moins importantes. Toute fois, une pièce sera fabriquée par impression 3D car elle ne subit aucun effort. Elle a pour but de maintenir en place les aimants dans notre système.
+
+\subsection{Conception mécanique}
+
+%modifier ceci, conception, amener furtivement l'idée d'utiliser, certain outil
+Lors de la conception des pièces, nous avons dû penser aux différents procédés d'obtention qui nous sont disponibles tels que le tour traditionnel, la fraise manuel, l'électro-érosion et l'impression 3D.
+Grâce à toutes ces connaissances, nous avons pu modéliser nos pièces sous un logiciel de CAO tel que Catia. Ainsi, nous avons modélisé deux modèles pouvants répondre au cahier des charges.\\
+    \\
+	La différence entre les deux modèles se distingue sur la conception de la partie statorique de la génératrice. D'un modèle à l'autre, les autres pièces sont identiques. \\
+
+\underline{\vspace{0.2cm} \centering	Le premier modèle: Modèle porte bobine} \\ %(schema)
+        
+\begin{wrapfigure}{l}{0.3\textwidth}
+\includegraphics[width=0.28\textwidth]{stator_porte_bobine.png}
+\end{wrapfigure}
+
+%détail l'explication des portes bobines en détail 
+Cette première solution permet de reduire au maximum le couple de détente tout en garantissant la puissance demander par le cahier des charges. La réalisation des portes-bobines reste néanmoins compliquée en raison de la précision demandée par l'outil d'usinage et des propriétés du matériaux. L'aluminium s'usine trop facilement à cause de sa forte conductivité électrique. Il a fallu être astucieux et comprendre la finesse de la machine et de sa capabilité pour usiner correctement les pièces. L'autre difficulté intervenant dans l'usinage des porte-bobines réside dans l'épaisseur des ailettes qui est de l'ordre de quelques dixièmes. Nous devons réduire la vitesse de coupe afin d'obtenir une telle précision. La vitesse de coupe est de l'ordre de $1mm.min^{-1}$ à $5mm.min^{-1}$. Ainsi, le temps d'usinage est d'environs 20 minutes correpondant à une longueur de contour de $56,2 mm$. Sachant qu'il y a 18 portes bobines, il faut au minimum 6 heures d'usinage.\\
+
+\underline{\vspace{0.5cm}	Le second modèle: Modèle bobine intégrées}\\%(schema 2 )
+    
+
+\begin{wrapfigure}[7]{l}{0.3\textwidth}
+\vspace{-0.8cm}
+\includegraphics[width=0.28\textwidth]{stator_sans_pb.png}
+\end{wrapfigure}
+  
+La seconde solution permet de passer à travers ce problème d'usinabilité des porte-bobines. On gagne en temps et en facilité d'usinage en restant sur un tour numérique. De plus, nous gagnerons sur la valeur de la FEM créée ,par contre le couple de détente sera superieur à la première solution. Toute fois, le couple de détente reste nettement inférieur à celui présent sur le premier prototype issue du groupe de l'année précédente.
+
+
+
+\subsection{Préparation d'usinage}
+	Toutes les pièces réalisées en fraisage et en électro-érosion sont réalisées par commande numérique ainsi l'erreur d'usinage est faible. Cependant il est impératif de prévoir en amont le code pour la réalisation de toutes les surfaces techniques. Pour se faire, nous utilisons le logiciel CATIA pour la réalisation des phases d'usinage. Après avoir bien défini les trajectoires des outils nous les avons traduit en langage compréhensible par la machine, c'est à dire le code ISO. Chaque machine possède ses propres variations du code, il est important de bien les relire et de vérifier que le code correspond bien à la machine. Nous avons établi également un programme de commande pour l'usinage sous la forme ".CMD". Ce programme de commande permet d'usiner tous les portes bobines.
+\subsection{Usinage}
+\begin{wrapfigure}[7]{l}{0.3\textwidth}
+\vspace{-0.8cm}
+\includegraphics[width=0.29\textwidth]{stator.jpg}
+\end{wrapfigure}
+Après l'usinage des pièces avec l'aide de notre co-encadrant, voiçi le deuxième modèle de Génébike. Par manque de temps, nous n'avons pas pu faire l'usinage complet de la deuxième solution.
+
+
+\subsection{Montage}
+	Le montage des aimants est particulièrement difficil de plus le temps de bobinage est très long. Pour faciliter le montage des aimants nous utilisons une cage ce qui permet de bien les positioner. Pour les bobines le choix des portes bobines permet de faire un bobinage rapide car possible avec les 18 bobines à la fois.
+\begin{figure}[h]
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=3.5cm]{IMG_0360.JPG}
+	\caption{montage : rotor,grille d'aimant, aimants}
+	\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=4cm]{IMG_0362.JPG}
+	\caption{montage : axe,roulement à bille}
+	\end{center}
+\end{minipage}
+\end{figure}
+\begin{figure}[h]
+\begin{minipage}[c]{.45\linewidth} 
+    \begin{center}
+	\includegraphics[width=4cm]{IMG_0512.JPG}
+	\caption{Electro-érosion, Usinage du porte bobine}
+	\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{.45\linewidth}
+	\begin{center}
+	\includegraphics[width=5cm]{IMG_0302.JPG}
+	\caption{Porte bobine}
+	\end{center}
+\end{minipage}
+\end{figure}
+\newpage
+\section{Validation du modèle et Prix}
+\t . Ainsi les flasque n'ont pas été montés ainsi que les rayons et le reste de la roue. On ne peut donc pas avoir la vitesse du vélo dans ces conditions. Dans cette expérience on fait une mesure à vide au borne de toutes les bobine. Par un extrapolation des données on peut dire qu'on valide le cahier des charges.\\
+Bilan du prix des composants dans le prototype final
+\begin{itemize}
+\item Aimants : 206,28 \euro
+\item ABS : 0,5 \euro
+\item Aluminum : 4,7 \euro
+\item Acier : 0,8 \euro
+\item Usinage : 40 \euro (hors électro-érosion)
+\end{itemize}
+Mais dans le cas d'une grande série nous pouvons faire baisser le prix des aimants à 20\euro les 20( changement de matériaux et économies d'échelle). On peut aussi faire baisser le coût d'usinage en réalisant toutes les pièces avec des machines à commande numérique. Nous gagnons en temps et nous réduisons le coût de fabrication.
+
+\section{Conclusion}
+
+
+
+\subsection*{Les améliorations}
+Nous avons réduit le couple de détente.\\
+Notre prototype est montable sur une roue.\\
+Nous sommes passés d'un TRL(Technology Readiness Level) 4 à un TRL 5.\\
+
+\subsection*{ Les améliorations à faire }
+Le blocage des roulements à bille. \\
+Il aurait fallu faire une étude plus poussée sur la déformation des matériaux car à chaque usinage nous avons du réadapter notre modèle à cause de certains problème et des imprécisions d'usinage. \\
+Exemple lors de l'usinage interne du rotor, lorsque le brut a été usiné par l'intérieur, des déformations sont alors apparues dans la pièce. Les conséquences ont été que notre cylindre c'est ovalisé de quelques 10ème de millimètre.\\
+Repenser au bobinage du stator.\\
+
+\newpage
+\appendix
+\section{Annexe}
+\subsection{Plans des pièces}
+
+\end{document}
+
+
+
+
+
+\end{document}

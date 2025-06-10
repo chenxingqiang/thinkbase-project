@@ -1,0 +1,216 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WARNING: There should be no reason to edit this file.
+%%          This project has been setup so that all files
+%%          that need to be edited or added should be done
+%%          in one of the directories inside this project.
+%%          See the README.md file for an overview of the
+%%          project layout.
+%%          --DDM
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt]{cpthesis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Math packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}     % for lots math items
+\usepackage{amssymb}     % for more math symbols
+\usepackage{mathtools}   % for DeclareMathOperator
+\usepackage{bm}          % for bold math symbols
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figures and tables packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% figure related packages
+\usepackage{silence}
+% This document class is not known to the caption class, but
+% there is nothing to be done and the default values are ok.
+\WarningFilter{caption}{Unknown document class (or package)}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\captionsetup{
+    format=hang,
+    font={it, singlespacing},
+    labelfont=bf,
+%    textformat=period,
+    labelsep=colon
+}
+\captionsetup[table]{position=above}
+\captionsetup[subfigure]{labelformat=parens, font={it, singlespacing}}
+\captionsetup[subtable]{labelformat=parens, font={it, singlespacing}, position=top}
+
+% Ensures table floats have caption above table.
+% from https://tex.stackexchange.com/a/43097
+% Note: Still have to manually do this for non-floating tables.
+\usepackage{floatrow}
+\floatsetup[table]{capposition=top}
+
+%% table related packages
+\usepackage{tabularx}
+
+%% figure related packages
+\usepackage{graphicx}
+
+% Add figures folder to the graphics path
+\graphicspath{{figures/}}
+
+\newcommand{\printlistoftables}{
+    \listoftables
+    \addtocontents{lot}{\hbox to \linewidth{\hspace{1.5em}Table\hfill Page}}
+}
+
+\newcommand{\printlistoffigures}{
+    \listoffigures
+    \addtocontents{lof}{\hbox to \linewidth{\hspace{1.5em}Figure\hfill Page}}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Nomenclature packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[intoc,notocbasic]{nomencl}
+% changes to formatting of the list of symbols to be upper case
+\renewcommand{\nomname}{\MakeUppercase{\listsymbolsname}}
+% allow cross-references to the nomenclature
+% see: https://tex.stackexchange.com/a/158934
+\usepackage{etoolbox}
+\patchcmd{\thenomenclature}
+  {\chapter*{\nomname}}
+  {\phantomsection\chapter*{\nomname}\label{sec:Nomenclature}}
+  {}
+  {}
+\makenomenclature
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Bibliography packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[
+    backend=biber,
+    style=numeric,
+    url=true,
+    giveninits=true,
+    maxnames=4,
+    minnames=3,
+]{biblatex} % bibliography
+%\AtEveryBibitem{\clearlist{language}}
+%\AtEveryBibitem{\clearfield{note}}
+\addbibresource{bibliography/references.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Algorithm and code listing packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xpatch}
+\usepackage[chapter]{algorithm}
+\usepackage[noEnd=true, indLines=true]{algpseudocodex}
+\captionsetup[algorithm]{labelsep=colon}
+% remove top rule for algorithm environment
+% https://tex.stackexchange.com/a/180337
+\DeclareFloatStyle{rulednotop}{midcode=rule,postcode=lowrule,capposition=top,heightadjust=all}
+\floatsetup[algorithm]{style=rulednotop}
+\renewcommand{\listalgorithmname}{\MakeUppercase{\listalgorithmsname}}
+\addtocontents{loa}{\hbox to \linewidth{\hspace{1.5em}Algorithm\hfill Page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Code and code listing packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{listings}
+\lstset{
+    basicstyle=\linespread{1.0}\ttfamily,
+%    numbers=left,
+    breaklines=true,
+    xleftmargin=5ex,
+    frame=lines,
+}
+\renewcommand{\lstlistlistingname}{\MakeUppercase{\listcodelistingsname}}
+\renewcommand{\lstlistingname}{Code Listing}
+\addtocontents{lol}{\hbox to \linewidth{\hspace{1.5em}Code Listing\hfill Page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Additional packages needed for specific thesis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{frontmatter/preamble}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% hyperlinks and URL handling
+%% Note: must be one of the last packages added
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{url}
+\usepackage[breaklinks=true,hidelinks,pdfusetitle]{hyperref}
+% Options for hyperref
+\hypersetup{
+    bookmarksnumbered=true,
+    bookmarksopen=false,
+    bookmarksopenlevel=0,
+    colorlinks=false,
+    pdfstartview=Fit,
+    pdfborder={0 0 0},
+}
+% remove \uppercase from references to chapters
+% see: https://tex.stackexchange.com/a/417078
+\pdfstringdefDisableCommands{\let\uppercase\@firstofone}
+% Make URLs use same typeface as rest of document
+\urlstyle{same}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Automatic determination of kind of reference
+%% Note: must be included after hyperref
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\RequirePackage{cleveref}
+% Define Appendix refs
+\crefname{app}{appendix}{appendices}
+\Crefname{app}{Appendix}{Appendices}
+% oxford comma
+\newcommand{\creflastconjunction}{, and~}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% End of document preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Setting for the front matter
+\input{frontmatter/information}
+
+\begin{document}
+    %% The content before first chapter
+    \begin{frontmatter}
+        \maketitle
+
+        % Custom made for Cal Poly (by Mark Barry, modified by Andrew Tsui).
+        \copyrightpage
+
+        % Custom made for Cal Poly (by Andrew Tsui).
+        \committeemembershippage
+
+        % Abstract page
+        \begin{abstract}
+            \input{frontmatter/abstract}
+        \end{abstract}
+
+        % Acknowledgments page (if wanted)
+        \input{frontmatter/acknowledgments}
+
+        % Dedication page (if wanted)
+        \input{frontmatter/dedication}
+
+        % Insert table of contents
+        \tableofcontents
+
+        % Insert all of the potentially optional listings
+        \input{frontmatter/listings}
+
+        % Insert list of symbols
+        % Note: package handles inserting into table of contents
+        \input{frontmatter/nomenclature.tex}
+    \end{frontmatter}
+
+    %% Input the chapters as configured from the file
+    \input{chapters/outline}
+
+    %% Bibliography/references section
+    \input{bibliography/bib_info.tex}
+    \printbibliography[
+        heading=bibintoc,
+        title={\MakeUppercase{\bibname}}
+    ]
+
+    %% Input the appendices (if any) as configured from the file
+    \input{appendices/outline}
+\end{document}

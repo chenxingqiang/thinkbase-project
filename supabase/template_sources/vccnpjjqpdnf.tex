@@ -1,0 +1,62 @@
+%  A simple AAU report template.
+%  2015-05-08 v. 1.2.0
+%  Copyright 2010-2015 by Jesper Kjær Nielsen <jkn@es.aau.dk>
+%  Modified 2023 by Andreas Højrup
+%
+%  This is free software: you can redistribute it and/or modify
+%  it under the terms of the GNU General Public License as published by
+%  the Free Software Foundation, either version 3 of the License, or
+%  (at your option) any later version.
+%
+%  This is distributed in the hope that it will be useful,
+%  but WITHOUT ANY WARRANTY; without even the implied warranty of
+%  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%  GNU General Public License for more details.
+%
+%  You can find the GNU General Public License at <http://www.gnu.org/licenses/>.
+%
+
+\input{setup/preamble.tex}% package inclusion and set up of the document
+ 
+\input{setup/macros.tex}% my new macros
+
+\begin{document}
+
+%TODO list -> Remember to un-comment in preamble
+%\listoftodos[TODOs]
+
+%frontmatter
+\pagestyle{empty} %disable headers and footers
+\pagenumbering{roman} %use roman page numbering in the frontmatter
+\input{sections/front_pages/frontpage}
+\input{sections/front_pages/titlepages}
+\cleardoublepage
+\pdfbookmark[0]{Contents}{label:contents}
+\pagestyle{fancy} %enable headers and footers again
+
+\tableofcontents
+\input{sections/front_pages/preface}
+\input{sections/front_pages/abbreviations}
+
+\cleardoublepage
+%mainmatter
+\pagenumbering{arabic} %use arabic page numbering in the mainmatter
+
+
+%Introduction
+\input{sections/introduction.tex}
+
+%Conklusion
+\input{sections/conclusion.tex}
+
+%Bibliography
+\printbibliography[heading=bibintoc]
+\label{bib:mybiblio}
+
+%Appendix
+\cleardoublepage
+\pagenumbering{alph} % If appendix is more than 27 pages use {roman}
+\appendix
+\input{sections/appendix.tex}
+
+\end{document}

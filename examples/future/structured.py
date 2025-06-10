@@ -1,14 +1,14 @@
 from typing import List, Optional
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 from pydantic import BaseModel, Field
 import json
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -64,7 +64,7 @@ def create_person_json(description: str) -> str:
     else:
         raise ValueError("Unknown person description")
 
-@ell2a.with_ell2a()
+@ell.with_ell()
 async def create_person(description: str) -> Person:
     """Create a person based on the given description."""
     try:
@@ -83,10 +83,10 @@ async def create_person(description: str) -> Person:
         )
         
         # Process the message
-        response = await ell2a.process_message(message)
+        response = await ell.process_message(message)
         
         if not response:
-            raise ValueError("No response received from ELL2A")
+            raise ValueError("No response received from ELL")
             
         # Parse the response content
         response_text = response.content if isinstance(response.content, str) else str(response.content)

@@ -1,0 +1,71 @@
+% 50 quadratische Gleichungen werden automatisch erzeugt.
+% So geht's:
+% Wenn rechts die Vorschau erscheint, oben PDF anklicken.
+% Für neue Aufgaben bitte hier [  ] ein
+% Leerzeichen eingeben und wieder löschen. 
+%-------------------------------------------------------------
+% 50 quadratic equations will be created automatically.
+% Please wait until you see the preview.
+% Then click on PDF to save the file.
+% For creating new equations please 
+% insert space here [  ] and delete it.
+%-------------------------------------------------------------
+\documentclass[fontsize=11pt]{scrartcl}
+% Pakete für LuaLaTeX:
+\usepackage{polyglossia} 
+\setmainlanguage{german}
+\usepackage{amsmath}        % <------ vor unicode-math laden, sonst FEHLER!!
+\usepackage{unicode-math}   % lädt auch fontspec!
+\usepackage{luacode}  
+% Weitere Pakete:
+%\usepackage{fancyhdr}
+\usepackage{multicol} 
+\usepackage{typearea}
+\areaset[40mm]{190mm}{237mm}
+% Zeichensätze:
+\setmainfont{Linux Libertine O}
+\setsansfont{Linux Biolinum O}
+\setmonofont[Scale=MatchLowercase]{Inconsolata}
+\setmathfont{Asana-Math}
+
+\setlength{\arraycolsep}{0.1mm}
+
+% Lua:
+% Pseudozufallszahlen erzeugen und rechnen.
+% Der Schwierigkeitsgrad der Aufgaben hängt von den Parametern von math.random() ab.
+\begin{luacode*}
+math.randomseed(os.time())
+
+function quadgleichungen(n)
+tex.print{[[\noindent\begin{math}]]}
+tex.print{[[\begin{array}{rcrrp{7cm}rrrrrrr}]]}
+for k = 1, n do
+    x1 = math.random(-10,10) 
+	x2 = math.random(-10,10)
+    tex.print{k, ')&~~~x^2&'}
+    p=-x1-x2
+    if p>0 then tex.print{'+'} end
+    if p~=0 then tex.print{p, 'x'} end
+    tex.print{ '&'}
+    q=x1*x2
+	if q>0 then tex.print{'+'} end
+    if q~=0 then tex.print{q} end
+    tex.print{'=0 &&', k,')&~~~  x_1=&', x1, ' ~~;~~& x_2=&', x2}
+    tex.print{[[\\]]}
+	end
+tex.print{[[\end{array}]]}
+tex.print{[[\end{math}]]}
+end    
+\end{luacode*}
+ 
+ 
+% ----------------------------------------
+% Hier kommt das eigentliche Dokument:
+\begin{document}
+\title{Quadratische Gleichungen}
+\author{Werner Pronkow}
+\section*{Quadratische Gleichungen}
+\pagestyle{empty}
+\enlargethispage{2cm}
+\directlua{quadgleichungen(50)}
+\end{document}

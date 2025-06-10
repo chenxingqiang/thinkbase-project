@@ -1,0 +1,67 @@
+%! TEX program = lualatex
+%! BIB program = biber
+\documentclass[11pt, a4paper]{book}
+
+\input{oppsett/oppsett}
+
+\input{oppsett/vannmerke}
+
+\title{Rapportmal}
+
+
+\begin{document}
+
+\pagenumbering{gobble}% Remove page numbers (and reset to 1)
+
+
+\includepdf[pages={1}]{omslag.pdf}
+
+\pagestyle{empty}
+
+\input{side2}
+
+\input{kapitler/forord}
+
+\clearpage
+\pagenumbering{arabic}
+\addtocounter{page}{3} % Denne må endres hvis antall sider før endrer seg!
+
+\input{kapitler/sammendrag}
+\pagestyle{fancy}
+
+% Fjern de fire "%" for å få innholdfortegnelsen til å begynne på venstre side,
+% hvis den går over to sider.
+%\makeatletter
+%\@openrightfalse
+\tableofcontents
+%\@openrighttrue
+%\makeatother
+
+\input{kapitler/innledning}
+
+\input{kapitler/metode}
+
+\input{kapitler/resultater}
+
+\input{kapitler/diskusjon}
+
+\clearpage
+
+% referanser
+\printbibliography[title=Referanser]
+\addcontentsline{toc}{chapter}{Referanser}
+
+\input{vedlegg/vedlegg}
+
+% Sørge for at det ikke står noe på nest siste side (siste oddetall-side) og at
+% baksiden kommer på partall-side.
+\null
+\cleardoublepage
+\pagestyle{empty}
+\cleartoleftpage
+
+\includepdf[pages={2}]{omslag.pdf} % bakside
+
+
+\end{document}
+

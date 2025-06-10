@@ -1,0 +1,185 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Classicthesis Typographic Thesis
+% LaTeX Template
+% Version 1.4 (1/1/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% André Miede (http://www.miede.de) with commenting modifications by:
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% GNU General Public License (v2)
+%
+% General Tips:
+% 1) Make sure to edit the classicthesis-config.file
+% 2) New enumeration (A., B., C., etc in small caps): \begin{aenumerate} \end{aenumerate}
+% 3) For margin notes: \marginpar or \graffito{}
+% 4) Do not use bold fonts in this style, it is designed around them
+% 5) Use tables as in the examples
+% 6) See classicthesis-preamble.sty for useful commands
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+% Os parâmetros "oneside" e "openany" fazem com que não hajam páginas em branco na impressão 
+\documentclass[
+		oneside,openany,titlepage,numbers=noenddot,headinclude,%headlines,
+	 	footinclude=true,
+		dottedtoc, % Make page numbers in the table of contents flushed right with dots leading to them
+		BCOR=5mm,paper=a4,fontsize=11pt, % Binding correction, paper type and font size
+		portuguese, % Languages, change this to your language(s)
+		]{scrreprt} 
+                
+% Includes the file which contains all the document configurations and packages - make sure to edit this file
+\input{classicthesis-config}
+
+% Espaçamento entre linhas
+\usepackage{setspace}
+
+%\usepackage[document]{ragged2e}
+
+% Caracteres especiais ao longo do texto
+%\usepackage[utf]{inputenc}
+
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ %total={170mm,257mm},
+ left=30mm,
+ right=20mm, % O correto seria 20mm
+ top=30mm,
+ bottom=30mm
+}
+
+% Mathematical tools
+\usepackage{siunitx}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{relsize}
+\usepackage{gensymb}
+
+% Timeline draw
+\usepackage{charter}
+\usepackage{environ}
+\usepackage{tikz}
+\usetikzlibrary{calc,matrix}
+
+%Sistemas de equações
+\usepackage{systeme}
+
+% Rotacionar tabelas
+\usepackage{adjustbox}
+\usepackage{rotating}
+
+% Tabelas
+\usepackage{booktabs}
+
+%Legendas
+\usepackage[labelfont=bf,textfont=it]{caption}
+
+% Permite o uso de estruturas enumerativas
+\usepackage{enumitem}
+
+% Float figures
+\usepackage{float}
+
+% Caracteres unicode
+\usepackage[utf8]{inputenc}
+
+%\usepackage[sectionbib]{chapterbib}
+\addbibresource{Bibliography.bib} % The file housing your bibliography
+%\usepackage[num]{abntex2cite}
+%\renewcommand{\bibname}{Bibliography}
+%\addbibresource[label=ownpubs]{Self_Publications.bib} % Uncomment for optional self-publications
+%\citeoption{abnt-options4}
+
+%\hyphenation{Put special hyphenation here}
+
+% Comando para alterar a fonte de todo o trabalho
+%\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\familydefault}{cmr}
+
+% Identação na primeira linha
+\setlength{\parindent}{3em}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[hang]{\huge}{\thechapter}{1em}{}
+\titlespacing{\chapter}{0pt}{0pt}{1cm}
+
+\begin{document}
+
+\frenchspacing % Reduces space after periods to make text more compact
+
+\raggedbottom % Makes all pages the height of the text on that page
+
+\selectlanguage{portuguese} % Select your default language - e.g. american or ngerman
+
+%\renewcommand*{\bibname}{new name} % Uncomment to change the name of the bibliography
+%\setbibpreamble{} % Uncomment to include a preamble to the bibliography - some text before the reference list starts
+
+\pagenumbering{roman} % Roman page numbering prior to the start of the thesis content (i, ii, iii, etc)
+
+\pagestyle{plain} % Suppress headers for the pre-content pages
+
+%----------------------------------------------------------------------------------------
+%	PRE-CONTENT THESIS PAGES
+%----------------------------------------------------------------------------------------
+
+\include{FrontBackMatter/Titlepage} % Main title page 
+
+\include{FrontBackMatter/Backcover} % Main title page
+
+\include{FrontBackMatter/Dedication} % Dedication page
+
+\include{FrontBackMatter/Abstract} % Abstract page
+
+\include{FrontBackMatter/Acknowledgments} % Acknowledgements page
+
+\pagestyle{scrheadings} % Show chapter titles as headings
+
+\include{FrontBackMatter/Contents} % Contents, list of figures/tables/listings and acronyms
+
+\pagenumbering{arabic} % Arabic page numbering for thesis content (1, 2, 3, etc)
+%\setcounter{page}{90} % Uncomment to manually start the page counter at an arbitrary value (for example if you wish to count the pre-content pages in the page count)
+
+%----------------------------------------------------------------------------------------
+%	THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+%\begin{refsection}
+
+\include{Chapters/Introduction} % Introdução
+\include{Chapters/Objectives} % Objetivos
+\include{Chapters/Theory} % Revisão bibliográfica
+\include{Chapters/Methodology} % Metodologia
+\include{Chapters/Results} % Revisão bibliográfica
+\include{Chapters/Conclusions} % Conclusões e perspectivas
+%\printbibliography
+%\include{FrontBackMatter/Bibliography}
+
+%\end{refsection}
+%------------------------------------------------
+
+\appendix
+\ctparttext{Ao longo dos Apêndices são apresentados os resultados}
+\part{Apêndice} % New part of the thesis for the appendix
+
+\begin{refsection}
+\include{Chapters/Appendix} % Appendix A
+\end{refsection}
+
+%----------------------------------------------------------------------------------------
+%	POST-CONTENT THESIS PAGES
+%----------------------------------------------------------------------------------------
+\include{FrontBackMatter/Bibliography} % Bibliography
+\include{FrontBackMatter/Timeline} % Timeline
+
+%----------------------------------------------------------------------------------------
+
+\end{document}

@@ -1,0 +1,87 @@
+\documentclass{wissdoc}
+
+%% --------------------
+%% |     Packages     |
+%% --------------------
+
+\include{config/packages}
+
+%% --------------------
+%% |     Settings     |
+%% --------------------
+
+% Settings: Titlepage, Comments, etc.
+\include{config/settings}
+
+% Bibliography
+\addbibresource{bib/references.bib}
+
+%% --------------------------------------------------------------------------------
+%% |                           BEGINNING OF DOCUMENT                              |
+%% --------------------------------------------------------------------------------
+\begin{document}
+
+%% ----------------------
+%% |     Title Page     |
+%% ----------------------
+\frontmatter
+\pagenumbering{roman}
+\ifnotdraft{
+ \includepdf[pages=-]{titelseiten.pdf}
+}
+
+%% ----------------------------
+%% |     Table of Content     |
+%% ----------------------------
+
+\ifnotdraft{
+\pagenumbering{roman}
+{\parskip 0pt\tableofcontents} % toc bitte einzeilig
+\listoffigures
+\listoftables
+}
+\cleardoublepage
+{\pagestyle{empty}
+~
+\cleardoublepage}
+%\thispagestyle{empty}
+
+%% ------------------
+%% |     Content    |
+%% ------------------
+
+\graphicspath{{src/}}
+
+\mainmatter
+\pagenumbering{arabic}
+
+\include{tex/chapter/introduction} 
+\include{tex/chapter/background}  
+\include{tex/chapter/analysis}
+\include{tex/chapter/design} 
+\include{tex/chapter/implementation}
+\include{tex/chapter/evaluation} 
+\include{tex/chapter/futurework} 
+\include{tex/summary} 
+
+%% ----------------
+%% |   Appendix   |
+%% ----------------
+
+\appendix
+%\include{src/appendix/anhang_a}
+%\include{src/appendix/anhang_b}
+
+%% --------------------
+%% |   Bibliography   |
+%% --------------------
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bibname}
+\printbibliography
+
+\end{document}
+%% --------------------------------------------------------------------------------
+%% |                              END OF DOCUMENT                                 |
+%% --------------------------------------------------------------------------------

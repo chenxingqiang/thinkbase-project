@@ -1,0 +1,274 @@
+\documentclass[
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,			% para impressão em verso e anverso. Oposto a oneside
+	a4paper,			% tamanho do papel. 
+	english,			% idioma adicional para hifenização
+	french,				% idioma adicional para hifenização
+	spanish,			% idioma adicional para hifenização
+	brazil				% o último idioma é o principal do documento
+	]{abntex2}
+	
+\usepackage{lmodern}				% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}			% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}			% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}				% Usado pela Ficha catalográfica
+\usepackage{indentfirst}			% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}					% Controle das cores
+\usepackage{graphicx}				% Inclusão de gráficos e imagens
+\usepackage{microtype} 				% para melhorias de justificação
+\usepackage{mathtools}				% Matemática
+\usepackage{multirow}				% Tabelas
+\usepackage[table,xcdraw]{xcolor}	% Tabelas (cores)
+\usepackage{pdfpages}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{makeidx}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{array}
+\usepackage{gensymb}
+\usepackage{float}
+
+\hyphenpenalty=10000
+
+\usepackage{lipsum}				% para geração de dummy text
+
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf, abnt-etal-list=0]{abntex2cite}	% Citações padrão ABNT
+
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+
+\renewcommand{\backref}{}
+
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+	
+\newcommand{\STAB}[1]{\begin{tabular}{@{}c@{}}#1\end{tabular}}
+	
+\titulo{Template com Tópicos Básicos para uma Dissertação}
+\autor{Geraldo Braz Junior}
+\local{São Luís - MA}
+\data{2019}
+\orientador{Prof. Dr. <nome>}
+%\coorientador{Prof. Dr. Anselmo Cardoso de Paiva} %se houver
+\instituicao{
+Programa de Pós-Graduação em Ciência da Computação 
+\par 
+Universidade Federal do Maranhão
+}
+\tipotrabalho{Dissertação}
+\preambulo{Dissertação apresentada como requisito parcial para obtenção do título de Mestre em Ciência da Computação, ao Programa de Pós-Graduação em Ciência da Computação, da Universidade Federal do Maranhão.}
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico}, 
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+\makeindex
+
+\begin{document}
+
+\selectlanguage{brazil}
+
+\frenchspacing 
+
+% ---
+% Capa
+% ---
+\renewcommand{\imprimircapa}{%
+\begin{capa}%
+\center
+\includegraphics[scale=0.25]{imagens/logoufma.png} \\ 
+\vspace{1cm}
+\ABNTEXchapterfont\Large UNIVERSIDADE FEDERAL DO MARANHÃO \\
+\ABNTEXsectionfont\Large Programa de Pós-Graduação em Ciência da Computação \\
+
+\vspace*{5cm}
+
+\begin{center}
+{\ABNTEXsectionfont\Large\imprimirautor} \\
+%\vfill
+\ABNTEXchapterfont\bfseries\LARGE\imprimirtitulo
+\end{center}
+\vfill
+\large\imprimirlocal \\
+\large\imprimirdata
+\vspace*{1cm}
+\end{capa}
+}	
+\imprimircapa
+
+%CASO PRECISE
+%\includepdf[pages={1}]{capa_dissertacao.pdf}
+
+\imprimirfolhaderosto
+
+
+%\includepdf[pages={1}]{ficha_final.pdf}
+%\includepdf[pages={1}]{assinaturas.pdf}
+
+\begin{folhadeaprovacao}
+
+  \begin{center}
+    {\ABNTEXchapterfont\large\imprimirautor}
+
+    \vspace*{\fill}\vspace*{\fill}
+    \begin{center}
+      \ABNTEXchapterfont\bfseries\Large\imprimirtitulo
+    \end{center}
+    \vspace*{\fill}
+    
+    \hspace{.45\textwidth}
+    \begin{minipage}{.5\textwidth}
+        \imprimirpreambulo
+    \end{minipage}%
+    \vspace*{\fill}
+  \end{center}
+        
+  Trabalho ???. \imprimirlocal, ?? de ??????? de 20??:
+
+  \assinatura{\textbf{\imprimirorientador} \\ Orientador\\ Universidade Federal do Maranhão} 
+  %\assinatura{\textbf{\imprimircoorientador} \\ Coorientador\\ Universidade Federal do Maranhão} 
+   
+  \assinatura{\textbf{Prof. Dr. 1} \\ Examinador Interno \\ Universidade Federal do Maranhão}
+  \assinatura{\textbf{Prof. Dr. 2} \\ Examinador Externo \\ ??}
+      
+  \begin{center}
+    \vspace*{0.5cm}
+    {\large\imprimirlocal}
+    \par
+    {\large\imprimirdata}
+    \vspace*{1cm}
+  \end{center}
+  
+\end{folhadeaprovacao}
+
+% ---
+% Dedicatória
+% ---
+\begin{dedicatoria}
+  \vspace*{\fill}
+  %\RaggedRight
+  %\noindent
+  \begin{flushright}
+        \textit{Aos meus imprescindíveis ... Dedicatória}
+  \end{flushright}
+  \vspace*{\fill}
+\end{dedicatoria}%
+% ---
+
+% ---
+% Agradecimentos
+% ---
+\begin{agradecimentos}
+Agadeça quem ajudou você diretamente no trabalho.
+
+Aproveite para agradecer aqueles que colaboraram também.
+\end{agradecimentos}
+% ---
+
+% ---
+% Epígrafe
+% ---
+\newpage
+\begin{epigrafe}
+   \vspace*{\fill}
+	\begin{flushright}
+		\textit{"Aprendizagem nunca esgota a mente."}
+
+    (Leonardo da Vinci)
+	\end{flushright}
+\end{epigrafe}
+% ---
+
+
+% resumo em português
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+
+Alguma informação de contexto/motivação do trabalho. A principal atividade do estudo (propósito) e seu escopo. Alguma informação sobre a metodologia proposta. Os resultados mais importantes do estudo. Uma afirmação de conclusão ou recomendação.
+
+\textbf{Palavras-chave}: Template, Modelo, Tópicos.
+\end{resumo}
+
+% resumo em inglês
+\begin{resumo}[Abstract]
+\begin{otherlanguage*}{english}
+
+The same, in English.
+ 
+\textbf{Keywords}:
+\end{otherlanguage*}
+\end{resumo}
+
+\cleardoublepage
+
+% inserir lista de ilustrações
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+
+% inserir lista de tabelas
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+
+% inserir lista de abreviaturas e siglas
+\begin{siglas}
+
+    \item[SVM] \textit{Support Vector Machines}
+
+\end{siglas}
+
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+\textual
+
+\input{1_introducao.tex}
+\input{2_relacionados.tex}
+\input{3_referencial.tex}
+\input{4_metodologia.tex}
+\input{5_resultados.tex}
+\input{6_conclusao.tex}
+\input{extra.tex}
+
+\phantompart
+
+\postextual
+
+\bibliography{bibliography}
+
+\end{document}

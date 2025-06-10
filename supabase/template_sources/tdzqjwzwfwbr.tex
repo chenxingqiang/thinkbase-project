@@ -1,0 +1,188 @@
+%% $HeadURL: https://repository.cs.ru.is/svn/template-staff/tex/recommendation-sterilized/recommendation-template.tex $
+%% $Id: recommendation-template.tex 28 2018-02-19 22:41:23Z foley $
+%% LaTeX template for writing student recommendations by Joseph T. Foley <foley@ru.is>
+%% This can easily be used for anything that needs the RU letterhead.
+%% To get the exact font that is used on the official letterhead,
+%%   run xelatex instead of pdflatex.
+%% This should not be distributed outside of RU staff to avoid having students forge documents.
+
+%%%%%%%%%%%%%%%%%%%% TeXStudio Magic Comments %%%%%%%%%%%%%%%%%%%%%
+%% These comments that start with "!TeX" modify the way TeXStudio works
+%% For details see http://texstudio.sourceforge.net/manual/current/usermanual_en.html   Section 4.10
+%%
+%% What encoding is the file in?
+% !TeX encoding = UTF-8
+%% What language should it be spellchecked?
+% !TeX spellcheck = en_US
+%% What program should I compile this document with?
+% !TeX program = pdflatex
+%% Which program should be used for generating the bibliography?
+% !TeX TXS-program:bibliography = txs:///biber
+%% This also sets the bibliography program for TeXShop and TeXWorks
+% !BIB program = biber
+
+%% Options should be separated by commas
+%% Option: 11pt -- default font is 11pt
+%% Option: letterhead -- if you want to "fake" letterhead instead of using real letterhead
+%% Option: bibmagic -- if you want a references section with bibtex
+%%              this option is not needed with biblatex/biber
+\documentclass[11pt,letterhead,draft]{recommendation}
+\setlogo{ru-logo}
+\usepackage[backend=biber,style=numeric,natbib=true]{biblatex}
+%% natbib allows \citet and \citep to exist
+\addbibresource{references.bib}
+
+%% Put your information here
+\newcommand{\myname}{John Hancock}
+\signature{\myname}
+
+\newcommand{\myopening}{Dear admissions officer,}
+%% Default opening for all the letters
+
+\newcommand{\myclosing}{Kind regards}
+%% Pick if you have a graphic for the signature or not If you have a
+%% graphic for a signature, uncomment the lines below.  Replace signature.pdf with
+%% your signature file.
+\signature{}
+\renewcommand{\myclosing}{Kind regards, \\
+\fromsig{\includegraphics[height=3\baselineskip]{signature}}\\\fromname{\myname{}}}
+
+%% More information
+\newcommand{\email}{{\tt johnhc@ru.is}} 
+\newcommand{\position}{Professor}
+\newcommand{\department}{Department of Stuff}
+\newcommand{\university}{Reykjavík University}
+\newcommand{\universityaddress}{Menntavegur 1\\
+  Reykjavík 101\\
+  Iceland}
+\address{\myname{}\\\position{}\\\department{}\\university{}\\\universityaddress{}}
+\newcommand{\cred}{(BJU BS '99)}
+\newcommand{\info}{I am an \position{} at \university{} in the \department{}}
+\newcommand{\phone}{+354-555-5555}
+\newcommand{\imaddr}{skype at {\tt foo}, and google hangouts at {\tt foo.bar@gmail.com}}%last!
+\newcommand{\disciplines}{Divine intervention}
+\newcommand{\tenure}{8 years} 
+
+%% Information about the student
+% \newcommand{\studentfull}{Jón Jonson}
+\newcommand{\studentfull}{Katrín Jakobsdóttir}
+\newcommand{\student}{Katrín}
+%% Prononuns for the boilerplate text
+\newcommand{\He}{She}
+\newcommand{\he}{she}
+\newcommand{\His}{Her}
+\newcommand{\his}{her}
+\newcommand{\studenttime}{3 months}
+\newcommand{\teammates}{three team-mates} %%can put the number here if needed
+\newcommand{\course}{my Awesome Robots\footnote{sometimes called Robotics or Industrial Feedback Systems in other curricula} course}
+\newcommand{\grade}{$X \rightarrow Y$ \fxfatal{Fill in grade.}}
+\newcommand{\rank}{Z out of ZZ in the class. \fxfatal{Fill in rank}}
+\newcommand{\field}{Mechatronics}
+\newcommand{\setfield}[1]{\renewcommand{\field}{#1}}
+\newcommand{\target}{Bob Jones University}
+\newcommand{\settarget}[1]{\renewcommand{\target}{#1}}
+\newcommand{\skillsmastered}{\He{} has mastered the fundamentals necessary for research in this field including praying to the gods of the magic blue smoke in electronics.
+}
+
+%% Macros defined by the letter class
+\address{\myname{}\\\position{}\\\department{}\\\university{}\\\universityaddress{}}
+
+\newcommand{\recommendationbase}[1]{
+  \begin{refsection}
+  My name is Dr.\ \myname{} \cred{} and \info{}.
+  I have been teaching at this university for \tenure{} in the areas of \disciplines{}.
+
+  I have known \studentfull{} for \studenttime{}.
+  \student{} has completed \course{}  and excelled with a grade of \grade{} out of 10.
+  \He{} ranked \rank{}.
+
+  \He{} had an excellent grasp of the very challenging and interdisciplinary material which draws from computer science, electrical engineering, and mechanical engineering.
+  \His{} final project with \teammates{} demonstrated all of the learning outcomes in Mechatronics 1:
+  \begin{itemize}
+  \item Be able to design, build, and test advanced circuits with active elements
+  \item Write lab reports for experiments performed
+  \item See opportunities, not obstacles, when problems arise. 
+  \end{itemize}
+
+  \fxfatal{Fill in a summary of the group project, at least a paragraph.}
+  \His{} team built {\em something}.
+  This project  required them to {\em do something}.
+  The project was well thought out, well implemented, and properly documented in a presentation and technical report.
+
+  \fxfatal{Fill out individual information, at least a paragraph}
+  \student{} has {\em characteristics}.
+  \He{} has shown {\em characteristic 1 by doing something}.
+  
+  \fxfatal{Add the part makes the recommendation believable (and not generic).
+  Be as detailed as possible.}
+  \He{} has {\em area of improvement}.
+  \He{} is {\em improving them by doing \ldots\/}
+
+  %% Summary goes here.  Put \skillsmastered{} in argument for default skills.
+  #1
+
+  If you have further questions, I can be contacted at \phone{},
+  \email{}, \imaddr{}.
+  
+  \closing{\myclosing{}} 
+
+% make sure you have the bibmagic option for bibtex
+% \bibliography{references}  %bibtex
+  \printbibliography{}  %biber/biblatex
+\end{refsection}
+}
+
+
+\newcommand{\recommendation}[2]{\recommendationbase{To summarize, I would highly recommend \student{} for \his{} proposed graduate studies in #1 in #2.  \skillsmastered{}}  }
+\newcommand{\recommendationGrant}[1]{\recommendationbase{To summarize, I would highly recommend \student{} for #1.    \skillsmastered{}}
+  \setfield{#1}}
+
+\begin{document}
+%% Generic letter, probably for an industry job or needing more specific recommendation
+%% This allows us to change the opening and the specific summary
+%% For the common universities, macros have been setup as shown later.
+% \begin{letter}{Human Resources Department\\
+%     Marel ehf.\\
+%     Austurhraun 9\\
+%     210 Garðabær\\
+%     Iceland}
+%   \opening{Dear Human Resources administrator,} 
+%   \recommendationbase{To summarize, I would recommend \student{} for positions in mechanical design, especially research and development.
+%     \He{} has mastered the fundamentals necessary for effective work in this field, including: design methodologies, CAD tools, rapid prototyping, version control, and documentation in \LaTeX.}
+% \end{letter} 
+
+% Example of a grant or scholarship
+% \newcommand{\scholname}{Google Europe Scholarship for 2016}
+% \begin{letter}{\scholname{}}
+%   \opening{To whom it may concern,}
+%   \recommendationGrant{\scholname{}}
+% \end{letter}
+
+
+%%%%%%%%%%%%%
+%% The preformatted address macros live in custom.tex
+
+%% This is a recommendation boilerplate, but needing a specific address
+% e.g. \genericletter{Name of University}{Address\\Address}{Degree Program}
+% \genericletter{University of Southampton}{Faculty Of Engineering And The Environment\\
+% Building 177\\
+% University Of Southampton\\
+% Boldrewood Campus\\
+% SOUTHAMPTON\\
+% SO16 7QF\\
+% United Kingdom}{Unmanned Aircraft Systems Design}
+
+\chalmersletter{Graduate Admissions}{Mechatronics}
+%\dtuletter{Graduate Admissions}{Mechatronics}
+%\ethletter{Graduate Admissions}{Mechatronics}
+%\kthletter{Graduate Admissions}{Mechatronics}
+%\tudelftletter{Graduate Admissions}{Mechatronics}
+%\usdkletter{}{Mechatronics} % USDK doesn't use department
+%\swedenletter{Graduate Admissions}{Mechatronics}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% TeX-engine: xetex
+%%% End:

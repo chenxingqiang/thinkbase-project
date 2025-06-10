@@ -1,0 +1,166 @@
+%%\input{./StylesheetDraft.tex}
+\documentclass[12pt,a4paper,oneside]{book}
+\usepackage[polutonikogreek,british]{babel} % for ancient Greek
+%\usepackage[utf8]{inputenc}
+\usepackage[notes, backend=biber,autocite=footnote,doi=false,isbn=false,url=false,eprint=false,clearlang=true]{biblatex-chicago}
+\usepackage{fontspec}
+\usepackage{setspace}
+\usepackage[multiple,flushmargin]{footmisc}
+\usepackage{graphicx}
+\graphicspath {{Imgs/}}  % TODO set your images directory
+\usepackage{makeidx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{csquotes}
+\usepackage{metalogo}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage[colorinlistoftodos,textsize=tiny]{todonotes}
+%\usepackage{lineno}
+%\font\greekFont="Everson Mono Oblique" at 11pt
+%\font\greekFootnoteFont="Minion Pro" at 9pt
+%\font\greekFont="Minion Pro" at 10pt
+%\usepackage{palatino}
+\usepackage[colorinlistoftodos,textsize=tiny]{todonotes}
+
+% This patch should permit \autocite to function properly in footnotes.
+\makeatletter
+\patchcmd\@footnotetext
+  {#1}
+  {\toggletrue{blx@footnote}#1}
+  {\togglefalse{blx@tempa}}
+  {}
+\makeatother
+
+%\renewcommand{\footnotesize}{\small} % 10pt footnotes in 11pt doc instead of 9pt
+\usepackage{etoolbox}
+
+%Widow and Orphen control
+\widowpenalty10000
+\clubpenalty10000
+
+%%%%% begin DOI in bibliography only
+\renewbibmacro*{doi+eprint+url}{%
+  \iftoggle{bbx:doi}
+    {\ifboolexpr{test {\iffootnote}}{}{\printfield{doi}}}
+    {}%
+  \newunit\newblock
+  \iftoggle{bbx:eprint}
+    {\usebibmacro{eprint}}
+    {}%
+  \newunit\newblock
+  \ifboolexpr{test {\iftoggle{bbx:url}}
+               or test {\ifentrytype{online}}}
+    {\usebibmacro{url+urldate}}
+    {}}
+%%%%% end DOI in bibliography only
+
+%%%%% short citations for \autocite
+
+\makeatletter
+\AtEveryCitekey{%
+  \ifboolexpr{ test {\iffieldequalstr{entrysubtype}{classical}}
+               and not test {\iffieldundef{shorttitle}} }
+    {\ifciteseen
+       {\blx@ibidreset\clearname{labelname}}
+       {\savefield{title}{\cbxtitle}\restorefield{labeltitle}{\cbxtitle}}}
+    {}}
+\makeatother
+
+%%%%%
+
+%%%%% begin Custom footnote definition
+% \makeatletter%%
+% \patchcmd{\@makefntext}{%
+% \ifFN@hangfoot
+% \bgroup}%
+% {%
+% \ifFN@hangfoot
+% \bgroup\def\@makefnmark{\rlap{\normalfont\@thefnmark}}}{}{}%
+% % %%%
+% \patchcmd{\@makefntext}{%
+% \ifdim\footnotemargin>\z@
+% \hb@xt@ \footnotemargin{\hss\@makefnmark}}%
+% {%
+% \ifdim\footnotemargin>\z@
+% \hb@xt@ \footnotemargin{\@makefnmark\hss}}{}{}%
+% \makeatother
+%
+\setlength{\footnotemargin}{-0.75em} % Between marker and text
+% \setlength{\skip\footins}{1\baselineskip} % Between main text and note rule
+% \setlength{\footnotesep}{\skip\footins} % Between footnotes [= previous]
+%
+% \renewcommand{\hangfootparskip}{0pt}
+%\renewcommand{\hangfootparindent}{-1.25em}
+%%%% end Custom footnote definition
+
+% Font specifications
+\usepackage{fontspec}
+%\setmainfont{Prestige Elite Std}
+%\setmainfont{Minion Pro}
+
+% 72 pt top and bottom margins for 12pt font
+\addtolength{\topmargin}{-0.875in}
+\addtolength{\textheight}{1.75in}
+
+\pagestyle{plain}
+
+%\usepackage{showframe} %%%% For layout debugging
+
+\newcommand{\greek}[1]{{\selectlanguage{polutonikogreek}#1}}
+
+% Remove the language field
+\AtEveryBibitem{\clearlist{language}}
+\bibliography{./thss-bb.bib}
+
+%\setdefaultlanguage[variant=british]{english}
+
+\begin{document}
+% FRONT MATTER
+\input{./ttlpg-kcl.tex}
+\input{./dclrtn.tex}
+\input{./acknwldgmnts.tex}
+\input{./smmry.tex}
+
+% Set font size for rest of document
+\normalsize
+\mdseries
+
+\tableofcontents
+
+\listoffigures
+
+\newpage
+
+% MAIN MATTER
+
+% Linespacing
+\doublespacing
+\frenchspacing
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+\addtocontents{toc}{\protect\enlargethispage{\baselineskip}}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sem nulla pharetra diam sit amet nisl suscipit. Massa ultricies mi quis hendrerit dolor magna eget. Metus vulputate eu scelerisque felis imperdiet proin fermentum. Commodo ullamcorper a lacus vestibulum sed. Adipiscing elit ut aliquam purus sit amet. Est lorem ipsum dolor sit amet. Arcu bibendum at varius vel pharetra vel. Tellus id interdum velit laoreet id donec ultrices tincidunt. At augue eget arcu dictum varius duis. Eget aliquet nibh praesent tristique magna sit amet purus. Eu facilisis sed odio morbi quis commodo odio aenean. Enim facilisis gravida neque convallis a cras semper. Ornare quam viverra orci sagittis eu volutpat. Semper auctor neque vitae tempus. Quisque egestas diam in arcu cursus euismod quis viverra nibh. Accumsan lacus vel facilisis volutpat est velit egestas dui. Odio eu feugiat pretium nibh ipsum.
+
+\section{Volupat Blandit}
+
+Volutpat blandit aliquam etiam erat. Aliquam eleifend mi in nulla posuere sollicitudin. Turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Vitae nunc sed velit dignissim sodales ut eu sem integer. Ultrices tincidunt arcu non sodales neque sodales ut. Pellentesque habitant morbi tristique senectus. Elementum pulvinar etiam non quam lacus suspendisse faucibus. Odio eu feugiat pretium nibh. Neque egestas congue quisque egestas diam in arcu. Purus in massa tempor nec feugiat nisl pretium fusce id.
+
+Sed vulputate mi sit amet mauris commodo quis. Pellentesque elit eget gravida cum sociis natoque penatibus. Quam elementum pulvinar etiam non quam lacus suspendisse. Egestas dui id ornare arcu odio ut sem nulla pharetra. Tristique magna sit amet purus. Egestas dui id ornare arcu odio ut sem nulla. In ornare quam viverra orci. Id aliquet lectus proin nibh nisl condimentum id. Sollicitudin nibh sit amet commodo nulla facilisi. Feugiat pretium nibh ipsum consequat nisl vel. Luctus accumsan tortor posuere ac ut consequat. Quis commodo odio aenean sed. Consectetur a erat nam at.
+
+\subsection{Ultricies Leo Ineger}
+
+Ultricies leo integer malesuada nunc vel risus commodo viverra. Quis hendrerit dolor magna eget. Est placerat in egestas erat imperdiet sed euismod nisi. Facilisis sed odio morbi quis commodo. Morbi leo urna molestie at elementum. Sit amet justo donec enim. Mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Eget velit aliquet sagittis id consectetur. Mauris rhoncus aenean vel elit scelerisque. Vel elit scelerisque mauris pellentesque pulvinar pellentesque.
+
+Morbi tristique senectus et netus et malesuada. Gravida neque convallis a cras semper auctor neque. Velit sed ullamcorper morbi tincidunt. Pellentesque habitant morbi tristique senectus et netus et malesuada. Nulla facilisi cras fermentum odio. In massa tempor nec feugiat nisl pretium fusce id. Proin sagittis nisl rhoncus mattis rhoncus urna neque viverra justo. Aliquam sem et tortor consequat id. Pretium lectus quam id leo in vitae. Id eu nisl nunc mi ipsum faucibus vitae aliquet nec. Ultrices neque ornare aenean euismod elementum.
+
+% END MATTER
+\newpage
+\printbibliography
+\newpage
+\printindex
+\input{./clphn.tex}
+\end{document}

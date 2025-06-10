@@ -247,13 +247,22 @@ class ObjectiveHandler:
         }
         
         for criteria in objective.success_criteria:
-            validator_type = criteria.get("validation_method")
+            validator_type = criteria.validation_method
+            if not validator_type:  # Skip if no validation method
+                results["criteria_results"].append({
+                    "type": criteria.criteria_type,
+                    "description": criteria.description,
+                    "validated": False,
+                    "error": "No validation method specified"
+                })
+                continue
+                
             validator = ValidatorRegistry.get_validator(validator_type)
             
             if not validator:
                 results["criteria_results"].append({
-                    "type": criteria["type"],
-                    "description": criteria["description"],
+                    "type": criteria.criteria_type,
+                    "description": criteria.description,
                     "validated": False,
                     "error": f"No validator found for method: {validator_type}"
                 })
@@ -262,19 +271,21 @@ class ObjectiveHandler:
             # Get validation data from objective metadata
             validation_data = objective.metadata.get("validation_data", {})
             
-            # Validate
-            validation_result = validator.validate(validation_data, criteria)
+            # Convert criteria to dict for validator
+            criteria_dict = {
+                "type": criteria.criteria_type,
+                "description": criteria.description,
+                "threshold": criteria.threshold,
+                "validation_method": criteria.validation_method,
+                "metadata": criteria.metadata
+            }
             
-            # Store validation result
-            self.persistence.save_result(
-                objective_id=objective_id,
-                validation_type=validator_type,
-                result=validation_result
-            )
+            # Validate
+            validation_result = validator.validate(validation_data, criteria_dict)
             
             results["criteria_results"].append({
-                "type": criteria["type"],
-                "description": criteria["description"],
+                "type": criteria.criteria_type,
+                "description": criteria.description,
                 "validated": validation_result.is_valid,
                 "score": validation_result.score,
                 "details": validation_result.details,
@@ -335,7 +346,7 @@ class ObjectiveHandler:
             # Clear all validation types
             success = True
             for criteria in self.objectives[objective_id].success_criteria:
-                validator_type = criteria.get("validation_method")
+                validator_type = criteria.validation_method
                 if validator_type:
                     success = success and self.persistence.delete_result(
                         objective_id=objective_id,

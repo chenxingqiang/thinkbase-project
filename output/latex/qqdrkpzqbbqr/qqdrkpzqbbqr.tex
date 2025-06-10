@@ -1,0 +1,264 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dreuw & Deselaer's Poster
+% LaTeX Template
+% Version 1.0 (11/04/13)
+%
+% Created by:
+% Philippe Dreuw and Thomas Deselaers
+% http://www-i6.informatik.rwth-aachen.de/~dreuw/latexbeamerposter.php
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Amended by Evan Russenberger-Rosica 6/14/2019
+%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[8pt,final,hyperref={pdfpagelabels=false}]{beamer}
+\usepackage{multirow}
+\usepackage[orientation=landscape,size=a0,scale=1.4]{beamerposter} % Use the beamerposter package for laying out the poster with a portrait orientation and an a0 paper size
+\usepackage{xcolor}
+\usetheme{I6pd2} % Use the I6pd2 theme suplied with this template
+%\usepackage{extsizes}
+\usepackage[english]{babel} % English language/hyphenation
+
+\usepackage{amsmath,amsthm,amssymb,latexsym, subfig} % For including math equations, theorems, symbols, etc
+\theoremstyle{plain}
+
+%\usepackage{times}\usefonttheme{professionalfonts}  % Uncomment to use Times as the main font
+%\usefonttheme[onlymath]{serif} % Uncomment to use a Serif font within math environments
+
+\usepackage{booktabs} % Top and bottom rules for tables
+
+\graphicspath{{figures/}} % Location of the graphics files
+
+\usecaptiontemplate{\small\structure{\insertcaptionname~\insertcaptionnumber: }\insertcaption} % A fix for figure numbering
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION 
+%----------------------------------------------------------------------------------------
+
+\title{\huge Generative Art via Neural Networks} % Poster title
+
+\author{Evan Russenberger-Rosica  \texorpdfstring{\\}{} er1093a@student.american.edu} % Author(s)
+
+
+
+
+\institute{Department of Mathematics and Statistics - American University \\ 
+\color {white} Learn more at evanrosica.com/GANArt/
+} % Institution(s)
+
+
+
+%----------------------------------------------------------------------------------------
+%	FOOTER TEXT
+%----------------------------------------------------------------------------------------
+
+\newcommand{\leftfoot}{bit.do/poster-PDP093} % Left footer text
+
+\newcommand{\rightfoot}{PDP-093/SKPP/III/2018} % Right footer text
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
+
+\begin{frame} % The whole poster is enclosed in one beamer frame
+
+\begin{columns}[t] % The whole poster consists of four major columns, each of which can be subdivided further with another \begin{columns} block - the [t] argument aligns each column's content to the top
+
+% --------------------------- BEGIN COLUMN 1 ----------------------------------------------
+\begin{column}{.23\textwidth} % The first column. Since there are 4 columns each col width must be less than 1/4 = .25 wide
+                
+    \begin{block}{Abstract}
+        \begin{itemize}
+            \item
+            We investigate if neural networks can be used to create art which is novel, detailed, and aesthetically pleasing. We evaluate two state-of-the-art approaches against these criteria: neural style transfer (NST) as in Johnson et al. and unpaired image-to-image translation (IIT) as in Zhu et al. 
+            
+            \item In the process, we mathematically prove that Zhu et al's implementation of the “cycle consistency constraint” is unnecessarily complex. We also observe that their method undesirably converges to the test image as the test image becomes relatively large.
+            
+            
+            \item We conclude that both methods meet our criteria in different ways. NST works best when trained on abstract images as well those with geometric patterns, while IIT works better on less abstract images.
+            
+            \item We believe that our comparison between IIT and NST is the most extensive yet done, and the only one to consider very large images. 
+        \end{itemize}
+    \end{block}
+    
+    \begin{block}{Unpaired Image-To-Image Translation}
+        \begin{itemize}
+            \item In \textit{Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks}, authors Zhu et al. define \textbf{image-to image translation} as "a class of vision and graphics problems where the goal is to learn the mapping between an input image and an output image using aligned image pairs." 
+            
+            \item Since paired image training data is rare, Zhu et al. investigate how to “translate images from a source domain $X$ to a target domain $Y$ in the absence of paired examples.”[zhu, 1]
+            
+            \item Zhu et al improve on standard GAN optimization problem by adopting the bias that translation should be \textbf{cycle consistent}. I.e., if we were to translate a sentence from English to French, and then translate it back from French to English, we should arrive back at the original sentence.
+
+            \begin{figure}
+                \includegraphics[width=.8\linewidth]{figures/Cycle_Consistency.png}
+            \end{figure}
+
+            \item Mathematically, if $G:X\rightarrow Y$ and $F:Y\rightarrow X$ then $$F(G(x))=G(F(x))=I(x)=x$$ where $I(x)$ represents the identity function. Zhu et al. state "$G$ and $F$ should be inverses of each other, and both should be bijections."[zhu, 2]
+            
+            
+            \item In the following theorem, we prove that this is actually a stronger condition than is needed to ensure cycle consistency.
+        \end{itemize}
+    \end{block}
+
+\end{column} % End of the first column
+ 
+% --------------------------- BEGIN COLUMN 2 ----------------------------------------------
+\begin{column}{.23\textwidth} % The second column
+    
+    \begin{theorem}
+        \begin{small}
+        If $F(G(x))=I(x)$ and $F$ is an injection, then $G(F(x))=I$.
+        
+        Proof: By contradiction, assume $F(G(x))=I(x)$ and $G(F(x))\neq I$. Then
+        $\exists x\in Y,G(F(x))=y\land y\neq x$. By hypothesis we know $F(G(x))=I(x)$,
+        therefore:
+        \begin{align*}
+        G\left(F\left(x\right)\right) & =y\\
+        F\left[G(F(x))\right] & =F(y)\\
+        I(F(x)) & =F(y)\\
+        F(x) & =F(y)
+        \end{align*}
+        which is a contradiction since $F$ is an injection. Therefore $G(F(x))=I$
+        and so $F,G$ are cycle consistent. $\square$
+        
+        \end{small}
+    \end{theorem}
+    
+    \begin{block}{Neural Style Transfer}
+        \begin{itemize}
+            \item Unlike CycleGAN which learns to mimic the style of an entire collection of artworks, "\textbf{neural style transfer} learns to transfer the style of a single selected piece of art onto another".[johnson][gatys] 
+            
+            \item The neural style transfer system consists of two parts: an image transformation network, and a loss network. "The image transformation network is a deep residual convolutional neural network. By jointly minimizing the feature reconstruction loss and a style reconstruction loss also based on features extracted from a pretrained convolutional network..... this method produces high-quality results."
+        
+            \begin{figure}
+                \includegraphics[width=.8\linewidth]{figures/Style_Transfer_Mechanism}
+            \end{figure}
+        \end{itemize}
+    \end{block}
+    
+    \begin{block}{Training and Logistics}
+        \begin{itemize}
+        
+            \item Since NST uses a pre-trained neural network, the user need only supply a style image and a content image in order to produce results with NST. 
+            
+            \item A style transfer network can be trained on a modern GPU in several hours. (We used an AWS p3.2xlarge instance with a Tesla V100 GPU w/16GB VRAM). Once the network is trained, performing the style transfer itself takes only a few seconds.
+            
+            \item Conversely, to use CycleGAN, one must first build a (large) image dataset, and then train the GAN. This is a very resource intensive process, and is best done on a cloud service providing GPU compute such as AWS.
+        
+        \end{itemize}
+    \end{block}
+    
+\end{column} % End of the second column
+
+% --------------------------- BEGIN COLUMN 3 ----------------------------------------------
+\begin{column}{.23\textwidth} % The Third column
+    \begin{block}{Neural Style Transfer}
+        \begin{figure}
+        \includegraphics[width=1\linewidth]{figures/1_4139x1920.png}
+        \end{figure}
+        \begin{figure}
+        \includegraphics[width=1\linewidth]{figures/05-26-2013-1_4139x1920.png}
+        \end{figure}
+    \end{block}
+    \begin{block}{Neural Style Transfer - Style Images}
+        \begin{figure}
+            \centering
+            \begin{minipage}{0.49\textwidth}
+                \centering
+                \includegraphics[width=1 \linewidth]{figures/study-to-composition-ii-1910.jpg} % first figure itself
+                \caption{Kandinsky:  Composition II, 1910}
+            \end{minipage}\hfill
+            \begin{minipage}{0.49\textwidth}
+                \centering
+                \includegraphics[width=1\linewidth]{figures/style1.png} % second figure itself
+                \caption{Unknown}
+            \end{minipage}
+        \end{figure}
+        \begin{itemize}
+            \item The network which created the top image in this column, seems to have learned to make brushstrokes from Kandinsky's Composition II (above left).
+            
+            \item Close inspection of the second image from the top shows that the style network has learned to render objects as triangles. The unnamed style image is above right. 
+        \end{itemize}
+    \end{block}
+\end{column} % End of the Third column
+
+% --------------------------- BEGIN COLUMN 4 ----------------------------------------------
+\begin{column}{.23\textwidth} % The Fourth column
+    \begin{block}{CycleGAN: Monet, Ukiyo \& Cezanne Styles}
+
+        \begin{figure}
+        \includegraphics[width=1\linewidth]{figures/DSC_3738_fake_B.png}
+        \end{figure}
+        
+        \begin{figure}
+        \includegraphics[width=1\linewidth]{figures/Positano_Panorama_1_fake_B.png}
+        \end{figure}
+        
+        \begin{figure}
+        \includegraphics[width=1\linewidth]{figures/cezanne.png}
+        \end{figure}
+    
+    \end{block}
+    \begin{block}{Reference Images}
+        \begin{figure}
+            \centering
+            \begin{minipage}{0.49\textwidth}
+                \centering
+                \includegraphics[width=1 \linewidth]{figures/DSC_3738_real_A.png} % first figure 
+            \end{minipage}\hfill
+            \begin{minipage}{0.49\textwidth}
+                \centering
+                \includegraphics[width=1\linewidth]{figures/Positano_Panorama_1.jpg} % second figure itself
+            \end{minipage}
+        \end{figure}
+        \begin{itemize}
+            \item We use the above original pictures of the Almafi Coast of Italy as reference content images. 
+        \end{itemize}
+    \end{block}
+
+\end{column} % End of the Fourth column
+\end{columns} % End of all the columns in the poster
+\end{frame} % End of the enclosing frame
+
+\end{document}
+
+\end{document}

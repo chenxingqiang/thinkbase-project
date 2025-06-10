@@ -1,0 +1,412 @@
+\documentclass[
+    a4paper,
+    brazil,
+    12pt,
+        ]{icmc}
+
+%\voffset=0pt
+%\usepackage[none]{hyphenat}	para evitar hifenizacao
+\hyphenpenalty=2000 		% (nao ta funcionando)
+\tolerance=400			%
+\clubpenalty=10000		% Alteração Vinícius
+\widowpenalty=10000		%
+\displaywidowpenalty=10000	%
+
+% alteracao Vinícius
+%\usepackage{tocloft}
+
+%\newlength\mylena
+%\settowidth\mylena{Figura}
+%\newlength\mylenb
+%\settowidth\mylenb{Tabela}
+
+%\addtolength\cftfignumwidth{\mylena}
+%\addtolength\cfttabnumwidth{\mylenb}
+
+%\renewcommand\cftfigpresnum{Figura }
+%\renewcommand\cfttabpresnum{Tabela }
+%fim
+%
+\usepackage{listings,listings}
+
+\usepackage{pdfpages}
+\usepackage[brazil]{babel}
+%\usepackage[latin1]{inputenc} % modified by Karol Kozioł for ShareLaTeX
+\usepackage[utf8]{inputenc}
+
+%Landir -------------------------------------------
+\usepackage{multirow}
+\newcommand{\conj}[4]{#1=\{#3~|~#2 \leq #3 \leq #4, ~#3 \in \mathbb{N}\}}
+\newcommand{\matrizz}[7]{#1_{#2 \times #3} \textrm{, } #4_{#5 #6} \in \mathbb{#7}}
+\newcommand{\matrizzz}[9]{#1_{#2 \times #3 \times #4} \textrm{, } #5_{#6 #7 #8} \in \mathbb{#9}}
+\newcommand{\interval}[3]{#1 \leq #2 \leq #3}
+\newcommand{\quintupla}[5]{\langle #1,#2,#3,#4,#5 \rangle}
+\newcommand{\tripla}[3]{\langle #1,#2,#3 \rangle}
+\newcommand{\parord}[2]{\langle #1,#2 \rangle}
+
+%ambiente para definições, teoremas etc...
+\newtheorem{defi}{Definição}[chapter]
+\newtheorem{propri}{Propriedade}[chapter]
+\newtheorem{conce}{Conceito}[chapter]
+\newtheorem{propo}{Proposição}[chapter]
+\newcommand{\dsum}{\displaystyle\sum}
+\usepackage{algorithm}
+\usepackage{clrscode3e}
+\usepackage{lscape}	%pagina em formato paisagem
+%--------------------------------------------------
+
+\usepackage[toc,page]{appendix}
+%\usepackage{isoaccent} % modified by Karol Kozioł for ShareLaTeX
+\usepackage{setspace}
+\usepackage{babel}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage[nottoc]{tocbibind}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+%--------------------------------------------------
+\usepackage{subfigure}
+\graphicspath{{figuras/}}
+
+%--------------------------------------------------
+
+\usepackage{amssymb, amsmath}
+\usepackage{capaUEM}      % Para formatação de capa e folhas de rosto
+\usepackage[
+    sort&compress,
+    %numbers,
+    authoryear,
+    ]{natbib} % Para usar estilo novo de referências
+\usepackage{verbatim}
+\usepackage{titlesec}
+\usepackage{enumerate}
+\usepackage{pdfpages}
+\usepackage{colortbl}
+\usepackage{color}
+\usepackage{textfit}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{fancyhdr}
+\usepackage{url}
+\usepackage{placeins}
+\usepackage{afterpage}
+\usepackage{setspace}
+\usepackage{amsmath}
+%\singlespacing
+\onehalfspacing
+%\doublespacing
+%\setstretch{1.1}
+
+\RequirePackage{ifthen}
+%
+% Importando APUD do abntcite.sty
+%
+\newcommand{\apudname}{apud}
+\def\citeopen{(}
+\def\citeclose{)}
+
+\newcommand{\apud}[3][]{\citeopen\citeauthor{#2}, \citeyear{#2} \apudname\ %
+\citeauthor{#3}, \citeyear{#3}%
+\ifthenelse{\equal{#1}{\empty}}{}{, #1}\citeclose}
+
+\let\cite=\citep    % O natbib requer \citep para referências. Então, se vc já escreveu muita coisa usando \cite, este comando substitui na hora de compilar
+
+\usepackage[a4paper, top=3cm, bottom=2cm, %   footskip=15pt,
+    verbose,
+    left=3cm,
+    right=2cm,
+  ]{geometry}
+
+%\widowpenalty=350 % comentado por Vinicius
+%\clubpenalty=350  % ''
+
+\exhyphenpenalty=10000 \hyphenpenalty=800
+
+\vfuzz1pc % Don't bother to report overfull boxes if over-edge is < 1pc
+\hfuzz1pc % Don't bother to report overfull boxes if over-edge is < 1pc
+
+\newcommand{\atributo}[1]{\textbf{\textit{#1}}}
+
+
+%% Limpa os cabeçalhos, deixando só o número da página
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancyplain}
+\fancyhf{}
+\rhead{\fancyplain{}{\thepage}}
+
+%% Muda a formataçao dos títulos das listas de figuras, tabelas e sumário
+\makeatletter
+
+\def\tableofcontents{
+\newpage
+\pagestyle{empty}
+\centerline{\large \textbf{SUMÁRIO}}
+\@mkboth{SUMÁRIO}{SUMÁRIO}
+\@starttoc{toc}
+}
+
+\def\listoffigures{
+\newpage
+\pagestyle{empty}
+\centerline{\large LISTA DE FIGURAS}
+\@mkboth{LISTA DE FIGURAS}{LISTA DE FIGURAS}
+\@starttoc{lof}
+}
+
+
+
+\def\listoftables{
+\newpage
+\pagestyle{empty}
+\centerline{\large LISTA DE TABELAS}
+\@mkboth{LISTA DE TABELAS}{LISTA DE TABELAS}
+\@starttoc{lot}
+}
+\makeatother
+\hyphenation{proba-bi-li-da-des}
+\hyphenation{apre-sen-tar}
+\hyphenation{gra-ma-ti-cais}
+\hyphenation{e-qui-va-le}
+\hyphenation{es-ta-be-le-ci-das}
+\hyphenation{cate-goria}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Estilos diferentes para cabeçalho de capítulo - by Adenilso
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makeatletter  %usado para que o @ seja considerado
+ \newcounter{capkind}
+ \setcounter{capkind}{1}   % define qual tipo de cabeçalho usar
+    
+     
+ \ifcase\value{capkind}
+ \def\@makechapterhead#1{%
+ \begingroup
+ \centering
+   \vspace*{50\p@}%
+         \noindent\begin{tabular}{p{0.34\textwidth}|p{0.22\textwidth}|p{0.34\textwidth}}
+   \cline{2-2}
+   \raisebox{0pt}[25pt][15pt]{}& \centering\large{\sffamily\scshape{\@chapapp}}\space \itshape\thechapter & \\
+   \hline
+   \hline
+       \multicolumn{3}{|p{0.97\textwidth}|}{\raisebox{0pt}[30pt][20pt]{}\centering\Huge \bfseries #1}\\
+   \hline
+   \hline
+   \raisebox{0pt}[10pt][10pt]{}&  & \\	
+   \cline{2-2}
+   \end{tabular}\par
+   \vspace*{40\p@}%
+ \endgroup
+ }
+ \def\@makeschapterhead#1{%
+ \begingroup
+ \centering
+   \vspace*{50\p@}%
+         \noindent\begin{tabular}{p{0.34\textwidth}|p{0.22\textwidth}|p{0.34\textwidth}}
+   \cline{2-2}
+   \raisebox{0pt}[10pt][10pt]{}&  & \\
+   \hline
+   \hline
+       \multicolumn{3}{|p{0.97\textwidth}|}{\raisebox{0pt}[30pt][20pt]{}\centering\Huge \bfseries #1}\\
+   \hline
+   \hline
+   \raisebox{0pt}[10pt][10pt]{}&  & \\	
+   \cline{2-2}
+   \end{tabular}\par
+   \vspace*{40\p@}%
+ \endgroup
+ }
+ \or %%%%%%%%%%%%%%%%%%%%%%%
+ 
+ \def\@makechapterhead#1{%
+ \begingroup
+   \vspace*{50\p@}%
+      \noindent
+       \sffamily\Huge\hrulefill          
+      {\begin{tabular}{|c|}
+          %\rowcolor{black}
+          \hline
+          \color{white} \large \scshape % \@chapapp{} \\
+          %\hline
+          \vspace{-2ex}\\ %coloquei para aumentar o espaço entre o título e o número
+          \Huge \slshape \scaletoheight{1cm}{\thechapter} \\ \hline
+      \end{tabular}     
+      }
+   
+      \par
+      \vspace*{18\p@}
+      {\Huge\bfseries\begin{flushright} #1\end{flushright}}\par
+      \vspace*{-6\p@}
+      \hspace*{0pt plus 1fill}
+     	\rule{.8\textwidth}{0.5pt}\\[-36\p@]
+     \hspace*{0pt plus 1fill}
+      \rule{.8\textwidth}{3pt}
+      \vskip 1.7ex
+ \endgroup
+     }
+                               
+ \def\@makeschapterhead#1{%       Essa parte configura o cabeçalho do capítulo referências
+  
+ \begingroup
+   \vspace*{30\p@}%
+      \noindent
+      \sffamily\Huge
+      {\Huge\bfseries \begin{flushright} #1\end{flushright}}\par
+      \vspace*{0\p@}
+ %     \hspace*{0pt plus 1fill}
+ %     	\rule{.8\textwidth}{0.5pt}\par
+      \vspace*{-12\p@}
+      \hspace*{0pt plus 1fill}
+       \rule{.8\textwidth}{3pt}
+      \vskip 1.7ex
+      
+ \endgroup
+      
+   
+     }
+     \def\@schap#1{%      
+  	 \begingroup
+   \vspace*{30\p@}%
+      \noindent
+      \sffamily\Huge
+      {\Huge\bfseries \begin{flushright} #1\end{flushright}}\par
+      \vspace*{0\p@}
+ %     \hspace*{0pt plus 1fill}
+ %     	\rule{.8\textwidth}{0.5pt}\par
+      \vspace*{-12\p@}
+      \hspace*{0pt plus 1fill}
+       \rule{.8\textwidth}{3pt}
+      \vskip 1.7ex
+      
+ \endgroup
+      
+   
+     }
+
+  
+
+
+\fi
+
+\makeatother %para voltar a ignorar o @
+%\includeonly{gerenciamento}
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DADOS PARA CAPA, FOLHA DE ROSTO E FOLHA DE APROVAÇÃO
+%
+\Jautor{JOÃOZINHO JÚNIOR}
+\Jtipoorientador{o} %% caso seja orientador
+\Jorientador{Beltrano da Silva}
+\JtipobancaC{o} %% caso seja professor (usado na folha de aprovação)
+
+
+%\Jcoorientador{o}{\small  Jose} %% caso haja co-orientador(a)
+%\Jtipocoorientador{o} %% caso seja co-orientador
+%\JtipobancaC{a}  %% caso seja professora (usado na folha de aprovação)
+
+
+
+
+
+%\Jtipocoorientador{a} %% caso seja co-orientadora
+\Jtitulo{Operadores de ... aplicados ao problema de ...}
+\Jtituloabs{Efficient neighborhood ... applied to the ...}
+
+\Jlocal{Maringá}
+\Jdata{2013}
+\Jcomentario{%
+\hyphenpenalty=10000
+Dissertação apresentada ao Programa de Pós-Graduação
+em Ciência da Computação do Departamento de Informática,
+Centro de Tecnologia da Universidade Estadual de Maringá,
+como requisito parcial para obtenção do título de
+Mestre em Ciência da Computação.}
+\Jcabecalho{
+UNIVERSIDADE ESTADUAL DE MARINGÁ\\
+CENTRO DE TECNOLOGIA\\
+DEPARTAMENTO DE INFORMÁTICA\\
+PROGRAMA DE PÓS-GRADUAÇÃO EM CIÊNCIA DA COMPUTAÇÃO}
+
+
+%\JtipobancaA{a} %% caso seja professora
+\JtipobancaA{o}  %% caso seja professor
+\JbancaA{Fulano 1}
+\JinstituicaoA{Universidade Estadual de Maringá --- DIN/UEM}
+
+%\JtipobancaB{a}  %% caso seja professora
+\JtipobancaB{o} %% caso seja professor
+\JbancaB{Fulano 2}
+\JinstituicaoB{Universidade Federal do Fim do Mundo --- DEINFO/UFFM}
+
+
+\Jdatadefesa{21 de Fevereiro de 2013.}
+\Jlocaldefesa{Sala 101, Bloco C-56, \textit{campus} da Universidade
+Estadual de Maringá}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frontmatter
+\Jcapa
+\mainmatter
+
+\Jfolhaderosto
+
+
+%\Jfichacatalografica
+%\include{ficha}
+%\include{errata}
+\Jfolhaaprovacao
+\geometry{left=2.5cm}
+
+
+\geometry{left=3cm}
+%\include{dedicatoria}
+\include{texto/_agradecimentos}
+
+\include{texto/_resumo}
+\include{texto/_abstract}
+
+\listoffigures
+
+\listoftables
+
+\include{texto/_abreviaturas}
+\tableofcontents
+
+% Capítulo 1
+\include{texto/_introducao}
+
+% Capítulo 2
+\include{texto/_problema_horarios}
+
+% Capítulo 3
+\include{texto/_revisao_literatura}
+
+% Capítulo 4
+\include{texto/_algoritmos_propostos}
+
+% Capítulo 5 
+\include{texto/_experimentos_computacionais}
+
+% Capítulo 6 
+\include{texto/_conclusao} 
+
+% Fancyhead
+\fancyhead[RO,LE]{\itshape REFERÊNCIAS}
+\fancyhead[RO,LE]{\thepage}
+
+% Bibliografia
+
+\renewcommand{\bibname}{REFERÊNCIAS} 
+%\setlength\bibindent{0mm}
+\setlength\bibhang{0mm} 
+%\bibliographystyle{apalike}
+\bibliographystyle{icmc2}
+\bibliography{texto/RevisaoLiteratura}
+
+% Apêndices
+
+\initappendix
+
+\end{document}

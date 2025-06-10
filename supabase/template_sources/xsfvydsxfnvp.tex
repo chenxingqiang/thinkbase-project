@@ -1,0 +1,139 @@
+\documentclass[a4paper,landscape, 12pt]{article}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ %total={170mm,257mm},
+ left=10mm,
+ right=10mm,
+ top=15mm,
+ bottom=10mm
+ }
+\usepackage[LGR, T1]{fontenc}
+\pagenumbering{gobble}%no page numbering
+\usepackage[english]{babel}
+\usepackage{fontspec,polyglossia}%itroduces nice fonts
+\setmainfont{Linux Libertine O}
+%https://tex.stackexchange.com/questions/37355/list-of-figures-tables-eliminate-dots
+\makeatletter
+\renewcommand\@dotsep{10000}%suppresing dots from LOF
+\makeatother
+\usepackage{pgfpages}
+\graphicspath{{./pics/}} %Setting the graphicspath
+\author{\LARGE\textbf{John Doe}}
+\date{\LARGE\textbf{\today}}
+\title{\textbf{{\Huge\textsc{Storyboard Template}}}\\
+}
+\usepackage[implicit=true]{hyperref}
+\usepackage[english]{cleveref}
+\usepackage{pgffor}%loops
+\usepackage{graphicx}
+\usepackage{xcolor}
+\hypersetup{%
+  colorlinks=true,% 
+  linkcolor=black,% 
+  urlcolor=black,% 
+  linkbordercolor=red,%
+  urlbordercolor=red,% 
+}
+\usepackage[export]{adjustbox}%frame for graphhics
+\usepackage[list=true,labelfont=bf,textfont=it,listformat=simple,labelformat=original,compatibility=false,labelsep=space,font=normalsize,position=top,figurename=SCENE]{caption} %get rid of colon
+\usepackage[list=true,listformat=simple,labelformat=simple,labelsep=space,font=normalsize,position=bottom]{subcaption}    %%Adding option to remove parenthesis
+\usepackage[ddmmyyyy]{datetime} %better format of the date
+\usepackage{fancyvrb} % for "\Verb" macro
+\usepackage{parskip}
+\usepackage{tikz,comment,verbatim,fancyvrb,color,soul}
+\renewcommand{\subfigurename}{SHOT}%custom subfigure name ;)
+\renewcommand\thefigure{\normalsize\arabic{figure}}
+\renewcommand\thesubfigure{\footnotesize{\thefigure\Alph{subfigure}}}
+%customizing the appearance of lof 
+\DeclareCaptionListFormat{figprefix}{\textbf{\figurename~#2}}
+\DeclareCaptionListFormat{subfigprefix}{\textbf{\subfigurename~#2}}
+\renewcommand{\numberline}[1]{#1\quad}   %avoiding overlap
+%https://tex.stackexchange.com/questions/630024/text-overlaps-with-declarecaptionlistformat-in-caption-package
+
+\newcommand\xxx{0.32}%sneaky variable to be used along with width of each picture 
+\newcommand\createGridLines{\dotfill}
+
+\makeatletter
+\g@addto@macro\p@subfigure{.}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\captionsetup[figure]{listformat=figprefix}%custom labels for lof
+\captionsetup[subfigure]{listformat=subfigprefix}%idem
+
+\makeatletter
+\@wholewidth2pt%width of frame ;)
+\makeatother
+\pagecolor{gray!10}%create a light gray background 
+\renewcommand*\listfigurename{List of Scenes \& Shots} %change of title 
+\vfill
+\maketitle
+\vfill
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{logo_stavrakos_dark.png}
+\end{figure}
+\clearpage    
+\listoffigures%
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\centering
+\caption{Cheatsheet 1}
+\includegraphics[width=0.8\textwidth]{storyboard_cheat_sheet.jpg}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\centering
+\caption{Cheatsheet 2}
+\includegraphics[width=0.8\textwidth]{pics/storyboard+shots.png}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\caption{Description of one scene\label{scene:1}}{
+\subfloat[Description of one shot]{\frame{\includegraphics[width=\xxx\textwidth]{sc1sh1.jpg}}\label{shot:1a}}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc1sh2.jpg}}\label{shot:1b}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc1sh3.jpg}}}\label{shot:1c}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc1sh4.jpg}}\label{shot:1d}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc1sh5.jpg}}\label{shot:1e}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc1sh6.jpg}}\label{shot:1f}}\quad
+\end{figure}
+\clearpage    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ \begin{figure}[h!]
+\centering
+%\quad has no height, but only width.
+\caption{Description of another scene \label{scene:2}}{
+\subfloat[Description of another shot]{\frame{\includegraphics[width=\xxx\textwidth]{sc2sh1.jpg}}\label{shot:2a}}}
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc2sh2.jpg}}\label{shot:2b}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc2sh3.jpg}}\label{shot:2c}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc2sh4.jpg}}\label{shot:2d}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc2sh5.jpg}}\label{shot:2e}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc2sh6.jpg}}\label{shot:2f}}\quad
+\end{figure}
+\clearpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+ \begin{figure}[h!]
+\centering
+\caption{You can describe a scene with a lot of words.\label{scene:3}}{
+\subfloat[You can describe a shot with a lot of words as well]{\frame{\includegraphics[width=\xxx\textwidth]{sc3sh1.jpg}}\label{shot:3a}}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc3sh2.jpg}}\label{shot:3b}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc3sh3.jpg}}\label{shot:3c}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc3sh4.jpg}}\label{shot:3d}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc3sh5.jpg}}\label{shot:3e}}\quad
+\subfloat[\createGridLines]{\frame{\includegraphics[width=\xxx\textwidth]{sc3sh6.jpg}}\label{shot:3f}}\quad
+\end{figure}
+\clearpage
+\section*{Commenting}
+We can now refer to scenes and shots. Here is how, by using the package \Verb+ subref+
+
+In scene \ref{scene:1} we can refer to shot \subref{shot:1a} and \subref{shot:1f}.
+Additionally in scene \ref{scene:2} we can refer to shots \subref{shot:2d} and \subref{shot:2a}
+\Cref{scene:1,scene:2}
+
+%%%
+%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

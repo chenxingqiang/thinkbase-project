@@ -1,0 +1,348 @@
+
+% This one will format for two-sided binding (ie left and right pages have mirror margins; blank pages inserted where needed):
+\documentclass[a4paper,twoside]{gamosinos}
+
+
+%----------------------------------------------------------------------------------------
+%	NOMBRE DEL AUTOR
+%----------------------------------------------------------------------------------------
+
+%% HERE CHANGE NAME
+\fancyfoot[C]{\emph{Name author, \today}}  %HERE
+
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES
+%----------------------------------------------------------------------------------------
+
+\usepackage{pdfpages}
+
+\usepackage{listings}
+\usepackage{ctable}
+\usepackage{xcolor}
+\usepackage{xcolor,colortbl}
+
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{mdframed}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+%%
+%% Julia definition (c) 2014 Jubobs
+%%
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},
+   sensitive=true,
+   alsoother={},
+   morecomment=[l]\#,
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+    language         = Julia,
+    basicstyle       = \ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+}
+
+\lstdefinestyle{Matlab}{  
+  belowcaptionskip=1\baselineskip,
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                % sets automatic line breaking
+  xleftmargin=\parindent,
+  language=C,
+  morekeywords={end, elseif},
+  comment=[l]\%,                              % comments    
+  tabsize=4, 
+  numberstyle=\tiny\noncopynumber,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\itshape\color[rgb]{.133,.545,.133},
+  stringstyle=\color{mauve},
+  directivestyle=\bfseries\color{purple},
+  framexleftmargin=3mm,
+  frame=single,
+}
+
+\lstset{%
+    language         = Matlab,
+    basicstyle       = \ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+}
+
+
+%%
+%% OpenSCAD definition
+%%
+\lstdefinelanguage{OpenSCAD}%
+  {keywords={sphere,cylinder,acos,atan2,translate,rotate,norm},
+      morekeywords=[2]{module,false,true},
+  keywordstyle=[2]\color{cyan},
+   sensitive=true,
+   alsoother={},
+   morecomment=[l]{//},
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+    language         = OpenSCAD,
+    basicstyle       = \ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+}
+
+%%
+%% BDF definition
+%%
+\lstdefinelanguage{BDF}%
+  {keywords={ID,SOL,TIME,TITLE,SUBTITLE,LOAD,SPC,DISP,STRESS,STRAIN,ELFORCE,SPCFORCE,BAILOUT,MDLPRM,SPC1,FORCE,GRID,MAT1,CBAR,PBARL,BAR,ALL},
+  morekeywords=[2]{CEND,BEGIN,PARAM,BULK,ENDDATA},
+  keywordstyle=[2]\color{cyan},
+  sensitive=true,
+  comment=[l]{\$},
+}[keywords,comments,strings]%
+
+\lstset{%
+    language         = BDF,
+    basicstyle       = \ttfamily,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{codegreen},
+    showstringspaces = false,
+    literate =  {=}{{{\color{red}=}}}1
+                {,}{{{\color{red},}}}1,
+}
+
+%%
+%% VTU definition
+%%
+
+\lstdefinelanguage{VTU}{%
+  language     = XML,
+  morekeywords = {VTKFile,UnstructuredGrid,Piece,Points,DataArray,Cells,CellData},
+}
+
+%%
+%% STL definition
+%%
+
+\lstdefinelanguage{STL}{%
+  morekeywords = {solid,endsolid,facet,normal,outer,loop,vertex,endloop,endfacet},
+}
+
+%%
+%% DOS/Terminal definition
+%%
+
+\lstdefinelanguage{DOS}{
+    backgroundcolor=\color{black},
+    basicstyle=\scriptsize\color{white}\ttfamily,
+    numbers=none,
+}
+
+\usepackage{afterpage}
+
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+
+
+
+\correctionstrue
+
+% To make text superscripts shortcuts
+	\renewcommand{\th}{\textsuperscript{th}} % ex: I won 4\th place
+	\newcommand{\nd}{\textsuperscript{nd}}
+	\renewcommand{\st}{\textsuperscript{st}}
+	\newcommand{\rd}{\textsuperscript{rd}}
+
+%----------------------------------------------------------------------------------------
+%	START DOCUMENT
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+\pagenumbering{gobble}
+
+%%%%% TITLE PAGE INFORMATION
+% Everybody needs to complete the following:
+\title{Suitably impressive title} %HERE
+\author{\textbf{Your Name}} % HERE
+\college{Nonlinear Solid Mechanics and Structures Group\\
+(GAMOSINOS)}
+\degree{Aeronautics and Space Engineer}
+\degreedate{2022} % HERE
+
+
+%%%%% CHOOSE YOUR LINE SPACING
+% This is the official option.  Use it for your submission copy and library copy:
+\setlength{\textbaselineskip}{22pt plus2pt}
+% This is closer spacing (about 1.5-spaced) that you might prefer for your personal copies:
+%\setlength{\textbaselineskip}{18pt plus2pt minus1pt}
+
+% You can set the spacing here for the roman-numbered pages (acknowledgements, table of contents, etc.)
+\setlength{\frontmatterbaselineskip}{17pt plus1pt minus1pt}
+
+% Leave this line alone; it gets things started for the real document.
+\setlength{\baselineskip}{\textbaselineskip}
+
+%%%%% CHOOSE YOUR SECTION NUMBERING DEPTH HERE
+% You have two choices.  First, how far down are sections numbered?  (Below that, they're named but
+% don't get numbers.)  Second, what level of section appears in the table of contents?  These don't have
+% to match: you can have numbered sections that don't show up in the ToC, or unnumbered sections that
+% do.  Throughout, 0 = chapter; 1 = section; 2 = subsection; 3 = subsubsection, 4 = paragraph...
+
+% The level that gets a number:
+\setcounter{secnumdepth}{2}
+% The level that shows up in the ToC:
+\setcounter{tocdepth}{2}
+
+
+
+% JEM: Pages are roman numbered from here, though page numbers are invisible until ToC.  This is in
+% keeping with most typesetting conventions.
+
+%\afterpage{\blankpage}
+\maketitle
+
+\pagenumbering{arabic}
+\begin{romanpages}
+
+%\afterpage{\blankpage}
+%----------------------------------------------------------------------------------------
+%	QUOTATION PAGE
+%----------------------------------------------------------------------------------------
+
+\vspace*{0.1\textheight}
+\newpage
+\vspace*{0.2\textheight}
+\noindent\enquote{\itshape Thanks to my solid academic training, today I can write hundreds of words on virtually any topic without possessing a shred of information, which is how I got a good job in journalism.}\bigbreak
+
+\hfill Dave Barry
+\afterpage{\blankpage}
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS -- Nothing to do here except comment out if you don't want it.
+%----------------------------------------------------------------------------------------
+
+
+\begin{acknowledgements}
+ 	\input{text/acknowledgements}
+\end{acknowledgements}
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+%%%%%  Nothing to do here except comment out if you don't want it.
+\begin{abstract}
+	\input{text/abstract}
+\end{abstract}
+
+%%%%% MINI TABLES
+% This lays the groundwork for per-chapter, mini tables of contents.  Comment the following line
+% (and remove \minitoc from the chapter files) if you don't want this.  Un-comment either of the
+% next two lines if you want a per-chapter list of figures or tables.
+\dominitoc % include a mini table of contents
+%\dominitoc  % include a mini list of figures
+%\dominilot  % include a mini list of tables
+%\dominilol
+%\dominilol
+
+% This aligns the bottom of the text of each page.  It generally makes things look better.
+\flushbottom
+
+% This is where the whole-document ToC appears:
+\tableofcontents
+
+\listoffigures
+	\mtcaddchapter
+% \mtcaddchapter is needed when adding a non-chapter (but chapter-like) entity to avoid confusing minitoc
+
+% Uncomment to generate a list of tables:
+\listoftables
+	\mtcaddchapter
+
+\lstlistoflistings
+	%\mtcaddchapter
+	
+\listofalgorithms
+	%\mtcaddchapter
+	
+	%\mtcaddchapter
+%%%%% LIST OF ABBREVIATIONS,symbols, constants...
+% This example includes a list of abbreviations.  Look at text/abbreviations.tex to see how that file is
+% formatted.  The template can handle any kind of list though, so this might be a good place for a
+% glossary, etc.
+\include{text/symbols}
+\include{text/abbreviations}
+
+% The Roman pages, like the Roman Empire, must come to its inevitable close.
+\end{romanpages}
+
+%----------------------------------------------------------------------------------------
+%	ADD CHAPTERS AND APPENDIX HERE
+%----------------------------------------------------------------------------------------
+
+%%%%% CHAPTERS
+% Add or remove any chapters you'd like here, by file name (excluding '.tex'):
+\flushbottom
+\input{text/chapters/list_of_chapters}
+
+% Starts lettered appendices, adds a heading in table of contents, and adds a
+%    page that just says "Appendices" to signal the end of your main text.
+\startappendices
+% Add or remove any appendices you'd like here:
+\input{text/appendix/list_of_appendices}
+
+
+%----------------------------------------------------------------------------------------
+%	REFERENCES
+%----------------------------------------------------------------------------------------
+
+\bibliographystyle{plain}
+\bibliography{references.bib}
+
+
+
+\end{document}

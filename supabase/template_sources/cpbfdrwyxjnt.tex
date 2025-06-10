@@ -1,0 +1,231 @@
+% Copyright (C) 2020-2024 by Thomas Auzinger <thomas@auzinger.name>
+
+\PassOptionsToPackage{usenames,dvipsnames,table}{xcolor} % Ensure that the document loads packages with all required options.
+\documentclass[draft,final]{istaustriathesis}
+
+% Set the copyright license. The possible choices are 'restricted' to reserve all rights or a Creative Commons license.
+% See https://creativecommons.org/choose/ for information on choosing a license.
+% The supported Creative Commons licenses are 'cc-by', 'cc-by-sa', 'cc-by-nd', 'cc-by-nc', 'cc-by-nc-sa', and 'cc-by-nc-nd'.
+\setlicense{choose} % Choose 'restricted' or any of the 'cc-by...'.
+% If a Creative Commons license is chosen, the corresponding license information can be added to the PDF metadata.
+% For this, the package 'doclicense' needs to be uncommented below.
+% Furthermore, the 'modifier' option of 'doclicense' needs to mirror the chosen Creative Commons license.
+\usepackage[type={CC},modifier={by-nc-sa},version={4.0},hyperxmp=false]{doclicense} % Sets the license metadata. See copyright licensing below.
+% If no Creative Commons license is chosen, then the appropriate copyright text and (potentially empty) URL must be entered manually.
+% For this, edit the command \Copyright{...} and \CopyrightURL{...} in the filecontents* environment of \jobname.xmpdata below.
+
+% The pdfx package throws an error when utilizing the \xspace command inside the XMP metadata generation.
+% Since \xspace is utilized by the \doclicenseLongTextForHyperref command of the doclicense package, a workaround is implemented below.
+% It defines a \doclicenseLongTextForHyperrefFixed command that can be used instead of \doclicenseLongTextForHyperref.
+\begingroup
+\renewcommand{\xspace}{\space} % Temporarily replace \xspace with \space.
+\xdef\doclicenseLongTextForHyperrefFixed{\doclicenseLongTextForHyperref} % Expand the \doclicenseLongTextForHyperref and define the fixed version globally.
+\endgroup
+
+% Define convenience functions to use the author name and the thesis title in the PDF document properties.
+\newcommand{\authorname}{Forename Surname} % The author name without titles.
+\newcommand{\thesistitle}{Title of the Thesis} % The title of the thesis.
+\newcommand{\issn}{2663-337X} % Standard ISSN of all ISTA PhD theses.
+\newcommand{\isbn}{978-0-00000-000-0} % Leave empty if no ISBN is used.
+% Please contact IST Library library@ist.ac.at if you want to register an ISBN for your thesis.
+
+% Create the XMP metadata file for the creation of PDF/A compatible documents.
+\begin{filecontents*}[overwrite]{\jobname.xmpdata}
+\Author{\authorname}                                    % The author's name in the document properties.
+\Title{\thesistitle}                                    % The document's title in the document properties.
+\Language{en-US}                                        % The document's language in the document properties. Select 'en-US' or 'en-GB'.
+\Keywords{a\sep list\sep of\sep keywords}               % The document's keywords in the document properties (separated by '\sep ').
+\Publisher{Institute of Science and Technology Austria} % The document's publisher in the document properties.
+\Subject{PhD Thesis}                                    % The document's subject in the document properties.
+\Copyright{\doclicenseLongTextForHyperrefFixed}         % The document's copyright message in the document properties.
+\CopyrightURL{\doclicenseURL}                           % The document's copyright URL in the document properties.
+\Copyrighted{True}
+\ISBN{\isbn}                                            % The document's ISBN in the document properties.
+\Journalnumber{\issn}                                   % The document's ISSN in the document properties.
+\end{filecontents*}
+
+% Extended LaTeX functionality is enabled by including packages with \usepackage{...}.
+\usepackage[english]{babel} % The language of the thesis. Use 'british' for British English.
+\usepackage{natbib}     % Extend bibliography management.
+\usepackage{bibentry}   % Provide full citation support for single references.
+\usepackage{amsmath}    % Extended typesetting of mathematical expression.
+\usepackage{amssymb}    % Provides a multitude of mathematical symbols.
+\usepackage{mathtools}  % Further extensions of mathematical typesetting.
+\usepackage{microtype}  % Small-scale typographic enhancements.
+\usepackage[inline]{enumitem} % User control over the layout of lists (itemize, enumerate, description).
+\usepackage{multirow}   % Allows table elements to span several rows.
+\usepackage{booktabs}   % Improves the typesetting of tables.
+\usepackage{subcaption} % Allows the use of subfigures and enables their referencing.
+\usepackage[ruled,linesnumbered,algochapter]{algorithm2e} % Enables the writing of pseudo code.
+\usepackage[usenames,dvipsnames,table]{xcolor} % Allows the definition and use of colors. This package has to be included before TikZ.
+\usepackage{nag}        % Issues warnings when best practices in writing LaTeX documents are violated.
+\usepackage{todonotes}  % Provides tooltip-like todo notes.
+\usepackage{morewrites} % Increases the number of external files that can be used.
+\usepackage[a-2b,mathxmp]{pdfx}  % Enables PDF/A compliance. Loads the package hyperref and has to be included second to last.
+\usepackage[acronym,toc]{glossaries} % Enables the generation of glossaries and lists of acronyms. This package has to be included last.
+
+% Set PDF document properties
+\hypersetup{
+	pdfpagelayout   = TwoPageRight,            % How the document is shown in PDF viewers (optional).
+	linkbordercolor = {Melon},                 % The color of the borders of boxes around hyperlinks (optional).
+}
+
+\setpnumwidth{2.5em}        % Avoid overfull hboxes in the table of contents (see memoir manual).
+\setsecnumdepth{subsection} % Enumerate subsections.
+
+\nonzeroparskip             % Create space between paragraphs (optional).
+\setlength{\parindent}{0pt} % Remove paragraph indentation (optional).
+
+\nobibliography* % Allow the use of full citation in the list of publications.
+
+\makeindex      % Use an optional index.
+\makeglossaries % Use an optional glossary.
+%\glstocfalse   % Remove the glossaries from the table of contents.
+
+% Comment the following line to switch the document to a serif font, i.e., Latin Modern Roman
+% (see https://tug.org/FontCatalogue/latinmodernroman/)
+\renewcommand{\familydefault}{\sfdefault} % Switch document to sans serif font, i.e., Latin Modern Sans.
+% (see https://tug.org/FontCatalogue/latinmodernsans/)
+
+% Set the page numbers to bottom centered.
+\makeevenfoot{plain}{}{\thepage}{} % For front and back matter.
+\makeoddfoot{plain}{}{\thepage}{} % For front and back matter.
+\makeevenfoot{Ruled}{}{\thepage}{} % For main matter.
+\makeoddfoot{Ruled}{}{\thepage}{} % For main matter.
+
+% Required data.
+\setthesis{phd} % Select 'master' or 'phd'.
+\settitle{\thesistitle}
+\setsubtitle{Optional Subtitle} % Comment this line if no subtitle is used.
+% If your subtitle contains commas, enclose it with additional curvy brackets (i.e., \setsubtitle{{subtitle text}}) or define it as a macro as done with \thesistitle.
+\setdate{2020}{03}{10} % Set signing date with 3 arguments: {day}{month}{year}.
+\setissn{\issn}
+\setisbn{\isbn} % Comment this line if no ISBN is used.
+
+% Define convenience function for an ISTA affiliation.
+\newcommand{\istaustriaaffiliation}{ISTA, Klosterneuburg, Austria}
+
+% Set persons with 4 arguments:
+%  {title(s) before name}{name}{title(s) after name}{affiliation}
+%  where both titles are optional (i.e. can be given as empty brackets {}).
+% Some of the following persons are optional for Master's or PhD theses and can be commented if they do not apply.
+\setauthor{}{\authorname}{}{\istaustriaaffiliation}
+\setsupervisor{}{Name Surname}{}{\istaustriaaffiliation}
+\setcosupervisor{}{Name Surname}{}{Institution, Place, Country} % Optional for Master's and PhD theses.
+\setcommitteememberI{}{Name Surname}{}{\istaustriaaffiliation}
+\setcommitteememberII{}{Name Surname}{}{Institution, Place, Country} % Optional for Master's thesis.
+\setcommitteememberIII{}{Name Surname}{}{Institution, Place, Country} % Optional for Master's and PhD theses.
+\setcommitteememberIIII{}{Name Surname}{}{Institution, Place, Country} % Optional for Master's and PhD theses.
+\setdefensechair{}{Name Surname}{}{\istaustriaaffiliation} % Optional for Master's thesis.
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% FRONT MATTER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frontmatter % Switch to roman page numbering and prevent chapter numbering.
+\pagestyle{plain} % Set simple page numbering.
+% The structure of the thesis has to conform to the guidelines at
+%  https://phd.pages.ist.ac.at/student-resources/.
+
+\addtitlepage
+\addcommitteepage
+\addstatementpage
+
+\begin{abstract}
+\todo[inline]{
+	Summarize the gist of your thesis in one page.}
+\end{abstract}
+
+% The Acknowledgement chapter is optional and can be removed.
+\begin{acknowledgements}
+\todo[inline]{
+	Mention grants if you were funded.
+	Consider Scientific Service Units (SSUs) at ISTA and other staff if you got their support.}
+\end{acknowledgements}
+
+\begin{aboutauthor}
+\todo[inline]{
+	Include paragraph of text summarizing your educational background, your academic profile (e.g. relevant research projects or work experience, list of publications), to give readers a snapshot idea of you as a person/academic.
+	It is not meant to be a CV in the sense that it is not intended for job applications.
+	This means things like your email address, your nationality, your current address, etc., should be left out.}
+\todo[inline,color=white]{
+	The following is an entirely fictional blurb to give you an idea:\\
+	Jane Doe completed a BSc in Natural Sciences at the University of Cambridge and an MSc in Cell Biology at the University of Edinburgh before joining ISTA in September 2016.
+	Her main research interests include evolution of genetic traits and environmental pressures on evolution.
+	She worked on the research project ``Mathematical Modeling of Evolutionary Constraints'' with the 
+	Abel group at the University of Vienna in the summer of 2014, and published these results in the high-impact journal Evolutionary Biology.
+	During her PhD studies, Jane also presented her research results at the EvoBIO conference in Parma in 2018 and helped develop the tool EVOBOT for modeling evolutionary constraints, currently hosted by ISTA.}
+\end{aboutauthor}
+
+\begin{publicationlist}  % Remove if not applicable for a Master's thesis.
+\todo[inline]{
+	Specify all co-authors and collaborator contributions to this thesis.
+	See the \href{https://phd.pages.ist.ac.at/graduate_school_guidelines_for_thesis_submission/}{Guidelines for Thesis Submission} for details.
+}
+\todo[inline]{
+	List all publications that appear in this thesis.
+}
+\todo[inline,color=white]{
+	Use the \texttt{\textbackslash bibentry} command to produce a full citation:
+}
+\bibentry{Turing1936} % Exemplary full citation.
+\end{publicationlist}
+
+\cleardoublepage
+\renewcommand{\contentsname}{Table of Contents} % Specify chapter heading for table of contents.
+\tableofcontents
+\listoffigures
+
+
+% Create a group and deactivate all page breaks and blank pages.
+% This puts the lists of figures, tables, etc. on the same pages.
+% To reintroduce page breaks or blank pages, take the lists out of the group.
+\begingroup % Starting a group keeps the deactivations restricted to the group.
+\let\newpage\relax
+\let\clearpage\relax
+\let\cleardoublepage\relax
+
+\listoftables
+\listofalgorithms\addcontentsline{toc}{chapter}{List of Algorithms}
+\printglossary[title={List of Terms}]
+\printglossary[type=\acronymtype,title={List of Abbreviations}]
+\endgroup % End the deactivation group.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% MAIN MATTER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mainmatter % Switch to Arabic page and chapter numbering.
+\pagestyle{Ruled} % Show chapter and section name at the top of the page.
+%\pagestyle{plain} % Alternative page style without the names at the top.
+
+\chapter{Introduction}
+\todo{Enter your text here.}
+
+\chapter{Additional Chapter}
+\todo{Enter your text here.}
+
+% REMOVE THE FOLLOWING LINE IN THE FINAL VERSION OF THE THESIS.
+\input{intro.tex} % A short introduction to LaTeX.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BACK MATTER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backmatter
+\pagestyle{plain}
+
+\bibliographystyle{alpha} % Define the citation style.
+\bibliography{intro} % Add the bibliography file (intro.bib in this case).
+
+\mainmatter* % Remove this line to prevent numbering of appendix chapters.
+\appendix % Number appendix chapters with letters instead of numbers.
+
+\chapter{Example Appendix Chapter}
+
+\backmatter
+% REMOVE THE FOLLOWING THREE LINES IN THE FINAL VERSION OF THE THESIS.
+\makeatletter\@todonotes@SetTodoListName{List of Todos}\makeatother % Set name of list of todos.
+\todototoc % Add the list of todos to the table of contents.
+\listoftodos % Add a list of all todos.
+
+\end{document}

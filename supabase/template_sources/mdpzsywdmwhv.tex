@@ -1,0 +1,181 @@
+\documentclass[a4paper,12pt]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{fancyhdr}
+\usepackage{amsmath, mathtools}
+\usepackage{amssymb}
+\usepackage{eurosym}    
+\usepackage{graphicx}
+\usepackage{float} 
+\usepackage{vmargin}
+\usepackage{cancel}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{appendix}   
+\usepackage[pdftex]{hyperref}   
+\hypersetup{colorlinks=true,linkcolor=black,linkcolor=black,filecolor=black,urlcolor=black, citecolor=black}    \urlstyle{same} %hipervinculos en negro y sin subrayar
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+\usepackage{listings}   
+\usepackage{xcolor} 
+\usepackage{wrapfig}    
+\usepackage{transparent}
+\usepackage{import}
+\usepackage{verbatim}
+\usepackage{afterpage}
+\usepackage{emptypage}
+\usepackage{etoolbox}
+\usepackage{parskip}
+\usepackage{amssymb}
+
+\makeatletter
+\definecolor{nar}{HTML}{FF8000}
+\renewcommand\mainmatter{
+    \clearpage
+  \@mainmattertrue
+  \pagenumbering{arabic}}
+
+\renewcommand\lstlistingname{Programación}
+\renewcommand\lstlistlistingname{Índice de programación}
+\addto\captionsspanish{\renewcommand*\contentsname{Índice}}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}  
+          \renewcommand{\listtablename}{Índice de tablas}}
+
+% cambiar márgenes chapters
+\patchcmd{\@makechapterhead}{50\p@}{\chapheadtopskip}{}{}% Space from top of page to CHAPTER X
+\patchcmd{\@makechapterhead}{20\p@}{\chapheadsep}{}{}% Space between CHAPTER X and CHAPTER TITLE
+\patchcmd{\@makechapterhead}{40\p@}{\chapheadbelowskip}{}{}% Space between CHAPTER TITLE and text
+% --- Patch \chapter*
+\patchcmd{\@makeschapterhead}{50\p@}{\chapheadtopskip}{}{}% Space from top of page to CHAPTER TITLE
+\patchcmd{\@makeschapterhead}{40\p@}{\chapheadbelowskip}{}{}% SPace between CHAPTER TITLE and text
+\makeatother
+% Set new lengths
+\newlength{\chapheadtopskip}\setlength{\chapheadtopskip}{20pt}
+\newlength{\chapheadsep}\setlength{\chapheadsep}{40pt}
+\newlength{\chapheadbelowskip}\setlength{\chapheadbelowskip}{15pt}
+
+\renewcommand{\arraystretch}{1.3}
+
+%Dimensiones
+\textwidth = 16cm
+\textheight = 25cm
+\topmargin = 1cm
+\oddsidemargin = 2.5cm
+\evensidemargin = 2.5cm
+\headsep = 1cm
+\footskip = 1.5cm
+
+%Encabezado y pie de página
+
+\makeatletter
+\renewcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
+\thispagestyle{fancy}% original style: plain
+\global\@topnum\z@
+\@afterindentfalse
+\secdef\@chapter\@schapter}
+%la siguiente línea es para que no haya páginas en blanco entre los capítulos
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+%para quitar lo de "capítulo 1"
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+      \if@mainmatter
+        %\huge\bfseries \@chapapp\space \thechapter
+        \Huge\bfseries \thechapter.\space%
+        %\par\nobreak
+        %\vskip 20\p@
+      \fi
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother %para usar lo mismo en la primera pag del capitulo
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\transparent{0.6}\includegraphics[width=3cm]{portada/logosportada/logoetsit.png}}
+\fancyhead[RE,LO]{\transparent{0.6}\thepage}
+\chead{\transparent{0.6}Nombre del autor}
+\fancyfoot[CE,CO]{\transparent{0.6}Título completo del TFG}
+\renewcommand{\headrulewidth}{0.4pt} % grosor de la línea de la cabecera
+\renewcommand{\footrulewidth}{0.4pt} % grosor de la línea del pie
+
+
+\begin{document}
+
+%Numeracion romana
+\frontmatter
+
+%Portada
+\input{portada/portadaNaranja.tex}
+\empty
+
+% Segunda portada
+\input{portada/segunda.tex}
+\empty
+\input{portada/portadaBlanca.tex}
+\empty
+
+% Resumen y agradecimientos 
+\input{pre/resumen}
+\newpage
+\input{pre/greetings}
+
+% Indice, lista de figuras y de tablas
+\newpage
+\begin{center}
+   \tableofcontents
+\end{center}
+\newpage
+\begin{center}
+   \listoffigures
+   \listoftables
+\end{center}
+\newpage
+
+% Lista de acrónimos
+    \input{pre/acronimos.tex}
+\newpage
+
+\mainmatter
+
+\chapter{Introducción y objetivos}
+    \import{capitulos/cap1/}{intro.tex}
+    \import{capitulos/cap1/}{objetivos.tex}
+\newpage
+
+\chapter{Marco teórico}
+    \import{capitulos/cap2/}{ejemplo.tex}
+\newpage
+
+\chapter{Desarrollo}
+    \import{capitulos/cap3/}{ejemploDesarrollo.tex}
+\newpage
+
+\chapter{Resultados}
+    \import{capitulos/cap4/}{ejemploResultados.tex}
+\newpage
+
+\chapter{Conclusiones y líneas futuras}
+    \import{capitulos/cap5/}{conclusiones.tex}
+    \import{capitulos/cap5/}{lineasfuturas.tex}
+
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{biblio}
+
+\backmatter
+\chapter{Anexo A: Aspectos éticos, económicos, sociales y ambientales}
+    \import{capitulos/anexos/}{anexoA.tex}
+
+
+\newpage
+\chapter{Anexo B: Presupuesto económico}
+    \import{capitulos/anexos/}{anexoB.tex}
+\newpage
+
+
+
+\end{document}

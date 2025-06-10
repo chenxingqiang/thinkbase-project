@@ -1,0 +1,130 @@
+% Layout
+\documentclass[12pt]{book}
+
+% Other packages needed to put together the various pieces
+\usepackage{import} % the "glue" of this project
+\usepackage[toc,page]{appendix}
+\usepackage[nonumberlist,nogroupskip]{glossaries} % allows creating a list of acronyms/glossaries
+\usepackage{morewrites} % needed for more than 18k entries, consider if it's necessary
+\usepackage{settings} % check if this package is available
+\usepackage{setspace}
+\usepackage{makeidx}
+\usepackage{enumitem} % standard for lists
+\usepackage{pdfpages} % allows including PDFs in your doc
+
+% Bibliography
+\usepackage[
+    backend=biber,
+    style=apa,
+    sorting=nyt
+]{biblatex}
+\addbibresource{references.bib}
+
+% Listings
+\usepackage[titles]{tocloft}
+
+% Quotes
+\usepackage{csquotes} % no style option here, use \setquotestyle if needed
+\usepackage{doi} % formats the DOI as a link
+
+% Footnotes line spacing
+\renewcommand{\footnotelayout}{\setstretch{1}}
+
+% Caption format
+\captionsetup{format=semanticnoodles} % make sure this style is defined or use a standard style
+
+% Reiterate sans serif
+\renewcommand*\ttdefault{lmvtt}
+
+% Load glossary.tex
+\loadglsentries{glossary}
+\makeglossaries
+
+%%%%%%%%% THE DOCUMENT %%%%%%%%%
+\begin{document} % yay!
+
+    % Frontmatter
+    \frontmatter
+
+    % Cover page
+    \include{00-cover/cover-sample.tex}
+    \restoregeometry % margins are slightly different in the cover
+    \renewcommand{\baselinestretch}{1.5} % same goes for line-height
+    \renewcommand{\arraystretch}{1.5} % White spaces in the table cells
+    \clearpage
+
+    % Credits
+    \include{credits.tex}
+    \clearpage
+
+    % Authorship Declaration
+    \include{02-frontmatter/authorship-declaration.tex}
+
+    % If the thesis follows the collection of articles format - External contributions
+    \include{02-frontmatter/datasets.tex}
+
+    % Acknowledgements
+    \include{02-frontmatter/acknowledgements.tex}
+
+    % Publications
+    \include{02-frontmatter/publications.tex}
+
+    % Abstract
+    \include{02-frontmatter/abstract.tex}
+
+    % Add the glossary
+    \let\cleardoublepage\clearpage
+    \printglossary
+    \addcontentsline{toc}{chapter}{Glossary} % add item to the TOC
+
+    % List of figures
+    \listoffigures
+
+    % List of tables
+    \listoftables
+
+    % List of listings
+    \renewcommand\listoflistingscaption{List of source codes} % feel free to change this title, but remember to change the TOC title accordingly!
+    \listoflistings
+    \addcontentsline{toc}{chapter}{List of Source Codes}
+
+    % Compile TOC
+    \thispagestyle{empty}
+    \tableofcontents
+
+    % Mainmatter
+    \thispagestyle{empty}
+    \mainmatter
+
+    % Chapters
+    \chapter{Getting Started} % Add here the title of your chapter
+    \thispagestyle{empty} % Removes the page number on the first page
+
+    % Import Chapter 1 parts
+    \import{01-chapters/}{chapt-01/ch011.tex}
+    \import{01-chapters/}{chapt-01/ch012.tex}
+    % This way you can attach more than one file to a specific chapter - you can keep a file per each new section or just have a cumulative one.
+
+    \chapter{Painful tables and how to rule them} % Add here the title of your chapter
+    \thispagestyle{empty} % Removes the page number on the first page
+    % Import Chapter 2 parts
+    \import{01-chapters/}{chapt-02/ch021.tex}
+
+    % Backmatter
+    \backmatter
+    \clearpage
+
+    % Add references
+    \renewcommand{\baselinestretch}{1} % same goes for line-height
+    \addcontentsline{toc}{chapter}{Bibliography}
+    \printbibliography
+    % Prevent the duplication of the DOI prefix
+    \renewcommand{\doitext}{}
+
+    % Add appendices
+    \clearpage
+    \appendix
+    \renewcommand{\thesection}{\Alph{section}} % Alphabetic numbering from now on
+    \include{zz-appendices/appendices.tex}
+    \clearpage
+\end{document}

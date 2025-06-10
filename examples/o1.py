@@ -1,4 +1,4 @@
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import os
 import openai
 import numpy as np
@@ -13,10 +13,10 @@ if not api_key:
 client = openai.OpenAI(api_key=api_key)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -50,7 +50,7 @@ async def get_completion(prompt: str, system_message: str = "") -> str:
         return "No response generated"
     return content
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def solve_complex_math_problem(equation: str, variables: dict, constraints: list, optimization_goal: str) -> str:
     """Solve a complex mathematical problem."""
     system_message = """You are an expert mathematician. Provide a clear, concise solution focusing on:
@@ -72,7 +72,7 @@ Focus on:
     
     return await get_completion(prompt, system_message)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def write_plot_code_for_problem_and_solution(solution: str) -> str:
     """Generate Python code to visualize the mathematical solution."""
     system_message = """You are a Python programmer. Write minimal plotting code that:

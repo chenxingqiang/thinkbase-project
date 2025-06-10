@@ -1,0 +1,148 @@
+% Este documento destina-se a servir como modelo para a produção de documentos
+% de pesquisa do PPGINF/UFPR, como projetos, dissertações e teses. A classe de
+% documento se chama "ppginf" (arquivo ppginf.cls) e define o formato básico do
+% documento. O texto está organizado em capítulos que são colocados em
+% subdiretórios separados. São definidos exemplos para a inclusão de figuras,
+% códigos-fonte e a definição de tabelas.
+%
+% Produzido por Carlos Maziero (maziero@inf.ufpr.br) em Outubro de 2015.
+% Adaptado de um modelo anterior construído pelo autor para o PPGIA/PUCPR.
+
+% Opções da classe ppginf:
+%
+% - defesa  : versão para entregar à banca; tem espaçamento 1,5
+%             e omite algumas páginas iniciais (agradecimentos, etc)
+% - final   : versão pós-defesa, para enviar à biblioteca;
+%             tem espaçamento simples e todas as páginas iniciais.
+% - oneside : para impressão somente frente; use quando for gerar
+%             somente o PDF, sem impressão.
+% - twoside : para impressão frente/verso; use quando for gerar
+%             uma versão impressa, para economizar papel.
+% - ... (demais opções aceitas pela classe "book")
+
+% Opções default: defesa, oneside
+\documentclass[defesa,oneside]{ppginf}	% versão para a defesa
+%\documentclass[final,oneside]{ppginf}	% versão final, só em PDF
+%\documentclass[final,twoside]{ppginf}	% versão final, em PDF + impresso
+
+% configurações de diversos pacotes, inclusive o fonte principal do texto
+\include{packages}
+
+%=====================================================
+
+\begin {document}
+
+% Principais dados, usados para gerar as páginas iniciais.
+% Campos não utilizados podem ser removidos ou comentados.
+
+% título :-)
+\title{Um modelo \LaTeX\ para dissertações e teses \\ (escrevi um título mais longo para ver como se comporta a quebra de linhas e o espaçamento entre elas)}
+
+% palavras-chave e keywords
+\pchave{palavra-chave 1, palavra-chave 2, palavra-chave 3}
+\keyword{keyword 1, keyword 2, keyword 3}
+
+% autoria
+\author{Carlos Alberto Maziero}
+\advisor{Donald Knuth}
+\coadvisor{Leslie Lamport}
+\instit{UFPR}{Universidade Federal do Paraná}
+
+% área de concentração (default do PPGInf, não mudar)
+\field{Ciência da Computação}
+
+% local e data
+\date{2016}
+\local{Curitiba PR}
+
+% imagem de fundo da capa (comentar se não desejar)
+\coverimage{0-iniciais/fundo-capa.jpg}
+
+%% Descrição do documento (obviamente, descomentar somente UMA!)
+
+% tese de doutorado
+\descr{Tese apresentada como requisito parcial à obtenção do grau de Doutor em Informática, no Programa de Pós-Graduação em Informática, setor de Ciências Exatas, da Universidade Federal do Paraná}
+
+% exame de qualificação de doutorado
+%\descr{Documento apresentado como requisito parcial para o exame de qualificação de Doutorado, no Programa de Pós-Graduação em Informática, setor de Ciências Exatas, da Universidade Federal do Paraná}
+
+% dissertação de mestrado
+%\descr{Dissertação apresentada como requisito parcial à obtenção do grau de Mestre em Informática, no Programa de Pós-Graduação em Informática, setor de Ciências Exatas, da Universidade Federal do Paraná}
+
+% exame de qualificação de mestrado
+%\descr{Documento apresentado como requisito parcial para o exame de qualificação de Mestrado, no Programa de Pós-Graduação em Informática, setor de Ciências Exatas, da Universidade Federal do Paraná}
+
+% trabalho de conclusão de curso
+%\descr{Trabalho apresentado como requisito parcial à conclusão do Curso de Bacharelado em XYZ, setor de Ciências Exatas, da Universidade Federal do Paraná}
+
+% trabalho de disciplina
+%\descr{Trabalho apresentado como requisito parcial à conclusão da disciplina XYZ no Curso de Bacharelado em XYZ, setor de Ciências Exatas, da Universidade Federal do Paraná}
+
+%=====================================================
+
+% define estilo das páginas iniciais (capas, resumo, sumário, etc)
+\frontmatter
+\pagestyle{frontmatter}
+
+% define capa e folha de rosto
+\titlepage
+
+% páginas que só aparecem na versão final (a inclusão é automática)
+\include{0-iniciais/catalografica}	% ficha catalográfica
+\include{0-iniciais/aprovacao}		% folha de aprovação
+\include{0-iniciais/dedica}		% dedicatória
+\include{0-iniciais/agradece}		% agradecimentos
+
+% resumo (português) e abstract (inglês), nesta ordem
+\include{0-iniciais/resumo}
+\include{0-iniciais/abstract}
+
+% listas  de figuras, tabelas, abreviações/siglas, símbolos
+\listoffigures
+\listoftables
+\include{0-iniciais/acronimos}		% ainda deve ser preenchida à mão
+\include{0-iniciais/simbolos}		% idem
+
+% sumário
+\tableofcontents
+
+%=====================================================
+
+% define estilo do corpo do documento (capítulos e apêndices)
+\mainmatter
+\pagestyle{mainmatter}
+
+% inclusao de cada capítulo, alterar a gosto (do professor de Metodologia)
+\include{1-intro/texto}			% introdução
+\include{2-fundam/texto}		% fundamentação teórica
+%\include{3-revbib/texto}		% revisão bibliográfica (estado da arte)
+%\include{4-proposta/texto}		% proposta
+%\include{5-valida/texto}		% experimentação e validação
+%\include{6-conclusao/texto}		% conclusão
+
+%=====================================================
+
+% Estilos de bibliografia recomendados (só descomentar um estilo!)
+% Mais infos: https://pt.sharelatex.com/learn/Bibtex_bibliography_styles
+\bibliographystyle{apalike-ptbr}	% [Maziero et al., 2006]
+%\bibliographystyle{alpha}		% [Maz06]
+%\bibliographystyle{plainnat}		% vide Google "LaTeX Natbib"
+%\bibliographystyle{plain}		% [1] ordem alfabética
+%\bibliographystyle{unsrt}		% [1] ordem de uso no texto
+
+% no estilo "unsrt", evita que citações nos índices sejam consideradas
+%\usepackage{notoccite}
+
+% base de bibliografia (BibTeX)
+\bibliography{referencias}
+%\bibliography{file1, file2, file3} % se tiver mais de um arquivo BibTeX
+
+%=====================================================
+
+% inclusão de apêndices
+\appendix
+\include{a1-exemplo/texto}
+
+\end{document}
+
+%=====================================================

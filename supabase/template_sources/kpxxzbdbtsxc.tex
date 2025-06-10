@@ -1,0 +1,333 @@
+% Setup Document_______________________________________________________________________________________________________________
+
+\documentclass[a4paper,12pt, titlepage]{article}
+\usepackage[top=2.5cm, bottom=2.5cm, left=4cm, right = 2.5cm]{geometry}
+
+% Load general Packages________________________________________________________________________________________________________
+
+\usepackage[english]{babel}                                     % SWITCH TO GERMAN: \usepackage[german]{babel}
+%\usepackage[latin1]{inputenc}                                  % Recode special German characters in Tex-Code (only necessary, if you use texstudio instead of overleaf)
+\usepackage{calc}                                               % Basic Arithmetics e.g. for \setcounter for page numbers
+\usepackage{setspace}                                           % to define line spacing
+\onehalfspacing                                                 % set line spacing to 1.5
+\usepackage{mathptmx}                                           % Times New Roman type clon
+\usepackage{parskip}                                            % Space between paragraphs
+\usepackage{amsmath}                                            % equations
+\usepackage[utf8]{inputenc}                                     % Reference list
+\usepackage[backend=bibtex, style=authoryear, maxcitenames=2,giveninits=true,dashed=false,doi=false,isbn=false,url=false,eprint=false]{biblatex}         
+                                                                % Imports Package biblatex to set citation and bibliography style
+\addbibresource{sample.bib}                                     % adds your bib file -> adapt sample.bib
+\usepackage{csquotes}                                           % useful for your bib file
+
+% Adapt citation style__________________________________________________________________________________________________         
+%\renewcommand*{\finalnamedelim}{%                              % If German is used, changes and to "und" in citation
+%\ifnumgreater{\value{liststop}}{2}{\finalandcomma}{}%
+%\addspace und \addspace}                                                                              
+%\DefineBibliographyStrings{german}{andothers={et\addabbrvspace al\adddot}}		% If babel is set to german: changes u.a. to et. al.
+
+%\renewcommand{\bibopenparen}{\addspace}                         % Removes default brackets around year in reference list
+%\renewcommand{\bibcloseparen}{}              % Removes default brackets around year in reference list
+\DeclareNameAlias{sortname}{family-given}                       % Corrects order of given and family name in list of references
+\DeclareFieldFormat[article,incollection,unpublished]{title}{#1}% Removes quotes for article titles in reference list
+\DeclareFieldFormat{pages}{#1}                                  % Removes pp. for page number in reference list
+
+\renewbibmacro{in:}{%                                           % Macro to remove "In:" in reference list
+  \ifboolexpr{%
+     test {\ifentrytype{article}}%
+     or
+     test {\ifentrytype{inproceedings}}%
+     or
+     test {\ifentrytype{incollection}}%
+  }{}{\printtext{\bibstring{in}\intitlepunct}}%
+}
+\AtBeginBibliography{\renewcommand*{\finalnamedelim}{\multinamedelim}} % Suppresses and for second author in reference list
+
+\renewbibmacro*{volume+number+eid}{%                            % Macro to put the Volume for articles in parentheses
+  \printfield{volume}%
+  \setunit*{\addnbthinspace}% there's also \addnbspace
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}}
+\DeclareFieldFormat[article]{number}{(#1)}
+
+\renewcommand*{\bibpagespunct}{%                                % Remove comma between Volume and page for articles
+  \ifentrytype{article}
+    {\addspace}
+    {\addcomma\space}}
+
+% Insert document information__________________________________________________________________________________________________
+\title{My Master Thesis}                    
+\author{Overleaf User}
+\date{ }
+
+% Define Settings for Graphs, Figures and Colours______________________________________________________________________________
+    \usepackage[dvips]{graphicx}                                    % Package to include graphics (\includegraphics)
+    \graphicspath{{./pics/}}                                        % Default-Path of your graphics
+    \DeclareGraphicsExtensions{.eps}                                % Default-extension of your graphic files
+
+    % Define colours via:
+    %                   \textcolor{colorname}{text}, \color{colorname}, \pagecolor{colorname}, \colorbox{colorname}{text},
+    %                   \fcolorbox{Frame}{Base}{text}, set framewidth via: \setlength{\fboxrule}{..pt}
+    \usepackage{color,colortbl}
+    \definecolor{Lightgray}{gray}{0.95}                              % Colorpalet "Gray": 0 = black, 1 = white
+    \definecolor{Gray}{gray}{0.7}                                   % Colorpalet "Gray": 0 = black, 1 = white
+    \definecolor{Darkgray}{gray}{0.5}                             % Colorpalet "Gray": 0 = black, 1 = white
+    \definecolor{MarineBlue}{rgb}{0, 0, 0.55}                       % RGB-Colorpalet:     Red, Green, Blue (Ratio 0..1)
+    \definecolor{Lightblue}{rgb}{0.59,0.74,1}                        % RGB-Colorpalet:     Red, Green, Blue (Ratio 0..1)
+
+
+% Additional packages/settings that are used___________________________________________________________________________________
+% Packages for text formatting
+\usepackage{longtable}                                          % Tabels with pagebreak
+\usepackage{tabularx}                                           % Tabels with automatic columnwidth
+    \newcolumntype{Z}{>{\centering\arraybackslash}X}            % Centered columns with autom. width in tabularx via "Z"
+    \newcolumntype{R}{>{\raggedleft\arraybackslash}X}           % Right-aligned columns with autom. width in tabularx via "R"
+\usepackage{xurl}                                               % Line break for long urls
+
+% Packages for maths/computer science
+\usepackage{algorithmic}                                        % Depiction of Pseudocode
+\usepackage{exscale}                                            % Scaling of mathematical equations                  
+
+% Packages to format page numbers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}                                                      % Deletes default formatting of page numbers
+\fancyfoot[R]{\thepage}                                         % Puts page numbers on right side of the footer
+\renewcommand{\headrule}{}                                      % Removes default headline from fancy page numbers
+
+% Package to add hyperrefs for sections to the corresponding pages
+\usepackage{hyperref}
+
+
+% Fill the document________________________________________________________________________________________________________
+\begin{document}
+
+% Add the titlepage (Adapt to your information)____________________________________________________________________________
+\begin{titlepage}
+
+   \begin{center}
+
+       \vspace*{1cm}
+ 
+       \centering{First name and surname}
+ 
+       %\vspace{0.5cm}
+        %Thesis Subtitle
+ 
+       \vspace{1.5cm}
+ 
+       \textbf{\large{Title}}
+			
+			 \vspace{1.5cm}
+ 
+      		 Bachelor/Master Thesis
+			
+			 \vspace{1.5cm}
+ 
+       in the Area Supply Chain Management
+			
+			 \vspace{1.5cm}
+ 
+       Supervisor: Prof. Dr. Mustermann
+			
+			 \vspace{1.5cm}
+ 
+      Master of Science (M. Sc.) in Business Administration \\ 
+			\vspace{0.5cm} 
+     Faculty of Management, Economics and Social Sciences \\
+			\vspace{0.5cm} 
+       University of Cologne
+			\vspace{0.5cm} 
+      
+					
+			\vspace{1.5cm}
+ 
+       Cologne, date of submission
+ 
+
+   \end{center}
+\end{titlepage}
+
+% Add the table of contents (Adapt language of heading if necessary)___________________________________________________________
+\renewcommand*\contentsname{Table of Contents}
+%\renewcommand*\contentsname{Inhaltsverzeichnis}                            % German
+\tableofcontents{}	\pagenumbering{Roman}\setcounter{page}{2} 
+\newpage{}
+
+% Add the list of figures (Adapt language of heading if necessary)_____________________________________________________________
+\listoffigures\addcontentsline{toc}{section}{List of Figures}
+%\listoffigures\addcontentsline{toc}{section}{Abbildungsverzeichnis}        % German
+\newpage{}
+
+% Add the list of tables (Adapt language of heading if necessary)_____________________________________________________________
+\listoftables\addcontentsline{toc}{section}{List of Tables}
+%\listoftables\addcontentsline{toc}{section}{Tabellenverzeichnis}           % German
+\newpage{}
+
+% Add the list of tables (Adapt language of heading if necessary)_____________________________________________________________
+\section*{List of Abbreviations}\addcontentsline{toc}{section}{List of Abbreviations}
+%\section*{Abkürzungsverzeichnis}\addcontentsline{toc}{section}{Abkürzungsverzeichnis} % German
+All abbreviations that are used in the bachelor thesis have to be listed here, if there are a lot of them and it appears to make sense. Common abbreviations, such as etc., should not be listed. There are also a few abbreviations that do not need to be mentioned in the List of Abbreviations. They should rater be explained directly in the text when they appear for the first time.
+The following table can be used as a template. After listing all abbreviations, you should delete spare lines, and then arrange the components of the table in alphabetical (ascending) order.
+
+
+\begin{table}[h]
+ {\def\arraystretch{2}\tabcolsep=10pt
+    \begin{tabular}{ll}
+      CR      &  Critical Ratio \\
+      DC      &  Distribution Center \\
+      DimWt   &  Dimensional Weight \\
+      DP      &  Demand Planning \\
+      ROI     &  Return on Investment \\
+      ...     &  ... \\
+      ...     &  ... \\
+      ...     &  ... \\
+    \end{tabular}
+    }
+\end{table}
+	
+\newpage{}\pagenumbering{arabic}
+
+% Start with the text sections_______________________________________________________________________________________________
+
+\setcounter{page}{1}
+
+\section{Introduction}\label{Introduction}
+For further information regarding theses at the Wiso-Faculty, please visit the website of the examination office („WiSo-Prüfungsamt“).  \par 
+For examination regulations of 2015 / 2021, please click this link: \\
+ \url{https://wiso.uni-koeln.de/de/fakultaet/dekanat/pruefungsamt/po-2015-po-2021/abschlussarbeiten} \par
+ 
+(last checked: 03.03.2023)
+
+\section{Main body}\label{Main Body}
+There always has to be a (mostly introductory) text between two headings. Please note that a new chapter does not have to start on a new page. The main body usually consists of more than one chapter.
+
+\subsection{First sub-section}\label{2.1}
+You should use a spacing of 1.5, a serif font (such as Times New Roman) with a size of 12pt and the format “full justification” (“Blocksatz”). \par
+The margins of the pages have to be set as follows: Left: 4 cm, Right: 2,5 cm, Upper: 2,5 cm, Lower: 2,5 cm. \par
+All pages have to be numbered consecutively. For the pages prior to the introduction, you should use Roman numbering (I, II, III, ...). However, please note that even though the front page counts as a page, it should not be numbered. For the pages starting with the introduction you have to use Arabic numbers (1, 2, 3,…). \par
+The page limit of the thesis is excluding table of contents, list of abbreviations, list of tables and figures, and appendix. All figures and tables in the main body are included in the page limit.
+
+\subsection{Other sub-sections follow...}\label{2.2}
+Each sections should have at least two sub-sections, meaning that 1.1 has to be followed by 1.2.
+
+\subsection{Other sub-section}\label{2.3}
+After uploading the file in the 'pics' folder, you have to make sure you include it using \verb|includegraphics[]{}| within the \verb|\begin{figure}| environment. 
+Afterwards, they should be centered. See the example Figure \ref{fig:Kölner Zoo}: 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Zoo.png}
+    \caption{Number of visitors of the zoo in cologne}
+    \label{fig:Kölner Zoo}
+\end{figure}
+
+The caption for the figure in the following line has to be generated inside „caption“. This formatting is necessary for the List of Figures and Tables. 
+
+\subsection{An example of a table}\label{2.4}
+
+The labelling of tables follows the same procedure as the one for figures and should be consistent. The caption is either placed below or above the table and should be formatted as „Caption“ (see \ref{2.3} for an instruction). All used figures and tables have to be mentioned in the text (e.g. see Table \ref{table:1}). If you struggle to create tables in Latex, you can use \url{https://tableconvert.com/excel-to-latex} to convert Excel tables into Latex code.
+
+\begin{table}[h]
+\centering  
+\begin{tabular}{  m{5em}  m{1cm} m{1cm}  } 
+
+  Size & $\mu$ & $\sigma$ \\
+  \hline
+  M & 40 & 20 \\ 
+  
+  M & 40 & 20 \\ 
+  
+  L & 40 & 20 \\ 
+  \hline
+\end{tabular}
+\caption{Sales quantity of Zoo T-Shirts per month}
+\label{table:1}
+\end{table}
+
+\subsection{Submission}\label{2.5}
+Please always check the current guidelines on the Website of the examination office (“Wiso-Prüfungsamt”).
+
+
+\subsection{Citations}\label{2.6}
+The use of knowledge from external sources has to be labelled with a reference to the author and the year of publication. Corresponding to that, the source has to be mentioned in the Reference List.
+
+\subsubsection{Citations in the text}\label{2.6.1}
+For all citations in the text, please use the Harvard citation style. In the case of word-for-word reproduction, you have to use quotation marks before and at the end of the quotation. If content is only indirectly reproduced in own words, no quotation marks are needed.  However, you should make it clear that the knowledge and the ideas you are using are not your own. You do that by inserting a citation at the end of your sentence as follows: 
+\begin{itemize}
+    \item Surname of the author (if there are two authors, both names are connected with “and”; if there are three or more authors, only the surname of the first author is mentioned and “et al.” is added)
+    \item Year of publication, e.g. 2009
+    \item Page number, if relevant (with abbreviation “p.” for page)
+\end{itemize}
+If you are quoting something word-for-word, it is recommended to add the corresponding page number. The same can be applied to the citation of books \parencite[p.~198]{thonemann2010operations}. If you reproduce something indirectly, the latter is not necessary. \par
+Examples:
+\begin{itemize}
+    \item Human behavior, such as misunderstandings concerning information about storage and demand, can cause the bullwhip-effect \parencite{sterman1989misperceptions}.
+    \item \textcite{CACHON2003227} analyze different contracts that can coordinate a supply chain ...
+\end{itemize}
+
+\subsubsection{Reference list}\label{2.6.2}
+The literature has to be arranged in alphabetical order by the name of the first author. If one author has several publications, the year of publications is used for sorting. In the case of several publications in the same year, lower case letters are used (e.g. “Thonemann 2001a”). You can find examples for quoting different sources in the Reference List of this text.
+
+\subsection{Listings/Numerations}\label{2.7}
+For numerations or listings, you can use either bullet points or Arabic numbers.
+First possibility looks as follows:
+\begin{itemize}
+    \item ...
+    \item ...
+\end{itemize}
+Second possibility looks as follows:
+\begin{enumerate}
+    \item ...
+    \item ...
+\end{enumerate}
+
+\subsection{Formulas}\label{2.8}
+Formulas should be used if they support the explanation. For formulas, LaTeX is ideal. \par
+A formula should - if it is not extremely short - be presented in a separate line. For referencing, formulas should be numbered consecutively with Arabic numbers. The numbers should be aligned right in the last line of a formula. Formulas and variables must always be explained in the text. \par
+
+Example: The following formula describes the expected mean snake length LQ of a (M/M/1) system, where represents the expected utilization:
+\begin{equation}
+       LQ=  \frac{\rho^2}{1-\rho} 
+\end{equation}
+
+
+ 
+If you present an entire optimization model, the objective function and constraints should be numbered individually. In addition, the model including variables, parameters and indices should be explained in the text.
+
+\section{Conclusion and Outlook}\label{3}
+The fundamental findings of the  thesis are summarized at the end. The Outlook is used for referring to possible future developments and research directions.
+
+% Add Reference List________________________________________________________________________________________________________
+
+\newpage{}
+%%%%Reference list
+\printbibliography[
+heading=bibintoc,
+title={Reference list}                                          %German: Literaturverzeichnis
+]
+
+The Reference List is not created separately for different kinds of sources (books, papers, websites, etc.). Please note that different types of sources need different citations. Please also refer to Section \ref{2.6.2}.
+In order to simplify the management of literature, there are specific literature management programs, such as Citavi, Zotero or Mendeley with plug-ins or add-ins for Latex. We highly recommend using such a program.
+
+As an alternative, you can use biblatex, which allows you to create a reference list as well. Click here for the instruction: \url{https://de.overleaf.com/learn/latex/Bibliography_management_in_LaTeX}
+
+We do not recommend creating the reference list manually. This is very time-consuming and particularly prone to error. 
+
+%\parencite{fisher2000rocket}
+%\parencite{Cachon.2009,fisher2000rocket}
+%\textcite{CACHON2003227}
+
+
+% Add Appendix______________________________________________________________________________________________________________
+\newpage{}
+\section*{Appendix}\addcontentsline{toc}{section}{Appendix}
+The appendix lists all explanations, figures and tables that are not needed to understand the main body but provide additional insights. Examples could be further explanations of specific concepts or data that is mentioned only for the sake of completeness. 
+In the case of extensive documentation (e.g. program code or questionnaire), it can be agreed on an individual exception (e.g. appendix on a DVD).
+If the appendix includes more than one section, you should put the different sections in order (Appendix A, Appendix B, Appendix C,...).
+
+% Add Statutory declaration______________________________________________________________________________________________________
+\subsection*{\newpage{}Statutory declaration}
+The form for the statutory declaration can be found on the website of the examination office (“Wiso-Prüfungsamt”). The statutory declaration should not be integrated into the printed version. Instead, it should be printed out separately, filled in and enclosed as a loose paper.
+
+
+\end{document}

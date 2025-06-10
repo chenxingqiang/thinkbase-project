@@ -1,0 +1,289 @@
+% arara: pdflatex: { interaction : nonstopmode }
+% arara: biber: { options: ['--isbn-normalise'] }
+
+\documentclass[
+  t,% place content on top of the page
+]{_style/tudelft-beamerposter}
+
+\usepackage[
+  orientation=portrait,
+  size=a3,
+  scale=1.45, % scaling factor to make sure the page looks full
+]{beamerposter}
+
+\makeatletter % without this, the color name 'beamer@tcb@titlebg' would be inaccessible.
+\tcbset{
+  % optionally: a border around the 'blocks', in the color of the title background:
+  borderline={1.5pt}{0pt}{beamer@tcb@titlebg},
+}
+\makeatother
+
+% used for headers, blocks etc.
+\setbeamercolor{bars}{bg=tud primary, fg=white}
+
+\addbibresource{bibfile.bib}
+
+\title[My awesome year]{Looking back on an awesome year with many conversations over a good cups of tea}
+\subtitle{including a sidenote on said tea}
+\author[Einstein \& Lorentz]{A.~Einstein\inst{1} \and H.~Lorentz\inst{2}}
+\date{31-12-1905}
+% define a graphic to be shown next to the title
+\titlegraphic{\includegraphics[width=0.4\paperwidth]{icons/digital society/electrical_engineering.pdf}}
+
+\institute[Uni. Leiden and TU Delft]{
+  \strut\llap{\inst{1}\,}Department of Black Holes and Tea, University of Leiden\and
+  \strut\llap{\inst{2}\,}Department of Bending Rivers, Space and Time, University of Delft}
+  \date[CFP 2003]{Conference on Fabulous Presentations, 2003}
+
+\setlength{\columnsep}{0.1\linewidth}
+
+\setlength{\TPHorizModule}{\paperwidth}
+\setlength{\TPVertModule}{\paperheight}
+
+\newcommand{\descriptor}{\raisebox{0.45ex}{\scalebox{0.25}{%
+  \begin{tabular}{l}Delft\\[-.5ex]University of\\[-.5ex]Technology\end{tabular}}}}
+
+\newcommand{\footertext}{%
+  \ifleftfooterwhite%
+    \textcolor{white}{\tudlogo\,\descriptor}%
+  \else%
+    \tudlogo[tud topaz]\,\descriptor%
+  \fi%
+}
+
+\setbeamertemplate{footline}{\Huge\quad\raisebox{1.4ex}{\footertext}}
+
+% Keep inside the main file, since probably the size, etc. has to be changed
+% for every individual poster
+% https://www.overleaf.com/learn/latex/Font_sizes%2C_families%2C_and_styles
+\renewcommand\maketitle{
+  {\begin{beamercolorbox}[
+    wd=\paperwidth,
+  ]{bars}{%
+    \centering\robotoslab%
+    \vskip0.01\paperheight
+    \begin{minipage}{\textwidth-30mm}\centering
+      \Huge\inserttitle\\[0.01\paperheight]
+      %  \hspace*{10mm} % throw in some more logo's, if you need to...
+      %  \includegraphics[width=45mm]{icons/buildings/TU Delft - icon - AULA.pdf}\hfill
+      %  \includegraphics[width=45mm]{icons/buildings/LIB.pdf}\hfill
+      %\begin{minipage}{\textwidth-150mm}\centering
+      \LARGE\insertsubtitle\\[0.01\paperheight]
+      \insertauthor\\[0.01\paperheight]
+      \normalsize\insertinstitute\\[0.01\paperheight]
+      \Large\insertdate
+      %\end{minipage}\hfill
+      % \includegraphics[width=45mm]{icons/communication/conference.pdf}\hfill
+      % \includegraphics[width=45mm]{icons/general/puzzle.pdf}
+      % \hspace*{10mm}
+    \end{minipage}\\
+    \vskip0.01\paperheight
+  }\end{beamercolorbox}}%
+}
+
+\usepackage{endnotes}
+\let\footnote=\endnote
+
+\begin{document}
+
+\begin{frame}
+  \maketitle
+
+  \begin{columns}[onlytextwidth, T]
+    \begin{column}{\widthfrac{2}{3}}
+      \section*{Abstract}
+      This is a template for a poster created in \LaTeX, using the corporate
+      style of the Technical University of Delft.%
+      \footnote{\url{https://www.tudelft.nl/huisstijl}}
+      It is based on the documentclass Beamer\footnote{\url{https://ctan.org/pkg/beamer}}
+      together with the package Beamerposter\footnote{\url{https://ctan.org/pkg/beamerposter}}.
+      
+      \section{Introduction}
+      The poster can be organised in columns, either by the mechanism of beamer (used on this page), or using the package
+      multicols (used on the next page), which allows latex to divide a longer text over several columns.
+      Many paper size van be used.
+      The beamerposter option `scale' allows for a scaling of the content to make sure all text fits on one full page.
+
+      \section{Examples using `Blocks'}
+      \begin{block}{Default block}
+        \begin{itemize}
+          \item Blocks can be used to give extra emphasis to a section of the poster
+          \item For customization, refer to the documentation of the package \texttt{tcolorbox}.
+        \end{itemize}
+      \end{block}
+
+      \begin{multicols}{2}
+        \begin{exampleblock}{Example block}
+          \begin{enumerate}
+            \item Sugar in a stirred cup of tea gathers in the middle.
+            \item Rivers often take a detour through flat terrain.
+          \end{enumerate}
+        \end{exampleblock}
+
+        \begin{alertblock}{Alert block}
+          Rivers and sweet tea do unexpected things.\cite{Einstein1926}
+        \end{alertblock}
+      \end{multicols}
+
+      \section{Graphs}
+      \hfill
+      \includegraphics[scale=0.7]{graphs/plt-bar-distribution_Roboto.pdf}
+      \hfill
+      \includegraphics[scale=0.7]{graphs/plt-bar-penguins_Roboto.pdf}
+      \hfill
+      \strut
+
+      \hfill
+      \includegraphics[scale=0.7]{graphs/plt-confidence-bands_Roboto.pdf}
+      \hfill
+      \includegraphics[scale=0.7]{graphs/plt-pie-chart_Roboto.pdf}
+      \hfill
+      \strut
+
+      \hfill
+      \includegraphics[scale=0.7]{graphs/plt-streamplot_Roboto.pdf}
+      \hfill
+      \includegraphics[scale=0.7]{graphs/plt-artists_Roboto.pdf}
+      \hfill
+      \strut
+    \end{column}
+    \begin{column}{\widthfrac{1}{3}}
+      \section{Mass--energy equivalence}
+      They say every formula you add to a presentation, will reduce your audience by \SI{50}{\percent}.
+      A simple yet effective way to mitigate this effect, is adding a nomenclature to your document, containing the symbols used in the formulae.
+      \[E=mc_0^2\]
+    
+      \section*{Nomenclature}
+      \begin{itemize}
+        \item[$E$] Energy (\unit{J})
+        \item[$m$] Mass (\unit{kg})
+        \item[$c_0$] Speed of light in vacuum (\qty{299.792458e6}{m/s})
+      \end{itemize}
+
+      \section*{Abbreviations}
+      \begin{description}[TU]% longest item
+        \item[TU] Technical University
+      \end{description}
+  
+      \AtNextBibliography{\normalsize}% or in the preamble \AtBeginBibliography{\small}
+      \printbibliography
+
+      \def\enotesize{\normalsize}
+      \theendnotes
+        
+      \section*{Gitlab}
+        A digital version of this presentation can be found here:
+      \url{https://gitlab.com/novanext/tudelft-poster}.
+      In case your audience finds it hard to remember this url, here is a QR code generated by \LaTeX:
+  
+      \begin{center}
+        \qrcode[height=3cm]{https://gitlab.com/novanext/tudelft-poster}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \maketitle
+
+  \section{Perpetual Motion Machines, Pink Micro-Elephants, and a Union of Corny Unicorns}
+  \smallskip
+  \begin{multicols}{3}
+    \subsection{Introduction}
+    Perpetual motion machines, captivating in their concept, stand as elusive dreams in the face of the unwavering laws of thermodynamics. As we traverse the principles of physics, this article delves into the challenges and impossibility of perpetual motion. However, our journey doesn't end there. We will also venture into a whimsical world, exploring the notion of pink micro-elephants and, further still, uncover a country hosting a sizable union of corny unicorns.
+
+    \subsection{First Law of Thermodynamics}
+    The first law of thermodynamics, the guardian of energy conservation, dictates that the total energy within an isolated system remains constant. In mathematical terms, this law is expressed as
+    \[\Delta U = Q - W,\]
+    where $\Delta U$ is the change in internal energy, $Q$ is the heat added to the system, and $W$ is the work done by the system.
+
+    \subsection{Second Law of Thermodynamics}
+    The second law introduces the concept of entropy, measuring the disorder in a system. It states that in any energy transformation, if no energy enters or leaves the system, the potential energy of the state will always be less than that of the initial state. Mathematically, the second law can be written as
+    \[\Delta S \geq \frac{Q}{T},\]
+    where $\Delta S$ is the change in entropy, $Q$ is the heat added to the system, and $T$ is the absolute temperature.
+
+    \subsection{Challenges to Perpetual Motion}
+    Numerous inventors and dreamers have attempted to engineer perpetual motion machines, devising intricate systems involving gravity, magnets, and perpetual cycling mechanisms. Alas, every attempt has fallen short, succumbing to the inexorable laws of thermodynamics.
+
+    \subsection{Impossibility and Real-world Examples}
+    Examining real-world examples reinforces the impossibility of perpetual motion. Even the most meticulously crafted machines inevitably face energy losses due to factors such as friction and air resistance. These unavoidable dissipations solidify perpetual motion as a tantalizing, unattainable dream.
+
+    \subsection{Enter the Fantastical: Pink Micro-Elephants}
+    Amid the rigid boundaries of thermodynamics, we turn our attention to a more whimsical concept: pink micro-elephants. In this delightful scenario, envision a microscopic world where tiny, pink-hued elephants roam. Here, the laws of thermodynamics yield to the enchanting rules of imagination.
+
+    \subsection{Benefits of Pink Micro-Elephants}
+    In this fanciful exploration, consider the potential benefits of these diminutive creatures. Picture their microscopic trunks carrying minuscule bouquets, spreading joy wherever they tread. Their petite size may allow for intricate dances on flower surfaces, pollinating and ushering forth vibrant blossoms. While imaginary, the charm of pink micro-elephants lies in the boundless wonders they bring to our minds.
+
+    \subsection{A Union of Corny Unicorns}
+    Our journey through the whimsical takes an unexpected turn to a distant land hosting a sizable union of corny unicorns. Picture a country where these fantastical creatures gather, their antics and pun-filled humor creating a land of light-hearted whimsy.
+
+    \subsection{Corny Charm}
+    These unicorns, known for their corny sense of humor, fill the air with laughter as they tell jokes that often involve delightful wordplay. Their hooves clop in rhythm to jovial tunes, and their manes shimmer with the colors of the rainbow, reflecting the mirth that surrounds them.
+
+    \subsection{Magical Fields of Corn}
+    The land they inhabit is adorned with magical fields of corn, where each cornstalk whispers a joke as the wind rustles through. The unicorns, with their mystical horns, sprinkle extra doses of laughter across the landscape, creating an atmosphere of joy and merriment.
+
+    \subsection{Corny Wisdom}
+    In this whimsical country, the corny unicorns are not just a source of amusement but also bearers of corny wisdom. Their pun-filled proverbs and whimsical advice bring smiles and laughter to all who encounter them, creating a harmonious union of joy and wit.
+
+    \subsection{Conclusion}
+    As we conclude our journey through the realms of physics and imagination, we celebrate the beauty of scientific principles while reveling in the creative wonders of the mind. Perpetual motion remains a dream confined by the laws of thermodynamics, but the worlds of pink micro-elephants and corny unicorns showcase the limitless possibilities of our inventive and imaginative spirits.
+  \end{multicols}
+\end{frame}
+
+
+% use either globally or locally (in between \begingroup ... \endgroup)
+\setbeamercolor{background canvas}{bg=tud green, fg=tud teal}
+\usebackgroundtemplate{\rlap{\textcolor{bg}{\rule{\paperwidth}{\paperheight}}}%
+  \textcolor{fg}{\smash{\hspace{-0.65\paperwidth}\raisebox{-0.2\paperheight}{%
+    \tudflame[scale=\numexpr\paperheight/800000]}}}}%
+
+\leftfooterwhitetrue
+% \setbeamertemplate{footline}{\Huge\quad\raisebox{1.4ex}{\textcolor{white}{\tudlogo}}}
+
+\begin{frame}
+  \grid% drawing a grid can be helpful to position elements at an absolute position.
+
+  \begin{abstikz}
+    \node[fill=white, text=red, align=center] at (0.5, 0.75) {
+      This text is placed at half the paper width\\
+      and 75\,\% of the paper height (origin at lower left)\\
+      using the environment \texttt{abstikz}};
+  \end{abstikz}
+
+  \begin{textblock}{0.5}[0.5, 0.5](0.75, 0.75)\centering
+    \rule{0.5\paperwidth}{0.1\paperheight}
+  \end{textblock}
+
+  \begin{textblock}{0.5}[0.5, 0.5](0.75, 0.75)\centering
+    \color{white} This block was placed using the environment \texttt{textblock}.\\
+    The width is half the page width.\\
+    The background is a \texttt{\textbackslash rule} of 50\,\% of the width, and 10\,\% of the height of the page
+
+    The center [0.5, 0.5] is at 75\,\% of the width, and 75\,\% of the height of the page,\\
+    where the origin is the top left.
+  \end{textblock}
+\end{frame}
+
+
+\begin{frame}
+  \centering
+  \vspace{0.1\paperheight}
+  \newlength{\currentparskip}
+  \setlength{\currentparskip}{\parskip}% save the value
+  \scalebox{10}{\begin{minipage}{4.5em}\raggedright
+    \setlength{\parskip}{\currentparskip}% restore the value
+    \robotoslab
+    %\rule{\textwidth}{1ex}
+    \color{white}
+    A\\TU Delft\\
+    poster\\
+    template\\
+    for \LaTeX
+
+    \textsf{\textbf{It's up TU.}}
+  \end{minipage}}
+\end{frame}
+
+\end{document}

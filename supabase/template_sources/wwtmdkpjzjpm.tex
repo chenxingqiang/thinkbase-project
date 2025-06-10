@@ -1,0 +1,64 @@
+\documentclass[11pt,a4paper,oneside,listof=totoc,bibliography=totoc]{scrreprt}
+% --------------------------------------------
+% Minimally required packages  
+% --------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{csquotes}
+\usepackage{lipsum} % for blindtext
+\usepackage[backend=biber,url=true,style=numeric,  sorting=none]{biblatex} 
+\usepackage{graphicx} % for images
+\usepackage{array,booktabs}  %for tables
+\usepackage{url}
+\usepackage{xspace}
+\usepackage{hyperref}
+\usepackage[ngerman,english]{babel} 
+
+% ----------------------------------------------
+% Settings
+% ----------------------------------------------
+% set bib file (source references.bib)
+\bibliography{content/98_references}
+
+% definitions for tables
+\newcommand {\otoprule}{\midrule [\heavyrulewidth]}
+\newcolumntype {+}{ >{\global\let\currentrowstyle\relax}}
+\newcolumntype {^}{ >{\currentrowstyle }}
+ \newcommand {\rowstyle}[1]{\gdef\currentrowstyle{#1} %
+ #1\ignorespaces
+ }
+\newcommand{\tabhead}{\rowstyle{\bfseries}}
+
+% --------------------------------------------
+% Document  
+% --------------------------------------------
+\begin{document}
+\input{meta/metadata}
+\input{meta/title}
+
+\pagenumbering{alph}
+
+\input{meta/disclaimer}
+\input{content/00_abstract}
+
+\tableofcontents
+
+% --------------------------------------------
+% Main Matter
+% --------------------------------------------
+\pagenumbering{arabic}
+\input{content/01_introduction}
+
+% --------------------------------------------
+% Backmatter starts here
+% --------------------------------------------
+\printbibliography{} % bibliography
+\begin{appendix}
+    \input{content/99_appendix1}
+    % Here you can add more appendices yourself.
+\end{appendix}
+
+\listoffigures{}
+\listoftables{} 
+
+\end{document}

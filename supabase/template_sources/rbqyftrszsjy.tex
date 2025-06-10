@@ -1,0 +1,127 @@
+\documentclass[12pt,openright,twoside]{report}
+\usepackage[a4paper,top=25mm,bottom=25mm,right=25mm,left=25mm,bindingoffset=6mm]{geometry}
+\usepackage[T1]{fontenc} 
+\usepackage[utf8]{inputenc}
+\usepackage[swedish,british]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{pict2e}
+\usepackage{tabu}
+\usepackage{booktabs}
+\usepackage{bookmark,hyperref}
+\usepackage{gensymb}
+\graphicspath{{Bilder/}}
+
+%Formatering av rubriker
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{titlesec, blindtext, color}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter}{20pt}{}{}
+\titlespacing*{\chapter}{0pt}{*0}{*3}
+\titlespacing*{\section}{0pt}{*4}{*1}
+\titlespacing*{\subsection}{0pt}{*3}{*0}
+\titlespacing*{\subsubsection}{0pt}{*4}{*1}
+
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tocloft} %Control the ToC formatting
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+%Formatering av sidornummer (Comment to have the number centered)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[RO,LE]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[hang, font=small, labelfont=bf]{caption}
+\usepackage{subcaption}
+\captionsetup{justification   = raggedright,
+              singlelinecheck = false,
+              format = hang}
+
+\usepackage[
+  backend=bibtex,
+  %%%%% For NameYear citation
+     style=authoryear,
+     citestyle=authoryear-comp,
+     sorting=nyt,
+  %%%%%
+  %%%%% For Number citation
+  %style=numeric,
+  %citestyle=numeric,
+  %sorting=none,
+  %%%%%
+  maxcitenames=2,maxbibnames=99,
+  natbib]
+{biblatex}
+\addbibresource{Referenser.bib}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DO NOT NEED TO CHANGE BEFORE THIS POINT %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    anchorcolor=black,
+    citecolor=black,
+    urlcolor=black,
+    pdftitle={TITEL},  % Skriv din titel här
+    pdfauthor={Författarens Namn}, % Skriv ditt namn här
+    }
+
+\title{
+    {\LARGE TITEL}\\ % Skriv din titel här
+    {\large UNDERTITEL}\\
+    {\vspace{10mm}}
+    {\includegraphics[width=0.6\textwidth]{Cover_Figure.png}}
+    }
+\author{Författarens Namn} % Skriv ditt namn här
+\date{\today}
+
+\begin{document}
+
+\selectlanguage{swedish}
+\maketitle
+\clearpage
+
+\thispagestyle{empty}
+\mbox{}
+\clearpage
+
+\setcounter{page}{1}
+\pagenumbering{Roman}
+
+\include{Abstract}
+\include{Sammanfattning}
+\include{Forord}
+\include{Notation}
+
+\cleardoublepage
+\tableofcontents
+\addcontentsline{toc}{chapter}{Innehåll}
+
+\cleardoublepage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\include{Kapitel/Kapitel_01}
+\include{Kapitel/Kapitel_02}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Litteratur}
+\printbibliography
+
+\appendix
+\titleformat{\chapter}[display]{\Huge\bfseries}{Bilaga \thechapter}{10pt}{}{}
+
+\include{Kapitel/Bilaga_A}
+
+\end{document}

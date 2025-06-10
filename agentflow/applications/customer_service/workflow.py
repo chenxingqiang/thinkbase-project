@@ -5,7 +5,7 @@ from ...core.workflow import BaseWorkflow
 class CustomerServiceWorkflow(BaseWorkflow):
     """Customer service workflow implementation"""
     
-    @ell2a.simple(model="gpt-4o")
+    @ell.simple(model="gpt-4o")
     def process_step(self, step_number: int, inputs: Dict[str, Any]) -> Any:
         """Process customer service workflow step"""
         step = next(s for s in self.workflow_def['WORKFLOW'] if s['step'] == step_number)

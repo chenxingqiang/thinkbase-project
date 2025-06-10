@@ -1,0 +1,632 @@
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Trabalho Academico (tese de doutorado, dissertacao de
+% mestrado e trabalhos monograficos em geral) em conformidade com 
+% ABNT NBR 14724:2011: Informacao e documentacao - Trabalhos academicos -
+% Apresentacao
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,				% tamanho da fonte
+	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,				% para impressão em verso e anverso. Oposto a oneside
+	a4paper,				% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,			% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,		% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,	% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,			% idioma adicional para hifenização
+	french,			% idioma adicional para hifenização
+	spanish,			% idioma adicional para hifenização
+	brazil			% o último idioma é o principal do documento
+	]{abntex2}
+
+% ---
+% Pacotes básicos 
+% ---
+\usepackage{lmodern}			% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}			% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{lastpage}			% Usado pela Ficha catalográfica
+\usepackage{indentfirst}			% Indenta o primeiro parágrafo de cada seção.
+\usepackage[table,dvipsnames]{xcolor}				% Controle das cores
+\usepackage{graphicx}				% para lidar com gráficos
+\graphicspath{{./Figuras/}}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.jpg,.png}
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{pdfpages}
+\usepackage{alphalph}
+\usepackage{xfrac}
+\usepackage{epigraph}
+% ---
+
+% ---
+% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+% ---
+\usepackage{lipsum}				% para geração de dummy text
+% ---
+
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}	% Paginas com as citações na bibl
+\usepackage[alf,abnt-etal-list=0,abnt-etal-cite=3,bibjustif,abnt-thesis-year=both]{abntex2cite}					% Citações padrão ABNT
+
+\usepackage{IEEEtrantools}
+%\begin{IEEEeqnarray}{rCl}
+%	z(t) & = & 0  \\
+%	t_i(t) & = & 0
+%\end{IEEEeqnarray}
+
+% *** ALIGNMENT PACKAGES ***
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+% --- 
+% CONFIGURAÇÕES DE PACOTES
+% --- 
+
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% ---
+% Configurações do pacote siunitx
+\sisetup{
+   output-decimal-marker = {,} ,
+   group-separator = {.}
+}
+% ---
+% Configurações do pacote subcaption
+%\renewcommand\thesubfigure{(\alph{subfigure})}
+\renewcommand*{\thesubfigure}{(\alphalph{\value{subfigure}})}
+% ---
+
+% Configurações do pacote epigraph
+\setlength{\epigraphrule}{0pt}
+
+% ---
+% Definições de comandos
+% ---
+\newcommand{\myVec}[1]{\bm{#1}}
+\newcommand{\myHat}[1]{\hat{\bm{#1}}}
+\newcommand{\myMatrix}[1]{\bm{\mathit{#1}}}
+\newcommand{\ud}{\,\mathrm{d}}
+\newcommand{\tabLabel}[1]{\multicolumn{1}{c}{\textbf{#1}}}
+\newcommand{\tabLabelMrow}[2]{\multicolumn{1}{c}{\multirow{#1}{*}{\textbf{#2}}}}
+\newcommand{\rowSpace}[1]{\renewcommand{\arraystretch}{#1}}
+\newcommand{\minitab}[2][c]{\begin{tabular}{#1}#2\end{tabular}}
+
+\newlist{sumariotese}{enumerate}{4}
+\setlist[sumariotese,1]{label=\arabic*}
+\setlist[sumariotese,2]{label=\arabic{sumariotesei}.\arabic*}
+\setlist[sumariotese,3]{label=\arabic{sumariotesei}.\arabic{sumarioteseii}.\arabic*}
+\setlist[sumariotese,4]{label=\arabic{sumariotesei}.\arabic{sumarioteseii}.\arabic{sumarioteseiii}.\arabic*}
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+\titulo{Título do projeto}
+\autor{Nome do Aluno}
+\local{Manaus}
+\data{2021}
+\orientador{Prof. Dr. Danilo de Santana Chui}
+%\coorientador{Equipe \abnTeX}
+\instituicao{Faculdade de Tecnologia, Universidade Federal do Amazonas}
+\tipotrabalho{Relatório de PIBIC}
+% O preambulo deve conter o tipo do trabalho, o objetivo, 
+% o nome da instituição e a área de concentração 
+\preambulo{Relatório de Projeto de Iniciação Científica para cumprir com os requisitos estabelecidos no Edital 081/2019-PROPESP/UFAM do Programa Institucional de Bolsas de Iniciação Científica da Universidade Federal do Amazonas.}
+% ---
+
+
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+	pdftitle={\@title}, 
+	pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	pdfcreator={LaTeX with abnTeX2},
+	pdfkeywords={ufam}{ft}{engenharia mecânica}{mecânica do contínuo}, 
+	colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=black,          	% color of internal links
+    	citecolor=black,        		% color of links to bibliography
+    	filecolor=black,      		% color of file links
+	urlcolor=black,
+	bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{1.3cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% Espessura das bordas das tabelas
+\setlength\heavyrulewidth{0.12em}
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% NEW COMMANDS
+\providecommand{\en}[1]{\ensuremath{\textrm{\textsc{e}-}{#1}}}
+\providecommand{\ep}[1]{\ensuremath{\textrm{\textsc{e}}{#1}}}
+
+\renewcommand{\imprimircapa}{
+	\begin{capa}
+		\begin{center}
+		\begin{tabular}{L{0.13\textwidth}C{0.68\textwidth}R{0.14\textwidth}}
+			\multirow{3}{*}{\includegraphics[height=2cm]{ufam.png}} & 
+			{\ABNTEXchapterfont\large UNIVERSIDADE FEDERAL DO AMAZONAS} \vspace*{0.2cm} &
+			\multirow{3}{*}{\includegraphics[height=2.2cm]{engmec.png}} \\
+			& {\ABNTEXchapterfont\large FACULDADE DE TECNOLOGIA} \vspace*{0.2cm} & \\
+			& {\ABNTEXchapterfont\large DEPTO. DE ENGENHARIA MECÂNICA} & \\
+		\end{tabular}
+		\\[0.5cm]
+		\includegraphics[width=3cm]{propesp_logo.png} \\
+		{\ABNTEXchapterfont\large Pró-Reitoria de Pesquisa e Pós Graduação} \\
+		{\ABNTEXchapterfont\large Programa Institucional de Bolsas de Iniciação Científica (PIBIC)} \\
+		{\ABNTEXchapterfont\large Programa de Apoio à Iniciação Científica (PAIC)} \\[2.5cm]
+		{\ABNTEXchapterfont\bfseries\LARGE\MakeUppercase RELATÓRIO PARCIAL} \\[0.5cm]
+		{\ABNTEXchapterfont\bfseries\LARGE\MakeUppercase\imprimirtitulo} \\[4.5cm]
+		{\ABNTEXchapterfont\bfseries\LARGE\MakeUppercase\imprimirautor}
+		\vfill
+		{\ABNTEXchapterfont\large\imprimirlocal} \\[0.2cm]
+		{\ABNTEXchapterfont\large\imprimirdata}
+		\vspace*{1cm}
+		\end{center}
+	\end{capa}
+}
+
+\makeatletter
+\renewcommand{\folhaderostocontent}{
+	\begin{center}
+		{\ABNTEXchapterfont\large\imprimirautor} \\[6cm]
+		\begin{center}
+			{\ABNTEXchapterfont\bfseries\Large RELATÓRIO PARCIAL} \\[1cm]
+			{\ABNTEXchapterfont\bfseries\Large\imprimirtitulo} \\
+		\end{center}
+		\vfill
+		\abntex@ifnotempty{\imprimirpreambulo}{
+			\hspace{4cm}
+			\begin{minipage}{0.68\textwidth}
+				\SingleSpacing
+				\imprimirpreambulo \\[0.5cm]
+			\end{minipage}
+		}
+		\vfill
+		{\large\imprimirlocal}
+		\par
+		{\large\imprimirdata}
+		\vspace*{1cm}
+	\end{center}
+}
+\makeatother
+
+% TEOREMAS
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{definicao}{Definição}[chapter]
+\newtheorem{algoritmo}{Algoritmo}[chapter]
+
+% OPERADORES MATEMATICOS
+\DeclareMathOperator{\cov}{cov}
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+% \pretextual
+
+% ---
+% Capa
+% ---
+\imprimircapa
+% ---
+
+% ---
+% Folha de rosto
+% (o * indica que haverá a ficha bibliográfica)
+% ---
+%\imprimirfolhaderosto*
+\imprimirfolhaderosto*
+% ---
+
+% ---
+% Inserir a ficha bibliografica
+% ---
+
+% Isto é um exemplo de Ficha Catalográfica, ou ``Dados internacionais de
+% catalogação-na-publicação''. Você pode utilizar este modelo como referência. 
+% Porém, provavelmente a biblioteca da sua universidade lhe fornecerá um PDF
+% com a ficha catalográfica definitiva após a defesa do trabalho. Quando estiver
+% com o documento, salve-o como PDF no diretório do seu projeto e substitua todo
+% o conteúdo de implementação deste arquivo pelo comando abaixo:
+%
+% \begin{fichacatalografica}
+%     \includepdf{EPUSP-Catalogacao-na-Fonte_corrigida_passo2.pdf}
+% \end{fichacatalografica}
+%
+\begin{fichacatalografica}
+	\begin{minipage}[c]{12.5cm}	
+	\noindent Autorizo a reprodução e divulgação total ou parcial deste trabalho, por qualquer meio convencional ou eletrônico, para fins de referência, estudo ou pesquisa, desde que citada a fonte. \\[1cm]
+		\begin{center}
+			Catalogação na publicação \\
+			Serviço de Biblioteca e Documentação \\
+			Faculdade de Tecnologia da Universidade Federal do Amazonas
+		\end{center}
+	\end{minipage}
+	
+	\vspace*{\fill}					% Posição vertical
+	\hrule							% Linha horizontal
+	\begin{center}					% Minipage Centralizado
+	\begin{minipage}[c]{12.5cm}		% Largura
+	
+	\imprimirautor
+	
+	\hspace{0.5cm} \imprimirtitulo  / \imprimirautor. --
+	\imprimirlocal, \imprimirdata-
+	
+	\hspace{0.5cm} \pageref{LastPage} p. : il. (algumas color.) ; 30 cm.\\
+	
+	\hspace{0.5cm} \imprimirorientadorRotulo~\imprimirorientador\\
+	
+	\hspace{0.5cm}
+	\parbox[t]{\textwidth}{\imprimirtipotrabalho~--~\imprimirinstituicao,
+	\imprimirdata.}\\
+	
+	\hspace{0.5cm}
+		1. PIBIC.
+		2. Engenharia Mecânica.
+		I. Universidade Federal do Amazonas.
+		II. Faculdade de Tecnologia.\\ 			
+	
+	\hspace{8.75cm} CDU 02:141:005.7\\
+	
+	\end{minipage}
+	\end{center}
+	\hrule
+\end{fichacatalografica}
+\cleardoublepage
+% ---
+
+% ---
+% Inserir errata
+% ---
+%\begin{errata}
+%\noindent CHUI, D. S. \textbf{Controle de chama através do monitoramento da qualidade de nebulização por visão computacional e filtro de Kalman}. 2016. XXX f. Tese (Doutorado) - Departamento de Engenharia Mecânica, Escola Politécnica, Universidade de São Paulo, São Paulo, 2016.
+%
+%\begin{table}[htb]
+%\center
+%\footnotesize
+%\begin{tabular}{|p{1.5cm}|p{1.5cm}|p{5cm}|p{5cm}|}
+%  \hline
+%   \textbf{Folha} & \textbf{Linha}  & \textbf{Onde se lê}  & \textbf{Leia-se}  \\
+%    \hline
+%    1 & 10 & auto-conclavo & autoconclavo\\
+%   \hline
+%\end{tabular}
+%\end{table}
+%
+%\end{errata}
+% ---
+
+% ---
+% Inserir folha de aprovação
+% ---
+
+% Isto é um exemplo de Folha de aprovação, elemento obrigatório da NBR
+% 14724/2011 (seção 4.2.1.3). Você pode utilizar este modelo até a aprovação
+% do trabalho. Após isso, substitua todo o conteúdo deste arquivo por uma
+% imagem da página assinada pela banca com o comando abaixo:
+%
+% \includepdf{folhadeaprovacao_final.pdf}
+%
+%\begin{folhadeaprovacao}
+ 
+%    \noindent Nome: \imprimirautor \\[0.5cm]
+%	Título: \imprimirtitulo
+%
+%	\hspace{4cm}
+%	\begin{minipage}{0.66\textwidth}
+%		\SingleSpacing
+%		\imprimirpreambulo \\[0.5cm]
+%		Área de Concentração: Engenharia de Controle e Automação Mecânica. \\[0.2cm]
+%	\end{minipage}
+%	\noindent Aprovado em: 17/02/2020\\
+	
+%\end{folhadeaprovacao}
+% ---
+
+% ---
+% Dedicatória
+% ---
+%\include{dedicatoria}
+% ---
+
+% ---
+% Agradecimentos
+% ---
+%\include{agradecimentos}
+% ---
+
+% ---
+% Epígrafe
+% ---
+%\include{epigrafe}
+% ---
+
+\chapter*[Dados do Projeto]{Dados do Projeto}
+\begin{center}
+    \noindent {\ABNTEXchapterfont
+    \begin{tabular}{|llll|}
+        \hline
+        \rowcolor{CornflowerBlue} \multicolumn{4}{|c|}{\textbf{EDIÇÃO:} PIBIC/PAIC 2020/2021} \\
+        \hline
+        \rowcolor{CornflowerBlue} \multicolumn{4}{|l|}{\textbf{RECURSOS HUMANOS}} \\
+        \hline
+        \multicolumn{2}{|l|}{\textbf{Nome do orientador:}} & \multicolumn{2}{|l|}{\textbf{Bolsa:}} \\
+        \multicolumn{2}{|l|}{\imprimirorientador} & \multicolumn{2}{|l|}{\multirow{3}{*}{
+            \begin{tabular}{ll}
+             ( ) CNPQ & ( ) UFAM   \\
+             ( ) FAPEAM & ( ) VOLUNTÁRIO  
+            \end{tabular}
+        }} \\
+        \cline{1-2}
+        \multicolumn{2}{|l|}{\textbf{Nome do aluno:}} & \multicolumn{2}{|l|}{} \\
+        \multicolumn{2}{|l|}{\imprimirautor} & \multicolumn{2}{|l|}{} \\
+        \hline
+        \rowcolor{CornflowerBlue} \multicolumn{4}{|l|}{\textbf{IDENTIFICAÇÃO DO PROJETO}} \\
+        \hline
+        \multicolumn{3}{|l|}{\textbf{Título:}} & \multicolumn{1}{|l|}{\textbf{Código do Projeto:}}\\
+        \multicolumn{3}{|l|}{\imprimirtitulo} & \multicolumn{1}{|l|}{PIB-ENG-XXXX}\\
+        \hline
+        \multicolumn{4}{|l|}{\textbf{Área de Conhecimento:}} \\
+        ( ) Agrárias & \multicolumn{2}{l}{\textbf{(X) Engenharias}} & ( ) Multidisciplinar \\
+        ( ) Biológicas & \multicolumn{2}{l}{( ) Exatas e da Terra} & ( ) Saúde \\
+        ( ) Ciências Humanas & \multicolumn{2}{l}{( ) Linguística, Letras e Artes} & ( ) Sociais Aplicadas \\
+        \hline
+        \rowcolor{CornflowerBlue} \multicolumn{4}{|l|}{\textbf{COMITÊ DE ÉTICA EM PESQUISA COM HUMANOS (CEP)}} \\
+        \rowcolor{CornflowerBlue} \multicolumn{4}{|l|}{\textbf{OU ANIMAIS (CEUA)}} \\
+        \hline
+        \multicolumn{4}{|l|}{( ) Aprovado - número do protocolo:} \\
+        \multicolumn{4}{|l|}{\textbf{(X) Não se aplica}} \\
+        \multicolumn{4}{|l|}{Caso o projeto não esteja aprovado, justifique:} \\
+        \multicolumn{4}{|l|}{} \\
+        \multicolumn{4}{|l|}{} \\
+        \multicolumn{4}{|l|}{} \\
+        \hline
+    \end{tabular}}  
+\end{center}
+\cleardoublepage
+
+% ---
+% RESUMOS
+% ---
+
+% resumo em português
+\setlength{\absparsep}{18pt} % ajusta o espaçamento dos parágrafos do resumo
+\begin{resumo}
+	\noindent NOME DO AUTOR {\textit\imprimirtitulo.} \imprimirdata. \pageref{LastPage} p. \imprimirtipotrabalho~--~\imprimirinstituicao, \imprimirlocal, \imprimirdata. \\[0.5cm]
+	
+	(Aqui vai o resumo)
+	
+	\textbf{Palavras-chaves}: 
+\end{resumo}
+
+% resumo em inglês
+%\begin{resumo}[Abstract]
+%	\begin{otherlanguage*}{english}
+%
+%   	\textbf{Keywords}: 
+%	\end{otherlanguage*}
+%\end{resumo}
+%\cleardoublepage
+
+%% resumo em francês 
+%\begin{resumo}[Résumé]
+% \begin{otherlanguage*}{french}
+%    Il s'agit d'un résumé en français.
+% 
+%   \textbf{Mots-clés}: latex. abntex. publication de textes.
+% \end{otherlanguage*}
+%\end{resumo}
+%
+%% resumo em espanhol
+%\begin{resumo}[Resumen]
+% \begin{otherlanguage*}{spanish}
+%   Este es el resumen en español.
+%  
+%   \textbf{Palabras clave}: latex. abntex. publicación de textos.
+% \end{otherlanguage*}
+%\end{resumo}
+%% ---
+
+% ---
+% inserir lista de ilustrações
+% ---
+\pdfbookmark[0]{\listfigurename}{lof}
+\listoffigures*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de tabelas
+% ---
+\pdfbookmark[0]{\listtablename}{lot}
+\listoftables*
+\cleardoublepage
+% ---
+
+% ---
+% inserir lista de abreviaturas e siglas
+% ---
+\begin{siglas}
+	\item[UFAM] Universidade Federal do Amazonas.
+\end{siglas}
+% ---
+
+% ---
+% inserir lista de símbolos
+% ---
+%\begin{simbolos}
+%	\item[$A$] área da imagem $I^{pb}$.
+%\end{simbolos}
+% ---
+
+% ---
+% inserir o sumario
+% ---
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+% ---
+
+
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+\include{1_introducao}
+
+\include{2_revisao_literatura}
+
+\include{3_metodologia}
+
+\include{4_resultados}
+
+\include{5_conclusoes}
+
+%% ----------------------------------------------------------
+%% Finaliza a parte no bookmark do PDF
+%% para que se inicie o bookmark na raiz
+%% e adiciona espaço de parte no Sumário
+%% ----------------------------------------------------------
+%\phantompart
+%
+%% ---
+%% Conclusão (outro exemplo de capítulo sem numeração e presente no sumário)
+%% ---
+%\chapter[Conclusão]{Conclusão}
+%%\addcontentsline{toc}{chapter}{Conclusão}
+%% ---
+%
+%\lipsum[31-33]
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+% ----------------------------------------------------------
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\bibliography{referencias}
+% ----------------------------------------------------------
+% Glossário
+% ----------------------------------------------------------
+%
+% Consulte o manual da classe abntex2 para orientações sobre o glossário.
+%
+%\glossary
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+\begin{apendicesenv}
+
+% Imprime uma página indicando o início dos apêndices
+% \partapendices
+
+%\include{apendice_imagens_proc}
+
+\end{apendicesenv}
+% ---
+
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+
+%% ---
+%% Inicia os anexos
+%% ---
+%\begin{anexosenv}
+%
+%% Imprime uma página indicando o início dos anexos
+%\partanexos
+%
+%% ---
+%\chapter{Morbi ultrices rutrum lorem.} 
+%% ---
+%\lipsum[30]
+%
+%\end{anexosenv}
+
+%---------------------------------------------------------------------
+% INDICE REMISSIVO
+%---------------------------------------------------------------------
+\phantompart
+\printindex
+%---------------------------------------------------------------------
+
+\end{document}

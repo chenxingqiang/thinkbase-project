@@ -1,0 +1,115 @@
+\documentclass[phd, titlesmallcaps, examinerscopy, copyrightpage, foronline]{mqthesis}
+
+%----------------------------------------------------------
+% OPTIONS
+% Options you can use in the documentclass above:
+%
+% phd/mres/hons = set the degree text [default=phd]
+% copyrightpage = print a copyright page on the back 
+%                 of the title page [default=false]. 
+%		NOTE: if true, you will have to manually change the name
+%		            and date in the mqthesis.cls file.
+% examinerscopy = print "Examiner's Copy" of title page and 
+%                 change linespacing to 1.5 [default=false]
+% draft = draft mode where figures are replaced with placeholder %         boxes to reduce file size [default=false]
+%-----------------------------------------------------------
+
+%-----------------------------------------------------------
+% PACKAGES
+% Some typical packages you might use
+\usepackage{rotating}  %used to rotate things like pictures or things you \put down
+\usepackage{theorem}   %for mathematical theorems and lemmas
+\usepackage{bm}  %bold fond inside equations, eg. $\bm{\alpha}$
+\usepackage{amsmath,amsfonts,amssymb,mathabx}
+\usepackage{booktabs}  %Makes nice tables in books (sorta like RevTeX can)
+\usepackage{pdfsync}   %used to sync pdf output inorder to flip from tex file to pdf and back
+ %graphicx is already included in the class file
+\usepackage{pdfpages}
+\usepackage{float}
+\usepackage{threeparttable}
+ 
+% add more required packages here 
+ 
+%-----------------------------------------------------------
+
+
+\ifpdf
+    \pdfinfo { /Title  (Title of Thesis)
+               /Creator (pdflatex) % probably this
+               /Producer (LaTeX with hyperref) % something like this
+               /Author (Insert author name here)
+               %/CreationDate (D:20100204000000)  %format D:YYYYMMDDhhmmss
+		% if /CreationDate is left out it will default to the file creation date
+               /Keywords (Obscure; Fields; Science; White Russians)}
+    \pdfcatalog { /PageMode (/UseOutlines) /OpenAction (fitbh)  }
+\fi
+
+\begin{document}
+
+\frontmatter
+
+%%%%% Acknowledgements, titlepage, abstract, list of publications
+\title{Insert title here} % put your title here
+
+\ifthenelse{\boolean{foronline}}{
+  \author{\href{mailto:your email here}{Your name}} % put your name and email here
+  \faculty{Your faculty here} %put your faculty here
+  \department{Your department here} % put your department here
+}{
+  \author{Your name} % put your name here
+    \faculty{Your faculty here} %put your faculty here
+  \department{Your department here} % put your department here
+}
+
+
+%%%%% Submition date if different from creation date
+% \submitdate{March 2010}
+
+% honours students will want to use the keyword honours instead of phd :)
+% or override the \degreetext variable with
+% something appropriate like:
+% \renewcommand{\degreetext}%
+% {in partial fulfilment of the Degree of Bachelor of Science with Honours}
+% also easy to changes this to be for Masters degrees.
+
+\titlepage
+
+\input{declaration}
+\input{acknowledge}
+\input{listofpublications}
+\input{abstract}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\mainmatter
+
+%%%%% Introduction
+\input{ch_intro/chap_intro}
+
+%%%%% Other chapters in here
+\input{ch_methods/chap_methods}
+
+\input{ch_other1/chap_other1}
+\input{ch_other2/chap_other2}
+\input{ch_other3/chap_other3}
+
+%%%%% discussion
+\input{ch_discussion/chap_discussion}
+
+\appendix
+
+%%%%% Appendix
+\input{ch_appendix/chap_appendix}
+ 
+\backmatter
+
+%%%%% List of symbols
+% your thesis may not need this, so comment out or delete the following line
+\input{listofsymbols}
+
+%%%%% Bibliography, in BibTeX format (the references.bib file)
+\bibliography{references}
+
+\end{document}

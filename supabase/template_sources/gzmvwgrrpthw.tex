@@ -1,0 +1,196 @@
+%========== Präambel ==========
+% Dokumentklasse
+\documentclass[a4paper,12pt,dvipsnames]{scrartcl}
+
+% Dokumentinformationen
+\usepackage[
+	pdftitle={},
+	pdfsubject={},
+	pdfauthor={},
+	pdfkeywords={},
+	pdftex=true,
+	colorlinks=true,
+	breaklinks=true,
+	citecolor=black,
+	linkcolor=black,
+	menucolor=black,
+	urlcolor=black
+]{hyperref}
+
+% Standard-Pakete
+\usepackage[utf8]{inputenc}	% Setzt das Enconding der Datei fest und erlaubt die Eingabe von Umlauten
+\usepackage[T1]{fontenc}    % Schriftart				
+\usepackage[ngerman]{babel} % Neue deutsche Rechtschreibung
+
+% Sonstiges
+\usepackage{pdfcomment} % PDFs kommentieren
+\usepackage{todonotes}
+\usepackage{mdwlist} % Unterbrechung in Listen
+
+% Textformatierung
+\usepackage[normalem]{ulem} % Textvorhebung (soul besser nicht verwenden: wurde schon lange nicht mehr geupdatet!)
+\usepackage[autostyle=true,english=american]{csquotes} % Package für die Formatierung von Anführungszeichen
+\renewcommand{\mkblockquote}[4]{\enquote{#1}#2\ifterm{\relax}{#3}#4} % Anführungszeichen bei \blockquote
+\renewcommand{\mkcitation}[1]{#1} % Korrekte Darstellung von Fußnoten bei \blockquote
+\usepackage{ragged2e} % Neue Schalter und Umgebungen um die Textausrichtung zu verändern.
+%\setlength{\textheight}{12.86cm} % Texthöhe 
+\interfootnotelinepenalty10000  % Fußnoten werden auf der Seite angezeigt, auf der die Fußnote im Text vorkommt
+\setlength{\parindent}{0cm} % Entfernt die standardmäßige Einrückung von Text
+
+% Zeilenabstand
+\usepackage{setspace} % Package zur Veränderung des Zeilenabstandes innerhalb des Textes
+\expandafter\def\expandafter\quotation\expandafter{\quote\singlespacing} % Einfacher Zeilenabstand in langen Zitaten
+\onehalfspacing % 1,5-facher Zeilenabstand im gesamten Dokument
+%\renewcommand{\baselinestretch}{1.5} % Zeilenabstand 
+%\setlength{\footnotesep}{10.0pt} % Abstand zwischen Fußnote und Text 
+
+% Schusterjungen und Hurenkinder vermeiden
+\clubpenalty = 10000
+\widowpenalty = 10000 
+\displaywidowpenalty = 10000
+
+% Mathe-Zeugs
+\usepackage{amsmath,amsfonts,amssymb} % Package für mathematische Umgebungen (wie Formelgestaltungen, etc.) 
+\usepackage{array} % Package zur Erzeugung von Matrizen (legt Position und Spalten fest)
+\usepackage{textcomp} % Package zur Generierung zusätzlicher Symbolzeichen 
+
+% Farben
+\usepackage{xcolor}
+
+% Grafiken
+\usepackage{graphicx} % Grafiken einfügen
+\usepackage{svg} % .svg's einbinden
+\usepackage{float} % Package zur Festlegung der Position von Tabellen/Abbildungen
+\usepackage[clockwise]{rotating} % Drehung von Bildern & Tabellen
+
+% TikZ
+\usepackage{tikz}
+
+% Packages für das Erstellen von Tabellen
+\usepackage{tabularx} % Package zur Gestaltung von Tabellen (Festlegen einer Tabellenbreite, automatischen Zeilenumbruch,...)
+\usepackage{booktabs} % Das Hauptaugenmerk von booktabs liegt dabei auf der Gestaltung der horizontalen Linien innerhalb einer Tabelle.  
+\usepackage{multirow} % Package, dass die Zusammenführung von Zellen in einer Tabelle ermöglicht
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\Centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
+
+% Bild- & Tabellenunterschriften & -quellen
+\usepackage{caption}
+\captionsetup{format=plain,justification=RaggedRight,singlelinecheck=false}
+\usepackage{capt-of}
+\usepackage[labelfont=bf]{caption}			
+\captionsetup[table]{justification=centerlast}
+
+% Seitenformatierung
+\usepackage[left= 3cm, right= 2cm, bottom= 2.5cm, top= 2.5cm]{geometry} % Seitenabstände
+\usepackage{pdflscape} % Package zur Drehung von Seiten
+
+% Überschriften-Schriftgröße und -art ändern
+\addtokomafont{disposition}{\rmfamily}
+%\setkomafont{chapter}{\rmfamily\LARGE\bfseries} % Nicht notwendig für die Klasse 'scrartcl'
+\setkomafont{section}{\rmfamily\Large\bfseries}
+\setkomafont{subsection}{\rmfamily\large\bfseries}
+
+% Deutsches Datumsformat
+\usepackage{datetime}
+\newdateformat{myformat}{\THEDAY{. }\monthname[\THEMONTH] \THEYEAR}
+
+% Kopf- & Fußzeile
+%\usepackage{fancyhdr}
+%\pagestyle{fancy} % Muss vor \renewcommand{\chaptermark} stehen
+%\fancyhf{} % Bereinigt Kopf- & Fußzeile 
+%\fancyfoot[L]{} % Links
+%\fancyfoot[C]{\thepage} % Mitte
+%\fancyfoot[R]{} % Rechts
+%\renewcommand{\chaptermark}[1]{
+%	\markboth{Kapitel \thechapter{}: #1}{}}
+%\renewcommand{\sectionmark}[1]{
+%	\markright{\thesection{} #1}}
+%\renewcommand{\headrulewidth}{0pt} % Dicke der Trennlinie oben
+
+% Tabellen- und Abbildungsverzeichnis nach der Lehrstuhlvorlage
+\usepackage{tocloft}
+\renewcommand{\cftfigpresnum}{Abbildung }
+\renewcommand{\cfttabpresnum}{Tabelle }
+
+\renewcommand{\cftfigaftersnum}{:}
+\renewcommand{\cfttabaftersnum}{:}
+
+\setlength{\cftfignumwidth}{3cm}
+\setlength{\cfttabnumwidth}{2,5cm}
+
+\setlength{\cftfigindent}{0,5cm}
+\setlength{\cfttabindent}{0,5cm}
+
+%  Zitation
+\usepackage[authordate,backend=biber, doi=false, isbn=false, footmarkoff]{biblatex-chicago}
+% Hinzufügen der Literatur
+\addbibresource{Literatur.bib}
+
+
+%%%%%%%% Beginn Dokumentinformationen %%%%%%%%
+\newcommand{\titel}{\LaTeX -Vorlage für wissenschaftliche Arbeiten} % Titel
+\newcommand{\untertitel}{ein sehr langer \\ Beispiel-Untertitel} % Untertitel
+\newcommand{\autor}{Max Mustermann} % Autor:in
+\newcommand{\betreuer}{Erika Musterfrau} % Betreuer:in
+\newcommand{\semester}{Sommersemester 2021} % Semester
+\newcommand{\ausgabe}{XX.XX.20XX} % Ausgabetag (Nur relevant für Abschlussarbeiten)
+\newcommand{\abgabe}{XX.XX.20XX} % Abgabetag
+\newcommand{\adresse}{Richard-Wagner-Straße 123 \\ 95447 Bayreuth} % Adresse
+\newcommand{\telefon}{+49 1234 56789} % Telefon-Nr.
+\newcommand{\email}{\href{mailto:Max.Mustermann@uni-bayreuth.de}{Max.Mustermann@uni-bayreuth.de}} % E-Mail
+\newcommand{\studium}{Economics, 6. Semester} % Studiengang, Semesterzahl
+\newcommand{\matrikel}{1234567} % Matrikelnummer
+%%%%%%%% Ende Dokumentinformationen %%%%%%%%
+
+
+%========== Dokumentbeginn ==========
+\begin{document}
+
+% Titelseite
+\input{Titelseite.tex}
+
+% Inhaltsverzeichnis
+\newpage % Erzeugt eine neue Seite
+\pagenumbering{Roman} % Umschalten auf römische Seitenzahlnummerierung 
+\tableofcontents % Erzeugt Inhaltsverzeichnis
+
+% Abbildungsverzeichnis
+\newpage % Erzeugt eine neue Seite
+\renewcommand\listfigurename{Abbildungsverzeichnis}
+\listoffigures
+\addcontentsline{toc}{section}{Abbildungsverzeichnis}
+
+% Tabellenverzeichnis
+\newpage % Erzeugt eine neue Seite
+\renewcommand\listtablename{Tabellenverzeichnis}
+\listoftables
+\addcontentsline{toc}{section}{Tabellenverzeichnis}
+
+% Abkürzungsverzeichnis
+\newpage % Erzeugt eine neue Seite
+\input{Abkuerzungen.tex}
+
+% Haupttext
+\newpage % Erzeugt eine neue Seite
+\pagenumbering{arabic} % Umschalten auf arabische Seitenzahlen
+\setcounter{page}{1} % Setzt die Seitenzahl auf 1 zurück		
+\input{Gliederung.tex} % In der Gliederung.tex-Datei werden alle Kapitel und Unterkapitel für eine bessere Übersicht geladen. Die main.tex-Datei dient in diesem Beispiel nur zur Konfiguration. Um dies zu ändern, muss lediglich diese Zeile mit dem Inhalt der Gliederung.tex-Datei ersetzt werden.
+
+% Literaturverzeichnis
+\newpage % Erzeugt eine neue Seite
+\addcontentsline{toc}{section}{Literaturverzeichnis}
+\printbibliography[heading=bibliography]
+
+% Anhang
+\newpage % Erzeugt eine neue Seite
+\addcontentsline{toc}{section}{Anhang}
+\input{Anhang.tex}
+
+% Eidesstattliche Erklärung (nicht notwendig bei Seminar- und Hausarbeiten)
+\newpage % Erzeugt eine neue Seite
+\input{eidesstatt-erklaerung.tex}
+
+
+\end{document}
+%========== Dokumentende ==========

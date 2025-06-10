@@ -1,0 +1,61 @@
+\documentclass[a4paper]{book} 
+\raggedbottom %evitem que el text s'estiri verticalment
+
+%Paquets que s'utilitzen en aquest document de tesi, afegeix els que necessitis
+    \usepackage[a4paper]{geometry} %els marges de la classe book són estrets, amb el paquet geometry es poden modificar
+        \geometry{margin=1in}
+    \usepackage{fancyhdr} %el paquet fancyhdr ofereix moltes opcions pel que fa capçalera de les pàgines i número de pàgina, veure: https://tex.stackexchange.com/a/670860/314029
+        \pagestyle{fancy}
+        \fancyfoot[C]{\thepage}
+    \usepackage{graphicx} %Required for inserting images
+    \usepackage[catalan]{babel} %En cas que escriguis la tesi en anglès, modifica l'idioma. Alguns títols caldrà canviar-los manualment
+    \usepackage{natbib}
+    
+    \usepackage{lipsum} %aquest paquet només s'utilitza per generar text a mode d'exemple
+
+%Modifica els termes dins els 2ns {} perquè apareguin actualitzats a la portada i la coberta
+\newcommand{\titol}{TITOL}
+\newcommand{\autortesi}{AUTOR}
+\newcommand{\anydediposit}{ANY}
+ 
+\begin{document} 
+
+    %per a aquestes primeres parts, es numeren les pàgines amb números romans
+    \pagenumbering{roman}
+    
+    %Coberta
+    \include{Estructura/1-Coberta}
+    \thispagestyle{empty} %la pàgina següent queda en blanc
+    %Portada
+    \include{Estructura/2-Portada}
+    \thispagestyle{empty}
+    
+    %Llista publicacions, abreviatures, certificat direcció, dedicatòria, agraïments
+    \pagestyle{plain}
+    \include{Estructura/3-Altres_preliminars}
+    %Índex general, de figures i de taules
+    \include{Estructura/4-Índexs}
+    %Resums (cat, cast, eng)
+    \include{Estructura/5-Resums}
+
+    
+    %a partir d'aquí, les pàgines es numeren amb números àrabs
+    \pagestyle{fancy}
+    \pagenumbering{arabic}
+
+    %Diversos capítols s'han en parts com a exemple, modifica els criteris i ordre d'agrupació d'agrupació segons necessitis.
+    \part{Introducció} %Inclou introducció general i objectius del conjunt del treball
+    \include{Estructura/6-Part_I}
+    
+    \part{Marc metodològic} %Inclou metodologia i resultats
+    \include{Estructura/7-Part_II}
+    
+    \part{Conclusions i següents passos} %inclou discussió i conclusions generals
+    \include{Estructura/8-Part_III}
+    
+    %Bibliografia
+    \addcontentsline{toc}{part}{Bibliografia}
+    \bibliographystyle{plainnat}
+    \bibliography{referències}
+
+\end{document}

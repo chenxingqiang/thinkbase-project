@@ -1,0 +1,179 @@
+% LaTeX template for Models of Computation assessed coursework
+% Most of the required packages are standard and should be provided by most TeX installations
+% The exception is mathpartir, which is provided alongside this document
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fullpage}
+\usepackage{rotating}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{stmaryrd}
+\usepackage{proof}
+\usepackage{mathpartir}
+\usepackage{tikz}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{multicol}
+\usepackage{xr-hyper}
+
+% Common macros
+
+% BNF notation
+\newcommand{\Gdef}{\mathrel{\mathop{::}}=}
+\newcommand{\Gbar}{\mathbin{\ \big|\ }}
+\newcommand{\Coloneqq}{\Gdef}
+
+% Big-step arrow
+\newcommand{\bigstep}{\mathrel{\Downarrow}}
+
+% Semantic operators are (often) underlined to avoid ambiguity
+\newcommand{\semop}[1]{\mathbin{\underline{#1}}}
+
+
+% Program syntax is set in teletype using the \cmd macro
+\newcommand{\cmd}[1]{\texttt{#1}}
+
+% Macros for program constructs
+\newcommand{\ifthen}[3]{
+  \cmd{if} \; #1 \; \cmd{then} \; #2 \; \cmd{else} \; #3 }
+\newcommand{\while}[2]{
+  \cmd{while} \; #1 \; \cmd{do} \; #2 }
+
+% \ang{x} typesets x in angled brackets
+\newcommand{\ang}[1]{\langle #1 \rangle}
+
+% The following two macros are for typesetting rules and derivations
+% Usage: \drule{rule name}{premise1 \\ premise2 \\ premise3 ...}{conclusion}
+% The premises will often also be derivations using \drule.
+% The difference between \drule and and \Drule is that the space for the rule name
+% is not measured with \Drule.  This is useful for typesetting left-most subderivations.
+\newcommand{\drule}[3]{\inferrule*[left={#1}]{#2}{#3}}
+\newcommand{\Drule}[3]{\inferrule*[Left={#1}]{#2}{#3}}
+
+% For defininitions
+\newcommand{\eqdef}{\triangleq}
+
+
+% WhileDM
+\newcommand{\whiledm}{\textsc{WhileDM}}
+% Names of types
+\newcommand{\tname}[1]{\mathit{#1}}
+\newcommand{\exprs}{\tname{Expr}}
+\newcommand{\bools}{\tname{Bool}}
+\newcommand{\comms}{\tname{Comm}}
+\newcommand{\vars}{\tname{Var}}
+\newcommand{\nums}{\tname{Num}}
+\newcommand{\addrs}{\tname{Addr}}
+\newcommand{\vals}{\tname{Val}}
+\newcommand{\stor}{\tname{Store}}
+\newcommand{\heap}{\tname{Heap}}
+\newcommand{\bv}{\tname{BVal}}
+\newcommand{\ad}[1]{\ulcorner {#1} \urcorner}
+\newcommand{\newp}{\texttt{newpair}}
+\newcommand{\fst}[1]{{#1}.\texttt{fst}}
+\newcommand{\snd}[1]{{#1}.\texttt{snd}}
+\newcommand{\stof}[2]{\texttt{fst} [ {#1} ] \leftarrow {#2}}
+\newcommand{\stos}[2]{\texttt{snd} [ {#1} ] \leftarrow {#2}}
+\newcommand{\dom}[1]{\mathrm{dom}(#1)}
+\newcommand{\bse}{\bigstep_e}
+\newcommand{\bsc}{\bigstep_c}
+\newcommand{\bsb}{\bigstep_b}
+\newcommand{\types}{\tname{Type}}
+\newcommand{\typ}{\tau} % Type variable
+\newcommand{\tc}{\Gamma} % Type context
+\newcommand{\tnat}{\mathsf{nat}}
+\newcommand{\tpair}[2]{(#1,#2)}
+\newcommand{\hptyp}[3]{#1 \Vdash #2 : #3}
+\newcommand{\tcompat}[3]{#1 ; #2 ; #3 \vdash \textsf{\textup{well-typed}}}
+\newcommand{\etyp}[3]{#1 \vdash #2 : #3}
+
+
+\begin{document}
+\title{Models of Computation Assessed Coursework I}
+\author{A. Student}
+
+\maketitle
+
+This document is a skeleton which provides macros to help typeset your solution to the coursework.
+
+Rules can be typeset like this:
+% gather* is a math environment provided by the amsmath package which can typeset multiple lines of maths (separated by \\).
+\begin{gather*}
+  \drule{e.var}{ x \in \dom{s} }{\ang{x, s, h} \bse \ang{s(x), s, h}} \qquad
+  \drule{e.num}{\ }{\ang{ n, s, h} \bse \ang{ n, s, h}} \\[0.5em]
+  \drule{e.add}{
+    \ang{E_1, s, h} \bse \ang{ n_1, s', h'} \\
+    \ang{E_2, s', h'} \bse \ang{ n_2, s'', h''} \\
+    n_3 = n_1 \semop+ n_2
+  }{ \ang{E_1 + E_2, s, h} \bse \ang{n_3, s'', h''} } \\[0.5em]
+  \drule{e.new}{ a \notin \dom h \\ (a + 1) \notin \dom h }{
+    \ang{\newp, s, h} \bse \ang{\ad a, s, h[a \mapsto 0][a + 1 \mapsto 0]}
+  } \displaybreak[1] \\[0.5em]
+  \drule{e.fst}{ \ang{E, s, h} \bse \ang{\ad a, s', h'} \\ a \in \dom{h'} }{
+    \ang{\fst{E}, s, h} \bse \ang{h'(a), s', h'}
+  } \\[0.5em]
+  \drule{e.snd}{ \ang{E, s, h} \bse \ang{\ad a, s', h'} \\ a+1 \in \dom{h'} }{
+    \ang{\snd{E}, s, h} \bse \ang{h'(a+1), s', h'}
+  }
+\end{gather*}
+
+Derivations can be typeset as in Figure~\ref{fig:deriveg}
+
+\begin{sidewaysfigure}
+% For very wide derivations, it can be helpful to write part of the derivation separately and use a symbol to stand for it, as in the following example:
+\[
+  (\dagger) \equiv \drule{$\lor$I-r}{
+          \Drule{$\lnot$I}{
+            \Drule{$\lnot$E}{
+              \Drule{$\lor$I-l}{
+                \lnot (p \lor \lnot p), p \vdash p
+              }{
+                \lnot (p \lor \lnot p), p \vdash p
+              } \\
+              \Drule{Ax}{\ }{\lnot (p \lor \lnot p) \vdash \lnot (p \lor \lnot p)}
+            }{
+              \lnot (p \lor \lnot p), p \vdash \bot
+            }
+          }{
+            \lnot (p \lor \lnot p) \vdash \lnot p
+          }
+        }{
+          \lnot (p \lor \lnot p) \vdash p \lor \lnot p
+        }
+\]
+\[
+  \drule{$\lnot\lnot$E}{
+    \Drule{$\lnot$I}{
+      \Drule{$\lnot$E}{
+        (\dagger) \\
+        \Drule{Ax}{\ }{\lnot (p \lor \lnot p) \vdash \lnot (p \lor \lnot p)}
+      }{
+        \lnot (p \lor \lnot p) \vdash \bot
+      }
+    }{
+      \vdash \lnot \lnot (p \lor \lnot p)
+    }
+  }{
+    \vdash p \lor \lnot p
+  }
+\]
+\caption{A derivation}
+\label{fig:deriveg}
+\end{sidewaysfigure}
+
+Types:
+\begin{gather*}
+  \tcompat{\Gamma}{s}{h} \\ % State is well-typed with respect to a context 
+  \etyp{\Gamma}{E}{\typ} \\ % E has type \typ in context \Gamma
+  \hptyp{h}{v}{\typ} \\ % Value v has type \typ in heap h
+\end{gather*}
+
+% For inline maths, use $ ... $
+Suppose that $\tcompat{\Gamma}{s}{h}$.
+% For display maths, use \[ \] (other options are available)
+We wish to show that 
+\[
+  \etyp{\Gamma}{E}{\typ} \implies \hptyp{h}{v}{\typ} \text{.}
+\]
+
+\end{document}

@@ -1,0 +1,156 @@
+%Dette er en helt simpel skabelon, som kan bruges til at skrive større opgaver og rapporter i. Koden er bevidst lavet så ukompliceret som muligt,
+%så dokumentet samtidigt kan bruges som en indgang til at læse LaTeX at kende.
+
+%---------------------------------------------------------
+%Dette er kun preample. Det behøver du ikke bekymre dig om. Går ned til der står "Start her". Eller til der hvor sidehovedet indstilles.
+%---------------------------------------------------------
+\documentclass[a4paper,12pt,oneside]{memoir}
+% lidt marginer
+\setlrmarginsandblock{3cm}{*}{1}
+\setulmarginsandblock{3cm}{*}{1}
+\checkandfixthelayout[nearest]
+\raggedbottom
+\setlength{\parindent}{0pt}%Fjerner indrykning ved nyt afsnit
+
+% Standard dansk opsætning
+\usepackage[utf8]{inputenc}   %æøå med utf8-encoding
+\usepackage[danish]{babel}            % dansk opsætning
+\renewcommand\danishhyphenmins{22}    % fikser en fejl i babel
+\usepackage[T1]{fontenc} %fontencoding
+\usepackage{lmodern} %sætter skrifttypen til Latin Modern
+
+% Matematiske symboler og fede tegn i ligninger
+\usepackage{amsmath, amssymb, bm, mathtools, mathdots}
+
+%Flere mulighder for understregning
+\usepackage[normalem]{ulem}
+
+% Tabeller og søjler
+\usepackage{array, booktabs, tabularx}
+
+% Figurer og farver
+\usepackage{graphicx, caption, subfig, xcolor}
+\captionsetup{font=small,labelfont=bf}
+
+%--------------------------------------------------------
+%Her sættes sidehoved og sidefod. Skriv dit eget navn ind.
+%--------------------------------------------------------
+\makepagestyle{mypagestyle} %Min pagestyle med sidetal
+\copypagestyle{mypagestyle}{empty}
+\makeoddhead{mypagestyle}{Navn\\Klasse}{\quad}{\today\\Fag}
+\makeheadrule{mypagestyle}{\textwidth}{\normalrulethickness}
+\makeoddfoot{mypagestyle}{}{\thepage}{} %Kræver to oversættelser
+\aliaspagestyle{chapter}{mypagestyle}
+\pagestyle{mypagestyle} %aktiver ny sidehoved/-fod
+
+\chapterstyle{section}
+
+%Punktopstilling
+\usepackage{enumerate}
+
+%Enheder og tal
+\usepackage[output-decimal-marker={,}]{siunitx}
+\usepackage{icomma} %Komma som decimalseperator
+
+%Talmængder
+\newcommand{\R}{\mathbb{R}} %\R for reelle tal
+\newcommand{\C}{\mathbb{C}} %\C for komplekse tal
+\newcommand{\N}{\mathbb{N}} %\N for naturlige tal
+\newcommand{\Z}{\mathbb{Z}} %\Z for hele tal
+\newcommand{\Q}{\mathbb{Q}} %\Q for rationale tal
+\newcommand{\dg}{^{\circ}}%Brug \dg til at indsætte gradtegn
+
+%Til hyperlinks
+\usepackage[hidelinks=true]{hyperref}
+\usepackage{memhfixc}
+
+\begin{document}%Her begynder indholdet af dokumentet.
+\frontmatter
+%-------------------------------------------
+%START HER!
+%-------------------------------------------
+
+%Forside
+\begin{titlingpage}
+\thispagestyle{empty}
+\vspace*{3cm}
+\centering
+\Huge \bfseries \sffamily Skabelon til større projekter\\
+
+\vspace*{3cm}
+\includegraphics[width=7cm]{cirkler}
+
+\vspace*{4cm}
+\begin{flushright}
+\large
+Lavet af: Navn\\
+Klasse: 2.x\\
+Fag: Matematik\\
+Dato: \today
+\end{flushright}
+\end{titlingpage}
+
+%Indholdfortegnelse
+\tableofcontents*
+
+\mainmatter
+\chapter{Første kapitel}
+Her er teksten til det første kapitel. Den kunne indeholde mange interessante ting.
+\section{Afsnit}
+Der er sørme også et afsnit!
+
+\chapter{Andet kapitel}\label{kapitel2}
+Her er et andet kapitel, som altid starter på en ny side. Her er det side \pageref{kapitel2}.
+
+\chapter{Tabeller og figurer}
+
+\section{Tabeller}
+Hvis man vil lave en simpel tabel, kan man gøre det på følgende måde
+\begin{table}[htb]
+\centering
+\begin{tabular}{|l|r|}
+\hline 
+$n$ & Primtal mindre end eller lig $n$ \\ 
+\hline 
+1 & 0 \\ 
+\hline 
+2 & 1 \\ 
+\hline 
+3 & 2 \\ 
+\hline 
+4 & 2 \\ 
+\hline 
+\end{tabular}
+\caption{Primtal mindre end eller lig et naturligt tal.}\label{tabel-primtal} 
+\end{table}
+
+Den tabel har nummeret \ref{tabel-primtal}. Tabellen er indlagt som en såkaldt \emph{float}, så \LaTeX\ sætter den selv ind på det sted i teksten, hvor den synes, der er bedst plads. Så behøver man ikke bekymre sig om det.
+
+\section{Figurer}
+Man kan også bruge floats til figurer. Det har vi gjort for figur \ref{fig-cirkler}.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=5cm]{cirkler}
+\caption{To cirkler.}\label{fig-cirkler}
+\end{figure}
+
+Man kan læse mere i \cite[kapitel~6]{latex-bog}, hvor brugen af floats er beskrevet i langt større detalje.
+
+\backmatter
+%Litteraturliste
+\begin{thebibliography}{1}
+\bibitem{latex-bog}
+Lars Madsen.
+\textit{Introduktion til \LaTeX{}}.
+2011.
+\bibitem{anden-bog}
+Jens Carstensen.
+\textit{Komplekse tal}.
+Systime,
+3. udgave, 2. oplag, 1996.
+\end{thebibliography}
+%---------------------------------------------------------
+%Dokumentet er slut.
+%---------------------------------------------------------
+\end{document}%Alt efter denne linje kommer ikke med i dokumentet.

@@ -1,0 +1,151 @@
+\documentclass[12pt]{article} 
+ 
+% Minimum packages required
+\usepackage{tikz, ifthen, xfp, geometry, libertine}
+\usepackage[colorlinks=false,hidelinks]{hyperref}  
+\geometry{legalpaper, landscape, margin=1in}
+ 
+
+% This is the main command, do NOT modify it unless you are an expert.
+\newcommand{\Class}[7]{
+  \colors{#5}
+  \filldraw[fill=\hourcolor,draw=black] (#1,\he{#2}{#3}-1) rectangle (#1+5,\he{#2}{#3});
+  \filldraw[fill=\hourcolor,draw=black] (#1+5,\he{#2}{#3}-1) rectangle (#1+10,\he{#2}{#3});
+  \filldraw[fill=MyFillcolor,draw=black] (#1,\fe{#2}{#3}{#6}) rectangle (#1+10,\he{#2}{#3}-1);
+       \draw[thick] (#1+2.5,\he{#2}{#3}) node [below=0pt] {\textbf{\footnotesize  \textsc{\textcolor{white}{{  #2:#3}}}}};
+       \draw[thick] (#1+5,\fe{#2}{#3}{#6*.45}) node [below=0pt] {\textbf{ \textsc{\textcolor{MyTextcolor}{{\href{#7}{#4}}}}}};
+       \draw[thick] (#1+7.5,\he{#2}{#3}) node [below=0pt] {\textbf{\footnotesize  \textsc{\textcolor{white}{{
+  \ifthenelse{ \fpeval{#3+(#6-floor(#6))*60}>59}
+  {\fpeval{#2+1+floor(#6)}:\ifthenelse{\fpeval{#3+(#6-floor(#6)-1)*60}<10}
+                                       {0\fpeval{#3+(#6-floor(#6)-1)*60}}
+                                       {\fpeval{(#6-floor(#6)-1)*60+#3}} }
+  {\fpeval{#2+floor(#6)}:\ifthenelse{\fpeval{(#6-floor(#6))*60-#3}=0}{00}{\fpeval{(#6-floor(#6))*60+#3}} }
+  }}}}};}
+
+% This places the days of the week, colors the box, places the text with some color font.
+% I would not change this.
+\newcommand{\myday}[5]{
+  \shadedraw[inner color=#3,outer color=color24, draw=black] (#1,#2) rectangle (#1+10,#2+2);
+  \draw[thick] (#1+5,#2+1.5) node [below=0pt] {\textbf{\textsc{\textcolor{#5}{{#4}}}}};}
+
+
+% These are the colors, we will refer to them by a number. 
+% You could add more and modify the command \colors appropriately.
+\definecolor{color1}{rgb}{0.0, 0.75, 1.0}  % capri
+\definecolor{color2}{rgb}{0.54,0.17,0.89} % purple
+\definecolor{color3}{rgb}{0.27, 0.42, 0.81} % hanblue
+\definecolor{color4}{rgb}{0.06, 0.75, 0.99}% spirodiscoball
+\definecolor{color5}{rgb}{0.7, 0.11, 0.11}% cornellred
+\definecolor{color6}{rgb}{0.0, 0.75, 1.0}% deepskyblue
+\definecolor{color7}{rgb}{0.31, 0.78, 0.47}% emerald
+\definecolor{color8}{rgb}{0.25, 0.41, 0.88} % ci2
+\definecolor{color9}{rgb}{0.0, 0.65, 0.58}% itam
+\definecolor{color10}{rgb}{0.47, 0.87, 0.47}% pastelgreen
+\definecolor{color11}{rgb}{0.0, 0.33, 0.71}% mediumtealblue
+\definecolor{color12}{rgb}{0.45, 0.76, 0.98}% mayablue
+\definecolor{color13}{rgb}{1.0, 0.0, 0.31}% folly
+\definecolor{color14}{rgb}{0.7, 0.11, 0.11}% oh
+\definecolor{color15}{rgb}{0.0, 0.75, 1.0}% deepskyblue
+\definecolor{color16}{rgb}{0.31, 0.78, 0.47} % emerald  http://latexcolor.com/
+\definecolor{color17}{rgb}{1.0, 0.55, 0.0}% itam2
+\definecolor{color18}{rgb}{0.6, 0.98, 0.6}% oc
+\definecolor{color19}{rgb}{0.0, 0.87, 0.87}% bluegreen
+\definecolor{color20}{rgb}{0.03, 0.91, 0.87}% darktourquoise
+\definecolor{color21}{rgb}{0.06, 0.06, 0.06}% onyx
+\definecolor{color22}{rgb}{0.0, 0.22, 0.66}% royalazure
+\definecolor{color23}{rgb}{0.25, 0.41, 0.88}% royalblue(web)
+\definecolor{color24}{rgb}{0.0, 0.14, 0.4}% darkblue
+\definecolor{color25}{rgb}{0.0, 0.14, 0.4}% royalblue(traditional
+\definecolor{color26}{rgb}{0.0, 0.0, 0.0}%
+\definecolor{daycolor}{rgb}{0.39, 0.58, 0.93}% color of the box for the day
+
+
+% Selects the text color white if it contrasts with MyFillColor, otherwise it selects black.
+\newcommand{\colors}[1]{
+  \ifthenelse{\equal{#1}{1}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color1}}{}
+  \ifthenelse{\equal{#1}{2}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color2}}{}
+  \ifthenelse{\equal{#1}{3}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color3}}{}
+  \ifthenelse{\equal{#1}{4}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color4}}{}
+  \ifthenelse{\equal{#1}{5}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color5}}{}
+  \ifthenelse{\equal{#1}{6}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color6}}{}
+  \ifthenelse{\equal{#1}{7}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color7}}{}
+  \ifthenelse{\equal{#1}{8}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color8}}{}
+  \ifthenelse{\equal{#1}{9}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color9}}{}
+  \ifthenelse{\equal{#1}{10}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color10}}{}
+  \ifthenelse{\equal{#1}{11}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color11}}{}
+  \ifthenelse{\equal{#1}{12}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color12}}{}
+  \ifthenelse{\equal{#1}{13}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color13}}{}
+  \ifthenelse{\equal{#1}{14}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color14}}{}
+  \ifthenelse{\equal{#1}{15}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color15}}{}
+  \ifthenelse{\equal{#1}{16}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color16}}{}
+  \ifthenelse{\equal{#1}{17}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color17}}{}
+  \ifthenelse{\equal{#1}{18}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color18}}{}
+  \ifthenelse{\equal{#1}{19}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color19}}{}
+  \ifthenelse{\equal{#1}{20}}{\colorlet{MyTextcolor}{black}\colorlet{MyFillcolor}{color20}}{}
+  \ifthenelse{\equal{#1}{21}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color21}}{}
+  \ifthenelse{\equal{#1}{22}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color22}}{}
+  \ifthenelse{\equal{#1}{23}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color23}}{}
+  \ifthenelse{\equal{#1}{24}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color24}}{}
+  \ifthenelse{\equal{#1}{25}}{\colorlet{MyTextcolor}{white}\colorlet{MyFillcolor}{color25}}{}
+   }
+   
+% This fixes the x-coordinates of each Class depending on the day of the week.
+   \newcommand{\Monday}{-2}
+   \newcommand{\Tuesday}{8}
+   \newcommand{\Wednesday}{18}
+   \newcommand{\Thursday}{28}
+   \newcommand{\Friday}{38}
+
+
+% This shortcut allows us to make height computations according to what time the class starts
+\newcommand{\he}[2]{\fpeval{-9*(#1+#2/60)/4+42}}   
+\newcommand{\fe}[3]{\fpeval{-9*(#1+#2/60+#3)/4+42}}
+
+% This will bring the bar of the days of the week to match the earliest class time.
+\newcommand{\MyDayStartsAt}[2]{\newcommand{\dayheight}{\he{#1}{#2}}}
+
+
+
+
+
+\begin{document}
+ 
+\pagecolor{color26}   % The color of the page. Try another one if you wish.
+
+\begin{center} 
+ \begin{tikzpicture}[scale=.5]
+    \newcommand{\hourcolor}{color2} % You can try a different color for the time-box.
+ %%%%%%%%%%   E N T E R   E A R L I E S T   T I M E   H E R E  %%%%%%%%%%%%    
+ \MyDayStartsAt{9}{00}  % Enter here the time at which your earliest class starts.
+
+ % This fixes the y-coordinates of each Class depending on the day of the week.
+   \myday{-2}{\dayheight}{daycolor}{Monday}{white}
+    \myday{8}{\dayheight}{daycolor}{Tuesday}{white}
+   \myday{18}{\dayheight}{daycolor}{Wednesday}{white}
+   \myday{28}{\dayheight}{daycolor}{Thursday}{white}
+   \myday{38}{\dayheight}{daycolor}{Friday}{white}
+
+ %%%%%%%%%%%%%   E N T E R   Y O U R   C L A S S E S   H E R E  %%%%%%%%%%%%
+ %  Enter your class as follows
+ %  \Class{\Friday}{14}{30}{Calculus II}{14}{1.5}{https://zoom.us/test}
+ %  This means 
+ %  Calculus II starts at 2:30pm on Friday. Box color is color14.
+ %  Class is 1.5 hours long. Link as given.
+ 
+  \Class{\Monday}{10}{30}{Linear Algebra}{25}{1.25}{ }
+  \Class{\Monday}{12}{00}{Real Analysis}{12}{1.25}{ }
+  \Class{\Monday}{15}{00}{Modern Tools}{11}{1.25}{ }
+  \Class{\Tuesday}{14}{00}{Calculus II}{24}{2}{ }
+  \Class{\Tuesday}{19}{00}{Intro Stats}{19}{3}{ }
+  \Class{\Wednesday}{10}{30}{Linear Algebra}{24}{1.25}{ }
+  \Class{\Wednesday}{12}{00}{Real Analysis}{12}{1.25}{ }
+  \Class{\Wednesday}{15}{00}{Modern Tools}{11}{1.25}{ }
+  \Class{\Thursday}{14}{00}{Calculus II}{24}{2}{ }
+  \Class{\Thursday}{19}{00}{Intro Stats}{19}{3}{ }
+  \Class{\Friday}{9}{00}{Office Hours}{14}{2}{https://zoom.us/test}
+
+ \end{tikzpicture}
+\end{center}
+
+\end{document}
+

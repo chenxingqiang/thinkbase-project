@@ -1,0 +1,150 @@
+\documentclass[12pt, a4paper,twoside, times, openany]{book}
+\usepackage{fullpage}
+\usepackage{setspace}\setstretch {1.5}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage{background}
+\backgroundsetup{scale=0.5,angle=0,opacity=0.1,contents={\includegraphics[width=\paperwidth, height=\paperwidth, keepaspectratio]{figures/blank.jpg}}}
+
+%Unconmment this if you want a UM background
+%\backgroundsetup{scale=0.5,angle=0,opacity=0.1,contents={\includegraphics[width=\paperwidth, height=\paperwidth, keepaspectratio]{figures/thesis2.pdf}}} 
+
+% Page margin setting
+\usepackage{geometry}
+\geometry{left=4cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bm} % bold vectors package style
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption} 
+\usepackage{siunitx}
+\usepackage{tocloft}
+\usepackage{color,soul,framed}   %highlight text, \hl{text}
+\usepackage{xcolor,soul,framed}
+\usepackage[figuresright]{rotating}
+\usepackage{indentfirst} 
+\usepackage[printonlyused]{acronym}
+
+\colorlet{shadecolor}{yellow}
+
+\DeclareMathOperator{\Tr}{Tr}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{remark}{Remark}[chapter]
+
+
+\renewcommand\listtablename{\vspace{-2.2cm} List of Tables and Figures}
+\renewcommand\listfigurename{\vspace{-1.5cm}}
+
+\newcommand{\lotlabel}{Table}
+\newcommand{\loflabel}{Figure}
+
+
+%\newcommand*{\l@section}{\@dottedtocline{1}{1.5em}{2.3em}}
+\setlength{\cftsecindent}{0em}
+\setlength{\cftsubsecindent}{2em}
+
+
+\setlength{\cftfigindent}{0em}
+\setlength{\cfttabindent}{0cm}
+
+\makeatletter
+\newcommand\listoftablesandfigures{%
+	\chapter*{List of Tables and Figures}%
+	\phantomsection
+	\@starttoc{lot}%
+	\bigskip
+	\@starttoc{lof}}
+\makeatother
+
+\renewcommand{\contentsname}{Table of Contents}
+
+
+\setcounter{tocdepth}{2}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\bfseries\boldmath\huge}%
+{\chaptername\ \thechapter}{0em}{}{}
+\titlespacing{\chapter}{0pt}{-8.0ex}{0\wordsep}
+
+
+\usepackage[square, numbers, comma, sort&compress]{natbib}
+\setcitestyle{open={},close={}}
+%\usepackage[sectionbib]{natbib}
+\usepackage{chapterbib}
+%%% Uncomment if you change the bibliography heading/title
+\renewcommand{\bibname}{References}
+
+
+%%% Uncomment if you want to include the bibliographies at the end of each chapter in the table of contents.  
+\usepackage[nottoc]{tocbibind}
+
+\renewcommand\bibnumfmt[1]{[\thechapter.#1]}
+
+
+
+\begin{document}
+
+% normal margin on the cover page
+\newgeometry{top=2.5cm,bottom=2.5cm,outer=2.5cm,inner=2.5cm} 
+\include{chapters/cover_page}
+\include{chapters/blank_page}
+\include{chapters/title_page}
+\include{chapters/blank_page}
+\include{chapters/author_right}
+\include{chapters/blank_page}
+%The above pages need single printing, the rest need double printing for the environment.
+% restore page margin setting
+\restoregeometry 
+\normalsize
+\doublespacing
+
+
+
+\frontmatter
+\pagenumbering{roman}
+\setlength{\parskip}{1em}
+\include{chapters/Acknowledgement}
+\include{chapters/blank_page2}
+
+\include{./chapters/Abstract_page}
+
+\include{chapters/declaration}
+\include{chapters/blank_page2}
+
+
+
+
+\newpage\thispagestyle{empty}\mbox{}
+\setlength{\parskip}{0em}
+\vspace{-2.2cm}
+\singlespacing
+\phantomsection\addcontentsline{toc}{chapter}{Table of Contents}
+\tableofcontents
+\phantomsection\addcontentsline{toc}{chapter}{List of Tables and Figures}
+\listoftablesandfigures
+
+\include{chapters/Acronym}
+
+\mainmatter
+\doublespacing
+
+\setlength{\parskip}{1em}
+\doublespacing
+\thispagestyle{plain}
+\include{./chapters/ch1}
+\include{./chapters/ch2}
+\include{./chapters/ch3}
+\include{./chapters/ch4}
+\include{./chapters/ch5}
+
+
+
+\end{document}

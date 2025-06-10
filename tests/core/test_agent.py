@@ -13,8 +13,8 @@ from agentflow.agents.agent import Agent, AgentState, RemoteAgent
 from agentflow.core.base_types import AgentStatus, AgentType
 from agentflow.core.config import AgentConfig, ModelConfig, WorkflowConfig
 from agentflow.core.workflow_types import WorkflowStep, WorkflowStepType, StepConfig
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import (
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import (
     Message, 
     MessageRole, 
     ContentBlock, 
@@ -43,9 +43,9 @@ def event_loop():
         loop.close()
 
 @pytest.fixture
-def mock_ell2a():
-    """Mock ELL2A integration."""
-    mock = MagicMock(spec=ELL2AIntegration)
+def mock_ell():
+    """Mock ELL integration."""
+    mock = MagicMock(spec=ELLIntegration)
     mock.enabled = True
     mock.tracking_enabled = True
     mock.config = {}
@@ -93,7 +93,7 @@ def workflow_config():
     }
 
 @pytest.fixture
-async def agent(model_config, workflow_config, mock_ell2a):
+async def agent(model_config, workflow_config, mock_ell):
     """Create and initialize test agent."""
     _agent = None
     try:
@@ -111,7 +111,7 @@ async def agent(model_config, workflow_config, mock_ell2a):
             },
             workflow=workflow_config
         )
-        _agent._ell2a = mock_ell2a
+        _agent._ell = mock_ell
         await _agent.initialize()
         _agent.metadata["test_mode"] = True
         yield _agent
@@ -132,11 +132,11 @@ async def test_agent_status_transitions():
     agent = Agent(config=AgentConfig(name="test_agent", type=AgentType.GENERIC))
     await agent.initialize()
     
-    # Mock ELL2A integration
-    class MockELL2A:
+    # Mock ELL integration
+    class MockELL:
         async def process_message(self, message):
             return Message(content=message.content, role=MessageRole.ASSISTANT, type=MessageType.TEXT)
-    agent._ell2a = MockELL2A()
+    agent._ell = MockELL()
     
     # Process a message
     message = "test message"
@@ -154,13 +154,13 @@ async def test_agent_initialization(agent):
         break
 
 @pytest.mark.asyncio
-async def test_message_processing(agent, mock_ell2a):
+async def test_message_processing(agent, mock_ell):
     """Test message processing."""
     async for agent_instance in agent:
         assert isinstance(agent_instance, Agent)
 
         # Ensure the mock is properly set up
-        agent_instance._ell2a = mock_ell2a
+        agent_instance._ell = mock_ell
         
         test_message = "Test message"
         response = await agent_instance.process_message(test_message)
@@ -179,14 +179,14 @@ async def test_message_processing(agent, mock_ell2a):
         break
 
 @pytest.mark.asyncio
-async def test_error_handling(agent, mock_ell2a):
+async def test_error_handling(agent, mock_ell):
     """Test error handling."""
     async for agent_instance in agent:
         assert isinstance(agent_instance, Agent)
 
         # Set up mock to raise an exception
-        mock_ell2a.process_message.side_effect = Exception("Test error")
-        agent_instance._ell2a = mock_ell2a
+        mock_ell.process_message.side_effect = Exception("Test error")
+        agent_instance._ell = mock_ell
 
         with pytest.raises(Exception):
             await agent_instance.process_message("Test message")
@@ -197,14 +197,14 @@ async def test_error_handling(agent, mock_ell2a):
         break
 
 @pytest.mark.asyncio
-async def test_error_limit(agent, mock_ell2a):
+async def test_error_limit(agent, mock_ell):
     """Test error limit handling."""
     async for agent_instance in agent:
         assert isinstance(agent_instance, Agent)
 
         # Set up mock to raise an exception
-        mock_ell2a.process_message.side_effect = Exception("Test error")
-        agent_instance._ell2a = mock_ell2a
+        mock_ell.process_message.side_effect = Exception("Test error")
+        agent_instance._ell = mock_ell
 
         # Generate more errors than the limit
         for i in range(agent_instance.max_errors + 5):

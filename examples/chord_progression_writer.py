@@ -1,17 +1,17 @@
 from typing import List, Optional
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
-from agentflow.ell2a.stores import SQLStore
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
+from agentflow.ell.stores import SQLStore
 from midiutil.MidiFile import MIDIFile
 import pygame
 import time
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
 CHORD_FORMAT = "| Chord | Chord | ... |"
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def write_a_chord_progression_for_song(genre: Optional[str], key: Optional[str]) -> str:
     """Write a chord progression for a song."""
     # Create system message
@@ -43,8 +43,8 @@ Instructions:
     )
     
     # Process messages
-    await ell2a.process_message(system_message)
-    response = await ell2a.process_message(user_message)
+    await ell.process_message(system_message)
+    response = await ell.process_message(user_message)
     
     # Return the response
     if isinstance(response, Message):
@@ -54,7 +54,7 @@ Instructions:
     else:
         return str(response)
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def parse_chords_to_midi(chords: List[str]) -> str:
     """Convert chord symbols to MIDI notes."""
     # Create system message
@@ -92,8 +92,8 @@ Chords:
     )
     
     # Process messages
-    await ell2a.process_message(system_message)
-    response = await ell2a.process_message(user_message)
+    await ell.process_message(system_message)
+    response = await ell.process_message(user_message)
     
     # Return the response
     if isinstance(response, Message):
@@ -132,8 +132,8 @@ def play_midi_file(file_path):
         time.sleep(1)
 
 if __name__ == "__main__":
-    # Initialize ELL2A
-    ell2a.configure({
+    # Initialize ELL
+    ell.configure({
         "enabled": True,
         "tracking_enabled": True,
         "store": "./logdir",

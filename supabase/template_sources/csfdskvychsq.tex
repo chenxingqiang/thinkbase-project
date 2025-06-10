@@ -1,0 +1,257 @@
+%%---%% Physics Lab Report Version 0.6 - 1.febrúar 2023 %%---%%
+% Höfundur/Author: Hákon Örn Árnason - hakona07 AT ru.is
+% Viðhaldið af/Maintained by: Hákon Örn Árnason - hakona07 AT ru.is
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Credits to:
+% Math template by Hlynur Arnarsson
+% How to write text by Andrei Manolescu, Haraldur Auðunsson, Sigurður Ingi Erlingsson, version 050918
+% Hákon Valur Haraldsson - figures and tables additions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{scrartcl}
+\input{File_Setup.tex}
+% ---------- Skrá fyrir myndir ---------- 
+\graphicspath{{graphics/}{Graphics/}{./}}
+% ---------- Skrá fyrir heimildir ---------- 
+\usepackage[style=ieee]{biblatex}
+\addbibresource{bibliography.bib}
+
+\begin{document}
+
+%% --- Titil síða / Title page --- %%
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.3\textwidth]{ru-logo-1.pdf}\par\vspace{1cm} %<-- RU Logo
+	{\scshape\LARGE Háskólinn í Reykjavík \par} %<-- Nafn háskólans (Háskólinn í Reykjavík / Reykjavik University)
+	\vspace{1cm}
+	{\scshape\Large Physics Lab Report\par} %<-- Áfanga titill / Class or course title
+	\vspace{1.5cm}
+	{\huge\bfseries How to write One\par} %<-- Titill Skýrslu / Title of Report
+	\vspace{2cm}
+	{\Large\itshape Nemandi 1}\par %<-- Nafn nemanda / Name of student
+	\texttt{ElskarEðl@ru.is}\par %<-- t-póstfang / e-mail
+	\vspace{0.5cm}
+	{\Large\itshape Nemandi 2}\par %<-- Nafn nemanda / Name of student
+	\texttt{Gerðiekkert@ru.is}\par %<-- t-póstfang / e-mail
+	\vfill
+	supervised by\par %<-- (Umsjón höfðu / supervised by)
+	Teacher \& Assistant %<-- Nafn kennara og aðstoðarkennara í tilraun / Name of Lab Teacher and TA
+	\vfill
+
+% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+
+%% --- Titil síða endar / Title page ends --- %%
+
+\section{Introduction} %<--  Inngangur / Introduction
+
+In this section of the report you explain the basic physical phenomenon, the principle(s), and the basic equations.
+All notations or symbols used in the equations will be explained.
+Using one or two figures to make the explanations clear is highly recommended.
+You also state briefly what you want to do or test in this lab/experiment\cite{anarticle, thesis, report, conv, unpub, notpub, notpub}.
+Do not copy-paste from the written documentation created for you.
+Use your own understanding.
+Imagine you are an expert working in a professional lab and you write a report for your clients or for your collaborators who are asking you to do measurements on their samples or materials.
+So you explain to them the basics of the experiment and the measurements.
+It is assumed that they already have some general knowledge, but they are not necessarily experts in your field.
+The recommended size of this section is about one page including figures.
+
+\begin{equation}\label{eu_eqn}
+e^{\pi i} + 1 = 0
+\end{equation}
+% <- þetta % passar að næsta lína sé ekki inndregin.
+The beautiful equation \ref{eu_eqn} is known as the Euler equation\cite{collection}
+
+\section{Methods} %<--  Aðferð / Methods -- Yfirkafli
+
+Here you explain methods used in the experiment\cite{bookseries}.
+Statistical methods, measurement methods...
+
+\subsection{Equipment and setup} %<-- Uppsetning og tæki / Equipment and setup -- undirkafli
+
+Here you explain the equipment you used and the experimental setup.
+Mention the instruments or the accessories used.
+Do not list up all the tools, but only the most important.
+Pictures might be very helpful.
+
+% --- Gerð rafrásamynda
+% --- How to make Circuit diagrams pictues
+% https://www.overleaf.com/learn/latex/LaTeX_Graphics_using_TikZ:_A_Tutorial_for_Beginners_(Part_4)%E2%80%94Circuit_Diagrams_Using_Circuitikz
+\begin{figure}[h]
+    \centering
+        \begin{circuitikz}
+        \draw
+        (0,0) to[battery] (0,4)
+          to[R, i_=2<\milli\ampere>] (4,4) 
+          to[C] (4,0) -- (3.5,0)
+          to[R, *-*] (0.5,0) -- (0,0)
+        (0.5,0) -- (0.5,-2)
+          to[voltmeter, l=3<\kilo\volt>] (3.5,-2) -- (3.5,0)
+        (4,4) -- (4,4)
+            to [R, label=$R$] (8,4)
+            to [C, label=$C$] (8,0) -- (4,0)
+        ;
+        \end{circuitikz}
+        \caption{(Example caption) Some description about the diagram.}
+        \label{fig:Circuit_diag}
+\end{figure}
+
+% Að setja inn mynd og bæta við örvum á hana - dæmi um tæknilega mynd.
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \node[] (chamber) at (0,0) 
+          {\includegraphics[width=0.7\linewidth]{Graphics/vac_chamber.jpg}}; % Þetta er myndin - það sem kemur fyrir neðan eru örvar og hringir til að benda á hvað er hvað á myndinni
+          \draw[thick, white] (-0.1,-0.1) circle (0.5cm);
+          \draw[<-,white] (-0.6,0) -- (-2,1) node[fill=white,text=black]{Sample stage};
+          \draw[thick, white] (3.5,2.5) circle (0.8cm);
+          \draw[<-,white] (3.2,3) -- (3,3.5) node[fill=white,text=black]{Ion gauge};
+          \draw[thick, white] (-1.3,-3.7) rectangle (1.2,-3);
+          \node[fill=white,text=black] at (-2.8,-3.2){Vacuum pump};
+      \end{tikzpicture}
+    \caption[Vacuum Chamber]{Spherical Vacuum chamber, the white box in the center is one of the custom built measurement stages, in the center (golden spot) is a UV-LED. Vacuum pump can be seen below the chamber, the Pirani gauge is on the far side.}
+    \label{fig:vac_chamber_GaAs}
+\end{figure}
+
+\subsection{Procedure} %<-- Framkvæmd / Procedure -- Undirkafli
+
+Describe the most important steps of the work.
+Do not go into too many details, like: “we opened the Capstone software and clicked Start”, or “we turned on the power source”. \cite{abook} %<-- heimild
+Such information is irrelevant for your clients or collaborators.
+Again, do not copy-paste from the description of the teacher.
+Explain your work such that the readers will understand what you did and will trust you.
+In general half a page should be sufficient here, but you can write more, depending on the complexity.
+You can include more technical details like limitations of the equipment, or improvements that you made, or other methodological aspects.
+
+\section{Results and Discussion} %<-- Niðurstöður og umræða / Results and Discussion
+
+Describe the data collection briefly and put the data tables and figures in context.
+In experiments when an electric circuit is studied the circuit and the meters used should be shown in the report.
+Data tables.
+Show the data tables.
+All tables should be numbered (like Table n), have a title and include a brief description.
+This description should be on top of the table. Of course, if you have thousands of numbers do not show all, but only the most important.
+Always mention the physical units used.
+
+% --- Tafla / Table 
+\begin{table}[ht] %<-- [ht] stýrir staðsetningu miðað við texta.
+    \centering
+    \begin{tabular}{llr} %<-- "llr" stýrir útliti töflu
+\hline
+\multicolumn{2}{c}{Item} \\ %<-- 
+\cline{1-2}
+Animal    & Description & Weight (\unit{\gram}) \\
+\hline %<-- býr til þverlínu
+Gnat      & per gram    & \qty{13.65}{\gram}      \\ %<-- & aðgreinir dálka
+          & each        & \qty{0.01}{\gram}       \\ %<-- \\ gerir nýja línu
+Gnu       & stuffed     & \qty{92.50}{\gram}      \\
+Emu       & stuffed     & \qty{33.33}{\gram}      \\
+Armadillo & frozen      & \qty{8.99}{\gram}       \\
+\hline
+\end{tabular}
+    \caption{Results of measuring different types of frozen perishables.
+    The description tells how each item is prepared.}
+    \label{tab:my_label}
+\end{table}
+
+\textbf{\textit{Graphs.}} 
+
+Often the graphs are the most important information of the work.
+Whether you do a graph with the computer or by hand, do it with great care.
+A graph contains a lot of information in a few cm2.
+Graphs should be numbered (like Graph n), have a title and include a brief description.
+This description should be below the graph itself. Label the axes the quantities shown and the units.
+Some software (like Excel) do not have convenient default options for graphs:
+grid-lines may be shown in one direction only, the displayed intervals might be much larger than the relevant intervals, etc. 
+Find the convenient settings, do not accept the default if it is not good enough.
+Use the whole graph area to show your data. Often you have to create either a straight line or another curve through the data points.
+If you cannot do it with the computer, just print the graph and do it by hand.
+Make sure that individual data points stand out clearly, they are your measurements.
+
+
+\begin{figure}[ht] %<-- [h] stýrir staðsetningu á mynd.
+    \centering
+    \begin{tikzpicture}
+    \begin{axis}[
+        height=0.2\paperheight,
+        width=0.9\linewidth,
+        scale only axis,
+        title = Pressure Plot?,
+        axis lines = left,
+        x SI prefix=kilo,
+        x unit=m,
+        y SI prefix=milli,
+        y unit=N,
+        xlabel=Distance,
+        ylabel=Force,
+     ]
+    %Below the red parabola is defined
+    \addplot [
+        red,
+        domain=-10:10, 
+        samples=100, 
+    ]
+    {x^2 - 2*x - 1}; %<-- hægt er að setja inn gagnaskrá í stað jöfnu ( væri þá sett í "Data_Files" og vísað síðan í hana hér )
+    \addlegendentry{$x^2 - 2x - 1$}
+    %Here the blue parabloa is defined
+    \addplot [
+        blue,
+        domain=-10:10, 
+        samples=100,
+        ]
+        {x^2 + 2*x + 1};
+    \addlegendentry{$x^2 + 2x + 1$}
+     
+    \end{axis}
+\end{tikzpicture}
+    \caption{(Example caption) Figure shows how the system pressure in [Pressure(\unit{\newton\metre})]changes with time for two cases.
+    Blue is the first and red is the second case.}
+    \label{fig:merkimiði_myndar}
+\end{figure}
+
+\textbf{\textit{Calculations.}}
+%%%
+Show your calculations.
+Show clearly the units you used for all physical quantities.
+Here you show the error/uncertainty analysis.
+Pay attention to the significant digits of the final results:
+as a rule the uncertainty will be shown with only one significant digit and the main result with the last significant digit corresponding to the uncertainty.\\
+Examples: 2.41±0.03 or 6.5±0.2 and not 2.412367±0.02698 nor 6.4±0.16.
+%%%
+\textbf{\textit{Discussion.}} 
+Discuss briefly your results, how well they fit some model, theory or other data.
+
+\section{Summary and Conclusions} %<-- Samantekt og niðurstöður / Summary and Conclusions
+
+It is very important to have a clear, short, and informative summary of all the important results.
+It can be a short table or a list, and possibly one or two short comments or explanations.
+You have to understand that your clients or collaborators may not have time to read the whole report as soon as they see it, but they need the results or the conclusions immediately.
+This is a typical situation in real life.
+Some readers will look only at the last section first, and only later to the whole report.
+That’s why in this final section you answer the initial question(s) or respond to what you wanted to do, as stated in the Introduction\cite{abook}.
+
+\begin{figure}
+\centering
+    \includegraphics[scale=0.2]{Classical_laboratory_methods_in_microbiology.jpg}
+    \caption{Ef myndir eru teknar frá öðrum þá verður að geta heimilda - einnig, svona myndir eiga ekki heima í tæknilegum skýrslum, bara tæknilegar myndir.}
+    \caption*{Source: \href{https://commons.wikimedia.org/wiki/File:Classical_laboratory_methods_in_microbiology.jpg}{Photo} by Dariusz Bartosik / \href{https://creativecommons.org/licenses/by/2.0/}{CC BY}}
+    \label{fig:Þessi_mynd}
+\end{figure}
+
+\textbf{\textit{Final recommendations:}} 
+The length of the report is not fixed.
+In general it should be between 4 and 6 pages, but it may vary depending on the number of graphs and tables included.
+Language can be English or Icelandic, at your choice.
+This description is an addition and clarification to “Skýrslur og ritgerðir” as published by the School of Science and Engineering, and is specific to physics lab reports.
+
+\newpage
+\printbibliography
+
+%------ To create Appendix with additional stuff -------%
+%\newpage
+%\appendix
+%\section{Appendix/Fylgi gögn}
+%Put data files, CAD drawings, additional sketches, etc.
+
+\end{document}

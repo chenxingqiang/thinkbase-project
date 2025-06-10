@@ -1,0 +1,270 @@
+\documentclass{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc} % allows to copy accented words on PDF
+\usepackage{blindtext}
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{url}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,compat=1.9}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{lmodern}
+\usepackage[framed,numbered,captionpos=t]{matlab-prettifier}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{gray97}{gray}{.97}
+\definecolor{gray75}{gray}{.75}
+\definecolor{gray45}{gray}{.45}
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+%----Java----
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color
+  style      = Matlab-editor,
+  basicstyle = \mlttfamily,
+  numbers=left,
+  stepnumber=1,
+  xleftmargin=.1\textwidth,
+  xrightmargin=.1\textwidth,
+  %basicstyle=\footnotesize,        % size of fonts used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=t,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{mymauve},     % string literal style
+  morekeywords={run, getDimensions, newArray, getResult}
+}
+
+% -=-=-=-=-=-=-=-=-=-=
+% Cabecera y pie de página
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Práctica 1: Nombre de la práctica}
+\lhead{Instituto Tecnológico de Morelia}
+\cfoot{\thepage}
+% -=-=-=-=-=-=-=-=-=-=
+
+
+% -=-=-=-=-=-=-=-=-=-=
+% Defniciones para título y autores
+\makeatletter
+\def\HUGE{\@setfontsize\HUGE{30}{60}}
+\setlength{\parskip}{0.1in}
+
+\newcommand{\myTitle}{Nombre de la una Práctica}
+
+\newcommand{\authora}{Nombre del Alumno 1}
+\newcommand{\authorb}{Nombre del Alumno 2}
+
+\newcommand{\myReviewers}{Dr. Gerardo Marx Chávez-Campos}
+
+\newcommand{\myDate}{Agosto del 2023}
+
+\begin{document}
+
+% archivo de la portada
+\include{TitlePage}
+
+% índice de contenido
+\tableofcontents
+
+
+
+
+\newpage
+
+\section{Introducción}
+
+% Considere que las referencias están en formato \textit{Bibitems} y se incluyen al final de este archivo.
+
+Este es un ejemplo de como se deben insertar referencia en el documento~\cite{conagua-2011}. Considere que las referencias están en formato \textit{Bibitems} y se incluyen al final de este archivo~\cite{conagua-2011,undesa2008}.
+
+
+% Texto dummy para rellenar el documento
+\blindtext[2]
+
+ % ejemplo de figura
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=3.5in]{universe}
+    \caption{Pie de texto en la figura.}
+    \label{fig:universe}
+\end{figure}
+
+\blindtext[3]
+
+\section{Objetivos}
+
+\subsection{Objetivo general}
+\blindtext[1]
+
+\subsection{Objetivos específicos}
+
+\begin{itemize}
+	\item Primer elemento y su descripción relacionada con los objetivos.
+	\item Segundo elemento y su descripción relacionada con los objetivos.
+	\item Tercer elemento y su descripción relacionada con los objetivos.
+	\item Cuarto elemento y su descripción relacionada con los objetivos.
+\end{itemize}
+
+\section{Marco Teórico}
+
+\blindtext[2]
+
+El Error Cuadrático medio queda definido por la Ecuación \eqref{eq:mse}:
+
+\begin{equation}
+	MSE(X,h_\theta)=\frac{1}{m}\sum_{i=0}^m\left(\theta x^{(i)}-y^{(i)} \right)^2 \label{eq:mse}
+\end{equation}
+
+\section{Desarrollo}
+
+\blindtext[1]
+
+\begin{lstlisting}[
+  language=Python,
+  label=lst:model,
+  frame= lines,
+  caption= {Script to implement the Joule heating ODE model considering physical geometry and its thermal and electrical properties}]
+# # Model definition
+# the main equation is:
+# $$Q_g+Q_i=Q_a+Q_l
+
+import numpy as np
+from scipy.integrate import odeint
+import termplotlib as tpl
+import matplotlib.pyplot as plt
+
+def jouleODE(y,t):
+    rho = 7870 # kg/m^3, material's density
+    Cp = 800 # J/(KgC)800, Heat Capacity
+    rhoE = 1.15E-6 #OhmXm @850C
+    h = 170 # W/m^2K
+    delta_z = 0.026 #m
+    diameter = 0.003 #m 
+    Ac = 2*3.141592*(diameter/2)*(diameter/2)
+    alpha = rhoE*delta_z/Ac
+    V = Ac*delta_z
+    beta = rho*Cp*V
+    A_cylinder = 2*3.141592*diameter/2*delta_z
+    A_s = 2*Ac+A_cylinder
+    theta = A_s*h
+    Tm = 27 #C room's temp
+    I = 140 #Amps, input's current
+    dydt = alpha/beta*(I*I)-theta/beta*(y-Tm)
+    return dydt
+
+y0 = 27
+t = np.linspace(0,1500)
+y = odeint(jouleODE, y0,t) 
+plt.plot(t,y,'.:k', label='model')
+plt.xlabel('Time (sec)')
+plt.ylabel('y(t)')
+plt.legend()
+plt.show()
+\end{lstlisting}
+
+
+
+\section{Resultados}
+
+\blindtext[1]
+
+Plotting from data:
+
+\begin{figure}[htb]
+\centering
+\begin{tikzpicture}
+\begin{axis}
+[
+	title={Resultados de la medición},
+	xlabel={$x$ Temperature [\textcelsius]},
+  ylabel={Solubility [g per 100 g water]},
+    xmin=0, xmax=100,
+    ymin=0, ymax=120,
+    xtick={0,20,40,60,80,100},
+    ytick={0,20,40,60,80,100,120},
+    legend pos=north west,
+    ymajorgrids=true,
+    grid style=dashed
+]
+
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (0,23.1)
+    (10,27.5)
+    (20,32)
+    (30,37.8)
+    (40,44.6)
+    (60,61.8)
+    (80,83.8)
+    (100,114)
+    };
+    \legend{Data $f(x)$}
+\end{axis}
+\end{tikzpicture}
+\end{figure}
+
+
+\section{Conclusiones}
+
+\blindtext[1]
+
+
+
+\clearpage
+%----------
+\begin{thebibliography}{99}
+
+\bibitem{conagua-2011}
+Comisión Nacional del Agua.
+\textit{Estadísticas del Agua en México, 2011.} Recuperado 8 de agosto de 2021, de \url{http://www.conagua.gob.mx/CONAGUA07/Publicaciones/Publicaciones/SGP-1-11-EAM2011.PDF}
+
+\bibitem{undesa2008}
+United Nations. Department of Economics and Social Affairs, Population Department,
+\textit{World Population Prospects: The 2008 Revision: Medium fertility variant 2010 - 2050.}
+Consultado en: \url{http://esa.un.org/unpd/wpp2008/index.html} 
+
+\bibitem{fondo2021}
+Fondo para la Comunicación y la Educación Ambiental, A.C.
+\textit{Contaminación en México.} Recuperado 10 de agosto de 2021, de \url{https://agua.org.mx/agua-contaminacion-en-mexico/}
+
+\bibitem{fernandez2020}
+Olaiz-Fernández GA, Gómez-Peña EG, Juárez-Flores A, Vicuña-de Anda FJ, Morales-Ríos JE, Carrasco OF. \textit{Panorama histórico de la enfermedad diarreica aguda en México y el futuro de su prevención. Salud Publica Mex [Internet]}. 20 de diciembre de 2019 [citado 19 de agosto de 2021];62(1, ene-feb):25-3. Disponible en: \url{https://saludpublica.mx/index.php/spm/article/view/10002}
+
+\bibitem{soto2016}
+Soto-Estrada, Guadalupe; Moreno-Altamirano, Laura  y  Pahua-D\'iaz, Daniel. \textit{Panorama epidemiológico de México, principales causas de morbilidad y mortalidad.} Rev. Fac. Med. (Méx.) [online]. 2016, vol.59, n.6 [citado  2021-08-19], pp.8-22, ISSN 2448-4865. Disponible en: \url{http://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S0026-17422016000600008&lng=es&nrm=iso}. 
+
+\bibitem{camara2021}
+Cámara de Diputados. \textit{Constitución Politica de los Estados Unidos Mexicanos.} Artículo 4, consultado en Agosto del 2021 en:  
+\url{http://www3.diputados.gob.mx/camara/001_diputados/012_comisioneslxii/01_ordinarias/002_agua_potable_y_saneamiento/13_marco_juridico/01_constitucion_politica_de_los_estados_unidos_mexicanos}
+
+\bibitem{merida2020}
+Mérida-Cano, Marvin Eduardo.
+\textit{Calidad bacteriológica del agua y su relación con el potencial de óxido reducción (ORP)}, 2020.
+
+\bibitem{astudillo2019}
+Astudillo-Naderas, Ricardo y Montes de Oca Barrera, Fabiola. \textit{Electrodo de grafito como electrodo indicador de reacciones redox}.  Universidad Nacional Autonoma de México, Facultad De estudios Superiores Cuautitlán, 2019.
+
+\bibitem{steininger1996}
+Steininger, Jacques y Pareja, Catherine. 
+\textit{Respuesta Del Sensor De ORP En Agua Clorada,} 1996
+
+\bibitem{lin2017}
+Wen-Chi, Lin; Klaus Brondum, Charles W. Monroe; y Mark A. Burns. \textit{Monitoreo del pH, potencial de oxidación-reducción (ORP) y conductividad de agua,}  2017
+
+\bibitem{trevor2004}
+Suslow, Trevor V. \textit{Potencial de oxidación-reducción (ORP) para el monitoreo, control y documentación de la desinfección del agua}, 2004.
+\end{thebibliography}
+
+\end{document}

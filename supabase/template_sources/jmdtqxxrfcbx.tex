@@ -1,0 +1,153 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a very unofficial and primitive template for typesetting
+%% dissertations, as outlined by the Faculty of Medicine of the 
+%% University of Freiburg i.Br., Germany. This example does not
+%% provide a finished and fully developed dissertation template 
+%% - not in any way! In fact, its mere purpose is to lay some  
+%% rudimentary foundations for further modifications! 
+%% (Latex compiler: XeLaTeX, preferably)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[
+    fontsize = 12pt 
+    ,paper = a4 
+    ,headings=big
+    ,parskip
+    ,numbers=noendperiod % 2.3.1 vs 2.3.1. (no dot after the last chapter number)
+    ,twoside = false %oneside alternatively
+    %BCOR = 0mm, %absolute value of binding correction
+	,toc = bibliography %add "bibliography" to the table of contents,
+	,toc=listof %add list of tables/figures to the table of contents
+	]{scrreprt} %alternatively: scrartcl, scrrpt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%# LANGUAGE and FONTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \usepackage{iftex}
+    \ifXeTeX %If you use the XELATEX-Compiler (see: https://www.overleaf.com/learn/latex/XeLaTeX)
+        \usepackage{fontspec}
+        \setmainfont{Arial} % or Times New Roman, or other fonts available on your operating system
+    \else %If you use the LATEX-Compiler (Times New Roman not available):
+        \usepackage[utf8]{inputenc}
+        \usepackage[T1]{fontenc}
+        %\usepackage{mathptmx} %font equals Times Roman 
+        \addtokomafont{disposition}{\fontfamily{arial}} %font equals Arial
+    \fi
+    
+    \usepackage[main=english, ngerman]{babel}
+    % for more languages add  e.g. ngerman, french, spanish, czech, russian, slovak, polish, hungarian etc.
+    %% foreign texts to be typeset as follows:
+    %%
+    %%   \begin{otherlanguage}{german}  ... \end{otherlanguage}
+    %%   \begin{otherlanguage}{russian} ... \end{otherlanguage}
+    %%   \begin{otherlanguage}{czech}   ... \end{otherlanguage}
+
+
+    %PLEASE do feel free to change the fonts of the chapter's/section's/subsection's headings; do so  by toggling comments, or by adding a selection of \bfseries (bold) \itshape (in italics) \Huge \huge \LARGE \Large \large (what so ever) to the second {}
+    \addtokomafont{chapter}{\normalfont}
+    \addtokomafont{section}{\normalfont}
+    \addtokomafont{subsection}{\normalfont}
+    \addtokomafont{subsubsection}{\normalfont\itshape\subsubsectionfont}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BIBLIOGRAPHY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \input{biber_preamble_harv} %specify file's name containing the biblatex-preamble (package-loading + modifications)
+
+    \addbibresource{bibfile.bib} %specify bib-file 
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PAGE LAYOUT and what ever concerns STYLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \usepackage[left=3cm,
+               top = 3cm, 
+               bottom = 3cm,
+               right= 3cm,
+               ]{geometry} %customize geometries of the page output
+               
+    \usepackage[onehalfspacing]{setspace}% inter-line spacing (1.5)
+    
+    \usepackage{fancyhdr} %create + modify your own headers/footers: http://www.ctex.org/documents/packages/layout/fancyhdr.pdf
+        \pagestyle{fancy}
+        \fancyhead{}
+        \chead{\leftmark}
+        \renewcommand{\chaptermark}[1]{%
+            \markboth{\MakeUppercase{%
+            \chaptername}\ \itshape\thechapter.%
+            \ #1}{}}
+        
+    \usepackage{graphicx} %include graphics/images
+    \usepackage[dvipsnames]{xcolor} %COLOURS, hooray!
+    \usepackage{blindtext} %gibberish
+    \usepackage[toc,title]{appendix} %adding appendices
+    
+    \usepackage{chngcntr} %continuous numbering of figures/tables 
+        \counterwithout{figure}{chapter}
+        \counterwithout{table}{chapter}
+    
+    \usepackage{nomencl} %list of abbreviations
+        \makenomenclature
+        \setlength{\nomitemsep}{-3\parsep} %value of spatial separation between abbreviations and description
+        \renewcommand{\nomname}{List of Abbreviations} %modify heading of Nomenclature, default=Nomenclature
+       % \setlength{\nomlabelwidth}{.25\hsize}
+        \renewcommand{\nomlabel}[1]{#1 \dotfill} % fill space with dots
+        
+    \RedeclareSectionCommand[beforeskip=0pt, afterskip=0.5cm]{chapter} %adjust spacing immediately before and after chapter/section/subsection headings
+
+    %in order to modify the headings' texts  (TOC, TOL and TOT, Appendix) please toggle comments:
+        %\renewcommand{\listfigurename}{List of plots} %default='List of Figures'
+        %\renewcommand{\listtablename}{Tables} %default='List of Tables'
+        \addto\captionsenglish{\renewcommand*\contentsname{Table of Contents}} %default='Contents'
+        %\renewcommand{\appendixtocname}{List of appendices} %default='Appendices'
+    
+    \AtBeginDocument{\addtocontents{toc}{\protect\thispagestyle{empty}}} %no page numbers on the pages of TOC
+
+    \usepackage{hyperref} %last package to be loaded
+        %PLEASE change the hyperlinks' colours as the whim takes you
+        \hypersetup{
+                    colorlinks=true,
+                    linkcolor=black,
+                    citecolor=black,
+                    filecolor=magenta,      
+                    urlcolor=red,
+                    }
+        \urlstyle{same}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% THE ACTUAL DOCUMENT STARTS NOW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+    \include{chapters/frontmatter}
+
+    {\pagestyle{empty}%\singlespacing
+    \tableofcontents %generate table of contents automatically (for correct use compile at least twice)
+    \newpage{}
+    }
+
+    \pagenumbering{roman} %new page-numbering starting here with 1
+    \setcounter{page}{1}
+    
+    \printnomenclature[10ex] 
+    \addcontentsline{toc}{chapter}{\nomname} %to include List of Abbreviations into the Table of Contents
+    \nomenclature{NCL}{Further reading: \href{https://de.overleaf.com/learn/latex/Nomenclatures}{https://de.overleaf.com/learn/latex/Nomenclatures}} %define an abbreviation
+
+    \listoffigures\label{TOF}
+    \listoftables
+
+    \include{chapters/introduction}
+
+    \include{chapters/chapter02}
+
+    \include{chapters/chapter03}
+
+    \include{chapters/conclusion}
+
+    \printbibliography
+    
+    \include{chapters/appendix}
+    
+\end{document}

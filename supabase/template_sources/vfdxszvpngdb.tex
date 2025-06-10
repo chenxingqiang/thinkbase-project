@@ -1,0 +1,561 @@
+\documentclass[12pt]{report}%Author Kristiāns Kacars 2022. Last updated 08.02.2023
+%\usepackage[utf8]{inputenc} neizmanto XeLatex, tad jāatkomentē.
+\usepackage[T1]{fontenc}
+
+\usepackage{geometry}
+\geometry{
+ a4paper,
+ left=30mm,
+ top=20mm,
+ right=20mm,
+ bottom=20mm,
+ includehead
+ }
+ 
+\usepackage{xcolor}
+\usepackage[]{graphicx}
+\usepackage{setspace}
+%\onehalfspacing %rindstarpas 1.5 vienības
+\linespread{1.5}
+\usepackage{placeins}%ērti izmantot \FloatBarrier, lai neļauti attēliem aiziet pārāk tālu no vajadzīgās vietas.
+\usepackage{titlesec}%izveido atstarpes starp chapter un section nosaukumu
+\titleformat{\chapter}
+  {\normalfont\fontsize{16}{18}\bfseries\raggedright}{\thechapter.}{0pt}{\MakeUppercase}{}
+  
+\titleformat{\section}
+  {\normalfont\fontsize{14}{16}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{16}\bfseries}{\thesubsection}{1em}{}  
+
+\titlespacing*{\chapter}{0pt}{0pt}{10pt}
+\titlespacing*{\section}{0pt}{5pt}{5pt}
+
+
+\usepackage{fancyhdr}%šis izveido header, lai tur ir līnija ar section nosaukumu
+\newcommand{\changefont}{%
+    \fontsize{9}{11}\selectfont
+}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\fancyhead[L]{\changefont \rightmark}
+
+\usepackage{polyglossia}
+\setdefaultlanguage{latvian}
+\usepackage{lipsum}
+\setlength{\parskip}{1.5pt}%atstarpe starp rindkopām
+
+%matematikas paketes
+\usepackage{amsmath} 
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{bm}%ērts priekš treknraksta matemātiskajā vidē
+\usepackage{esint}%integrāļu zīmes, kas nav parastajās ams paketēs
+
+%--pašizveidotās matemātikas komandas
+\newcommand{\bra}{\langle}
+\newcommand{\ket}{\rangle}
+%--
+
+\newtheorem{theorem}{Teorēma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definīcija}
+
+\usepackage{siunitx}%mērvienībām
+
+%Algoritmu atspoguļošanai
+\usepackage[ruled, vlined, linesnumbered, algochapter]{algorithm2e}
+\renewcommand{\algorithmcfname}{Algoritms}% nomaina nosaukumu uz latviešu variantu
+\usepackage[labelfont={bf}]{caption}%attēlu un tabulu nosaukumu fonts
+
+\usepackage[style=phys,%der arī citi, piem., chem-angew(bibliogrāfijā pie article nav links)
+articletitle=false,
+biblabel=brackets,%
+chaptertitle=false,%
+    sorting=none,%kārto pēc citēšanas secības
+    date=short]{biblatex}
+\addbibresource{biblio.bib}
+
+
+\usepackage{hyperref}%Izveido spiežamus linkus saturam, bibliogrāfijām uc.
+\hypersetup{
+    colorlinks,
+    citecolor=blue,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=red
+}
+
+
+\newcommand*{\SavedEqref}{}%Dod krāsainus un spiežamus vienādojumu linkus
+\let\SavedEqref\eqref
+\renewcommand*{\eqref}[1]{%
+  \begingroup
+    \hypersetup{
+      linkcolor=blue,
+      linkbordercolor=black,
+    }%
+    \SavedEqref{#1}%
+  \endgroup
+}%vienādojumiem
+
+
+\usepackage{chngcntr}%figure numeration
+\counterwithin{figure}{chapter}
+\counterwithin{table}{chapter}
+\counterwithin{equation}{chapter}%vienadojumu numerācija veidojas pa nodaļām
+
+
+
+%Pakete izveido apzīmējumu sarakstu
+\usepackage{nomencl}
+\makenomenclature
+\renewcommand{\nomname}{Apzīmējumu saraksts}
+%% Sadala grupās apzīmējumus
+%Ja gribat pievienot papildu kategoriju, nokopējat-->
+%   \ifstrequal{#1}{F}{Fizikas konstantes}{%
+% tikai pēdējā rindiņā( kur ir Lielumu apzīmējumi) ieliekat papildu "}"
+% -----------------------------------------
+\usepackage{etoolbox}
+\renewcommand\nomgroup[1]{%
+  \item[\bfseries
+  \ifstrequal{#1}{F}{Fizikas konstantes}{%
+  \ifstrequal{#1}{N}{Skaitļu kopas}{%
+  \ifstrequal{#1}{K}{Kaut kas cits}{%
+  \ifstrequal{#1}{C}{Lielumu apzīmējumi}{}}}}%
+]}
+% --------------------------------------------
+% ------- beidzas package izsaukšana un stila veidošana
+
+
+
+
+
+
+%%%--------- Aizpildīt titullapu---------- 
+%% Šis aizpildīs template titullapu ar jūsu informāciju
+% Darba tips, i.e. bakalaura vai maģistra
+\def\degree{Bakalaura darbs}
+% Fakultātes nosaukums
+\def\faculty{Fizikas, matemātikas un optometrijas fakultāte}
+% Nodaļa iekš fakultātes
+\def\department{Fizikas nodaļa}
+% Universitātes nosaukums
+\def\university{Latvijas Universitāte}
+% Universitātes logo
+\def\crest{\includegraphics[width = 0.5\textwidth]{LU_logo_LV_horiz.png}}%ja ieliekat attēlu kādā mapē, tad jāsauc attēls no šīs mapes, citādi neparādīsies tas titullapā.
+\def\vietlaiks{Rīga, 2022}
+\def\supervisor{Darba vadītājs: Dr. Jānis Bērziņš}
+\def\studaplieciba{kk123456}
+\author{Vārds Uzvārds}
+\title{Bakalaura darba sagatave}
+\date{Februāris 2022}
+\newcommand{\thedate}[0]{21.03.2022}%iesniegšanas datums
+%%%---------- Beidz aizpildīt titullapu----------- 
+
+
+
+
+\begin{document}
+
+
+
+\thispagestyle{empty}
+\makeatletter
+   \begin{center}
+       \vspace*{1cm}
+        
+    \vspace{10mm}
+    {\Large LATVIJAS UNIVERSITĀTE\\
+    \MakeUppercase{\faculty}\\
+    \vspace{2mm}
+    \MakeUppercase{\department}}
+    \vspace*{10mm}
+    
+    
+    
+    \vspace{5mm}
+    {\Large \MakeUppercase{\textbf{\@title}}}
+    \vspace{5mm}
+    
+
+       \vspace{1cm}
+    \Large
+    \MakeUppercase{\degree}
+    \end{center}
+    \vspace{3cm}
+    \begin{flushleft}
+    \large
+       Autors: \textbf{\large \@author}\\
+       Studentu apliecības Nr.: \studaplieciba \\
+       \supervisor
+    \end{flushleft}
+
+       \vfill
+     
+    \begin{center}
+    \Large      
+    \MakeUppercase{\vietlaiks}
+   \end{center}
+\makeatother
+
+\newpage
+
+
+
+
+\thispagestyle{empty}
+\noindent \textbf{Anotācija}
+
+\noindent Anotāciju sagatavo latviešu un angļu valodā. Pēc saskaņošanas ar studiju
+programmas direktoru var sagatavot arī papildu anotāciju kādā citā Eiropas Savienības oficiālajā
+valodā. Anotācijā izklāsta problēmas būtību, pētījuma mērķus, uzdevumus, raksturo iegūtos
+rezultātus. Anotācijas apjoms ir noteikts līdz 850 rakstu zīmēm, ieskaitot atstarpes.
+
+
+\vspace{4mm}
+\noindent \textbf{Atslēgas vārdi}: Atslēgvārdi raksturo darba tematu, rezultātus un izmantotās metodes. Ieteicamais
+atslēgvārdu skaits ir no 4 līdz 8.
+
+\vspace{20mm}
+\noindent \textbf{Abstract}
+
+\noindent In order to separate the equations, the radial part is set equal to a constant, and the form of the constant on the right above reflects the nature of the solution of the colatitude equation which yields the orbital quantum number. where $L_n^l$ is the associated Laguerre function.
+
+\vspace{4mm}
+\noindent \textbf{Keywords}: Thesis template, FMOF
+
+\newpage
+\tableofcontents
+\newpage
+%Apzīmējumu saraksts
+\nomenclature[N]{\(\mathbb{R}\)}{Reālo skaitļu kopa}
+\nomenclature[N]{\(\mathbb{H}\)}{Kvaternioni}
+
+\nomenclature[F]{\(\hbar\)}{Planka konstante}
+\nomenclature[C]{\(\psi\)}{Viļņa funkcija}
+
+\printnomenclature
+
+
+
+\addcontentsline{toc}{chapter}{Apzīmējumu saraksts}
+\chapter*{Ievads}
+\addcontentsline{toc}{chapter}{Ievads}
+Ievadā pamato temata izvēli un aktualitāti, kā arī apraksta:
+
+\begin{enumerate}
+    \item pētāmās problēmas vai izvirzītās hipotēzes;
+    \item darba mērķi un uzdevumus;
+    \item izmantotās pētniecības metodes;
+    \item faktoloģiskā materiāla avotus;
+    \item darba struktūru.
+\end{enumerate}
+
+
+
+\begin{center}
+    \chapter*{Lietošanas pamācība}
+    \addcontentsline{toc}{chapter}{Lietošanas pamācība}
+\end{center}
+\section{Noformējums}
+\noindent Kad vairs nevajag šo nodaļu, dzēšat nodaļu "Lietošanas pamācība" ārā.
+
+Lai izveidotu titullapu, aizpildiet .tex faila sākumā doto tekstu "\textbf{Aizpildīt titullapu}".
+
+Teksts tiek sadalīts nodaļās, sekcijās un apakšsekcijās. To svarīgums no augstākās ejot uz zemāko ir:
+\begin{itemize}
+    \item chapters, section, subsections
+\end{itemize}
+Ja vajadzīga nodaļa vai sadaļa, kura netiek nummurēta, bet to vajag saturā izmantot komandas
+\begin{enumerate}
+    \item \textbackslash chapter*\{Iedaļa\}
+    \item \textbackslash addcontentsline\{toc\}
+    \item \{chapter(iedaļas veids)\}\{Iedaļa\}.
+\end{enumerate}
+
+%Piemērs:
+%    \chapter*{Lietošanas pamācība}
+%    \addcontentsline{toc}{chapter}{Lietošanas pamācība}
+
+\noindent Teksta stili ir
+\begin{itemize}
+    \item \textbf{treknrakstā} ar \textbackslash textbf\{..\}
+    \item \textit{slīprakstā} ar \textbackslash textit\{..\}
+    \item \textit{\textbf{treknā slīprakstā}} ar \textbackslash textit\{\textbackslash textbf\{..\}\}.
+\end{itemize}
+
+
+
+\noindent Lai pievienotu apzīmējumu sarakstam apzīmējumu izmanto
+\begin{itemize}
+    \item \textbackslash nomenclature[N]\{apzīmējums\}\{Paskaidrojums\},
+\end{itemize}
+kur [N] parāda kam pieder apzīmējums. Pagaidām ir \textbf{Lielumu apzīmējumi} ar [C], \textbf{Fizikas konstantes} ar [F] un \textbf{skaitļu kopas} [N], ja vajag jaunu kategoriju, pie \textbackslash renewcommand\textbackslash nomgroup pievieno jaunu kategoriju (neaizmirst pielikt \}, lai noslēgtu pievienoto kategoriju, citādi nekompilēsies).
+
+Lai labāk sakārtots overleaf fails iesaku izmantot mapes, kur ir attēli salikti pa nodaļām, palīdzēs neapmaldīties.
+\section{Matemātiskais pieraksts}
+
+
+
+Matemātiskās funkcijas vai darbības rakstīt ar \textbackslash... kā $ \sin,\ \lim$ nevis $sin,\ lim$. Izmanto \textbackslash mathbb, lai iegūtu $\mathbb{R}$, $\mathbb{C}$. Vektorus var apzīmēt ar bultiņu vai treknrakstā: \[\vec{x}\quad \text{ar \textbackslash vec vai ar \textbackslash bm}\quad \bm{x},\] bet tas pie apzīmējumiem jāpaskaidro.
+
+Vienādojumus var rakstīt "inline mode" - pašā rindiņā - ar \$\$  vai \textbackslash(... \textbackslash), piemēram, $y = x$ \( \lim_{n\xrightarrow{}\infty} x_n = x\), vai "display mode", kad vienādojums ir atseviķi no teksta
+\begin{equation}
+    \int\limits_{0}^{\infty}\frac{\sin x}{x}dx \quad \text{ja vajadzīgs komentārs piem.}\ \forall  x\in \mathbb{R}.
+\end{equation}
+Vienādojumus var arī līdzināt ar \textbackslash begin\{align\}
+\begin{align}
+	a &= 5 \\
+	b + c &= a \\
+	a -2\cdot3 &= 5/4.
+\end{align}
+Līdzīgi align strādā arī gather, tur pats tex līdzina vienādojumus. Ja vairākus vienādojumus grib zem vienas references kā vienādojumā \eqref{eq1}, tad izmanto aligned vai gathered, tie ir iekš begin\{equation\} vides:
+\begin{equation}
+    \begin{gathered}
+    (x-3)x = 2x+1\\
+    x^2-5x-1 = 0.
+    \end{gathered}
+    \label{eq1}
+\end{equation}
+Vēl vienādojumus display mode var rakstīt ar \textbackslash[...]\textbackslash: \[ \iiint\limits_V \nabla\cdot \bm{E}\,dV = \oiint\limits_S \bm{E}\cdot \, d\bm{A}.\]
+Kad raksta vienādojumus ar iekavām izmantot \textbackslash left[.. \textbackslash right]:
+\begin{equation}
+    \left[\frac{x+y}{x-y}\right]\quad \text{nevis}\quad [\frac{x+y}{x-y}]
+\end{equation}.
+
+Matricu rakstība ir ar pmatrix vidi (tas pats tikai citas iekavas ap matricu ir arī bmatrix, Bmatrix, vmatrix, Vmatrix): 
+\begin{equation}
+\begin{pmatrix}
+a_{11}&a_{12}&\dots&a_{1n}\\
+a_{21}&a_{22}&\dots&a_{2n}\\
+\hdotsfor[2]{4}\\
+a_{n1}&a_{n2}&\dots&a_{nn}
+\end{pmatrix}.
+\end{equation}
+
+Ja vajag figūriekavas, kur atšķir gadījumus izmanto \textbackslash begin\{cases\}:
+\begin{equation}
+    f(x)=\begin{cases}
+0,& \text{ja $x>0$},\\
+x, &
+\text{ja $x<0$}.
+\end{cases}
+\end{equation}
+Ja grib atsaukties uz kādu vienādojumu, tad tam ir jābūt \textbackslash label\{nosaukums\}, un uz to atsaucas izmantojot \textbackslash eqref\{nosaukums\}, tas dos šo \eqref{eq1}.
+
+
+Ja vajag definēt jaunas komandas piemēram bra-ket notācijai, tad tex faila sākumā, pēc matemātikas paketēm izsaukšanas definē\newline \textbackslash newcommand\{\textbackslash ket\}\{\textbackslash langle\}, kas ļauj vieglāk uzrakstīt: $\bra\psi|\hat{H}|\psi\ket$. Kvantu mehānikā bieži izmanto īpašas konstantes un mērvienības: $\hbar$, \AA. 
+
+Failā definētas komandas teorēmas un pierādījumi:
+\begin{theorem}
+Saistīti stāvokļi viendimensionālos potenciālos nav deģenerēti.
+\end{theorem}
+\begin{proof}
+$\psi_1\neq \psi_2$
+\end{proof}
+Ir arī definīcijas, var ielikt arī lemmas un citas lietas, atkarībā no vajadzības.
+\begin{definition}
+Par Hilberta telpu sauc pilnu normētu telpu ar $||x|| = \sqrt{\bra x|x\ket}$
+\end{definition}
+\section{Noderīgi instrumenti}
+\subsection{Atsauču veidošana}
+Bibliogrāfiju veido sagatavojot .bib failu (skatīt biblio.bib).
+Atsaucoties uz zinātniskajiem rakstiem, ir parocīgi izmantot \textit{Export citation as BibTex} rīku. Tas izveidos .bib failā ieliekamu atsauci. Atsaukties var arī uz grāmatām \cite{dirac}, mājaslapām \cite{Algorithm}, piemēru apskatīt .bib failā. Var arī atsaukties uz vairākiem avotiem vienlaikus \cite{Algorithm, AlgorithmLV}.
+
+
+\subsection{Attēlu ievietošana}
+\FloatBarrier
+Attēlus ievieto izmantojot \textbackslash begin\{figure\}. Ieteicams izmantot vektorgrafika attēlus (.pdf nevis .png). Piemēram, uz to var atsaukties kā \textbackslash ref\{..\}: attēls \ref{fig:LU logo}.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{LU_logo_LV_horiz.png}
+    \caption{LU logo}
+    \label{fig:LU logo}
+\end{figure}
+Ja vēlas 2 attēlus blakus izmanto minipage
+\begin{figure}[!ht]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.4\textwidth]{LU_logo_LV_horiz.png} % first figure itself
+        \caption{Pirmais attēls}
+        \label{fig:min1}
+    \end{minipage}\hfill
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.4\textwidth]{LU_logo_LV_horiz.png} % second figure itself
+        \caption{Otrais attēls}
+        \label{fig:min2}
+    \end{minipage}
+\end{figure}
+\FloatBarrier
+Atsaukties uz tiem var atseviški, katram vajag tikai savu \textbackslash label, attēls \ref{fig:min1} un \ref{fig:min2}. Minipage var ielikt arī gan vienu attēlu, gan otru tabulu, netikai vairākus attēlus.
+\subsection{Tabulas un saraksti}
+
+Tabulas var veidot ar \textbackslash begin\{table\} kā tabulā \ref{tab1}. Pārvietot \textbackslash caption virs tabulas, nevis zem kā ir automātiski, jo virsrakstu vajag virs tabulas.
+
+\begin{table}[!ht]
+\centering \caption{Pirmā tabula.}
+\begin{tabular}{ |c|c|c| }% c automātiski padara kolonnu tik garu cik vajag
+\hline
+Npk. & Dati 1, \unit{kg.m.s^{-1}} &Dati 2, \unit{\mu W} \\
+\hline
+1. & 10.14 & 0.89\\
+\hline
+2. & 9.85   & 0.3 \\
+\hline
+3. &11.39 & 0.2 \\
+\hline
+\end{tabular}
+\label{tab1}
+\end{table}
+\FloatBarrier
+Sarakstus var veidot ar \textbackslash begin\{.....\}:
+\begin{itemize}
+    \item itemize (ar puntkiem)
+    \item enumerate (ar skaitļiem),
+    \item var taisīt arī sarakstu sarakstā
+    \begin{itemize}
+        \item[!--] cits saraksts 
+        \item[!--] ar paša izdomātu numerācijas stilu
+    \end{itemize} 
+\end{itemize}
+
+\subsection{Algoritmu rakstīšanas pakete}
+Ja vajadzīgs uzrakstīt algoritma darbības principu, kā algoritmā \ref{alg:typeChecking}, var izmantot paketi algorithm2e. Vairāk par šo paketi var apskatīt \cite{Algorithm}, un ja vajag pārlikt kādu keyword uz latviešu valodu var noderēt \cite{AlgorithmLV}.
+
+\begin{algorithm} [!ht]
+	\caption{Mans algoritms} \label{alg:typeChecking}
+	\KwIn{Polinoma pakāpe}
+	\KwResult{Atgriež polinomu, ar prasīto pakāpi $n$.}
+	\SetKwData{s}{s}
+	\BlankLine
+	\While{Kaut kas tiek darīts}{
+		\lForEach{global statement \s} {
+		}
+		\ForEach{function $fun$} {
+		\lForEach{statement \s in $fun$} {
+		}
+		}
+		\lForEach{statement \s in game} {
+		}
+	}
+	%\eIf{error messages were found}{\Return \False\;}{\Return \True\;}
+\end{algorithm}
+\begin{center}
+    \chapter{Teorija}
+   
+\end{center}
+\section{Pašsaistītā cikla metode}
+No kvantu mehānikas ir zināms, ka pirmie pašsaistīto cikla metodi izmantoja Kons un Šems \cite{PhysRev.140.A1133}. Šī metode ar visiem izvedumiem aprakstīta \cite{dirac}. Sniegšu īsu ievadu metodes darbības principā, lai pamatotu iegūtos rezultātus.
+
+
+\begin{center}
+    \chapter{Nākamā nodaļa}
+\end{center}
+\section{Pirmā sadaļa}
+
+\section{Otrā sadaļa}
+\subsection{Pirmā apakšsadaļa}
+
+
+
+
+\begin{center}
+    \chapter{Rezultāti}
+   
+\end{center}
+\section{Rezultātu analīze}
+Rezultātu daļā parāda svarīgākos iegūtos rezultātus, salīdzina tos ar līdzīgiem
+pētījumiem, novērtē rezultātu atbilstību izvirzītajām problēmām vai hipotēzei. 
+\chapter*{Secinājumi}
+\addcontentsline{toc}{chapter}{Secinājumi}
+Noslēguma secinājumos atšķirībā no secinājumiem katras nodaļas nobeigumā (ja
+autors tos formulējis) izsaka plašāku vispārinājumu, iesaka pētāmo problēmu risinājumu un
+norāda turpmākos pētījuma virzienus. Apjomīgākos pētījumos secinājumus ieteicams strukturēt.
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliogrāfija}
+\printbibliography
+
+\newpage
+\chapter*{Pielikums A}
+\addcontentsline{toc}{chapter}{Pielikums A}
+
+Ja darbam nepieciešams, dažādus palīgmateriālus var ievietot pielikumā. Tajā
+parasti iekļauj aprēķinu starprezultātus, ilustrācijas, anketu paraugus, kartes, aparātu un ierīču
+aprakstus u. c.
+
+
+
+\newpage
+
+\thispagestyle{empty}
+
+\begin{center}
+     \textbf{\LARGE Pateicība}
+\end{center}
+
+Pateicību izsaka personām, kuras ir sniegušas organizatorisku vai finansiālu
+palīdzību materiālu vākšanā vai arī metodiskus ieteikumus un morālo atbalstu darba izstrādē. Nav obligāts.
+
+\newpage
+
+
+\thispagestyle{empty}
+
+\begin{center}
+     \textbf{\LARGE Autora ieguldījums}
+\end{center}
+
+Nav obligāts.
+
+
+%dokumentācijas lapa
+% autoram/ei izskatīt, nomainīt locījumu vārdiem
+\newpage
+\thispagestyle{empty}
+\makeatletter
+{\setstretch{2.0}
+\degree \ "\@title" izstrādāts LU Fizikas, matemātikas un optometrijas fakultātē.
+    
+    
+\vspace{10mm}
+Ar savu parakstu apliecinu, ka pētījums veikts pastāvīgi, izmantoti tikai tajā norādītie informācijas avoti un iesniegtā darba elektroniskā kopija atbilst izdrukai:
+
+Autors: \rule{30mm}{0.2mm} \@author
+    
+\vspace{20mm}
+Rekomendēju/nerekomendēju darbu aizstāvēšanai
+
+Vadītājs/a: \supervisor \ \rule{30mm}{0.2mm} \thedate
+   
+\vspace{20mm}
+\noindent Recenzents: \rule{60mm}{0.2mm}
+
+\vspace{20mm}
+Darbs iesniegts Fizikas nodaļā \rule{35mm}{0.2mm} \thedate
+
+Dekāna pilnvarotā persona: \rule{60mm}{0.2mm}
+
+\vspace{20mm}
+
+Darbs aizstāvēts bakalaura gala pārbaudījuma komisijas sēdē
+
+\rule{7mm}{0.2mm}.\rule{7mm}{0.2mm}.\rule{14mm}{0.2mm} .prot. Nr. \rule{7mm}{0.2mm}
+
+Komisijas sekretāre: \rule{60mm}{0.2mm}
+
+}
+\makeatother
+
+
+
+
+
+
+
+
+\end{document}

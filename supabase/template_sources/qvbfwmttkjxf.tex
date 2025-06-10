@@ -1,0 +1,157 @@
+%% LLT: Turn off some annoying warnings...
+\RequirePackage{silence}
+\WarningFilter{titlesec}{Non standard sectioning command}
+\WarningFilter{scrreprt}{Usage of package}
+\WarningFilter{scrreprt}{Activating an ugly workaround}
+
+% *********************************************************
+% CHOOSE THEME (ucph, sund, science, hum, samf, jura, teo)
+% *********************************************************
+\newcommand{\thesisTheme}{ucph} % to colortheme and titlepage image
+
+
+% *********************************************************
+% DOCUMENT CLASS
+% *********************************************************
+\documentclass[%
+	paper=A4,					% paper size
+	12pt,						% font size
+	twoside=true,				% two-sided printing
+	openright,					% doublepage cleaning ends up right side
+	parskip=full,				% spacing value / method for paragraphs
+	chapterprefix=true,			% prefix for chapter marks
+	headings=normal,			% size of headings
+	bibliography=totoc,			% include bib in toc
+	listof=totoc,				% include listof entries in toc
+	titlepage=on,				% own page for each title page
+	captions=tableabove,		% display table captions above the float env
+	draft=false,				% value for draft version
+	abstract=on,                % abstract title on/off
+]{scrreprt}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}     % adjust the language
+
+% **************************************************
+% COMMANDS FOR REUSE
+% **************************************************
+
+% Thesis
+\newcommand{\thesisTitle}{Making a UCPH thesis template}
+\newcommand{\thesisSubtitle}{A case study for all faculties at University of Copenhagen}
+\newcommand{\thesisName}{Mikkel Roald-Arbøl}
+\newcommand{\thesisSubject}{MSc in Human Biology}
+\newcommand{\thesisDate}{September 2019}
+\newcommand{\thesisVersion}{Second Version}
+
+% Supervisors & Collaborators
+\newcommand{\thesisExternalSupervisor}{John Doe}
+\newcommand{\thesisInternalSupervisor}{Jane Doe}
+\newcommand{\thesisCollab}{If any?}
+
+% University of Copenhagen
+\newcommand{\thesisUniversity}{\protect{University of Copenhagen}}
+\newcommand{\thesisFaculty}{Faculty of Health and Medical Sciences}
+\newcommand{\thesisInstitute}{Masters Degree in Human Biology}
+\newcommand{\thesisCity}{Copenhagen N}
+\newcommand{\thesisAddress}{Blegdamsvej 3B}
+\newcommand{\thesisPostal}{2200}
+
+% External institution: University of Sussex
+\newcommand{\thesisUniSus}{\protect{University of Sussex}}
+\newcommand{\thesisUniSusDep}{Department of Life Sciences}
+
+
+% *********************************************************
+% PACKAGES
+% *********************************************************
+
+\usepackage[					% UCPH thesis style
+    figuresep=colon,        
+    sansserif=false,        
+    hangfigurecaption=false,
+    hangsection=true,       
+    hangsubsection=true,    
+    colorize=full,          
+    colortheme={\thesisTheme},  % ucph, sund, science, hum, etc.?
+    bibsys=biber,
+    bibfile=references,       % defines your .bib file
+    bibstyle=authoryear,        % refer to https://bit.ly/2YsvIJz
+]{ucphthesis}
+\hypersetup{					% setup the hyperref-package options
+	pdftitle={\thesisTitle},	% 	- title (PDF meta)
+	pdfsubject={\thesisSubject},% 	- subject (PDF meta)
+	pdfauthor={\thesisName},	% 	- author (PDF meta)
+	plainpages=false,			% 	-
+	colorlinks=false,			% 	- colorize links
+	pdfborder={0 0 0},			% 	-
+	breaklinks=true,			% 	- allow line break inside links
+	bookmarksnumbered=true,		%
+	bookmarksopen=true			%
+    }
+
+% *********************************************************
+% Cover page content
+% *********************************************************
+\subject{\vspace{4.5cm} \thesisSubject}
+\title{\thesisTitle}
+\subtitle{\thesisSubtitle}
+\author{\thesisName \\
+        \small{Supervised by {\thesisExternalSupervisor} and {\thesisInternalSupervisor}}
+    }
+\date{\thesisDate}
+
+
+% ********************************************************* 
+% THESIS CONTENT
+% *********************************************************
+\begin{document}
+
+% -------------------------- 
+% Front matter
+% --------------------------
+\pagenumbering{roman}
+\pagestyle{empty}				            % no header or footers
+\AddToShipoutPicture*{\TitleBackground}     % adding background picture
+\maketitle                                  % making the title
+\input{frontbackmatter/titlepage.tex}
+    \clearpage
+
+\pagestyle{plain}
+\input{frontbackmatter/quotes.tex}        % INCLUDE Quotes
+\input{frontbackmatter/preface.tex}       % INCLUDE Preface
+\input{frontbackmatter/acknowledgements.tex} % INCLUDE Acknowledgements
+\input{frontbackmatter/abstract.tex}      % INCLUDE Abstract
+    \clearpage
+
+
+\setcounter{tocdepth}{2}		% define depth of toc
+\tableofcontents				% display table of contents
+    \clearpage
+
+
+% -------------------------- 
+% Main matter
+% --------------------------
+\pagenumbering{arabic}			% arabic page numbering
+\setcounter{page}{1}			% set page counter
+\pagestyle{maincontentstyle} 	% fancy header and footer
+
+\input{mainmatter/rationale.tex}    % INCLUDE Rationale
+\input{mainmatter/aims.tex}         % INCLUDE Hypothesis
+\input{mainmatter/introduction.tex} % INCLUDE Introduction
+\input{mainmatter/methods.tex}      % INCLUDE Methods
+\input{mainmatter/results.tex}      % INCLUDE Results
+\input{mainmatter/discussion.tex}   % INCLUDE Discussion
+\input{mainmatter/conclusion.tex}   % INCLUDE Conclusion
+\input{mainmatter/perspectives.tex} % INCLUDE Perspectives
+
+
+% -------------------------- 
+% Back matter
+% --------------------------
+\input{frontbackmatter/bibliography.tex}
+
+% ********************************************************* 
+% END OF THESIS
+% *********************************************************
+\end{document}

@@ -1,0 +1,24 @@
+\documentclass[12pt]{article}
+\usepackage{tikz}
+\usepackage[a3paper,nohead,nofoot]{geometry}
+\usepackage{etoolbox}
+
+\begin{document}
+    \thispagestyle{empty}
+    \begin{tikzpicture}[remember picture, overlay, very thick]
+        \foreach \w / \h / \r in {1.5 / 1.8 / 6pt} {
+            \draw [line width=5pt] (current page.center)
+                 +(-9 * \w, -9 * \h) -- +(-9 * \w, 9 * \h) --
+                 +(9 * \w, 9 * \h) -- +(9 * \w, -9 * \h) -- cycle;
+            \foreach \s in {-7,-5,-3,-1,1,3,5,7} {
+                \draw (current page.center) +(\s * \w, -9 * \h) -- +(\s * \w, 9 * \h);
+                \draw (current page.center) +(-9 * \w, \s * \h) -- +(9 * \w, \s * \h);
+            }
+            
+            \foreach \y in {-3, 3}
+            \foreach \x in {-3, 3} {
+                \fill (current page.center) +(\x * \w, \y * \h) circle [radius=\r];
+            }
+        }
+    \end{tikzpicture}
+\end{document}

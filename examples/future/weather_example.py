@@ -1,13 +1,13 @@
 from typing import Optional
 from pydantic import BaseModel, Field
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -34,7 +34,7 @@ class TravelAdvice(BaseModel):
     destination: str = Field(description="The destination to get advice for")
     advice: str = Field(description="The travel advice")
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def get_weather(location: str) -> WeatherInfo:
     """Get the current weather for a given location."""
     # Simulated weather API call
@@ -44,7 +44,7 @@ async def get_weather(location: str) -> WeatherInfo:
         condition="sunny"
     )
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def travel_planner(destination: str) -> TravelAdvice:
     """Plan a trip based on the destination and current weather."""
     try:

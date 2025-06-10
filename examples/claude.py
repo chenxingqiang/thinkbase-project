@@ -1,10 +1,10 @@
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def hello_from_claude() -> str:
     """Say hello using Claude."""
     # Create message
@@ -18,7 +18,7 @@ async def hello_from_claude() -> str:
     )
     
     # Process message
-    response = await ell2a.process_message(message)
+    response = await ell.process_message(message)
     
     # Return the response
     if isinstance(response, Message):
@@ -29,8 +29,8 @@ async def hello_from_claude() -> str:
         return str(response)
 
 if __name__ == "__main__":
-    # Initialize ELL2A
-    ell2a.configure({
+    # Initialize ELL
+    ell.configure({
         "enabled": True,
         "tracking_enabled": True,
         "store": "./logdir",

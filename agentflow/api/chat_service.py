@@ -5,7 +5,7 @@ import json
 import asyncio
 from ..agents.agent import Agent
 from ..core.config import AgentConfig
-from ..monitoring.ell2a_monitor import EllMonitor
+from ..monitoring.ell_monitor import EllMonitor
 
 class ChatService:
     """Chat service for handling real-time communication."""
@@ -20,7 +20,7 @@ class ChatService:
         self.app = FastAPI()
         self.active_connections: List[WebSocket] = []
         self.agents: Dict[str, Agent] = {}
-        self.ell2a_monitor = EllMonitor(config.get('ell2a_config', {}))
+        self.ell_monitor = EllMonitor(config.get('ell_config', {}))
         
         # Register routes
         self._register_routes()
@@ -117,7 +117,7 @@ class ChatService:
             
         try:
             # Track with Ell
-            self.ell2a_monitor.track_agent_execution(
+            self.ell_monitor.track_agent_execution(
                 agent_id=agent_id,
                 prompt=content,
                 completion="",  # Will be updated with response
@@ -136,7 +136,7 @@ class ChatService:
                     })
                     
                     # Update Ell tracking
-                    self.ell2a_monitor.track_agent_execution(
+                    self.ell_monitor.track_agent_execution(
                         agent_id=agent_id,
                         prompt=content,
                         completion=chunk,
@@ -153,7 +153,7 @@ class ChatService:
                 })
                 
                 # Update Ell tracking
-                self.ell2a_monitor.track_agent_execution(
+                self.ell_monitor.track_agent_execution(
                     agent_id=agent_id,
                     prompt=content,
                     completion=response,
@@ -171,7 +171,7 @@ class ChatService:
             })
             
             # Track error in Ell
-            self.ell2a_monitor.track_agent_execution(
+            self.ell_monitor.track_agent_execution(
                 agent_id=agent_id,
                 prompt=content,
                 completion="",

@@ -1,0 +1,161 @@
+\documentclass[titlepage,12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{courier}
+\renewcommand{\rmdefault}{\ttdefault}
+\usepackage{xparse, expl3}
+
+\newcommand{\filmtitle}[1]{\begin{center}\centering "\underline{#1}"\end{center}}
+
+\newcommand{\stagedirection}[1]{\MakeUppercase{#1}\par\vspace{0.5cm}}
+\newcommand{\sd}[1]{\stagedirection{#1}}
+
+\NewDocumentCommand{\scenedescription}{ >{\SplitList{.}} m }{%
+  \ProcessList{#1}{\addnewline}%
+}
+
+\newcommand{\addnewline}[1]{%
+  #1.\par
+}
+
+\newcounter{scenenumber}
+\newcounter{shotnumber}
+\setcounter{scenenumber}{0}
+\setcounter{shotnumber}{0}
+
+\NewDocumentCommand{\getscenenumber}{}{
+  \ifnum\value{shotnumber}=0
+    \thescenenumber
+  \else
+    \thescenenumber-\Alph{shotnumber}
+  \fi
+}
+
+\newcommand{\barescene}[1]{
+    \stepcounter{scenenumber}%
+    \setcounter{shotnumber}{0}%
+    \textbf{\MakeUppercase{#1}\hfill\getscenenumber}%
+    \par%
+}
+\newcommand{\scene}[2]{\barescene{#1}\scenedescription{#2}}
+\newcommand{\bareshot}[1]{
+    \stepcounter{shotnumber}%
+    \textbf{\MakeUppercase{#1}\hfill\getscenenumber}\par%
+}
+\newcommand{\shot}[2]{\bareshot{#1}\scenedescription{#2}}
+
+\newcommand{\dialogue}[2]{
+    \vspace{-0.25cm}%
+    \begin{center}%
+        \MakeUppercase{\textbf{#1}}\\
+        \scenedescription{#2}%
+    \end{center}%
+    \vspace{-0.25cm}%
+}
+
+\begin{document}
+\begin{titlepage}
+	\centering
+    \filmtitle{ALIEN}
+    \vspace{1cm}
+    by\\
+    \vspace{1cm}
+    Walter Hill\\
+    \vspace{0.5cm}
+    and\\
+    \vspace{0.5cm}
+    David Giler\\
+    \vspace{3cm}
+    Based on screenplay\\
+    \vspace{0.5cm}
+    by\\
+    \vspace{0.5cm}
+    Dan O\textquotesingle Bannon\\
+    \vspace{1cm}
+    Story by\\
+    \vspace{0.5cm}
+    Dan O\textquotesingle Bannon and Ronald Shusett
+	\vfill
+
+% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+
+\filmtitle{ALIEN}
+
+\stagedirection{fade in}
+\sd{sometime in the future:}
+
+\scene{int. engine room}{Empty, cavernous}
+
+\scene{int. engine cubicle}{Circular, jammed with instruments.
+All of them idle. Console chairs for two. Empty}
+\shot{int. oily corridor - "C" level}{
+    Long, dark. Empty. Turbos throbbing. No other movement
+}
+\shot{int. corridor - "A" level}{Long, empty}
+\shot{INT. INFIRMARY - "A" LEVEL}{
+Distressed ivory walls.
+All instrumentation at rest}
+
+\scene{INT. CORRIDOR TO BRIDGE - "A" LEVEL}{Black, empty}
+
+\scene{INT. BRIDGE}{
+    Vacant.
+    Two space helmets resting on chairs.
+    Electrical hum.
+    Lights on the helmets begin to signal one another.
+    Moments of silence.
+    A yellow light goes on.
+    Data mind bank in bg.
+    Electronic hum.
+    A green light goes on in front of one helmet.
+    Electronic pulsing sounds.
+    A red light goes on in front of other helmet.
+    An electronic conversation ensues.
+    Reaches a crescendo.  
+    Then silence.
+    The lights go off, save the yellow
+}
+
+\shot{INT. CORRIDOR TO HYPERSLEEP VAULT}{
+    Lights come on.
+    Seven gowns hang from the curved wall.
+    Vault door opens
+}
+
+\scene{INT. HYPERSLEEP VAULT}{
+    Explosion of escaping gas.
+    The lid on a freezer pops open.
+    Slowly, groggily, KANE sits up.
+    Pale.
+    Kane rubs the sleep from his eyes.
+    Stands.
+    Looks around.
+    Stretches.
+    Looks at the other freezer compartments.
+    Scratches.
+    Moves off
+}
+
+\scene{INT. GALLEY}{
+    Kane plugs in a Silex.
+    Lights a cigarette.
+    Coughs.
+    Grinds some coffee beans.
+    Runs some water through
+}
+
+\dialogue{KANE}{Rise and shine, Lambert}
+
+\scene{INT. HYPERSLEEP VAULT}{
+    Another lid pops open. A young woman sits up
+}
+
+\dialogue{LAMBERT}{What time is it}
+\dialogue{KANE}{
+    (voice over)\\
+    What do you care
+}
+
+\end{document}

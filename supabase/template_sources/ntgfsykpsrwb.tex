@@ -1,0 +1,180 @@
+%LaTeX thesis layout as used and put together by Prof. Dorien Herremans, dorien_herremans@sutd.edu.sg
+
+% To update the index, run the command 'makeindex thesis' in a terminal
+
+\documentclass[parskip=half,10pt,twoside]{scrbook}
+
+
+ \PassOptionsToPackage{newparttoc}{titlesec} % MUST be called before classicthesis
+
+\usepackage{lipsum, lineno}
+\usepackage{mypreamble}
+\usepackage{makeidx}
+\makeindex
+
+             \usepackage[%
+%    drafting,
+%    minionpro,
+%    minionprospacing,
+%  linedheaders,
+% eulerchapternumbers,
+% eulermath,
+% beramono,
+    dottedtoc,
+    floatperchapter,
+    parts
+]{classicthesis}
+
+
+\renewcommand{\cftpartpresnum}{Part~}
+
+\newlength{\mylen} % a "scratch" length
+\settowidth{\mylen}{\cftpartpresnum} % extra space
+\addtolength{\cftpartnumwidth}{\mylen} % add the extra space
+
+\DeclareUnicodeCharacter{0233}{\egu}
+ \usepackage{chronosys}
+ 
+% \usepackage{nameref}
+% \usepackage{geometry}
+% \geometry{paperwidth=18.91cm,paperheight=24.589cm,
+% bindingoffset=0.89cm, % gutter
+% inner=2cm, % inside margin
+% outer=4cm, % outside margin
+% vmargin=2.5cm, % top and bottom margins
+% marginparsep=0.6cm,
+% marginparwidth=3cm,
+% }
+ 
+
+%remove the mag option when printing for real paperwidth should be 17 xxx
+%  \usepackage[bindingoffset=.5cm,margin=2cm,includeheadfoot,paperwidth=17cm,paperheight=24cm,mag=1270]{geometry}
+    \usepackage[bindingoffset=.5cm,margin=2cm,includeheadfoot,paperwidth=16.5cm,paperheight=24cm,mag=1270]{geometry}
+%    \usepackage[bindingoffset=.5cm,margin=2cm,includeheadfoot,paperwidth=16.5cm,paperheight=24cm]{geometry}
+
+
+\newcommand{\tableheadline}[1]{\multicolumn{1}{c}{\spacedlowsmallcaps{#1}}}
+% fixes for marginpar and latex
+\usepackage{mparhack}
+\usepackage{fixltx2e} 
+
+\renewcommand\thepart{\arabic{part}}
+ \usepackage{bibentry}
+ 
+ 
+%  
+%   \renewcommand{\cftpartpresnum}{Part~}
+%  
+%  \newlength{\mylen} % a "scratch" length
+%  \settowidth{\mylen}{\cftpartpresnum} % extra space
+%  \addtolength{\cftpartnumwidth}{\mylen} % add the extra space
+
+
+
+% \usepackage[libertine]
+\newenvironment{abstract}{\rightskip0.4in\itshape}{}
+
+\begin{document}
+
+
+\frontmatter
+
+%input the titlepage
+\input{frontandbackmatter/title}
+
+
+\clearpage  
+\input{frontandbackmatter/acknowledgements}
+
+% \thispagestyle{empty} %check this, new pagestyle
+ 
+
+
+% \makeatletter \renewcommand{\@dotsep}{10000} \makeatother
+
+\begin{singlespace}
+\clearpage \manualmark
+\markboth{\spacedlowsmallcaps{Overview}}{\spacedlowsmallcaps{Overview}}
+
+\shorttoc{Overview}{0}
+\end{singlespace}
+
+
+\clearpage \manualmark
+ \markboth{\spacedlowsmallcaps{Contents}}{\spacedlowsmallcaps{Contents}}
+\tableofcontents
+% \markboth{\spacedlowsmallcaps{Contents3}}{\spacedlowsmallcaps{Contents3}}
+
+\clearpage \addcontentsline{toc}{chapter}{\tocEntry{List of Figures}} \manualmark \markboth{\spacedlowsmallcaps{List of Figures}}{\spacedlowsmallcaps{List of Figures}} \listoffigures
+
+\clearpage \addcontentsline{toc}{chapter}{\tocEntry{List of Tables}} \manualmark \markboth{\spacedlowsmallcaps{List of Tables}}{\spacedlowsmallcaps{List of Tables}} \listoftables
+
+\clearpage
+% \clearpage{\pagestyle{plain}\cleardoublepage}
+
+\mainmatter
+
+% \chapter{Some very extremely long chapter title that might not be best but I still want it on here and a little bit longer}
+
+
+% \let\LaTeXStandardPart\part
+% \renewcommand{\part}[1]{%
+% \LaTeXStandardPart[]{#1}%
+% \addcontentsline{toc}{part}{Part~\thepart~#1}%
+% }%
+
+% \listoffixmes
+
+\input{frontandbackmatter/introduction}
+
+%Make the headings normal again: 
+ \renewcommand{\chaptermark}[1]{\markboth{\spacedlowsmallcaps{\chaptername}\ \spacedlowsmallcaps{\thechapter}.\ #1}{}}
+ \renewcommand{\sectionmark}[1]{ \markright{\spacedlowsmallcaps{\thesection}.\ \spacedlowsmallcaps{#1}}{} }
+ 
+\part{Your first part}
+\label{par:rules}
+
+\input{chapter1/topic}
+% \input{cp5/papercp5}
+% \input{fux/paperfux}
+
+ \part{The other part: experiments}
+ \label{par:ml}
+
+%replace with other chapters: 
+%\input{chapter1/topic}
+
+
+ \input{frontandbackmatter/conclusions}
+ \input{frontandbackmatter/dutchsummary}
+ 
+ \appendix
+  \input{appendices/appendix}
+  \input{appendices/appendix2}
+  \input{frontandbackmatter/publications}
+
+
+\clearpage
+
+\backmatter
+
+\manualmark
+\markboth{\spacedlowsmallcaps{\bibname}}{\spacedlowsmallcaps{\bibname}} % work-around to have small caps also
+
+%add the non numbered sections to the TOC:
+\addtocontents{toc}{\protect\vspace{\beforebibskip}}
+\addcontentsline{toc}{chapter}{\tocEntry{Bibliography}}
+
+
+\bibliography{bib/references}
+
+% \bibliographystyle{plainnat}
+\bibliographystyle{abbrvnat}
+
+\clearpage \addcontentsline{toc}{chapter}{\tocEntry{Index}} \manualmark \markboth{\spacedlowsmallcaps{Index}}{\spacedlowsmallcaps{Index}}
+
+
+\printindex
+
+
+\end{document}

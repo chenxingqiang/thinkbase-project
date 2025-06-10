@@ -1,0 +1,214 @@
+% ======================================================================
+% ======================================================================
+% ======================================================================
+%
+% UNOFFICIAL style for Posters at RU-DI
+% Radboud University, Donders Institute,
+% Nijmengen, Netherlands
+%
+%     Author: Riccardo Metere <r.metere@donders.ru.nl>
+%       Date: Jun 2018
+%  Copyright: 2018 (C) Riccardo Metere
+%    License: LaTeX Project Public License (LPPL) 
+%
+% Instructions:
+% - Look for `%FIXME` for finding items requiring author's attention
+% - Read the comments and if something is unclear please drop me a note
+%
+% TODO:
+% - Improve on the citation handling
+% - Improve on the figure reference handling
+% ======================================================================
+% ======================================================================
+% ======================================================================
+
+
+% ======================================================================
+% : initial configuration
+\documentclass[portrait,a0paper]{rudi-poster}  % FIXME (landscape|portrait)
+
+% : additional packages
+\usepackage[T1]{fontenc}  % Standard package for selecting font encodings
+\usepackage[utf8x]{inputenc}  % Accept different input encodings
+\usepackage{mathtools}  % Mathematical tools to use with amsmath
+% \usepackage[english]{babel}  % Multilingual support for Plain TeX or LaTeX
+\usepackage{amsmath}  % AMS mathematical facilities for LaTeX
+\usepackage{amsfonts}  % TeX fonts from the American Mathematical Society
+\usepackage{amssymb}  % Additional symbols from American Mathematical Society
+\usepackage{wasysym}  % LaTeX support file to use the WASY2 fonts
+\usepackage{bbm}  % "Blackboard-style" cm fonts
+\usepackage{array}  % Extending the array and tabular environments
+\usepackage{verbatim}  % Reimplementation of and extensions to LaTeX verbatim
+\usepackage{float}  % Improved interface for floating objects
+\usepackage[inline]{enumitem}  % Control layout of itemize, enumerate, description
+\usepackage{qrcode}  % Generate QR codes in LaTeX
+\usepackage{lipsum}
+
+
+% ======================================================================
+% : set-up document information  % FIXME
+\title{TEMPLATE: RU-DI Poster}
+% \title{RU-DI Poster Template RU-DI Poster Template RU-DI Poster Template RU-DI Poster Template RU-DI Poster Template RU-DI Poster Template}  % STRESS-TEST
+\author{Riccardo Metere}
+\date{2018-04-23}
+
+\newcommand{\Contact}{e-mail: \mailto{r.metere@donders.ru.nl}}
+\newcommand{\Authors}{
+	\hspace{-1ex}
+    \begin{itemize*}[label=]
+    	\item \theauthor\textsuperscript{1} %,
+% 	    \item \theauthor\textsuperscript{1}  % STRESS-TEST
+% 	    \item \theauthor\textsuperscript{1}  % STRESS-TEST
+% 	    \item \theauthor\textsuperscript{1}  % STRESS-TEST
+% 	    \item \theauthor\textsuperscript{1}  % STRESS-TEST
+    \end{itemize*}}
+\newcommand{\Affiliations}{
+%   \hspace{0.1ex}
+  \begin{enumerate*}[label=\textbf{\arabic*} ]
+    \item \RUDI, Nijmegen, Netherlands
+%     \item \RUDI  % STRESS-TEST
+%     \item \RUDI  % STRESS-TEST
+%     \item \RUDI  % STRESS-TEST
+%     \item \RUDI  % STRESS-TEST
+  \end{enumerate*}}
+\newcommand{\ExtraLogos}{%
+	\qrcode[height=\rudisizeextralogo]{https://www.overleaf.com/read/rtmwgwfyhhsv}}
+
+\newcommand{\EventName}{<Event Name>}
+\newcommand{\EventLocation}{<Event Location (Country)>}
+\newcommand{\PresentedAt}{Presented at the \EventName{} in \EventLocation{} on \theeventdate}
+
+\newcommand{\References}{
+    \textbf{References}\par
+    \begin{enumerate*}[label={[}\textbf{\arabic*}{]}]
+		\item Metere 2018 \url{https://www.overleaf.com/read/nhdtfpcwczns}
+        \item Author YEAR \doi{some-doi/if-not-doi/use-url}
+%         \item Author YEAR doi:some-doi/if-not-doi/use-url  % STRESS-TEST
+%         \item Author YEAR doi:some-doi/if-not-doi/use-url  % STRESS-TEST
+    \end{enumerate*}}
+\newcommand{\Acknowledgments}{
+	\textbf{Acknowledgments}:
+    \begin{itemize*}[label=]
+    	\item Pinco Panco,
+        \item Panco Pinco.
+    \end{itemize*}}
+\newcommand{\Funding}{
+	\textbf{Funded by}:
+    \begin{itemize*}[label=]
+    	\item Some institution through some grant;
+        \item Some foundation through some other grant.
+    \end{itemize*}}
+\newcommand{\Keywords}{
+	Magnetic Resonance Imaging,
+    MRI,
+    Nuclear Magnetic Resonance,
+    NMR}
+
+% ======================================================================
+% fill in PDF metadata
+\hypersetup{% hyperref setup for PDFs
+  pdftitle={\theauthor{}~-~\thetitle{}~-~(\EventName{},~\theyear{})},
+  pdfcreationdate={\thedate{}},
+  pdfauthor={\theauthor{}},
+  pdfkeywords={\Keywords{}},
+  pdflang={\languagename},
+}%
+
+% ======================================================================
+% :: adjust block sizes  % FIXME
+% : block sizes
+% \setlength{\rudisizeblockheader}{0.077\paperheight}
+% \setlength{\rudisizeblockintro}{0.087\paperheight}
+% \setlength{\rudisizeblockmethods}{0.099\paperheight}
+% \setlength{\rudisizeblockdiscussion}{0.130\paperheight}
+% % set length to vertical fill space of results block
+% \setlength{\rudisizeblockresults}{\paperheight - \rudisizeblockheader - \rudisizeblockintro - \rudisizeblockmethods - \rudisizeblockdiscussion - 0\rudisizeblocktitleheight - 4\parskip - 2\rudisizemargin - 8\rudisizevpadding - 10\rudisizeborder + 6\uum - 0\uum}
+% % set length of Addendum block equal to Discussion block
+% \setlength{\rudisizeblockaddendum}{\rudisizeblockdiscussion}
+
+
+% ======================================================================
+%% Document
+\begin{document}
+
+% ======================================================================
+\rudiposterheader{\thetitle}{\Authors}{\Affiliations}
+\rudipostersidenote{\PresentedAt}
+\rudiposterfooter{\Contact}{\ExtraLogos}
+
+% ======================================================================
+
+\begin{rudiblockintro}
+    \begin{multicols}{3}
+        \lipsum[1] \PresentedAt
+    \end{multicols}
+\end{rudiblockintro}
+
+
+
+% ======================================================================
+
+\begin{rudiblockmethods}
+    \begin{multicols}{3}
+        \lipsum[2] \DTMusedate{eventdate} in \languagename
+        
+	    \begin{itemize*}[label=]
+            \item Pinco Panco,
+            \item Panco Pinco.
+        \end{itemize*}
+        
+        \begin{enumerate*}[label=\textbf{\arabic*} ]
+            \item Pinco Panco,
+            \item Panco Pinco.
+        \end{enumerate*}
+        
+    \end{multicols}
+\end{rudiblockmethods}
+
+% ======================================================================
+
+\begin{rudiblockresults}
+    \begin{rudifig}{\hsize}{<title and/or number of the figure>}
+        \includegraphics[width=\hsize]{logo_rudi}
+    \end{rudifig}
+
+	base: \the\rudisizebase\par
+    paperheight: \the\paperheight\par
+    paperwidth: \the\paperwidth\par
+    header: \the\rudisizeblockheader\par
+    intro: \the\rudisizeblockintro\par 
+    methods: \the\rudisizeblockmethods\par 
+    results: \the\rudisizeblockresults\par 
+    discussion: \the\rudisizeblockdiscussion\par 
+    margin: \the\rudisizemargin\par 
+    $\int_0^{2\pi}\sin(x)dx=0$
+    $$\int_0^{2\pi}\cos(x)dx=0$$
+    \begin{rudisubblock}{\hsize}{Subtitle}
+    	\lipsum[2]
+    \end{rudisubblock}
+\end{rudiblockresults}
+
+% ======================================================================
+
+\begin{paralleltwoblocks}{0.66}
+    \begin{rudiblockdiscussion}
+        \begin{multicols}{2}
+            \lipsum[2]
+        \end{multicols}
+    \end{rudiblockdiscussion}
+    &
+    {
+    \begin{rudiblockaddendum}
+    	\small
+    	\References\par
+        \Acknowledgments\par
+        \Funding
+    \end{rudiblockaddendum}
+    }
+\end{paralleltwoblocks}
+
+% ======================================================================
+% force removal of empty page at the end
+% (this will not work inside `\AtEndDocument`)
+\clearpage
+\end{document}

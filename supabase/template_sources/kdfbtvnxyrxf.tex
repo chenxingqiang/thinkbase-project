@@ -1,0 +1,258 @@
+\documentclass[12pt,oneside,a4]{article}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,width=160mm,top=25mm,bottom=25mm]{geometry}
+\usepackage[lining,tabular]{fbb} % so math uses tabular lining figures
+\usepackage{graphicx}
+\usepackage{enumitem}
+\setlist{leftmargin=*}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily,frame=single,xleftmargin=3em,xrightmargin=3em}
+\usepackage[os=win]{menukeys}
+\renewmenumacro{\keys}[+]{shadowedroundedkeys}
+\usepackage{framed}
+\usepackage{etoolbox}
+\AtBeginEnvironment{leftbar}{\sffamily\small}
+\usepackage{array,lipsum}
+\newenvironment{fulltable}[1][H]
+ {\begin{table}[#1]%
+  \hspace*{-\leftmarginwidth}%
+  \begin{minipage}{\fullwidth}}
+ {\end{minipage}\end{table}}
+\usetikzlibrary{chains,arrows,shapes,positioning}
+\usepackage{hyperref}
+\graphicspath{{figures/}} %Setting the graphicspath
+\renewcommand\abstractname{Introduction}
+
+
+
+
+\title{PhysLogger -- Quick start Guide (App)\\ \small{v. 2019-1}}
+\author{Muhammad Umar Hassan, Muhammad Shiraz Ahmad, \\Muhammad Sabieh Anwar}
+
+\begin{document}
+
+\maketitle
+\begin{center}
+\includegraphics[width=0.7\linewidth]{PhysLogger.png}
+\end{center}
+\begin{abstract}
+%\includegraphics[width=1.0\linewidth]{PhysLogger.png}\\
+PhysLogger can adapt to any voltage measurement application that you might encounter. From pressure to torque and load to force, sensors convert mechanical properties to a voltage and PhysLogger can record that information, from single to multiple channels. This manual provides an overview of how the app, that goes with the same name, can be used to interface with the physical device. So happy logging! 
+\end{abstract}
+
+\clearpage
+\tableofcontents
+
+\clearpage
+
+\section{Overview to PhysLogger Device}
+PhysLogger is shown in Figure \ref{device}. It has a total of $18$ pin connections and one USB port to connect it with the PC. The functionality of these pins will now be described.
+\begin{figure}[H]
+\begin{center}
+  % Requires \usepackage{graphicx}
+\includegraphics[width=0.6\linewidth]{PhysLogger_Labeling.png}\\
+\caption{PhysLogger Device.}\label{device}
+ \end{center}
+\end{figure}
+Pins $01$ and $02$ are built in power sources of voltages $5~$V and $3.3~$V. These pins are used as power source for commonly available transducers. Pins $05$, $08$, $11$ and $14$ which are labelled as A$+$, B$+$, C$+$ and D$+$ are four input channels to read voltage levels. These channels can read data in different modes such as \texttt{Analog RSE} or \texttt{Analog Differential}. The pairs:
+\begin{center}
+\begin{enumerate}
+    \item[] A$+(05)$, G$(06)$;
+    \item[] B$+(08)$, G$(09)$;
+    \item[] C$+(11)$, G$(12)$;
+    \item[] D$+(14)$, G$(15)$;
+\end{enumerate}
+\end{center}are the combinations used in \texttt{RSE Differential} mode and the pairs:
+\begin{enumerate}
+    \item[]A$+(05)$, A$-(07)$;
+    \item[]B$+(08)$, B$-(10)$;
+    \item[]C$+(11)$, C$-(13)$; 
+    \item[]D$+(14)$, D$-(16)$;
+\end{enumerate} are used for \texttt{Analog Differential} mode. All the G$(04, 06, 09, 12$ and $15)$ pins are physically connected inside the device. The pin C$(3)$ is reserved for calibration purposed. 
+
+The pins IC$(18)$ and ID$(17)$ are meant for inputting digital $I^2C$ data.
+
+\section{Using PhysLogger App}
+\subsection{App Start-up}
+To run PhysLogger App:
+\begin{enumerate}
+    \item Insert the product CD in your PC, open the E: drive or letter of your CD--ROM drive.
+    \item Under the directory \menu{CD>Release}, run the file \texttt{PhysLogger.exe}.
+\begin{leftbar}
+To run the app, your PC must meet all  basic requirements mentioned in the Appendix.
+\end{leftbar}
+\end{enumerate}
+%This section briefly gives overview 
+\subsection{PhysLogger Desktop.}
+When you start PhysLogger, PhysLogger desktop appears (see Figure \ref{overview}), containing all the tools, required to control the acquisition and display of all signals.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=1\linewidth]{overview.eps}\\
+ \caption{PhysLogger Desktop. }\label{overview}
+\end{center}
+
+\end{figure}
+Here is a description of the various menu items visible on PhysLogger Desktop.
+\begin{enumerate}
+    \item Controls of each channel.
+    \item The live plots of the acquired electronic signals.
+    \item Locks or unlocks auto scrolling. 
+    \item Toggle switch between cascade and overlap modes. The latter mode puts all signals onto the same screen.
+    \item Connects or disconnects PhysLogger with the device through the USB port.
+    \item Device port selector.
+    \item Sampling frequency selector.
+    \item Resets the live session plot. It clears all data points in the buffer and continues acquiring the electronic signals afresh.
+    \item Time since last reset.
+\end{enumerate}
+\subsection{Customizing the channels}
+This section provide a quick introduction to PhysLogger’s desktop tools.
+\subsubsection{Channel options}
+    PhysLogger supports up to four (4) channels. One of the channels could be on $I^2C$ protocol. All have similar controls. They all have very similar controls.
+     To activate any channel, hover the mouse over the \textbf{line} before the channel label. A check--box will appear (see Figure 3). Click on that check--box to activate the corresponding channel.
+     The channels can be accessed by hovering the mouse over the live--plot of that channel and right clicking on it. The following options for each channel will be exposed upon right clicking:
+\begin{enumerate}
+    \item \textbf{Display Options}\\
+Color, thickness or opacity of the live--plot can be changed through this option.
+    \item \textbf{Channel Options} 
+    \begin{enumerate}
+        \item \textbf{Input Range:} Through this option you can change scale values on your live--plots. This switches the onboard amplifiers giving you a higher resolved view of small sized signals, for example.
+        \begin{leftbar}
+        Input range can be set to one of the following values: $6~$V, $0.6~$V or $30~$mV.
+        \end{leftbar}
+        \item \textbf{Type:} As PhysLogger can measure voltage changes from the sensors connected to its channels, hence some mathematical function is required to convert these voltage changes into corresponding required units. This is called scaling.
+        Following are some inbuilt transfer functions
+        \begin{enumerate}
+            \item \texttt{Analog Differential}: Differential analog voltage signal, e.g. between A$+$ and A$-$, B$+$ and B$-$, C$+$ and C$-$, D$+$ and D$-$
+            \item \texttt{Analog RSE}: Single ended analog signal measurement
+            \item \texttt{Physbar 1.0}: Pressure measurement
+            \item \texttt{Physlab Thermocouple Module}:
+            Temperature measurement
+            \item \texttt{PhysLoad 1.0}: Measurement of forces using a load cell
+            \item \texttt{PhysDisp}: Linear displacement measurement
+        \end{enumerate}
+        These functions can be accessed under menu \menu{Channel Options>Type}.
+    \end{enumerate}
+\end{enumerate}
+%    \begin{leftbar}
+ %   At least two signal inputs, or ``channels'', typically labelled “Channel” with the number next to it, but you can active/deactivate any channel any time. PhysLogger supports up-to 4 channels. Figure 1 shows all 4 channels showing time--varying voltages of input signals.  
+ %   \end{leftbar}
+    \subsubsection{Labelling channel names}
+    Channels are labeled as \textbf{Channel 1, Channel 2 ...} by default. To relabel any channel name, click on it's label (see Figure \ref{01}) and type in any desired name.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{01.png}\\
+ \caption{Check--box appeared with hovering mouse.}\label{01}
+\end{center}
+\end{figure}
+\subsubsection{Graph scaling}
+To change the time scale on a graph of any channel (see Figure \ref{03}), click on a space just above the \texttt{Time~(seconds)} caption and drag horizontally (left or right). Similarly, to change the voltage scale, click on a space left to the \texttt{Voltage~(V)} caption and drag vertically (up or down).\\
+\begin{leftbar}
+To auto scale incoming data on live--plot, right click on a space left to the \texttt{Voltage~(V)} and
+
+select/deselect auto scale option.
+\end{leftbar}
+\begin{leftbar}
+The time scale of all channels is synchronized, changing the time scale of any channel
+
+uniformly effects all channels whereas voltage scales can be changed independently.
+\end{leftbar}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.47\linewidth]{03.png}\\
+ \caption{Graph scaling options. }\label{03}
+\end{center}
+\end{figure}
+\subsubsection{Channel display modes}
+PhysLogger displays the output of all channels on separate graphs by default, but they can also be displayed on the same graph by changing the mode from \texttt{Cascade} to \texttt{Overlap} (see Figure 5).
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\linewidth]{02.png}\\
+ \caption{\textbf{a)} Cascade mode. \textbf{b)} Overlap mode.}
+\end{center}
+\end{figure} 
+\subsection{Exporting Data}
+The following data sets export options are available in PhysLogger:
+\begin{enumerate}
+\item \texttt{Tab-Delimited (.txt):} Readable by software like Excel, Origin etc.
+\begin{enumerate}
+\item To export data without headers, select \menu{Export>Data File>Raw\ldots} from the menu,
+\item To export data with headers, select \menu{Export>Data File>With Headers\ldots}  from the menu.
+\end{enumerate}
+\item \texttt{Copy to Clipboard}: Copies all the recorded data directly to the clipboard.
+\begin{enumerate}
+\item To copy data without headers, select \menu{Export>Copy to Clipboard>Raw\ldots} from the menu,
+\item To copy data with headers, select \menu{Export>Copy to Clipboard>With Headers\ldots}  from the menu.
+\end{enumerate}
+\begin{leftbar}
+PhysLogger exports data in tab--separated columns with the following sequence,
+
+Sr.No. \hspace{5mm} time\_s  \hspace{5mm} Channel 1  \hspace{5mm} Channel 2  \hspace{5mm} Channel 3  \hspace{5mm} Channel 4
+\end{leftbar}
+\item \texttt{Take Screen Shot}: To take screen shot of current window of PhysLogger,\\ select \menu{Export>Screen Shot}.
+\end{enumerate}
+\subsection{Saving/Opening Projects}
+The whole work space of PhysLogger, including all the recorded data and configuration, can be saved through menu \menu{Project>Save} and can be opened any time again same work space through menu \menu{Project>Open}.
+\section{Example: Using PhysLogger in an Optical Experiment:\\verifying Malus’s law}
+To test our PhysLogger in an optical setup, we used the configuration shown in Figure \ref{setup}.  An optical beam produced by a laser is passed through the polarizer and the analyzer and is finally detected on a photodiode.  The photodiode converts this interrupted optical signal into an electrical current which is converted to proportional voltage using a current-to-voltage amplifier. Finally, this signal is measured on PhysLogger. Here, output wires of current-to-voltage amplifier are connected with the pins A$+(05)$ and A$-(07)$ of PhysLogger with \texttt{Analog Differential} mode inside the app.
+
+Figure \ref{maluslaw} shows the experimental curve which agrees almost perfectly with the theoretical prediction of the square of cosine relationship.  In our experiment, we fixed the orientation of the polarizer while rotated the angle $\theta$ of the analyzer.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\linewidth]{PhysLogger_Malus_Law.png}\\
+ \caption{Schematic diagram of the experiment to verify the Malus’s law where ``P" represents the polarizer, ``A" represents the analyzer.}\label{setup}
+\end{center}
+\end{figure} 
+\begin{figure}[H]
+\begin{center}
+  % Requires \usepackage{graphicx}
+\includegraphics[width=0.5\linewidth]{malusLaw.eps}\\
+\caption{ Intensity of an optical beam as a function of angle between two crossed polar-izers, curve fitted on square of cosine, which satisfies Malus’s law.}\label{maluslaw}
+ \end{center}
+\end{figure}
+%\begin{enumerate}
+%\item 
+%\end{enumerate}
+\section{Appendix}
+If the app does not run when the PhysLogger executor file is run, one needs to ensure that few prerequisites are satisfied.
+\subsection{Prerequisites to run PhysLogger App}
+To run PhysLogger App, you must have,
+\begin{enumerate}
+    \item Arduino drivers properly installed on your PC.
+    \item PhysLogger device is connected to PC via USB cable.
+    \item Firmware is installed into PhysLogger device.
+    \item We have already installed .NET Framework of version $4.5.2$ or greater.
+\end{enumerate}
+\subsection{Frequently asked questions}
+\subsubsection{How to install Arduino drivers in PC}
+\begin{enumerate}
+    \item Insert the product CD in your PC, open the E: drive or letter of your CD–ROM drive.
+    \item Under the directory \menu{CD>Release}, run the program \texttt{PhysLogger.exe}
+    \item Under \menu{Tools} click on "Install Arduino Drivers".\\
+    \includegraphics[width=0.5\linewidth]{drivers.png}
+    \item In PhysLogger console, type ``Y'' and press \menu{Enter}.\\
+    \includegraphics[width=0.5\linewidth]{console.png}
+    \item Click on \menu{Yes} button on \texttt{User Account Control} pop--up.\\
+    \includegraphics[width=0.5\linewidth]{account_control.png}
+    \item In \texttt{Device Driver Installation Wizard}, click on the button \menu{Next} and then click on the button \menu{Finish}.\\
+    \includegraphics[width=0.5\linewidth]{wizard.png}
+    \end{enumerate}
+    \subsubsection{How to update the Firmware into PhysLogger device.}
+    \begin{enumerate}
+    \item Insert the product CD in your PC, open the E: drive or letter of your CD–ROM drive.
+    \item Under the directory \menu{CD>Release}, run the program \texttt{PhysLogger.exe}
+    \item Connect PhysLogger device with the App.\\
+    \includegraphics[width=0.3\linewidth]{connect.png}
+    \item Under \menu{Tools} click on "Update Firmware".\\
+    \includegraphics[width=0.5\linewidth]{drivers.png}
+    \item In PhysLogger console, type ``Y'' and press \menu{Enter}.\\
+    \includegraphics[width=0.7\linewidth]{UpdateFirm.png}
+    \item Wait for the message ``Press any key to exit...'', when it appears, press any key.\\
+    \includegraphics[width=0.3\linewidth]{pressany.png}
+    \end{enumerate}
+\begin{thebibliography}{99}
+\bibitem{web1} \url{http://bit.ly/PhysLab_Link01}
+\bibitem{web2} \url{http://bit.ly/PhysLab_Link02}
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,73 @@
+\def\jobname{main} % or whatever your main document .tex file is named!
+\documentclass[a4paper]{article}
+
+\title{Using PSTricks with pdflatex on Overleaf}
+\author{Overleaf}
+
+\usepackage{pst-node}
+\usepackage{pst-coil}
+\usepackage{auto-pst-pdf}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\pagestyle{empty}
+
+%%%%% 
+%% These lines are required ≥TL2021 due to 
+%% incompatibility between hyperref and preview
+%% (See https://www.reddit.com/r/LaTeX/comments/jhi7nk/with_pdflatex_hyperref_breaks_autopstpdf/ and 
+%% https://lists.gnu.org/archive/html/bug-auctex/2020-11/msg00000.html  
+\makeatletter
+\ifPreview
+  \let\Hy@FirstPageHook\relax
+  \let\Hy@EveryPageAnchor\relax
+\fi
+\makeatother
+%%%%%
+
+\begin{document}
+\maketitle
+
+\begin{description}
+\item[Solution 1 (Recommended):] Compile with XeLaTeX. You can switch to XeLaTeX from the Overlef project: see \href{https://www.overleaf.com/learn/how-to/Changing_compiler}{this help page} too.
+
+\item[Solution 2:] Use the \texttt{auto-pst-pdf} package \textbf{together with} a custom \texttt{latexmkrc} file that contains this line:
+
+\begin{verbatim}
+$hash_calc_ignore_pattern{'pdf'} = '^/(CreationDate|ModDate|ID) ';
+\end{verbatim}
+
+You will also need to add this line before your \verb|\documentclass|:
+
+\begin{verbatim}
+\def\jobname{main} % or whatever your main document .tex file is named!
+\end{verbatim}
+
+\end{description}
+
+
+This is a PSTricks drawing:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This example was taken from https://www.tug.org/PSTricks/main.cgi?file=Examples/pst-coil/coils
+\psset{subgriddiv=0}
+\SpecialCoor
+\psset{griddots=5,subgriddiv=0,gridlabels=0pt}
+% (Nearly) original code
+\begin{pspicture}(4,4)\psgrid
+  \pscircle(2,2){2}
+  \qdisk(!2  2 70 sin mul add 2 -2 70 cos mul add){4pt}
+  \pscoil[coilarm=3mm,coilwidth=3mm,linecolor=red]{-}%
+         (2,0)(!2 2 70 sin mul add 2 -2 70 cos mul add)
+  \rput(3.6,1.6){$m$}
+  \rput(2.8,1){$k$}
+  \psline[linecolor=blue,linewidth=1.5pt]{<-}(0,2)(2,2)
+  \rput(1,2.2){$r$}
+\end{pspicture}
+%%%%%%%%%%%%%%%%%%%%%%
+
+Here's a JPG picture to prove we're \emph{not} using the LaTeX+dvipdf engine!
+
+\includegraphics[width=5cm]{stream}
+
+\end{document}

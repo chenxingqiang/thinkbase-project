@@ -1,9 +1,9 @@
 from exa_py import Exa
-from agentflow import ell2a
-from agentflow.ell2a.evaluation import Evaluation
-from agentflow.ell2a.lmp.simple import simple
-from agentflow.ell2a.types.message import Message, MessageRole, ContentBlock
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow import ell
+from agentflow.ell.evaluation import Evaluation
+from agentflow.ell.lmp.simple import simple
+from agentflow.ell.types.message import Message, MessageRole, ContentBlock
+from agentflow.ell.integration import ELLIntegration
 import os
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -31,9 +31,9 @@ try:
     # Initialize Exa client
     exa = Exa(exa_api_key)
 
-    # Initialize ELL2A integration
-    ell2a_integration = ELL2AIntegration()
-    ell2a_integration.configure({"store": "./logdir", "verbose": True})
+    # Initialize ELL integration
+    ell_integration = ELLIntegration()
+    ell_integration.configure({"store": "./logdir", "verbose": True})
 except Exception as e:
     print(f"Error initializing clients: {str(e)}")
     sys.exit(1)

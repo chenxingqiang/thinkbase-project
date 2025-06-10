@@ -30,7 +30,7 @@ from agentflow.core.enums import StepStatus
 from agentflow.core.workflow_engine import WorkflowEngine
 from agentflow.core.workflow_executor import WorkflowExecutor
 from agentflow.core.exceptions import WorkflowExecutionError
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType, assistant, user
+from agentflow.ell.types.message import Message, MessageRole, MessageType, assistant, user
 from agentflow.core.isa.isa_manager import ISAManager
 from agentflow.core.isa.instruction_selector import InstructionSelector
 from agentflow.core.isa.instruction import Instruction
@@ -57,8 +57,8 @@ def event_loop():
         loop.close()
 
 @pytest.fixture(scope="function")
-def mock_ell2a():
-    """Create a mock ELL2A integration."""
+def mock_ell():
+    """Create a mock ELL integration."""
     mock = AsyncMock()
     mock.process_message.return_value = Message(
         role=MessageRole.ASSISTANT,
@@ -110,7 +110,7 @@ def mock_metrics_manager():
     return mock
 
 @pytest.fixture(scope="function")
-async def agent(mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def agent(mock_ell, mock_isa_manager, mock_instruction_selector):
     """Create a test agent."""
     workflow_cfg = WorkflowConfig(
         id=str(uuid.uuid4()),
@@ -160,17 +160,17 @@ async def agent(mock_ell2a, mock_isa_manager, mock_instruction_selector):
         workflow=workflow_cfg.model_dump()
     )
     agent = Agent(config=agent_config)
-    agent._ell2a = mock_ell2a
+    agent._ell = mock_ell
     agent._isa_manager = mock_isa_manager
     agent._instruction_selector = mock_instruction_selector
     await agent.initialize()
     return agent
 
 @pytest.fixture(scope="function")
-async def workflow_engine(mock_ell2a, mock_isa_manager, mock_instruction_selector, mock_state_manager, mock_metrics_manager):
+async def workflow_engine(mock_ell, mock_isa_manager, mock_instruction_selector, mock_state_manager, mock_metrics_manager):
     """Create a workflow engine for testing."""
     engine = WorkflowEngine()
-    engine._ell2a = mock_ell2a
+    engine._ell = mock_ell
     engine._isa_manager = mock_isa_manager
     engine._instruction_selector = mock_instruction_selector
     engine.state_manager = mock_state_manager
@@ -231,13 +231,13 @@ async def test_agent_registration(workflow_engine, agent):
     assert test_agent.id in engine.workflows
 
 @pytest.mark.asyncio
-async def test_workflow_execution(workflow_engine, agent, mock_ell2a, mock_isa_manager):
+async def test_workflow_execution(workflow_engine, agent, mock_ell, mock_isa_manager):
     """Test workflow execution."""
     engine = await workflow_engine
     test_agent = await agent
     
-    # Configure mock_ell2a
-    mock_ell2a.process_message.return_value = Message(
+    # Configure mock_ell
+    mock_ell.process_message.return_value = Message(
         role=MessageRole.ASSISTANT,
         content="Test response",
         type=MessageType.TOOL_RESULT,
@@ -321,9 +321,9 @@ async def test_workflow_error_handling():
     agent.metadata["test_mode"] = True
 
     # Configure mock to raise error for this test
-    mock_ell2a = AsyncMock()
-    mock_ell2a.process_message.side_effect = WorkflowExecutionError("Step failed due to should_fail flag")
-    agent._ell2a = mock_ell2a
+    mock_ell = AsyncMock()
+    mock_ell.process_message.side_effect = WorkflowExecutionError("Step failed due to should_fail flag")
+    agent._ell = mock_ell
 
     # Create workflow engine
     engine = WorkflowEngine()
@@ -378,7 +378,7 @@ async def test_workflow_error_handling():
     assert str(exc_info.value) == expected_error
 
 @pytest.mark.asyncio
-async def test_parallel_workflow_execution(workflow_engine, mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def test_parallel_workflow_execution(workflow_engine, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test parallel workflow execution."""
     engine = await workflow_engine
     
@@ -442,7 +442,7 @@ async def test_parallel_workflow_execution(workflow_engine, mock_ell2a, mock_isa
             isa_manager=mock_isa_manager,
             instruction_selector=mock_instruction_selector
         )
-        agent._ell2a = mock_ell2a
+        agent._ell = mock_ell
         agent._isa_manager = mock_isa_manager
         agent._instruction_selector = mock_instruction_selector
         await agent.initialize()
@@ -453,7 +453,7 @@ async def test_parallel_workflow_execution(workflow_engine, mock_ell2a, mock_isa
         await engine.register_workflow(agent, workflow_config)
 
 @pytest.mark.asyncio
-async def test_workflow_cleanup(workflow_engine, agent, mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def test_workflow_cleanup(workflow_engine, agent, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test workflow cleanup."""
     engine = await workflow_engine
     test_agent = await agent
@@ -524,7 +524,7 @@ async def test_workflow_cleanup(workflow_engine, agent, mock_ell2a, mock_isa_man
     assert result["steps"]["step1"]["status"] == "success"
 
 @pytest.mark.asyncio
-async def test_workflow_registration(workflow_engine, mock_ell2a, mock_isa_manager, mock_instruction_selector):
+async def test_workflow_registration(workflow_engine, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test workflow registration."""
     engine = await workflow_engine
     # Create agent
@@ -586,8 +586,8 @@ async def test_workflow_registration(workflow_engine, mock_ell2a, mock_isa_manag
     agent = Agent(config=config)
 
     # Set up mocks before initialization
-    mock_ell2a = AsyncMock()
-    mock_ell2a.process_message.return_value = Message(
+    mock_ell = AsyncMock()
+    mock_ell.process_message.return_value = Message(
         role=MessageRole.ASSISTANT,
         content="Test response",
         type=MessageType.TOOL_RESULT,
@@ -597,7 +597,7 @@ async def test_workflow_registration(workflow_engine, mock_ell2a, mock_isa_manag
             "status": "completed"
         }
     )
-    agent._ell2a = mock_ell2a
+    agent._ell = mock_ell
 
     mock_isa_manager = AsyncMock()
     mock_isa_manager.get_isa.return_value = "test_isa"
@@ -691,9 +691,9 @@ async def test_workflow_engine_execution():
     agent = Agent(config=config)
 
     # Set up mocks before initialization
-    mock_ell2a = AsyncMock()
-    mock_ell2a.process_message.side_effect = WorkflowExecutionError("Step failed due to should_fail flag")
-    agent._ell2a = mock_ell2a
+    mock_ell = AsyncMock()
+    mock_ell.process_message.side_effect = WorkflowExecutionError("Step failed due to should_fail flag")
+    agent._ell = mock_ell
 
     mock_isa_manager = AsyncMock()
     mock_isa_manager.get_isa.return_value = "test_isa"

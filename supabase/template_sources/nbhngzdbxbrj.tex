@@ -1,0 +1,351 @@
+%####################################################################
+% 上智大学情報理工系修士論文・卒業論文テンプレート
+% Version 2023.1.30
+% Author: Leo Liu @ Yairi Lab.
+
+% 設定箇所は２箇所あります（環境設定・追加設定）．
+% citesort は通常の latex に含まれていないので，ファイルと一緒に配布しています.
+% 追加設定に，便利なパッケージやマクロを既に追加されています．
+
+% Overleafを使用する場合，Compiler をデフォルトの「pdfLaTeX」でなく，
+% 「LaTeX」に設定した上で使ってください．
+
+% 英語の場合，2段組構成はお勧めです．
+%####################################################################
+
+
+%############################## 環境設定 ##############################
+
+% 英語で執筆する場合は \ENGtrue の前の % を削除
+\newif\ifENG
+% \ENGtrue
+
+% 定理型環境の末尾の□を消したい場合は \QEDtrue の前に % を入れる
+\newif\ifQED
+% \QEDtrue
+
+% 2段組にする場合は，\TWOCtrue の前の % を削除
+\newif\ifTWOC
+% \TWOCtrue
+
+% サブタイトルを無効にする場合は，\SUBtrue の前に % を入れる
+\newif\ifSUB
+\SUBtrue
+
+% サンプルモード．本文の執筆を始める前に \SAMtrue の前に % を入れる
+\newif\ifSAM
+\SAMtrue
+
+% コンパクトモード．無効にする場合は，\CMPtrue の前に % を入れる
+% 要旨を執筆する際はコンパクトモードはおすすめです．
+% コンパクトモードを無効にすると，レポートクラスのデフォルトページサイズになります．
+\newif\ifCMP
+\CMPtrue
+
+%######################### 環境設定, ここまで #########################
+
+
+%==================== 以下修正不要 =========================
+%
+% 内容を理解したうえで修正する分にはかまいません。(自己責任で)
+%
+
+%**********************************************************
+% ドキュメントクラス設定
+%
+\ifENG
+    \ifTWOC
+        \documentclass[a4paper,twocolumn]{report}
+    \else
+        \documentclass[a4paper]{report}
+    \fi
+\else
+    \ifTWOC
+        \documentclass[a4paper,twocolumn]{jreport}
+    \else
+        \documentclass[a4paper]{jreport}
+    \fi
+    \def\baselinestretch{.9}
+\fi
+%**********************************************************
+
+%**********************************************************
+% ページサイズ設定
+%
+\ifCMP
+    \textheight=252mm
+    \textwidth=170mm
+    \columnsep=10mm
+    
+    \voffset=-1in
+    \headheight=13mm
+    \headsep=12mm
+    \topmargin=0mm
+    
+    \hoffset=-1in
+    \oddsidemargin=20mm
+    \evensidemargin=20mm
+\fi
+%**********************************************************
+
+%**********************************************************
+% 定理型環境
+%
+\usepackage{theorem}
+\theorembodyfont{\normalfont}
+
+\makeatletter
+\def\QED{{\unskip\nobreak\hfil\penalty50
+\hskip1em\hbox{}\nobreak\hfil $\Box$\parfillskip\z@
+\finalhyphendemerits\z@\par}}
+\makeatother
+
+\ifENG
+\def\Definition{Definition}
+\else
+\def\Definition{定義}
+\fi
+
+\ifQED
+\newtheorem{defi}{\Definition}
+\newenvironment{definition}{\begin{defi}}{\QED\end{defi}}
+\else
+\newtheorem{definition}{\Definition}
+\fi
+
+\ifENG
+\def\Theorem{Theorem}
+\else
+\def\Theorem{定理}
+\fi
+
+\ifQED
+\newtheorem{theo}{\Theorem}
+\newenvironment{theorem}{\begin{theo}}{\QED\end{theo}}
+\else
+\newtheorem{theorem}{\Theorem}
+\fi
+
+\ifENG
+\def\Proposition{Proposition}
+\else
+\def\Proposition{命題}
+\fi
+
+\ifQED
+\newtheorem{prop}{\Proposition}
+\newenvironment{proposition}{\begin{prop}}{\QED\end{prop}}
+\else
+\newtheorem{proposition}{\Proposition}
+\fi
+%**********************************************************
+
+%==================== 修正不要, ここまで ====================
+
+
+%############################## 追加設定 ##############################
+
+%**********************************************************
+% 使用パッケージ
+%
+\usepackage[utf8]{inputenc}
+
+% IEEE基準
+\usepackage{amsmath,amssymb,graphicx}
+\usepackage{algorithmic,amsfonts,cite,graphicx,textcomp,ulem}
+\usepackage{xcolor,tabularx}
+
+% サンプルファイル用
+\usepackage{dtk-logos}
+\usepackage{listings}
+\usepackage{textcomp}
+%**********************************************************
+
+%**********************************************************
+% マクロ定義
+%
+\newcommand{\etal}{\textit{et al}. }
+\newcommand{\ie}{\textit{i}.\textit{e}. }
+\newcommand{\eg}{\textit{e}.\textit{g}. }
+\newcommand{\etc}{\textit{etc}. }
+%**********************************************************
+
+%######################### 追加設定，ここまで #########################
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+    \begin{center}
+        \Large 2022年度　学位論文 \\
+
+        \vfill
+        \Huge\textbf{論文のすゝめ}\\
+        \ifSUB
+            \huge\textbf{For Theses, With Theses}\\
+        \fi
+
+        \vfill
+        \Large 理工学研究科理工学専攻情報学領域 \\
+        \medskip
+        \Large 博士前期課程 \\
+        \vspace{\baselineskip}
+        \Large \textbf{B1234567} \\
+        \smallskip
+        \Large \textbf{上智花子} \\
+        \vspace{\baselineskip}
+        \large 指導教員 \quad 上智太郎\\
+
+        \vspace{3\baselineskip}
+        \number\year 年\number\month 月\number\day 日
+    \end{center}
+
+    \ifSAM
+        \footnotetext[1]{Sample Mode.}
+        \footnotetext[2]{Copyright 2022-2023 Leo Liu. All Rights Reserved.}
+    \fi
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\pagenumbering{gobble}
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{はじめに}
+
+このファイルは \LaTeX を利用して情報理工系修士論文・卒業論文を作成するためのサンプルファイルである．本ファイルに記述してある指示に従い，その中身を書き換えることで要旨を作成することができる．
+
+Overleaf で使用する場合，コンパイラをデフォルトの \pdflatex ではなく，\LaTeX に設定した上で使ってください．
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{論文の体裁}
+
+\section{ページ設定}
+
+基本は横書きで記述し，分量は各教員・研究科・学科の指示に従うこと．２種類のページサーズが用意されている．
+
+\begin{itemize}
+    \item \textbf{コンパクトモード}：用紙はA4サイズ(210mm×297mm)縦置き，ページ余白は上：25mm，左右・下：20mmとする．余白は少なめ．要旨などに．
+    \item \textbf{デフォルトモード}：\lstinline{report} または \lstinline{jreport} クラスのデフォルトページサイズ．余白は多め．製本用論文正文などに．
+\end{itemize}
+
+\section{本文}
+
+2段組みか，1段組みで執筆すること．詳細は各教員・研究科・学科の指示に従うこと．
+
+\section{フォントサイズ}
+
+フォントサイズは 10pt に設定されてあります．
+
+\section{文献の引用}
+
+文献の引用は，\lstinline{thebibliography} 環境または \BibTeX を利用できる．
+
+引用した文献は参考文献に明記し，引用箇所には\cite{F}, \cite{H-K}, \cite{F,H-K,Z}のように文献番号を表記すること．参考文献の表記方法については指導教員の指示に従うこと．
+
+\section{図・表について}
+
+表の挿入は，\lstinline{tabular} または \lstinline{tabularx} 環境を利用できる．
+
+図・表には図\ref{Figure_1}，表\ref{Table_1} のように図表番号をつけ，タイトルとともに，図は下部，表は上部に記すこと.
+
+\begin{table}[h]
+    \begin{center}
+        \caption{表のタイトル}
+        \label{Table_1}
+        \medskip
+        \begin{tabular}{|l|c|r|} \hline
+            \multicolumn{3}{|c|}{\textgt{請求書}} 		\\ \hline
+            \multicolumn{1}{|c|}{品名} & 数量 & 金額  	\\ \hline
+            \textit{The \TeX{}book}    &    1 & \$30.00 	\\ 
+            \textit{\TeX: The Program} &    1 & \$43.00 	\\ \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[width=40mm,clip]{graph.eps}
+        \caption{図のタイトル}
+        \label{Figure_1}
+    \end{center}
+\end{figure}
+
+\section{数式について}
+
+数式には必要に応じて式番号をつけること．数式の例を以下に示す．
+
+\begin{equation}
+ H = -\sum_{i=1}^{n} p_i \log p_i 
+\end{equation}
+
+\begin{gather}
+ E(X) = \sum_{i=1}^{n} x_i P(X=x_i) \\
+ V(X) = E((X-E(X))^2) = E(X^2)-(E(X))^2
+\end{gather}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{本ファイルの利用について}
+
+\section{執筆言語}
+
+論文を英語で記述する場合は, 本ファイル先頭の「環境設定」の中にある指示に従って処理すること．
+
+\section{論文題目・学生氏名}
+
+論文題目・学生氏名は，本文の \lstinline{titlepage} 部分に書き入れること．また，本文を英語で書く場合，題目・学生氏名とも英語で記載すること（ただし，指示に従うこと．）．なお, 副題（英語論文の日本語タイトル，またはその逆）も環境設定で設定の上，\lstinline{titlepage} 部分に書き入れること．
+
+\section{定義・定理などの定理型環境と末尾の処理について}
+
+定義(Definition)，定理(Theorem)，命題(Proposition)，補題(Lemma)，系(Corollary)，注意(Remark)，例(Example)などは定理環境を利用すること．
+
+本ファイルでは 「定義・定理・命題」のマクロを用意してあるので，必要があればそれを利用すること．また，これら3つの定理型環境の末尾に $\Box$ を出力するマクロを用意してあるので，本ファイルの環境設定の指示に従って有効・無効を切り替えること．
+
+独自に作成した定理型環境内で $\Box$ を出力するマクロを使用する方法は，本ファイル先頭にある「修正不要」の中の「定理型環境」を参考にすること．
+
+\begin{definition}
+    定理型環境(definition)の利用
+\end{definition}
+
+\begin{theorem}
+    定理型環境(theorem)の利用
+\end{theorem}
+
+\begin{proposition}
+    定理型環境(proposition)の利用
+\end{proposition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{おわりに}
+
+本稿では，\LaTeX により論文を作成する際の留意事項について解説した．ここに記載されていないことについては指導教員に確認し，その指示に従うこと．
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\pagenumbering{gobble}
+\onecolumn
+
+%=====================================
+% References, variant A: external bibliography
+%=====================================
+%\bibliography{your_external_BibTeX_file}
+
+%=====================================
+% References, variant B: internal bibliography
+%=====================================
+\begin{thebibliography}{9}
+    % Reference 1
+    \bibitem{F} W.~Fulton, ``Young tableaux,'' London Mathematical Society Student Text {\bf 35}, Cambridge, 1996.
+    % Reference 2
+    \bibitem{H-K} J.~Hong and S-J~Kang, ``Introduction to Quantum Groups and Crystal Bases,'' American Mathematical Society, 2002.
+    % Reference 3
+    \bibitem{Z} A.~V.~Zelevinsky, ``A Generalization of the Littlewood-Richardson Rule and the Robinson-Shensted-Knuth Correspondence,'' J.~Math. {\bf 69}, pp.82--94, 1981.
+\end{thebibliography}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

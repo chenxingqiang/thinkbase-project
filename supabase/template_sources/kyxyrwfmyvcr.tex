@@ -1,0 +1,150 @@
+% !TEX program =  xelatex
+
+% author: aqnin@outlook.com
+
+% TODO 定理环境 使用mathtools
+
+\documentclass{nkuthesis}
+
+\usepackage{graphicx}
+\usepackage{booktabs} 
+\usepackage{siunitx}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{url}
+\usepackage{algpseudocode}
+
+\addbibresource{example.bib}
+
+\title{模板：南开大学本科生毕业论文（计网）\\ 版本：2023/09/01}
+\title*{Nankai University Bachelor's Thesis for CS}
+\studentid{0101010}
+\author{匿名}
+\grade{20XX  级}
+\major{计算机科学与技术}
+\department{计算机科学与技术}
+\college{计算机学院}
+\adviser{某某\quad 教授\\ 某某\quad 教授}
+\date{\the\year 年 \the\month 月}
+\keywords{毕业论文；本科；LaTeX模板；南开大学；计网专用；Overleaf；XeLaTeX}
+\keywords*{thesis; bachelor; LaTeX template; Nankai University; computer college; Overleaf; XeLaTeX}
+
+\begin{document}
+
+%% front body
+\maketitle
+
+\pagenumbering{Roman}
+
+\begin{abstract}
+模板
+\end{abstract}
+\begin{abstract*}
+template
+\end{abstract*}
+
+\tableofcontents
+
+%% main body
+\pagenumbering{arabic}
+
+\section{前言}
+
+当前网络上流传的模板大部分由研究生论文模板修改得来，个别模板虽然从头重新实现，但缺少封面、参考文献部分的排版，仍然不完善。因此，这里分享一个新的适用于计网学院的本科生毕业论文模板。本模板具有如下优点：
+
+\begin{enumerate}
+\item \emph{不做过度封装}。尽可能遵循LaTeX2e使用习惯和原有接口。
+\item \emph{简易封面接口}。提供了更加简易的封面设置接口，多行标题的排版可以通过换行符实现。
+\item \emph{参考文献格式}。通过BibLatex详细调整了参考文献格式，且无需引入独立的样式文件。
+\item \emph{接近Word}。行间距根据word中1.5倍行距实际排版效果设置。
+\item \emph{简洁易读的模板实现}。使用常用宏包实现排版，方便二次修改。
+\end{enumerate}
+
+当前执行标准为\href{http://jwc.nankai.edu.cn/2022/1124/c24a497818/page.htm}{《本科毕业论文（设计）指导手册（2022年11月）》}和\href{https://github.com/Tr0py/NKU-thesis-template-2020/files/11620969/2023V2.pdf}{《本科生学位论文排版规范（2023修订）（版本 2.1.1）（计算机学院）（网络空间安全学院）》}。往年教务老师毕业论文发布时间较晚，请\emph{留意格式变化}。
+
+中文使用ctex宏包设置的默认字体，在Overleaf上为Fandol字体，根据往年经验可以直接使用。如需使用中易字体，可以选择在Windows平台编译，编译前请检查XITS字体是否存在。
+
+
+
+\section{使用方法}\label{sec:usage}
+
+\subsection{文章构成}
+
+请结合示例查看封面、原创声明、摘要、关键词、目录、附录、参考文献、致谢的排版。
+
+\subsection{正文排版}\label{sec:mainbody}
+
+以下仅对特别调整的内容进行说明，对于未进行说明的部分\footnote{对字体、标题、页眉、页脚、页边距、脚注等方面进行了调整，但是不改变原有使用方式}，请参照ctexart文档类\footnote{见\href{http://mirrors.ctan.org/language/chinese/ctex/ctex.pdf}{《CTEX宏集手册》}}的使用方式。
+
+正文字号为小四号，行距已根据肉眼调整至接近Word中的1.5倍行距。
+
+\subsubsection{浮动体}
+
+图、跨页表、表、算法、代码，调整为五号字
+
+\begin{longtable}{ccc}
+% \centering
+\caption{跨页表格示例}
+\label{tab:longtable_example} \\
+
+\toprule 第一列 & 第二列 & 第三列 \\  \midrule
+\endfirsthead
+
+\multicolumn{3}{r}{续\tablename\ \thetable}\\
+\toprule 第一列 & 第二列 & 第三列 \\  \midrule 
+\endhead
+
+\midrule \multicolumn{3}{r}{接下页} \\ \bottomrule
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 \\
+0.0 & 1 & 2 
+\end{longtable}
+
+\subsubsection{交叉引用}\label{sec:crossref}
+
+以本小节为例，说明标题的交叉引用。本小节位于\ref{sec:usage}中的\ref{sec:mainbody}中的\ref{sec:crossref}。可以看到，小节的排版仍然为英文风格，并不十分美观，尽量避免使用。
+
+模板为图、表、公式、算法、代码这些常用环境设置了交叉引用格式，并且按章节对其进行编号。但是，其他类型交叉引用标签的格式和编号需要使用者自行设置，格式通过LaTeX2e的内置命令 \verb|\labelformat{figure}{图~#1\space}| 进行设置，编号可以通过chngcntr宏包的 \verb|\counterwithin{figure}{section}| 命令进行设置。
+
+\appendix
+
+如需修改模板，请结合注释理解当前实现，如需深入了解\LaTeXe，按优先级阅读感兴趣的内容。
+
+\begin{enumerate}
+    \item \href{http://mirrors.ctan.org/info/lshort/chinese/lshort-zh-cn.pdf}{《一份不太简短的 LaTeX2e 介绍》}
+    \item \href{http://mirrors.ctan.org/language/chinese/ctex/ctex.pdf}{CTEX宏集手册}
+    \item Overleaf\cite{lees2015overleaf} \href{https://www.overleaf.com/learn}{Documentation}
+    \item  \href{https://github.com/ustctug/ustcthesis/wiki}{ustcthesis Wiki}
+\end{enumerate}
+
+%% back body
+\printbibliography
+
+\begin{acknowledgement}
+
+\begin{description}
+\item[2023/09/01] 整理模板并分享。by \href{mailto:aqnin@outlook.com}{aqnin@outlook.com}
+\item[2099/12/31] ……
+\end{description}
+
+\end{acknowledgement}
+
+\end{document}

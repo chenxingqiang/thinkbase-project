@@ -1,0 +1,123 @@
+{
+    "AGENT": {
+        "NAME": "DeepSeekAgent",
+        "VERSION": "1.0.0",
+        "TYPE": "LLM_INFERENCE"
+    },
+    "INPUT_SPECIFICATION": {
+        "MODES": [
+            "DIRECT_INPUT",
+            "CONTEXT_INJECTION",
+            "STREAM_INPUT"
+        ],
+        "TYPES": {
+            "DIRECT": {
+                "supported_formats": ["text", "code", "json"]
+            },
+            "CONTEXT": {
+                "sources": [
+                    "PREVIOUS_AGENT_OUTPUT",
+                    "GLOBAL_MEMORY"
+                ]
+            },
+            "STREAM": {
+                "modes": [
+                    "REAL_TIME",
+                    "BATCH"
+                ]
+            }
+        },
+        "VALIDATION": {
+            "STRICT_MODE": true,
+            "SCHEMA_VALIDATION": true,
+            "TRANSFORM_STRATEGIES": [
+                "TYPE_COERCION",
+                "DEFAULT_VALUE"
+            ]
+        }
+    },
+    "OUTPUT_SPECIFICATION": {
+        "MODES": [
+            "RETURN",
+            "FORWARD",
+            "STORE"
+        ],
+        "STRATEGIES": {
+            "RETURN": {
+                "options": [
+                    "FULL_RESULT",
+                    "SUMMARY"
+                ]
+            },
+            "FORWARD": {
+                "routing_options": [
+                    "DIRECT_PASS",
+                    "TRANSFORM"
+                ]
+            },
+            "STORE": {
+                "storage_types": [
+                    "GLOBAL_MEMORY",
+                    "TEMPORARY_CACHE"
+                ]
+            }
+        },
+        "TRANSFORMATION": {
+            "ENABLED": true,
+            "METHODS": [
+                "FILTER",
+                "MAP",
+                "REDUCE"
+            ]
+        }
+    },
+    "COLLABORATION": {
+        "MODE": "SEQUENTIAL",
+        "WORKFLOW": [
+            "input_validation",
+            "context_preparation",
+            "model_inference",
+            "output_processing"
+        ],
+        "COMMUNICATION_PROTOCOL": {
+            "TYPE": "SEMANTIC_MESSAGE",
+            "CONSTRAINTS": {
+                "MAX_DEPTH": 5,
+                "TIMEOUT": 30.0,
+                "RETRY_STRATEGY": {
+                    "MAX_RETRIES": 3,
+                    "BACKOFF_FACTOR": 1.5
+                }
+            }
+        },
+        "PERFORMANCE_TRACKING": {
+            "METRICS": [
+                "EXECUTION_TIME",
+                "RESOURCE_UTILIZATION",
+                "TASK_COMPLETION_RATE"
+            ]
+        }
+    },
+    "model": {
+        "name": "deepseek-code",
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "top_p": 0.95,
+        "context_window": 8192
+    },
+    "api": {
+        "base_url": "https://api.deepseek.com/v1",
+        "api_key": "sk-88d0d7467fa84dfc996b9d09962fb75e"
+    },
+    "logging": {
+        "level": "DEBUG",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    },
+    "ell": {
+        "enabled": true,
+        "tracking_enabled": true,
+        "store": "./logdir",
+        "verbose": true,
+        "autocommit": true
+    }
+} 

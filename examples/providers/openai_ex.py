@@ -2,7 +2,7 @@
 OpenAI example: This example demonstrates using OpenAI to generate stories and chat responses.
 Make sure you have set the OPENAI_API_KEY environment variable.
 """
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import openai
 import os
 
@@ -27,10 +27,10 @@ except ValueError as e:
     exit(1)
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",

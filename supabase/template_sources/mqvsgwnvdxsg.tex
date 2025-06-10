@@ -1,0 +1,72 @@
+\documentclass[a4paper,11pt]{scrreprt}                       % default is A4 paper style and 11pt font size
+
+
+%%%%%%%%%%%% version history %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%27.05.2021: updates about layout/plagiarism from Monica Patrascu, Bogdan Dumitrescu
+%25.04.2020:  modified the lst definitions (monospaced, gray); localized versions (romanian) for the \autoref command; updated the romanian.lbx file
+%26.03.2017:    corrections for the latex source-code: diacritics issues; corrected the glossaries and added listings packages; added fontspec (only works with xelatex/lualatex !!!)
+%2014:          put in latex version + some small additions - Florin Stoican
+%2013:          content from Dan Stefanoiu
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%% macros for various paths %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def \cls {./cls} 																					 % path to common latex files (change for your own relative/absolute path)
+\def \pics {./pics}      																		 % path to pics files (change for your own relative/absolute path)
+\def \chapters {./chapters}      														 % path to chapter files (change for your own relative/absolute path)
+\def \code {./code}      													        	 % path to source code files (change for your own relative/absolute path)
+
+% you don't have to use them but it's nicer this way
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% language={english/romanian} selects between the languages used in the manusript (changes, e.g., the name of the chapter)
+% type={bachelor/master/phd} selects between the type of manusript (changes, e.g., the titlepage make-up)
+\usepackage[language=romanian,type=bachelor]{\cls/standard} % introduces useful packages and commands(CHANGE ONLY IF YOU KNOW WHAT YOU'RE DOING)
+\addbibresource{\cls/bib.bib}																% bib resource (using biblatex package, for complex stuff use the biber backend instead of bibtex
+\include{\cls/gls}        																	% put here all your glossary terms; only the ones actually used will appear in the glossary list of the manuscript
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%% frontmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{roman}																				% default numbering for the frontmatter is roman
+
+\title{Titlu lucrare de diplomă}					    % title of your manuscript
+\author{nume student}																				% author name
+\advisor{nume coordonator}																			    % advisor name
+
+\maketitle
+
+% show table of contents, figures, tables and algorithms
+
+\tableofcontents 
+\printnoidxglossaries																				% \printglossaries works only if the makeindex has the correct arguments
+\listoffigures 
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+\listofalgorithmes
+\addcontentsline{toc}{chapter}{\listalgorithmcfname}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%% mainmatter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}																			% default numbering for the mainmatter is arabic
+
+% here is the text of you manuscript; you can put it directly here but it is better to include files (the main file will be more compact)
+\input{\chapters/intro}
+\input{\chapters/diverse}
+\input{\chapters/main}
+\input{\chapters/notatii}
+
+%%%%%%%%%%%%%%%%%%%%%% back matter %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\appendixpage
+\addappheadtotoc
+\begin{appendices}																				  % from here onwards are the appendices
+\input{\chapters/surse}
+\end{appendices}
+
+\cleardoublepage
+
+\printbibliography[heading=bibintoc]
+\end{document}

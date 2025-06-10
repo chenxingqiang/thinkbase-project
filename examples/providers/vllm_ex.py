@@ -4,7 +4,7 @@ Make sure you have vLLM installed and a model running locally:
 pip install vllm
 vllm serve --model meta-llama/Llama-2-7b-chat-hf --port 8000
 """
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.integration import ELLIntegration
 import openai
 import os
 

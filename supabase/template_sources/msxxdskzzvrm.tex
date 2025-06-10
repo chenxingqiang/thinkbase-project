@@ -1,0 +1,200 @@
+%%%%%%%%%%%%
+%% This is the CWRU thesis template for PhD and Masters degree theses. The template file cwru_thesis.cls and this main.tex file follow the guidelines of the school of graduate studies found at https://case.edu/gradstudies/current-students/electronic-theses-and-dissertation-guidelines as of February 2023, with the inclusion of an additional List of Symbols if desired.
+%%
+%% This .tex file is for use with BibLaTeX.
+%%
+%% As of Spring 2023, the School of Graduate Studies requires some minimum accessibility requirements for all electronic theses. Accessibility is difficult to produce with LaTeX on the front end, but fortunately it is quite easy to meet the requirements on the back end using Adobe (not Adobe Reader). Simply download the PDF of your thesis and follow this guide: https://case.edu/gradstudies/sites/case.edu.gradstudies/files/2023-02/CWRU%20Thesis%20and%20Dissertation%20Accessiblity%20Guide_0.pdf
+%%%%%%%%%%%%
+
+\documentclass[12pt]{cwru_thesis}
+\usepackage[hyphens]{url}
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black, filecolor=black, urlcolor=black, citecolor=black}
+\urlstyle{same}
+\usepackage[acronym,toc]{glossaries}
+\usepackage[intoc]{nomencl}
+\renewcommand{\nomname}{List of Symbols}
+
+\usepackage{mathptmx}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amsmath, amsthm, amssymb}
+\usepackage{newtxtext,newtxmath}
+
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\Dif}{\mathrm{D}}
+\renewcommand{\vec}[1]{\ensuremath{\underline{#1}}}
+\newcommand{\grad}{\underline{\nabla}}
+\newcommand{\curl}{\underline{\nabla} \times}
+\newcommand{\lap}{\underline{\nabla}^2}
+\renewcommand{\div}{\underline{\nabla} \cdot}
+\newcommand{\paren}[1]{\left( {#1} \right)}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+% Must use biblatex to produce the Published Contents and Contributions, per-chapter bibliography (if desired), etc.
+\usepackage[
+    backend=biber,natbib,style=numeric-comp,maxbibnames=99
+]{biblatex}
+
+% Name of your .bib file(s)
+\addbibresource{example.bib}
+
+\makeglossaries
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Glossary entries
+\newglossaryentry{galaxy}
+{
+    name=galaxy,
+    description={A system of stars independent from all other systems}
+}
+\newglossaryentry{asteroid}
+{
+    name=asteroid,
+    description={A very small planet ranging from 1,000 km to less than one km in diameter. Asteroids are found commonly around other larger planets}
+}
+
+%Acronyms to include in the list of acronyms
+\newacronym{leo}{LEO}{Low Earth Orbit}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makenomenclature
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Nomenclature entries
+\nomenclature{\(\alpha\)}{Angle of attack (degrees)}
+\nomenclature{\(c\)}{Speed of light in a vacuum (m/s)}
+\nomenclature{\(\mathbb{R}\)}{Real numbers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\pagenumbering{roman}
+
+% Do remember to remove the square brackets!
+\title{[Thesis Title]} %Title of your thesis in title case
+\author{[Your Full Name]} %Your name
+
+\degreeaward{[Name of Degree]}                 % Degree to be awarded
+\department{[Department]}
+\university{Case Western Reserve University}    % Institution name  
+\unilogo{cwru_logo.eps}                                 % Institution logo
+\defendmonth{[Graduation Month, Year]}          % Graduation month and year
+\defenddate{[Date of Defense]}          % Date of thesis defense
+
+%Committee Member names. If you have a different number of committee members for your defense, you will need to edit lines 183-190 of cwru_thesis.cls accordingly.
+\committeeChair{[Chair Name]} %Committee Chair's name
+\committeeOne{[Committee Member \#1]} %Committee member #1's name
+\committeeTwo{[Committee Member \#2]} %Committee member #2's name
+\committeeThree{[Committee Member \#3]} %Committee member #3's name
+
+%%  If you'd like to add the CWRU logo from your title page, simply add the "[logo]" text to the maketitle command. Note that the School of Graduate Studies doesn't like this.
+%\maketitle[logo]
+\maketitle
+
+\begin{dedication} 	 
+   [Add a dedication page here. If you do not wish to add any to your thesis, you may simply remove this block of text from the document along with the begin and end statements.]
+\end{dedication}
+
+\begin{KeepFromToc}
+  \tableofcontents
+\end{KeepFromToc}
+\listoftables
+\listoffigures
+
+\begin{preface}
+    [You may provide a preface if you wish, it is entirely optional. If you do not wish to provide a preface, simply delete the entire preface block, including the begin and end statements.]
+\end{preface}
+
+\begin{acknowledgements}
+    [Add an acknowledgements page here. If you do not wish to add any to your thesis, you may simply remove this block of text from the document along with the begin and end statements.]
+\end{acknowledgements}
+
+%If you have acroynms you wish to define, include this line. If not, you may delete it. See https://www.overleaf.com/learn/latex/Glossaries#Acronyms for more information about how to use Acronyms.
+\printglossary[type=\acronymtype, title=List of Abbreviations]
+
+%If you have terms you wish to define in a glossary, include this line. If not, you may delete it. See https://www.overleaf.com/learn/latex/Glossaries for more information about how to use Glossaries
+\printglossary
+
+%If you have a nomenclature section for defining symbols, include this line. If not, you may delete it. See https://www.overleaf.com/learn/latex/Nomenclatures for more information about how to use Nomenclatures
+\printnomenclature
+
+\begin{abstract}
+   [Include the text of the abstract here. Dissertation abstracts must not exceed 350 words. Thesis abstracts should be limited to 150 words. There must be one overall abstract for the entire work, even if the ETD consists of separate articles. Individual abstracts can be included in addition to, but not instead of the main abstract.]
+\end{abstract}
+
+\mainmatter
+
+\setcounter{secnumdepth}{2}
+
+\chapter{Introduction} \label{chap:intro}
+Start off all chapters with \verb|chapter|. \verb|\extrachapter| will give you an unnumbered chapter that's added to the Table of Contents. Labeling is also good practice. That way you can reference sections and chapters from anywhere. For instance, I can reference Sec.~\ref{sec:exsection} from here.
+
+Here's an example of a citation \citep{GMP81}. Here's another \citep{PP98}. These will appear in the big bibliography at the end of the thesis.
+
+If you're new to \LaTeX{} and would like to begin by learning the basics, please see our free online course available at:\\ \url{https://www.overleaf.com/latex/learn/free-online-introduction-to-latex-part-1} \index{LaTeX@\LaTeX}
+
+You can define terms and/or symbols in a glossary \index{glossary} as you talk about key terms in your thesis. So what's a \gls{galaxy}? These can also include acronyms, such as \acrlong{leo}, which is abbreviated as \acrshort{leo}. You should always define acronyms at the point of first use in the text, in addition to including them in the glossary.
+
+
+\section{This is a Section} \label{sec:exsection}
+\lipsum[1-2]
+
+Check this out! I can reference a figure number in the text of the document by referring to Fig.~\ref{fig:logo}.
+
+\begin{figure}[hbt!]
+    \centering
+    \includegraphics[width=.5\textwidth]{cwru_logo.eps}
+    \caption{This is a figure. \label{fig:logo}}
+\end{figure}
+
+\subsection{This is a Subsection} \label{subsec:exsubsec}
+
+\begin{table}[hbt!]
+\centering
+\begin{tabular}{ll}
+\hline
+Area & Count\\
+\hline
+North & 100\\
+South & 200\\
+East & 80\\
+West & 140\\
+\hline
+\end{tabular}
+\caption{This is a table. \label{tab:sample}}
+\end{table}
+
+\lipsum[3] 
+
+I can add another glossary entry wherever I like, and I can make it capitalized by using the macro command with a capital letter like this: \Gls{asteroid}. The quadratic formula is given in Eq.~\eqref{eq:quadratic}.
+\begin{equation}
+    x=\frac{-B \pm \sqrt{B^2 - 4AC}}{2A}
+    \label{eq:quadratic}
+\end{equation}
+
+\lipsum[4-5] 
+
+\section{This is Another Section}
+\lipsum[6-7] 
+
+\chapter{This is the Second Chapter}
+\lipsum[8-9]
+
+
+\chapter{This is the Third Chapter}
+See? I can reference the first chapter from all the way down here. I think the first chapter was Chapter~\ref{chap:intro}.
+\chapter{This is the Fourth Chapter}
+\chapter{This is the Fifth Chapter}
+\chapter{This is the Sixth Chapter}
+\chapter{This is the Seventh Chapter}
+\chapter{This is the Eighth Chapter}
+
+
+%If you have appendices to your thesis, place them here
+\appendix
+
+\chapter{Questionnaire}
+
+\printbibliography[heading=bibintoc]
+
+\end{document}

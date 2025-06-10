@@ -1,0 +1,75 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=2cm,a4paper]{geometry}
+\usepackage{parskip}
+
+\title{Getting psfrag to work in pdflatex }
+
+\usepackage[T1]{fontenc}
+\usepackage{ebgaramond}
+\usepackage{newtxmath}
+
+\usepackage{graphicx}
+\usepackage[process=all]{pstool}
+\usepackage{hyperref}
+
+%%%%% 
+%% NOTE IF LOADING hyperref PACKAGE
+%% These lines are required ≥TL2020 due to 
+%% incompatibility between hyperref and preview
+%% (See https://github.com/latex3/hyperref/issues/166#issuecomment-760157370)
+\makeatletter
+\providecommand\HyPL@Entry[1]{}
+\AddToHook{env/document/begin}{%
+\@ifpackageloaded{preview}{
+\ifPreview
+ \let\Hy@FirstPageHook\relax
+ \let\Hy@EveryPageAnchor\relax
+\fi}{}}
+\makeatother
+\begin{document}
+
+You will still need a \texttt{.eps} image file; there is no \texttt{pdffrag} package that works for \texttt{.pdf} files. 
+
+If you want to use the \texttt{[process=all]} option for \texttt{pstool}, add a custom \texttt{latexmkrc} file that contains this line:
+
+\begin{verbatim}
+$hash_calc_ignore_pattern{'pdf'} = '^/(CreationDate|ModDate|ID) ';
+\end{verbatim}
+
+to avoid infinite compiling leading to a timeout on Overleaf.
+
+Alternatively, you may want to work out all the \verb|\psfrag| commands in a separate project with \verb|\usepackage{psfrag}| and the LaTeX+dvipdf engine (see \url{https://www.overleaf.com/latex/examples/psfrag-example/tggxhgzwrzhn}), and once you've finalised that, copy the code into your main project (using pdflatex) and replace with \verb|\usepackage{pstool}| and \verb|\psfragfig| instead.
+
+\begin{figure}[h!]
+\centering
+
+\psfragfig[width=0.6\linewidth]{example}{%
+  \psfrag{p1}{$p_1$}
+  \psfrag{p2}{$p_2$}
+  \psfrag{p3}{$p_3$}
+  \psfrag{\\tex[B][B]\{Plot of \$\\sin(t)\$ and \$\\cos(t)\$\}}{Plot of $\sin(t)$ and $\cos(t)$}
+  \psfrag{\\tex[t][t]\{\$t\$\}}{$t$}
+  \psfrag{\\tex[B][B]\{\$\\sin(t)\$, \$\\cos(t)\$\}}{$\sin(t)$, $\cos(t)$}
+  \psfrag{-1}{-1}
+  \psfrag{-0.2}{-0.2}
+  \psfrag{-0.4}{-0.4}
+  \psfrag{-0.6}{-0.6}
+  \psfrag{-0.8}{-0.8}
+  \psfrag{0}{0}
+  \psfrag{0.2}{0.2}
+  \psfrag{0.4}{0.4}
+  \psfrag{0.6}{0.6}
+  \psfrag{0.8}{0.8}
+  \psfrag{1}{1}
+  \psfrag{2}{2}
+  \psfrag{4}{4}
+  \psfrag{6}{6}
+  \psfrag{8}{8}
+  \psfrag{10}{10}
+}
+% \includegraphics[width=.6\linewidth]{example}
+\caption{The same EPS image with psfragfig}
+\end{figure}
+
+
+\end{document}

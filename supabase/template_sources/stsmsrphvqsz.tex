@@ -1,0 +1,254 @@
+%% abtex2-modelo-trabalho-academico.tex, v-1.9.7 laurocesar
+%% Copyright 2012-2018 by abnTeX2 group at http://www.abntex.net.br/ 
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%% 
+%% The Current Maintainer of this work is the abnTeX2 team, led
+%% by Lauro César Araujo. Further information are available on 
+%% http://www.abntex.net.br/
+%%
+%% This work consists of the files abntex2-modelo-trabalho-academico.tex,
+%% abntex2-modelo-include-comandos and abntex2-modelo-references.bib
+%%
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% abnTeX2: Modelo de Trabalho Academico (tese de doutorado, dissertacao de
+% mestrado e trabalhos monograficos em geral) em conformidade com 
+% ABNT NBR 14724:2011: Informacao e documentacao - Trabalhos academicos -
+% Apresentacao
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\documentclass[
+	% -- opções da classe memoir --
+	12pt,						% tamanho da fonte
+	openright,					% capítulos começam em pág ímpar (insere página vazia caso preciso)
+	oneside,					% para impressão em recto e verso. Oposto a oneside
+	a4paper,					% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	%chapter=TITLE,				% títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,				% títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,			% títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE,		% títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,					% idioma adicional para hifenização
+	french,						% idioma adicional para hifenização
+	spanish,					% idioma adicional para hifenização
+	brazil						% o último idioma é o principal do documento
+	]{abntex2}
+
+
+\usepackage{lmodern}			% Usa a fonte Latin Modern			
+\usepackage[T1]{fontenc}		% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}		% Indenta o primeiro parágrafo de cada seção.
+\usepackage{color}				% Controle das cores
+\usepackage{graphicx}			% Inclusão de gráficos
+\usepackage{microtype} 			% para melhorias de justificação
+\usepackage{lipsum}				% para geração de dummy text
+\usepackage[brazilian,hyperpageref]{backref}	 % Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
+\usepackage{multirow}
+
+\usepackage{pdfpages}
+\usepackage{forest}
+\usepackage{fontawesome}
+
+\definecolor{thered}{rgb}{0.65,0.04,0.07}
+\definecolor{thegreen}{rgb}{0.06,0.44,0.08}
+\definecolor{thegrey}{gray}{0.5}
+\definecolor{theshade}{rgb}{1,1,0.97}
+\definecolor{theframe}{gray}{0.6}
+\definecolor{blue}{RGB}{41,5,195} 
+
+\usepackage{listings}
+\lstset{
+	basicstyle=\small, % print whole listing small
+	keywordstyle=\color{blue}\bfseries, %\underbar,% underlined bold black keywords
+	% keywords=[0]{uint32_t, exit},
+	% keywordstyle=[0]\color{thered},
+	identifierstyle=, % nothing happens
+	commentstyle=\color{gray!85}, % white comments
+	stringstyle=\color{thered}\ttfamily, % typewriter type for strings
+	showstringspaces=false, % no special string spaces
+	numbers=left,
+	numberstyle=\tiny,
+	stepnumber=2
+}
+
+\definecolor{folderbg}{RGB}{124,166,198}
+\definecolor{folderborder}{RGB}{110,144,169}
+
+\def\Size{4pt}
+\tikzset{
+  folder/.pic={
+    \filldraw[draw=folderborder,top color=folderbg!50,bottom color=folderbg]
+      (-1.05*\Size,0.2\Size+5pt) rectangle ++ (.75*\Size,-0.2\Size-5pt);  
+    \filldraw[draw=folderborder,top color=folderbg!50,bottom color=folderbg]
+      (-1.15*\Size,-\Size) rectangle (1.15*\Size,\Size);
+  }
+}
+
+
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na (s) página (s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase#1
+		Nenhuma citação no texto.%
+	\or%
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+
+
+
+
+%-------------------------------------------------------------------------------------
+%		DADOS PESSOAIS
+%		Informações básicas sobre os trabalho e os autores 
+%-------------------------------------------------------------------------------------
+\titulo{Título da Dissertação}
+\autor{Nome do Autor}
+\local{Salvador}
+\data{Dezembro 2022}
+\orientador{Prof. Dr. Nome do Orientador}
+\coorientador{Prof. Dr. Nome do Coorientador}
+\tipotrabalho{Dissertação (Mestrado)} 
+\preambulo{Dissertação de Mestrado apresentada à Comissão Acadêmica Institucional do PROFMAT-UFBA como requisito parcial para obtenção do título de Mestre em Matemática.}
+
+\instituicao{%
+  Universidade Federal da Bahia - UFBA
+  \par
+  Instituto de Matemática - IM
+  \par
+  Sociedade Brasileira de Matemática - SBM
+}
+
+%	Configurações de aparência do PDF final
+\input{config_pdf}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%																					 %
+% 							 Início do documento								     %
+%																					 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+%-------------------------------------------------------------------------------------
+% 		ELEMENTOS PRÉ-TEXTUAIS
+%		Insire elementos pré textuais, ficha catalográfica 
+%-------------------------------------------------------------------------------------
+% \pretextual
+
+\imprimircapa
+
+\imprimirfolhaderosto*	% (o * indica que haverá a ficha bibliográfica)
+
+
+\include{pre-textuais/ficha_catalografica}
+\include{pre-textuais/errata}
+\include{pre-textuais/folha_aprovacao}
+\include{pre-textuais/dedicatoria}
+\include{pre-textuais/agradecimentos}
+\include{pre-textuais/epigrafe}
+\include{pre-textuais/resumo}
+\include{pre-textuais/abstract}
+%\include{pre-textuais/listas_1}
+%\include{pre-textuais/listas_siglas}
+%\include{pre-textuais/listas_simbolos}
+
+% inserir o sumario
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage%
+
+%-------------------------------------------------------------------------------------
+% 		ELEMENTOS TEXTUAIS
+%		Informações relevantes ao trabalho, capítulos e suas respectivas seções.
+%-------------------------------------------------------------------------------------
+\textual%
+
+\include{capitulos/capitulo_introducao}
+
+% PARTE
+% ----------------------------------------------------------
+\part{Preparação da pesquisa}
+\include{capitulos/capitulo_01}
+
+% PARTE
+% ----------------------------------------------------------                                  
+\part{Referenciais teóricos}
+\include{capitulos/capitulo_02}
+
+% PARTE
+% ----------------------------------------------------------  
+\part{Resultados}
+\include{capitulos/capitulo_03}
+\include{capitulos/capitulo_04}
+
+% ----------------------------------------------------------
+% Finaliza a parte no bookmark do PDF
+% para que se inicie o bookmark na raiz
+% e adiciona espaço de parte no Sumário
+% ----------------------------------------------------------
+\phantompart%
+
+% Conclusão
+% ---
+\include{capitulos/capitulo_05}
+
+%-------------------------------------------------------------------------------------
+%		CONTEÚDO PÓS-TEXTUAL
+%		Parte do documento que aparece após o capítulo de conclusão, incluindo 
+%		bibliografia e anexos.
+%-------------------------------------------------------------------------------------
+\postextual\bibliography{references} 
+
+%\glossary
+
+% Apendices
+%-------------------------------
+% \begin{apendicesenv}
+% \partapendices
+% \include{apendices/apendiceA}
+% \end{apendicesenv}
+
+% Anexos
+%-------------------------------
+% \begin{anexosenv}
+% \partanexos
+% \include{anexos/anexoA}
+% \include{anexos/anexoB}
+% \include{anexos/anexoC}
+% \end{anexosenv}
+
+% Indice remissivo
+%-------------------------------
+% \phantompart
+% \printindex
+
+\end{document}

@@ -1,0 +1,226 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% %**********************************************************************
+% Version 2024-03-05 [580c2b3d]
+% Base layout + including standard packages
+%**********************************************************************
+\documentclass[a4paper,12pt]{report}
+
+% allows direct input of special chars
+\usepackage[utf8]{inputenc}  
+
+%**********************************************************************
+% YOUR SETTINGS - START
+%**********************************************************************
+
+% About your study degree programme
+\def \study{ITM} % possible options: 
+          % ITM 
+          % SWD
+          % MSD
+          % IRM
+          % IMS
+
+
+% More about you and your thesis:
+\def \title{<Title of Your Thesis>}
+\def \subtitle{<The subtitle.>}
+\def \yourName{<your name>}
+\def \yourIdentifier{<1700000017>} % Used for Seminar Work / Projektarbeit ONLY
+\def \yourPlace{<place>}
+\def \submissionDate{<date>}  % month year. e.g. June 2017
+\def \yourAdvisor{<firstname lastname>}  
+
+
+\def \thisDocumentIsA{Thesis} % possible options:
+                    % Thesis  .... for Master's Thesis   / Masterarbeit
+                    % Thesis  .... for Bachelor's Thesis / Bachelorarbeit
+                    % Seminar .... for Seminar Work      / Seminararbeit
+                    % Project .... for Project Work      / Projektarbeit
+
+% ITM/SWD/IRM: you could possibly write in German.
+\def \yourLanguage{english} % possible options:
+                 % english
+                 % german
+
+%**********************************************************************
+% YOUR SETTINGS - END
+%**********************************************************************
+
+
+
+% LaTeX preamble = include a lot of packages, configure latex settings
+\input{chapters/00_preamble} 
+
+% Add one (or multiple) file(s) with bibliography entries:
+%   here "thesis.bib" i.e. pdflatex sets \jobname to 'thesis'
+%   the name specified when running pdflatex
+%   \addbibresource{thesis.bib}
+\addbibresource{references.bib}
+
+
+
+
+
+\begin{document}
+%**********************************************************************
+% Structure of thesis: inclusion of chapters
+%**********************************************************************
+\ifthenelse{\equal{\yourLanguage}{german}}{
+  \selectlanguage{german}
+}{ % else: default language = english
+  \selectlanguage{english}
+}
+
+
+
+
+\ifthenelse{\equal{\thisDocumentIsA}{Thesis}}{  
+  % a title page is included for BA/MA Thesis only
+  \include{chapters/01_titlepage}
+}{ 
+  \ifthenelse{\equal{\thisDocumentIsA}{Seminar}}{ 
+    % Seminar Work (se)
+    \include{chapters/01_titlepage_se}
+  }{
+    % Project Work (pw)
+    \include{chapters/01_titlepage_pw}
+  }
+}
+
+
+% Anmerkung: 
+%    NUR gesperrte Arbeiten werden gedruckt und benötigen eine 
+%    Eidesstattliche Erklärung / Signed Declaration
+%\include{chapters/02_declaration} 
+
+
+\include{chapters/03_abstract}
+
+% optional:
+%\include{chapters/04_acknowledge} 
+
+\chapterend
+
+\pagenumbering{roman}  	% roman page numbers for title pages
+
+
+\tableofcontents            % TOC = Table-of-Contents
+
+% OPTIONALLY, adding single entries (LoF, LoT, LoL) to TOC: 
+
+% Adding entry LoF "List of Figures / Abbildungsverzeichnis" to TOC
+\clearpage
+\addcontentsline{toc}{chapter}{\listfigurename} 
+\listoffigures
+
+% Adding entry LoT "List of Tables / Tabellenverzeichnis" to TOC
+\clearpage
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables 
+
+% Adding entry LoL "List of Code Snippets" to TOC
+% \clearpage
+% \addcontentsline{toc}{chapter}{List of Code Snippets}
+% \lstlistoflistings
+
+\chapterend
+
+
+
+
+
+\pagenumbering{arabic}  % ... for ordinary chapters
+\onehalfspacing
+
+
+
+% remove this, when starting to write your thesis:
+\include{chapters/09_latex_info}     % LaTeX examples  
+
+
+
+% Add chapters as required. For example 
+
+\include{chapters/10_introduction}   % framing the problem 
+                                     % research questions
+                                     % hypothesis
+                                     % method
+
+\include{chapters/20_related}        % research related (to your!) work 
+%\include{chapters/30_background}    % if necessary, explain possilby unknown terms or technologies used
+\include{chapters/40_concept}        % concept/design of solution
+\include{chapters/60_implementation} % implementation, prototype
+\include{chapters/80_evaluation}     % evaluation of prototype and reflection of the results
+\include{chapters/90_conclusion}     % summary, your conclusions/outlook
+
+\appendix
+\include{chapters/99_acronyms}       % optional: abbreviations
+
+
+
+
+%**********************************************************************
+% Bibliography: 
+%**********************************************************************
+
+
+\TODO{Finally, check the bibliography, because readers must be able to trace back and verify each and every source. Are you sure, that everyone can find the given resources with the information you supplied? Besides author(s), title and year, for books you need the publisher information and the ISBN, for IEEE/ACM research papers add the conference/journal title, location and the DOI.}
+
+
+
+
+%For disabling "Further reading" section, remove \nocite: 
+\nocite{*}
+
+% Note 1: With heading=bibintoc we list the biblio in table-of-contents 
+% Note 2: Special case for German: 
+%  rename "Literatur" to "Literaturverzeichnis" 
+\ifthenelse{\equal{\yourLanguage}{german}}{
+  % renaming "Literatur"
+  % cited entries
+  \printbibliography[title={Literaturverzeichnis},heading=bibintoc, category=cited]
+  % Optionally, (if /nocite{*} enabled) we show non-cited entries
+  \printbibliography[title={Weiterführende Literatur},notcategory=cited]
+
+}{  
+  % default English title "Bibliography"
+  % cited entries
+  \printbibliography[heading=bibintoc, category=cited]
+  % Optionally, (if /nocite{*} enabled) we show non-cited entries
+  \printbibliography[title={Further Reading},notcategory=cited]
+}
+
+\end{document}
+
+
+%**********************************************************************
+%**********************************************************************
+
+
+\end{document}

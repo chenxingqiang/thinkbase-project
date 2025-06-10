@@ -1,0 +1,107 @@
+% 	This template is done by Maram Alzahrani.
+
+% 	You can edit this template and add or remove commands to suit your needs as you prepare your thesis.
+
+% usage instructions:
+% To compile locally, please use - PdfLatex.
+% To print bibilography list locally, please check build in biber
+% removing any packages may lead to get error, be cautious.
+%  Since the babel package has added, do not insert the polyglossia package since this will cause an issue.
+%  subcaptions package has added, avoid insert  subfig package.
+%  In this tempelet the apa style has been used, you can substitute it with another style, such IEEE, by changing the apa style in the bibtex package to IEEE.
+%===============================================================================
+\documentclass[a4paper,12pt]{report}
+%===========SET DOCUMENT===============
+\input{packages/Packages} % include essiatial package [you can add further packages, !Do not remove any current package!]
+
+\input{profile} % this file include the information of user such name, title of thesis and names of supervisors...[add your own information]
+
+\input{symbols} % include list of symbols and abberviations [add your own list]
+
+\addbibresource{ref.bib} %include entire used references, in format bibtex[add your own references inside the file, ! Do not remove file !]
+%=====================================
+
+
+\begin{document}
+%%%%%%%%%                        %%%%%%%%%%%%%%%
+%--------- insert cover page -------
+\input{TitleCover}
+\pagenumbering{roman} % start numbering  below pages with roman style
+
+%--------- إضافة صفحة البسملة (ملف بدي اف) -------
+\includepdf[]{figures/P.pdf}
+%--------- insert approval page -------
+\addtocontents{toc}{\protect\thispagestyle{empty}{Examination Committee Approval}} % Add the approval page to the table of contents
+\include{frontmatter/approval}
+\cleardoublepage
+%--------- insert dedication page -------
+\phantomsection
+\addcontentsline{toc}{section}{\bfseries Dedication} % Add the dedication page to the table of contents
+\include{frontmatter/dedication}
+\cleardoublepage
+
+%--------- insert Acknowledgement page ------
+\phantomsection
+\addcontentsline{toc}{section}{\bfseries Acknowledgement} % Add the Acknowledgement page to the table of contents
+\include{frontmatter/acknowledgement}
+\cleardoublepage
+%--------- insert Abstract page -------
+\addcontentsline{toc}{section}{\bfseries Abstract} % Add the Abstract page to the table of contents
+\include{frontmatter/Abstract}
+\cleardoublepage
+
+%%%%%%%%%                        %%%%%%%%%%%%%%%
+%------- insert table of contants ---------
+\phantomsection
+{\addcontentsline{toc}{section}{\bfseries Table of Contents}
+\tableofcontents}
+\cleardoublepage
+%------- insert list of tables/figures ---------
+% List of figures (if you have figures)
+\phantomsection
+{\addcontentsline{toc}{section}{\bfseries List of Figures} 
+    \listoffigures} % Add list of figures to the table of contents
+ \cleardoublepage
+ 
+ %----------------------------------
+ % List of tables (if you have tables)
+ \phantomsection
+ {\addcontentsline{toc}{section}{\bfseries List of Tables} 
+ \listoftables} % Add list of tables to the table of contents
+\cleardoublepage
+
+%------- insert list of symbols and abbreviations ---------
+% List of symbols
+\phantomsection
+\addcontentsline{toc}{section}{\bfseries List of Symbols}  % Add list of symbols to the table of contents
+    \printglossary[title= \titlecap{list of symbols}]
+% List of abbreviations (if you use acronyms)
+\phantomsection
+\addcontentsline{toc}{section}{\bfseries List of Abbreviations}  % Add list of abbreviations to the table of contents
+    \printglossary[type=\acronymtype, title= \titlecap{list of abbreviations}]
+ \cleardoublepage
+ %%%%%%%%%                        %%%%%%%%%%%%%%%
+%------- insert chapters files ---------
+\pagenumbering{arabic} % start numbering chapters pages with arabic style.
+%\setcounter{page}{0}  % reset numbering of page
+
+%%%   [you can add more chapters via \
+%%%     inclde{}/ or remove unseeary %%% chapters via delete or add before command %]
+\include{chapters/ch1/ch1cover}
+\include{chapters/ch2/ch2cover}
+\include{chapters/ch3/ch3cover}
+\include{chapters/ch4/ch4cover}
+\include{chapters/ch5/ch5cover}
+
+%%%%%%%%%                        %%%%%%%%%%%%%%%
+%------- insert list of references ---------
+\addcontentsline{toc}{chapter}{List of References} % Add list of references to the table of contents
+\addto{\captionsenglish}{\renewcommand{\bibname}{List of References}} % change heading of references into list of references [you can change into another heading]
+
+\printbibliography[title = List of References] % [you can change into another heading]
+%%%%%%%%%                        %%%%%%%%%%%%%%%
+%------- insert appendix files ---------
+  \addcontentsline{toc}{chapter}{Appendix}% Add Appendix to the table of contents
+  
+\include{Appendices/AppendixA} % return appedix chapter[you can add more appendix/ or remove if you don need]
+\end{document}

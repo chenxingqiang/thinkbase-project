@@ -1,0 +1,130 @@
+% Template for University of Warwick Thesis
+% Created by Samuel A. Maloney in 2023/2024
+% Inspired by template from M Hadley and S Royle in Overleaf Gallery
+
+% Check the "Presentation of thesis" information here:
+% https://warwick.ac.uk/services/dc/submission/gtehdr/
+
+% This template assumes a single volume thesis.
+
+\RequirePackage[l2tabu,orthodox]{nag}
+% Two-sided printing is accepted for the final hard bound version for the
+% Library as of the time of this writing (March, 2024)
+% \documentclass[11pt,a4paper,twoside,openright,extrafontsizes]{memoir}
+\documentclass[11pt,a4paper,oneside,extrafontsizes]{memoir}
+% \usepackage{bm} % https://tex.stackexchange.com/questions/3238/bm-package-versus-boldsymbol
+% The only package option is the margin, with a default of 4cm on each side
+\usepackage[margin=4cm]{uwthesis}
+% I've changed to using biblatex instead of natbib for more flexibility
+% https://www.overleaf.com/learn/latex/Bibliography_management_with_biblatex
+\usepackage[backend=biber,style=nature,doi=true]{biblatex}
+% Unfortunately TeXLive 2023 causes nameref to warn about \label being changed, which memoir does until summer 2023, after TeXLive 2023 was released
+\usepackage{silence} % for WarningFilter
+\WarningFilter{nameref}{The definition of \label has changed!}
+\usepackage{multirow} % for table cells spanning multiple rows
+% \usepackage{varioref}
+\usepackage[hidelinks]{hyperref}   % This should generally be loaded 2nd to last
+\usepackage[nameinlink,noabbrev]{cleveref}  % This should almost certainly be loaded last
+
+% Add .bib file
+\addbibresource{references.bib}
+
+% These macros adjust/fix bibliography entries.
+% I've left them in case they are helpful, but feel free to delete or modify
+\DeclareSourcemap{
+    \maps[datatype=bibtex]{
+% if doi is present, clear issn, isbn, and url fields so they are not printed
+        \map{
+            \step[fieldsource=doi,final]
+            \step[fieldset=issn,null]
+            \step[fieldset=isbn,null]
+            \step[fieldset=url,null]
+        }
+% fix issue with Mendeley import improperly escaping underscores in doi field
+        \map{
+            \step[fieldsource=doi, match=\regexp{\{\\_\}}, replace=\regexp{_}]
+        }
+    }
+}
+
+% These relax the line-breaking rules for urls in the bibliography to try and
+% prevent lines extending past the right margin (overfull hbox warnings).
+% Try uncommenting more/different lines if this is an issue for you. 
+\setcounter{biburlnumpenalty}{9000} % URL breaking after numbers
+% \setcounter{biburllcpenalty}{7000} % URL breaking lowercase letters
+% \setcounter{biburlucpenalty}{8000} % URL breaking uppercase letters
+
+% This command shifts the margins for the document to provide a 4cm inside
+% margin to accomodate physical binding. The default uses equal margins, which
+% is best for PDF submission, but shifted is likely better for bound printing.
+% \shiftmarginsforbinding
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Required Details for the title page and library form
+
+% The full title of the thesis and the subtitle, if any
+\title{Catchy Title for Your Thesis: Perhaps With a Descriptive Subtitle}
+% The full name of the author, followed, if desired, by any qualifications and distinctions
+\author{John Everyman Smith}
+% The month and year of submission (or resubmission)
+\date{March 2024}
+% The full name of the qualification for which the thesis is submitted (e.g. Doctor of Philosophy in Physics)
+\qualification{Doctor of Philosophy in ...}
+% The name of the department, school or centre in which the research was conducted (e.g. Department of Physics)
+\department{Department of ...}
+% Your university number, used on Library Declaration and Deposit Agreement form
+\studentnumber{XXXXXXX}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Optional selections for the Library Declaration and Deposit Agreement form
+
+% Uncomment the following line to refuse to allow the thesis to be photocopied.
+% Agreement to allow photocopying is the default.
+% \photocopydonotagree
+
+% Uncomment one of the following lines to change the embargo conditions for
+% public availability of your thesis.
+% The first option (both immediately available) is the default
+% \renewcommand*{\availabilitystatement}{Both the hard and digital copy thesis can be made publicly available immediately.}
+% \renewcommand*{\availabilitystatement}{The hard copy thesis can be made publicly available immediately and the digital copy thesis can be made publicly available after a period of two years (\emph{should you subsequently wish to reduce the embargo period please inform the Library}).}
+% \renewcommand*{\availabilitystatement}{Both the hard and digital copy thesis can be made publicly available after a period of two years (\emph{should you subsequently wish to reduce the embargo period please inform the Library}).}
+% Don't forget to modify your specific embargo period if using this option
+% \renewcommand*{\availabilitystatement}{Both the hard copy and digital copy thesis can be made publicly available after \rule{1in}{0.4pt} (insert time period in excess of two years). \textbf{This option requires the prior approval of the Chair of the Board of Graduate Studies (see 2.3 above)}.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The abbreviation definitions have to come before the \begin{document}
+\input{abbreviations}
+
+\begin{document}
+
+% Generate the Library Declaration and Deposit Agreement form.
+% N.B. This is before the \frontmatter because it is not part of the actual
+% thesis and so should not be included in the page numbering.
+% \libraryform
+
+% Separating the contents into different files is just for organisation:
+% the \input macro simply inserts the contents of the indicated file.
+\input{frontmatter}
+
+% This sets the page numbers to be printed in arabic numerals, restarts
+% the page numbering from 1, and begins numbering of sectional divisions.
+\mainmatter
+
+% This is where the main content of your thesis should be input.
+% One file per chapter is likely the most sensible unit for organisation.
+\input{introduction}
+
+% This grouping and its contained commands help with line-breaking and
+% justification in the bibliography, which is often problematic.
+\begingroup
+\setlength{\emergencystretch}{2em}
+\hbadness 10000\relax
+\printbibliography % this actually prints the bibliography
+\endgroup
+
+% Uncomment the following lines to begin adding appendices.
+% \appendix
+% \chapter{Title of first appendix}
+% This is an appendix.
+
+\end{document}

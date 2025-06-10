@@ -1,0 +1,305 @@
+% -------------------------------------------------------
+% ~~~~~~~~~~~~~~~~~~~   PREAMBLE   ~~~~~~~~~~~~~~~~~~~~~~
+% -------------------------------------------------------
+
+% double sided, necessary for page numbering and margins
+\documentclass[twoside, 10pt]{report}
+
+% -------------
+
+% the usual
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % maths
+
+% -------------
+
+% bibliography
+\usepackage{biblatex}
+\addbibresource{references.bib}
+
+% -------------
+
+% set margins
+\usepackage[papersize={169mm,239mm},top={15mm},left={18mm},right={36mm},bottom={30mm}, includehead, headheight={10pt},headsep={12.5mm}]{geometry}
+% 1 pt is roughly 0.35 mm
+
+% -------------
+
+% for adjusting the headers
+\usepackage{fancyhdr} 
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{ %
+  \renewcommand{\headrulewidth}{0pt} % remove lines as well
+}
+
+% -------------
+
+% refer by names of labels (might come in handy)
+\usepackage{nameref}
+% use this for referring between external documents (such as chapters)
+% this doesn't work well in overleaf as it 
+\usepackage{xr-hyper}
+\usepackage{hyperref}
+
+\makeatletter
+\newcommand*{\addFileDependency}[1]{% argument=file name and extension
+  \typeout{(#1)}
+  \@addtofilelist{#1}
+  \IfFileExists{#1}{}{\typeout{No file #1.}}
+}
+\makeatother
+
+\newcommand*{\myexternaldocument}[1]{%
+    \externaldocument{#1}%
+    \addFileDependency{#1.tex}%
+    \addFileDependency{#1.aux}%
+}
+
+% -------------
+
+% change fonts
+\usepackage[T1]{fontenc}
+% close to Georgia font
+% rmdefault sets this as the default serif (roman) font
+\usepackage[rmdefault, osf]{XCharter}
+% close to Figtree font
+% sfdefault sets this as the default sans serif font
+\usepackage{tgheros}
+
+% -------------
+
+% just the good ol lorem ipsum
+\usepackage{lipsum}
+
+% -------------
+
+% set new sans serif font as the title font for the sections, also set section title to bold size 12 etc
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\fontsize{14}{17}\bfseries}{}{0pt}{}
+\titlespacing*{\chapter}
+  {0pt}{10pt}{16pt}
+\titleformat*{\section}{\sffamily\fontsize{12}{14}\bfseries}
+\titleformat*{\subsection}{\normalsize\sffamily\bfseries}
+\titleformat*{\subsubsection}{\normalsize\sffamily}
+\titleformat*{\paragraph}{\normalsize\sffamily\itshape}
+
+% -------------
+
+% change font of list of tables, figures and table of contents
+\usepackage{tocloft}
+
+\renewcommand\cftchapfont{\normalfont\sffamily\fontsize{14}{17}\bfseries}
+\renewcommand\cftsecfont{\sffamily\fontsize{12}{14}\bfseries}
+\renewcommand\cftsubsecfont{\sffamily\fontsize{10}{13}\bfseries}
+\renewcommand\cftsubsubsecfont{\sffamily\fontsize{10}{13}}
+
+\renewcommand\cftchappagefont{\normalfont\sffamily\fontsize{14}{17}\bfseries}
+\renewcommand\cftsecpagefont{\sffamily\fontsize{12}{14}\bfseries}
+\renewcommand\cftsubsecpagefont{\sffamily\fontsize{10}{12}\bfseries}
+\renewcommand\cftsubsubsecpagefont{\sffamily\fontsize{10}{12}}
+
+\renewcommand\cfttoctitlefont{\normalfont\sffamily\fontsize{16}{19}\bfseries}
+
+\renewcommand\cftlottitlefont{\normalfont\sffamily\fontsize{16}{19}\bfseries}
+\renewcommand\cfttabpagefont{\normalfont\sffamily}
+\renewcommand\cfttabfont{\normalfont\sffamily}
+
+\renewcommand\cftloftitlefont{\normalfont\sffamily\fontsize{16}{19}\bfseries}
+\renewcommand\cftfigfont{\normalfont\sffamily}
+\renewcommand\cftfigpagefont{\normalfont\sffamily}
+
+% add dots for chapters also in toc (in the guide it is lines, but I like dots)
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}} % for chapters
+
+% -------------
+
+% adjust all figure and table captions
+% there was no clear guide on the indentation so I guessed
+\usepackage{caption}
+\captionsetup{font = {sf,footnotesize}, indention = 40pt} % why have they misspelled indentation...?
+
+% -------------
+
+% set higher depth in section numbering
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{4}
+
+% -------------
+
+% to paste urls (optional of course)
+\usepackage{url}
+
+% -------------
+
+% change bibliography heading size
+\defbibheading{bibliography}[\bibname]{%
+\section*{#1}%
+\markboth{#1}{#1}}
+
+% -------------
+
+% renew command so that chapter titles can be in headers
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+
+% -------------
+
+% change the number of the footnote to not be superscripted
+% when you make the footnote you have make it superscripted again in the text body
+\makeatletter
+\renewcommand{\@makefnmark}{\makebox{\@thefnmark}}
+\makeatother
+
+% -------------
+
+% footnotes in footer according to graphical profile...
+\newcommand{\fancyfootnotetext}[2]{%
+  \fancypagestyle{dingens}{%
+    \fancyfoot[L]{\fontsize{7}{10}\sffamily{\noindent\makebox[\linewidth]{\rule{\textwidth}{0.4pt}}\newline\footnotemark[#1] ~~#2}}}
+  \thispagestyle{dingens}%
+}
+
+% -------------
+
+% change indentation length for new paragraphs etc
+\setlength\parindent{4mm}
+
+% -------------
+
+% -------------------------------------------------------
+% ~~~~~~~~~~~~~~~~~~~   DOCUMENT   ~~~~~~~~~~~~~~~~~~~~~~
+% -------------------------------------------------------
+
+% put your external documents here so that you can cross-reference between them
+\myexternaldocument{chapter1}
+\myexternaldocument{chapter2}
+
+
+% finally the document begins ...
+\begin{document}
+
+
+% -------------
+
+% clear header and footer fields
+\fancyhead{}
+\fancyfoot[]{}
+
+% -------------
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% abstract extracted from abstract.tex file
+\include{abstract}
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% preface from preface.tex
+\include{preface}
+
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% list of your papers from paperlist.tex
+\include{paperlist}
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% table of contents
+\tableofcontents
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% list of tables (i have included these although they are not in the KTH guide)
+\listoftables
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% list of figures
+\listoffigures
+
+% -------------
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% start including chapters from separate .tex files (if you want to)
+\include{chapter1}
+
+\include{chapter2}
+
+% make sure that the final part (future work, references etc) start on the right-hand page, like they do in this template.
+
+% -------------
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+\include{futurework}
+
+% -------------
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% bibliography
+\renewcommand{\bibfont}{\fontsize{8}{10}\sffamily}
+\renewcommand\bibname{References} % put whatever you like here
+\printbibliography
+\addcontentsline{toc}{chapter}{References}
+
+% -------------
+
+% blank page
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+% clear header and footer so that it doesn't say "References"
+\fancyhead{}
+\fancyfoot[]{}
+
+% personally, I didn't like that the references were after the papers in the graphical profile
+% therefore, I'm putting the toc line here, and then I suppose the papers come in later
+\chapter*{This is where the papers and their summaries will be.}
+That is up to the printing service.
+\addcontentsline{toc}{chapter}{Summary of appended papers}
+
+
+\end{document}

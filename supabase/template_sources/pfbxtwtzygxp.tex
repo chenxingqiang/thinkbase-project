@@ -1,0 +1,100 @@
+% Preamble
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+    \geometry{margin=1.75in, top=1.5in, bottom=1.5in}
+    \setlength{\parindent}{1em}
+    \setlength{\parskip}{0.5em}
+\usepackage{graphicx}
+\usepackage{subfiles}
+\usepackage[sectionbib]{natbib}
+\usepackage[linktoc=all,
+    colorlinks=true, 
+    linkcolor=black, 
+    citecolor=black]
+    {hyperref}
+\usepackage{doi}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+    \renewcommand{\sectionmark}[1]{\markright{\thesection~~~#1}}
+    \renewcommand{\chaptermark}[1]{\markboth{\if@mainmatter \fi#1}{}}
+\usepackage[acronym,nonumberlist,nogroupskip,nopostdot,toc]{glossaries}
+    \loadglsentries{Sections/Frontmatter/Acronyms}
+    \makeglossaries
+\usepackage{setspace}
+\usepackage{emptypage}
+\usepackage[titletoc]{appendix}
+
+% Start
+\begin{document}
+\frontmatter
+
+% Style
+\pagestyle{fancy}
+\fancyhead[RO,LE]{\thepage}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyfoot{} 
+
+% Frontmatter
+\subfile{Sections/Frontmatter/Title Page}
+\subfile{Sections/Frontmatter/Dedication}
+\subfile{Sections/Frontmatter/Contributions} 
+\subfile{Sections/Frontmatter/Acknowledgements}
+\subfile{Sections/Frontmatter/Abstract} 
+
+% Table of contents
+\newgeometry{margin=1.25in}
+\renewcommand*\contentsname{Table of Contents}
+\tableofcontents
+\thispagestyle{empty}
+
+% List of Figures
+\cleardoublepage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+\thispagestyle{empty}
+
+% List of Tables
+\cleardoublepage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+\thispagestyle{empty}
+
+% List of Acronyms
+\doublespacing
+\large{
+\printacronyms[title=List of Acronyms, style=super]
+\glsaddall
+}
+\singlespacing
+\thispagestyle{empty}
+
+% Chapter 1
+\mainmatter
+\subfile{Sections/Chapter 1/Part 1}
+\subfile{Sections/Chapter 1/Part 2}
+\subfile{Sections/Chapter 1/Part 3}
+
+% Chapter 2
+\subfile{Sections/Chapter 2/Part 1}
+\subfile{Sections/Chapter 2/Part 2}
+\subfile{Sections/Chapter 2/Part 3}
+
+% Chapter 3
+\subfile{Sections/Chapter 3/Part 1}
+\subfile{Sections/Chapter 3/Part 2}
+\subfile{Sections/Chapter 3/Part 3}
+    
+% References
+\renewcommand{\bibsection}{\chapter*{References}}
+\addcontentsline{toc}{chapter}{References}
+\bibliography{references.bib}
+\bibliographystyle{aasjournal}
+\thispagestyle{empty}
+
+% Appendices
+\subfile{Sections/Appendices/A}
+\subfile{Sections/Appendices/B}
+
+\end{document}

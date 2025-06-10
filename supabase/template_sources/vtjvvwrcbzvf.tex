@@ -1,0 +1,186 @@
+%%%%%%%%%%%%%%%%% Allgemeines Dokumentenformat %%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt,headsepline]{scrartcl}
+
+%%%%%%%%%%%%%%%%% Einbinden von Paketen %%%%%%%%%%%%%%%%%
+
+% Grafiken aus PNG Dateien einbinden
+\usepackage{graphicx}
+
+% Deutsche Sonderzeichen benutzen 
+\usepackage{ngerman}
+
+% deutsche Silbentrennung
+\usepackage[ngerman]{babel}
+
+% Eurozeichen einbinden
+\usepackage[right]{eurosym}
+
+% Umlaute unter UTF8 nutzen
+\usepackage[utf8]{inputenc}
+
+% Zeichenencoding
+\usepackage[T1]{fontenc}
+
+% Schriftart
+\usepackage{lmodern}
+\usepackage{fix-cm}
+
+% mehrseitige Tabellen ermöglichen
+\usepackage{longtable}
+
+% Packet für Seitenrandabständex und Einstellung für Seitenränder
+\usepackage{geometry}
+
+% Paket für Boxen im Text
+\usepackage{fancybox}
+
+% bricht lange URLs "schön" um
+\usepackage[hyphens,obeyspaces,spaces]{url}
+
+% Paket für Textfarben
+\usepackage{color}
+
+% Mathematische Symbole importieren
+\usepackage{amssymb}
+
+% erzeugt Inhaltsverzeichnis mit Querverweisen zu den Kapiteln (PDF Version)
+\usepackage[bookmarksnumbered,hyperfootnotes=false]{hyperref}
+
+% neue Kopfzeilen mit fancypaket
+\usepackage{fancyhdr} %Paket laden
+
+% für Tabellen
+\usepackage{array}
+
+% Paket für Zeilenabstand
+\usepackage{setspace}
+
+% für Bildbezeichner
+\usepackage{capt-of}
+
+% für Stichwortverzeichnis
+\usepackage{makeidx}
+
+% für Listings
+\usepackage{listings}
+
+% Glossar und Akronyme
+\usepackage[acronym, toc]{glossaries}
+
+%%%%%%%%%%%%%%%%% Seitenformatierung %%%%%%%%%%%%%%%%%
+
+% Layout
+\geometry{left=3.5cm, right=2cm, top=2.5cm, bottom=2cm}
+
+% Kopfzeile
+\pagestyle{fancy} %eigener Seitenstil
+\fancyhf{} %alle Kopf- und Fußzeilenfelder bereinigen
+\fancyhead[L]{\nouppercase{\leftmark}} %Kopfzeile links
+\fancyhead[C]{} %zentrierte Kopfzeile
+\fancyhead[R]{\thepage} %Kopfzeile rechts
+\renewcommand{\headrulewidth}{0.4pt} %obere Trennlinie
+
+% Festlegung Art der Zitierung - Havardmethode: Abkuerzung Autor + Jahr
+\bibliographystyle{alphadin}
+
+% Schaltet den zusätzlichen Zwischenraum ab, den LaTeX normalerweise nach einem Satzzeichen einfügt.
+\frenchspacing
+
+% Formatierung für Listings
+\lstset{numbers=left, numberstyle=\tiny, numbersep=5pt, keywordstyle=\color{black}\bfseries, stringstyle=\ttfamily,showstringspaces=false,basicstyle=\footnotesize,captionpos=b}
+\lstset{language=java}
+
+% Indexerstellung
+\makeindex
+
+% Glossar erstellen
+\makeglossaries
+
+% Meta-Informationen erstellen 
+\hypersetup{
+  pdftitle    = {Titel},
+  pdfsubject  = {Um was geht es},
+  pdfauthor   = {Autor bzw. Autoren},
+  pdfkeywords = {Stichwort1, Stichwort2, ...}
+}
+
+% Disable single lines at the start of a paragraph (Schusterjungen)
+\clubpenalty = 10000
+% Disable single lines at the end of a paragraph (Hurenkinder)
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+
+%%%%%%%%%%%%%%%%% Definitionen %%%%%%%%%%%%%%%%%
+
+% Glossar-Definitionen
+\include{definitionen/glossar}
+
+% Variablen-Definitionen
+\include{definitionen/variablen}
+
+% Silbentrennungs-Definitionen
+\include{definitionen/trennung}
+
+%%%%%%%%%%%%%%%%% Inhalt %%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% Titelseite %
+\include{extras/deckblatt}
+
+% Sperrvermerk
+\include{extras/sperrvermerk}
+
+% Eidesstattliche Erklärung
+\include{extras/erklaerung}
+
+% Einleitung / Abstract
+\include{extras/abstract}
+
+% Inhaltsverzeichnis
+\newpage
+\tableofcontents
+
+\newpage
+\fancyhead[L]{Abbildungs- / Tabellen- / Listingverzeichnis}
+% Abbildungsverzeichnis
+\addcontentsline{toc}{section}{Abbildungsverzeichnis} % Soll im Inhaltsverzeichnis auftauchen
+\listoffigures
+% Tabellenverzeichnis
+\addcontentsline{toc}{section}{Tabellenverzeichnis}
+\listoftables
+% Listingverzeichnis
+\addcontentsline{toc}{section}{Listingverzeichnis}
+\renewcommand{\lstlistlistingname}{Listingverzeichnis} % eigenen Listingverzeichnis-Titel setzen
+\lstlistoflistings
+
+% Glossar
+\newpage
+\fancyhead[L]{Glossar} %Kopfzeile links
+\printglossary
+
+% Abkürzungsverzeichnis
+\newpage
+\fancyhead[L]{Abkürzungsverzeichnis}
+\printglossary[type=\acronymtype, title={Abkürzungsverzeichnis}]
+
+% einzelne Kapitel
+\newpage
+\fancyhead[L]{\nouppercase{\leftmark}} %Sectiontitle in die Kopfzeile
+\include{kapitel/1_abbildungen}
+\include{kapitel/2_tabellen}
+\include{kapitel/3_quellcode}
+\include{kapitel/4_formeln}
+\include{kapitel/5_zitate}
+\include{kapitel/6_begriffe}
+
+% Literaturverzeichnis
+\newpage
+\addcontentsline{toc}{section}{Literaturverzeichnis}
+\bibliography{definitionen/literatur}
+
+% Anhang
+\include{extras/anhang}
+
+\end{document}

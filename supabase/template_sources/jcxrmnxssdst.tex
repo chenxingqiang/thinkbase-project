@@ -1,0 +1,487 @@
+% arara: pdflatex: { interaction : nonstopmode }
+% arara: biber: { options: ['--isbn-normalise'] }
+\documentclass[t, aspectratio=169, english, table]{_style/tudelft-beamer}
+% \includeonlyframes{current}% beamer documentation \S 4.3.3
+
+\title[My awesome year]{Looking back on an awesome year with many conversations over a multitude of good cups of tea}
+\subtitle{including a sidenote on said tea}
+\author[Einstein \& Lorentz]{A.~Einstein\inst{1} \and H.~Lorentz\inst{2}}
+\date{31-12-1905}
+% define a graphic to be shown next to the title
+\titlegraphic{\includegraphics[width=0.4\paperwidth]{icons/digital society/electrical_engineering.pdf}}
+
+% optional:
+% \setlength{\titlesplitpos}{-0.5\paperwidth}
+% mind that in this case, the white pane is the background, and the blue one on top.
+
+\institute[Universities of Somewhere and Elsewhere]{
+  \strut\llap{\inst{1}\,}Department of Black Holes and Tea\\University of Leiden\and
+  \strut\llap{\inst{2}\,}Department of Bending Rivers, Space and Time\\University of Delft}
+\date[CFP 2003]{Conference on Fabulous Presentations, 2003}
+
+\addbibresource{bibfile.bib}
+
+\newcommand{\absimage}[4][0.5,0.5]{%
+	\begin{textblock}{#3}%width
+		[#1]% alignment anchor within image (centered by default)
+		(#2)% position on the page (origin is top left)
+		\includegraphics[width=#3\paperwidth]{#4}%
+\end{textblock}}
+
+
+\begin{document}
+
+
+\titleframe
+
+
+\begin{frame}[fragile]{Welcome!} % some commands, e.g. \verb require [fragile]
+  \frametitle{TU Delft presentation template}
+  \framesubtitle{In \LaTeX\ using the package Beamer}
+  
+  This template can be used to make a presentation in the 2022 version of the TU Delft style described here:
+  \url{https://www.tudelft.nl/huisstijl/middelen/presentaties}
+  
+  The icons have been converted to pdf, so they can be included crisply against a colored background:
+
+  \includegraphics[height=10ex]{icons/communication/presentation.pdf}
+  \textcolor{tud pink}{\rule{10ex}{10ex}}\hspace{-10ex}%
+  \includegraphics[height=10ex]{icons/communication/presentation.pdf}
+  
+\end{frame}
+
+
+\begin{frame}
+  A digital version of this presentation can be found at \url{https://gitlab.com/novanext/tudelft-beamer}.
+
+  Here's a QR code made by \LaTeX, pointing to the same link:
+
+  \begin{center}  
+    \qrcode{https://gitlab.com/novanext/tudelft-beamer}
+  \end{center}
+
+  Slides like these are straightforward to make, the following contains more fancy examples. Using all of these slide options in one presentation is probably too much for your audience\ldots
+\end{frame}
+
+
+{
+  \renewcommand{\bginsert}{\hfill\raisebox{0.15\paperheight}{\color{tud purple}%
+    \clap{\includegraphics[width=1.1\paperwidth]{tud-logo.pdf}}}\hfill}
+  \setbeamercolor{background canvas}{bg=tud pink}
+  \renewcommand{\sectionsubtitle}{Hope you will be inspired!}
+  \section{Random Subset\\of Features}
+}
+
+{
+\footerinfootnotestrue
+\begin{frame}{Citing}
+  If you happen to give a presentation with an older projector, you can set the aspect ratio to 4:3 using the documentclass option aspectratio=43.
+
+  To make a presentation with citations easier to follow, a footnote will show the full reference:
+
+  Rivers and sweet tea do unexpected things.\cite{Einstein1926}
+\end{frame}
+}
+
+\begin{frame}{Columns}
+  \begin{columns}[T, onlytextwidth]
+    \begin{column}{.45\textwidth}
+      Short lines of text work well in a column.
+      You can combine a text column with images, where the \texttt{\textbackslash absimage}
+      command can be used to place a picture at an exact location, over other elements.
+
+      To make sure the columns are top-aligned, and margins don't jump between pages,
+      you can add the optional arguments \texttt{[T, onlytextwidth]} to the
+      \texttt{\textbackslash columns} environment.
+    \end{column}
+    \begin{column}{.45\textwidth}
+      \color{tud teal}
+      Let's attempt to place an image on top of this square:
+
+      % square filling the column
+      \rule{1\columnwidth}{1\columnwidth}
+      % place an image
+      % horizontal position = 73%
+      % vertical position = 45%
+      % width = 40% of page
+      \absimage{.74, .55}{.35}{tud-logo.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}{Grid}
+  \grid
+  The command \texttt{\textbackslash grid} can be used to add a grid to the slide,
+  which makes it easier to place elements at a specific location.
+
+  The grid applies to \texttt{tikz}; \texttt{textpos} has the origin at the upper left.
+  
+  \begin{abstikz}
+    \draw (0.75, 0.5) circle (0.5ex);
+    \node[anchor=south west] at (0.75, 0.5) {(0.75, 0.5)};
+  \end{abstikz}%
+\end{frame}
+
+
+\begin{frame}{`Blocks'}
+  \begin{columns}[onlytextwidth]
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Default block}
+        \begin{itemize}
+          \item item 1
+          \item item 2
+        \end{itemize}
+      \end{block}
+      \begin{alertblock}{Alert block}
+        \begin{enumerate}
+          \item Sugar in a stirred cup of tea gathers in the middle.
+          \item Rivers often take a detour through flat terrain.
+        \end{enumerate}
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{exampleblock}{Example block}
+        \center
+        \input{mass-spring.tikz}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}
+  \minipage[t]{\linewidth}
+  \frametitle{List styling}
+  In beamer, enumerations and itemizations can consist of three levels:
+  \begin{itemize}
+    \item One
+    \begin{itemize}
+    \item Two
+    \begin{itemize}
+      \item Three
+    \end{itemize}
+    \end{itemize}
+  \end{itemize}
+  \begin{enumerate}
+    \item One
+    \begin{enumerate}
+    \item Two
+    \begin{enumerate}
+      \item Three
+    \end{enumerate}
+    \end{enumerate}
+  \end{enumerate}
+  \endminipage
+\end{frame}
+
+
+\begin{frame}{Speed up the compilation cycle}
+  \begin{itemize}
+    \item Add to the preamble:\\
+      \texttt{\textbackslash includeonlyframes\{current\}}\\
+    \item And to the frame you are working on:\\
+      \texttt{[label=current]}\\
+      (from the \texttt{beamer} documentation \S 4.3.3)
+    \item Use \texttt{pdflatex} instead of \texttt{xelatex}
+    \item  Compile in draft mode.
+  \end{itemize}
+\end{frame}
+
+
+{
+  \renewcommand{\bginsert}{\hfill\smash{\rotatebox{30}{\color{tud teal}%
+    \includegraphics[width=0.9\paperwidth]{tud-logo.pdf}}}\hfill}
+  \setbeamercolor{background canvas}{bg=tud green}
+  \section{Working with\\split frames}
+}
+
+
+\setlength{\splitpos}{0.4\paperwidth}
+\renewcommand{\bginsert}{\textcolor{tud blue}{\hspace*{-0.1\paperwidth}\tudflame[0.6\paperwidth]}}
+\leftfooterwhitetrue
+
+\begin{frame}%
+  \frametitle{A split \texttt{frame}}%
+  \framesubtitle{for \texttt{\textbackslash splitpos} = 0.4 \texttt{\textbackslash paperwidth}}
+  \begin{columns}[T]
+    \begin{textcolumn}
+    \end{textcolumn}
+    \begin{textcolumn}
+      When \texttt{\textbackslash splitpos} is given a positive value, the frame title to the right side, and the left side gets a colored background.
+      \begin{itemize}
+        \item The \texttt{textcolumn} environment can be used to add text to either one of the columns.
+        \item The command \texttt{\textbackslash bginsert} can be redefined to add something on top of the colored pane, clipped off at the edges.
+        \item Use \texttt{\textbackslash usebackgroundtemplate} to redefine the background more generally.
+      \end{itemize}
+    \end{textcolumn}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}%
+  \frametitle{A split \texttt{frame}}%
+  \framesubtitle{scoping\ldots}%
+  \begin{columns}[T]
+    \begin{textcolumn}
+    \end{textcolumn}
+    \begin{textcolumn}
+      To keep the footers visible, they can be made white using these commands:
+      \begin{itemize}
+        \item \texttt{\textbackslash leftfooterwhitefalse}
+        \item \texttt{\textbackslash rightfooterwhitefalse}
+        \item \texttt{\textbackslash leftfooterwhitetrue}
+        \item \texttt{\textbackslash rightfooterwhitetrue}
+      \end{itemize}
+      
+      The scope for all of these tweaks can be limited by \texttt{\{} and \texttt{\}},
+      or---more readable---by \texttt{\textbackslash begingroup} and \texttt{\textbackslash endgroup}.
+    \end{textcolumn}
+  \end{columns}
+\end{frame}
+
+
+\setlength{\splitpos}{-0.4\paperwidth}
+\leftfooterwhitefalse
+\rightfooterwhitetrue
+
+{
+\footerinfootnotestrue
+\begin{frame}%
+  \frametitle{Negative \texttt{\textbackslash splitpos}}
+  \framesubtitle{e.g. \texttt{-0.4\textbackslash paperwidth}}
+  \begin{columns}[T]
+    \begin{textcolumn}
+      Using a negative value for \texttt{\textbackslash splitpos}, the background panes swap places.
+      
+      The \texttt{tikzcolumn} environment can be used instead of \texttt{textcolumn},
+      to place items in one of the panes using tikz\footnote[frame]{see \url{https://tikz.dev/}} commands.
+      The default units are set relative to the paper size.
+
+      The \texttt{abstikz} environment does almost the same, without being restricted to the column, or influencing the placement of another \texttt{textcolumn}.
+    \end{textcolumn}
+    \begin{tikzcolumn}
+      \node at (.8, .5)
+        {\includegraphics[height=0.9\paperheight]{icons/design proces/iterations.pdf}};
+      \draw[red, latex-] (1, 0) -- ++(135:1em) node[anchor=east] {(\textbackslash paperwidth, 0)};
+      \draw[red, latex-] (1, 1) -- ++(-135:1em) node[anchor=east] {(\textbackslash paperwidth, \textbackslash paperheight)};
+    \end{tikzcolumn}
+    \begin{abstikz}
+      \draw[red, latex-] (0, 0) -- ++(45:1em) node[anchor=west,rotate=90] {origin (0, 0)---using \texttt{abstikz}};
+    \end{abstikz}
+  \end{columns}
+\end{frame}
+}
+
+\begin{frame}{Mass--energy equivalence}
+  \begin{columns}[T]
+    \begin{textcolumn}
+      They say every formula you add to a presentation, will reduce your audience
+      by \SI{50}{\percent}. A simple yet effective way to mitigate this effect,
+      is adding a compact nomenclature to the slides containing formulae.
+      \[E=mc_0^2\]
+      
+      If you find this is taking up too much of your precious space,
+      than you are doing something wrong, and it is not adding this little nomenclature.
+      
+      % Pro tip: You can use this mechanism as well to show other bits of easily
+      % forgotten information, say, the meaning of acronyms, or the value of
+      % parameters that your listeners need to know to fathom the depths of your
+      % insights.
+    \end{textcolumn}
+    \begin{textcolumn}
+      \color{white}
+      \begin{tabular}{cp{7em}c}
+        $E$ & Energy & (\unit{J}) \\
+        $m$ & Mass & (\unit{kg}) \\
+        $c_0$ & Speed of light in vacuum & (\unit{m/s})\\
+        %(\qty{299.792458e6}{m/s}) \\
+        TU &  Technical University
+      \end{tabular}
+    \end{textcolumn}
+  \end{columns}
+\end{frame}
+
+
+\setlength{\splitpos}{-0.3\paperwidth}
+
+\begin{frame}[t]{Colors}
+  \begin{columns}[T, onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      All colors from the TUD style guide are predefined for your convenience.
+      You can create a table similar to the example in their powerpoint as such:\\[1ex]
+      
+      \renewcommand{\arraystretch}{1.4}
+      \rowcolors{2}{gray!25}{white}
+      \newcommand{\thead}{\color{white}\bfseries} % for table header formatting
+      \begin{tabular}{>{\color{primary}\bfseries}l|S}
+        \rowcolor{primary}
+        \thead Table head & {\thead Table head} \\
+        Huge number & 100e3 \\
+        Large number & 1000\\
+        Normal number & 10\\
+        Small number & 0.1\\
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \begin{itemize}
+        \item \textcolor{tud navy}{\textbf{navy}}
+        \item \textcolor{tud topaz}{\textbf{topaz}}
+        \item \textcolor{tud blue}{\textbf{blue}}
+        \item \textcolor{tud purple}{\textbf{purple}}
+        \item \textcolor{tud pink}{\textbf{pink}}
+        \item \textcolor{tud shiraz}{\textbf{shiraz}}
+        \item \textcolor{tud grapefruit}{\textbf{grapefruit}}
+        \item \textcolor{tud orange}{\textbf{orange}}
+        \item \textcolor{tud yellow}{\textbf{yellow}}
+        \item \textcolor{tud green}{\textbf{green}}
+        \item \textcolor{tud teal}{\textbf{teal}}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.25\textwidth}
+      \begin{itemize}
+        \item \textcolor{tud navy}{\textbf{navy}}
+        \item \textcolor{tud topaz}{\textbf{topaz}}
+        \item \textcolor{tud blue}{\textbf{blue}}
+        \item \textcolor{tud purple}{\textbf{purple}}
+        \item \textcolor{tud pink}{\textbf{pink}}
+        \item \textcolor{tud shiraz}{\textbf{shiraz}}
+        \item \textcolor{tud grapefruit}{\textbf{grapefruit}}
+        \item \textcolor{tud orange}{\textbf{orange}}
+        \item \textcolor{tud yellow}{\textbf{yellow}}
+        \item \textcolor{tud green}{\textbf{green}}
+        \item \textcolor{tud teal}{\textbf{teal}}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\section{Animations}
+\setlength{\splitpos}{0pt}
+\rightfooterwhitefalse
+
+\begin{frame}[fragile]{Animation}
+  Some commands take optional arguments in the form of \verb|<x-y>|,
+  where \verb|x| is the first `sub-frame' on which the context is shown,
+  and \verb|y| is the last. \verb|x| or \verb|y| can be replaced by \verb|+|,
+  referring to `the next sub-frame'. 
+  \vfill
+  \begin{columns}[T,onlytextwidth]
+  \begin{column}{.5\textwidth}
+    \begin{enumerate}
+      \item<+-> uncovered\ldots
+      \item<+-> one\ldots
+      \item<+-> by\ldots
+      \item<+-> one.
+    \end{enumerate}
+    \end{column}
+  \begin{column}{.5\textwidth}
+      Using only:\only<1>{1}\only<2>{2}\only<3>{3}
+
+      Using onslide:\onslide<1>{1}\onslide<2>{2}\onslide<3>{3}
+
+      Using pause:\pause1\pause2\pause3
+  \end{column}
+  \end{columns}
+  \vfill
+  For more advanced animations, see \S 14 of the manual:\\
+  \url{https://www.ctan.org/pkg/beamer}
+  % \url{https://www.ctan.org/pkg/animate}\\
+  % \url{https://www.ctan.org/pkg/media9}
+  \vfill
+  % \transduration{2} automatic progression of slides
+  \transpush<1>
+\end{frame}
+
+{
+  \renewcommand{\bginsert}{\hfill\smash{\raisebox{-0.2\paperheight}{\color{tud orange}%
+  \includegraphics[width=2\paperwidth]{tud-logo.pdf}}}\hfill}
+  \setbeamercolor{background canvas}{bg=tud yellow}
+  \section{Matplotlib\\plots}
+}
+
+\begin{frame}{A bar chart}
+  \includegraphics{_python/bar-chart.pdf}
+\end{frame}
+
+
+\begin{frame}{A pie chart}
+  \includegraphics{_python/pie-chart.pdf}
+\end{frame}
+
+
+\begin{frame}{Confidence intervals}
+  \includegraphics{_python/confidence-bands.pdf}
+\end{frame}
+
+
+\begin{frame}{Stream plot}
+  \includegraphics{_python/streamplot.pdf}
+\end{frame}
+
+{
+  \renewcommand{\bginsert}{\hfill\smash{\raisebox{-0.2\paperheight}{\color{tud orange}%
+  \includegraphics[width=2\paperwidth]{tud-logo.pdf}}}\hfill}
+  \setbeamercolor{background canvas}{bg=tud yellow}
+  \section{Full-screen graphics}
+}
+
+
+{
+  \setlength{\splitpos}{\paperwidth}
+  \leftfooterwhitetrue
+  \rightfooterwhitetrue
+  \renewcommand{\bginsert}{\hspace*{-3ex}\smash{\raisebox{-20ex}{\color{tud blue}\tudflame[90ex]}}\hfill}
+  \begin{frame}
+    \begin{abstikz}
+      \node[align=center, font=\huge\color{white}] at (0.5, 0.5) {%
+        It is important to use the \textcolor{black}{flame}\\
+        often and abundantly, and use\\
+        the \textcolor{tud orange}{colors} given on the next slide.};
+    \end{abstikz}
+  \end{frame}
+}
+
+
+{
+  \setbeamercolor{frametitle}{fg=white,bg=tud primary}
+  \usebackgroundtemplate{%
+    \rlap{\textcolor{tud grapefruit}{\rule{\paperwidth}{\paperheight}}}%
+    \textcolor{tud orange}{\smash{\includegraphics[width=\paperwidth]{tud-logo.pdf}}}%
+    }%
+  \begin{frame}
+      \leftfooterwhitetrue
+      \rightfooterwhitetrue
+      \frametitle{White Frame Title}
+      \framesubtitle{On blue background}
+      Optional text\ldots
+  \end{frame}
+}
+
+
+{
+  \setlength\splitpos\paperwidth
+  \leftfooterwhitetrue
+  \rightfooterwhitetrue
+  \begin{frame}
+    \leftfooterwhitetrue
+    \renewcommand{\rightfooter}{}
+    \vfill
+    \vfill
+    \vfill
+    \color{white}
+    \raggedleft
+    {\usebeamerfont{title}\color{white}\huge Bedankt voor uw aandacht}\\\medskip
+    \hfill \large{\insertshortauthor}
+  \end{frame}
+}
+
+
+\begin{frame}[allowframebreaks,t]{\bibname}
+	% the 'I' is caused by 'allowframebreaks'
+	\AtNextBibliography{\footnotesize}% or in the preamble \AtBeginBibliography{\small}
+	\printbibliography
+\end{frame}
+
+\end{document}

@@ -1,0 +1,188 @@
+% Template for a book in arabic
+% author: Nadjib Mammeri
+% Copyright 2023
+% largely inspired from Mohammed Obaid Alziyadi book template
+% with simplification and update to work with latest Tex release
+%
+
+\documentclass[10pt,oneside,a5paper]{book}%
+\usepackage[no-math]{fontspec}
+\usepackage{xltxtra,url,amsmath}
+\usepackage[quiet,nolocalmarks]{polyglossia}
+\usepackage[linktocpage,breaklinks,linktoc=all,hidelinks]{hyperref}
+\usepackage[top=20mm,bottom=25mm,left=20mm,right=20mm,a5paper]{geometry}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage[doublespacing]{setspace}
+\usepackage{titling}
+\usepackage{ifthen}
+\usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage[titles]{tocloft}
+\usepackage{etoolbox}
+\usepackage[figure,table]{totalcount}
+\usepackage[nottoc]{tocbibind}
+\usepackage[within=chapter]{newfloat}
+\usepackage[labelsep=period]{caption}
+\usetikzlibrary{matrix,arrows,decorations.pathmorphing}
+\usepackage{collcell}
+\usepackage{float}
+%\usepackage[printwatermark]{xwatermark} % was causing error with latest textlive 
+%\usepackage[automark]{scrlayer-scrpage}
+
+% set fonts
+\setmainfont[Scale=1.2]{Amiri-Regular.ttf}
+\newfontfamily\arabicfont[Script=Arabic,Scale=1.2]{Amiri-Regular.ttf}
+\setmonofont{Amiri-Regular.ttf}
+\let\arabicfonttt\ttfamily
+\newfontfamily\englishfont[Scale=1.2]{TeX Gyre Termes}
+\let\XeTeX\undefined
+\let\XeLaTeX\undefined
+
+% set languages
+\setdefaultlanguage[calendar=gregorian,hijricorrection=1,locale=algeria]{arabic}
+\setotherlanguage[variant=british]{english}
+% \setotherlanguage{farsi}
+\setotherlanguage{german}
+
+
+% Basic spacing
+\setlength{\parindent}{.5in}
+\setcounter{secnumdepth}{5}
+\setlength{\intextsep}{\baselineskip}
+%\openup 0.5em
+
+% set captions
+\addto\captionsarabic{
+	\renewcommand{\contentsname}{الفهرس}
+	\renewcommand{\listtablename}{قائمةالجداول }
+	\renewcommand{\listfigurename}{قائمة الاشكال }
+	\renewcommand{\chaptername}{الحلقة}
+	\renewcommand{\cftchapfont}{\normalfont}
+	\renewcommand{\cftchappagefont}{\normalfont}
+	\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}}
+\renewcommand{\cftchapaftersnum}{.}
+\renewcommand{\cftfigaftersnum}{.}
+\renewcommand{\cfttabaftersnum}{.}
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsubsecaftersnum}{.}
+\setlength{\cftbeforesecskip}{.5\baselineskip}
+\setlength{\cftbeforesubsecskip}{0.5\baselineskip}
+\setlength{\cftbeforetabskip}{0.5\baselineskip}
+\setlength{\cftbeforefigskip}{0.5\baselineskip}
+\setlength{\cftfigindent}{0em}
+\setlength{\cfttabindent}{0em}
+\setlength{\cftfignumwidth}{3.5em}
+\cftsetindents{section}{1em}{3.5em}
+\cftsetindents{chapter}{1em}{2.5em}
+\renewcommand{\bibname}{المراجع}
+\DeclareTotalCounter{appendixfigure}
+\DeclareTotalCounter{appendixtable}
+\DeclareFloatingEnvironment[fileext=loaf,placement={ht},listname={جدول الملحقات },name=Figure]{appendixfigure}
+\DeclareFloatingEnvironment[fileext=loat,placement={ht},listname={جدول الملحقات },name=Table]{appendixtable}
+
+% Fix table captions
+\captionsetup[table]{position=top,skip=\baselineskip}
+\captionsetup[appendixtable]{position=top,skip=\baselineskip}
+
+
+% set pagestyle headers and footers
+\pagestyle{plain}  % remove this to include headers
+
+
+% Format table of contents	
+\addtocontents{lot}{\noindent\underline{جدول}\hfill \underline{صفحة}\par}
+\addtocontents{lof}{\noindent\underline{أشكال}\hfill \underline{صفحة}\par}
+\addtocontents{loat}{\noindent\underline{Table}\hfill \underline{Page}\par}
+\addtocontents{loaf}{\noindent\underline{صفحة}\hfill \underline{أشكال}\par}
+
+% ------- Labels chapters correctly
+%\titleformat{\chapter}[display] % 2 lines chapter title
+% \titleformat{\chapter} % single line chapter title
+% {\centering\normalfont\bfseries}{{\LARGE\MakeUppercase{{\chaptertitlename}} \thechapter.}}{1em}{\LARGE\MakeUppercase}
+
+% No chapeter name and number
+%{\centering\normalfont\bfseries}{}{1em}{\LARGE\MakeUppercase}
+
+\titleformat{\section}
+{\Large\bfseries}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{*0}{0pt}
+
+\titleformat{\subsection}
+{\normalfont\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{*0}{0pt}
+
+\titleformat{\subsubsection}
+{\normalfont\bfseries}{\thesubsubsection.}{0.5em}{}
+\titlespacing*{\subsubsection}{0pt}{*0}{0pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+
+%========================================= Main document
+
+
+\title{   رحلة في كوكب افريقيا }
+\author{ نجيب معمري  }
+
+
+\begin{document}
+
+%\pagenumbering{alph}
+\pagenumbering{arabic} 
+%\pagenumbering{gobble} %switch off page numbering
+
+%========================================= Title page
+\begin{titlepage}
+    \centering{
+        {\fontsize{40}{48}\selectfont 
+         رحلة في كوكب افريقيا}
+    }\\
+        
+    \vspace{15mm}
+    \centering{\Large{   نجيب معمري     }}\\
+
+    \vspace{\fill}
+    \centering \large{2022}
+\end{titlepage}
+
+
+%========================================= Acknowledgment
+
+\include{acknowledgment}
+
+%========================================= Introduction
+
+\include{introduction}
+
+%========================================= Table of content
+\begin{singlespace}\tableofcontents\end{singlespace}
+
+\iftotaltables
+\begingroup
+\renewcommand*{\addvspace}[1]{}
+\begin{singlespace}\listoftables\end{singlespace}
+\endgroup
+\fi
+\iftotalfigures
+\begingroup
+\renewcommand*{\addvspace}[1]{}
+\begin{singlespace}\listoffigures\end{singlespace}
+\endgroup
+\fi
+\iftotalappendixtables\begin{singlespace}\listofappendixtables\end{singlespace}\fi
+\iftotalappendixfigures\begin{singlespace}\listofappendixfigures\end{singlespace}\fi
+
+%========================================= Chapters
+
+% enable this if you want page numeric numbering to start from here
+%\pagenumbering{arabic}
+
+
+\include{chapter1}
+
+% test chapter to show multi-lingual support
+\include{test-chapter}
+
+
+\end{document}

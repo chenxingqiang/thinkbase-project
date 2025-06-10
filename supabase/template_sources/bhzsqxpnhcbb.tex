@@ -1,0 +1,235 @@
+\documentclass[urlsf]{utem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is MyThesis.tex, as on October 10, 2014.
+% It was originally designed and developed Lim Lian Tze of USM.
+% A major modification was made by Nor Hafeizah Hassan and Gede Pramudya. Later by A.Sadhiqin M.Isira
+% This is the "main" file for the thesis, formatted according to the Guide to the 
+% Preparation, Submission and Examination of Theses, published by PPS UTeM.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Example of packages used
+\usepackage{epstopdf}
+\usepackage{lipsum}
+\usepackage{setspace}
+\usepackage{tocbibind}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{subfig}
+\usepackage{appendix}
+
+%list of abbreviations and symbols
+\usepackage[acronym,smallcaps,nonumberlist]{glossaries}
+    \newglossarystyle{mylong}{%
+    \setglossarystyle{long}%
+    \renewenvironment{theglossary}%
+    {\begin{longtable}[l]{p{2cm}p{\hsize}}}% <-- change the value here
+     {\end{longtable}}}
+
+%for list of abbreviations
+\newacronym{ny}{NY}{New York}
+\newacronym{la}{LA}{Los Angeles}
+\newacronym{un}{UN}{United Nations}
+\newacronym{utem}{UTeM}{Universiti Teknikal Malaysia Melaka}
+\newacronym{fkekk}{FKEKK}{Fakulti Kejuruteraan Elektronik dan Kejuruteraan Komputer}
+\newacronym{mas}{MAS}{Multi-agents System}
+\newacronym{kba}{KBA}{Kedudukan Baik Anugerah}
+\newacronym{iot}{iOT}{Internet of Things}
+
+% nomenclature/symbols for List of Symbols
+\newglossaryentry{angelsperarea}{
+  name = $a$ ,
+  description = The number of angels per unit area,
+}
+\newglossaryentry{numofangels}{
+  name = $N$ ,
+  description = The number of angels per needle point
+}
+\newglossaryentry{areaofneedle}{
+  name = $A$ ,
+  description = The area of the needle point
+}
+\newglossaryentry{laplacianmatrix}{
+  name = $\mathcal{L}$ ,
+  description = The Laplacian matrix
+}
+
+\makeglossaries
+
+
+% Particulars about your thesis are here
+% Your Name
+\author{Author's Name}
+% English title of your thesis
+\title{Title of Thesis}
+% Malay title of your thesis
+\titlems{Title of Thesis}
+% Year submitted
+\submityear{Year}
+% Month submitted
+\submitmonth{Month}
+% Choose only 1 degree type
+\degreetype{Type of Degree}
+%\degreetype{Master of Engineering (Electronics)}
+
+% Options for generating hyperlinks when using pdfLaTeX - with link, color is nil, underline is nil
+% Also a TOC without dotted lines
+\ifpdf
+  \makeatletter
+  \usepackage[hidelinks,pdftex,plainpages=false,hypertexnames=false,bookmarksnumbered,pdfpagelabels,%
+    pdfauthor={\@author},pdftitle={\@title}]{hyperref}
+\renewcommand*{\cftdotsep}{\cftnodots}
+  \makeatother
+\else
+  \usepackage[dvips,plainpages=false,bookmarksnumbered,breaklinks=true]{hyperref}
+\fi
+
+
+% As we have loaded the natbib package, you can customise the citation style to 
+% some extent.  The following line specifies some standard punctuations:
+%
+% \bibpunct{#1}{#2}{#3}{#4}{#5}{#6}
+% #1: open punctuation (a round bracket here)
+% #2: close punctuation (a round bracket here)
+% #3: punctuation separating multiple authors (a semi-colon here)
+% #4: n - citation using numerical system
+%     s - numeric superscript system
+%     any other letter - author-year system
+% #5: punctuation separating author name(s) from year
+% #6: punctuation separating years for multiple citations
+%     with same author(s)
+%
+% The default citation that I used here is therefore of the form
+% (Wilks and Stevenson, 1999; Somers, 2000)
+%
+% You may change any of the 6 parameters if you prefer a different citation style. 
+% Also see the natbib documentation.
+%\bibpunct{(}{)}{;}{a}{,}{,}
+
+%\renewcommand{\cftchapafterpnum}{\vspace{\cftbeforechapskip}}
+\renewcommand\thesubfigure{\alph{subfigure}}
+\newcommand{\subfigureautorefname}{\figureautorefname}
+\newcommand*\thesubfloattable{\themaintable\alph{subfloattable}}
+\newenvironment{subtables}{\subtablesbegin}{\subtablesend\global\@ignoretrue}
+\begin{document}
+
+	
+		
+	\lstset{fontadjust=true}
+
+	\frontmatter
+	\addtocontents{toc}{\protect\raggedright\protect\sloppy}
+	\addtocontents{toc}{\protect\hfill{\protect\bfseries PAGE}\\}
+	\addtocontents{lof}{\protect\raggedright\protect\sloppy}
+	\addtocontents{lof}{\protect{\protect\bfseries FIGURE}\hfill{\protect\bfseries TITLE}\hfill{\protect\bfseries PAGE}\\}
+	\addtocontents{lot}{\protect\raggedright\protect\sloppy}
+	\addtocontents{lot}{\protect{\protect\bfseries TABLE}\hfill{\protect\bfseries TITLE}\hfill{\protect\bfseries PAGE}\\}
+	\addtocontents{lop}{\protect\raggedright\protect\sloppy}
+	\addtocontents{lop}{\protect\hfill{\protect\bfseries PAGE}\\}
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Inserts the cover page (the hard cover with gold-lettering) and the title page. 
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\makecover
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Inserts a "Front Matter" bookmark if using pdfLaTeX
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\ifpdf
+    	\pdfbookmark[-1]{Front Matter}{front}
+	\else\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% include declaration, approval, dedication, english abstract, Malay abstrak, and acknowledgement
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\setcounter{page}{0} %not included at page numbering
+	\include{chapters/declaration}
+	\setcounter{page}{0}
+	\include{chapters/approval}
+	\setcounter{page}{0}
+	\include{chapters/dedication}
+
+	\include{chapters/abstract}
+	\newpage
+	\input{chapters/abstrak}
+		
+%  TOC,LOF,LOT
+	\renewcommand{\contentsname}{TABLE OF CONTENTS}
+	\newcommand\tocheading{\par\bigskip\MakeUppercase{\chaptername}\hfill \MakeUppercase{Page}\par}
+	\renewcommand{\listfigurename}{LIST OF FIGURES}
+	\renewcommand{\listtablename}{LIST OF TABLES}
+	%\singlespacing
+	\begin{singlespace}\label{list:toc}
+	\tableofcontents \clearpage
+	\listoftables \clearpage
+	\listoffigures \clearpage
+	\end{singlespace}
+	%\singlespacing
+	\include{chapters/publications}
+    \include{chapters/abbrvsymbols}
+	\include{chapters/appendiceslist}
+	%page numbering starts from here
+	
+	\include{chapters/acknowledgements}
+		
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%  List of abreviation, accronyms, symbols, and own-publications
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		%\include{loa}
+		
+		%---------------------------------------------------------------
+		%Include the List of (own) Publications. Each item can not be cited, according
+		%to the convention addopted by UTeM and talk between me and TD PPS. So it
+		%should be created manually (at the moment by using 'dumb' idea)
+		% --------------------------------------------------------------
+		\begin{singlespace}
+		%\include{lop} %under construction
+		%\include{loptrial}
+		\end{singlespace}
+	
+	% Paragraph spacing
+	\setlength\parskip{18pt}
+	% paragraph indentation
+	\setlength\parindent{1.22cm}
+
+	\addtocontents{toc}{\protect\setlength{\protect\cftbeforechapskip}{5mm}}
+	%\addtocontents{toc}{\protect\cftpagenumbersoff{chap}}
+ 
+	\mainmatter
+	\ifpdf
+  		\pdfbookmark[-1]{Main Chapters}{main}
+	\else\fi
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% All Chapters
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
+	\onehalfspacing
+	\include{chapters/1-chap-intro}
+    \include{chapters/2-chap-review}
+    \include{chapters/3-chap-method}
+    \include{chapters/3-chap-result-analysis}
+    \include{chapters/4-chap-discussion}
+    \include{chapters/5-chap-conc-fw}
+
+	%-----------------------------------------------------------------
+	% include the bibliography which is titled as "References"
+	%-----------------------------------------------------------------
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% You can choose from several bibliography styles.  It is agreed to use Harvard.
+	% One of the Harvard styles which is close the the Guide is dcu
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\bibliographystyle{IEEEtran}
+	%\bibliographystyle{dcu}
+	%\bibliographystyle{unsrtnat}
+	\addtocontents{toc}{\protect\cftpagenumberson{chap}}
+	\renewcommand{\bibname}{\textbf{REFERENCES}}
+	\bibliography{mybib}
+
+	
+	\include{chapters/appendices}
+	
+	
+	
+	
+
+\end{document}

@@ -1,0 +1,70 @@
+%!TEX TS-program = xelatex 
+%!TEX encoding = UTF-8 Unicode
+
+% Modify the following line to match your school
+% Available options include `FAU`
+\documentclass[School=FAU]{Dissertate}
+
+% Ensures that all chapters start on odd pages (with intentionally blank pages on the left / even pages)
+% Taken from http://mirrors.ctan.org/macros/latex/unpacked/latex.ltx
+\makeatletter
+\def\cleardoublepage{\clearpage\ifodd\c@page\else
+    \hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi\fi}
+\makeatother
+
+\begin{document}
+% the front matter
+\input{frontmatter/personalize}
+\maketitle
+\copyrightpage
+\abstractpage
+\tableofcontents
+%\authorlist
+\listoffigures
+\listoftables
+
+% Start of List of Acronyms and Abbreviations
+
+\newpage
+\begin{adjustwidth*}{0.5cm}{0cm}
+\vspace*{35pt}
+\huge
+\begin{flushright}
+\noindent List of Acronyms and Abbreviations
+\end{flushright}
+\vspace{50pt}
+\small
+\input{chapters/acro_list.tex}
+\end{adjustwidth*}
+
+% End of List of Acronyms and Abbreviations
+
+\dedicationpage
+\acknowledgments
+
+\doublespacing
+
+% include each chapter...
+\setcounter{chapter}{0}  % start chapter numbering at 0
+\include{chapters/chapter1}
+\include{chapters/chapter2}
+\include{chapters/chapter3}
+\include{chapters/chapter4}
+\include{chapters/chapter5}
+\begin{appendices}
+    \include{chapters/appendixA}
+\end{appendices}
+
+\singlespacing
+
+% the back matter
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+
+\bibliography{references}
+\bibliographystyle{apalike2}
+
+\include{endmatter/colophon}
+
+\end{document}

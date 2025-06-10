@@ -1,0 +1,228 @@
+% !TEX TS-program = latex
+% -*- mode : latex; coding: utf-8 -*-
+
+%% 재단 맡길 때에는 showtrims을 켜서 a4로 출력 후 잘라내면 됨.
+%\documentclass[11pt,a4paper,oneside,openany,reqno,chapter,nokorean,showtrims]{oblivoir}
+\documentclass[11pt,a4paper,oneside,openany,reqno,chapter,nokorean]{oblivoir}
+
+\usepackage[utf8]{inputenc}
+\usepackage[dbl4x6]{fapapersize}
+
+\chapterstyle{default}
+\usepackage{tocloft}% http://ctan.org/pkg/tocloft
+\def\cftchapteraftersnum{.}
+\renewcommand{\cftchapterdotsep}{\cftdotsep}% Chapters should use dots in ToC
+
+
+\let\interHchar\undefined
+\let\interhword\undefined
+\usepackage[default]{dhucs-interword}
+\usepackage{dhucs-gremph}
+\usepackage{dhucs-enumerate}
+%\usepackage{enumerate}
+\usepackage{ifpdf}
+\usepackage{url}
+\usepackage{rotating}
+
+
+
+\ifpdf
+\usepackage[pdftex]{hyperref} 
+\hypersetup{
+colorlinks = true
+} 
+\fi
+
+\usepackage{amsmath,amsthm,amssymb,amsxtra}
+\usepackage{graphicx}
+\newsubfloat{figure}
+\usepackage{epsfig}
+\let\footruleskip\undefined
+\usepackage{fancyhdr}
+\usepackage{environ}
+\usepackage{siunitx}
+\ifpdf
+% enable hyper links
+\hypersetup{
+ pdftitle={Thesis},
+ pdfauthor={Geonmo Ryu},
+ pdfkeywords={j/psi,charmed meson},
+ citecolor=black,
+ %citecolor=darkblue,
+ filecolor=black,
+ linkcolor=black,
+ %inkcolor=darkblue,
+ urlcolor=blue,
+ colorlinks=true}
+\fi
+\usepackage{uosphysicsEnglish} %서울시립대양식
+
+\setlength\parindent{2pc} % 들여쓰기 1글자
+
+\newtheorem{theorem}{Theorem}[chapter] % Theorem 1.1, Theorem 3.4
+\newtheorem{corollary}[theorem]{Corollary} % Corollary는 독자번호 없음.
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{question}{Question} % 독자적인 번호를 갖는다. Question 1, Question 2
+\newtheorem{step}{Step}
+
+% 번호를 붙이지 않는 `정리' 만들기
+\newtheorem{lemmawon}{Lemma}
+\newtheorem{claim}{Claim}
+
+% 특별한 이름을 갖는, 번호가 붙지 않는 Theorem 만들기
+\newtheorem{questionA}{Question~A}
+\newtheorem{mainthmA}{Main Theorem~A}
+
+% 본문의 글씨가 기울어지지 않는 환경
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+% 화면에 나오는 이름이 이탤릭체인 환경
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{remarkof}{Remark}[theorem] % 어떤 Theorem의 아래에 Remark
+\newtheorem{remarkwon}{Remark}
+
+% 수식 번호 붙이기 (1.1), (3.3)
+\numberwithin{equation}{chapter} 
+
+%책갈피용
+%\usepackage[bookmarks=true]{hyperref}
+\usepackage{bookmark}
+
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{2}
+
+
+%표 정렬용
+\usepackage{multirow}
+\renewcommand{\multirowsetup}{\centering}
+
+%그림위 글자 기능(인준서 도장용)
+\usepackage[abs]{overpic}
+\setlength\unitlength{1mm}
+
+\begin{document}
+  
+  %% 정보
+  \EnglishTitle{Top quark mass measurement using charmed meson within b-jet}
+  %% 본문이 영문일 경우, 국문 제목은 빈칸으로 둘 것
+  %\KoreanTitle{b-제트 안의 참 쿼크 중간자를 이용한 탑 쿼크 질량 측정}
+  \KoreanTitle{}
+  \AuthorKoreanName{류 건 모}
+  \AuthorEnglishName{Geonmo Ryu}
+  \KoreanNameofDegree{물리학 박사}
+  
+  %% 해당 내용으로 채울 것. 석사학위의 경우 학과에 따라 "Science" 등 별도 용어 필요
+  %% Mater of Physics 등도 심사를 맡아봐야 할듯.
+  \EnglishNameofDegree{Doctor of Philosophy}
+  \EnglishNameofPaper{Ph.D. Dissertation}
+
+  %\EnglishNameofDegree{Master of ???}
+  %\EnglishNameofPaper{Master Thesis}
+
+  \GraduateDate{2017년 2월}
+  \GraduateDateEnglish{February 2017}
+  \SummittedDate{2016년 12월}
+	\EnglishSummittedDate{December 2016}
+  \EnglishDepartmentName{Department of Physics}
+  \KoreanDepartmentName{물리학과}
+  \RefereeDate{2016년 12월}
+  \RefereeChief{Hyunsoo Min}
+  \RefereeSecond{Inkyu Park}
+  \RefereeThird{Jason Sanghun Lee}
+	\RefereeFourth{Intae Yu}
+	\RefereeFifth{Tae Jeong Kim}
+  \AdvisorKoreanName{박 인 규}
+  \AdvisorEnglishName{Inkyu Park}
+  \KeyWordsEnglish{LHC, CMS, top quark, $J/\psi$, D0, D*, charmed meson}
+  \KeyWordsKorean{LHC, CMS, 탑 쿼크, $J/\psi$ 중간자, D0, D*, 참 중간자}
+
+  %% 앞표지
+  \makefrontcover
+  
+  %% 
+	\englishproposal
+  
+  %% 국문 제출 승인서. 국문 인준서의 경우 업데이트가 되지 않아서 추가 작업 필요.
+  %\makeapproval
+
+  %% 영문 제출 승인서
+  \makeenglishapproval
+  %% 국문초록
+  \pagenumbering{gobble}
+  \include{abs-english}
+  \makefrontcover
+  \cedp
+  
+  %% 본문 이전의 쪽들
+  \frontmatter
+  
+  %% TOC/ LOF / LOT 끝의 * 지우면 안됨. ( 목차에서 명단 삭제 필요 )
+  \pagestyle{plain}%
+	%% 목차
+	\clearpage
+	\phantomsection 
+    \tableofcontents*
+    
+	%% 그림목차
+	\clearpage
+	\phantomsection
+    \listoffigures*
+	%% 표목차
+	\clearpage
+	\phantomsection
+	\listoftables*
+  
+  %%% 본문 시작
+  \mainmatter
+  \linespread{2}
+  %\SetHangulspace{2.2}{2.0}
+
+  %% 쪽번호가 아래 중앙에 붙는다.
+  \pagestyle{fancy}%
+  \lhead{\leftmark}%
+  \rhead{}%
+  \chead{}%
+  \cfoot{\thepage}%
+  \renewcommand{\headrulewidth}{0pt}
+  
+  % \part{1부 소개}
+  \include{chapter1}
+  \cedp
+  \include{chapter2}
+  \cedp
+  \include{chapter3}
+  \cedp
+  \include{chapter4}
+  \cedp
+  \include{chapter5}
+  \cedp
+  \include{chapter6}
+  \cedp
+  \include{chapter7}
+  \cedp
+  \include{chapter8}
+  \cedp
+  \include{chapter9}
+  \cedp
+
+  \pagestyle{plain}%
+  %% 참고문헌
+	\clearpage
+	\phantomsection	
+  \include{biblo}
+  \cedp
+ 
+  %% 초록
+  \include{abs-korean}	
+  \cedp
+  
+  % 감사의 글
+  \include{thanksto}
+  \cedp
+  
+
+\end{document}

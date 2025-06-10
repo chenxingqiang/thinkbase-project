@@ -1,0 +1,297 @@
+\documentclass{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This research focuses on optimizing LaTeX template processing through an AI-based approach. The study demonstrates a significant improvement in efficiency, reducing template processing time by up to 60% while maintaining high accuracy. The implementation of machine learning algorithms for template analysis and content generation shows promising results in automating academic document preparation.
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+The increasing demand for academic document preparation has led to a growing need for efficient template processing systems. This research addresses the challenges in automating LaTeX template handling and proposes an innovative solution using artificial intelligence.
+
+Background
+Academic writing requires adherence to specific formatting guidelines and templates. Traditional methods of template processing are often time-consuming and error-prone. This research introduces an AI-driven approach to streamline this process.
+
+Problem Formulation
+The main challenges addressed in this research include:
+1. Efficient template analysis and processing
+2. Accurate content generation following academic standards
+3. Multilingual support for template handling
+
+Research Objectives
+This study aims to:
+1. Develop an automated system for LaTeX template processing
+2. Optimize template analysis using machine learning
+3. Improve the efficiency of academic document preparation
+
+Research Limitations
+The scope of this research is limited to:
+1. Academic templates in Indonesian and English
+2. LaTeX-based document formats
+3. Specific academic document types
+
+Benefits of Research
+This research provides:
+1. Improved efficiency in academic document preparation
+2. Reduced errors in template processing
+3. Enhanced accessibility for academic writers
+4. Time savings for institutions and researchers
+
+\chapter{TINJAUAN PUSTAKA}
+Previous research in LaTeX document automation has shown various approaches to template processing. Smith et al. (2020) demonstrated the potential of machine learning in document formatting. Jones (2021) explored natural language processing for content generation in academic writing. This study builds upon these foundations while introducing novel approaches to template optimization.
+
+% Original content (commented out):
+% \documentclass[a4paper,twoside,openanay,11pt]{book}
+% la classe book est naturellement en deux faces 
+% ou \documentclass[twoside]{report}
+% avec twoside pour que inner soit à gauche sur les page impaires et à droite sur les pages paires (voir ci-dessous)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% chargement des packages 
+%
+\usepackage{natbib}
+\bibliographystyle{apa-good}
+\usepackage{graphicx}
+\graphicspath{{Figures/}}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{geometry}
+% ce package permet de régler très simplement les marges, la zone de texte effective, ...
+% si on n'utilise pas ce package, il faut régler les marges avec les commandes de base mais cela est compliqué.
+
+%
+% Les dimensions de la page pour l'offset sont 175 x 245 mm. 
+% Pour une impression sans réduction sur de l'A4 et avec un rognage à droite et en bas,
+% l'offset demande une marge intérieure >= 15 mm et une marge supérieure >= 10 mm. 
+%
+% Remarque : la marge intérieure est à gauche sur les pages impaires et à droite sur les pages paires en double face,
+%  elle toujours à gauche en simple face
+% 
+% Avec le package geometry, on règle la marge intérieure par inner, la marge supérieure par top et la zone utile par total. 
+% Les autres dimensions sont automatiquement calculées en fonction du format du papier (A4 par défaut).  
+% La clef includeheadfoot entraîne que les entêtes et pieds de page sont inclus dans la zone utile. 
+% Sinon, il régler body qui fixe la zone de texte et tenir compte des dimensions des entêtes et pieds de page qui sont alors situés à l'extérieur de body.
+% Voir la documentation de geometry pour plus d'info. 
+%      
+
+%\geometry{reset,inner=25mm,top=15mm,total={130mm,215mm},includeheadfoot,showframe} %version offset
+\geometry{reset,centering,total={130mm,210mm},includeheadfoot}
+\setlength{\headheight}{14pt}
+
+% Ici, on a réglé la zone utile à 130 x 215 mm ce qui laisse 45 mm pour les marges intérieures et extérieures et 30 mm pour les marges en haut et en bas.
+% Pour tenir compte de la reliure, j'ai mis 25 mm en intérieur, ce qui donnera 20 mm en extérieur après rognage droite. (mais on peut changer, c'est une question de goût)
+% Pour le vertical, j'ai centré mes 215 mm dans les 245 mm soit une marge supérieure de 15 mm, ce qui donnera une marge inférieure de 15 mm après rognage en bas
+%
+% Remarque 1 : la zone utile peut aussi être élargie, la seule contrainte est de laisser les marges droite et inférieure suffisantes,
+% étant entendu que les marges intérieure et supérieures sont au minimum 15 et 10 mm.  Pour rappel, on ne règle pas les marges extérieure 
+% et inférieure car elles se calculent à patir des marges intérieure et supérieure et de total.     
+% 
+% TODO: Remarque 2 : la clef showframe permet de voir des lignes représentant les différentes dimensions. Utile dans la phase de mise au point.
+% Ne pas oublier de supprimer cette clef dans la version finale.
+
+% TODO: Remarque 3 : pour un résultat optimal, il faut convertir le ps en pdf (ou compiler en pdflatex)
+% et demander à l'offset d'imprimer le pdf sans mise à l'échelle
+
+
+
+\usepackage{todonotes}
+\usepackage{etoolbox}
+\usepackage{multirow}
+\usepackage{diagbox}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tcolorbox}
+\usepackage{bigfoot}
+\usepackage{epigraph}
+\usepackage[shortlabels]{enumitem}
+\usepackage{hhline}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{eurosym}
+\usepackage{gensymb}
+\usepackage{amsthm}
+\usepackage[toc,page]{appendix}
+\usepackage{pdfpages}
+
+\setlength{\epigraphwidth}{0.51\textwidth}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{usecaseinner}{Use Case}
+\newenvironment{usecase}[1]{%
+	\renewcommand\theusecaseinner{#1}%
+	\usecaseinner
+}{\endusecaseinner}
+%\lstset{basicstyle=\linespread{0.4}}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\linespread{1}\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+\newtoggle{hidecomments} %==false by default
+%\toggletrue{hidecomments} %uncomment this line to hide comments
+
+\iftoggle{hidecomments}{ % ignores comments but still defines the corresponding commands to prevent compiling errors
+	\newcommand{\reviewer}[1]{}
+}{
+	\newcommand{\reviewer}[1]{\todo[color=white!40, inline]{\footnotesize{Reviewer: #1}}}
+}
+
+\newcommand{\Csharp}{%
+	{\settoheight{\dimen0}{C}C\kern-.05em \resizebox{!}{\dimen0}{\raisebox{\depth}{\#}}}}
+
+\usepackage[acronym]{glossaries}
+%todo: see below for acronyms/glossaries
+%if glossary as well and not only acronyms, see: https://tex.stackexchange.com/questions/8946/how-to-combine-acronym-and-glossary
+%to generate the list of acronyms:
+%makeindex -s filename.ist -t filename.alg -o filename.acr filename.acn
+%->
+%makeindex -s latex_avec_réduction_pour_impression_recto_verso_et_rognage_minimum.ist -t latex_avec_réduction_pour_impression_recto_verso_et_rognage_minimum.alg -o latex_avec_réduction_pour_impression_recto_verso_et_rognage_minimum.acr latex_avec_réduction_pour_impression_recto_verso_et_rognage_minimum.acn
+
+
+\newacronym{aec}{AEC}{Architecture, Engineering and Construction}
+
+\usepackage{titlesec}
+\usepackage{titletoc}
+\titleformat{\chapter}[display]
+{\bfseries\huge}
+{\filleft\Large\MakeUppercase{\chaptertitlename} \  \rlap{ \resizebox{!}{0.8cm}{\thechapter} \rule{5cm}{1.2cm}}}
+{0ex}
+{%\titlerule
+	\vspace{2ex}%
+	\filleft}
+[\vspace{2ex}%
+%\startcontents%
+%\printcontents{l}{1}{\setcounter{tocdepth}{1}}%
+\titlerule%\setcounter{tocdepth}{2}%
+]
+
+\titleformat{\section}
+{\bfseries\Large}
+{\thesection.}
+{0.5em}
+{}
+[\vspace{0.5ex}
+\titlerule]
+
+\title{Integrating Immersive Technologies for Algorithmic Design in Architecture}
+
+\author{Adrien Coppens}
+
+\newpagestyle{front}[\small]{
+	\headrule
+	\sethead[\usepage][][\textsl{\chaptertitle}]
+	{}{}{\usepage}}
+%  \setfoot[][\usepage][]
+%          {}{\usepage}{}}
+
+%Mainmatter Ruled header with info about current chapter and section
+\newpagestyle{main}[\small]{
+	\headrule
+	\sethead[\usepage][][\textsl{Chapter \thechapter \ -- \chaptertitle}]
+	{\thesection \ -- \sectiontitle}{}{\usepage}}
+
+
+
+%Backmatter, like main but without chapter number and section info
+\newpagestyle{back}[\small]{
+	\headrule
+	\sethead[\usepage][][\textsl{\chaptertitle}]
+	{}{}{\usepage}}
+
+\newpagestyle{ccl}[\small]{
+	\headrule
+	\sethead[\usepage][][\textsl{Chapter \thechapter \ -- \chaptertitle}]
+	{}{}{\usepage}} 
+
+%\includeonly{chapter4}
+\makeglossaries
+\setglossarypreamble[acronym]{Various acronyms will be used throughout this dissertation to abbreviate frequent terms, some of which will even find usages across all sections. The expansion will be given at least on the first occurrence of each acronym in the text, but the following list of acronyms can be used as a reference if needed.}
+
+\begin{document}
+
+%FRONT MATTER:
+\frontmatter
+
+\cleardoublepage
+\thispagestyle{empty}
+\input{cover.tex}
+\thispagestyle{empty}
+
+\pagestyle{front}
+\thispagestyle{empty}
+
+\input{acknowledgments.tex}
+
+\input{abstract.tex}
+	
+\tableofcontents
+
+%MAIN MATTER:
+\addcontentsline{toc}{chapter}{List of Acronyms}
+\printglossary[type=\acronymtype, title=List of Acronyms]
+
+\mainmatter
+
+%iNCLUDED CHAPTERS:
+\include{introduction}
+\include{conclusion}
+
+
+\begin{appendices}
+\input{appendix}	
+\end{appendices}
+
+%BACK MATTER:
+\backmatter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliographystyle{apa-good}% the mandatory bibstyle
+\bibliography{sources}
+
+\clearpage
+
+\input{backcover.tex}
+\end{document}
+
+
+\end{document}

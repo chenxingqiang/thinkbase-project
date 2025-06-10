@@ -1,0 +1,367 @@
+\documentclass{jsarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english,indonesian]{babel}
+
+\title{Optimasi Pemrosesan Template LaTeX Menggunakan Pendekatan Berbasis AI}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\chapter{PENDAHULUAN}
+
+
+\chapter{TINJAUAN PUSTAKA}
+
+
+% Original content (commented out):
+% % Last Update: 2025.01.23 by Tetsuaki Baba
+% Last Update: 2024.01.28 by Tetsuaki Baba
+
+% 学部は \documentclass[a4paper,uplatex]{jsarticle}を利用して，\section で論文を構成してください．
+% 修士、博士は \documentclass[a4paper,uplatex]{jsreport} を利用して， \chapter で論文を構成してください．
+% for English users: replace jsarticle -> article or jsreport -> report
+\documentclass[a4paper,uplatex]{jsarticle}
+
+% 必要なパッケージを読み込み（ここはいじらない）%%%%%
+\usepackage{iathesis}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{appendix}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage[english]{babel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 文献引用設定 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Default: [文献番号] スタイル sorting=none: 文献が論文中に登場する順序．このほか，nty, nyt等ある．sort オプションについては 次のリンクを参照する https://ja.overleaf.com/learn/latex/Bibliography_management_with_biblatex#Reference_guide
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+
+% 著者名(西暦）スタイル style=authoryearの場合は引用表記が「名,姓」の順になるので，bib内のauthorを修正すること
+% \usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+
+% 文献読み込み
+\addbibresource{references.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{url}
+\urlstyle{same}
+
+\usepackage{CJKutf8}
+
+\begin{document}
+
+% ソースコード表記は code_listings.tex を参照してください。詳細：https://www.overleaf.com/learn/latex/Code_listing
+\include{code_listings.tex}
+
+% settings for kind of thesis %%%%%%%
+% 卒業論文の場合は \bachelorthesis
+% 卒業作品の場合は \bacheloarthesisartwork
+% 修士論文の場合は \masterthesis
+% 博士論文の場合は \doctorthesis
+% For English Users
+% 卒業論文の場合は \bachelorthesisEN
+% 卒業作品の場合は \bacheloarthesisartworkEN
+% 修士論文の場合は \masterthesisEN
+% 博士論文の場合は \doctorthesisEN
+\bachelorthesis % このサンプルでは卒業論文にしています
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 表紙 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% for English users, Please replace Japanese words into English
+\title{論　文　題　目}
+\fisicalyear{ \currentfisicalyear 年度}
+%\fisicalyear{ FY \currentfisicalyear }
+\supervisor{指導教員}{氏  名} % 氏名欄に指導教員名を入れる
+\studentNumber{学修番号}
+\author{氏　　名} % 自分の氏名
+\affiliation{東京都立大学\\システムデザイン学部\\インダストリアルアート学科} % 大学院は以下のコメントアウトした所属を参照
+% \affiliation{東京都立大学大学院\\システムデザイン研究科 博士前期課程\\インダストリアルアート学域}
+% \affiliation{Master's Course\\Division of Industrial Art\\Graduate School of Systems Design\\Tokyo Metropolitan University}
+
+\submissiondate{ \currentyear 年1月31日} % 実際の論文提出日にすること
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{roman} % 要旨はRoman書体で表示
+\setcounter{page}{1} % 1から振り直す
+
+% 副題がある場合は必ず先頭にハイフン（半角）を3つつけること
+\jasummary{論文タイトル}{--- 副題（必要であれば記入）}
+ここには日本語文章のみで論文要旨を記述してください。A4一枚程度の文量を目安としてください。なお修士、博士論文の場合は学位申請で提出した要旨と同一のものでなければなりませんので注意してください。
+
+\summary{Title}{--- Subtitle}
+The author shall describe his/her thesis in English text. 150 words.
+
+% 目次表示の深さ設定 %%%%%%%%%%%%%%%%%%%%%%%%%
+% 以下をコメントアウトすると，subsubsectionまで目次に表示される．数字を減らすと浅く，増やすと深くなる
+% \setcounter{tocdepth}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makemokuji % 目次の作成
+
+\newpage % 改ページ
+
+% フッターのページ設定 %%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}  % 論文本体はArabicで表示
+\setcounter{page}{1} % ページ番号を1から振り直す
+\pagestyle{plain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 修士論文や博士論文等で記述ページが多い場合は，\section（節） ではなく，\chapter（章） を使ってください
+\section{はじめに}
+
+論文の執筆にあたり必要最低限の注意事項（論文の構成，フォーマット，記述方法）を記載した。利用するアプリケーションはMicrosoft Word、\TeX ( 厳密にはこのテンプレートは \pLaTeXe だが，いろいろと説明が面倒なので以後は省略記号として \TeX と記述する．一般論として \TeX とその他のテフを混同しているといろいろ言われる場合があるので注意されたい)としてる．なお本稿は \TeX ユーザに対してガイドラインを説明．一部内容は Microsoft Word のそれと重複する\footnote{ちなみに \TeX の読み方は 「テフ」である．気になる読者は「TeX 読み方」等と検索するとよい．}。
+
+\section{\TeX の利用環境}
+\TeX を利用して論文を作成する際、予めそれらに関するソフトウェアを導入する必要がある。各OSに関してインストールには様々なやり方が存在するが、個人的には以下が初心者にとって最も利用しやすいパッケージである。特にブラウザ動作のOverleafは特別な環境構築をせずとも、こちらから提供するIA論文フォーマットを利用することですぐに執筆に取り掛かることができる。もしあなたが\TeX 初心者である場合はTeX Wiki \footnote{http://oku.edu.mie-u.ac.jp/~okumura/texwiki/}を参照してTeXの基本を抑えておいてほしい。
+\begin{itemize}
+\item Windows：TeX インストーラ 3\footnote{http://www.math.sci.hokudai.ac.jp/~abenori/soft/abtexinst.html}
+\item Mac OSX：MacTeX\footnote{http://www.tug.org/mactex/2011/}
+\item ブラウザ動作：Overleaf\footnote{https://ja.overleaf.com}
+\end{itemize}
+
+\TeX の扱い方について、不明な点がある場合、ウェブ上に大量の参考資料があるので、基本的には自己解決すること。\TeX を利用することに自信がない場合はMicrosoft Wordを利用すること。
+
+\section{文字コード}
+このファイル main.tex は UTF-8 の文字コードにて記述されている．例えばmacTex等のローカル環境ではデフォルトのTeXShop編集画面が文字化けして表示される．その場合は環境設定で文字コードをUTF-8に変更すること．Overleafでは気にすることはない．
+
+\section{論文の構成}
+学士論文であればsectionで，修士・博士論文であればchapterを用いて構成を分ける．chapterは章，sectionは節にあたる．学士論文であっても論文のページ数が多い（50ページ程度を目安）場合は chapter を用いて論文構成を分けてもよい．一般的にsectionのみで論文を記述するのはjournal（学術雑誌）やproceedings（予稿）に当たる論文を指し，学位論文ではchapterを用いる．インダストリアルアート学科では学士では卒業作品も認められているため，chapter構成で大きく見出しを取るほど文章量がない場合があるため，chapterかsectionかは適時判断してもちいること．
+
+論文は本論を含め以下の１--８の項目を含むこと。ただし\textcolor{red}{\textbf{ここで示した各項目名がそのまま章や節タイトルになるわけではない}}．適切な見出しは指導教員とよく相談すること。
+\begin{enumerate}
+\item 表紙 … 論文全体の内容を表す表題、指導教員名、提出年月日、学修番号、氏名等を記載すること。
+\item 要約 … 論文全体の要約を和文2000 字程度、英文150語程度で記述すること。研究の背景、目的、実施内容、その手法と結果、結論を簡単明瞭に網羅すること。
+\item 目次 … 論文の章・節の番号とその表題およびページを記入すること。
+\item 序論 … 論文の第１章では序論（又は背景、はじめに等）として、その分野における本研究の位置付け、歴史的背景、本研究の目的を述べること。従来研究のリミテーションを述べ、本研究がどういう点で既存問題解決に役立つか、又は新しいかを明確に述べる必要がある。
+\item 本論 … 先行研究や制作・開発した内容，実験や評価，結果等をまとめる．
+\item 結論 … 論文の最後の章に結論を設けること。研究目標に対してこの研究がどこまで到達できたかを検討し簡単に記述すること。また、本研究で成し得なかった事項、今後の課題等も述べるとよい。
+\item 謝辞… 研究を遂行する際、援助・協力等があった場合、必要に応じて謝辞を記すこと。
+\item 参考文献 … 研究内容に直接関係のある文献、引用した文献等は必ずその出処を明らかにすること。
+\end{enumerate}
+
+\subsection{階層について}
+上記で説明した chapterやsectionの他，subsectionやparagraph等も利用することができる．これらの階層を表\ref{tab:kaisou}に示す．ただし学位論文でsection基準の場合は，sectionが階層1となる．一般的にはsubsubsectionまで利用すると，逆に文章構造を把握しにくくなる場合もあるため，むやみに階層は深くしないほうがよい．
+
+\begin{table}[t]
+  \caption{chapterを基準とした見出しの階層}
+  \label{tab:kaisou}
+  \centering
+  \begin{tabular}{llllc} % l:Left, c:Center, r:Right 寄せ
+    \hline
+    \TeX コマンド  & 名前  &  階層  & 論文中の表示 & 目次表示\\
+    \hline \hline
+    \textbackslash{chapter}  & 章   & 1 & 1 & あり\\
+    \textbackslash{section}  & 節  & 1.1 & 1.1 & あり\\
+    \textbackslash{subsection}  & 小節  & 1.1.1 & 1.1.1 & あり\\
+    \textbackslash{subsubsection}  & 小小節  & 1.1.1.1 & なし & なし\\
+    \textbackslash{paragraph}  & 段落  & 1.1.1.1.1 & あり（■） & なし\\
+    \textbackslash{subparagraph}  & 小段落  & 1.1.1.1.1.1 & なし & なし\\
+    \hline
+  \end{tabular}
+\end{table}
+
+
+\section{論文のフォーマットと利用例}
+本節では，句読点，レイアウト等の論文のフォーマットから利用方法，利用例などを合わせて提示する．なお論文のお作法は分野や研究室によって大きくことなる場合もあるため，迷いが生じた場合は必ず指導教員に確認すること．
+
+\subsection{テキストスタイル}
+論文内の文章では\textbf{フォントの太さ}， \resizebox{8ex}{3ex}{サイズ}， \textcolor[RGB]{200,70,120}{テキストの色}や\underline{アンダーライン}等の装飾のテキストスタイルは別途設定してはいけない．テキストスタイルはすでに \TeX 内で適切に設定されているため，各セクションや項目等，適切なコマンドを利用するだけで，執筆者はテキストスタイルを気にする必要はない．
+
+\subsection{句読点}
+句読点は論文内で統一する．句読点は一般的に横書き論文においては「，．」を利用し、縦書き論文において「、。」を利用する．句読点の設定はIMEの環境設定から行える．ただし横書きであっても分野によっては「、。」を利用する場合もよくあるため，指導教員によく確認すること．
+
+「,.」を利用する場合，日本語入力（全角入力）による「，．」と半角入力による「,.」は記号が異なるため十分注意すること．IME設定ではなく，半角の「,.」で句読点を代用すると文字組がおかしくなるので，半角「.,」の利用には注意すること．例えば以下のように誤って句読点を用いると表示が美しくなくなる．逆に英語表記に対しては半角を用いること．
+\begin{itemize}
+    \item \textbf{正（全角）：} 美しく，整った日本語．これを常に心がけたい．
+    \item \textbf{正（半角）：} Hi all, This is what I always want to keep in mind.
+    \item \textbf{誤（半角）：} 美しく,整った日本語.これを常に心がけたい.
+    \item \textbf{誤（全角）：} Hi all， This is what I always want to keep in mind．
+\end{itemize}
+
+\subsection{レイアウト：Microsoft Word}
+用紙のサイズはA4．印刷は片面印刷とし，余白は上35mm，他下左右30mmとし，ヘッダーの用紙の端からの距離は15mm，ヘッダーのそれは17.5mmとする．
+Microsoft Wordの標準設定であり，Microsoft Wordの使用者は特に設定する必要はない．用紙の確認は，「ファイル」メニューより「ページ設定」、余白と用紙サイズが以下のようになっているかを確認する．本文の日本語フォント種類はMS明朝、英語フォントはTimes New Romanとする．フォントの大きさは10.5pt．本文中で使用する英語や数字は基本的に半角文字とする（表記が論文内で統一されていればどちらでもよい）．
+
+論文レイアウトは，A4文字の大きさは12ptとし，１行当たりの字数を40字，行数を30行とする．修士論文の場合50ページ程度を目安とするが，必ずしも50ページを満たす必要はない．これについては指導教員の指示に従うこと．研究室ごとに文化が異なる．用紙の下中央に連続したページ番号を付けること．
+
+\subsection{レイアウト： \TeX}
+原則は、上記で示したMicrosoft Wordの形式の通りで設定されている．ただし字数に関しては \TeX が最適な字間を決定するため、1行あたりの文字数40字はあくまで目安となる．
+
+\subsection{ソースコードの入れ方}
+ソースコードを論文に記載する場合は，以下のような記法を用いること．出力結果はListing.\ref{list:label}に示す．図は表と同様に番号を振るのを忘れずに．配色はcode\_listings.texを編集することで各自変更することが可能．特別なこだわりがなければデフォルトのまま利用することを勧める．
+
+\begin{Verbatim}
+\begin{lstlisting}[language=Javascript]
+ここにコードを記述
+\end{lstlisting}
+\end{Verbatim}
+
+% ソースコードの挿入
+% 詳細：　https://www.overleaf.com/learn/latex/Code_listing
+\begin{lstlisting}[language=Javascript, caption=p5.js start sample, label={list:label}]
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  background(220);
+}
+\end{lstlisting}
+
+\subsection{図表の入れ方}
+図はfigure，表はtableにて挿入する．図\ref{fig:tmu_hino}は日野キャンパス外観を示す．本稿で利用できる画像形式はjpg，pngを中心に利用されたい．ただしEPS，TIFFも利用できる．どちらの場合も解像度を考慮してデータを作成すること．図を複数枚横に並べて表示したい場合は，minipage を利用すると図\ref{fig:tmu_hino_yokonarabi}の様に表示できる．論文内に図や表を入れる場合，論文本文内にて必ず引用すること．よくある間違いとして，論文中で示されている図に関して論文本文で引用されず，また説明もされていない場合がある．
+
+\begin{figure}[t]
+  \begin{center}
+    \includegraphics[width=0.95\hsize]{./images/sample.jpg}
+    \caption{東京都立大学日野キャンパス}
+    \label{fig:tmu_hino}
+  \end{center}
+\end{figure}
+
+表\ref{tab:sample}はインダストリアルアートにて開講している授業を示す．
+
+\begin{figure}[t]
+  \begin{center}
+    \begin{tabular}{ccc}
+
+    \begin{minipage}{0.3\hsize}
+	\includegraphics[width=\hsize]{./images/sample.jpg}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \includegraphics[width=\hsize]{./images/sample.jpg}
+    \end{minipage}
+    &
+    \begin{minipage}{0.3\hsize}
+      \includegraphics[width=\hsize]{./images/sample.jpg}
+    \end{minipage}
+
+  \end{tabular}
+    \caption{日野キャンパス横並び}
+    \label{fig:tmu_hino_yokonarabi}
+  \end{center}
+\end{figure}
+
+\begin{table}[t]
+  \caption{インダストリアルアートの授業}
+  \label{tab:sample}
+  \centering
+  \begin{tabular}{lcr} % l:Left, c:Center, r:Right 寄せ
+    \hline
+    授業名  & 担当教員  &  場所  \\
+    \hline \hline
+    インダストリアルアート概論  & 全教員   & 南大沢 \\
+    インダストリアルアート特別研究  & 全教員  & 日野 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\subsubsection{図表の位置}
+\TeX では図表位置は基本的にはシステムにまかせて記述します。システムが適当なスペースに対して図を割り当ててくれます。それでも「この図はなるべく文章の近くに」、「ページの頭に」といった希望があると思います。そのような場合はfigureのオプションを利用してください。例えば下記のように[htb]と指定した場合、第一希望はh（here:その場所）に、第2希望はt（top:ページトップ）、第3希望はb（bottom:ページ下）に表示するように調整してください。ただし全体のレイアウトから必ずしもユーザの希望が叶うわけではありません。
+\begin{verbatim}
+\begin{figure}[htb]
+\end{verbatim}
+
+\subsubsection{図表一覧の表示}
+一部の論文フォーマットでは論文や章立ての最後に図表一覧を記載することがあります．このIA論文フォーマットではデフォルトではそのような表示はしていませんが，もし希望する場合は \textbackslash{listoffigures}や\textbackslash{listoftables}を用いることで以下のように自動で一覧リストを生成することができます．
+
+% 図表リストを表示する場合は以下をコメントアウトする。自動ですでに掲載されている図や表がリスト化される。もし
+% \caption[目次に記載される文章]{図表の説明文章}
+% と記述することでリストと図表の説明文章を分けることができます。
+\listoffigures  % 図リストを生成
+\listoftables   % 表リストを生成
+
+デフォルトでは図表のキャプション文章と同じものがリストにも載っていますが，\textbackslash{caption[リスト文章}{キャプション文章} と各図表のcaptionにオプションを追記することでリスト文章とキャプション文章を分けて記載することができます．
+
+\subsection{数式の入れ方}
+数式は文章中に表示する場合（インライン表示）と，別段落で表示する場合（ディスプレイ表示）の2種類がある．細かな利用方法はインターネットやChatGPT等で確認，質問してほしい．
+
+\paragraph{インライン表示}
+インライン表示では以下のいずれかの記号ペアで囲んだ中に数式を記載する．
+\begin{itemize}
+    \item \$ と \$
+    \item \textbackslash{(} と \textbackslash{)}
+    \item \textbackslash begin\{math\} と \textbackslash end\{math\}
+\end{itemize}
+
+
+\paragraph{ディスプレイ表示}
+ディスプレイ表示では以下のいずれの記号で囲んだ中に数式を記載する．
+\begin{itemize}
+    \item \$\$ と \$\$
+    \item \textbackslash{[} と \textbackslash{]}
+    \item \textbackslash begin\{displaymath\} と \textbackslash end\{displaymath\}
+\end{itemize}
+
+一般的には変数等の式を伴わない場合はインライン，式が伴う場合はディスプレイ表示で使い分けることが多い．例えば，$x$の値それぞれ$ a, b(ただしa < b)$ を範囲とした $f(x)$ の積分値 $ A $は
+$$
+A = \int^{b}_{a} f(x) dx
+$$
+と表現することができる．また，数式に番号を振る場合は equation環境を利用し，番号の引用にはlabelを利用する．以下 式(\ref{eq:sum}) は一般的な積分を示す．といった具合に表示する．詳細はソースを参照すること．
+\begin{equation}
+A = \int^{b}_{a} f(x) dx
+\label{eq:sum}
+\end{equation}
+
+\subsection{URLの扱い方}
+論文ではURLを表記することは好まれなかった．なぜならば，URLは一時的なものであり，10年または場合によっては数年で参照ができなくなる可能性があるためである．そのため参考文献においてはなるべく論文や書籍等，一定期間の保管が担保されているものを利用することが望ましいことをまず理解してほしい。その上で取り扱う分野においては，文献そのものがウェブページ形式である場合，URL以外に適切な文献が参照できない場合，動画を参照してほしい場合や，githubによるソースリポジトリへの誘導等はURLを利用する場合は決して禁止されているわけではない．ということも合わせて理解しておくこと。ただしこの場合も，無闇矢鱈に参考文献には追加せず、footnoteを活用すること．URLを紹介する程度であればそもそもfootnoteで十分である．つまり，URL先の内容が論文の根拠になる場合は参考文献に，そうでなければfootnoteを利用するのが目安となる．
+
+インダストリアルアート公式ウェブサイト https://industrial-art.sd.tmu.ac.jp の場合、特に問題は生じないが、URLエンコードがなされたURLでは \% 記号が含まれるため \TeX での利用には注意が必要である。 なぜなら \% はコメントアウトの記号だからだ．例えば ia wikiのia論文フォーマットページのリンクは {https://industrial-art.sd.tmu.ac.jp/wiki/doku.php?id=public:ia論文フォーマット} であるが，一般的には日本語等のマルチバイト文字の場合は「論文フォーマット」の部分がURLエンコードされ，「\url{%E8%AB%96%E6%96%87%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88}」となる．そのため，URLを \TeX 上で扱う場合は \textbackslash{url}コマンドを利用して \textbackslash{url\{表示したいURL\}}と \TeX 内では記述すること．
+
+\subsection{参考文献の書き方}
+参考文献は、ジャーナルの場合、著者名・タイトル・雑誌名・巻号・ページ・発行年、著書の場合は、著者名・書名・発行所・発行年、以上の順に書くこと。書籍の場合は、著者名、書籍タイトル、出版社、発表年の順。著者が複数の場合も略さず全著者名を記入すること。\TeX を利用している限りはreferences.bibに項目を追加するだけなので，特に意識する必要はない．wordを利用している場合は指導教員によく確認をとること．
+
+このテンプレートでは references.bib に引用したい文献をbibtex形式で列挙する．文献を記載し，適時 \cite{fujiwara}\cite{baba}\cite{weko_222242_1} などと引用ができる．なお参考文献の作成の仕方は幾つかあり、このサンプルファイルでは references.bibに記載されたリストから引用する方法である。bibitemコマンドでこのファイル中に直接記載する方法も存在するが，細かなオプションや引用スタイルミスにつながるため，使用は控えること．
+
+\subsubsection{引用形式}
+論文の引用形式は分野によって異なる．例えば，[文献番号]で引用される場合もあれば，著者名（西暦）といった引用スタイルも存在する．それらはAPA, IEEEスタイル等様々な呼び名と種類があり，ここでは詳しく触れない．デフォルトでは[文献番号]の引用スタイルとしているが，必要に応じてプリアンブルに指定されている以下の読み込みオプションにて， numeric以外の authoryearやalphabetic等を試して見るとよい．ただし引用スタイルによっては氏名が逆になる場合もある．このテンプレートではnumericスタイルを使用しているが，authoryearに変更した場合，references.bib内のauthorは氏名を逆にしなければ，本来 「都立 太郎」 と表記されるべきことろが， 「太郎 都立」等となってしまう．bibtex等の文献の参照形式は，論文を紹介しているウェブページ等にて提供されている場合が多いので，うまく活用すること．
+ \footnote{\url{https://ja.overleaf.com/learn/latex/Biblatex_bibliography_styles}}．
+\begin{verbatim}
+\usepackage[backend=biber,style=numeric]{biblatex}    
+\end{verbatim}
+
+
+
+% 参考文献の見出しを「引用文献」等と変更したい場合 %%%%%%%%%%%%%%
+%\renewcommand{\refname}{新しい参考文献見出し} % jsarticleの時
+%\renewcommand{\bibname}{新しい参考文献見出し} % jsreport
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand\refname{参考文献}
+\printbibliography
+
+
+\section*{謝辞}
+\addcontentsline{toc}{section}{謝辞} % 番号を振らずに目次に追加
+IA論文フォーマットを作成するにあたりご尽力いただいた教員、学生のみなさまに深謝いたします。
+
+
+% sectionのあとにアスタリスクをいれると、番号が振られず、目次にも掲載されない節となります。
+\section*{論文の提出期限}
+大学院は大学院教務委員に確認し、学部生は指導教員に確認してください。
+
+% 付録がある場合はすべての記述の一番最後に追加する
+\appendix
+\section{補足情報}
+多くの図表やプログラムコード等の補足資料がある研究では，すべてを論文内にいれると逆に理解が困難になる場合がある．その場合は重要な図表等は論文中で紹介しつつ，別途Appendix（付録）で紹介することがある．適時活用するとよい．
+
+
+
+\end{document}
+
+
+
+
+\end{document}

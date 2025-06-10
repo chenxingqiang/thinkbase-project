@@ -1,0 +1,130 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This template has been created from a previous Overleaf template
+%% Author F. Brivio
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a (brief) model paper using the achemso class
+%% The document class accepts keyval options, which should include
+%% the target journal and optionally the manuscript type. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\documentclass[journal=jacsat,manuscript=article,email=false]{achemso}
+\documentclass[10pt,a4paper]{article}
+%\usepackage{achemso}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+%\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage[version=3]{mhchem}
+\usepackage{setspace}
+\title{Research Plan}
+\author{Federico Brivio}
+\date{}
+\setlength{\voffset}{-0.75in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional packages needed here.  Only include packages
+%% which are essential, to avoid problems later. Do NOT use any
+%% packages which require e-TeX (for example etoolbox): the e-TeX
+%% extensions are not currently available on the ACS conversion
+%% servers.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[version=3]{mhchem} % Formula subscripts using \ce{}
+%\setkeys{acs}{maxauthors=0}      % will list all authors
+\usepackage{hyperref}
+%\setkeys{acs}{articletitle=true}
+
+%\newcommand*\mycommand[1]{\texttt{\emph{#1}}}
+\usepackage[LGRgreek]{mathastext}    
+\usepackage[
+    sorting=none,
+    giveninits=true,
+    maxbibnames=100,
+    style=numeric-comp,
+    sortcites=true,
+    backend=biber,
+    defernumbers=true,
+    natbib
+]{biblatex}
+%\addbibresource{achemso-demo.bib}
+% Different bib files to be included
+\addbibresource{list.bib}
+\addbibresource{preprint.bib}
+\addbibresource{thesis.bib}
+% Add a specific  keyword to everything coming from a given .bib file
+% In this example we used the keyword pre for the preprint.bif and thesis for thesis.bib
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map[overwrite]{
+      \perdatasource{preprint.bib}
+      \step[fieldset=keywords, fieldvalue={,pre}, append]
+    }
+  }
+}
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map[overwrite]{
+      \perdatasource{thesis.bib}
+      \step[fieldset=keywords, fieldvalue={,thesis}, append]
+    }
+  }
+}
+
+\begin{document}
+\section{Intruction - TO BE DELETED}
+This document creates a list of all your publications divided per type and it is based on this page:
+\href{https://tex.stackexchange.com/questions/358963/one-bibliography-section-per-bib-file-biblatex}{https://tex.stackexchange.com/questions/358963/one-bibliography-section-per-bib-file-biblatex} .
+
+The publication are grouped by type in different files. In this case we distinguish between regular papers (list.bib), preprints ( preprint.bib) and the thesis (thesis.bib).
+
+To list each type of publication independently, each file is marked with a specific tag.
+This tag is \texttt{fieldvalue} and it is included in this code in the preamble:
+\begin{verbatim}
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map[overwrite]{
+      \perdatasource{thesis.bib}
+      \step[fieldset=keywords, fieldvalue={,thesis}, append]
+    }
+  }
+}
+\end{verbatim}
+For each bib file it is possible to add a fieldvalue \texttt{fieldvalue={,thesis}} that allows to select which bib file is printed in a list and which is not.
+To print a section that contains only the publications of a file with a specific tag the code is the following:
+\begin{verbatim}
+    \printbibliography[keyword={thesis},title=PhD Thesis]
+\end{verbatim}
+To print the papers not listed in a file with a specific tag:
+\begin{verbatim}
+    \printbibliography[notkeyword={pre},notkeyword={thesis},title=YOURNAME Publication list]
+\end{verbatim}
+
+Other divisions are of course possible. E.g. \textit{Publications as leading author}, \textit{Publications as last Author}, etc. .
+
+A different method is available here: \href{https://bastian.rieck.me/blog/posts/2021/publication_lists/}{https://bastian.rieck.me/blog/posts/2021/publication\_lists}
+
+\section{ACTUAL LISTS}
+% For the final document cancell ALL from /begin{document) exclued to this line %%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The "tocentry" environment can be used to create an entry for the
+%% graphical table of contents. It is given here as some journals
+%% require that it is printed as part of the abstract page. It will
+%% be automatically moved as appropriate.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\nocite{*}   % Since this is not a text document, we need to cite ALL the paper in the .bib file
+
+\printbibliography[notkeyword={pre},notkeyword={thesis},title=YOURNAME Publication list]  % This will list all the publications execpt the ones contained in bib files tagged with the keywords pre and thesis
+
+\printbibliography[keyword={pre},title=Preprint]  % This list only the publications contained in files tagged with the jeyword pre 
+\printbibliography[keyword={thesis},title=PhD Thesis]
+\end{document}

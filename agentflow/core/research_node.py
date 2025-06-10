@@ -1,14 +1,20 @@
 """Research node implementation."""
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Protocol, runtime_checkable
 import logging
 import asyncio
 
 from .node import AgentNode
-from ..ell2a.integration import ELL2AIntegration
-from ..ell2a.types.message import Message, MessageRole
+from ..ell.integration import ELLIntegration
+from ..ell.types.message import Message, MessageRole
 
 logger = logging.getLogger(__name__)
+
+@runtime_checkable
+class ELLProtocol(Protocol):
+    def cleanup(self) -> None: ...  # Not async in actual implementation
+    async def process_message(self, message: Message) -> Any: ...
+    def configure(self, config: Dict[str, Any]) -> None: ...
 
 class ResearchNode(AgentNode):
     """Node for executing research tasks."""
@@ -27,13 +33,13 @@ class ResearchNode(AgentNode):
             "model": "gpt-3.5-turbo",
             "temperature": 0.7
         }
-        self._ell2a = None
+        self._ell: Optional[ELLProtocol] = None
     
     async def _initialize_impl(self) -> None:
-        """Initialize ELL2A integration."""
-        if not self._ell2a:
-            self._ell2a = ELL2AIntegration()
-            self._ell2a.configure({
+        """Initialize ELL integration."""
+        if not self._ell:
+            self._ell = ELLIntegration()
+            self._ell.configure({
                 "model": self.model_config,
                 "system_prompt": "You are a research assistant helping with academic research."
             })
@@ -48,6 +54,12 @@ class ResearchNode(AgentNode):
             Research findings
         """
         try:
+            # Initialize if needed
+            if not self._ell:
+                await self._initialize_impl()
+            
+            assert isinstance(self._ell, ELLProtocol), "ELL not properly initialized"
+            
             # Extract research parameters
             topic = task.get("RESEARCH_TOPIC", "")
             academic_level = task.get("ACADEMIC_LEVEL", "")
@@ -79,8 +91,8 @@ class ResearchNode(AgentNode):
                 }
             )
             
-            # Process with ELL2A
-            response = await self._ell2a.process_message(message)
+            # Process with ELL
+            response = await self._ell.process_message(message)
             
             return {
                 "findings": response.content,
@@ -97,7 +109,7 @@ class ResearchNode(AgentNode):
             raise
     
     async def _cleanup_impl(self) -> None:
-        """Clean up ELL2A resources."""
-        if self._ell2a:
-            await self._ell2a.cleanup()
-            self._ell2a = None 
+        """Clean up ELL resources."""
+        if isinstance(self._ell, ELLProtocol) and callable(getattr(self._ell, 'cleanup', None)):
+            self._ell.cleanup()  # Not async
+            self._ell = None 

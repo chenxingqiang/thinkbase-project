@@ -1,0 +1,223 @@
+\documentclass[12pt,a4paper,twoside]{article}
+\makeatletter\if@twocolumn\PassOptionsToPackage{switch}{lineno}\else\fi\makeatother
+
+\usepackage{amsfonts,amssymb,amsbsy,latexsym,amsmath,tabulary,graphicx,times,xcolor}
+\usepackage[T1]{fontenc}
+\usepackage{url,multirow,morefloats,floatflt,cancel,tfrupee,multicol}
+\makeatletter
+
+\AtBeginDocument{\@ifpackageloaded{textcomp}{}{\usepackage{textcomp}}}
+\makeatother
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{pifont}
+\usepackage[nointegrals]{wasysym}
+\usepackage[superscript,biblabel]{cite}
+\urlstyle{rm}
+\makeatletter
+
+%Etal definition in references
+\@ifundefined{etal}{\def\etal{\textit{et~al}}}{}
+
+\AtBeginDocument{
+\expandafter\ifx\csname eqalign\endcsname\relax
+\def\eqalign#1{\null\vcenter{\def\\{\cr}\openup\jot\m@th
+  \ialign{\strut$\displaystyle{##}$\hfil&$\displaystyle{{}##}$\hfil
+      \crcr#1\crcr}}\,}
+\fi
+}
+
+\@ifundefined{tsGraphicsScaleX}{\gdef\tsGraphicsScaleX{1}}{}
+\@ifundefined{tsGraphicsScaleY}{\gdef\tsGraphicsScaleY{.9}}{}
+% To automatically resize figures to fit inside the text area
+\def\checkGraphicsWidth{\ifdim\Gin@nat@width>\linewidth
+	\tsGraphicsScaleX\linewidth\else\Gin@nat@width\fi}
+
+\def\checkGraphicsHeight{\ifdim\Gin@nat@height>.9\textheight
+	\tsGraphicsScaleY\textheight\else\Gin@nat@height\fi}
+
+\def\fixFloatSize#1{}%\@ifundefined{processdelayedfloats}{\setbox0=\hbox{\includegraphics{#1}}\ifnum\wd0<\columnwidth\relax\renewenvironment{figure*}{\begin{figure}}{\end{figure}}\fi}{}}
+\let\ts@includegraphics\includegraphics
+
+\def\inlinegraphic[#1]#2{{\edef\@tempa{#1}\edef\baseline@shift{\ifx\@tempa\@empty0\else#1\fi}\edef\tempZ{\the\numexpr(\numexpr(\baseline@shift*\f@size/100))}\protect\raisebox{\tempZ pt}{\ts@includegraphics{#2}}}}
+
+%\renewcommand{\includegraphics}[1]{\ts@includegraphics[width=\checkGraphicsWidth]{#1}}
+\AtBeginDocument{\def\includegraphics{\@ifnextchar[{\ts@includegraphics}{\ts@includegraphics[width=\checkGraphicsWidth,height=\checkGraphicsHeight,keepaspectratio]}}}
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+\def\URL#1#2{\@ifundefined{href}{#2}{\href{#1}{#2}}}
+
+\edef\fntEncoding{\f@encoding}
+\def\EUoneEnc{EU1}
+\makeatother
+\def\floatpagefraction{0.8} 
+\def\dblfloatpagefraction{0.8}
+\def\style#1#2{#2}
+\def\xxxguillemotleft{\fontencoding{T1}\selectfont\guillemotleft}
+\def\xxxguillemotright{\fontencoding{T1}\selectfont\guillemotright}
+
+\newif\ifmultipleabstract\multipleabstractfalse%
+\newenvironment{typesetAbstractGroup}{}{}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[hmargin=1.8cm,vmargin=2.2cm]{geometry}%,headsep=0.3in,footskip=0.49in
+\setlength{\columnsep}{0.25in}
+\setlength\headheight{19.5pt}
+
+\makeatletter
+\def\author#1{\gdef\@author{\hskip-\dimexpr(\tabcolsep)\hskip1pt\parbox{\dimexpr\textwidth-1pt}{\centering #1}}}
+
+\let\@articletype\@empty \def\articletype#1{\gdef\@articletype{{\fontsize{14}{16}\selectfont #1}}}
+
+\usepackage{fancyhdr}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{headings}{\fancyhf{}\fancyhead[RE]{\MakeTextUppercase{\textbf{\RunningAuthor}}}\fancyhead[LE]{\textbf{\thepage}}\fancyhead[LO]{\MakeTextUppercase{\textbf{\RunningHead}}}\fancyhead[RO]{\textbf{\thepage}}}\pagestyle{headings}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\textbf{\thepage}}}
+
+\AtBeginDocument{\usepackage{lastpage}}
+\def\title#1{%
+  \gdef\@title{%
+%   {\vspace*{-42pt}\raggedright\fontsize{10}{12}\selectfont\textbf{\MakeTextUppercase{\journalTitle}}\\%
+%   \textbf{Volume xx, Number x, \the\year}\\%
+%   \textbf{Mary Ann Liebert, Inc.}\\%
+%   \textbf{Pp. 1--\pageref{LastPage}}\\%
+%   \textbf{DOI: 10.1089/xxx.xxxx.xxxx}\\}%
+    \ifx\@articletype\@empty\else\@articletype~\\\fi%
+     #1}%
+}
+
+
+\usepackage{abstract}
+\def\abstractname{\textbf{Abstract}}
+\renewenvironment{onecolabstract}
+{\vspace*{-.4pc}\trivlist\item[]\leftskip1pt\noindent\selectfont\hfill\abstractname\hfill\mbox{\null}\par\ignorespaces}{\endtrivlist}
+
+\def\NormalBaseline{\def\baselinestretch{1.1}}
+
+\usepackage{textcase}
+\usepackage[explicit]{titlesec}
+\setcounter{secnumdepth}{5}
+
+\titleformat{\section}[block]{\NormalBaseline\boldmath\bfseries}
+{\thesection.}
+{6pt}
+{#1}
+[]
+\titleformat{\subsection}[hang]{\NormalBaseline\filright\itshape}
+{\thesubsection.}
+{6pt}
+{#1}
+[]
+\titleformat{\subsubsection}[runin]{\NormalBaseline\filright\itshape}
+{\hspace{16pt}\thesubsubsection}
+{6pt}
+{#1}
+[]
+\titleformat{\paragraph}[runin]{\NormalBaseline}
+{\theparagraph}
+{6pt}
+{#1}
+[]
+\titleformat{\subparagraph}[runin]{\NormalBaseline}
+{\thesubparagraph}
+{6pt}
+{#1}
+[]
+
+\titlespacing{\section}{0pt}{1.5\baselineskip}{.2\baselineskip}  
+\titlespacing{\subsection}{0pt}{1.5\baselineskip}{.2\baselineskip}  
+\titlespacing{\subsubsection}{0pt}{1.5\baselineskip}{.2\baselineskip}  
+\titlespacing{\paragraph}{0pt}{.5\baselineskip}{10pt}  
+\titlespacing{\subparagraph}{0pt}{.5\baselineskip}{10pt}
+
+
+\usepackage{caption}
+\DeclareCaptionLabelFormat{figlabel}{Figure #2}
+\captionsetup[figure]{font={footnotesize},labelfont={bf},labelformat=figlabel,skip=1.4pt,aboveskip=1pc,labelsep=period,justification=centering}
+\captionsetup[table]{font={footnotesize},skip=1.4pt,labelsep=period,justification=centering}
+
+\date{}
+\makeatother
+
+\usepackage{endfloat}
+% \usepackage[authoryear]{natbib}
+\usepackage{float}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Document content starts below
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\title{Preparation of papers for Mary Ann Liebert Inc. Soft Robotics Journal}
+\def\RunningHead{
+Preparation of papers short title
+}
+\def\RunningAuthor{smith \etal}
+\author{John Smith and Bernard D. Researcher
+\thanks{John Smith and Bernard D. Researcher are with Faculty of Electrical Engineering, Mathematics and Computer Science,
+        University of Twente, 7500 AE Enschede, The Netherlands
+        {\tt\small john.smith@email.com, b.d.researcher@email.org}}%
+}
+
+\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\begin{onecolabstract}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+\def\keywordstitle{Keywords}
+\smallskip\noindent\textbf{Keywords: }{\normalfont
+Keyword1, Keyword2, Keyword3
+}
+\end{onecolabstract}}
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{multicols}{2}
+
+\section{Introduction}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Example figure reference here: Figure~\ref{FigureLabel1}. Example reference citation here.\cite{examplereference}
+
+\begin{figure*}[!htbp]
+    \centering
+    \includegraphics{Images/SmithFig1.eps}
+    \caption{Figure caption goes here}
+    \label{FigureLabel1}
+\end{figure*}
+
+
+\section{Materials and Methods}
+Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat. Curabitur augue lorem, dapibus quis, laoreet et, pretium ac, nisi. Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.
+
+
+\section{Results}
+Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat. Curabitur augue lorem, dapibus quis, laoreet et, pretium ac, nisi. Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.
+
+
+\section{Conclusion}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Acknowledgements} 
+Acknowledgements go here.
+
+
+\section*{Author Disclosure Statement}
+Detail any competing interests here.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{ieeetr}
+\bibliography{references.bib}
+
+\end{multicols}
+\end{document}

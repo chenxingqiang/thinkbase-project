@@ -1,0 +1,192 @@
+
+% Mohamed bin Zayed University of Artificial Intelligence (MBZUAI) Thesis Template for LaTeX 
+
+% uOttawa (unofficial) Thesis Template for LaTeX
+
+% Edited by Wail Gueaieb based on the uWaterloo’s Template
+% The updated version of this template has been edited by Moayad Aloqaily and Mohsen Guizani.
+
+
+% DON'T USE THIS TEMPLATE IF YOU DON'T KNOW WHAT YOU'RE DOING!
+% Remember, it comes WITH NO WARRANTY!
+
+% Please read the "00readme.txt" file first.
+% Here is how to use this template:
+%
+% DON'T FORGET TO ADD YOUR OWN NAME AND TITLE in the "hyperref" package
+% configuration in the "thesis-preample.tex" file. THIS INFORMATION GETS 
+% EMBEDDED IN THE PDF FINAL PDF DOCUMENT.
+% You can view the information if you view Properties of the PDF document.
+
+% The template is based on the standard "book" document class which provides 
+% all necessary sectioning structures and allows multi-part theses.
+
+
+
+
+% N.B. The "pdftex" program allows graphics in the following formats to be
+% included with the "\includegraphics" command: PNG, PDF, JPEG, TIFF
+% Tip 1: Generate your figures and photos in the size you want them to appear
+% in your thesis, rather than scaling them with \includegraphics options.
+% Tip 2: Any drawings you do should be in scalable vector graphic formats:
+% SVG, PNG, WMF, EPS and then converted to PNG or PDF, so they are scalable in
+% the final PDF as well.
+% Tip 3: Photographs should be cropped and compressed so as not to be too large.
+
+% To create a PDF output that is optimized for double-sided printing: 
+%
+% 1) comment-out the \documentclass statement in the preamble below, and
+% un-comment the second \documentclass line.
+%
+% 2) change the value assigned below to the boolean variable
+% "PrintVersion" from "false" to "true".
+
+% --------------------- Start of Document Preamble -----------------------
+
+% Specify the document class, default style attributes, and page dimensions
+% For hyperlinked PDF, suitable for viewing on a computer, use this:
+\documentclass[letterpaper,12pt,titlepage,oneside,final]{book}
+ 
+% For PDF, suitable for double-sided printing, change the PrintVersion variable below
+% to "true" and use this \documentclass line instead of the one above:
+% \documentclass[letterpaper,12pt,titlepage,openright,twoside,final]{book}
+
+
+% This package allows if-then-else control structures.
+\usepackage{ifthen}
+\newboolean{PrintVersion}
+\setboolean{PrintVersion}{false} 
+% \setboolean{PrintVersion}{true} 
+% CHANGE THIS VALUE TO "true" as necessary, to improve printed results 
+% for hard copies by overriding some options of the hyperref package.
+
+
+% Load your needed packages and other commands of yours.
+\input{thesis-preamble}
+
+% This is where thesis margins and spaces are set.
+\input{private/thesis-margins-and-spaces}
+
+%======================================================================
+%   L O G I C A L    D O C U M E N T -- the content of your thesis
+%======================================================================
+\begin{document}
+
+% For a large document, it is a good idea to divide your thesis
+% into several files, each one containing one chapter.
+% To illustrate this idea, the "front pages" (i.e., title page,
+% declaration, borrowers' page, abstract, acknowledgements,
+% dedication, table of contents, list of tables, list of figures,
+% nomenclature).
+%----------------------------------------------------------------------
+% FRONT MATERIAL
+%----------------------------------------------------------------------
+%
+% C O V E R  P A G E
+% ------------------
+\newcommand{\thesisauthor}{[First name] [Last name]}
+\newcommand{\thesistitlecoverpage}{%
+  Mohamed bin Zayed University of Artificial Intelligence (MBZUAI) \\
+  {\LaTeX} Template
+}
+\newcommand{\degree}{MSc./Ph.D.} % possible values are:
+                            % M.A. / M.A.Sc. / M.Sc. / MCS / Ph.D.
+\newcommand{\nameofprogram}{ML, CV, and NLP}
+\newcommand{\academicunit}{Department of Machine Learning}
+\newcommand{\faculty}{Faculty of Engineering}
+\newcommand{\graduationyear}{2021}
+%
+\input{private/frontpage}
+%
+%
+% R E S T  O F  F R O N T  P A G E S
+% ----------------------------------
+\input{private/examiners}
+\input{private/declarationpage}
+
+% Edit the following 3 files with your abstract, acknowledgements, 
+% and dedication.
+\input{Chapters/Abstract}
+\input{Chapters/Acknowledgements}
+\input{Chapters/Lay _Summary_of_Thesis}
+
+\input{Chapters/Dedication}
+
+% No need to edit this file.
+\input{private/toc-lot-lof}
+\input{Chapters/List_of_Abbreviations}
+
+%
+% No need to edit this file. But you may want to comment the whole line if you
+% don't have or want a Nomenclature section.
+%\input{private/list-of-symbols}  
+
+
+% Change page numbering back to Arabic numerals
+\pagenumbering{arabic}
+
+%----------------------------------------------------------------------
+% MAIN BODY
+%---------------------------------------------------------------------- 
+% Chapters 
+% Include your "sub" source files here (must have extension .tex)
+\include{Chapters/Chapter_01}
+\include{Chapters/Chapter_02}
+
+%Add Chapters as much as you want!
+\include{private/list-of-symbols}
+
+\renewcommand*{\bibname}{References}
+
+% Add the References to the Table of Contents
+\addcontentsline{toc}{chapter}{\textbf{References}}
+%----------------------------------------------------------------------
+% APPENDICES
+%---------------------------------------------------------------------- 
+
+\addcontentsline{toc}{chapter}{APPENDICES} 
+\appendix
+% Designate with \appendix declaration which just changes numbering style 
+% from here on
+% Add a title page before the appendices and a line in the Table of Contents
+
+%
+
+
+%----------------------------------------------------------------------
+% END MATERIAL
+%----------------------------------------------------------------------
+
+% B I B L I O G R A P H Y
+% -----------------------
+%
+% The following statement selects the style to use for references.  It controls the sort order of the entries in the bibliography and also the formatting for the in-text labels.
+\bibliographystyle{plain}
+% This specifies the location of the file containing the bibliographic information.  
+% It assumes you're using BibTeX (if not, why not?).
+\ifthenelse{\boolean{PrintVersion}}{
+\cleardoublepage % This is needed if the book class is used, to place the anchor in the correct page,
+                 % because the bibliography will start on its own page.
+}{
+\clearpage       % Use \clearpage instead if the document class uses the "oneside" argument
+}
+\phantomsection  % With hyperref package, enables hyperlinking from the table of contents to bibliography             
+% The following statement causes the title "References" to be used for the bibliography section:
+
+
+\bibliography{bibliography/keylatex}
+% Tip 5: You can create multiple .bib files to organize your references. 
+% Just list them all in the \bibliogaphy command, separated by commas (no spaces).
+
+\include{Chapters/Appendix_A} %"Sources of Information and Help"
+\include{Chapters/Appendix_B} %"Matlab Code for Making a PDF Plot"
+%----------------------------------------------------------------------
+\end{document}
+%======================================================================
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

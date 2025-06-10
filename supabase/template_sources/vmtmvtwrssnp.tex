@@ -1,0 +1,182 @@
+%%
+%% Latex Style File for MECH0020 - AY 2023/2024
+%%
+%% I. Eames 
+%% version 2
+%% 26th March 2024
+%% Uses vanilla form of latex with no need to additional style files
+%%
+
+\documentclass[11pt,twocolumn]{article} 
+\usepackage{fancyhdr}
+\usepackage{expl3,xparse,xcoffins,titling,kantlipsum}
+\ExplSyntaxOn
+\coffin_new:N \l_my_abstract_coffin
+\dim_zero_new:N \l_my_width_dim
+\keys_define:nn { my / abstract }
+  {
+    width .code:n = {
+      \dim_set:Nn \l_my_width_dim {#1\textwidth}
+    }
+  }
+\NewDocumentCommand \myabstract { O {width=.8} m }{%
+  \keys_set:nn { my / abstract } { #1 }
+  \SetVerticalCoffin \l_my_abstract_coffin {\l_my_width_dim} {#2}
+  \renewcommand\maketitlehookd{%
+    \mbox{}\medskip\par
+    \centering
+    \TypesetCoffin \l_my_abstract_coffin
+  }
+}
+\ExplSyntaxOff
+\usepackage[document]{ragged2e}
+\usepackage{geometry}
+ \geometry{
+  a4paper,
+  total={170mm,257mm},
+  left=17.5mm,
+  right=17.5mm,
+  bottom=15mm,
+  top=15mm
+ }
+ 
+% \documentclass{gji}
+\usepackage{timet,color}
+\usepackage{nomencl}
+\setlength{\nomitemsep}{-\parsep}
+\usepackage{graphicx}
+\usepackage[urlcolor=blue,citecolor=black,linkcolor=black]{hyperref}
+\usepackage[english]{babel}
+\usepackage{times}
+\usepackage{multicol}
+\makenomenclature
+\begin{document}
+
+\title{\bf \Huge Long title of project}
+\author{{\bf \Large A.N. Engineer SN: 10102023}\\
+  $^1$ Department of Mechanical Engineering, University College London,\\ Torrington Place, London, WC1E 7JE, UK
+  }
+\date{March 11th 2024}
+
+
+\let\leqslant=\leq
+
+\label{firstpage}
+
+
+%%
+%% This format for begin abstract is a reclaration of a macro to 
+%% create single columne for abstract
+%%
+\myabstract[width=.7]{
+The report should contain an abstract within 300 words. The report should have a self-contained, citation-free abstract and state briefly the purpose of the research, methodology, key results and major conclusions. Abstract should be in a single paragraph with running sentences. Do not use any subheading or point list within the abstract. Also, non-standard or uncommon abbreviations should be avoided, but if essential they must be defined at their first mention in the abstract itself.  
+\noindent
+{\bf Keywords:} Authors are advised to write 3-5 keywords related to the project, separated by comma. 
+}
+
+
+\maketitle
+
+%%
+%% This creates a header title for MECH0020_AY2023-24
+%%
+\pagestyle{fancy}
+\fancyhead[L]{MECH0020\underline{\hspace{.1in}}AY2023-24}
+%%
+%% This creates the nomenclature list - dont forget to tag the 
+%% definitions for new symbols as you go through
+%%
+
+\printnomenclature
+
+\section{Introduction}
+
+We use the following equation
+\begin{equation}
+E = mc^2, \label{eqn:equation1}
+\end{equation}
+to estimate the energy produced during a nuclear reaction. 
+
+The equation (\ref{eqn:equation1}) was derived by \cite{einstein1916foundation}.
+
+\nomenclature{$c$}{Speed of light}
+\nomenclature{$m$}{mass of particle}
+
+\cite{listersqueegee}
+
+\section{Literature review}
+This part should contain sufficient detail to reproduce reported data. It can be divided into subsections if several methods are described. Methods already published should be indicated by a reference [4], only relevant modifications should be described. Methodology should be written concisely in detail by maintaining continuity of the texts. 
+
+\section{Theory and Calculation / Experimental set-up}
+
+A theory section should extend, not repeat, the background to the article already dealt with in the Introduction and lay the foundation for further work. In contrast, a Calculation section represents a practical development from a theoretical basis. Do not add extensive basic definitions or well-known theories, instead highlight theoretical background and its specific usages in view of your work only.
+\subsection{Mathematical Expressions and Symbols}
+Mathematical expressions and symbols should be inserted using equation tool of Microsoft word. References may be added for used equations to support its authenticity, e.g. this result has been analysed using Fourier series [5].
+\begin{equation}
+f(x) = a_0 + \sum_{n=1}^\infty \left( a_n \cos {n\pi x\over L} + b_n \sin {n\pi x \over L} \right).
+\end{equation}
+
+\section{Results and Discussion}
+This section may each be divided by subheadings or may be combined.  A combined Results and Discussion section is often appropriate.  This should explore the significance of the results of the work, don’t repeat them. Avoid extensive citations and discussion of published literature, instead discuss only recent literature for comparing your work to highlight novelty of the work in view of recent development and challenges in the field.
+
+\subsection{Preparation of Figures and Tables}
+You are supposed to embed all figures and tables at appropriate place within text. Figures and Tables should be numbered properly with descriptive title. Each Figure/Table must be explained within the text by referring to corresponding figure/table number. Max. 10 illustrations recommended, i.e., figures, graphs, tables are allowed in this report. All additional illustrations can be added to the Appendix/Supplemental Material.
+
+\subsection{Formatting Tables}
+Table should be prepared using table tool within the Microsoft word and cited consecutively in the text. Every table must have a descriptive title and if numerical measurements are given, the units should be included in the column heading. Formatting requirement has been summarized in the Table 1.
+
+
+\begin{table}
+\caption{Summary of formatting requirement for submitting paper in this journal.}
+
+\begin{tabular}{|c|c|c|c|c|} \hline
+Layout	& Size&	Margin  &	Footer &	 \\ 
+ 	&  &	(normal) &	 &	 \\  \hline
+Font &	Article 	&Headings	&Reference	&Text \\ 
+ &	Title	& 	& list	& \\ \hline
+& & & & \\				\hline
+Line  &	1.15	&1.15&	1.15	&1.15 \\ \hline
+ Spacing &		&  &		&  \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsection{Formatting Figures}
+All figures should be cited in the paper in a consecutive order. Figures should be used in bitmap formats (TIFF, GIF, JPEG, etc.) with 300 dpi resolution at least unless the resolution is intentionally set to a lower level for scientific reasons. Figure 1 shows the logo of UCL.
+
+ 
+\begin{figure}
+    \centering
+\includegraphics[width=0.45\textwidth]{figures/UCLlogo.png}
+    \caption{UCL logo.}
+    \label{fig:enter-label}
+\end{figure}
+
+Larger tables and figures could be placed in a single column layout.
+
+\section{Conclusions}
+
+Each report should contain a conclusion section within 250-450 words which may contain the major outcome of the work, highlighting its importance, limitation, relevance, application and recommendation. Conclusion should be written in continuous manner with running sentences which normally includes main outcome of the work, its application, limitation and recommendation. Do not use any subheading, citation, references to other part of the manuscript, or point list within the conclusion.
+\section{Declarations}
+
+\subsection{Acknowledgements}
+All acknowledgments (if any) should be included here and may include list of peoples who contributed to the work in the manuscript but not listed in the author list. 
+\subsection{Use of AI}
+Declare any use of AI tools for generating this report and the category of use (ref, module handbook)
+\section{References}
+You are responsible for ensuring that the information in each reference is complete and accurate. Avoid using grey literature (unauthentic website, news portal, social media, Wikipedia etc) as reference, only scholarly literature (Journal, online books, proceedings, patents, authentic websites with permanent archival policy) are acceptable references. All references must be numbered consecutively and citations of references in the text should be identified using numbers in square brackets (e.g., “as explained by [1]”; “as discussed in many reports [2]-[6]”). All references should be cited within the text correctly; do not list any reference without citation within the text. All cited references should be listed in the Vancouver or Harvard style as specified in the handbook. 
+
+
+
+\cite{Darwin1953}
+
+
+\cite{hirt1981volume}
+
+
+\bibliographystyle{IEEEtran}
+
+% \bibliographystyle{ieeetr}
+\bibliography{manuscript_references}
+
+\end{document}

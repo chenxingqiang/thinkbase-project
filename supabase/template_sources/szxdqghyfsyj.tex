@@ -1,0 +1,159 @@
+% FDUletter_example.tex - an example latex file to illustrate FDUletter.cls
+%
+% Template by Brian Wood (brian.wood@oregonstate.edu).  Please feel free to send suggestions for changes; this template/cls is not exactly elegantly done!
+% Modified by Huang Weiran (huangweiran1998@outlook.com) to fit the need of FDU students.
+% Modified by Phosphorus15 (phosphophate@gmail.com) into one-page for CSU students.
+% Modified by 0xdkxy (0xdkxy.pollardlee@gmail.com) into one-page GPA certification for CSU students.
+
+
+
+\documentclass[12pt]{CSUGPAletter}
+\usepackage{luatexja-fontspec}
+\setmainjfont{FandolSong}
+\usepackage{fontspec} 
+\usepackage{tikz} 
+\usepackage{xcolor}
+	\definecolor{csublue}{rgb}{0.0549, 0.208, 0.545}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{eso-pic}
+%
+% This section is just a bunch of busywork so that the second and following pages read ``Page X of Y''
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\rhead{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+%
+%
+% Set custom font here. Comment this line out if you do not have a Cambria font (originally included with this template) installed; computer modern (or whatever your current default font is) will be substituted.
+%
+%\setmainfont{[Cambria.ttf]}[BoldFont  = [CambriaBold.ttf], ItalicFont  = [CambriaItalic.ttf], BoldItalicFont = [CambriaBoldItalic.ttf] ]
+
+% define the variables of your personal information
+% please fill your personal information here
+
+% Attention!!!! the personal information below is not true !!!!
+% All of them are fake names and random number I type as I like.....
+\def\namecn{黎虚拟}
+\def\nameen{Lowell Virtual}
+\def\IDnum{1145141919810}
+\def\studentID{114514}
+\def\day{15}
+\def\month{06}
+\def\year{2023}
+\def\programcn{计算机科学}
+\def\programen{Computer Science and Technology}
+\def\schoolcn{计算机学院}
+\def\schoolen{School of Computer Science and Engineering}
+\def\GPA{114.51}
+\def\genderen{male}
+\def\gendercn{男}
+
+\newcommand{\watermark}[3]{\AddToShipoutPictureBG{
+\parbox[b][\paperheight]{\paperwidth}{
+\vfill%
+\centering%
+\begin{tikzpicture}
+    \path (0,0) -- (\paperwidth,\paperheight);
+    \node[opacity=.08] at (current page.center)
+    {\includegraphics[width=0.55\textwidth]{background.pdf}};
+    \end{tikzpicture}
+\vfill}}}
+
+% The material below is a whole big dang thing whose purpose is just to set up a fixed coordinate system for \tikz so that you can put the Department or School address in the upper right-hand side without it moving all around every time you change something in the page.  I think it works.
+% Defining a new coordinate system for the page:
+%
+% --------------------------
+% |(-1,1)    (0,1)    (1,1)|
+% |                        |
+% |(-1,0)    (0,0)    (1,0)|
+% |                        |
+% |(-1,-1)   (0,-1)  (1,-1)|
+% --------------------------
+\makeatletter
+\def\parsecomma#1,#2\endparsecomma{\def\page@x{#1}\def\page@y{#2}}
+\tikzdeclarecoordinatesystem{page}{
+    \parsecomma#1\endparsecomma
+    \pgfpointanchor{current page}{north east}
+    % Save the upper right corner
+    \pgf@xc=\pgf@x%
+    \pgf@yc=\pgf@y%
+    % save the lower left corner
+    \pgfpointanchor{current page}{south west}
+    \pgf@xb=\pgf@x%
+    \pgf@yb=\pgf@y%
+    % Transform to the correct placement
+    \pgfmathparse{(\pgf@xc-\pgf@xb)/2.*\page@x+(\pgf@xc+\pgf@xb)/2.}
+    \expandafter\pgf@x\expandafter=\pgfmathresult pt
+    \pgfmathparse{(\pgf@yc-\pgf@yb)/2.*\page@y+(\pgf@yc+\pgf@yb)/2.}
+    \expandafter\pgf@y\expandafter=\pgfmathresult pt
+}
+\makeatother
+%%%%%%%%%%%%%%%%  Footer information  %%%%%%%%%%%%%%%%%%
+%
+%  The next line is for your college, used as a footer.  If you prefer not to have this, just comment out these lines in favor of the line labeled "[[Alternate]]" below
+\def\school{\small{} } 
+% \def\school{~}  % [[Alternate]]
+%
+
+\begin{document}
+%
+%
+%%%%%%%%  The "To" address goes here.
+%
+\begin{letter}{
+               Some University\\ 
+               Some Addresss\\ 
+               SomeTown, SomeState 					       				  		 ~~SomeZip
+               }
+% This line sets up the return address to the right-side of the OSU logo.  The location is set with absolute node addresses using ``\tikz''.  It can still be a bit fussy, and you may need to alter this a little to get things to look right.  The bit that changes the position are the numbers in parentheses ``at (14.2,2.7)''
+%
+%$\begin{tikzpicture}[remember picture,overlay,,every node/.style={anchor=center}]
+%$\node[text width=7cm] at (page cs:0.5,0.73){\small \newaddress};
+%$\end{tikzpicture} 
+
+%%%%%%  The ``opening'' is just the method of address you would like to use at the start of the letter.
+%
+\opening{成绩平均分证明}
+
+
+%%%%%%%%%% Body of letter   %%%%%%%%%%%%%%
+% Remove it if you do not want watermark
+\watermark{}{}{}
+
+
+
+% The ``\lipsum[1-8]" command just fills the letter with 8 paragraphs of Latin for the purposes of filler.  Unless you really want to send filler Latin to someone, you will replace this command with actual text.  Do that here:
+%
+%\lipsum[1]
+兹证明我校学生\namecn（\gendercn，身份证号：\IDnum，学号：\studentID），毕业于中南大学\programcn 专业，学制四年，在校期间全部课程加权平均分为\GPA（百分制）。 
+
+特此证明。
+
+
+%%%%%%% ``closing'' sets the sign-off line.
+\closing{中南大学\schoolcn \\ \year 年\month 月\day 日}
+
+\opening{Weighted Average Score Certification}
+
+This is to certify that \nameen (\genderen, ID number: \IDnum, student ID: \studentID), a student of our university, graduated from the \programen program at Central South University. The duration of the program was four years, and the weighted average score for all courses during his time at the university was \GPA (100-scale).
+
+Hereby certify.
+
+\closing{\schoolen , \\ 
+Central South University \\ 
+\year/\month/\day
+}
+
+% Comment out/in the lines below as necessary
+%\encl{If an enclosure is provided, let them know what it is.}
+
+% \ps{A postscript if that is a thing you do.}
+
+% \cc{Someone Who Cares (and is copied).}
+
+\end{letter}
+
+\end{document}

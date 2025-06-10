@@ -1,0 +1,152 @@
+%%% Main driver file for SRM Articles.
+%% Edits only in the Edit Section
+
+\documentclass[jou,biblatex,a4paper,draftfirst]{apa6}
+
+% --------------------------------------------------------------------
+% Edits
+% -----
+
+% Layout Editor
+\def\Entry{XXXX}    % Insert Submission Idenitifer 
+%\def\Questions{\relax} % Uncomment to load <Entry>_questions.tex 
+%\def\Appendix{\relax}  % Uncomment to load <Entry>_appendix.
+%\def\Packages{\relax}  % Uncomment to load <Entry>_packages.tex 
+
+
+% Editor in Chief ONLY (EIC)
+\def\VolYear{2021} % Year 
+\def\Volume{15} % Volume  
+\def\Number{4} % Number 
+\def\StartPage{9999} % Start Page  
+\SetWatermarkText{Galley proof} % Comment for final version
+
+
+% --------------------------------------------------------------------
+% NO EDITS BEYOND THIS LINE
+
+% Styles
+% ------
+
+% Fonts und Symbole
+\usepackage{dsfont}  % Mathematische Schriftschnitte
+\usepackage{amsmath, amsthm, amssymb} 
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{pifont}
+\usepackage{eurosym}
+
+% Webadressen:
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{xcolor}
+\hypersetup{colorlinks,
+  linkcolor={black},
+  citecolor={blue!50!black},
+  urlcolor={blue!50!black}
+}
+
+% Tabellen
+\usepackage{dcolumn}
+\usepackage{array}
+\usepackage{ltxtable}
+\usepackage{tabularx}
+\usepackage{tabulary}
+\usepackage{multicol}
+\usepackage{multirow}
+
+% Floats
+\usepackage{rotating} 
+
+% References
+\usepackage[american]{babel}
+\defbibheading{bibliography}{\section*{\refname}}%
+\usepackage{csquotes}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{\Entry_bib.bib}
+
+% We used numbered sections and subsections
+% (Contrary to APA Style)
+\setcounter{secnumdepth}{2}
+
+\ifdef{\Packages}{\input{\Entry_packages}}{}
+
+
+% Eigene Kommandos
+% -----------------
+
+% Kompakte Listen
+\newcommand{\bci}{\begin{APAitemize}}
+\newcommand{\eci}{\end{APAitemize}}
+\newcommand{\bce}{\begin{APAenumerate}}
+\newcommand{\ece}{\end{APAenumerate}}
+
+%Fragebogenkästchen
+\newcommand{\bx}{\large{\Square}}
+
+% Tabellen
+%Spaltenüberschrift zenriert, wenn Spalte nicht zentriert
+\newcommand{\mc}[1]{\multicolumn{1}{c}{#1}} % usage: \mc{Titel}
+
+% Ausrichtung am Dezimaltrenner
+\newcolumntype{.}[1]{D{.}{.}{#1}}  % usage: .{2} für 2 Nachkommastellen, etc.
+
+% Zum "Verstecken" des Ausrichters
+\newcolumntype{h}[1]{D{,}{}{#1}} 
+
+% Multirows
+%\renewcommand\multirowsetup{\centering}
+\newcommand{\mr}[1]{\multirow{2}{*}{#1}}
+
+% Indent Entry in a Table row
+\newcommand{\IE}[1][1]{%
+  \hspace{#1em}\ignorespaces
+}
+
+
+% Standardfunktionen für Mathe
+\DeclareMathOperator{\SE}{SE}
+\newcommand{\vt}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\mx}[1]{\ensuremath{\mathsf{#1}}}
+
+
+% Start entry
+% -----------
+
+\usepackage{lastpage}
+
+% Top left
+\journal{\scriptsize Survey Research Methods ({\VolYear})}
+\volume{Vol.\,\Volume, No.\,\Number, pp. \thepage-\pageref{LastPage}
+  \\ \href{http://dx.doi.org/10.18148/srm/\VolYear.v\Volume i\Number.\Entry}{doi:10.18148/srm/\VolYear.v{\Volume}i\Number.\Entry} 
+  \\ \href{https://www.europeansurveyresearch.org/}{European Survey Research Association}
+}
+ 
+% Top right
+\ccoppy{\copyright~\VolYear Author(s) \\ \includegraphics[height=2.1em]{by-nc.svg.pdf}}
+\copnum{\href{https://creativecommons.org/licenses/by-nc/4.0/deed.en}{CC BY-NC 4.0}}
+
+\input{\Entry_header}
+
+\begin{document}
+
+\maketitle
+\setcounter{page}{\StartPage}
+\def\UrlFont{\normalfont}
+
+\input{\Entry_artcl}
+
+\printbibliography
+
+
+\ifdef{\Appendix}{\input{\Entry_appendix}}{}
+
+\ifdef{\Questions}{
+  \clearpage
+  \section*{Questions}
+  \input{\Entry_questions}
+}{}
+
+\end{document}
+
+

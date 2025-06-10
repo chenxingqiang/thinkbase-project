@@ -1,0 +1,53 @@
+\documentclass{article}
+\paperwidth 4.135in
+\paperheight 5.83in
+\usepackage{calc}
+\usepackage[top=0.35in,bottom=0.65in,left=0.35in,right=0.35in]{geometry}
+\usepackage{tikz}
+\usepackage{pgffor}
+
+\newlength{\wholeboxwd}
+\setlength{\wholeboxwd}{0.99\textwidth}
+\newlength{\wholeboxht}
+\setlength{\wholeboxht}{0.99\textheight}
+%
+\newlength{\cuewd}
+\setlength{\cuewd}{0\wholeboxwd}
+\newlength{\summht}
+\setlength{\summht}{0.1\wholeboxht}
+\newlength{\cgridht}
+\setlength{\cgridht}{\wholeboxht-\summht}
+\newlength{\cgridwd}
+\setlength{\cgridwd}{\wholeboxwd-\cuewd}
+\newlength{\xorig}
+\newlength{\yorig}
+\setlength{\xorig}{0cm}
+\setlength{\yorig}{0cm}
+
+%With credit to 康奈尔笔记模板 by Lucy, currently available here: 
+% https://www.overleaf.com/latex/templates/kang-nai-er-bi-ji-mo-ban/dwyxggpgvsbk
+
+	\newcommand\drawPage{
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[step=.5cm,lightgray!80,thin] (\cuewd,\summht) grid (\wholeboxwd,\wholeboxht);
+			%% Optional:
+			%\draw[step=.25cm,gray!30,thin] (\cuewd,\summht) grid (\wholeboxwd,\wholeboxht);
+			% Summary, top:
+			\draw [line width=.2pt] (\xorig,\summht) -- (\wholeboxwd,\summht);
+			% Grid, left:
+			\draw [line width=.2pt] (\cuewd,\summht) -- (\cuewd,\wholeboxht);
+			% Draw the big box:
+			\draw (\xorig,\yorig) rectangle (\wholeboxwd,\wholeboxht);
+			\node[anchor=west] at (0.25,\summht-1em){\textbf{Mood For Today:}};
+			\node[anchor=west,fill=white] at (\cuewd+1em,\wholeboxht-1em) {\textbf{\ Journal:\ }};
+		\end{tikzpicture}
+	\end{center}
+}
+
+\begin{document}
+
+	\foreach \n in {1,...,50}{\drawPage}
+\end{document}
+
+

@@ -1,0 +1,107 @@
+% Letter template which should agree largely with DIN5008A https://de.wikipedia.org/wiki/DIN_5008
+% 
+% Till Blaha 2023, Creative Commons
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Configuration
+
+% According to DIN5008A, the height of the right-hand location field can vary between 40 and 75mm
+% you can set this value accordingly, if you need more vertical space in that field
+\newcommand{\mylocheight}{40mm}
+
+% show foldmarks?
+\newcommand{\showfoldmarks}{on} % on or off
+
+% include the preamble
+\input{preamble.tex}
+
+%%% uncomment these 2 lines to make sure the boxes for address and location are not overrun
+\LoadLetterOption{visualize}
+%\showfields{head,address,location,refline,foot}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Content %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%
+% Sender Variables %
+%%%%%%%%%%%%%%%%%%%%
+\setkomavar{fromname}{John Doe}
+\setkomavar{fromaddress}{Freedom Drive 1960\\12345 City\\Country}
+\setkomavar{fromphone}{+31 6 123 456 78}
+\setkomavar{fromemail}{email@example.com}
+\setkomavar{backaddressseparator}{\ \textperiodcentered \ }
+\setkomavar{signature}{\hspace{5mm}\includegraphics[scale=1]{Signature}\\John Doe} % with scanned signature
+%\setkomavar{signature}{\vspace{10mm} \\ John Doe} % without scanned signature
+\setkomavar{place}{Some City}
+\setkomavar{date}{\today}
+\setkomavar{enclseparator}{: }
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Letterhead variables %
+%%%%%%%%%%%%%%%%%%%%%%%%
+\setkomavar{letterheadsubtitle}{Aerospace Engineer}
+
+%%%%%%%%%%%%%%%%%%%%%%
+% Location Variables %
+%%%%%%%%%%%%%%%%%%%%%%
+
+\setkomavar{location}{
+\newline\vspace{-18pt}% no idea why this hack is needed to align the table to the left
+\begin{tabbing}
+	\hspace{35mm} \= \hspace{25mm} \= \kill % Spacing within the block
+	Reference Number:        \> 123456789\\
+	Client Number:           \> 202012345\\
+	Telephone:               \> \usekomavar{fromphone}\\
+	Email:                   \> \usekomavar{fromemail}
+\end{tabbing}
+}
+
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Addressee                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \begin{letter}{%
+    Addressee \\
+    Address line 1 \\
+    Address line 2 \\
+    Address line 3 \\
+    1234 AB Stad \\
+    les Pays-Bas
+    }
+    
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Start of Actual Content of the Letter         %
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+    \setkomavar{subject}{Letter of Motivation supporting my \LaTeX{} Template}
+    
+    \opening{To whom it may concern,} % 100 words
+    
+    \lipsum[1-4] 
+    
+    
+    \vspace*{5mm}\textbf{Subsection Headline}
+    
+    \lipsum[5]
+    
+	
+    \closing{Met vriendelijke groet,}
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%
+    % Enclosures          %
+    %%%%%%%%%%%%%%%%%%%%%%%
+    
+    \encl{\textit{Proof (2 pages),\\ More Proof (7 pages)}}
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%
+    % End of Tex Document %
+    %%%%%%%%%%%%%%%%%%%%%%%
+    
+    \end{letter}
+\end{document}
+
+
+

@@ -5,13 +5,13 @@ from pydantic import BaseModel, Field
 import re
 import asyncio
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def create_person_json(description: str):
     """
     Generate a JSON object describing a person based on the given description.
@@ -25,7 +25,7 @@ async def create_person_json(description: str):
     return json.dumps(person)
 
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def generate_ui_json(description: str):
     """
     Generate a JSON object describing a UI based on the given description,
@@ -109,8 +109,8 @@ def print_ascii_ui(ui_component, indent=0, width=60):
     render_component(ui_component, 0, width)
     print(hr(width, '='))
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",

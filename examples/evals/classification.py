@@ -6,8 +6,8 @@ should return "Banana".
 """
 
 from typing import Any, Dict, List, Union, Optional, Type
-from agentflow.ell2a.evaluation import Evaluation
-from agentflow.ell2a.integration import ELL2AIntegration
+from agentflow.ell.evaluation import Evaluation
+from agentflow.ell.integration import ELLIntegration
 import numpy as np
 
 # Default API parameters for different models
@@ -34,9 +34,9 @@ MODELS_TO_TEST = [
     }
 ]
 
-# Initialize ELL2A integration with default configuration
-ell2a_integration = ELL2AIntegration()
-ell2a_integration.configure(MODELS_TO_TEST[0])  # Use first model's parameters as default
+# Initialize ELL integration with default configuration
+ell_integration = ELLIntegration()
+ell_integration.configure(MODELS_TO_TEST[0])  # Use first model's parameters as default
 
 def is_correct(datapoint: Dict[str, Any], output: str) -> float:
     """Check if the prediction matches the expected output.

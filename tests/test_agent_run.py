@@ -8,12 +8,12 @@ from agentflow.core.workflow_types import WorkflowConfig, WorkflowStep, Workflow
 from agentflow.core.exceptions import WorkflowExecutionError
 from agentflow.agents.agent_types import AgentMode
 from agentflow.agents.agent import Agent
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType, ContentBlock, ContentWrapper
+from agentflow.ell.types.message import Message, MessageRole, MessageType, ContentBlock, ContentWrapper
 import json
 
 @pytest.fixture
-def mock_ell2a():
-    """Create a mock ELL2A integration."""
+def mock_ell():
+    """Create a mock ELL integration."""
     mock = MagicMock()
     mock.enabled = True
     mock.tracking_enabled = True
@@ -57,7 +57,7 @@ def mock_ell2a():
     return mock
 
 @pytest.mark.asyncio
-async def test_agent_run(mock_ell2a):
+async def test_agent_run(mock_ell):
     """Test agent run functionality."""
     workflow = WorkflowConfig(
         id="test-workflow-1",
@@ -96,7 +96,7 @@ async def test_agent_run(mock_ell2a):
         workflow=workflow
     )
     agent = Agent(config=agent_config)
-    agent._ell2a = mock_ell2a  # Set the mock ELL2A
+    agent._ell = mock_ell  # Set the mock ELL
     await agent.initialize()
     
     try:
@@ -112,7 +112,7 @@ async def test_agent_run(mock_ell2a):
         await agent.cleanup()
 
 @pytest.mark.asyncio
-async def test_agent_run_with_dependencies(mock_ell2a):
+async def test_agent_run_with_dependencies(mock_ell):
     """Test agent run with workflow dependencies."""
     workflow = WorkflowConfig(
         id="test-workflow-2",
@@ -165,7 +165,7 @@ async def test_agent_run_with_dependencies(mock_ell2a):
         workflow=workflow
     )
     agent = Agent(config=agent_config)
-    agent._ell2a = mock_ell2a  # Set the mock ELL2A
+    agent._ell = mock_ell  # Set the mock ELL
     await agent.initialize()
     
     try:
@@ -181,7 +181,7 @@ async def test_agent_run_with_dependencies(mock_ell2a):
         await agent.cleanup()
 
 @pytest.mark.asyncio
-async def test_agent_run_error_handling(mock_ell2a):
+async def test_agent_run_error_handling(mock_ell):
     """Test agent run error handling."""
     workflow = WorkflowConfig(
         id="test-workflow-3",
@@ -218,8 +218,8 @@ async def test_agent_run_error_handling(mock_ell2a):
     agent = Agent(config=agent_config)
     
     # Configure mock to raise an error
-    mock_ell2a.process_message.side_effect = WorkflowExecutionError("Test error during execution")
-    agent._ell2a = mock_ell2a
+    mock_ell.process_message.side_effect = WorkflowExecutionError("Test error during execution")
+    agent._ell = mock_ell
     await agent.initialize()
     
     try:

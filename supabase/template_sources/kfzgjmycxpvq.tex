@@ -1,0 +1,508 @@
+\documentclass[11pt,a4paper,openright]{book}
+
+\usepackage{nomencl}
+
+% give the header a bit more room for fancyhdr below
+% otherwise LaTeX will spew on each page
+\addtolength{\headheight}{2.5pt}
+
+
+\usepackage{epigraph}
+\usepackage{rotating}
+\usepackage[section]{placeins}
+\usepackage{breakcites}
+%
+%\usepackage{makeidx}
+%\makeindex
+\usepackage{lipsum}  
+
+\usepackage{longtable}
+
+% first set to zero ... 
+\setlength{\oddsidemargin}{-1in}
+\setlength{\evensidemargin}{-1in}
+\setlength{\topmargin}{-1in}       
+
+% adjust these if printer is off by a bit
+\setlength{\hoffset}{0mm}
+\setlength{\voffset}{0mm}
+
+% from HDR Thesis Preparation Advice 2008
+% margins >= 3.5cm on binding edge and >= 1.5cm on opposite
+%         >= 2.0cm on top and bottom 
+
+% NB also that the optimal number of characters per line 
+% for readability is only 60-70, we're over so we'll be a
+% bit more generous on the evensidemargin
+
+\addtolength{\oddsidemargin}{40mm} 
+\addtolength{\evensidemargin}{20mm}
+\addtolength{\topmargin}{30mm}
+
+% set up some of the spacing
+\setlength{\marginparwidth}{40pt}  
+\setlength{\marginparsep}{10pt}
+\setlength{\headsep}{0.5in}
+
+% A4 dimensions [mm]: 209.903 x 297.039
+\setlength{\textwidth}{21 cm}
+\setlength{\textheight}{29.7 cm}
+
+% fix up width
+\addtolength{\textwidth}{-\oddsidemargin}
+\addtolength{\textwidth}{-\evensidemargin}
+% now we've added 2inches in setting up margins
+\addtolength{\textwidth}{-2in}
+
+% fix up height
+\addtolength{\textheight}{-2\topmargin}
+\addtolength{\textheight}{-\headheight}
+\addtolength{\textheight}{-\headsep}
+\addtolength{\textheight}{-\footskip}
+% now we've added 2inches in setting up margins
+\addtolength{\textheight}{-2in}
+
+\brokenpenalty=10000   % dunno what this does, maybe handy
+
+
+% this stops one figure taking up a whole page and lets more text onto
+% the one page when a figure exists
+\renewcommand\floatpagefraction{0.8} %   Default = 0.5
+
+\newcommand{\NewAppendix}[1]{
+    % put appendix on a new page
+    \clearpage
+
+    % reset the page counter
+    \pagenumbering{arabic}
+
+    % set the format for the appendix page number
+    \renewcommand{\thepage}{\thesection - \arabic{page}}
+
+    % set the appendix name
+%    \section{#1}
+}
+
+%%% load the required packages
+% fancyhdr for nice, fancy headings
+\RequirePackage{fancyhdr}
+% ccaption for good caption handling
+\RequirePackage{ccaption}
+% xspace so that spaces after commands are handled correctly
+\RequirePackage{xspace}
+% required for nice pictures
+\RequirePackage{graphicx} 
+% required to use \ifpdf statements, see end of doc
+\RequirePackage{ifpdf}
+% ifthenelse for if loops
+\RequirePackage{ifthen}
+
+%\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tabularx,booktabs}  % Combines tabularx and longtable functionality
+%\usepackage{subfigure}
+\usepackage{array} 
+\usepackage{multicol} 
+\usepackage{multirow}
+
+% improved version of caption handling
+\usepackage{ccaption}
+\captionnamefont{\scshape}
+\captionstyle{}
+\makeatletter
+\renewcommand{\fnum@figure}[1]{\quad\small\textsc{\figurename~\thefigure}:}
+\renewcommand{\fnum@table}[1]{\quad\small\textsc{\tablename~\thetable}:}
+\renewcommand{\@makecaption}[2]{%
+\vskip\abovecaptionskip
+\sbox\@tempboxa{#1: #2}%
+\ifdim \wd\@tempboxa >\hsize
+\def\baselinestretch{1}\@normalsize
+#1: #2\par
+\def\baselinestretch{1.5}\@normalsize
+\else
+\global \@minipagefalse
+\hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+\fi
+\vskip\belowcaptionskip}
+\makeatother
+
+\let\origdoublepage\cleardoublepage
+\newcommand{\clearemptydoublepage}{%
+  \clearpage
+  {\pagestyle{empty}\origdoublepage}%
+}
+
+
+% set the pagestyle to look good
+\pagestyle{fancy}
+
+%%%%% Fancyhdr stuff
+% define how headers are marked, for details, see fancyhdr docs
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+
+% define where sections, chapters and pagenumbers are put
+% see fancyhdr docs for details
+% the \nouppercase stops book.cls making the contents, bibliography
+% and index headers from being all in uppercase.
+% The options used here are essentially that in Lamport's book, but
+% with small caps for the headings.
+\fancyhf{}
+\fancyhead[LE,RO]{\nouppercase{\thepage}}
+\fancyhead[LO]{\sc \nouppercase{\rightmark}}
+\fancyhead[RE]{\sc \nouppercase{\leftmark}}
+
+%%% other settings required for a thesis
+% It's a references section, not a bibliography, hence redefine
+% \bibname i.e. change ``Bibliography'' to ``References''
+\renewcommand*{\bibname}{References}
+\newcommand{\blankpage}{\newpage This page intentionally left blank.}
+\newcommand{\blankfrontpage}{\newpage}
+% single line spacing for the final copy
+\renewcommand{\baselinestretch}{1}
+
+% spell things correctly
+\newenvironment{centre}{\begin{center}}{\end{center}}
+\newenvironment{itemise}{\begin{itemize}}{\end{itemize}}
+
+
+
+%\usepackage{play}
+\usepackage[grey,times]{quotchap} % this makes the chapter title look nice, 
+                                               % and you can insert a quote
+
+
+
+%%%%% optional packages
+%\usepackage[square,comma,numbers,sort&compress]{natbib}
+		% this is the natural sciences bibliography citation
+		% style package.  The options here give citations in
+		% the text as numbers in square brackets, separated by
+		% commas, citations sorted and consecutive citations
+		% compressed 
+		% output example: [1,4,12-15]
+
+\usepackage[nottoc]{tocbibind}  
+				% allows the table of contents, bibliography
+				% and index to be added to the table of
+				% contents if desired, the option used
+				% here specifies that the table of
+				% contents is not to be added.
+				% tocbibind needs to be after natbib
+				% otherwise bits of it get trampled.
+
+
+\newcommand{\varFM}[1]{{\operatorname{\mathit{#1}}}}
+\newcommand{\ABK}{$(\alpha,\beta)$-$k$}
+
+\usepackage[pdftitle={PhD Thesis Title}, pdfauthor={Mohammad Nazmul Haque}, pdfsubject={Thesis},  
+ bookmarks,
+ bookmarksopen = true,
+ bookmarksnumbered = true,
+ breaklinks = true,
+ linktocpage,
+ hyperindex = false,
+ hyperfigures,
+ pagebackref,
+ colorlinks=true,
+ linkcolor=blue,
+ urlcolor=blue,
+ citecolor=red,
+ anchorcolor=green
+ ]{hyperref}
+\usepackage{hyperref}
+
+\usepackage{listings}
+\usepackage{color}
+\usepackage{tabularx} 
+\newcolumntype{A}{>{\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+
+\usepackage[toc,page]{appendix}
+\usepackage{graphicx}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{textcomp}
+\usepackage{subfloat}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[chapter] % reset theorem numbering for each chapter
+\newtheorem{obj}{Objective}[chapter] % use global Objective numbering 
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition} % definition numbers are dependent on theorem numbers
+\newtheorem{exmp}[thm]{Example} % same for example numbers
+
+\usepackage{setspace}
+%\doublespacing
+% or:
+
+
+\begin{document}
+
+\frontmatter
+
+
+\pagenumbering{roman}  % make sure that front matter is numbered roman
+\hypersetup{urlcolor=black}{}
+\thispagestyle{empty}%
+    \null
+    \begin{center}
+            \huge\sc\expandafter{Title of the PhD Thesis} % put in small caps
+    \end{center}
+    \vskip1cm%
+    \begin{center}
+        \textrm{By}\\
+        \vskip0.25cm%
+        \Large\textrm{\href{mailto:Firstname.Lastname@uon.edu.au}{Firstname Lastname} \\\small{MSc (UniA), BSc (UniB)}}
+
+    \end{center}
+    \vfill
+    \begin{center}
+         \Large\textbf{Thesis}\\
+         \vskip0.2cm
+         \textit{submitted in fulfilment of the requirements for the Degree of}\\
+         \vskip0.2cm
+          \Large\textbf{Doctor of Philosophy}
+
+	    \vskip1cm%
+           \includegraphics[width=0.2 \columnwidth]{images/newcastle.png}\\
+		School of Electrical Engineering and Computer Science\\
+		\href{http://www.newcastle.edu.au/}{The University of Newcastle}\\
+		Callaghan, New South Wales 2308, Australia\\
+           April 2022\\
+        \vspace{1cm}
+    \end{center}
+    \vfill
+    \newpage
+    \thispagestyle{empty}
+    \mbox{}
+\hypersetup{urlcolor=blue}{}
+%%%%% Submition date if different from creation date
+%\submitdate{September 2013}
+
+\onehalfspacing
+
+\include{ch-front-matter}
+
+
+\tableofcontents
+
+\listoffigures
+\listoftables
+\listofalgorithms
+\addcontentsline{toc}{chapter}{List of Algorithms}
+
+
+
+
+\chapter*{Abstract}
+\lipsum[2-4]
+\clearpage\thispagestyle{empty}
+\onehalfspacing
+
+
+\mainmatter
+
+
+
+%=======================================
+%	Chapter 1
+%=======================================
+
+\chapter{Introduction}
+\lipsum[1-4]
+\cite{smit54}
+
+\section{Background}
+\lipsum[4-6]
+
+\subsection{Specific Background}
+\lipsum[1-3]
+
+
+
+
+\subsection{Further refinement of the Background}
+\lipsum[3-8]
+
+
+\section{Motivation}
+\lipsum[1-2]
+
+
+\begin{description}
+\item [Challenge 1:] \lipsum[1]
+
+\item [Challenge 2:] \lipsum[2]
+
+\item [Challenge 3:] \lipsum[3]
+
+\item [Challenge 4:] \lipsum[4]
+
+\end{description}
+
+
+
+\section{Research Objectives \label{sec:obj}}
+\lipsum[1-2]
+
+\begin{description}
+\item[Obj 1\label{Obj1}:] \lipsum[1]
+
+\item[Obj 2\label{Obj2}:]\lipsum[2]
+
+\item[Obj 3\label{Obj3}:]\lipsum[3]
+
+\item[Obj 4\label{Obj4}:] \lipsum[4]
+\end{description}
+
+
+
+\section{Organisation of the Thesis}
+\lipsum[7]
+
+
+\section{Summary}
+\lipsum[4]
+
+%=======================================
+%	Chapter 2
+%=======================================
+\chapter{Literature Review}\label{ch-lit-rev}
+\lipsum[1]
+
+\section{Review of Main Method}
+\lipsum[2-3]
+\cite{gree00,jame76}
+
+\subsection{Review of Sub Method 1}
+\lipsum[3-6]
+\cite{phil99,smit54}
+ 
+\subsection{Review of Sub Method 2}
+\lipsum[5-9]
+
+
+
+\section{Challenges in The Method}
+\lipsum[3-7]
+
+
+
+
+\section{Summary}
+
+\lipsum[1-2]
+%\blankpage
+
+
+
+% ===========================================
+%	Chapter 3
+% ===========================================
+
+\begin{savequote}[0.75\linewidth]
+	This chapter contains parts of the paper ``How {I} Discovered {America}" published on the Journal (\cite{colu92}).
+	\qauthor{} 
+\end{savequote}
+\chapter{Chapter 3}\label{ch-ga-eoc}
+
+\lipsum[2]
+
+\section{Discovery of America}
+\lipsum[3]
+
+
+\section{Performance of the Proposed Method}
+The\lipsum[3-8]
+
+
+
+\section{Discussion}
+
+\lipsum[2-5]
+
+
+%\blankpage
+
+
+ 
+% ===========================================
+%	Chapter 7
+% ===========================================
+
+
+\chapter{Conclusion and Final Remarks}\label{ch-concl}
+
+\lipsum[5-9]
+
+
+
+\section{Research Contributions}
+\lipsum[2]
+
+\begin{description}
+\item[Obj 1:] \lipsum[1]
+
+
+\item[Obj 2:] \lipsum[2]
+\end{description}
+
+
+\lipsum[3]
+
+
+\begin{description}
+\item[Obj 3:] \lipsum[4]
+
+\item[Obj 4:] \lipsum[5]
+\end{description}
+
+
+
+\lipsum[6]
+
+\section{Future Challenges}
+
+\lipsum[3-5]
+
+
+\section{Conclusion}
+
+\lipsum[8]
+
+
+\singlespacing
+
+\bibliographystyle{apalike}  
+% or: plain,unsrt,alpha,abbrv,acm,apalike,...
+\bibliography{sample}
+\clearpage
+
+
+
+\appendix
+\include{ch-apendix}
+
+%\backmatter
+\include{listofSymbols}
+
+%\printindex
+
+\end{document}

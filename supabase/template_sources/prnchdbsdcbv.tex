@@ -1,0 +1,358 @@
+% Type of the document
+\documentclass{beamer}
+
+% elementary packages:
+\usepackage{graphicx}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{eso-pic}
+\usepackage{mathrsfs}
+\usepackage{url}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tikz}
+
+
+
+% additional packages
+\usepackage{bbm}
+
+% packages supplied with ise-beamer:
+\usepackage{cooltooltips}
+\usepackage{colordef}
+\usepackage{beamerdefs}
+\usepackage{lvblisting}
+
+% Mathematics
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+\usepackage{amsthm,amsfonts}
+\usepackage{mathtools}
+\usepackage{algorithmic}
+\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage{float}
+
+
+% Change the pictures here:
+% logobig and logosmall are the internal names for the pictures: do not modify them. 
+% Pictures must be supplied as JPEG, PNG or, to be preferred, PDF
+\pgfdeclareimage[height=2cm]{logobig}{Figures/hulogo}
+% Supply the correct logo for your class and change the file name to "logo". The logo will appear in the lower
+% right corner:
+\pgfdeclareimage[height=0.7cm]{logosmall}{Figures/hulogo}
+
+% Title page outline:
+% use this number to modify the scaling of the headline on title page
+\renewcommand{\titlescale}{1.0}
+% the title page has two columns, the following two values determine the percentage each one should get
+\renewcommand{\titlescale}{1.0}
+\renewcommand{\leftcol}{0.6}
+
+% smaller font for selected slides
+\newcommand\Fontvi{\fontsize{10}{7.2}\selectfont}
+\newcommand\Fontsm{\fontsize{8}{7.2}\selectfont}
+
+
+% Define the title. Don't forget to insert an abbreviation instead 
+% of "title for footer". It will appear in the lower left corner:
+\title[Title shown at each slide]{Title for title page}
+% Define the authors:
+\authora{Author 1} % a-c
+\authorb{Author 2}
+\authorc{Author 3}
+
+% Define any internet addresses, if you want to display them on the title page:
+\def\linka{http://lvb.wiwi.hu-berlin.de}
+\def\linkb{www.case.hu-berlin.de}
+\def\linkc{}
+% Define the institute:
+\institute{Ladislaus von Bortkiewicz Chair of Statistics \\
+C.A.S.E. -- Center for Applied Statistics\\
+    and Economics\\
+Humboldt--Universit{\"a}t zu Berlin \\}
+
+% Comment the following command, if you don't want, that the pdf file starts in full screen mode:
+\hypersetup{pdfpagemode=FullScreen}
+
+%%%%
+% Main document
+%%%%
+\begin{document}
+% Draw title page
+\frame[plain]{%
+\titlepage{}
+}
+
+% The titles of the different sections of you talk, can be included via the \section command. The title will be displayed in the upper left corner. To indicate a new section, repeat the \section command with, of course, another section title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame{
+\frametitle{Outline}
+\begin{enumerate}
+\item Introduction 
+\item Pre-processing Steps
+\item Model Selection
+\item Variable Importance and Dimensionality Reduction 
+\item Results and Conclusion
+\end{enumerate}
+}
+
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% (A numbering of the slides can be useful for corrections, especially if you are
+% dealing with large tex-files)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame{
+\frametitle{Formal Problem Setting}
+\begin{itemize}
+\item \textit{training set}: inputs $X = (x_1,\dots,x_n) \in \mathbb{R}^{n \times d}$ and labels $Y = (y_1,\dots,y_n)  \in  \mathbb{R}^{n}$
+\item  \textit{test set}: inputs $X' = (x'_1,\dots,x'_t) \in \mathbb{R}^{t \times d}$ without labels
+\end{itemize}
+\vspace{0.5cm}
+Find a function 
+\begin{align}
+f: X\rightarrow Y 
+\end{align}
+s.t. the \textit{test set} labels are predicted as accurately as possible, i.e.
+\begin{align}
+f(X') \approx Y'
+\end{align} 
+}
+
+\section{Pre-Processing}
+ 
+\frame{
+\frametitle{Outline}
+\begin{enumerate}
+\item Introduction \quad \checkmark
+\item Pre-processing Steps 
+\item Model Selection
+\item Variable Importance and Dimensionality Reduction 
+\item Results and Conclusion
+\end{enumerate}
+}
+
+\frame{
+\vspace{0.1cm}
+Several transformations and cleaning steps needed before putting the data into an algorithm, e.g. 
+\frametitle{Pre-processing}
+
+\begin{figure}
+	\begin{center}
+	\includegraphics[scale=0.25]{Figures/DataPipeline-1.jpg}
+	\caption{Workflow of Pre-Processing Steps}
+	\label{fig:DataPipeline}
+	\end{center}
+\end{figure}
+All transformation need to be preformed on the test set as well! 
+}
+
+\begin{frame}[fragile]
+\begin{center}
+\begin{lstlisting}[
+    basicstyle=\tiny, %or \small or \footnotesize etc.
+]
+basic_preprocessing = function(X_com, y, scaler="gaussian") 
+{
+	source("replace_ratings.R")
+	source("convert_categoricals.R")
+	source("impute_data.R")
+	source("encode_time_variables.R")
+	source("impute_outliers.R")
+	source("scale_data.R")
+	source("delete_nearzero_variables.R")
+    X_ratings = replace_ratings(X_com)
+    X_imputed = naive_imputation(X_ratings)
+    X_no_outlier = data.frame(lapply(X_imputed, iqr_outlier))
+    X_time_encoded = include_quarter_dummies(X_no_outlier)
+    X_scaled = scale_data(X_time_encoded, scale_method = scaler)
+    X_encoded = data.frame(lapply(X_scaled, cat_to_dummy))
+    X_com = delect_nz_variable(X_encoded)
+    idx_train = c(1:length(y))
+    train = cbind(X_com[idx_train, ]
+    test = X_com[-idx_train, ]
+    return(list(train = train, X_com = X_com, test = test))
+}
+\end{lstlisting}
+\end{center}
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/dataProcessing/}{dataProcessing}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model Selection}
+
+\frame{
+\frametitle{Outline}
+\begin{enumerate}
+\item Introduction \quad \checkmark
+\item Pre-processing Steps \quad \checkmark
+\item Model Selection
+\item Variable Importance and Dimensionality Reduction 
+\item Results and Conclusion
+\end{enumerate}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{Optimizing Hyper-parameters} 
+
+\begin{algorithm}[H]
+\algsetup{linenosize=\tiny}
+\scriptsize
+\BlankLine
+\ForEach{i in 1:t}
+    {
+     Randomly split the data into k folds of the same size \\
+    	\ForEach{j in 1:k}
+    	{
+    	Use $j$th fold as test set and the union of remaining folds as training set \\
+        \ForEach{p in 1:grid}
+        {
+                Fit model on training set using parameter set $p$ \\
+                Predict on test set and calculate RMSE 
+        }
+    	}%end inner for
+        \ForEach{p in 1:grid}{
+                Calculate average RMSE over the $t \times k$-runs 
+        }
+        choose $p$ with the lowest RMSE
+    }%end oute and r for
+\caption{t-time k-fold crossvalidation and gridSearch}
+\label{alg:seq}
+\end{algorithm}
+
+
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/xgbTuning/}{xgbTuning}
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/rfTuning/}{rfTuning}
+\quantnet \href{https://github.com/koehnden/SPL16/tree/master/Quantnet/svmTuning}{svmTuning}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame{
+\frametitle{Taking on the curse of Dimensionality}
+Problem: 
+\begin{itemize}
+\item many variables (99 after pre-processing)
+\item small training set ($n = 1460$) 
+\item variables are correlated with each other
+\end{itemize}
+\vspace{0.1cm}
+Our approaches:
+\begin{itemize}
+\item Variable selection through variable importance ranking
+\item Extract a smaller set of variable using PCA
+\end{itemize}
+}
+
+\section{Results and Conclusion}
+\frame{
+\frametitle{Outline}
+\begin{enumerate}
+\item Introduction \quad \checkmark
+\item Pre-processing Steps \quad \checkmark
+\item Model Selection \quad \checkmark
+\item Variable Importance and Dimensionality Reduction \quad \checkmark 
+\item Results and Conclusion
+\end{enumerate}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame{
+\frametitle{Results}
+\begin{itemize}
+\item Gaussian SVR with all variable is the single best model
+\item PCA did not work well 
+\item Models perform best with the full set of variables as Figure \ref{fig:RFE} suggested 
+\end{itemize}
+\vspace{0.25cm}
+\begin{table}
+\begin{center}
+\begin{tabular}{c|ccc} 
+\hline\hline
+Inputs 		  & Gaussian SVR    & Random Forest & GBM      \\ 
+\hline 
+All Variables & \textbf{0.1308} &  0.1484       & 0.1333   \\
+Top 30 		  & 0.1323  	 	&  0.1515       & 0.1436    \\
+PCA	   		  & 0.1607  	    &  0.1657       & 0.1657     \\
+\hline\hline
+\end{tabular}
+\caption{RMSE of submitted predictions}
+\end{center}
+\end{table}
+\hspace{7.2cm} \href{https://github.com/koehnden/SPL16/blob/master/finalModels.R}{Github: finalModels}
+}
+
+\frame{
+\frametitle{Outline}
+\begin{enumerate}
+\item Introduction \quad \checkmark
+\item Pre-processing Steps \quad \checkmark
+\item Model Selection \quad \checkmark
+\item Variable Importance and Dimensionality Reduction \quad \checkmark 
+\item Results and Conclusion \quad \checkmark 
+\end{enumerate}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dedicated section for references
+\section{References}
+\frame{
+\frametitle{References}
+\begin{thebibliography}{aaaaaaaaaaaaaaaaa}
+\Fontvi
+\beamertemplatearticlebibitems
+\bibitem{Breiman:2003}
+Breiman, Leo
+\newblock{\em "Random Forest." Machine learning, 45(1), 5-32, (1999)}
+\newblock available on \href{http://machinelearning202.pbworks.com/w/file/fetch/60606349/breiman_randomforests.pdf}{http://machinelearning202.pbworks.com}
+\bibitem{ChenGuestrin:2015}
+Chen, Tianqi, and Carlos Guestrin
+\newblock{\em "XGBoost: Reliable Large-scale Tree Boosting System", Proceedings of the 22nd International Conference on Knowledge Discovery and Data Mining
+Pages 785-794 (2015)}
+\newblock available on \href{http://learningsys.org/papers/LearningSys_2015_paper_32.pdf}{http://learningsys.org} 
+\beamertemplatearticlebibitems
+\bibitem{DeCock:2011}
+De Cock, Dean
+\newblock{\em "Ames, Iowa: Alternative to the Boston housing data as an end of semester regression project" Journal of Statistics Education 19.3 (2011)}
+\newblock available on \href{https://ww2.amstat.org/publications/jse/v19n3/decock.pdf}{https://ww2.amstat.org}
+\beamertemplatearticlebibitems
+\end{thebibliography}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame{
+\frametitle{References}
+\begin{thebibliography}{aaaaaaaaaaaaaaaaa}
+\Fontvi
+\beamertemplatearticlebibitems
+\bibitem{Friedman:2003}
+Friedman, Jerome H.
+\newblock{\em "Greedy function approximation: a gradient boosting machine." Annals of statistics 1189-1232 (2001).}
+\newblock available on \href{http://projecteuclid.org/download/pdf_1/euclid.aos/1013203451}{https://www.jstor.org/journal/annalsstatistics}
+\bibitem{Kuhn:2015}
+Kuhn, Max, and Kjell Johnson
+\newblock{\em "Applied predictive modeling". New York: Springer (2013)}
+\beamertemplatearticlebibitems
+\bibitem{Vapnik:1997}
+Vapnik, Vladimir, Steven E. Golowich, and Alex Smola
+\newblock{\em "Support vector method for function approximation, regression estimation, and signal processing." Advances in neural information processing systems 281-287 (1997)}
+\newblock available on \href{https://pdfs.semanticscholar.org/43ff/a2c1a06a76e58a333f2e7d0bd498b24365ca.pdf}{https://semanticscholar.org}
+\beamertemplatearticlebibitems
+\end{thebibliography}
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

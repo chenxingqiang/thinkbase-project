@@ -1,11 +1,11 @@
-"""ELL2A integration module."""
+"""ELL integration module."""
 
 from typing import Dict, Any, Optional, List, Callable
 from functools import wraps
-from .ell2a.types.message import Message, MessageRole, MessageType
+from ell.types.message import Message, MessageRole, MessageType
 
-class ELL2AIntegration:
-    """Singleton class for ELL2A integration."""
+class ELLIntegration:
+    """Singleton class for ELL integration."""
     
     _instance = None
     _initialized = False
@@ -24,7 +24,7 @@ class ELL2AIntegration:
     def __new__(cls):
         """Create or return singleton instance."""
         if cls._instance is None:
-            cls._instance = super(ELL2AIntegration, cls).__new__(cls)
+            cls._instance = super(ELLIntegration, cls).__new__(cls)
             cls._instance._initialize()
         return cls._instance
     
@@ -33,7 +33,7 @@ class ELL2AIntegration:
         pass
     
     def _initialize(self):
-        """Initialize ELL2A integration."""
+        """Initialize ELL integration."""
         if not self._initialized:
             self.config = {
                 "default_model": "gpt-4",
@@ -56,14 +56,14 @@ class ELL2AIntegration:
             self._initialized = True
     
     def cleanup(self):
-        """Reset ELL2A integration state."""
+        """Reset ELL integration state."""
         self._workflows.clear()
         self._messages.clear()
         self._metrics.clear()
         self._initialized = False
         
     def configure(self, config: Optional[Dict[str, Any]] = None):
-        """Configure ELL2A integration."""
+        """Configure ELL integration."""
         if config:
             self._mode_configs.update(config)
 
@@ -72,7 +72,7 @@ class ELL2AIntegration:
         return self._mode_configs.get(mode, {})
     
     async def process_message(self, message: Message) -> Message:
-        """Process a message through ELL2A."""
+        """Process a message through ELL."""
         self._messages.append(message)
         # Return a result message
         return Message(
@@ -124,8 +124,8 @@ class ELL2AIntegration:
         return self._metrics.copy()
     
     @staticmethod
-    def with_ell2a(mode: str = "simple"):
-        """Decorator to enable ELL2A for any function.
+    def with_ell(mode: str = "simple"):
+        """Decorator to enable ELL for any function.
         
         Args:
             mode: Processing mode (simple or complex)
@@ -136,13 +136,13 @@ class ELL2AIntegration:
         def decorator(func: Callable):
             @wraps(func)
             async def wrapper(*args, **kwargs):
-                ell2a = ELL2AIntegration()
-                config = ell2a.get_mode_config(mode)
+                ell = ELLIntegration()
+                config = ell.get_mode_config(mode)
                 func_name = func.__name__
                 
                 # Initialize metrics for function if not exists
-                if func_name not in ell2a._metrics:
-                    ell2a._metrics[func_name] = {
+                if func_name not in ell._metrics:
+                    ell._metrics[func_name] = {
                         "calls": 0,
                         "total_time": 0.0,
                         "errors": 0
@@ -153,7 +153,7 @@ class ELL2AIntegration:
                     result = await func(*args, **kwargs)
                     
                     # Update metrics
-                    ell2a._metrics[func_name]["calls"] += 1
+                    ell._metrics[func_name]["calls"] += 1
                     
                     # Create message from function result
                     message = Message(
@@ -167,15 +167,15 @@ class ELL2AIntegration:
                         }
                     )
                     
-                    # Process with ELL2A
-                    processed = await ell2a.process_message(message)
+                    # Process with ELL
+                    processed = await ell.process_message(message)
                     
                     # Return original result
                     return result
                     
                 except Exception as e:
                     # Update error metrics
-                    ell2a._metrics[func_name]["errors"] += 1
+                    ell._metrics[func_name]["errors"] += 1
                     
                     # Create error message
                     message = Message(
@@ -190,8 +190,8 @@ class ELL2AIntegration:
                         }
                     )
                     
-                    # Process error with ELL2A
-                    await ell2a.process_message(message)
+                    # Process error with ELL
+                    await ell.process_message(message)
                     
                     # Re-raise the original exception
                     raise
@@ -201,7 +201,7 @@ class ELL2AIntegration:
     
     @staticmethod
     def track_function():
-        """Decorator to track function execution with ELL2A.
+        """Decorator to track function execution with ELL.
         
         Returns:
             Decorated function
@@ -209,12 +209,12 @@ class ELL2AIntegration:
         def decorator(func: Callable):
             @wraps(func)
             async def wrapper(*args, **kwargs):
-                ell2a = ELL2AIntegration()
+                ell = ELLIntegration()
                 func_name = func.__name__
                 
                 # Initialize metrics for function if not exists
-                if func_name not in ell2a._metrics:
-                    ell2a._metrics[func_name] = {
+                if func_name not in ell._metrics:
+                    ell._metrics[func_name] = {
                         "calls": 0,
                         "total_time": 0.0,
                         "errors": 0
@@ -225,15 +225,15 @@ class ELL2AIntegration:
                     import time
                     start_time = time.time()
                     result = await func(*args, **kwargs)
-                    ell2a._metrics[func_name]["calls"] += 1
-                    ell2a._metrics[func_name]["total_time"] += time.time() - start_time
+                    ell._metrics[func_name]["calls"] += 1
+                    ell._metrics[func_name]["total_time"] += time.time() - start_time
                     return result
                 except Exception as e:
-                    ell2a._metrics[func_name]["errors"] += 1
+                    ell._metrics[func_name]["errors"] += 1
                     raise
                 
             return wrapper
         return decorator
 
 # Global instance
-ell2a_integration = ELL2AIntegration() 
+ell_integration = ELLIntegration() 

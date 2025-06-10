@@ -1,0 +1,202 @@
+%% IMPORTANTE: Manual de tesis oficial Universidad Católica del Norte se %%encuentra en el siguiente link:
+%%http://online.ucn.cl/files/bidoc/MANUAL1_PAUTA_UCN_Digitalizacion_Tesis.pdf
+
+%%  Letra utilizada Times New Roman 14pt
+%%  Este template LaTex fue realizado por
+%%  Simón Orrego Astudillo.
+%%  Por favor cualquier discrepancia o eventualidad 
+%%  que difiera con el manual requerido, hacerlo saber a:
+%%  e-mail soa005@alumnos.ucn.cl
+%%
+%%  WARNINGS:       Posibles diferencias a mejorar pero que no resultan         %%                  significativas: 
+%%                  - Números romanos debieran ser en minúscula antes de la    %%                    introducción.
+%%                  - Espaciado 1.5 podría diferir un poco del espaciado Word.
+%%                  - Letra Times New Roman genérica, por lo que es lo más identica posible a Word pero no es la misma.
+%%                  - Cambiar el template a letra Arial 12pt si es deseable.
+%%                  - Fancy de página no requerido por manual pero tampoco                            rechazado.
+%%                  - Tamaño de Letra de los Capítulos debiera ser igual que la                       letra del texto 
+%%  
+%----------------------------------------------------------------------------%
+\documentclass[12pt,openany]{report}
+%Configuration page
+\usepackage{geometry}
+\geometry{
+	width=215mm, 
+	height=280mm,
+	left=4cm,
+	right=2.5cm,
+	bottom=2.5cm,
+	top=4cm,
+}
+%...............................................................
+\usepackage{setspace}%Da la posibilidad de poner un interlineado (Line spacing)
+\setlength{\parindent}{3em}%Indent (Sangría)
+\usepackage{anyfontsize}%Manage font size 
+%...............................................................
+%Tamaño para titulos de chapters,secciones,subsecciones
+\usepackage{sectsty}
+\usepackage{titlesec}
+\sectionfont{\large}
+\subsectionfont{\large}
+%...............................................................
+%figures and Tables 
+\usepackage{caption}
+\usepackage{subcaption}
+%...............................................................
+%Using Packages (general)
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc, url}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{times} %Use Font Times New Roman 
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\graphicspath{{figures/}} %Import images from folder
+\usepackage{float}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[toc,page]{appendix}
+%...............................................................
+%Comments
+\usepackage{comment}%Comments in file  
+\usepackage[colorinlistoftodos]{todonotes}%Comments in pdf
+%...............................................................
+%Generic text packages 
+\usepackage{blindtext}
+\usepackage{lipsum}
+%...............................................................
+%Change tables, contents, figures parameters 
+\usepackage{tocloft}
+\usepackage{tocenter}
+\usepackage{gensymb} %Degree Symbol
+\usepackage{textcomp} %Symbols 
+\usepackage{chngpage}% allows for temporary adjustment of side margins
+%...............................................................
+%Page style
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textit{\leftmark}}
+\rfoot{\thepage}
+%\rfoot{\thepage}
+%...............................................................
+%Redefine plain (chapters, tables, appendix)
+\fancypagestyle{plain}{
+\fancyhf{}
+%\fancyhead[OC]{\leftmark}
+\fancyfoot[R]{\thepage}
+\fancyfoot[L]
+}
+%...............................................................
+% To make cites and references
+\usepackage[hidelinks,pdfusetitle,pdfdisplaydoctitle]{hyperref} 
+\usepackage{doi}
+\renewcommand{\doitext}{}
+\usepackage{natbib} %Package to cite references
+%...............................................................
+% To make pretty tables
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{dcolumn}
+\usepackage{array}
+%Control de terminaciones de linea en párrafo
+\hyphenpenalty=100000   % No se dividen las palabras al terminar una línea
+\sloppy % Ayuda a que las cosas no se salgan de los márgenes.
+\raggedbottom % Hace que el tamaño de las páginas llegue hasta donde llegue el texto, no agrega espacio vertical
+
+%----------------------------------------------------------------------------%
+\begin{document}
+    \setstretch{1.5}
+    \include{portada}
+    \pagenumbering{roman} %Números Romanos de acuerdo al formato de tesis UCN
+	\setcounter{page}{2} %Desde acá empieza el contador 
+%..................................	
+	%Sections 
+	\begin{center}
+		\phantomsection \label{glads}
+		\large{\textbf{AGRADECIMIENTOS}}
+	\end{center}
+	\input{agradecimientos}
+	\clearpage
+%..................................	
+    \begin{center}
+		\phantomsection \label{resumen}
+		\large{\textbf{RESUMEN}}
+	\end{center}
+	\input{resumen}
+	\clearpage
+%..................................	
+    %Borrar si no se desea abstract en inglés
+    \begin{center}
+		\phantomsection \label{abstract}
+		\large{\textbf{ABSTRACT}}
+	\end{center}
+	\input{abstract}
+	\clearpage
+%..................................	
+	\setstretch{1.5}
+	\renewcommand{\cfttoctitlefont}{\large}
+	\renewcommand{\contentsname}{\textbf{TABLA DE CONTENIDOS}}
+	\tableofcontents 
+	\newpage
+	\renewcommand\cftloftitlefont{\large}
+	\renewcommand{\listfigurename}{\textbf{ÍNDICE DE FIGURAS}}
+	%\listoffigures
+	{%
+		\let\oldnumberline\numberline%
+		\renewcommand{\numberline}{\figurename~\oldnumberline}%
+		\listoffigures%
+	}
+	\newpage
+	\renewcommand\cftlottitlefont{\large}
+	\renewcommand{\listtablename}{\textbf{ÍNDICE DE TABLAS}}
+	{%
+		\let\oldnumberline\numberline%
+		\renewcommand{\numberline}{\tablename~\oldnumberline}%
+		\listoftables%
+	}
+	\newpage
+%..................................	
+	\pagenumbering{arabic} % Comienza la numeración arábiga (números normales)
+	\setcounter{page}{1} % Comienza el contador de páginas en 1
+%..................................	
+	\chapternumberfont{\huge}
+	\chaptertitlefont{\large}
+	\chapter{INTRODUCCIÓN} \label{intr}
+	\input{chapters/intro}
+%..................................	
+	\chapter{MARCO TEÓRICO} \label{cap2}
+	\input{chapters/cap2}
+%..................................	
+	\chapter{MARCO TEÓRICO 2} \label{cap3}
+	\input{chapters/cap3}
+%..................................	
+	\chapter{MARCO GEOLÓGICO}
+	\input{chapters/cap4}
+%..................................	
+	\chapter{RESULTADOS}
+	\input{chapters/resultados}
+%..................................	
+	\chapter{DISCUSIÓN}
+	\input{chapters/discusion}
+%..................................	
+	\chapter{CONCLUSIÓN}
+	\input{chapters/conclusion}
+	\clearpage
+%..................................	
+	\addcontentsline{toc}{chapter}{REFERENCIAS}
+	\renewcommand{\bibname}{REFERENCIAS}
+	\bibliographystyle{apalike}
+	\setstretch{1}
+	\setlength{\bibsep}{2em plus 0.5ex}
+	\bibliography{references/papers} %Link a referencias
+	\clearpage
+%..................................	
+	\appendix
+	\renewcommand{\appendixname}{ANEXOS}
+	\renewcommand{\appendixpagename}{ANEXOS}
+	\renewcommand{\appendixtocname}{ANEXOS}
+	\addappheadtotoc	
+	\input{chapters/anexos}
+\end{document}

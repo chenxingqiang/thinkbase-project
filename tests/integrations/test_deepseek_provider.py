@@ -4,7 +4,7 @@ import logging
 import os
 import pytest
 from requests.exceptions import RequestException
-from agentflow.ell2a.providers.deepseek import DeepSeekProvider, DeepSeekConfig
+from agentflow.ell.providers.deepseek import DeepSeekProvider, DeepSeekConfig
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)

@@ -1,0 +1,352 @@
+\documentclass[
+	% -- opções da classe memoir --
+	article,	% indica que é um artigo acadêmico
+	11pt,		% tamanho da fonte
+	oneside,	% para impressão apenas no recto. Oposto a twoside
+	a4paper,	% tamanho do papel. 
+	% -- opções da classe abntex2 --
+	%chapter=TITLE,   % títulos de capítulos convertidos em letras maiúsculas
+	%section=TITLE,   % títulos de seções convertidos em letras maiúsculas
+	%subsection=TITLE,  % títulos de subseções convertidos em letras maiúsculas
+	%subsubsection=TITLE % títulos de subsubseções convertidos em letras maiúsculas
+	% -- opções do pacote babel --
+	english,	% idioma adicional para hifenização
+	brazil,	% o último idioma é o principal do documento
+	sumario=tradicional
+	]{abntex2}
+
+% ---
+% PACOTES
+% ---
+
+% ---
+% Pacotes fundamentais 
+% ---
+\usepackage{lmodern}														% Usa a fonte Latin Modern
+\usepackage[T1]{fontenc}													% Selecao de codigos de fonte.
+\usepackage[utf8]{inputenc}													% Codificacao do documento (conversão automática dos acentos)
+\usepackage{indentfirst}													% Indenta o primeiro parágrafo de cada seção.
+\usepackage{nomencl}														% Lista de simbolos
+\usepackage{color}															% Controle das cores
+\usepackage{graphicx}														% Inclusão de gráficos
+\usepackage{microtype}														% para melhorias de justificação
+% ---
+\usepackage{titlesec}%[newparttoc]% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
+\usepackage{lipsum}       % para geração de dummy text
+
+\usepackage{tabularx}
+\usepackage{array,makecell}
+\usepackage{multirow}														% tabelas complexas
+\usepackage{mdframed}														% ambiente de seções "boxed"
+% ---
+% ---
+% ---
+% Pacotes de citações
+% ---
+\usepackage[brazilian,hyperpageref]{backref}								% Paginas com as citações na bibl
+\usepackage[alf]{abntex2cite}												% Citações padrão ABNT
+
+% \newcounter{mydef}
+% \renewcommand\themydef{\arabic{mydef} -- }
+% \setcounter{mydef}{2}
+
+% \mdtheorem[style=theoremstyle,theoremseparator= -- ]{definition}{#1 -- }
+\newcounter{theo}
+\setcounter{theo}{2}
+\newenvironment{theo}[1][]{
+\stepcounter{theo}
+\ifstrempty{#1}
+{\mdfsetup{
+frametitle={
+{Theorem~\thetheo};}}
+}
+{\mdfsetup{
+frametitle={\thetheo~--~#1}}
+}
+\mdfsetup{frametitlerule=true}
+% linewidth=2pt,topline=true,
+% frametitleaboveskip=\dimexpr−\ht\strutbox\relax,}
+ \begin{mdframed}[]\relax
+ }{\end{mdframed}}
+
+% \usepackage{siunitx}
+% \newtheorem{theorem}{Theorem}[section]
+% \renewcommand{\thetheorem}{\thesection--\arabic{theorem}}
+% % \renewcommand{\thetheorem}{\thesection--\arabic{theorem}}
+% \mdtheorem[style=theoremstyle]{definition}{Definition}[section]
+% \mdtheorem[style=theoremstyle]{theorem}[definition]{Theorem}
+\setheadfoot{3cm}{1cm}
+
+\makepagestyle{meuestilo}
+	%%cabeçalhos
+	\makeevenhead{meuestilo} %%pagina par
+		 {}
+		 {\includegraphics[width=\textwidth]{fige.pdf}}
+	{}
+	\makeoddhead{meuestilo} %%pagina ímpar ou com oneside
+		 {}
+		 {\includegraphics[width=.9\textwidth]{fige.pdf}}
+		 {}
+% ---
+% Configurações do pacote backref
+% Usado sem a opção hyperpageref de backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+	\ifcase #1 %
+		Nenhuma citação no texto.%
+	\or
+		Citado na página #2.%
+	\else
+		Citado #1 vezes nas páginas #2.%
+	\fi}%
+% ---
+
+% --- Informações de dados para CAPA e FOLHA DE ROSTO ---
+\titulo{Título PIBEX 2023}
+% \tituloestrangeiro{Canonical article template in \abnTeX: optional foreign title}
+\local{Campus Ipojuca}
+
+% \autor{
+% Equipe \abnTeX\thanks{``Recomenda-se que os dados de vinculação e
+% endereço constem em nota, com sistema de chamada próprio, diferente do sistema 
+% adotado para citações no texto.'' \url{http://www.abntex.net.br/}} 
+% \\[0.5cm] 
+% Lauro César Araujo\thanks{``Constar currículo sucinto de cada autor, com 
+% vinculação corporativa e endereço de contato.''} }
+
+\data{Ipojuca, \today}
+% ---
+% ---
+% Configurações de aparência do PDF final
+
+% alterando o aspecto da cor azul
+\definecolor{blue}{RGB}{41,5,195}
+
+% informações do PDF
+\makeatletter
+\hypersetup{
+			%pagebackref=true,
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+			pdfsubject={Modelo de artigo científico com abnTeX2},
+			pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{atigo científico}, 
+		colorlinks=true,          % false: boxed links; true: colored links
+			linkcolor=blue,           % color of internal links
+			citecolor=blue,           % color of links to bibliography
+			filecolor=magenta,          % color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+% --- 
+
+% ---
+% compila o indice
+% ---
+\makeindex
+% ---
+
+% ---
+% Altera as margens padrões
+% ---
+\setlrmarginsandblock{2cm}{2cm}{*}
+\setulmarginsandblock{4.5cm}{2cm}{*}
+\checkandfixthelayout
+% ---
+
+% --- 
+% Espaçamentos entre linhas e parágrafos 
+% --- 
+
+% O tamanho do parágrafo é dado por:
+\setlength{\parindent}{0.0cm}
+
+% Controle do espaçamento entre um parágrafo e outro:
+\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+
+% Espaçamento simples
+\SingleSpacing
+
+
+% ----
+% Início do documento
+% ----
+% \newcolumntype{s}{>{\hsize=.5\hsize}X}
+
+\newcolumntype{a}{>{\hsize=.21\hsize}X}
+\newcolumntype{e}{>{\hsize=1.050\hsize}X}
+\newcolumntype{i}{>{\hsize=.35\hsize}X}
+\newcolumntype{o}{>{\hsize=1.890\hsize}X}
+\newcolumntype{u}{>{\hsize=2.240\hsize}X}
+\newcolumntype{g}{>{\hsize=1.75\hsize}X}
+\newcolumntype{s}{>{\hsize=0.5\hsize}X}
+
+\begin{document}
+\pagestyle{meuestilo}
+\checkandfixthelayout
+% Seleciona o idioma do documento (conforme pacotes do babel)
+%\selectlanguage{english}
+\selectlanguage{brazil}
+
+% Retira espaço extra obsoleto entre as frases.
+\frenchspacing 
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+
+%---
+%
+% Se desejar escrever o artigo em duas colunas, descomente a linha abaixo
+% e a linha com o texto ``FIM DE ARTIGO EM DUAS COLUNAS''.
+% \twocolumn[       % INICIO DE ARTIGO EM DUAS COLUNAS
+%
+%---
+
+% página de titulo principal (obrigatório)
+%\maketitle
+
+
+
+
+% titulo em outro idioma (opcional)
+
+
+
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+\pagestyle{meuestilo}
+
+\phantom{This text will be invisible}
+\vfill
+
+\begin{center}
+\imprimirtitulo
+\end{center}
+
+\vfill
+
+\begin{center}
+Local de execução: \imprimirlocal
+\end{center}
+
+\vfill
+
+\begin{center}
+\imprimirdata
+\end{center}
+\newpage
+
+\begin{center}
+\begin{table}[h]
+%\begin{tabular}{p{.3cm}p{1.9cm}p{1.1cm}p{3.9cm}p{0.3cm}p{1.1cm}p{5.1cm}}
+\begin{tabularx}{\linewidth}{aeioaeu}
+
+ &  & & & & &  \\\hline
+\multicolumn{7}{|l|}{\textbf{1 -- DADOS DO PROJETO}}                                                                                             \\ \hline
+\multicolumn{7}{|l|}{Título: \imprimirtitulo}                                \\ \hline
+\multicolumn{7}{|l|}{Área Temática Principal}                                                                                                   \\ \hline
+%\multicolumn{7}{|l|}{\textit{(assinalar apenas uma Área   Temática, aquela que melhor define o problema que deu origem ao projeto)}} \\ \hline
+\multicolumn{1}{|c|}{}        & \multicolumn{3}{l|}{Comunicação}    & \multicolumn{1}{c|}{}          & \multicolumn{2}{l|}{Meio Ambiente}     \\ \hline
+\multicolumn{1}{|c|}{}         & \multicolumn{3}{l|}{Cultura}        & \multicolumn{1}{c|}{}           & \multicolumn{2}{l|}{Saúde}             \\ \hline
+\multicolumn{1}{|c|}{} &
+	\multicolumn{3}{l|}{Direitos Humanos e Justiça} &
+	\multicolumn{1}{c|}{X} &
+	\multicolumn{2}{l|}{Tecnologia e Produção} \\ \hline
+\multicolumn{1}{|c|}{}         & \multicolumn{3}{l|}{Educação}       & \multicolumn{1}{c|}{}           & \multicolumn{2}{l|}{Trabalho}          \\ \hline
+\multicolumn{3}{|l|}{\begin{tabular}[c]{@{}l@{}}Local de realização/\\ Município\end{tabular}} &
+	\multicolumn{4}{l|}{Microregião de SUAPE no Estado de Pernambuco, Brasil} \\ \hline
+\multicolumn{3}{|l|}{Comunidade}                       & \multicolumn{4}{l|}{Comunidades dos municípios de Ipojuca e Cabo de Santo Agostinho} \\ \hline
+\multicolumn{2}{|l|}{\begin{tabular}[c]{@{}l@{}}Beneficiários \\ Diretos\end{tabular}} &
+	\multicolumn{2}{l|}{\begin{tabular}[c]{@{}l@{}}Moradores da \\ região de X\end{tabular}} &
+	\multicolumn{2}{l|}{\begin{tabular}[c]{@{}l@{}}Beneficiários \\ Indiretos\end{tabular}} &
+	\multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Trabalhadores da \\ empresa X\end{tabular}} \\ \hline
+\end{tabularx}
+\end{table}
+\end{center}
+
+\begin{table}[h]
+		\centering
+		\begin{tabularx}{\textwidth}{|g|g|s|s|s|}
+\hline
+\multicolumn{5}{|l|}{\textbf{2 -- INSTITUIÇÕES PARCEIRAS}}                                                                                             \\ \hline
+
+
+{\multirow{2}{*}{Nome completo da Instituição}} &
+	{\multirow{2}{*}{Função}} &
+	\multicolumn{3}{c|}{Tipo} \\ \cline{3-5} 
+\multicolumn{1}{|c|}{} &
+	\multicolumn{1}{c|}{} &
+	\multicolumn{1}{c|}{Pública} &
+	\multicolumn{1}{c|}{Privada} &
+	\multicolumn{1}{c|}{ONG} \\ \hline
+Casa da Mãe Joana &
+	Fornecer abrigo &
+	\multicolumn{1}{c|}{\textbf{X}} &
+	\multicolumn{1}{c|}{\textbf{}} &
+	\multicolumn{1}{c|}{\textbf{}} \\ \hline
+Fábrica de Livros &
+	Imprimir livros &
+	\multicolumn{1}{c|}{\textbf{}} &
+	\multicolumn{1}{c|}{\textbf{X}} &
+	\multicolumn{1}{c|}{\textbf{}} \\ \hline
+Amigos do ambiente &
+	vas &
+	\multicolumn{1}{l|}{\textbf{}} &
+	\multicolumn{1}{l|}{\textbf{}} &
+	\textbf{} \\ \hline
+		\end{tabularx}
+\end{table}
+
+\begin{theo}[APRESENTAÇÃO]
+    Este é um modelo para o template de submissão de PIBEX do IFPE \cite{abntex2-wiki-como-customizar}. Aqui tem um exemplo de referência bibliográfica \cite{ibge1993}.
+    
+    \lipsum[1-3]
+\end{theo}
+
+\begin{theo}[CARACTERIZAÇÃO E JUSTIFICATIVA]
+    \lipsum[4-6]
+\end{theo}
+
+\begin{theo}[OBJETIVOS]
+	\lipsum[7]
+\end{theo}
+
+\begin{theo}[METODOLOGIA]
+	\lipsum[8-12]
+\end{theo}
+
+\begin{theo}[RESULTADOS ESPERADOS]
+	\lipsum[13-14]
+\end{theo}
+
+\begin{theo}[ACOMPANHAMENTO E AVALIAÇÃO]
+	\lipsum[15]
+\end{theo}
+
+\begin{theo}[CRONOGRAMA]
+	\lipsum[16]
+\end{theo}
+
+\begin{theo}[RECURSOS E INFRAESTRUTURA EXISTENTES]
+	\lipsum[17-18]
+\end{theo}
+
+\begin{theo}[RECURSOS E INFRAESTRUTURA NECESSÁRIOS]
+	\lipsum[19-20]
+\end{theo}
+
+\renewcommand{\bibname}{}
+
+\begin{theo}[REFERÊNCIAS]
+\vspace{-1.6cm} 
+\bibliography{abntex2-modelo-references}
+\end{theo}
+
+\end{document}

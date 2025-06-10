@@ -2,6 +2,8 @@
 from typing import Dict, Any, List, Optional
 from enum import Enum
 from dataclasses import dataclass
+
+from litellm import Field
 from .exceptions import ValidationError
 
 class InputMode(Enum):
@@ -20,7 +22,7 @@ class InputType(Enum):
 class ValidationConfig:
     strict_mode: bool = False
     schema_validation: bool = True
-    transform_strategies: List[str] = None
+    transform_strategies: List[str] = Field(default_factory=list)
 
 class InputProcessor:
     """处理Agent输入的核心组件"""
@@ -48,6 +50,8 @@ class InputProcessor:
             raise ValueError(f"Unsupported input mode: {mode}")
             
         processor = self._get_processor(mode)
+        if processor is None:
+            raise ValueError(f"No processor found for mode: {mode}")
         return processor(input_data)
 
     def _get_processor(self, mode: InputMode):

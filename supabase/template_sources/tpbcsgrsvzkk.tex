@@ -1,0 +1,195 @@
+
+% Include LaTeX packages
+\documentclass[conference]{styles/acmsiggraph}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
+\usepackage{fullpage}
+\usepackage{enumitem}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{etoolbox}
+\usepackage{verbatim}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\usepackage{menukeys}
+\usepackage{titlesec}
+
+% Set additional LaTeX options
+\setlength{\parskip}{.8mm}
+\setcounter{MaxMatrixCols}{20}
+\hypersetup{
+	colorlinks=true,
+	urlcolor=[rgb]{0.97,0,0.30},
+	anchorcolor={0.97,0,0.30},
+	linkcolor=black,
+	filecolor=[rgb]{0.97,0,0.30},
+}
+
+% Define title, author, and affiliation information
+\title{\huge Homework 1: Solutions \\ \LARGE {CSE 490V: Virtual Reality Systems}}
+\author{\Large Student Name \\ student@uw.edu}
+\pdfauthor{Student Name}
+
+% Redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ %
+ frame=lines, % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ %
+ label=\fbox{\color{Black}\textbf{OUTPUT}},
+ labelposition=topline,
+ %
+ commandchars=\|\(\), % escape character and argument delimiters for commands within the verbatim
+ commentchar=* % comment character
+}
+
+% Set addditional formatting options
+\titlespacing*{\section}{0pt}{5.5ex plus 1ex minus .2ex}{2ex}
+\titlespacing*{\subsection}{0pt}{3ex}{2ex}
+\setcounter{secnumdepth}{4}
+\renewcommand\theparagraph{\thesubsubsection.\arabic{paragraph}}
+\newcommand\subsubsubsection{\paragraph}
+
+% Define a convenient norm symbol
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+% Define a macro for hiding answers
+\newbool{hideanswers} \setbool{hideanswers}{false}
+\newenvironment{answer}{}{}
+\ifbool{hideanswers}{\AtBeginEnvironment{answer}{\comment} %
+\AtEndEnvironment{answer}{\endcomment}}{}
+
+% Define text formatting for points and normals
+\newcommand{\points}[1]{\hfill \normalfont{(\textit{#1pts})}}
+\newcommand{\pointsin}[1]{\normalfont{(\textit{#1pts})}}
+
+\begin{document}
+\maketitle
+
+This document provides a sample \LaTeX~template for formatting your homework solutions for CSE 490V. Note that it is not necessary to include the original question prompts in your submitted solutions, although they have been included here to provide additional formatting examples.
+
+\section{Theoretical Part}
+
+%%%%%%%%%%%%%%%%%%
+%   Question #1  %
+%%%%%%%%%%%%%%%%%%
+
+\subsection{Graphics Pipeline Refresher \points{5}}
+Before we dive into math, let's review the graphics pipeline as shown in the figure below:
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.6]{figures/pipeline}
+\end{figure}
+Please fill in all the blanks. Make sure you review the graphics pipeline of transforming from object space to window space before starting to solve the following questions.
+
+%%%%%%%%%%%%%%%%%%
+%   Answer #1 
+%%%%%%%%%%%%%%%%%%
+
+\begin{answer}
+	\rule{\textwidth}{0.4pt}
+	
+	\textbf{Answer:}
+	
+	Write your answer to this question here.
+
+	\rule{\textwidth}{0.4pt}
+\end{answer}
+
+%%%%%%%%%%%%%%%%%%
+%   Question #2  %
+%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection{Understanding Transformation Matrices \points{10}}
+
+\begin{enumerate}[label=(\roman*)]
+	\itemsep1em 
+	\item Show that a scaling matrix with $s_x = -1$, $s_y = 1$, $s_z = -1$ creates the same $4\times 4$ transformation matrix as a rotation around the $y$ axis by 180 degrees. Write out the matrices. \pointsin{5}
+	\item Derive the $4 \times 4$ matrices for the two transformations below and show that they are not commutative: \pointsin{5}
+	\begin{itemize}
+		\item \textbf{(Translation)} translation vector $\vec{t} = (1,\ 1,\ 1)^T$
+		\item \textbf{(Rotation)} rotate around the $x$ axis by 90 degrees
+	\end{itemize}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%
+%   Answer #2 
+%%%%%%%%%%%%%%%%%%
+
+\begin{answer}
+	\rule{\textwidth}{0.4pt}
+	\textbf{Answer:}
+	\begin{enumerate}[label=(\roman*)]
+		\item Write your answer to this question here.
+		\item Write your answer to this question here.
+	\end{enumerate}
+	\rule{\textwidth}{0.4pt}
+\end{answer}
+
+%%%%%%%%%%%%%%%%%%
+%   Question #3  %
+%%%%%%%%%%%%%%%%%%
+\newpage
+\subsection{Graphics Pipeline Step-by-Step \points{20}}
+
+In this question, we will go through the graphics pipeline step by step. Suppose we have a 3D point $\vec{p} = (2,\ 1,\ 3)^T$ and its normal vector $\vec{n} = (\frac{1}{3},\ \frac{2}{3},\ \frac{2}{3})^T$.
+
+\begin{enumerate}[label=(\roman*)]
+	\itemsep1em 
+	\item \textbf{(Model Transform)} First, transform the point, $\vec{p}$, and vector, $\vec{n}$, into the world coordinate system, $\vec{p}_{w}$ and $\vec{n}_{w}$ respectively. Apply the following transformations in order:
+	\begin{itemize}
+		\item scale $y$ by 3 and scale $x$ and $z$ by 2
+		\item rotate around $x$-axis by 180 degrees
+		\item translate along $x, y$, and $z$ axes by 1
+	\end{itemize}
+	%
+	Report the scaling, rotation, and translation matrices, and $\vec{p}_{w}$ and $\vec{n}_{w}$. \pointsin{5}
+	
+	\textbf{Hint:} Are homogeneous coordinate representation and transformation of points and vectors the same?
+	
+	\item \textbf{(View Transform)} Next, transform the point, $\vec{p}_{w}$, from the world coordinate system, into camera (or view) coordinates, $\vec{p}_{v}$. Use the following parameters to define the view transform:
+	
+	\begin{itemize}
+		\item eye point (camera location) $\vec{e} = (0,\ 10,\ 10)$
+		\item look-at (i.e., center) point $\vec{c} = (0,\ 0,\ 0)$
+		\item up vector $\vec{u} = (0,\ \frac{\sqrt{2}}{2},\ -\frac{\sqrt{2}}{2})^T$
+		\item gaze vector $\vec{g} = \vec{c}-\vec{e}$ ($\vec{g}$ denotes the vector pointing from point $\vec{e}$ to point $\vec{c}$)
+	\end{itemize}
+	%
+	Report $\vec{p}_{v}$. As a sanity check, apply this view transform to $\vec{e}$ (point), $\vec{u}$ (vector), and $\vec{g}$ (vector), and report your findings. What do you expect to see and why is this a good way to check that your view transform is implemented correctly? \pointsin{5}
+	
+	\item \textbf{(Projection Transform)} At this stage of the pipeline, the projection comes in. Apply the (symmetric) perspective projection transform to the point in camera coordinates, $\vec{p}_{v}$, using the following camera parameters:
+	%
+	\begin{itemize}
+		\item \textit{aspect}: 1
+		\item \textit{fovy}: $90^\circ$
+		\item \textit{zNear}(\textit{n}): 2, \textit{zFar}(\textit{f}): 22
+	\end{itemize}
+	%
+	
+	Report the projection matrix, the transformed point in clip coordinates, $\vec{p}_{clip}$ ($4\times1$ vector), and the transformed point in normalized device coordinates, $\vec{p}_{ndc}$ ($3\times1$ vector), after the perspective divide. \pointsin{5}
+	
+	\item \textbf{(Viewport Transform)} The point after the perspective divide is a $3\times1$ vector $\begin{pmatrix} x_{ndc},y_{ndc},z_{ndc} \end{pmatrix}^{ T }$. The $x$ and $y$ components now have to be mapped onto a 2D screen. For simplicity, let's map the point to a small square screen with a resolution of 200$\times$200 pixels (i.e., $l_{ w }$=200\, and\, $h_{ w }$=200), where the bottom-left coordinate is (0,\ 0). Report the corresponding 2D window coordinate on the screen (in floating point). \pointsin{5}
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%
+%   Answer #3 
+%%%%%%%%%%%%%%%%%%
+
+\begin{answer}
+	\rule{\textwidth}{0.4pt}
+	\textbf{Answer:}
+	\begin{enumerate}[label=(\roman*)]
+		\item Write your answer to this question here.
+		\item Write your answer to this question here.
+		\item Write your answer to this question here.
+		\item Write your answer to this question here.
+	\end{enumerate}
+	\rule{\textwidth}{0.4pt}
+\end{answer}
+
+\end{document}

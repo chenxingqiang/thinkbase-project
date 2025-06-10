@@ -1,0 +1,652 @@
+%% LaTeX2e template for FEUP's Project FE-UP
+%% 
+%% FEUP, JCL,  Fri Dec  1 01:10:53 2023
+%%
+%% PLEASE send improvements to jlopes at fe.up.pt (up till 2028 :-)
+
+\documentclass[11pt,a4paper]{report}
+
+%%------------------------------- preamble ------------------------------------
+
+%% comment next for EN
+\usepackage[portuges]{babel}      % language PT 
+\usepackage[utf8]{inputenc}       % accents
+\usepackage[T1]{fontenc}          % PS fonts
+\usepackage{newtxtext,newtxmath}  % do not use CM fonts
+\usepackage{amsmath}              % multi-line and other mathematical statements
+\usepackage{setspace}             % setting the spacing between lines
+\usepackage{graphicx}             % go far beyond what the graphics package
+\usepackage[normalem]{ulem}       % various types of underlining
+\usepackage{caption}              % rotating captions, sideways captions, etc.
+\usepackage{float}                % tables and figures in the multi-column environment 
+\usepackage{subcaption}           % for subfigures and the like
+\usepackage{longtable}            % tables that continue to the next page
+\usepackage{multirow}             % tabular cells spanning multiple rows
+\usepackage[table]{xcolor}        % driver-independent color extensions
+\usepackage{lipsum}               % loren dummy text
+\setlength{\marginparwidth}{2cm}  % todonotes' requirements
+\usepackage{todonotes}            % todo's
+\usepackage{csquotes}             % context sensitive quotation facilities
+\usepackage[backend=biber,authordate]{biblatex-chicago}  % Chicago Manual of Style
+
+%% document dimensions
+\usepackage[a4paper,left=25mm,right=25mm,top=25mm,bottom=25mm,headheight=6mm,footskip=12mm]{geometry}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1ex}
+%% headers & footers
+%\usepackage{lastpage}
+\usepackage{fancyhdr}
+\fancyhf{}                            % clear off all default fancyhdr headers and footers
+\chead{\small{\emph{\projtitle, \projsubtitle}}}
+\cfoot{\small{\thepage}}
+%\lfoot{\small{\emph{\projtitle, \projsubtitle}}}
+%\rfoot{\small{\thepage\ / \pageref{LastPage}}}
+\pagestyle{fancy}                     % apply the fancy header style
+\renewcommand{\headrulewidth}{0.0pt}  % no head rule
+\renewcommand{\footrulewidth}{0.0pt}
+
+%% colors
+\usepackage{color}
+\definecolor{engineering}{rgb}{0.549,0.176,0.098}
+\definecolor{cloudwhite}{cmyk}{0,0,0,0.025} 
+
+%% source-code listings
+\usepackage{listings}
+\lstset{ %
+ language=C,                        % choose the language of the code
+ basicstyle=\footnotesize\ttfamily,
+ keywordstyle=\bfseries,
+ numbers=left,                      % where to put the line-numbers
+ numberstyle=\scriptsize\texttt,    % the size of the fonts that are used for the line-numbers
+ stepnumber=1,                      % the step between two line-numbers. If it's 1 each line will be numbered
+ numbersep=8pt,                     % how far the line-numbers are from the code
+ frame=tb,
+ float=htb,
+ aboveskip=8mm,
+ belowskip=4mm,
+ backgroundcolor=\color{cloudwhite},
+ showspaces=false,                  % show spaces adding particular underscores
+ showstringspaces=false,            % underline spaces within strings
+ showtabs=false,                    % show tabs within strings adding particular underscores
+ tabsize=2,                         % sets default tabsize to 2 spaces
+ captionpos=t,                      % sets the caption-position to top
+ belowcaptionskip=12pt,             % space between caption and listing
+ breaklines=true,                   % sets automatic line breaking
+ breakatwhitespace=false,           % sets if automatic breaks should only happen at whitespace
+ escapeinside={\%*}{*)},            % if you want to add a comment within your code
+ morekeywords={*,var,template,new}  % if you want to add more keywords to the set
+}
+
+%% hyperreferences (HREF, URL)
+\usepackage{hyperref}
+\hypersetup{
+    plainpages=false, 
+    pdfpagelayout=SinglePage,
+    bookmarksopen=false,
+    bookmarksnumbered=true,
+    breaklinks=true,
+    linktocpage,
+    colorlinks=true,
+    linkcolor=engineering,
+    urlcolor=engineering,
+    filecolor=engineering,
+    citecolor=engineering,
+    allcolors=engineering
+}
+
+%% path to the figures directory
+\graphicspath{{figures/}}
+
+%% bibliography file, must be in preamble
+\addbibresource{bibliography.bib}
+
+%% macros, to be updated as needed
+\newcommand{\school}{Faculdade de Engenharia da Universidade do Porto}
+\newcommand{\degree}{Licenciatura em Engenharia Informática e Computação}
+\newcommand{\projfeup}{Projeto FEUP 2023/24 --- LEIC}
+\newcommand{\projtitle}{Título do Trabalho}
+\newcommand{\projsubtitle}{Subtítulo do Trabalho}
+\newcommand{\projteam}{Equipa 1LEIC11-1}
+
+%% my other macros, if needed
+\newcommand{\windspt}{\textsf{WindsPT\/}}
+\newcommand{\windscannerpt}{\emph{Windscanner.PT\/}}
+\newcommand{\class}[1]{{\normalfont\sffamily #1\/}}
+\newcommand{\svg}{\class{SVG}}
+
+%% my environments for infos
+\newenvironment{info}[1]{\vspace*{6mm}\color{blue}[ \begin{em} #1}
+                        {\vspace*{6mm}\end{em} ]}
+\newenvironment{infoopt}[1]{\vspace*{6mm}\color{blue}[ \textbf{Elemento opcional.} \begin{em} #1}
+                        {\vspace*{6mm}\end{em} ]}
+
+%%------------------------------- document-------------------------------------
+
+\begin{document}
+
+%% preamble page numbers with roman numerals
+\pagenumbering{roman}\setcounter{page}{1}
+
+%%------------------------------- cover page ----------------------------------
+
+\begin{titlepage}
+\center
+
+\vspace*{-12mm}
+{\large \textbf{\textsc{\school}}}\\
+
+\vfill
+
+\includegraphics[width=62mm]{uporto-feup.pdf}
+
+\vfill
+
+{\huge \textbf{\projtitle}}\\[6mm]
+{\Large \textbf{\projsubtitle}}\\
+
+\vfill
+
+\includegraphics[width=52mm]{pup.png}
+
+\vfill
+
+{\Large \textbf{\projfeup}}\\[12mm]
+
+{\Large \textbf{Coordenação}}\\[4mm]
+{\large Geral: Manuel Firmino e Sara Ferreira \hspace*{18mm}
+        De curso: José Magalhães Cruz}\\[6mm]
+
+{\Large \textbf{\projteam}}\\[4mm]
+{\large Supervisor: João Correia Lopes \hspace*{12mm}
+        Monitor: Nome do Monitor}\\[6mm]
+
+{\Large \textbf{Estudantes \& Autores}}\\[4mm]
+{\large Nome do Autor1 $<$email1@up.pt$>$ \hspace*{12mm}
+        Nome do Autor2 $<$email2@up.pt$>$}\\[2mm]
+{\large Nome do Autor3 $<$email1@up.pt$>$ \hspace*{12mm}
+        Nome do Autor4 $<$email2@up.pt$>$}\\[2mm]
+{\large Nome do Autor5 $<$email1@up.pt$>$ \hspace*{12mm}
+        Nome do Autor6 $<$email2@up.pt$>$}\\[2mm]
+{\large Nome do Autor7 $<$email1@up.pt$>$}\\[8mm]
+
+%\renewcommand{\today}{15 de dezembro de 2023}
+\today
+
+\end{titlepage}
+
+%%------------------------------- Abstract ------------------------------------
+
+\chapter*{Resumo}
+
+\begin{info}
+O resumo tem um caráter essencialmente informativo, devendo ser
+escrito de forma concisa (até 200 palavras) de maneira a captar o
+interesse de quem o vai ler.
+
+O Resumo substitui a leitura do documento e não contem figuras,
+tabelas, citações, etc.\ 
+Deve incluir os seguintes tópicos: âmbito, objetivos, os métodos, as
+principais descobertas, incluindo resultados, conclusões e
+recomendações, se existirem.
+
+Para saber mais sobre como redigir um bom resumo consulte o tutorial
+online disponível no website na Biblioteca, ``Guia de Apoio à
+Publicação'', secção: 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit\#heading=h.s4z9k57ywd9w}
+{Estruturar Relatório Técnico}''.
+\end{info}
+
+\todo[inline]{Escrever o Resumo, mas só no fim.}
+
+\vspace{\fill}
+{\Large \textbf{Palavras-chave}:} palavra1, palavra2, palavra3, palavra4
+\vspace*{24mm}
+
+%%------------------------------- Acknowledgments -----------------------------
+
+\chapter*{Agradecimentos}
+
+\begin{infoopt}
+Habitualmente é mencionada a contribuição de outras pessoas ou
+entidades, tanto para a realização do estudo como para a produção do
+relatório. 
+Podem fazer-se numa página autónoma ou incluir-se na introdução.
+\end{infoopt}
+
+%%------------------------------- table of contenys ---------------------------
+
+%% redefine tableofcontents text, ONLY for PT
+\renewcommand{\contentsname}{Índice}
+
+\tableofcontents
+
+%%------------------------------- list of todos -------------------------------
+
+% list todos; comment in the end (should be empty before delivery :-)
+\listoftodos
+
+\begin{infoopt}
+Podem ser colocadas anotações durante a preparação do documento, que
+são listadas aqui.
+
+Este elemento não aparece no documento final!
+\end{infoopt}
+
+%%------------------------------- list of figures -----------------------------
+
+\listoffigures
+\addcontentsline{toc}{chapter}{Lista de figuras}
+
+\begin{infoopt}
+Justifica-se quando é necessário apresentar elementos complementares à
+compreensão do texto (fotografias, tabelas, gráficos, etc.), que devem
+ser previamente identificados sob a forma de listas, com as respetivas
+legendas e páginas de início. 
+\end{infoopt}
+
+%%------------------------------- list of tables ------------------------------
+
+\listoftables
+\addcontentsline{toc}{chapter}{Lista de tabelas}
+
+\begin{infoopt}
+Justifica-se quando é necessário apresentar,  na forma tabular,
+elementos complementares à compreensão do texto.
+\end{infoopt}
+
+%%------------------------------- Acronyms ------------------------------------
+
+\chapter*{Lista de acrónimos}
+\addcontentsline{toc}{chapter}{Lista de acrónimos}
+
+\begin{flushleft}
+\begin{tabular}{l p{0.8\linewidth}}
+ADT      & Abstract Data Type\\
+API      & Application Programming Interface\\
+WWW      & World Wide Web
+\end{tabular}
+\end{flushleft}
+
+\begin{infoopt}
+Justifica-se se estes elementos (acrónimos, unidades, símbolos)
+ocorrerem com grande frequência no relatório.
+Quando ocorrerem pela primeira vez no texto deve apresentar-se a
+respetiva definição.
+Por exemplo: Application Programming Interface (ADT) é uma \ldots 
+
+A lista de itens deve ser ordenada alfabeticamente.
+\end{infoopt}
+
+%%------------------------------- Glossary ------------------------------------
+
+\chapter*{Glossário}
+\addcontentsline{toc}{chapter}{Glossário}
+
+\begin{description}
+\item[bash] \hfill \\
+  Bash é uma \emph{shell Unix} e uma linguagem de comando escrita 
+  em 1989 por Brian Fox para o Projeto GNU como um substituto de 
+  software livre para a \emph{Bourne shell}.
+\item[firewall] \hfill \\
+  Em computação, uma \emph{firewall} é um sistema de segurança de rede 
+  que monitoriza e controla o tráfego de entrada e saída da rede 
+  com base em regras de segurança predeterminadas.
+  Uma \emph{firewall} normalmente estabelece uma barreira entre uma 
+  rede confiável e uma rede não confiável, como a Internet.
+\item[Glossário] \hfill \\
+  Glossário é uma espécie de pequeno dicionário específico para
+  palavras e expressões pouco conhecidas presentes num texto, seja
+  por serem de natureza técnica, regional ou de outro idioma.
+\end{description}
+
+\begin{infoopt}
+Justifica-se sempre que seja necessário esclarecer o leitor sobre o
+significado de terminologia específica usada no texto no relatório.
+Recomenda-se a sua localização nos elementos iniciais, embora na
+normalização existente haja variantes, podendo também constar nos
+elementos finais.
+
+A lista de itens deve ser ordenada alfabeticamente.
+
+Para saber mais consulte o tutorial online 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit}
+{Guia de Apoio à Publicação}''.
+\end{infoopt}
+
+%%------------------------------- chapter ------------------------------------
+
+\chapter{Introdução}
+
+%% display headers & footers
+\pagestyle{fancy}
+%% main page numbers with arabic numerals
+\pagenumbering{arabic}\setcounter{page}{1}
+
+\begin{info}
+Contextualização sucinta do assunto do relatório, fazendo-se
+referência ao âmbito e aos objetivos.
+Aqui clarifica-se a motivação do trabalho apresentado e explica-se a
+abordagem adotada e a sua relação com trabalhos análogos, numa
+perspetiva genérica.
+Não se deve antecipar detalhes sobre o que é explicado nas secções
+posteriores. 
+Se for pertinente, pode-se indicar ainda qual o público a que se
+destina.
+
+Para saber mais consulte o tutorial online 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit}
+{Guia de Apoio à Publicação}''.
+\end{info}
+
+%%------------------------------- chapter ------------------------------------
+
+\chapter{Um capítulo}
+
+\begin{info}
+As partes componentes subsequentes que constituem o corpo do texto
+devem ser estruturadas em secções, estimando-se que até 3 níveis seja
+o suficiente para este tipo de trabalho.
+
+Para saber mais consulte o tutorial online 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit}
+{Guia de Apoio à Publicação}''.
+Note-se que as seções aí indicadas podem ser adaptadas em função do tema
+ou profundidade do estudo a desenvolver.
+\end{info}
+
+\section{Uma secção}
+
+\begin{info}
+Não é costume haver cabeçalhos de secções seguidas sem texto.
+
+A compreensão dos textos pode ser melhorada através de uma pequena 
+introdução às secções seguintes e que vai fazer a ligação da narrativa
+do documento.
+\end{info}
+
+\section{Exemplos}
+
+\todo[inline]{Remover a secção ``Exemplos'' quando já não for necessária.}
+
+\begin{info}
+São ilustradas de seguida algumas partes do documento.
+\end{info}
+
+\subsection{Equações}
+
+\begin{info}
+Este texto é apenas um exemplo que precede uma equação.
+\end{info}  
+
+Equações simples podem ser inseridas em linha com o texto: 
+a reta é \(y=mx+b\).
+
+Equações mais complicadas devem ser separadas em linhas individuais e
+numeradas sequencialmente à direita dentro de parêntesis.
+Esta é a equação 2º grau genérica:
+
+\begin{equation} \label{eq:1}
+  ax^2+bx+cx=0
+\end{equation}
+
+Onde $a$ é o coeficiente de 2º grau; $b$ o de 1º grau; $c$ o
+coeficiente independente da variável $x$, a determinar.
+
+As equações devem ser referidas mantendo o seu número.
+Por exemplo, a Equação~\ref{eq:2} resolve problemas formulados tal como 
+mostrado na Equação~\ref{eq:1}.
+
+\begin{equation} \label{eq:2}
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+\end{equation}
+
+\subsection{Figuras e tabelas}
+
+Todas as figuras e tabelas devem ser obrigatoriamente legendadas e
+numeradas sequencialmente:
+
+\begin{itemize}
+\item as figuras devem ser legendadas por baixo;
+\item as tabelas devem ser legendadas no topo. 
+\end{itemize}
+
+Mantenha as figuras centradas e em linha com o texto para que a
+legenda apareça sempre colada com a imagem.
+
+\begin{info}
+As figuras devem flutuar livremente na página e ser referidas e
+descritas no texto, com as fontes devidamente explicitadas, para
+evitar o plágio.
+\end{info}
+
+Como exemplo, a Figura~\ref{fig:campus} % (retirada de \url{www.fe.up.pt}) 
+mostra o \emph{campus} da FEUP. 
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{campus}
+\caption[Fotografia aérea do Campus da FEUP]{Fotografia aérea do Campus da FEUP~\cite{kn:figura}.} \label{fig:campus}
+\end{figure}
+
+\begin{info}
+Pode ser reservado espaço para colocar, no futuro, uma figura; por
+exemplo, a Figura~\ref{fig:natal}.
+\end{info}
+
+\begin{figure}
+  \centering
+  \missingfigure{Inserir a figura do Natal.}
+  \caption{O Natal no Campus da FEUP.} \label{fig:natal}
+\end{figure}
+
+A Tabela~\ref{tab:feup} % (excerto adaptado de ``A FEUP em números'', 2011)
+serve para exemplificar como mostrar alguns valores que neste caso têm
+a ver com alguns dados numéricos associados a recursos e investimentos
+da FEUP no ano de 2011. 
+
+\begin{table} [b]
+  \centering
+  \caption[Recursos Físicos da FEUP]{Recursos Físicos da FEUP. Adaptado de~\cite{kn:tabela}}
+  \begin{tabular}{| l | c |}
+    \hline
+    \textbf{Designação} & \textbf{Quantidade}\\\hline
+    \hline
+    Área total do campus FEUP & 93 918 $m^2$\\\hline
+    Espaços verdes & 23 000 $m^2$\\\hline
+    Número de computadores dedicados ao ensino & 1 815\\\hline
+    Investimento em equipamentos de laboratório & 1,46 M€\\
+    \hline
+  \end{tabular}
+  \label{tab:feup}
+\end{table}
+
+\lipsum[4]
+
+\subsection{Citações}
+
+À medida que escreve o texto do relatório, deve indicar os trabalhos
+de outros autores em que se baseia, sob a forma de citações.
+Isto consiste em indicar de forma abreviada as fontes usadas às quais
+foi buscar informação adicional para desenvolver o tema do seu
+relatório.
+
+Existem duas formas principais de citar:
+\begin{itemize}
+\item por \textbf{paráfrase}: interpretação do conteúdo original por
+  palavras diferentes das da fonte consultada, indicando a fonte logo
+  a seguir; ou 
+\item 
+  por \textbf{transcrição}: uso de um excerto do conteúdo original
+  apresentando-o entre aspas, indicando a fonte logo a seguir.
+\end{itemize}
+
+As citações devem obedecer a um estilo normalizado.
+De entre os muitos que existem, a Biblioteca da FEUP aconselha o
+estilo Chicago (formato autor-data).
+
+\begin{info}
+De seguida exemplificam-se, ao acaso, algumas citações (por paráfrase)
+de acordo com esse estilo.
+\end{info}
+
+A decisão de escolha de um tema para um trabalho académico pode
+variar~\cite{kn:Bel02-book}.
+O tema pode ser pensado e escolhido pelo próprio estudante, ou a
+partir de uma lista de temas já concebidos, com potencial interesse
+para estudo~\cite{kn:GLPR14-joPhysics}.
+
+A cada citação ao longo do texto deve corresponder uma referência
+indicada na lista final de referências
+bibliográficas~\cite{kn:Lip08,kn:MSS+12-wemep,kn:VKL+18-dtu}. 
+
+É importante não esquecer que também as figuras (imagens, tabelas,
+gráficos, etc.) provenientes de obras de outros autores (por exemplo 
+obtidas através da Internet) devem ser citadas sempre, após as
+respetivas legendas~\cite{kn:GLPC22-torque}.
+
+Para saber mais sobre este assunto e ver exemplos, consulte o guia
+``Evitar o plágio: boas práticas no uso da
+informação''\footnote{\url{https://feup.libguides.com/plagio/citar}}.  
+
+\subsection{Código}
+
+\begin{info}
+De seguida é ilustrado como incluir código no documento.
+\end{info}
+
+Listing~\ref{code:useless} 
+\lipsum[4]
+
+\begin{lstlisting}[language=Python, caption=Python example, label=code:useless]
+# Take the user's input
+words = input("Enter the text to translate to pig latin: ")
+print(f"You entered: {words}")
+
+# Break apart the words into a list
+words = words.split(' ')
+
+# Use a list comprehension to translate words greater than or equal to 3 characters
+translated_words = [(w[1:] + w[0] + "ay") for w in words if len(w) >= 3 ]
+
+# Print each translated word
+for word in translated_words:
+    print(word)
+\end{lstlisting}
+
+\subsection{Uso das macros}
+
+\begin{info}
+De seguida é ilustrada a utlização de macros \LaTeX{} definidas no
+preâmbulo.
+De salientar o uso da macro \verb!\class{}! para classes, métodos e componentes.
+\end{info}
+
+O \windspt, retirado do \windscannerpt, usa o \svg\ \ldots\ como em \class{Student.calculate-age()}.
+
+\lipsum[2]
+
+\subsection*{O travessão}
+
+Sobre o uso do hífen e do travessão\footnote{"Ciberdúvidas da Língua Portuguesa", 
+\url{https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/o-uso-do-hifen-e-do-travessao/31251}}: 
+\begin{enumerate}
+    \item O hífen (Alt + 0045): sem espaços em branco (-);
+    \item O travessão (ou travessão duplo)/em-dash(1) (Alt + 0151): em português, envolto em espaços em branco (---);
+    \item O traço de ligação/en dash (Alt + 150): sem espaços em branco (--);
+    \item O sinal matemático de subtração: sem espaços em branco (–).
+\end{enumerate}
+
+\subsection*{As aspas}
+
+Sobre as aspas  em \LaTeX, ou é usado o slifo diretamente, ou então são feitas com o acento para trás no início e a plica no fim, como em ``exemplo''\footnote{What is the best way to use quotation mark glyphs? 
+\url{https://tex.stackexchange.com/questions/531/what-is-the-best-way-to-use-quotation-mark-glyphs}}.
+
+%%------------------------------- chapter ------------------------------------
+
+\chapter{Outro capítulo}
+
+\lipsum[2]
+
+%%------------------------------- chapter ------------------------------------
+
+\chapter{Recomendações}
+
+\begin{infoopt}
+Se as recomendações forem breves, podem ser incluídas nas conclusões.
+Se forem mais extensas, devem figurar em separado. 
+Devem ser concisas e indicar uma ação que é necessária na sequência
+das conclusões extraídas (como por exemplo áreas adicionais para
+estudo ou decisões de produção).
+Devem justificar-se com base no estudo ou investigação descritos.
+
+A ordem dos elementos Conclusões e Recomendações é flexível, podendo ser inversa, se o contexto/instituição o exigir.
+
+Para saber mais consulte o tutorial online 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit}
+{Guia de Apoio à Publicação}''.
+\end{infoopt}
+
+%%------------------------------- chapter ------------------------------------
+
+\chapter{Conclusões}
+
+\begin{info}
+Nas conclusões é feita a apresentação clara e organizada das deduções
+ou ilações extraídas após a discussão dos resultados do estudo, como
+forma de responder à pergunta inicial do projeto.
+Por esse motivo não deve ser um texto de detalhe, num texto em que
+se apresente algo de novo, mas um texto de afirmação que deve ser lido
+de forma independente do restante relatório.
+
+A ordem dos elementos Conclusões e Recomendações é flexível, podendo ser inversa, se o contexto/instituição o exigir.
+
+Para saber mais consulte o tutorial online 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit}
+{Guia de Apoio à Publicação}''.
+\end{info}
+
+%%------------------------------- Bibliography --------------------------------
+
+\begin{info}
+De seguida  deverão constar as referências bibliográficas constantes do texto
+do relatório e eventual bibliografia relevante consultada durante o
+projeto.
+\end{info}
+
+\renewcommand{\bibname}{Referências bibliográficas}
+%\bibliographystyle{chicago}
+%\bibliography{refs}
+\printbibliography
+\addcontentsline{toc}{chapter}{\refname}  % add it to table of contents
+
+\begin{info}
+Na lista final de referências devem constar os trabalhos dos autores
+citados de forma abreviada ao longo do texto, obtida automaticamente
+com o \class{BibTeX}.
+A referência bibliográfica é a forma mais desenvolvida de indicar as
+fontes de informação em que se baseou. 
+\end{info}
+
+%%------------------------------- appendix ------------------------------------
+
+\appendix
+\chapter{Um Apêndice}
+
+\begin{infoopt}
+Os apêndices e os anexos contêm informação que complementa, apoia e
+clarifica o relatório e cuja inclusão no corpo principal do relatório
+interferiria com uma boa ordem de apresentação das ideias.
+
+Há uma diferença importante entre apêndices e anexos: ``No apêndice
+compilam-se apenas os documentos que são da autoria do autor do
+relatório, enquanto no anexo se compilam os documentos de autoria de
+outros autores que não o do relatório.''.
+
+Para saber mais consulte o tutorial online 
+``\href{https://docs.google.com/document/d/1TDC1behVq8x7fQL4CcPEEh_np5GXviJevQxnQ9gbiJs/edit}
+{Guia de Apoio à Publicação}''.
+\end{infoopt}
+
+%%------------------------------- the end. ------------------------------------
+
+\end{document}

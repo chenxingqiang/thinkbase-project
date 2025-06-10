@@ -1,0 +1,177 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[lmargin=1in,rmargin=1in,tmargin=1in,bmargin=1in]{geometry}
+
+% -------------------
+% Packages
+% -------------------
+\usepackage{
+	amsmath,			% Math Environments
+	amssymb,			% Extended Symbols
+	amsthm,			    % Theorem Environments
+	cancel,			    % Use Cancels
+	enumerate,		    % Enumerate Environments
+	graphicx,			% Include Images
+	lastpage,			% Reference Lastpage
+	multicol,			% Use Multi-columns
+	multirow,			% Use Multi-rows
+	xcolor			    % Use Colors
+}
+
+
+% -------------------
+% Font
+% -------------------
+\usepackage[T1]{fontenc}
+\usepackage{charter}
+
+%\usepackage[T1]{fontenc}
+%\usepackage{mathpazo}
+
+%\usepackage[bitstream-charter]{mathdesign}
+%\usepackage[T1]{fontenc}
+
+
+% -------------------
+% Tikz & PGF
+% -------------------
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usetikzlibrary{
+	calc,
+	decorations.pathmorphing,
+	matrix,arrows,
+	positioning,
+	shapes.geometric
+}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+
+% -------------------
+% Commands
+% -------------------
+
+% Problem Labels
+\newcounter{problem}
+\newcommand{\problem}{
+\stepcounter{problem} %
+\noindent \textbf{Problem \theproblem. }}
+\newcommand{\solution}{\noindent \textbf{Solution: }}
+\newcommand{\pf}{\noindent\emph{Proof. }}
+
+% Special Characters
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+% Math Operators
+\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\disc}{disc}
+\DeclareMathOperator{\Span}{span}
+
+% Special Commands
+\newcommand{\pspace}{\par\vspace{\baselineskip}}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\defeq}{\stackrel{\text{def}}{=}}
+\newcommand{\ov}[1]{\overline{#1}}
+\newcommand{\ma}[1]{\stackrel{#1}{\longrightarrow}}
+\newcommand{\twomatrix}[4]{\begin{pmatrix} #1 & #2 \\ #3 & #4 \end{pmatrix}}
+
+
+% -------------------
+% Header & Footer
+% -------------------
+\usepackage{fancyhdr}
+
+\fancypagestyle{title}{
+	%Headers
+	\fancyhead[L]{\Large My Name}
+	\fancyhead[C]{\Large MAT 999}
+	\fancyhead[R]{\Large Homework \#}
+	\renewcommand{\headrulewidth}{0.2pt}
+	%Footers
+	\fancyfoot[L]{}
+	\fancyfoot[C]{}
+	\fancyfoot[R]{\thepage \,of \pageref{LastPage}}
+	\renewcommand{\footrulewidth}{0.0pt}
+}
+\fancypagestyle{pages}{
+	%Headers
+	\fancyhead[L]{}
+	\fancyhead[C]{}
+	\fancyhead[R]{}
+	\renewcommand{\headrulewidth}{0.0pt}
+	%Footers
+	\fancyfoot[L]{}
+	\fancyfoot[C]{}
+	\fancyfoot[R]{\thepage \,of \pageref{LastPage}}
+	\renewcommand{\footrulewidth}{0.0pt}
+}
+\headheight=18pt
+\footskip=14pt
+
+\pagestyle{pages}
+
+
+% -------------------
+% Content
+% -------------------
+\begin{document}
+\thispagestyle{title}
+
+
+
+% Problem 1
+\problem Show that there exists no nontrivial unramified extensions of $\Q$. \pspace
+
+\solution  If $K/\Q$ is a nontrivial number field, then $|\disc K|>1$. But then $\disc K$ has a prime factor so that some prime ramifies in $K$. \qed \pspace
+
+
+
+% Problem 2
+\problem Complete the following:
+        \begin{enumerate}[(a)]
+	\item How does one prove a cotheorem?
+	\item Compute $\ds \int \cos x \;dx$.
+	\item How does one square $\twomatrix{a}{b}{c}{d}$?       
+        \end{enumerate}
+
+\solution
+\begin{enumerate}[(a)]
+\item Use rollaries.
+
+\item We have
+	\begin{equation} \label{eq:integral}
+	\int \cos x \;dx= \sin x + C	
+	\end{equation}
+We can check \eqref{eq:integral}:
+	\[
+	\dfrac{d}{dx} \left( \sin x + C \right)= \cos x
+	\]
+
+\item This is routine. 
+\end{enumerate} \qed \pspace
+
+
+
+% Problem 3
+\problem Prove that $\sqrt{2}$ is irrational. \pspace
+
+\pf Assume that $\sqrt{2}= \dfrac{a}{b}$, where $a,b \in \Z$. Without loss of generality, we may assume $\gcd(a,b)= 1$. Then we have
+	\begin{align}
+	\sqrt{2}&= \dfrac{a}{b} \nonumber \\
+	\sqrt{2}^2&= \left( \dfrac{a}{b} \right)^2 \label{eq:implication1} \\
+	2&= \dfrac{a^2}{b^2} \nonumber \\
+	a^2&= 2b^2 \label{eq:implication2}
+	\end{align}
+But then from \eqref{eq:implication2}, we know that $a^2$ is even so that $a$ is even. But then we must have
+	\[
+	2a^2= b^2
+	\]
+so that $b^2$ is even, implying $b$ is even. But then $\gcd(a,b) \geq 2$, a contradiction. \qed \\
+
+
+
+\end{document}

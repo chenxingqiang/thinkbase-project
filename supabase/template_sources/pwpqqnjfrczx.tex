@@ -1,0 +1,363 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Modelo de tese com capítulos individuais
+%% 
+%% Neste formato, cada capítulo é preparado de maneira que possa ser lido individualmente, muitas vezes baseado
+%% em trabalho publicado em revista científica na forma de artigo. Assim sendo, cada capítulo possui 
+%% aproximadamente a mesma estrutura de um artigo, quais sejam: resumo, abstract, introdução, material e 
+%% métodos, resultados, discussão, e conclusões.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%=============================================================================================================
+%% Definições gerais - tipo de documento
+%%=============================================================================================================
+
+%% Tipo de documento e a classe a ser usada para sua formatação.
+%\documentclass[tese, header, twoside, openright]{UFRuralRJ} %%% original
+\documentclass[tese, header, oneside, openright]{UFRuralRJ}
+
+%% A opção 'openright' força inícios de capítulos em páginas ímpares
+%\documentclass[openright]{UFRuralRJ}
+
+%% Use a opção 'twoside' para gerar uma versão frente-e-verso
+%\documentclass[twoside]{UFRuralRJ}
+
+%%=============================================================================================================
+%% Pacotes - língua, codificação e fonte
+%%=============================================================================================================
+%\usepackage[brazilian, english, spanish]{babel} %% use 'english' para documento escrito em inglês % não foi necessário usar spanish
+\usepackage[brazilian, english]{babel} %% use 'english' para documento escrito em inglês
+%\usepackage[english]{babel}
+
+%%% Para a fonte padrão Latex, usar:
+%\usepackage[T1]{fontenc} %% Conjunto de caracteres correto (para usar com compilador pdfLaTeX ou XeLaTeX YG; cometado por YG)
+%%%\usepackage[utf8]{inputenc} %% Para acentuação correta (cometado por YG)
+
+%%% ou 
+
+%%% Para a fonte Times New Roman, usar: (Adicionado por YG)
+\usepackage{fontspec} %% Para Font Times New Roman é necessaŕio o compilador XeLaTeX (de fato somente funciona com compilador XeLaTeX YG)
+\setmainfont{Times New Roman} %% Para Font Times New Roman (YG) https://pt.overleaf.com/learn/latex/XeLaTeX
+%%\setmainfont{DejaVu Serif} %% Para Font DejaVu Serif (YG)
+
+%%=============================================================================================================
+%% Pacotes - formatação de equações e números
+%%=============================================================================================================
+
+\usepackage{amsmath,latexsym,amssymb}
+\usepackage{siunitx} %% Sistema Internacional de Unidades
+
+%%=============================================================================================================
+%% Pacotes - formatação de figuras
+%%=============================================================================================================
+
+%% Importar figuras corretamente
+\usepackage{graphicx}
+
+%% Diretório onde estão as figuras dos capítulos
+%\graphicspath{{capitulos-b/figuras/}}
+\graphicspath{{tese_capitulos/}} %%% yuri ppgctia
+
+\usepackage{float}
+\usepackage{wrapfig}
+
+%%=============================================================================================================
+%% Pacotes - formatação de hyperlinks e urls
+%%=============================================================================================================
+
+%% Opção 'hidelinks' disponível no pacote 'hyperref' a partir da versão 2011-02-05  6.82a. 'hidelinks' retira 
+%% os retângulos do entorno das palavras com links.
+
+\usepackage[%hidelinks%, 
+            bookmarksopen=true, linktoc=page, colorlinks=true,
+            linkcolor=blue, citecolor=blue, filecolor=magenta, urlcolor=blue,
+            pdftitle={UFRuralRJ -- Classe LaTeX para formatação de documentos acadêmicos na UFRRJ},
+%            pdfauthor={Graziela Barroso}, %%% original
+            pdfauthor={Yuri Gelsleichter},
+            pdfsubject={Tese de Doutorado},
+            pdfkeywords={LaTeX, UFRuralRJ, Documentos acadêmicos}
+            ]{hyperref}
+
+%% Pacote para lidar com url longa, deve ser carregado depois do pacote 'hyperref'
+%\usepackage[hyphenbreaks]{breakurl} %%% deu conflito no overleaf com o compilador pdflatex, por isso comentar 
+
+%% Se o pacote 'hyperref' acima foi carregado, a linha abaixo corrige um bug na 
+%% hora de montar o sumário da lista de figuras e tabelas. Comente a linha se o
+%% pacote 'hyperref' não foi carregado.
+%\input{macros/bugcaption}
+
+%%=============================================================================================================
+%% Pacotes - formatação da bibliografia de acordo com as normas da ABNT
+%%=============================================================================================================
+% O pacote 'abntex2cite' precisa, obrigatoriamente, ser carregado depois do pacote 'hyperref'.
+% Mais informações podem ser obtidas na página do pacote no GitHub: https://github.com/abntex/abntex2
+
+\usepackage[alf, abnt-and-type=&, abnt-etal-cite=2, abnt-etal-list = 0]{abntex2cite}
+
+%%=============================================================================================================
+%% Pacotes - formatação de verbatim
+%%=============================================================================================================
+%% O ambiente verbatim é o ambiente onde são inseridos exemplos de código fonte.
+%% Está opção adiciona cor de fundo ao ambiente verbatim.
+%% Comente para desabilitar.
+
+\let\oldv\verbatim
+\let\oldendv\endverbatim
+\def\verbatim{\par\setbox0\vbox\bgroup\oldv}
+\def\endverbatim{\oldendv\egroup\fboxsep0pt 
+                 \noindent\colorbox[gray]{0.8}{\usebox0}\par}
+
+%%=============================================================================================================
+%% Pacotes - outros
+%%=============================================================================================================
+
+% \usepackage{showframe}
+
+\usepackage{blindtext} %% Amostra de texto (\blindtext[1])
+
+%\usepackage{times} %% Usar fonte Adobe Times Roman, equivalente à Times New Roman
+
+\usepackage{threeparttable} %%% foot note on tables
+
+\usepackage{longtable} %%% to several pages tables (long tables)
+
+\usepackage{subcaption} %%% figuras com mais de uma descrição
+
+\usepackage{threeparttablex} % for "ThreePartTable" environment
+
+\usepackage{booktabs}        % for well-spaced horizontal rules
+
+\captionsetup{skip=1pt} %%% distancia entre legenda e figura e tabela %%% opcional font=small, justification=raggedright,singlelinecheck=false
+
+%%%%%% \usepackage{fancyhdr} %%% controlar numero da primeira página do apêndice
+
+\usepackage{listings} %%% for display R code %%% acabei não utilizando
+\lstset{language=R, %%% configuratiobn of package "listings"
+	basicstyle=\small\ttfamily,
+	stringstyle=\color{green},
+	otherkeywords={0,1,2,3,4,5,6,7,8,9},
+	morekeywords={TRUE,FALSE},
+	deletekeywords={data,frame,length,as,character},
+	keywordstyle=\color{blue},
+	commentstyle=\color{green},
+}
+
+%%=============================================================================================================
+%% Identificação do trabalho
+%%=============================================================================================================
+\titulo{Titulo do trabalho} %% Título
+\author{Sobrenome}{Nome} %% Autor: sobrenome, nome
+%\autoratrue %% Usar no caso de uma AUTORA
+%\instituto{PRÓ-REITORIA DE PESQUISA E PÓS-GRADUAÇÃO} %% Instituto
+\instituto{Pró-Reitoria de Pesquisa e Pós-Graduação} %% Instituto
+%\curso{PROGRAMA DE PÓS-GRADUAÇÃO EM CIÊNCIA, TECNOLOGIA E INOVAÇÃO EM AGROPECUÁRIA} %% Curso de pós-graduação
+\curso{Programa de Pós-graduação em Ciência, Tecnologia e Inovação em Agropecuária} %% Curso de pós-graduação
+\area{Recursos Naturais e Proteção Ambiental} %% Área de concentração
+\local{Seropédica}{RJ}{Brasil} %% Local da defesa
+
+%%=============================================================================================================
+%% Identificação dos orientadores
+%%=============================================================================================================
+\advisor[Professora]{Dra.}{Sobrenome}{Nome}{UFRRJ} %% Orientadora
+\coadvisor[Professora]{Dr.}{Sobrenome}{Nome} %% Co-orientador
+%\coadvisor[Pesquisador]{Dr.}{Xavier}{Chico} %% Co-orientador
+
+%%=============================================================================================================
+%% Informações sobre a defesa
+%%=============================================================================================================
+\committee[Ph.D.]{Sobrenome}{Nome}{Instituição} %% Presidente
+\committee[Ph.D.]{Sobrenome}{Nome}{Instituição} %% Examinadora
+\committee[Dra.]{Sobrenome}{Nome}{Instituição} %% Examinador
+\committee[Dr.]{Sobrenome}{Nome}{Instituição} %% Examinadora
+\committee[Dr.]{Sobrenome}{Nome}{Instituição} %% Examinador
+\date{26}{03}{2020} %% Data da defesa
+
+%%=============================================================================================================
+%% identificar problemas com caracters unicode
+%%=============================================================================================================
+%\DeclareUnicodeCharacter{0301}{*************************************} %%% identificar problemas com caracters unicode %https://tex.stackexchange.com/questions/443018/package-inputenc-error-unicode-char-%CC%81-u301inputenc
+
+%%=============================================================================================================
+%% Início do documento
+%%=============================================================================================================
+\begin{document}
+%%% \pagenumbering{roman} %%% YG %%% comentado por YG posteriormente, como esta numeração é opcional optamos por deixar sem
+
+%%=============================================================================================================
+%% Capa e folha de rosto
+%%=============================================================================================================
+\maketitle %%% original
+%%% \thispagestyle{empty} %%% para não numerar a folha de rosto YG %%% comentado por YG posteriormente, como esta numeração é opcional optamos por deixar sem
+
+%%=============================================================================
+%% Ficha catalográfica
+%%=============================================================================
+\makeCIP{seuEmail@ufrrj.br} % email do autor
+
+%%=============================================================================================================
+% Folha de aprovação
+%%=============================================================================================================
+\makeapprove
+
+%%=============================================================================================================
+%% Dedicatória (opcional)
+%%
+%% NOTA: Usar versão estrelada de 'chapter'
+%%=============================================================================================================
+\chapter*{}
+\vfill
+\begin{flushright}
+  {\em
+  Dedico a minha família.
+  %Àqueles que financiaram meu trabalho...
+  %\par
+  %...DEDICO!
+  }
+\end{flushright}
+
+%%=============================================================================================================
+%% Agradecimentos (opcional)
+%%
+%% NOTA: Usar versão estrelada de 'chapter'
+%%=============================================================================================================
+
+%\chapter*{Agradecimentos}
+%%% o texto de agradecimento pode ser colocado diretamente aqui. Pode ser colocado com o comando: \noindent{text, text} se quiser remover o espaço de identação de cada parágrafo. 
+
+%\noindent{Agradeço a Deus pelo dom da vida.... Mais uma vez, deixo aqui o meu muito obrigado!}
+%\noindent{À Universidade Federal Rural do Rio de Janeiro.}
+%\noindent{Às agências de fomento.}
+%\noindent{Aos orientadores.}
+%\noindent{À todos que, direta ou indiretamente, contribuíram para a construção deste trabalho.}
+
+%%% Como esse texto é extenso, preferi adicionar de arquivo .tex externo pelo comando abaixo:
+\include{elementos_pre_pos_text/Agradecimentos}
+
+%%=============================================================================================================
+%% Biografia (opcional)
+%%
+%% NOTA: Usar versão estrelada de 'chapter'
+%%=============================================================================================================
+% \chapter*{Biografia}
+% \noindent{O autor nasceu, cresceu e escreveu uma tese.}
+
+%%=============================================================================================================
+%% Epígrafe (opcional)
+%%
+%% NOTA: Usar versão estrelada de 'chapter'
+%%=============================================================================================================
+% \chapter*{}
+% \vfill
+% \begin{flushright}
+%   {\em
+%   ``Fazer é a melhor forma de dizer.''
+%   \par
+%   Autor desconhecido
+%   }
+% \end{flushright}
+
+%%=============================================================================================================
+%% Prefácio (opcional)
+%%
+%% NOTA: Usar versão estrelada de 'chapter'
+%%=============================================================================================================
+%\chapter*{Prefácio}
+%\blindtext[2]
+
+
+%%=============================================================================================================
+%% Extended Abstract, Resumen Ampliado, Resumo geral, General abstract
+%%=============================================================================================================
+
+%%==============================================================================
+%% Resumo geral (português)
+%%==============================================================================
+\include{elementos_pre_pos_text/Resumo_Geral} %% Incluir Resumo_Geral
+
+%%==============================================================================
+%% General abstract (inglês)
+%%==============================================================================
+\include{elementos_pre_pos_text/General_Abstract} %% Incluir General_Abstract
+
+%% Resumen Ampliado (espanhol)
+%%==============================================================================
+\include{elementos_pre_pos_text/Resumen_ampliado} %% Incluir Resumen_ampliado
+%%==============================================================================
+
+%%==============================================================================
+%% Extended Abstract (inglês)
+%%==============================================================================
+\include{elementos_pre_pos_text/Extended_Abstract} %% Incluir Extended_Abstract
+
+%%=============================================================================================================
+%% Listas (comentar se não houver) e sumário
+%%=============================================================================================================
+\listoffigures %% Lista de figuras
+\listoftables %% Lista de tabelas
+%\listofappendix %% Lista de apêndices
+%\listofannex %% Lista de anexos
+
+%%=============================================================================================================
+%% Lista de abreviações e siglas
+%%=============================================================================================================
+% pode ser colocada diretamente aqui entre: 
+%%% \begin{listofabbrv}{UbiComp} %% Lista de abreviaturas e siglas
+	%\item [UFRRJ] Universidade Federal Rural do Rio de Janeiro
+	%\item [UFRuralRJ] Universidade Federal Rural do Rio de Janeiro
+%%% \end{listofabbrv}
+% mas como a minha é muito extensa preferi modificar e adicionar por arquivo .tex externo:
+\include{elementos_pre_pos_text/lista_abrev_siglas} %% Incluir lista_abrev_siglas
+
+%%% Lista de siglas (no meu caso (Yuri) usei junto com a lista de abreviações)
+%\begin{listofsymbols}{teste} %% Lista de simbolos
+% \item [$\varnothing$] vazio %% Simbolos devem aparecer conforme a ordem em que aparecem no texto
+% \item [$\Gamma$]  Gama      %% O parâmetro deve ser o símbolo mais longo
+% \item [$\forall$] Para todo
+%\end{listofsymbols}
+
+\tableofcontents %% Sumário
+%\thispagestyle{empty} %%% a segunda página do sumario estava em algarismo arábico mas deveria ser romano como a primeira, então foi adicionado este comando para não numerar a segunda página do sumário YG
+
+%%% depois dessa solução pesquiseii sobre quebra de seção e encontrei "\breake" : https://www.overleaf.com/learn/latex/line_breaks_and_blank_spaces , funcionou muito bem
+%%% \break %%% comentado por YG posteriormente, como esta numeração é opcional optamos por deixar sem
+
+%%=============================================================================================================
+%% Início da tese
+%%=============================================================================================================
+%%% \pagenumbering{arabic} %%% YG %%% comentado por YG posteriormente, como esta numeração é opcional optamos por deixar sem
+
+\include{tese_capitulos/00_intro_geral} %% Incluir Introdução Geral
+\include{tese_capitulos/01_chapter_I} %% Incluir capítulo 01
+\include{tese_capitulos/02_chapter_II} %% Incluir capítulo 02
+\include{tese_capitulos/03_concl_geral} %% Incluir Conclusão Geral
+
+%%=============================================================================================================
+%% Referências
+%%=============================================================================================================
+%% O arquivo 'references' com as referências bibliográficas deve estar no formato BibTeX.
+%%%\shorttitle{Referências bibliográficas}
+\renewcommand{\bibname}{REFERENCES} %%% YG, muda de REFERÊNCIAS BIBLIOGRÁFICAS para REFERENCES
+\shorttitle{References}
+\bibliography{referencias/references} % sincronizado com Mendeley pelo OverLeaf
+
+%%=============================================================================================================
+%% Apêndices
+%%=============================================================================================================
+%% IMPORTANTE:
+%% O Manual da UFRRJ não prevê a inclusão de apêndices, mas apenas anexos. O 
+%% problema disso é que apêndices e anexos são completamente diferentes. 
+%% O anexo pode constituir de qualquer material, não necessariamente de sua 
+%% autoria ou fundamental para o entendimento do seu documento como um todo, 
+%% ao contrário do apêndice.
+%% NOTA:
+%% Caso seja necessário inserir seção ou subseção dentro do apêndice, use o
+%% comando \tocless para não adicioná-los no Sumário.
+%% Exemplo: \tocless\section{Histórico}
+
+\renewcommand{\appendixname}{APPENDIX} %%% YG, muda de Apêndice para Appendix
+
+\appendix %% Comando para criar o apêndice
+\include{elementos_pre_pos_text/apendice_a_tables} %% Incluir apêndice A
+
+%\annex %% Anexos
+%\include{main/anexoa} %% Incluir anexo A
+\end{document}

@@ -1,0 +1,137 @@
+%===================================================================
+% Liste des packages utilisés
+%===================================================================
+\documentclass[a4paper, 11pt]{article}% autres choix : book, report
+\usepackage[utf8]{inputenc}%            gestion des accents (source)
+\usepackage[T1]{fontenc}%               gestion des accents (PDF)
+\usepackage[francais]{babel}%           gestion du français
+\usepackage{mathtools,amssymb,amsthm}%  packages de l'AMS + mathtools
+\usepackage{geometry}%                  package pour gérer les marges
+\usepackage{graphicx}%                  gestion des images
+\usepackage{xcolor}%                    gestion des couleurs
+\usepackage{titlesec}%                  pour les sections https://fr.sharelatex.com/learn/Sections_and_chapters
+\usepackage{enumitem}%                  pour les listes numérotées http://tex.stackexchange.com/questions/2291/how-do-i-change-the-enumerate-list-format-to-use-letters-instead-of-the-defaul
+\usepackage{import}%                    permet d 'importer des pages
+\usepackage{eurosym}%                   symbole €
+\usepackage[labelsep=none]{caption}%    caption
+\usepackage{titleps}%                   Used to set footer and header
+\usepackage{calc} %                     http://tex.stackexchange.com/questions/18576/get-width-of-a-given-text-as-length
+\usepackage{lastpage}%                  https://fr.sharelatex.com/learn/Page_numbering
+\usepackage{lipsum} %                   https://www.ctan.org/pkg/lipsum
+\usepackage[pagewise, modulo]{lineno}%  permet d'ajouter le numéro des lignes
+
+%===================================================================
+
+
+%===================================================================
+% Configuration
+%===================================================================
+\geometry{nomarginpar,% shrinks spaces for marginal notes to 0pt
+    includehead,
+    includefoot,
+    headheight=11pt,
+    heightrounded}% makes the text height contain an integer number of lines
+
+\setlength\linenumbersep{1cm-\widthof{10}}% Marges ajustés pour inclure le numéro des lignes
+
+\renewcommand{\baselinestretch}{1.5}% Interligne de 1.5
+
+\import{config/}{page-styles}
+
+% Style des sections + suppression de la numérotation des lignes
+\titleformat{\section}[hang]{\Large\scshape\bfseries}{}{0pt}{\centering\nolinenumbers}[\linenumbers\vspace{11pt}]
+%===================================================================
+
+
+%===================================================================
+%===================================================================
+\begin{document}
+%===================================================================
+%===================================================================
+
+
+%===================================================================
+% Configuration
+%===================================================================
+\setcounter{page}{1}
+
+% Change caption of figures
+\renewcommand{\figurename}{\Large\scshape\bfseries FIG}
+
+\newgeometry{tmargin=2cm,
+    bmargin=2cm,
+    lmargin=3.5cm,
+    rmargin=2cm}
+
+\linenumbers% Enable line numbers
+%===================================================================
+
+
+%===================================================================
+% Description de l'invention
+%===================================================================
+\pagestyle{description}
+\import{description/}{description.tex}
+\clearpage
+%===================================================================
+
+
+%===================================================================
+% Les revendications sur l'invention
+%===================================================================
+\pagestyle{revendications}
+\section{revendications}
+\import{revendications/}{revendications.tex}
+\clearpage
+%===================================================================
+
+
+%===================================================================
+% Abrégé
+%===================================================================
+\pagestyle{abrege}
+\section{abrégé}
+\import{abrege/}{abrege.tex}
+\clearpage
+%===================================================================
+
+
+%===================================================================
+% Nouvelle géométrie pour la section dessins
+%===================================================================
+\setcounter{page}{1}
+\restoregeometry
+\newgeometry{tmargin=2.5cm,
+    bmargin=1cm,
+    lmargin=2.5cm,
+    rmargin=1.5cm}
+\nolinenumbers% Disable line numbers
+%===================================================================
+
+
+%===================================================================
+% Les dessins
+%===================================================================
+\pagestyle{dessins}
+\import{dessins/}{dessins.tex}
+\label{last_page_dessins}
+\clearpage
+%===================================================================
+
+
+%===================================================================
+% Figure pour l'abrégé
+%===================================================================
+\setcounter{page}{1}
+\pagestyle{fig-abrege}
+\section{figure pour l'abrégé}
+\import{fig-abrege/}{fig-abrege.tex}
+\clearpage
+%===================================================================
+
+%===================================================================
+%===================================================================
+\end{document}
+%===================================================================
+%===================================================================
+

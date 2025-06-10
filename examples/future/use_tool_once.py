@@ -4,14 +4,14 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
-from agentflow.ell2a.integration import ELL2AIntegration
-from agentflow.ell2a.types.message import Message, MessageRole, MessageType
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole, MessageType
 
 # Get singleton instance
-ell2a = ELL2AIntegration()
+ell = ELLIntegration()
 
-# Initialize ELL2A
-ell2a.configure({
+# Initialize ELL
+ell.configure({
     "enabled": True,
     "tracking_enabled": True,
     "store": "./logdir",
@@ -70,7 +70,7 @@ class Summary(BaseModel):
     """Summary of a text."""
     text: str = Field(description="The text to summarize")
 
-@ell2a.with_ell2a(mode="simple")
+@ell.with_ell(mode="simple")
 async def summarize_text(text: str) -> Summary:
     """Summarize the given text."""
     try:

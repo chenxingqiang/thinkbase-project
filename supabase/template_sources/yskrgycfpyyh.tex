@@ -1,0 +1,175 @@
+% National Institute of Technology, Srinagar Thesis Template for LaTeX 
+
+% (unofficial) Thesis Template for LaTeX
+
+% Edited by Nayeem Iqbal
+
+
+% DON'T USE THIS TEMPLATE IF YOU DON'T KNOW WHAT YOU'RE DOING!
+% Remember, it comes WITH NO WARRANTY!
+
+
+% Here is how to use this template:
+%
+% DON'T FORGET TO ADD YOUR OWN NAME AND TITLE and other changes in the certificates, similarity index, no of pages
+
+% The template is based on the standard "book" document class which provides all necessary sectioning structures and allows multi-part theses.
+
+% Tip 1: Generate your figures and photos in the size you want them to appear
+% in your thesis, rather than scaling them with \includegraphics options.
+% Tip 2: Any drawings you do should be in scalable vector graphic formats:
+% SVG, PNG, WMF, EPS and then converted to PNG or PDF, so they are scalable in
+% the final PDF as well.
+% Tip 3: Photographs should be cropped and compressed so as not to be too large.
+
+% To create a PDF output that is optimized for double-sided printing: 
+%
+% 1) comment-out the \documentclass statement in the preamble below, and
+% un-comment the second \documentclass line.
+%
+% 2) change the value assigned below to the boolean variable
+% "PrintVersion" from "false" to "true".
+
+% --------------------- Start of Document Preamble -----------------------
+
+% Specify the document class, default style attributes, and page dimensions
+% For hyperlinked PDF, suitable for viewing on a computer, use this:
+\documentclass[a4paper,12pt,titlepage,oneside,final]{book}
+ 
+%our college require one side printing, for thesis submission.
+ 
+ 
+% For PDF, suitable for double-sided printing, change the PrintVersion variable below
+% to "true" and use this \documentclass line instead of the one above:
+% \documentclass[a4paper,12pt,titlepage,openright,twoside,final]{book}
+
+
+% This package allows if-then-else control structures.
+\usepackage{ifthen}
+\newboolean{PrintVersion}
+\setboolean{PrintVersion}{false} 
+% \setboolean{PrintVersion}{true} 
+% CHANGE THIS VALUE TO "true" as necessary, to improve printed results 
+% for hard copies by overriding some options of the hyperref package.
+
+
+% Load your needed packages and other commands of yours.
+\input{thesis-preamble}
+
+% This is where thesis margins and spaces are set.
+\input{private/thesis-margins-and-spaces}
+
+%======================================================================
+%   L O G I C A L    D O C U M E N T -- the content of your thesis
+%======================================================================
+\begin{document}
+
+% For a large document, it is a good idea to divide your thesis
+% into several files, each one containing one chapter.
+% To illustrate this idea, the "front pages" (i.e., title page,
+% declaration, certificate, similarity index, abstract, acknowledgements,
+% dedication, table of contents, list of tables, list of figures, list of
+% abbrevations, list of symbols etc.
+%----------------------------------------------------------------------
+% FRONT MATERIAL
+%----------------------------------------------------------------------
+%
+% C O V E R  P A G E
+% ------------------
+\newcommand{\thesisauthor}{Student Name}
+\newcommand{\thesistitlecoverpage}{NIT Srinagar thesis format in {LaTeX}}
+\newcommand{\nameofdegree}{Master of Technology} % Bachelor of technology, MSc, Phd, MS, MBA etc use full form here..
+\newcommand{\nameofprogram}{Micro Electronics} 
+\newcommand{\nameofguide}{Guide Name} %without prefix
+\newcommand{\enrol}{202XMECEMEXXX} 
+\newcommand{\academicunit}{Department of Electronics and Communication Engineering}
+\newcommand{\graduationyear}{July 2022} %edit to your own graduation year
+%
+\input{private/frontpage}
+%
+%
+% R E S T  O F  F R O N T  P A G E S
+% ----------------------------------
+\input{private/certificate}
+\input{private/similarity_certificate} %minimal edit with your similarity index
+\input{private/declarationpage}
+
+% Edit the following 3 files with your abstract, acknowledgements, 
+% and dedication.
+\input{Chapters/Abstract}
+\input{Chapters/Acknowledgements}
+\input{Chapters/Dedication} %You can comment-out dedication, if you want. This is not necessary.
+
+% No need to edit this file.
+\input{private/toc-lot-lof}
+
+%List the abbrevations. You can comment-out List_of_Abbreviations and symbols, if you dont want to have abbrevations and symbols
+\input{Chapters/List_of_Abbreviations}
+\input{Chapters/List_of_Symbols} 
+
+
+
+% Change page numbering back to Arabic numerals
+\pagenumbering{arabic}
+
+%----------------------------------------------------------------------
+% MAIN BODY
+%---------------------------------------------------------------------- 
+% Chapters 
+% Include your "sub" source files here (must have extension .tex)
+\include{Chapters/Chapter_01}
+\include{Chapters/Chapter_02}
+\include{Chapters/Chapter_03}
+
+%Add Chapters as much as you want!
+%3 chapters are suggested
+%1st introduction and review
+%2nd physics and problem statement
+%3rd result, conclusion and future outlook
+%remain in consult with your advisor about the no of chapters and the structure...
+
+
+
+% B I B L I O G R A P H Y
+% -----------------------
+%
+% The following statement selects the style to use for references.  It controls the sort order of the entries in the bibliography and also the formatting for the in-text labels.
+\bibliographystyle{plainurl}
+% This specifies the location of the file containing the bibliographic information.  
+% It assumes you're using BibTeX (if not, why not?).
+
+
+
+\ifthenelse{\boolean{PrintVersion}}{
+\cleardoublepage % This is needed if the book class is used, to place the anchor in the correct page,
+                 % because the bibliography will start on its own page.
+}{
+\clearpage       % Use \clearpage instead if the document class uses the "oneside" argument
+}
+
+
+\bibliography{bibliography/references}
+% Add the References to the Table of Contents
+\phantomsection 
+\addcontentsline{toc}{chapter}{\textbf{References}}
+% Tip 5: You can create multiple .bib files to organize your references. 
+% Just list them all in the \bibliogaphy command, separated by commas (no spaces).
+\phantomsection 
+
+\begin{appendix}
+\include{Chapters/Appendix_A} %"Software & Code for obtaining the plots and results"
+
+%include appendix as required, you can also include proof of concept.
+
+\end{appendix}
+
+
+%----------------------------------------------------------------------
+% END MATERIAL
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+\end{document}
+%======================================================================
+
+

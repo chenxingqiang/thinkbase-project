@@ -1,0 +1,159 @@
+\documentclass[a4paper, twoside]{report}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage[backend=biber,style=imperialharvard]{biblatex}
+\usepackage{afterpage}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{csquotes}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage{booktabs}
+
+% Listings (for displaying code):
+\usepackage{listings}
+\lstset{
+    frame = single, 
+    framexleftmargin=15pt
+}
+
+% Center figure captions:
+\usepackage[labelfont=bf,justification=centering]{caption}
+
+% ----------- Algorithm2e setup
+\usepackage[ruled,vlined]{algorithm2e}
+\makeatletter
+\renewcommand{\SetKwInOut}[2]{%
+  \sbox\algocf@inoutbox{\KwSty{#2}\algocf@typo:}%
+  \expandafter\ifx\csname InOutSizeDefined\endcsname\relax% if first time used
+    \newcommand\InOutSizeDefined{}\setlength{\inoutsize}{\wd\algocf@inoutbox}%
+    \sbox\algocf@inoutbox{\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~}\setlength{\inoutindent}{\wd\algocf@inoutbox}%
+  \else% else keep the larger dimension
+    \ifdim\wd\algocf@inoutbox>\inoutsize%
+    \setlength{\inoutsize}{\wd\algocf@inoutbox}%
+    \sbox\algocf@inoutbox{\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~}\setlength{\inoutindent}{\wd\algocf@inoutbox}%
+    \fi%
+  \fi% the dimension of the box is now defined.
+  \algocf@newcommand{#1}[1]{%
+    \ifthenelse{\boolean{algocf@inoutnumbered}}{\relax}{\everypar={\relax}}%
+%     {\let\\\algocf@newinout\hangindent=\wd\algocf@inoutbox\hangafter=1\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo\hfill:}~##1\par}%
+    {\let\\\algocf@newinout\hangindent=\inoutindent\hangafter=1\parbox[t]{\inoutsize}{\KwSty{#2}\algocf@typo:\hfill}~##1\par}%
+    \algocf@linesnumbered% reset the numbering of the lines
+  }}%
+\makeatother
+% --------- end algorithm2e setup
+
+% \bm allows typing bold math:
+\usepackage{bm}
+
+% -------- Fancy page headers:
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\slshape\nouppercase\leftmark}
+\lhead{\slshape\nouppercase{\rightmark}}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+
+\lfoot{\thepage}
+\rfoot{\thepage}
+% -------- Finish setting up fancy page headers
+
+
+% ---------- Setup for definitions:
+\usepackage{tipa}
+\usepackage{tcolorbox}
+\definecolor{mdgrey}{rgb}{0.8, 0.8, 0.8}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{lipsum}
+\newtheoremstyle{defi}
+  {\topsep}%
+  {\topsep}%
+  {\normalfont}%
+  {}%
+  {\bfseries}% 
+  {:}%
+  {.5em}%
+  {\thmname{#1}\thmnote{~(#3)}}%
+\theoremstyle{defi}
+\newmdtheoremenv{definitioni}{Definition}
+\newmdtheoremenv[
+hidealllines=true,
+leftline=true,
+innertopmargin=0pt,
+innerbottommargin=0pt,
+linewidth=4pt,
+linecolor=gray!40,
+innerrightmargin=0pt,
+]{definitionii}{Definition}
+\newmdtheoremenv[
+roundcorner=5pt,
+innertopmargin=0pt,
+innerbottommargin=5pt,
+linewidth=4pt,
+linecolor=gray!40,
+]{definitioniii}{Definition}
+% ---------- End setup for definitions
+
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\renewcommand*{\rmdefault}{bch}
+\renewcommand*{\ttdefault}{lmtt}
+\newcommand{\citationneeded}{\textcolor{red}{[citation-needed]}}
+
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+
+\title{Your Title Goes Here... Lorem Ipsum Dolor Sit Amet Consectetuer Adipiscing Elit}
+
+% Uncomment if you want a subtitle:
+% \vspace{1em}\large Interim Report}
+
+\author{Joe Bloggs}
+% Update supervisor and other title stuff in title/title.tex
+
+% Add bigger skip between paragraphs, makes reading easier:
+\setlength{\parskip}{0.5em}
+
+\bibliography{bibs/bibliography.bib}
+
+\begin{document}
+\input{title/title.tex}
+
+% \begin{abstract}
+% Your abstract goes here
+% \end{abstract}
+% 
+% \renewcommand{\abstractname}{Acknowledgements}
+% \begin{abstract}
+% Thanks mum!
+% \end{abstract}
+
+\tableofcontents
+
+% Inputs:
+% Uncomment or add folders to add your own chapters and input files.
+
+\input{introduction/introduction.tex}
+\input{background/background.tex}
+% \input{project_plan/project_plan.tex}
+% \input{evaluation_plan/evaluation_plan.tex}
+\input{design/design.tex}
+\input{implementation/implementation.tex}
+% \input{evaluation/evaluation.tex}
+% \input{conclusion/conclusion.tex}
+% \input{appendix/appendix.tex}
+
+\printbibliography
+
+\end{document}

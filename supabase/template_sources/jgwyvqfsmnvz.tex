@@ -1,0 +1,174 @@
+\documentclass[twoside,leqno]{article}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ left=43mm,
+ right=43mm,
+ top=30mm,
+ bottom=82mm
+ }
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor,graphicx,hyperref,titling,float}
+\usepackage{academicons}
+\usepackage{orcidlink}
+\usepackage[numbers]{natbib}
+\definecolor{orcidlogocol}{HTML}{A6CE39}
+\definecolor{PJ}{RGB}{242,145,22}
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\fontsize{13}{15}\bfseries}{\thesection}{1em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[LE]{\thepage}
+\fancyhead[RO]{\thepage}
+\fancyhead[CE]{\@title}
+\usepackage{etoolbox}
+\setcounter{page}{16}
+\cfoot{}
+\newcommand{\inlinemaketitle}{{\let\newpage\relax\maketitle}}
+
+
+
+\makeatletter
+\newcounter{author}
+\renewcommand*\author[1]{%
+  \stepcounter{author}%
+  \ifnum\c@author=1
+    \gdef\@author{#1}%
+  \else
+    \xdef\@author{\unexpanded\expandafter{\@author\and#1}}%
+  \fi
+  \csgdef{author@\the\c@author}{#1}}
+\newcommand*\email[1]{%
+  \csgdef{email@\the\c@author}{#1}}
+\newcommand*\address[1]{%
+  \csgdef{address@\the\c@author}{#1}}
+\AtEndDocument{%
+  \xdef\author@count{\the\c@author}%
+  \c@author=1
+  \print@authors}
+\newcommand*\print@authors{%
+  \ifnum\c@author>\author@count
+  \else
+    \print@author{\the\c@author}%
+    \advance\c@author by 1
+    \expandafter\print@authors
+  \fi}
+\newcommand*\print@author[1]{%
+  \par\medskip
+  \begin{tabular}{@{}l@{}}%
+    \textsc{Addresses of \csuse{author@#1}}\\
+    \csuse{address@#1}\\
+    \textit{E-mail address}:
+    \href{mailto:\csuse{email@#1}}{\csuse{email@#1}}
+  \end{tabular}}
+\makeatother
+
+
+
+
+
+
+\title{\textbf{Title of your Article}}
+
+
+\author{Author A\, \orcidlink{0000-0000-0000-0000} }
+\address{example road A\\example village}
+\email{email@Author.A}
+
+\author{Author B\, \orcidlink{0000-0000-0000-0000} }
+\address{example road B\\example village}
+\email{email@Author.B}
+
+\author{Author C\, \orcidlink{0000-0000-0000-0000} }
+\address{example road C\\example village}
+\email{email@Author.C}
+
+
+\date{November 2022}
+
+
+
+  \makeatletter
+\newcommand{\showtitle}{\begin{center}{{\bf\Large \@title}}\\
+\end{center}}
+
+\newcommand{\showauthor}{{\bf \@author}}
+\makeatother
+
+
+
+\renewcommand{\abstractname}{\color{PJ} \large Abstract\\}
+
+
+
+\begin{document}
+
+\newgeometry{
+ left=43mm,
+ right=43mm,
+ top=30mm,
+ bottom=10mm}
+\begin{flushleft}
+{\small Proyecciones Journal of Mathematics\\
+Vol. XX, No X, pp. XXXX-XXXX, XXX XXXX.\\
+Universidad Católica del Norte\\
+Antofagasta - Chile}
+\end{flushleft}
+\makebox[\textwidth]{\includegraphics[scale=0.7]{PJ_bar}}
+\inlinemaketitle
+
+\thispagestyle{empty}
+\begin{center}
+\color{gray} Recieved: XXXX. $|$ Accepted: XXXXX
+\end{center}
+\noindent\makebox[\linewidth]
+{\textcolor{PJ}{\rule{\paperwidth}{1.5pt}}} 
+\begin{abstract}
+    Write here the abstract of your paper. Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.Write here the abstract of your paper.
+\end{abstract}
+\noindent\makebox[\linewidth]{\textcolor{PJ}{\rule{\paperwidth}{1.5pt}}}  \\ \\
+{\color{PJ}\bf Keywords:} {\it your keywords 
+here} \\ \\ 
+{\color{PJ}\bf MSC (2020):}  {\it your keywords here} \\[2cm]
+\noindent\makebox[\linewidth]{\textcolor{PJ}{\rule{\paperwidth}{80pt}}}  
+\restoregeometry
+
+\newpage
+
+\section*{Introduction}
+The citations follow the IEEE referencing format\\
+An article \cite{anarticle}\\
+A book \cite{abook}\\
+A series \cite{bookseries}\\
+Someone's thesis \cite{thesis}\\
+Some technical report \cite{report}\\
+A collection \cite{collection}\\
+Visited website \cite{website}\\
+Accepted for publication \cite{acceptedpub}\\
+Submitted for publication \cite{unpub}\\
+Not published \cite{notpub}\\
+Conversation \cite{conv}
+\section{Section 1}
+You can include figures with the command figure
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{IMG.png}
+    \caption{An example of a Calabi yau Manifold}
+    \label{fig:my_label}
+\end{figure}
+You can use the citations to refer to your figures and tables. For example the Figure \ref{fig:my_label} is a manifold.
+
+Equations can be included too
+\begin{equation}
+    \int_1^2 f(x) \ dx=f(4)
+\end{equation}
+\bibliographystyle{ieeetr}
+\bibliography{refs}
+\end{document}
+  \vspace{0.3cm}
+  \begin{center}
+  {\it\Large{\@author}} 
+  \end{center}
+

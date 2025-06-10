@@ -1,0 +1,46 @@
+%%% https://www.overleaf.com/learn is a very good resource for mastering LaTeX
+
+%%% These lines tell the arara program how to compile the document
+%%% pdflatex builds the pdf
+%%% biber builds the bibliography if you have one
+% arara: pdflatex
+% arara: biber
+% arara: pdflatex
+% arara: pdflatex
+%%% the following line will tidy up all these extra files that the compiler produces
+% arara: clean : {extensions:[aux,bbl,bcf,blg,glg,glo,gls,idx,ilg,ind,ist,lof,lol,lot,nlo,nls,out,ptc,toc,run.xml]}
+
+\documentclass[a4paper, 14pt, extrafontsizes, oneside, openany, x11names]{memoir} % specifies the document class and its options
+% You can change 12pt to other sizes
+% The memoir class is generally used for writing reports, books, and theses but
+% can make any kind of document and looks really nice
+
+\input{preamble/packages.tex} % imports the packages.tex file from the preamble directory
+\input{preamble/environments.tex} % imports the environments.tex file from the preamble directory
+\input{preamble/macros.tex} % imports the macros.tex file from the preamble directory
+\input{preamble/settings.tex} % imports the settings.tex file from the preamble directory
+
+\addbibresource{bib/library.bib} % this is your list of references (you can use Zotero to organise your references and generate a bib file)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document} % starts the document
+
+\frontmatter % formats the stuff before the main document begins
+\input{preamble/titlepage.tex} % imports the titlepage.tex file from the preamble directory
+\clearpage % starts a new page
+\pagestyle{contents} % specifies how to format the table of contents
+\tableofcontents* % produces the table of contents
+\clearpage % starts a new page
+
+\mainmatter % formats the main document
+\chapter{First chapter}\label{chapter1} % begins a chapter and labels it for cross-referencing
+\input{chapters/chapter1/section1.tex} % imports the section1.tex file from the chapters/chapter1 directory
+
+\newpage
+\appendix
+\chapter{First appendix}\label{appendix1} % begins an appendix and labels it for cross-referencing
+
+\backmatter % formats the stuff after the main document
+\printbibliography[heading=bibintoc] % prints the bibliography and puts it in the table of contents
+
+\end{document} % ends the document

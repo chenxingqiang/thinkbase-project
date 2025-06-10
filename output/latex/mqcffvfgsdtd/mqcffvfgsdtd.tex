@@ -1,0 +1,752 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    left=2.5cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{times}
+
+% Set up page style
+\pagestyle{fancy}
+\fancyhf{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% Title formatting
+\titleformat{\chapter}[display]{\normalfont\bfseries}{\chaptertitle\thechapter}{0pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+
+% Document info
+\title{Template Document}
+\author{Academic Support Agent}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\title{Exact Solutions to the Unsteady Two-Phase Hele-Shaw Problem}
+
+\author{Darren G. Crowdy\setcounter{footnote}{1}\thanks{$\langle${d.crowdy@imperial.ac.uk}$\rangle$
+ the footnote testing the footnote testing  the footnote testing the footnote testing\newline
+\hspace*{10.5pt}The author is grateful to Dr Sam Howison for useful discussions. He also
+thanks the Leverhulme Trust for the award of a 2004 Philip Leverhulme Prize
+in Mathematics which has supported this research. He also acknowledges the
+hospitality of the Department of Mathematics at MIT where this research was carried out.
+}\\
+Department of Mathematics,\\ Imperial College London,\\ London  SW7 2AZ}
+%,\\ 180 Queen's Gate,\\ London  SW7 2AZ}
+
+\maketitle
+%{\def\thefootnote{}\def\thefnmark{}
+%\footnotetext{without footnote mark testing the footnote testing the footnote %testing the footnote testing the footnote testing the footnote testing the %footnote testing the footnote testing the footnote testing the footnote}}
+
+\markboth{}{Exact Solutions To The Unsteady\\ Two-Phase Hele-Shaw Problem}
+
+\pagestyle{headings}
+\begin{abstract} 
+{While many explicit solutions to the single-phase Hele-Shaw problem 
+are known, solutions to the two-phase problem (also known as the `Muskat
+problem') are scarce. This paper presents a new class of exact time-dependent
+solutions to the two-phase  Hele-Shaw problem. It is demonstrated that an
+elliptical inclusion of one phase remains elliptical under evolution when
+immersed in any unsteady far-field linear flow of a second ambient phase.
+On the basis of this solution class, an `elliptical inclusion model'  for
+interactions in inhomogeneous porous media is outlined.}
+{ }
+\end{abstract}
+
+\section{Introduction}
+The Hele-Shaw problem, in which fluid of one viscosity displaces
+a fluid of a different viscosity in the space between two glass
+plates, has been an important paradigm for free-surface dynamics
+for over a century. The literature on this, and related problems,
+is vast. A bibliography containing references up to the late nineties
+has been compiled by Howison (\citealt{How2}).
+One reason for its importance is that the governing equations
+are identical to those governing the motion of interfaces in
+porous media. Thus,  in one respect, the Hele-Shaw cell can be considered
+a simple apparatus for realizing flows in porous media.\footnote{article
+footnote testing the footnote testing the footnote testing the footnote testing  the footnote testing the footnote testing  the footnote testing the footnote testing}
+
+It is well known  that the one-phase Hele-Shaw problem, in which
+the less viscous fluid is assumed to be simply a region of
+constant pressure, is amenable to a number of analytical solution techniques.
+This has led to a large variety of exact mathematical
+solutions for both the steady and the unsteady evolution of
+the interface. For example, the form of a steady viscous
+finger in a Hele-Shaw channel was studied by
+Saffman and  Taylor (\citealt{ST}; \citealt{PGS2}) went on to show that an
+exact time-dependent solution for the finger can be found.
+(\citealt{Galin}, \citealt{PK})
+and Richardson (\citealt{Rich}) have all found exact time-dependent
+solutions to the one-phase problem in other geometries using 
+a variety of mathematical techniques, a key component of
+which is the description of the evolving interface
+in terms of a time-dependent conformal map.
+Shraiman and Bensimon (\citealt{BS}) later\break formulated
+a theory of `pole dynamics' for such free
+boundary problems, which is intimately related
+to these earlier theories of exact solutions.
+
+
+\begin{table}[t!]%6
+\vspace*{-14pt}
+%\tblcaptionnotes
+\caption{Log odds ratios (OR) from a Bayesian logistic regression on the best ML model for the Sarcoidosis study}
+\noindent {\mbox{\fontsize{8}{10}\sffamily\begin{tabular}{@{}lcccc@{}}
+\multicolumn{5}{@{}l}{\rule{\textwidth}{2pt}}\\
+Covariates  & Gender & Smoking & DQB*201 &  {\itshape S}$_{\textsf{12}} \vee$ {\itshape
+S}$_{\textsf{14}}$\\[-6.5pt]
+\multicolumn{5}{@{}l}{\rule{\textwidth}{.4pt}}\\%\midline log(OR) & $-$1.84  & 0.94    & 2.99    & 1.51 \\
+sd(log OR)  &  $\phantom{-}$0.39  & 0.39    & 0.37    & 0.37\\[-6.5pt]
+\multicolumn{5}{@{}l}{\rule{\textwidth}{.4pt}}\\
+\end{tabular}}}
+{\fontsize{6}{8}\selectfont\sffamily sd, standard deviation}\label{tab04}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+By contrast, in the two-phase Hele-Shaw problem where the dynamics of each
+of the two fluids is now resolved equally, almost all of the exact solution techniques relevant to the single-phase problem simply fail. This problem
+is also known as the `Muskat problem' (\citealt{Muskat}). It is a well-known fact
+that many two-phase systems are generally not amenable to straightforward
+analysis by means of conformal mapping techniques. The reason is that while
+some simple preimage region, such as the interior of a unit disk,  in a parametric
+plane might correspond, under a one-to-one conformal mapping,  to the region
+occupied by one phase, it is generally {\em not} true that the exterior of
+the unit disk corresponds to the region occupied by the second phase. However,
+as will be shown here, there are certain special scenarios involving two-phase
+flow where conformal mapping techniques can be usefully employed.
+
+A very small number of exact mathematical solutions of this type {\em are} known. It is clear that in the steadily-translating Saffman--Taylor finger
+solution, the constant pressure region can be trivially replaced by
+a region of viscous fluid in uniform translation---a fact
+pointed out by the original authors themselves (\citealt{ST}).
+Howison (\citealt{Howison}) has listed several other simple solutions including
+travelling wave solutions in a channel, radially symmetric
+solutions and a stagnation point flow solution. To the best of this author's knowledge, the only non-trivial time-dependent exact solutions to the two-phase problem are due to Jacquard and S\'eguier (\citealt{JS}). It turns out that the shape of the interface in their solution can be described by the same conformal mapping relevant to Saffman's (\citealt{PGS2}) solution of the one-phase problem
+(although the time evolution of the parameters in the map
+is different). The solution scheme of (\citealt{JS}) appears to
+be somewhat serendipitous. Howison (\citealt{Howison}) has reappraised the Jacquard--S\'eguier
+solution and proposed a more general context, an `inverse method', 
+in which to derive it, and possibly other solutions,
+in a more systematic manner. The more general mathematical
+question of the global existence and well-posedness of the Muskat
+problem has also been the focus of recent investigations by Siegel, Caflisch and Howison (\citealt{Sieg}) and Ambrose (\citealt{Ambrose}).
+
+This paper derives a class of exact time-dependent solutions of the\break two-phase Hele-Shaw \nobreak{problem} that does not appear to have been reported\break previously.
+The solutions involve a `radial geometry' (as opposed
+to the\break channel geometry of (\citealt{JS})) in which 
+an unbounded region of one fluid evolves 
+while containing a bounded elliptical inhomogeneity
+(or inclusion) of a second fluid.
+As for the single-phase problem in which a
+less viscous inclusion is modelled as a `bubble' of constant
+pressure surrounded by a 
+more viscous fluid, Howison (\citealt{How10}) has discussed similarities
+between the \nobreak{problem} in a channel and a radial 
+geometry, especially in the context of the fingering
+phenomenon. Paterson (\citealt{Pat}) contributed some earlier work
+on fingering, for the single-phase problem, in a radial geometry.
+
+\subsection{Test Second Level Section}
+
+
+This paper derives a class of exact time-dependent solutions of the two-phase Hele-Shaw \nobreak{problem} that does not appear to have been reported previously.
+The solutions involve a `radial geometry' (as opposed
+to the channel geometry of (\citealt{JS})) in which 
+an unbounded region of one fluid evolves 
+while containing a bounded elliptical inhomogeneity
+(or inclusion) of a second fluid.
+As for the single-phase problem in which a
+less viscous inclusion is modelled as a `bubble' of constant
+pressure surrounded by a 
+more viscous fluid, Howison (\citealt{How10}) has discussed similarities
+between the \nobreak{problem} in a channel and a radial 
+geometry, especially in the context of the fingering
+phenomenon. Paterson (\citealt{Pat}) contributed some earlier work
+on fingering, for the single-phase problem, in a radial geometry.
+
+\subsubsection{The Case-Space Frame Work.}
+
+This paper derives a class of exact time-\break dependent solutions of the two-phase Hele-Shaw \nobreak{problem} that does not appear to have been reported previously.
+The solutions involve a `radial geometry' (as opposed
+to the channel geometry of (\citealt{JS})) in which 
+an unbounded region of one fluid evolves 
+while containing a bounded elliptical inhomogeneity
+(or inclusion) of a second fluid.
+As for the single-phase problem in which a
+less viscous inclusion is modelled as a `bubble' of constant
+pressure surrounded by a 
+more viscous fluid, Howison (\citealt{How10}) has discussed similarities
+between the \nobreak{problem} in a channel and a radial 
+geometry, especially in the context of the fingering
+phenomenon. (\citealt{Pat}) contributed some earlier work
+on fingering, for the single-phase problem, in a radial geometry.
+
+\paragraph{Minority couteropinions.}
+
+Consider the two-phase Hele-Shaw problem in an unbounded
+planar region. Let a bounded inclusion of one fluid 
+(called fluid 2) be embedded in an unbounded region of
+another fluid (called fluid 1).
+
+\section{Problem Formulation}
+
+Consider the two-phase Hele-Shaw problem in an unbounded
+planar region. Let a bounded inclusion of one fluid 
+(called fluid 2) be embedded in an unbounded region of
+another fluid (called fluid 1). Let the mobility of fluid 1
+be $k_1$ and that of the fluid 2 be $k_2$;
+in the Hele-Shaw problem, $k_i = h^2/12 \upmu_i$ where
+$\upmu_i$ denote the viscosities of the two fluids and
+$h$ is the gap width of the cell.
+Let ${\bf u}_{1,2}$ and $p_{1,2}$ be, respectively,
+fluid velocities and pressures in each phase. Then
+\begin{equation}
+{\bf u}_1 = \nabla \upphi_1,\quad {\bf u}_2 = \nabla \upphi_2,
+\end{equation}
+where
+\begin{equation}
+\upphi_1 = - k_1 p_1,\quad \upphi_2=-k_2 p_2.
+\end{equation}
+Under the assumption that there is no surface tension 
+on the interface, one condition that must hold there
+is that the fluid pressures must be continuous so that
+\begin{equation}
+p_1 = p_2,\quad {\rm on\ the \ interface}.
+\end{equation}
+It is also necessary 
+that the normal fluid velocities must be equal at the interface,
+and further, must give the normal velocity $V_n$ of the interface. Thus,
+at the interface,
+\begin{equation}
+{\partial \phi_1 \over \partial n} ={\partial \phi_2 \over \partial n} = V_n.\label{eq:eqKin}
+\end{equation}
+It is condition (\ref{eq:eqKin}) that governs the
+time evolution of the interface.
+
+\section{The Solution Method}
+
+Let the complex potentials in the two fluid regions be denoted
+by $w_1(z,t)$ and $w_2(z,t)$ so that
+\begin{equation}
+\phi_1 = {\rm Re}[w_1(z,t)],\quad \phi_2 = {\rm Re}[w_2(z,t)].
+\end{equation}
+The condition that the pressures are equal on the interface implies
+that
+\begin{equation}
+w_1(z,t) + \overline{w_1(z,t)} = \Lambda {\left(w_2(z,t) + \overline{w_2(z,t)}\right)},
+\end{equation}
+where $\Lambda =k_1/k_2$. Equivalently,
+on differentiating this with respect to $z$, the condition is
+\begin{equation}
+w_1'(z,t) + \overline{w_1'(z,t)} {d \bar{z} \over dz} = \Lambda {\left(w_2'(z,t) + \overline{w_2'(z,t)}{d \bar{z} \over dz}
+\right )},\label{eq:eqK1}
+\end{equation}
+where the prime notation denotes the derivative with respect to
+the first argument of the function. The condition that the normal velocities of the two fluids are equal at the interface is equivalent to
+\begin{equation}
+{\rm Im}[w_1'(z,t) dz] = {\rm Im}[w_2'(z,t) dz],
+\end{equation} 
+or
+\begin{equation}
+w_1'(z,t) - \overline{w_1'(z,t)} {d \bar{z} \over dz} = 
+w_2'(z,t) - \overline{w_2'(z,t)}{d \bar{z} \over dz}.
+\label{eq:eqK2}
+\end{equation}
+Adding (\ref{eq:eqK1}) and (\ref{eq:eqK2}) yields the relation
+\begin{equation}
+w_1'(z,t) = {1 \over 2}\!\!{\left((\Lambda+1) w_2'(z,t) + (\Lambda-1) \overline{w_2'(z,t)} {d \bar{z} \over dz}\right)}.\label{eq:eqK6}
+\end{equation}
+We now restrict attention to 
+a particular class of time-dependent flows which will
+be shown to admit exact solutions. First, we
+suppose that the flow in fluid region 2 is given by a complex
+potential having a derivative of the linear form
+\begin{equation}
+w_2'(z,t) = \epsilon(t) z + \delta(t)\label{eq:eqK5}
+\end{equation}
+for some complex-valued functions $\epsilon(t)$ and $\delta(t)$. Further,
+it will be assumed that the enclosed region 2 has an elliptical boundary
+at all times in the evolution, with its geometrical centre positioned at
+some (complex) point $\gamma(t)$. It will be shown that (\ref{eq:eqK5}) is
+consistent with the preservation of the elliptical shape of the inclusion.
+
+\subsection{Conformal Mapping}
+To proceed with the analysis it is convenient to introduce
+a conformal mapping from the unit $\zeta$-disk in 
+a parametric $\zeta$-plane to fluid region 1.
+The fact that fluid region 2 is an elliptical inclusion 
+implies that such a conformal mapping
+has the functional form
+\begin{equation}
+z(\zeta,t) = \gamma(t) + {\alpha(t) \over \zeta} + \beta(t) \zeta,\label{eq:eqCM}
+\end{equation}
+where $\alpha(t)$ is a function of time that can be assumed to
+be real (by a rotational degree of freedom of the Riemann mapping
+theorem) while $\beta(t)$ is some generally complex function.
+Henceforth, for convenience, we suppress the explicit
+dependence of the parameters on time.
+
+On the interface between the fluids where $\bar{\zeta} = \zeta^{-1}$,
+one can write
+\begin{equation}
+\bar{z} = \overline \gamma + \alpha \zeta +{\bar{\beta} \over \zeta}.
+\end{equation}
+However, it is also true, from (\ref{eq:eqCM}), that
+\begin{equation}
+{1 \over \zeta} = {z \over \alpha} - {\gamma \over \alpha}
+- {\beta \over \alpha} \zeta,
+\end{equation}
+which is a relation valid everywhere inside the unit $\zeta$-disk and,
+in particular, on its boundary. It follows that, on the interface,
+\begin{equation}
+\bar{z} = \overline \gamma - {\bar{\beta} \gamma \over \alpha}
++{\bar{\beta} z \over \alpha} + {\left(\alpha - {|\beta|^2 \over \alpha} \right)} \zeta.
+\label{eq:eqK3}
+\end{equation}
+The right-hand side of (\ref{eq:eqK3}), which is purely an analytic
+function of the complex variable $\zeta$, can now be used to
+provided the analytic continuation of $\bar{z}$
+off the unit $\zeta$-circle (where relation (\ref{eq:eqK3}) is originally valid) and into the interior of the unit $\zeta$-disk (that is, into fluid region 1). It might be mentioned that, considered as a function of $z$ (or $\zeta$) the analytic continuation of $\bar z(z)$ off the interface is sometimes
+referred to as the {\em Schwarz function} (\citealt{Davis}) of the interface.
+Since $\zeta \to 0$ as $z \to \infty$,  observe that  the right-hand side
+is analytic everywhere in fluid region 1, becoming singular only as $z \to
+\infty$ where it tends to a linear function of $z$. Note also that, on differentiation
+with respect to $z$, we also have that
+\begin{equation}
+{d \bar z \over dz} = {\bar \beta \over \alpha}
++ {\left(\alpha - {|\beta|^2 \over \alpha} \right)} 
+{\left({dz \over d \zeta} \right )}^{-1}.\label{eq:eqK4}
+\end{equation}
+Similarly, (\ref{eq:eqK4}) provides the analytic continuation of $d \bar{z}/dz$ into fluid region 1 and, since $z_\zeta(\zeta)$ admits no zeros and is analytic
+inside the unit $\zeta$-disk, it follows that $d \bar z/dz$ is analytic everywhere inside region 1, tending to a constant as $z \to \infty$.
+
+Making use of (\ref{eq:eqK3}), (\ref{eq:eqK4}) and (\ref{eq:eqK5})
+in (\ref{eq:eqK6}) yields the following explicit expression for the (derivative
+of the) complex potential governing the motion in fluid 1:
+\begin{equation}
+\begin{array}{rcl}
+\displaystyle w_1'(z,t) & \displaystyle=&\displaystyle {\Lambda+1 \over 2} (\epsilon z + \delta)+{\Lambda-1 \over 2} {\left[\vphantom{+\bar \epsilon {\left(\alpha -{|\beta|^2 \over \alpha} \right )} \zeta}\bar \delta +
+\bar \epsilon {\left(\bar \gamma - {\bar \beta \gamma \over \alpha} \right)}+ {\bar \epsilon \bar \beta \over \alpha} z\right.}\nonumber\\[10pt] 
+&&\displaystyle\left.+\bar \epsilon {\left( \alpha -{|\beta|^2 \over \alpha} \right )} \zeta\right]{\left({\bar \beta \over \alpha} -{(\alpha^2 -|\beta|^2) \zeta^2 \over\alpha( \alpha - \beta \zeta^2)} \right )}. \label{eq:eqW1}
+\end{array}\end{equation}
+In contrast to the simple linear flow taking place in fluid 2,
+the flow in region 1 is clearly more complicated.
+A crucial observation is that it is analytic
+everywhere in fluid region 1 and, as $|z| \to \infty$,
+\begin{eqnarray}
+w_1'(z,t) &\to& {\left[ {(\Lambda + 1) \epsilon \over 2} + 
+{(\Lambda - 1) \bar \beta^2 \bar \epsilon \over 2 \alpha^2} \right ]} z
++ {(\Lambda +1) \delta \over 2}+
+{(\Lambda -1) \bar \beta \over 2 \alpha}\nonumber\\[6pt]
+&&\quad\times{\left[\bar \delta + {\bar \epsilon}
+{\left( \bar \gamma - {\bar \beta \gamma
+\over \alpha} \right)} \right]}
++ {\cal O}(z^{-1}).\label{eq:eqFF}
+\end{eqnarray}
+In the far field the flow is linear, comprising an irrotational strain superposed with a uniform flow.
+
+While we have  found the instantaneous complex potentials in both fluid regions,
+it remains to compute the evolution of the boundary to examine whether the
+elliptical shape of fluid region 2 is preserved under the dynamics. The kinematic
+condition governing the interface motion is equiva\-lent to 
+\begin{equation}
+\hspace*{-3pt}-{\rm Im}{\left[{\partial z \over \partial t} {\partial \bar z \over 
+\partial s} \right]}
+= {\rm Im}{\left[w_2'(z,t) {\partial z \over \partial s} \right]}.\label{eq:eqKC}
+\end{equation}
+It is convenient to introduce the notation
+\begin{equation}
+z_t \equiv {\partial z \over \partial t}, \quad
+z_\zeta \equiv {\partial z \over \partial \zeta}.
+\end{equation}
+On use of the condition that 
+\begin{equation}
+{\partial z \over \partial s} = -{i \zeta z_\zeta \over |z_\zeta|},
+\end{equation}
+while
+\begin{equation}
+z_t(\zeta,t) = \dot \gamma + {\dot \alpha \over \zeta} + \dot \beta \zeta,
+\quad  \zeta z_\zeta(\zeta,t) = -{ \alpha \over \zeta} + \beta \zeta,
+\end{equation}
+where, for convenience, we use dots to denote time derivatives,
+(\ref{eq:eqKC})
+takes the form\vspace*{3pt}
+\begin{eqnarray}
+&&\displaystyle {\rm Re} {\left[{\left( -\alpha \zeta +{\bar \beta \over \zeta} \right )}
+{\left(\dot \gamma + {\dot \alpha \over \zeta} + \dot \beta \zeta
+\right)}\right]}\notag\\[6pt]
+&&\quad = {\rm Re} {\left[{\left(\epsilon
+{\left (\gamma + { \alpha \over \zeta} + \beta \zeta
+\right)} + \delta \right )}
+{\left(-{\alpha \over \zeta} +{\beta \zeta} \right )}
+ \right]}\!.\label{eq:eqFINAL}
+\end{eqnarray}
+On use of the fact that $\bar \zeta=\zeta^{-1}$
+on $|\zeta|=1$, algebraic manipulations reveal
+that (\ref{eq:eqFINAL}) is equivalent to the 
+system of three nonlinear ordinary differential equations given by
+\begin{align}
+&\displaystyle 2 \dot \alpha \alpha - \beta \overline{\dot \beta} - \dot \beta \bar \beta =0, \notag\\[5pt]
+&\displaystyle -\alpha \dot \gamma + \beta \overline{\dot \gamma} = \beta (\epsilon \gamma
++ \delta) - \alpha (\bar \epsilon \bar \gamma + \bar \delta), \notag\\[5pt]
+&\displaystyle -\alpha \dot \beta + \dot \alpha \beta = \epsilon \beta^2 - \bar \epsilon\alpha^2.
+\label{eq:eqD3}
+\end{align}
+This system can be simplified. Equation (\ref{eq:eqD3})$_{1}$ can be integrated immediately to give
+\begin{equation}
+\alpha^2 - |\beta|^2 = {\rm constant}
+\label{eq:eqF1}
+\end{equation}
+which, reassuringly, is just a statement that the area  of ellipse-shaped
+fluid region 2 is constant in time. Taking the complex conjugate of (\ref{eq:eqD3})$_{2}$ and eliminating $\overline{\dot \gamma}$ yields
+\begin{equation}
+\dot \gamma = \bar \epsilon \bar \gamma + \bar \delta,
+\label{eq:eqF2}
+\end{equation}
+which is natural, since comparing with (\ref{eq:eqK5}),  shows   that the
+centre of the ellipse moves with the local fluid velocity. It can also be
+shown, after some algebra and by making use of (\ref{eq:eqD3})$_{1}$
+to eliminate $\dot \alpha$, that (\ref{eq:eqD3})$_{3}$
+is equivalent to the nonlinear ordinary differential equation
+\begin{equation}
+\dot e = \overline{\epsilon(t)} - \epsilon(t) e^2,\label{eq:eqRic}
+\end{equation}
+where 
+\begin{equation}
+e \equiv {\beta \over \alpha}.
+\end{equation}
+The complex parameter $e(t)$ encodes the eccentricity and orientation of
+the elliptical inclusion. Note that in order for the mapping (\ref{eq:eqCM})
+to represent a bounded ellipse with non-zero area, it is necessary that $|e(t)| < 1$.
+
+It is important to remark that the special
+combination of a linear flow in fluid region 2 together with the
+elliptical shape of the interface conspires in such a way as
+to admit the class of exact solutions found here. These solutions
+seem, however, to be rather special and it does not seem
+a straightforward matter to extend this analysis, for example, to other
+bubble shapes.\footnote{test footnote test footnote test footnote test footnote
+test footnote.}
+
+\section{Dependence on Far-Field Parameters}
+
+The ordinary differential equations 
+governing the evolution of the ellipse are (\ref{eq:eqF1}),
+(\ref{eq:eqF2}) and (\ref{eq:eqRic}).
+These depend on the parameters $\epsilon(t)$ and $\delta(t)$
+determining the linear flow inside the inclusion (fluid 2).
+In most applications, however, it is not expected
+that these will be controllable flow parameters.
+Rather, we expect the evolution of the elliptical inclusion to be determined
+by some imposed ambient far-field flow  in fluid region 1.  From (\ref{eq:eqFF}),
+as $|z| \to \infty$, the linear ambient flow of fluid 1 is given by
+\begin{equation}
+w_1'(z,t) \sim E(t) z + D(t),
+\end{equation}
+where 
+\begin{eqnarray}
+\begin{array}{l}
+\displaystyle E(t) = {(\Lambda + 1) \epsilon \over 2} + 
+{(\Lambda - 1) \bar e^2 \bar \epsilon \over 2}, \\[12pt]
+\displaystyle D(t) = {(\Lambda +1) \delta \over 2}+
+{(\Lambda -1) \bar e \over 2} {\left[
+\bar \delta + {\bar \epsilon}
+\left ( \bar \gamma - {\bar e \gamma} \right ) \right]}.
+\end{array}
+\label{eq:eqSOL}
+\end{eqnarray}
+Clearly, $E(t)$ corresponds to some ambient strain rate
+while $D(t)$ is some uniform ambient flow.
+Given externally specified functions $E(t)$ and $D(t)$, the system (\ref{eq:eqSOL})
+(which is linear in $\epsilon(t)$ and $\delta(t)$)  can be solved for $\epsilon(t)$
+and $\delta(t)$ as functions of $E(t), D(t)$ and the instantaneous parameter $e(t)$.
+
+\section{Equilibria and Dynamics}
+\subsection{subsection}
+
+It is natural to first seek equilibrium solutions of system
+(\ref{eq:eqD3}) in the case where the linear flow in the
+far field is steady. Without loss of generality, let $E(t)=E_0$,
+where $E_0$ is a real constant, and set $D(t)=0$. For equilibrium, we must
+then have $\gamma(t)=0$, so that $\delta(t)=0$, together with
+\begin{equation}
+\overline{\epsilon} = e^2 \epsilon, \quad
+E_0 = {\left({\Lambda + 1 \over 2} \right )} \epsilon
++ {\left({\Lambda - 1 \over 2} \right )} \overline{\epsilon} \bar e^2.
+\label{eq:eqEQ}
+\end{equation}
+However, setting $\epsilon = r e^{i \phi}$ and seeking
+solutions of (\ref{eq:eqEQ}) yields only the two solutions $r=1, \phi=0$
+and $r=\sqrt{\lambda}, \phi=0$, where $\lambda=(\Lambda+1)/(\Lambda-1)$. Neither of these solutions is physically interesting: the first corresponds to a zero-area `flat-plate' inclusion aligned along the real axis; the second solution is inadmissible since we require $|e| \le 1$ while $\sqrt{\lambda}
+> 1$ for all $\Lambda > 0$. It does not therefore appear that the system
+(\ref{eq:eqD3}) admits any interesting equilibrium solutions.
+\begin{figure}[t!]
+\includegraphics[width=300pt]{figAveTE.eps}
+\caption{A schematic of the flow configuration giving
+rise to exact mathematical solutions. A time-evolving
+elliptical inclusion of fluid 2 is embedded in a (possibly time-dependent) ambient linear straining flow of fluid 1.}\vspace*{-1pc}
+\end{figure}
+
+To explore the more general dynamics, note from (\ref{eq:eqSOL})
+that it is consistent to set $D(t)=\delta(t)=\gamma(t)=0$. 
+Physically this means that there is a pure straining flow in
+the far field (with no uniform flow) and the inclusion remains centred at
+$z=0$  for all times. As initial conditions, we take the inclusion to be circular with area $\pi$ at $t=0$. This corresponds to $e(0)=0$. Once $e(t)$
+is found, $\alpha(t)$ and $\beta(t)$ follow from 
+\begin{eqnarray}
+\alpha(t) = {1 \over \sqrt{1-|e(t)|^2}},\quad\beta(t) = e(t) \alpha(t).\label{test}\vspace*{1pt}
+\end{eqnarray}
+
+In this case, it can be shown that the
+evolution equation for $e(t)$ is\vspace*{3pt}
+\begin{equation}\vspace*{3pt}
+\dot e = -{2(\Lambda-1) e^2 \bar e^2 \overline{E} - 4 \Lambda E e^2
++ 2(\Lambda+1) \overline{E} \over
+(\Lambda-1)^2 e^2 \bar e^2 - (\Lambda+1)^2}.\label{eq:eqFIN}
+\end{equation}
+ 
+When the principal axes of the ambient straining flow
+are perpendicular and remain fixed for all times,
+an analytical solution of the differential equation
+(\ref{eq:eqFIN}) is possible. Without loss of generality,
+let $E(t)$ be a real function of time so that the principal
+axes of strain are aligned with the real and
+imaginary axes.  It is  clear from (\ref{eq:eqFIN}) that, since $E(t)$ is real, we expect $\overline{e(t)} = e(t)$
+at all times. Then (\ref{eq:eqFIN}) assumes the form
+\begin{figure}[t!]
+\centering
+\includegraphics[width=300pt]{figAveTEP2.eps}
+\caption{Evolution of an initially circular inclusion of
+unit radius. $E=1$ and $\Lambda=2$ 
+(above) and $\Lambda=0{\cdot}5$ (below).\label{Fig2}}\vspace*{4pt}
+\end{figure}
+% \begin{figure}[t!]
+% \caption{Evolution of an initially circular inclusion of
+% unit radius. $\Lambda=0{\cdot}5$ and $E=\cos t$. By $t=2 \pi$, 
+% the inclusion returns to its original state. \label{Fig4}}\vspace*{5pt}
+% \end{figure}
+\begin{equation}\vspace*{2pt}
+\dot e = - {2 E(t) \over \Lambda -1} 
+{\left({e^4 - \mu e^2 + \lambda \over e^4-\lambda^2}
+\right)},
+\end{equation}
+where $\lambda= (\Lambda+1)/(\Lambda-1)$ and $\mu \equiv 2 \Lambda/(\Lambda-1)$.
+It is easy to check that this equation simplifies to\vspace*{2pt}
+\begin{equation}\vspace*{2pt}
+\dot e = - {2 E(t) \over \Lambda -1} {\left ({e^2-1 \over e^2+\lambda}\right)},
+\end{equation}
+and so the solution of this separable ordinary differential
+equation is given by
+\begin{equation}\vspace*{2pt}
+\int_0^e {{e'}^2 + \lambda \over {e'}^2-1} de' = - \int_0^t 
+{2 E(t') d t' \over \Lambda -1}.
+\end{equation}
+After performing the integration on the left-hand side, the final solution
+is\vspace*{2pt}
+\begin{equation}
+\Lambda \tanh^{-1}(e) -{\left({\Lambda -1 \over 2}\right )} e=  \int_0^t E(t')
+dt'.\label{eq:eqSOL2}
+\end{equation}
+This explicit formula can be useful. Suppose we take $E(t)=1$ so that
+the inclusion is in a constant ambient straining flow, then
+(\ref{eq:eqSOL2})  becomes
+\begin{equation}
+\Lambda \tanh^{-1}(e) -{\left({\Lambda -1 \over 2}\right)} e=  t,
+\end{equation}
+which shows that if $e(t)$ tends to unity
+from below then necessarily $t \to \infty$. This implies  that the inclusion
+becomes infinitely elongated along the real axis as $t \to \infty$,
+but its boundary remains analytic for all finite times.
+It can also be deduced that if $E(t)$ is periodic with some period $\omega$
+then so is its primitive with respect to $t$ and hence, by (\ref{eq:eqSOL2}),
+so is $e(t)$. Further, it can also be seen that, for fixed amplitude and frequency of the driving straining flow in the far field,
+the amplitude of the oscillations of $e(t)$ decreases as $\Lambda$ increases.
+As illustrative examples, Fig. \ref{Fig2} shows the evolution
+of an initially circular inclusion of unit radius when subjected
+to a constant straining flow with $E(t)=1$ and for $\Lambda=2, 0{\cdot}5$.
+Finally, Fig. \ref{Fig4} shows the typical evolution of
+an initially circular inclusion in an oscillatory straining
+flow with $E(t)=\cos t$.
+\begin{cor}
+There is a sequence $b_{M},$ with $%
+b_{M}\rightarrow \infty $ as $M\rightarrow \infty ,$ such that, uniformly in
+$t,$
+\end{cor}
+\begin{cor}
+There is a sequence $b_{M},$ with $%
+b_{M}\rightarrow \infty $ as $M\rightarrow \infty ,$ such that, uniformly in
+$t,$
+\end{cor}
+\begin{prop}
+There is a sequence $b_{M},$ with $%
+b_{M}\rightarrow \infty $ as $M\rightarrow \infty ,$ such that, uniformly in
+$t,$
+\end{prop}
+
+\begin{theorem}
+There is a sequence $b_{M},$ with $%
+b_{M}\rightarrow \infty $ as $M\rightarrow \infty ,$ such that, uniformly in
+$t,$
+\end{theorem}
+\begin{assum}
+There is a sequence $b_{M},$ with $%
+b_{M}\rightarrow \infty $ as $M\rightarrow \infty ,$ such that, uniformly in
+$t,$
+\end{assum}
+
+\begin{lemma}
+
+There is a sequence $b_{M},$ with $%
+b_{M}\rightarrow \infty $ as $M\rightarrow \infty ,$ such that, uniformly in
+$t,$
+
+\begin{description}
+\item[{\rm (i)}\phantom{ii}] $\hbox{\rm E}( N_{t,M}) =O(b_{M}^{-1}),$
+
+\item[{\rm (ii)}\phantom{i}] $\hbox{\rm E}( N_{t,M}^{2}) =O(b_{M}^{-1}),$
+
+\item[{\rm (iii)}] $\hbox{\rm E}( N_{t,M}^{4}) =O(b_{M}^{-3/2}),$
+
+\item[{\rm (iv)}\phantom{\hspace*{.5pt}}] either
+\begin{itemize}
+\item[{\rm (a)}] $N_{t,M}$ is strong mixing with size $-2r/(r-2)$, where $r>2$, or some text some text some text 
+
+\item[{\rm (b)}] $\hbox{\rm E}( N_{t,M}N_{s,M}) =O(b_{M}^{-2})$.
+%+\alpha
+%_{t-s}O(b_{M}^{-1}),$ where $\alpha _{t-s}=O(|t-s|^{-2}).$
+\end{itemize}
+\end{description}
+\end{lemma}
+In more general cases, when $E(t)$ is a generally complex-valued
+function, the complex nonlinear ordinary differential
+equation (\ref{eq:eqFIN}) can easily be integrated numerically.
+
+
+\section{An Elliptical Inclusion Model}
+
+There are a number of physical problems where an elliptical inhomogeneity
+evolves, and remains elliptical, in a linear ambient field. For example,
+an elliptical patch of uniform vorticity is known to remain elliptical when
+placed in any linear ambient straining and/or shear flow (\citealt{PGS}).  Similarly,
+a compressible elliptical inclusion in an ambient linear slow viscous Stokes
+flow is also known to remain elliptical, in this case, even changing its
+area as it evolves (\citealt{Cro1}). In the vortex dynamics problem, this has
+led naturally to the so-called `elliptical vortex approximation' of two-dimensional
+vortex interactions. In this approximation, each vortical region is assumed
+to be an elliptical vortex patch that is sufficiently far from all its neighbouring
+vortical regions.  Then, the flow induced in the neighbourhood of any chosen
+elliptical patch by all the other patches is expanded to linear order and
+this linear expansion is used as the `far-field' flow in which the chosen
+ellipse is evolving. Similarly, the preservation of isolated, shrinking elliptical
+pores in Stokes flow has formed the basis of a related `elliptical pore model'
+for late-stage viscous sintering (\citealt{Cro2}). This paper has shown that,
+in the two-phase Hele-Shaw problem, the same phenomenon occurs. That is,
+an isolated elliptical inhomogeneity of one fluid remains elliptical when
+placed in a linear ambient flow of another fluid. It is clear that this fact
+might similarly form the basis of an `elliptical inclusion model' of interaction
+of inhomogeneities in porous media. Given a distribution of inhomogeneities
+evolving in an ambient fluid due to some driving mechanism (for example,
+a far-field strain), each inhomogeneity can be assumed to be elliptical with
+some centre, area, orientation and eccentricity. Expanding the local flow
+(due to the forcing and other inhomogeneities) in the neighbourhood of any
+chosen inhomogeneity will then provide the local values of $E(t)$ and $D(t)$
+(in the notation of this paper) with which the evolution of the inhomogeneity
+can be computed using the ordinary differential equations derived here.
+
+\begin{thebibliography}{99}
+
+\bibitem[Black(2006)]{How2}
+Black, Duncan. 2006. www.maths.ox.ac.uk/howison/Hele-Shaw. 
+
+\bibitem[Brenner(1958)]{ST}
+Brenner, Saul. 1984. The penetration of a fluid into a porous
+medium or Hele-Shaw cell containing a more viscous fluid, {\it Proc. R.
+Soc.} 312--29.
+
+\bibitem[Brenner(1959)]{PGS2}
+Brenner, Saul. 1959. Exact solutions for the growth of fingers from a flat interface between two fluids in a porous medium or Hele-Shaw cell, {\it Q. Jl Mech. Appl. Math.} 146--150.
+
+\bibitem[Cameron et al.(1945)]{Galin}
+Cameron, Charles M., Jeffery A. Segal, and Donald Songer. 2000. Unsteady filtration with a  free surface, {\it Dokl. Akad. Nauk. S.S.S.R.}  246--49.          
+\bibitem[Coffin(1945)]{PK}
+Coffin, Frank M. 1945. On the motion
+of an oil contour,  {\it ibid.} 254--57.
+
+\bibitem[Cameron et al.(1945)]{Rich}
+Cameron, Charles M., Jeffery A. Segal, and Donald Songer. 2000. Unsteady filtration with a  free surface, {\it Dokl. Akad. Nauk. S.S.S.R.}  246--49. 
+
+\bibitem[Brenner(1959)]{BS}
+Brenner, Saul. 1959. Exact solutions for the growth of fingers from a flat interface between two fluids in a porous medium or Hele-Shaw cell, {\it Q. Jl Mech. Appl. Math.} 146--150.
+
+
+\bibitem[Coffin(1945)]{Muskat}
+Coffin, Frank M. 1945. On the motion
+of an oil contour,  {\it ibid.} 254--57.
+
+
+\bibitem[Brenner(1959)]{Howison}
+Brenner, Saul. 1959. Exact solutions for the growth of fingers from a flat interface between two fluids in a porous medium or Hele-Shaw cell, {\it Q. Jl Mech. Appl. Math.} 146--150.
+
+
+\bibitem[Brenner(1958)]{JS}
+Brenner, Saul. 1984. The penetration of a fluid into a porous
+medium or Hele-Shaw cell containing a more viscous fluid, {\it Proc. R.
+Soc.} 312--29.
+
+
+\bibitem[Cameron et al.(1945)]{Sieg}
+Cameron, Charles M., Jeffery A. Segal, and Donald Songer. 2000. Unsteady filtration with a  free surface, {\it Dokl. Akad. Nauk. S.S.S.R.}  246--49. 
+
+\bibitem[Brenner(1959)]{Ambrose}
+Brenner, Saul. 1959. Exact solutions for the growth of fingers from a flat interface between two fluids in a porous medium or Hele-Shaw cell, {\it Q. Jl Mech. Appl. Math.} 146--150.
+
+
+\bibitem[Donald(1986)]{How10}
+Donald, Howison. 1986. Fingering in Hele-Shaw cells, {\it J. Fluid Mech.}  439--53.
+
+\bibitem[Paterson(1981)]{Pat}
+Paterson, Lamb. 1981. Radial fingering in a Hele-Shaw
+cell, {\it ibid.} 513--29.
+
+\bibitem[Pramod(1973)]{Davis}
+Pramod, Davis. 1973. {\it The Schwarz Function and its
+Applications}, Carus Mathematical Monographs.
+
+\bibitem[Saffman(1992)]{PGS}
+Saffman, Gopal. 1992. {\it Vortex Dynamics} (Cambridge University Press).
+
+\bibitem[Crowdy(2003)]{Cro1}
+Crowdy, Donald. 2003. Compressible bubbles in Stokes flows,
+{\it J. Fluid Mech.} 345--56.
+
+\bibitem[Crowdy(2004)]{Cro2}
+Crowdy, Donald. 2004. An elliptical-pore model of late-stage planar viscous sintering, {\it ibid.} 251--77.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,158 @@
+% Plantilla básica para ejemplar formal oficial de tesis de la Escuela Internacional de Doctorado (EIDUM) 
+% de la Universidad de Murcia, España. (ejemplar formal)
+% Antonio Maurandi López, 8 de marzo de 2023
+%
+% Notas: 
+% - el dir "estilos" contiene un fichero variables.tex donde poner titulo, autor, etc... y otros de librerías etc...
+% - en el dir "capitulos" van los capítulos a inc con un input
+% - otro dir de "capitulos/tablas" para editarlas tranquilamente e inc con un input tb.
+% - en el directorio "pics" pongo las imágenes
+% - la biblio no es APA, pq no me gusta, tampoco es obligatorio q así lo sea.
+% -
+% ---------------------------------------------------------
+
+\documentclass[a4paper,12pt]{book}
+\input{./estilos/estilo-basico.tex} 
+\input{./estilos/estilo-capitulos.tex}
+\input{estilos/variables}
+
+\begin{document}
+%-------------------------------------------------------------------
+%	PORTADA
+%-------------------------------------------------------------------
+\pagestyle{empty}
+\input{capitulos/portada.tex}
+\newpage 
+\ % pagina ne blanco
+\newpage
+% CONTRAPORTADA con nombres de directoras
+\input{capitulos/portada-interior.tex}
+%\newpage
+
+%-------------------------------------------------------------------
+%	Frase Culterana
+%-------------------------------------------------------------------
+%\pagestyle{empty}
+\frontmatter
+\chapter*{}
+\input{./capitulos/fraseculterana.tex}
+%-------------------------------------------------------------------
+%	DEDICATORIA
+%-------------------------------------------------------------------
+%\pagestyle{empty}
+\frontmatter
+\chapter*{}
+\input{./capitulos/dedicatoria.tex}
+%-------------------------------------------------------------------
+%	AGRADECIMIENTOS
+%-------------------------------------------------------------------
+\chapter*{Agradecimientos}
+%\markboth{AGRADECIMIENTOS23}{AGRADECIMIENTOS} % encabezado 
+\input{./capitulos/agradecimientos.tex}
+
+%-------------------------------------------------------------------
+%	PREFACIO
+%-------------------------------------------------------------------
+\chapter*{Prefacio}
+\input{./capitulos/prefacio.tex}
+
+%-------------------------------------------------------------------
+%	RESUMEN y SUMMARY para la versión oficial
+%-------------------------------------------------------------------
+\chapter*{Resumen y Summary}
+\input{./capitulos/resumenYsummary.tex}
+
+%-------------------------------------------------------------------
+%	TABLA DE CONTENIDOS
+%-------------------------------------------------------------------
+%\setcounter{tocdepth}{1}
+%level -1: part, 0: chapter, 1: section, etc.
+\renewcommand{\baselinestretch}{0.1}\normalsize
+\tableofcontents
+\renewcommand{\baselinestretch}{0.3}\normalsize
+\listoffigures
+\renewcommand{\baselinestretch}{0.3}\normalsize
+\listoftables
+\renewcommand{\baselinestretch}{1.2}\normalsize
+
+%-------------------------------------------------------------------
+%	TESIS
+%-------------------------------------------------------------------
+\mainmatter %empieza la numeración de las páginas
+\pagestyle{headings}
+
+\def\tablename{Tabla}% para que denomine tabla a las tablas y no "cuadro"
+%\doublespacing
+\onehalfspace
+%\singlespace
+%\spacing{1.5}	
+\setlength{\parskip}{3mm}% separación entre párrafo
+\setlength{\parindent}{1cm}%identación primera linea de párrafo
+
+
+\chapter{Introducción y antecedentes}
+\input{./capitulos/10-intro.tex}
+
+\chapter{Justificación y objetivos}
+\input{./capitulos/20-just-objetivos.tex}
+
+\chapter{Material y métodos}\label{Materialymetodos}
+\input{./capitulos/30-matYmet.tex}
+
+\chapter{Resultados y discusión}
+\input{./capitulos/50-Resultados-y-Discusion.tex}
+
+\chapter{Conclusiones}\label{Conclusiones}
+\input{./capitulos/40-Conclusiones.tex}
+
+
+%-------------------------------------------------------------------
+%	BIBLIOGRAFÍA
+%-------------------------------------------------------------------
+%\backmatter
+%\nocite{*}   %Ojo! si pones nocite{*} te incluye en bilbiografia todas las entradas del .bib, incluso cunado no la citas intext!!
+%\bibliographystyle{unsrt} % igual q plain pero numera en orden de aparición
+\bibliographystyle{apalike}
+
+%\usepackage{apacite} %esto entes de begin document
+%\DefineBibliographyStrings{spanish}{ andothers = {et\addabbrvspace al\adddot}, and = {y}, }
+%\bibliographystyle{apacite}
+
+%\bibliographystyle{plainnat}
+\bibliography{referenciasBibliograficas.bib}
+
+
+%-------------------------------------------------------------------
+%	APÉNDICES
+%-------------------------------------------------------------------
+
+\addtocontents{toc}{\vspace{2em}} % Agrega espacios en la toc
+\appendix % Los siguientes capítulos son apéndices
+
+\chapter{Esto será un apéndice}\label{Apendice_A}
+\input{./capitulos/110-apendice.tex}
+
+\chapter{Esto será otro apéndice}\label{Apendice_B}
+\input{./capitulos/120-apendice.tex}
+
+\chapter{Esto será otro apéndice que es un PDF}\label{Apendice_C}
+\includepdf[pages=-,templatesize={120mm}{175mm},noautoscale=false]{./capitulos/otrosDocs/documento-pdf-de-ejemplo.pdf}
+
+\chapter{Esto será otro apéndice que es un PDF}\label{Apendice_C}
+\includepdf[pages=-,templatesize={120mm}{175mm},noautoscale=false]{./capitulos/otrosDocs/codigo.pdf}
+
+\newpage %añado una página adicional blanca
+\thispagestyle{empty} % empty
+\mbox{}
+
+\addtocontents{toc}{\vspace{2em}} % Agrega espacio en la toc
+\end{document}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,225 @@
+%\title{LaTeX Portrait Poster Template}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Henriques lab poster template 
+% Version 1.0 (13/04/2019)
+% Originally based on:
+%
+% a0poster Portrait Poster
+% LaTeX Template
+% Version 1.0 (22/06/13)
+%
+% The a0poster class was created by:
+% Gerlinde Kettl and Matthias Weiser (tex@kettl.de)
+% 
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[a0,portrait]{a0poster}
+
+\usepackage{multicol} % This is so we can have multiple columns of text side-by-side
+\columnsep=50pt % This is the amount of white space between the columns in the poster
+\columnseprule=0pt % This is the thickness of the black line between the columns in the poster
+
+\usepackage[svgnames]{xcolor} % Specify colors by their 'svgnames', for a full list of all colors available see here: http://www.latextemplates.com/svgnames-colors
+
+\usepackage{times} % Use the times font
+%\usepackage{palatino} % Uncomment to use the Palatino font
+
+\graphicspath{{figures/}} % Location of the graphics files
+\usepackage{booktabs} % Top and bottom rules for table
+\usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
+\usepackage{amsfonts, amsmath, amsthm, amssymb} % For math fonts, symbols and environments
+\usepackage{wrapfig} % Allows wrapping text around tables and figures
+\usepackage[labelformat=empty]{caption}
+\usepackage{fontawesome}
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	POSTER HEADER 
+%----------------------------------------------------------------------------------------
+
+% The header is divided into two boxes:
+% The first is 75% wide and houses the title, subtitle, names, university/organization and contact information
+% The second is 25% wide and houses a logo for your university/organization or a photo of you
+% The widths of these boxes can be easily edited to accommodate your content as you see fit
+
+\begin{minipage}[b]{0.75\linewidth}
+\VeryHuge \color{NavyBlue} \textbf{NanoJ: High-Performance Open-Source Super-Resolution Microscopy in ImageJ}
+\color{Black}\\[0.4cm] 
+\Large \textbf{
+\authorName{R.F.~Laine}{1-2\space *}, 
+\authorName{K.L.~Tosheva}{1\space *}, 
+%\authorName{N.~Gustafsson}{1}, 
+\authorName{R.D.M.~Gray}{1}, 
+\authorName{P.~Almada}{1}, 
+\authorName{D.~Albrecht}{1}, 
+\authorName{J.~Mercer}{1}, 
+\authorName{C.~Leterrier}{3}, 
+\authorName{P.M.~Pereira}{1-2\space\Letter}, 
+\authorName{S.~Culley}{1-2\space\Letter} and
+\authorName{\underline{R.~Henriques}}{1-2\space\Letter}; \authorAffil{*}{equal contribution}}\\[0.4cm] % Author(s)
+\large \textbf{
+\authorAffil{1}{University College London, UK}; 
+\authorAffil{2}{The Francis Crick Institute, UK}; 
+\authorAffil{3}{Aix-Marseille Univ, CNRS, INP, France}}\\[0cm]
+\large \textbf{Correspondence to: p.pereira@ucl.ac.uk, s.culley@ucl.ac.uk, r.henriques@ucl.ac.uk}
+\begin{center}
+    \large \textbf{Poster DOI: 10.6084/m9.figshare.7963556 \\ \faGithub \ github.com/HenriquesLab | \faTwitter \ @HenriquesLab}
+\end{center}
+\end{minipage}
+%
+\begin{minipage}[b]{0.25\linewidth}
+\begin{center}
+\includegraphics[width=10cm]{RH_picture3.png}\\ 
+\includegraphics[width=16cm]{RH_banner.png}\\
+\end{center}
+\end{minipage}
+
+%\vspace{.2cm} % A bit of extra whitespace between the header and poster content
+
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{3} % This is how many columns your poster will be broken into, a portrait poster is generally split into 2 columns
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\noindent
+Our team has built an open-source image analysis framework for super-resolution microscopy designed to combine high performance and ease of use. We named it NanoJ - a reference to the popular ImageJ software it was developed for. Here we highlight the current capabilities of NanoJ for several essential processing steps: spatio-temporal alignment of raw data (NanoJ-Core), super-resolution image reconstruction (NanoJ-SRRF), image quality assessment (NanoJ-SQUIRREL), structural modelling (NanoJ-VirusMapper) and control of the sample environment (NanoJ-Fluidics). We expect to expand NanoJ in the future through the development of new tools designed to improve quantitative data analysis and measure the reliability of fluorescent microscopy studies.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.8\linewidth]{FigureMain_v4.png}
+%\captionof{figure}{\textbf{NanoJ framework.} Currently NanoJ consists of 5 modules dedicated to super-resolution imaging and analysis.}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+%	NanoJ-Core: Drift Correction
+%----------------------------------------------------------------------------------------
+\section*{NanoJ-Core: Drift Correction}
+
+\noindent
+Drift estimation is achieved by directly analysing a raw sequence of timepoints. Frames can then be directly translated to correct drift or a table with drift coordinates can be generated and used in other algorithms (e.g. SRRF).
+
+\begin{center}\vspace{1cm}
+    \includegraphics[width=0.8\linewidth]{FigureDrift_v2.png}
+    \captionof{figure}{\textbf{Drift correction with NanoJ-Core.} \textbf{a)} Composite image of two frames from a time-lapse dataset of the same field-of-view. \textbf{b)} Cross-correlation map (CCM) between the two frames shown in a). The vector position of the maximum indicates the linear shift between the two frames. \textbf{c)} Overlay of the two frames after drift correction using NanoJ-Core. \textbf{d)} Vertical and horizontal drift curves obtained using NanoJ-Core from the 100-frame raw data.}
+    \label{fig:DriftCorrection}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+%	NanoJ-Core: Channel registration
+%----------------------------------------------------------------------------------------
+\section*{NanoJ-Core: Channel Registration}
+
+\noindent
+Channel registration is able to calculate and apply an elastic transform to realign different captured wavelengths.
+
+\begin{center}\vspace{1cm}
+    \includegraphics[width=0.8\linewidth]{FigureChannelAlignment_v4.png}
+    \captionof{figure}{\textbf{Multi-colour channel registration with NanoJ-Core.} \textbf{a)} Composite image of multi-colour beads, prior to (left) and after (right) channel registration using NanoJ-Core. Scale bars: 25 \textmu{}m, insets: 0.5 \textmu{}m. \textbf{b)} Vectorial representation of the shift between the two channels (left, displacement vector length 50 times larger for representation purposes), horizontal (middle) and vertical (right) shift maps obtained and applied to the data shown in a). Scale bars: 25 \textmu{}m.}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+%	NanoJ-SRRF: Live-Cell Super-Resolution Imaging
+%----------------------------------------------------------------------------------------
+\section*{NanoJ-SRRF: Live-Cell Super-Resolution}
+
+\noindent
+Super-Resolution Radial Fluctuations (SRRF) is able to generate a super-resolution reconstruction by analysing fluctuations in the emission of fluorophores captured in a short image sequence.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.85\linewidth]{FigureSRRF_v6.png}
+\captionof{figure}{\textbf{Live-cell super-resolution microscopy with NanoJ-SRRF.} \textbf{a)} Comparison of widefield and SRRF reconstruction from UtrCH-GFP actin labelling. Scale bar: 5 \textmu{}m. \textbf{b)} Time-course of the inset shown in a), obtained at 33.3 Hz and displayed every 30 s. Scale bar: 1 \textmu{}m. \textbf{c)} Colour-coded time course. Scale bar: 1 \textmu{}m.}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+%	NanoJ-SQUIRREL: Estimating Image Quality & Resolution
+%----------------------------------------------------------------------------------------
+\section*{NanoJ-SQUIRREL: Estimating Image Quality \& Resolution}
+SQUIRREL quantitatively calculates local quality and resolution in super-resolution images. It highlights  limitations on the data collected and a reference point to help researchers improve imaging fidelity.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.85\linewidth]{FigureSQUIRREL_v3.png}
+\captionof{figure}{\textbf{Quality and resolution assessment with NanoJ-SQUIRREL.} \textbf{a)} A super-resolution rendering and acquired widefield image of fixed Alexa647 labelled microtubules. \textbf{b)} Left: SQUIRREL error map highlighting discrepancies between the super-resolution and diffraction-limited images in (a). Right: Magnified insets at indicated positions on error map. \textbf{c)} Left: SQUIRREL resolution map of the super-resolution image in (a). Right: Magnified insets for indicated resolution blocks. Whole image scale bars = 5 \textmu{}m, inset scale bars = 1 \textmu{}m.}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+%	NanoJ-VirusMapper: Structural Mapping and Modelling
+%----------------------------------------------------------------------------------------
+\section*{NanoJ-VirusMapper: Structural Mapping and Modelling}
+
+VirusMapper features a single-particle analysis (SPA) algorithm, capable of generating structural models of conserved structures imaged by Super-Resolution Microscopy
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=0.7\linewidth]{Figure_VirusMapper.png}
+\captionof{figure}{\textbf{Quantitative SPA-based modelling.} Multicomponent model of the Vaccinia virus by imaging in super-resolution hundreds of fluorescently labelled viruses and modelling their structure through VirusMapper}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+%	NanoJ-Fluidics: Sample Liquid Exchange
+%----------------------------------------------------------------------------------------
+\section*{NanoJ-Fluidics: Liquid Exchange}
+
+NanoJ-Fluidics (Pumpy McPumpface) entails the control of a simple inexpensive LEGO-based syringe pump array that automates live-to-fixed imaging and sequential labelling of the sample. Protocols can be run automatically in parallel to the acquisition.
+
+\begin{center}\vspace{1cm}
+\includegraphics[width=1\linewidth]{Pumpy_Figure1_NComm_Rev3_v6.png}
+\captionof{figure}{\textbf{Schematics of the NanoJ-Fluidics system.} \textbf{a)} 3D side view of a single syringe pump. \textbf{b)} 2D top view of a syringe pump array (representing 4 pumps out of 128 maximum) and a fluid extraction peristaltic pump, both controlled by an Arduino UNO. \textbf{c)} Example of possible workflows}
+\end{center}%\vspace{1cm}
+
+
+% %----------------------------------------------------------------------------------------
+% %	CONCLUSIONS
+% %----------------------------------------------------------------------------------------
+
+% \section*{Conclusions}
+% blabla
+
+%----------------------------------------------------------------------------------------
+%	Gender balance
+%----------------------------------------------------------------------------------------
+
+\section*{Author representation}
+\begin{minipage}{0.1\linewidth}% to keep image and caption on one page
+\makebox[\linewidth]{%        to center the image
+    \includegraphics[width=0.8\linewidth]{FigureGenderEquality.png}}\
+\end{minipage}
+\begin{minipage}{0.9\linewidth}% to keep image and caption on one page
+    I recognise a gender inequality in the author list (2F/8M). I am committed to achieve a better balanced representation of gender and minorities in our future work.  
+\end{minipage}
+
+
+%----------------------------------------------------------------------------------------
+%	References
+%----------------------------------------------------------------------------------------
+
+\small
+\nocite{*} % Print all references regardless of whether they were cited in the poster or not
+\bibliographystyle{plain} % Plain referencing style
+\bibliography{sample} % Use the example bibliography file sample.bib
+
+
+%----------------------------------------------------------------------------------------
+%	Funding
+%----------------------------------------------------------------------------------------
+\section*{Funded by}
+\begin{center}\vspace{0cm}
+\includegraphics[width=0.95\linewidth]{FigureFunding.png}
+\end{center}%\vspace{1cm}
+
+%----------------------------------------------------------------------------------------
+
+\end{multicols}
+\end{document}

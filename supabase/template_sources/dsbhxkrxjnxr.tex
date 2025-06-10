@@ -1,0 +1,198 @@
+\documentclass[11pt]{article}
+\usepackage{xltxtra}
+\usepackage{bookmark}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{url}
+\urlstyle{tt}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{calc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{relsize}
+\usepackage{xspace}
+\usepackage{fontawesome}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{siunitx}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{fontspec}
+
+\CJKsetecglue{}							            % 取消中文字符与数字之间的间隔
+\setlength{\parindent}{0pt}							% 取消全局段落缩进
+\pagenumbering{gobble}								% 取消页码显示
+%\setlist{noitemsep}									% 禁用列表中项目之间的额外垂直间距，但保留列表周围的间距
+%\setlist{nosep}										% 禁用列表中项目之间的额外垂直间距及列表周围的间距
+\setlist[itemize]{topsep=0em, leftmargin=*}		% 增加了itemize顶部间距
+\setlist[enumerate]{topsep=0em, leftmargin=*}	% 增加了enumerate顶部间距
+
+\titleformat{\section}					    % 将原标题前面的数字取消了
+  {\LARGE\bfseries\raggedright} 		      % 字体改为LARGE，bold，左对齐
+  {}{0em}                      			  % 可用于添加全局标题前缀
+  {}                           			  % 可用于添加代码
+  [{\color{NCU_Blue}\titlerule}]            % 标题下方加一条线
+\titlespacing*{\section}{0cm}{*1.2}{*1.2}	% 标题左边留白，上方1.2倍，下方1.2倍
+
+\titleformat{\subsection}				    % 将原二级标题前面的数字取消了
+  {\large\bfseries\raggedright} 		      % 字体改为large，bold，左对齐
+  {}{0em}                      			  % 可用于添加全局二级标题前缀
+  {}                           			  % 可用于添加代码
+  []
+\titlespacing*{\subsection}{0cm}{*1.2}{*1.2}% 二级标题左边留白，上方1.2倍，下方1.2倍
+
+% 页面大小与页边距，按需求调整
+\usepackage[
+	a4paper,
+	left=1.2cm,
+	right=1.2cm,
+	top=1.5cm,
+	bottom=1cm,
+	nohead
+]{geometry}
+
+% 中文字符间距
+\renewcommand{\CJKglue}{\hskip 0.05em}
+
+% 英文字体
+\setmainfont[
+    Path=fonts/,
+    Extension=.ttf,
+    BoldFont=* Bold,
+]{Microsoft Yahei}
+% 中文字体
+\setCJKmainfont[
+    Path=fonts/,
+    Extension=.ttf,
+    BoldFont=* Bold,
+]{Microsoft Yahei}
+
+% 主题色
+% 昌专蓝
+\definecolor{NCU_Blue}{RGB}{29, 42, 84}
+
+% 这里把表格的行间距调成1.2倍了
+\renewcommand{\arraystretch}{1.2}
+% 这里把正文的行间距调成1.2倍了
+\linespread{1.2}
+
+\newcommand{\school}{xxxxx学院 | School of xxxx}
+
+% 联系方式
+\newcommand{\contact}
+{
+    \small              % 换了更小的字号
+    % \footnotesize       % 这比上面的小一号
+    \scriptsize         % 这比上面的再小一号
+    \textcolor{white}
+    {
+        \faEnvelope \quad \href{mailto:xxxx@xxx.com}{xxxx @xxx.com}    % 邮箱，前面的超链接可以直达邮箱软件
+        \hspace{4em}    % 这里可以调间距
+        \faPhone \quad xxxxxxxxxxxxx                % 手机号
+    }
+}
+
+\begin{document}
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[anchor=north, inner sep=0pt](header) at (current page.north){
+			\includegraphics[width=\paperwidth]{images/background.png}
+		};
+		\node[anchor=west](school_logo) at (header.west){
+			\hspace{0.5cm}
+			\includegraphics[width=0.25\textwidth]{images/ncu_logo_2.png}
+		};
+		\node[anchor=east](school_name) at(header.east){
+			\textcolor{white}{\textbf{\school}}
+			\hspace{0.5cm}
+		};
+	\end{tikzpicture}
+	\vspace{-4em}
+
+	% 页脚，联系方式
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[anchor=south, inner sep=0pt](footer) at (current page.south){
+			\includegraphics[width=\paperwidth]{images/footer.png}
+		};
+        % 联系方式
+        \node[anchor=center] at(footer.center){\contact};
+	\end{tikzpicture}
+	
+	% 背景
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[opacity=0.1] at(current page.center){
+			\includegraphics[width=0.36\paperwidth, keepaspectratio]{images/ncu_logo_big.png}
+		};
+	\end{tikzpicture}
+
+	% 个人信息
+    \begin{figure}[h]
+        % 左半边，信息，比例占行宽87%，可以自己调
+        \begin{minipage}{0.83\textwidth}
+            \section{\makebox[\widthof{\faUser}][c]{\color{NCU_Blue}{\faUser}}\quad 个人信息}
+            \begin{tabularx}{\linewidth}{p{\widthof{出生日期:}}Xp{\widthof{政治面貌:}}X}
+                姓\qquad 名: & xxx & 性\qquad 别: & x \\
+                出生日期: & 2003年xx月xx日 & 政治面貌: & xxxx \\
+                联系方式: & xxxxxxxxxxxx & 电子邮箱: & \href{mailto:xxxx@xxx.com}{xxxx @xxx.com} \\
+            \end{tabularx}
+        \end{minipage}
+        % 右半边，照片，比例占行宽12%，可以自己调
+        % images/example_avatar.png 替换成你证件照的路径。
+        \begin{minipage}{0.16\textwidth}
+            \includegraphics[width=\linewidth]{images/avatar.png}
+        \end{minipage}
+        % 尽量留至少1%的间距，不然会换行
+    \end{figure}
+
+
+	
+	\section{\makebox[\widthof{\faGraduationCap}][c]{\color{NCU_Blue}{\faGraduationCap}}\quad 教育背景}
+	\vspace{-1em}
+    \begin{table}[h!]
+        \begin{tabularx}{\textwidth}{XXp{\widthof{2021年 -- 预计2025年7月毕业}}}
+            xxxx学院 & xx学 & 2021年 -- 预计2025年7月毕业\\
+            \textbf{GPA: x.xx/4} & \textbf{GPA排名: x/xx} \\%& \textbf{综测排名: ??/??} \\
+        \end{tabularx}
+    \end{table}
+
+    % 所获荣誉（这个看你想不想写了）
+    \section{\makebox[\widthof{\faStar}][c]{\color{NCU_Blue}{\faStar}}\quad 所获荣誉}
+    \vspace{-1em}
+    \begin{multicols}{2}
+        \begin{itemize}
+            \item 2021-2022xxxx
+        \end{itemize}
+    \end{multicols}
+
+    % 竞赛经历
+    \section{\makebox[\widthof{\faTrophy}][c]{\color{NCU_Blue}{\faTrophy}}\quad 竞赛经历}
+    \vspace{-1em}
+    \begin{table}[h!]
+        \begin{tabularx}{\textwidth}{Xp{\widthof{第零负责人}}p{\widthof{国家级-第100名}}p{\widthof{2030年13月}}}
+            \textbf{20xxxxxxxxx比赛} & 第x负责人 & x级-x等奖 & 20xx年x月 \\
+            % 同理，可以自己加
+        \end{tabularx}
+    \end{table}
+
+    % 项目经历
+    \section{\makebox[\widthof{\faGears}][c]{\color{NCU_Blue}{\faGears}}\quad 项目经历}
+    \vspace{0.5em}
+    
+    \subsection{xxxx \hfill 科研训练项目}
+    \hfill 20xx年xx月-20xx年xx月
+    
+    xxx
+    
+    
+
+    \section{\makebox[\widthof{\faWrench}][c]{\color{NCU_Blue}{\faWrench}}\quad 技能特长}
+    \vspace{0.5em}
+    \begin{itemize}
+        \item 熟练使用xxx。
+    \end{itemize}
+
+\end{document}

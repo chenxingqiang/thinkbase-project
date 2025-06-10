@@ -1,0 +1,388 @@
+
+
+%%Dear students,
+%%
+%%This is the LaTeX template for your thesis.
+%%You should not change any file or folder except the following:
+%%thesis.tex, references.bib and the media folders figures, logos. 
+%%The thesis.tex file is self-explanatory: you only have to make minor adjustments or pay attention wherever you see a TODO or text in blue. You will write your actual thesis starting with the \begin{document} command. This template also includes some examples on how to insert figures and create tables or equations. To see your output you have to compile your 'code' via the 'Recompile' button. Comments are created via the % sign and are blue in color. Comments won't be compiled and therefore won't appear on the pdf file which you can download on Overleaf via the download button above the output on the right side. 
+
+
+
+\documentclass{thesisclass}
+
+% Based on [adapted] thesisclass.cls of Timo Rohrberg, 2009
+
+
+% NOTE: Use your preferred language.
+\usepackage[english]{babel}%<--- TODO: If you want to write your thesis in English don't uncomment this command by putting a % sign before the command.
+%\usepackage[ngerman]{babel}%<--- TODO: If you want to write your thesis in German, uncomment this command by removing the % sign before the command.
+
+
+
+\usepackage{graphicx} 											
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\graphicspath{{./figures/}} %TODO: Save your figures in the figures folder, if you want to include graphics in your thesis. This template will reference to that folder.									
+\usepackage[natbibapa]{apacite}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsthm}
+\usepackage[]{todonotes}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\chapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+\makeatother
+\usepackage{chngcntr}
+\counterwithout{footnote}{chapter}
+\counterwithout{equation}{chapter}
+\counterwithout{table}{chapter}
+\counterwithout{figure}{chapter}
+\makeatletter
+\patchcmd{\scr@startchapter}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+\makeatother
+\usepackage{mathptmx}
+\setkomafont{disposition}{\bfseries}
+
+
+
+
+
+
+
+% TODO: Uncomment just one of the following commands, according to your thesis type. Seminar Thesis is set by default.
+
+\newcommand{\mytype}{\iflanguage{english}{Bachelor's Thesis}{Bachelorarbeit}} 
+%\newcommand{\mytype}{\iflanguage{english}{Master's Thesis}{Masterarbeit}} 
+%\newcommand{\mytype}{\iflanguage{english}{Seminar Thesis}{Seminararbeit}} 
+
+% TODO: Enter personal information and information about your thesis.
+\newcommand{\myname}{\iflanguage{english}{Forename Surname} {Vorname Nachname}}
+\newcommand{\matricle}{1234567}
+\newcommand{\mytitle}{\iflanguage{english}{Title} {Titel der Arbeit}}
+\newcommand{\myinstitute}{\iflanguage{english}
+{Chair of Machine Learning and Uncertainty Quantification}
+{Lehrstuhl für Maschinelles Lernen, \\insbesondere Uncertainty Quantification}}
+
+\newcommand{\reviewerone}{Prof. Dr. Daniel Schnurr}% TODO:change the names of your reviewer and advisor to your actual needs.
+\newcommand{\advisor}{Vorname Nachname}
+
+
+\newcommand{\timeend}{\iflanguage{english}{Month DD, 20YY}{DD. Monat 20YY}} % TODO: Insert submission date.
+\newcommand{\submissiontime}{DD.MM.20YY} % TODO: Insert submission date which will be displayed in your Declaration.
+
+\hypersetup{
+ pdfauthor={\myname},
+ pdftitle={\mytitle},
+ pdfsubject={\mytype},
+ pdfkeywords={\mytype}
+}
+
+
+
+
+\begin{document}
+
+%Do not change anything until the next TODO appears, unless the title is so logn that the title page spreads over two pages. In this case, reduce the vertical spaces highlighted by the blue comments below 
+
+\pagenumbering{arabic}
+\newcommand{\diameter}{20}
+\newcommand{\xone}{-15}
+\newcommand{\xtwo}{160}
+\newcommand{\yone}{15}
+\newcommand{\ytwo}{-253}
+
+\begin{titlepage}
+	
+	\begin{textblock}{10}(5,2)
+	\begin{center}
+	    
+		\iflanguage{english}
+		{\includegraphics[width=.3\textwidth]{logos/ur-logo-bildmarke-grau.jpg}}
+		{\includegraphics[width=.3\textwidth]{logos/ur-logo-bildmarke-grau.jpg}}		
+		
+	\end{center}
+	\end{textblock}
+	\begin{textblock}{10}[0,0](10,2.5)
+	\end{textblock}
+	\changefont{ppl}{m}{n}
+	\vspace*{3cm}
+	\begin{center}
+		\Huge{\mytitle}
+		\vspace*{1.6cm}\\ % reduce vspace if title page spreads over two pages
+		\Large{
+			\iflanguage{english}{\mytype\\of}			
+			{\mytype\\von}
+		}\\
+		\vspace*{1cm}
+		\huge{\myname}\\
+		\Large{\matricle}\\
+		\vspace*{1cm} % reduce vspace if title page spreads over two pages
+		\Large{
+			\iflanguage{english}{University of Regensburg \\ Faculty of Business, Economics and Management Information Systems}			
+			{Universität Regensburg \\ Fakultät für Wirtschaftswissenschaften}
+			\\
+			\myinstitute
+		}
+	\end{center}
+	\vspace*{1.8cm} % reduce vspace if title page spreads over two pages
+	\Large{
+		\begin{center}
+			\begin{tabular}[ht]{l c l}
+
+				\iflanguage{english}{Reviewer}{Gutachter}: & \hfill  & \reviewerone\\
+				\iflanguage{english}{Advisor}{Betreuender Assistent}: & \hfill  & \advisor\\
+			
+			\end{tabular}
+		\end{center}
+	}
+	
+	
+	\vspace{1.8cm} % reduce vspace if title page spreads over two pages
+	\begin{center}
+		\timeend
+	 \end{center}
+	
+	
+	
+\end{titlepage}
+
+\clearpage
+\setcounter{page}{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ACTUAL THESIS BEGINS HERE %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%TODO: Follow the next instructions and examples to create important elements for your thesis. 
+
+%% ==============================
+\chapter{Introduction} %TODO: If you want to write your Thesis in German, you should change the chapter's name.
+\label{ch:Introduction}           
+%% ==============================
+
+This is a nice little introduction with a reference to Figure~\ref{fig:valuechain}. %NOTE: this reference uses a label which you can create when you include graphics, create tables, chapters, equations etc. like in the following examples.
+
+\begin{figure}[htp] %NOTE: This command creates a figure environment. An environment always starts with a \begin{} command and ends with an \end{} command. 
+	\begin{center} %<-- this command aligns your figure as desired, here the figure will be centered.
+		\includegraphics[width = 0.5\textwidth]{picture.png} %this includes you graphic stored in your figures folder. Upload works via the upload button on the left side.
+		\caption{This is a figure with a caption \citep*[][p.15]{kraemer2017}.}%this command creates a caption.
+		\label{fig:valuechain}% this is the aforementioned label, which can be now referred by name. Here it would be \ref{fig:valuchain}. 
+	\end{center}
+\end{figure} 
+
+Different cite-commands can be used:%NOTE: To use citations, you have to save the information about the cited work in the file called references.bib. See the references.bib file for more instructions. 
+
+\begin{itemize}
+	\item citet results in: \citet{Becker2009} %NOTE the referenced work has the label that you created in the references.bib file.
+	\item citet (again) results in: \citet{Becker2009}
+	\item citet* results in: \citet*{Becker2009}
+	\item citet* (again) results in: \citet*{Becker2009}
+	\item citep results in: \citep{Becker2009}
+	\item citep* results in: \citep*{Becker2009}
+	\item cite results in: \cite{Becker2009}
+	\item citealp results in: \citealp{Becker2009}
+	\item citealt results in: \citealt{Becker2009}
+	\item citeauthor results in: \citeauthor{Becker2009}
+	\item citeauthor* results in: \citeauthor*{Becker2009}
+\end{itemize}
+
+
+A citation may either appear at the end of a sentence in parentheses. For example: Start of sentence
+``[...] random citation [...]'' \citep[][p.20]{bernheim1990}. Or you can cite the author(s) within the sentence. For example: Further information can be found in \cite{cassar2004}.
+
+More examples for different types of sources: This sentence contains a citation of a legal recommendation that has been published in  the Official Journal of the European Union \citep{ec2013}. In-text citations of working papers also include author names and year \citep[see, for example,][]{kraemer2016}. \citet{breuer2015} is an example for a citation of a conference paper.
+
+
+%% ==============
+\chapter{Content Section 1} %TODO: Rename the chapters and labels according to your needs. Follow the instructions in the text.
+\label{ch:section1}
+%% ==============
+
+
+
+Of course, the content chapters of your thesis should be renamed. The number of chapters you need to write depends on the specific task(s) of your thesis and cannot be said in general.
+
+
+%% ===========================
+\section{Subsection 1}
+\label{ch:section1:sec:subsection1}
+%% ===========================
+
+You can reference any chapter, section or subsection by its label: looking forward to Section~\ref{ch:section1:sec:subsection2}. You can also reference Appendix~\ref{AppendixA} and add footnotes if necessary.\footnote{This is a footnote ending with a full stop.} 
+
+\dots
+
+%% ===========================
+\section{Subsection 2}
+\label{ch:section1:sec:subsection2}
+%% ===========================
+
+
+
+You can add tables by using the following commands. There is no need for a list of tables or a list of figures in this paper-style thesis. But you should always reference tables and figures in the text (see Table~\ref{tab:prices}). 
+\begin{table}[htb]%<-- this command starts the table environment which allows you to place your actual table (tabular) with parameters e.g. h for here.
+	\centering
+	\begin{tabular}{llr}
+		\toprule
+		\multicolumn{2}{c}{Item} \\
+		\cmidrule(r){1-2}
+		Animal    & Description & Price (\$) \\
+		\midrule
+		Gnat      & per gram    & 13.65      \\
+		& each        & 0.01       \\
+		Gnu       & stuffed     & 92.50      \\
+		Emu       & stuffed     & 33.33      \\
+		Armadillo & frozen      & 8.99       \\
+		\bottomrule
+	\end{tabular}
+	\caption{A table that lists items \citep[based on][]{Becker2009}}
+	\label{tab:prices}
+\end{table}
+
+
+%% ==============
+\chapter{Content Section 2}
+\label{ch:section2}
+%% ==============
+
+During the writing of your thesis, you may want to highlight some parts or take notes. This is accomplished by using the following command for highlighting or taking notes in the text. \todo[inline]{This is a note in the text}
+
+
+If you want to take notes on the side, use the following command.\todo{This is a marginal note} Also make sure that you remove all your notes before submission.
+
+
+
+%% ===========================
+\section{Subsection 1}
+\label{ch:section2:sec:subsection1}
+%% ===========================
+Adding formulas is easy. Either inline formulas like $E=mc^3$ or unnumbered equations like $$E=mc^3$$ or a single numbered equation like 
+
+\begin{equation}
+E=mc^3
+\end{equation}
+
+or multiple numbered equations that are aligned like
+
+\begin{align}
+E &=mc^3\label{eq:energy}\\
+a^2 &=b^2 + c^2\label{eq:thales}.
+\end{align}
+
+You can also reference the equations if you set a label. Our approach is captured by the fundamental equations \eqref{eq:energy} and \eqref{eq:thales}.
+
+
+%% ===========================
+\section{Subsection 2}
+\label{ch:section2:sec:subsection2}
+%% ===========================
+
+\dots 
+
+
+
+%% ==================
+\chapter{Discussion}
+\label{ch:Discussion}
+%% ==================
+
+\dots
+
+%% ===============================
+\section{Subsection 1}
+\label{ch:discussion:sec:subsection1}
+%% ===============================
+
+\dots
+
+%% ===============================
+\section{Subsection 2}
+\label{ch:discussion:sec:subsection2}
+%% ===============================
+
+\dots
+
+%% ==================
+\chapter{Conclusion}
+\label{ch:conclusion}
+%% ==================
+
+\dots
+
+
+% References
+\phantomsection
+\addcontentsline{toc}{chapter}{\bibname}
+
+% References Style
+\iflanguage{english}
+{\bibliographystyle{apacite}}	% english style
+{\bibliographystyle{apacite}}	% german style
+
+\pagebreak
+\bibliography{references}
+
+
+
+%%TODO: If you don't need an Appendix, delete the next chapter before the \pagebreak command and also delete your appendix references.
+%% ==============================
+%\chapter{Appendix}
+%\label{ch:Appendix}
+%% ==============================
+
+\pagebreak
+\appendix
+
+\iflanguage{english}
+{\addchap{Appendix}}	% english style
+{\addchap{Anhang}}	% german style
+
+
+\section{First Appendix}   %TODO: Rename your Appendix as needed
+\label{AppendixA}  
+\setcounter{figure}{0}
+
+\dots
+
+
+\pagebreak
+
+
+%% ==================
+%DON'T: German is set as default for the declaration, don't change it
+\chapter*{Eidesstattliche Erklärung}
+\label{ch:Declaration}
+%% ==================
+
+Hiermit versichere ich an Eides statt, dass ich die vorliegende Arbeit selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt habe. Die aus fremden Quellen direkt oder indirekt übernommenen Gedanken sind als solche kenntlich gemacht. Ich bestätige, dass a) kein Inhalt oder Teil der Arbeit von ChatGPT oder anderen KI-Inhaltsgeneratoren erzeugt wurde, oder b) dass ich in den entsprechenden Abschnitten der Arbeit klar angegeben habe, wie solche Systeme bei der Erstellung der Arbeit verwendet wurden. Die Arbeit wurde bisher in gleicher oder ähnlicher Form keiner anderen Prüfungsbehörde vorgelegt und auch nicht veröffentlicht. Die elektronische Ausfertigung der Arbeit habe ich bereits beim Prüfer eingereicht.
+
+\vspace*{1cm}
+\hspace*{4cm} Regensburg, den \submissiontime \hspace*{0.5cm}\hrulefill \\
+\hspace*{10.5cm} \myname \\
+
+\todo[inline]{Wählen Sie nachfolgend die für Ihre Prüfungsordnung einschlägige Eidesstattliche Erklärung aus, ersetzen Sie Datum und Name und löschen Sie anschließend diese To-Do-Note.}
+
+% Erklärung für Studierende gemäß der Bachelor-/ und Masterprüfungsordnung 2015
+% Ich habe die vorliegende Arbeit selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt. Die Arbeit wurde bisher an keiner anderen Hochschule zur Erlangung eines akademischen Grades eingereicht. Die vorgelegten Druckexemplare und die dem Prüfer/der Prüferin zur Verfügung gestellte elektronische Version (PDF-Datei) der Arbeit sind identisch. Von den in §13 Abs. 3 PO 2015 vorgesehenen Rechtsfolgen habe ich Kenntnis.
+
+% Erklärung für Studierende gemäß der Bachelorprüfungsordnung 2021 (Studienbeginn ab 01.10.2021)
+Ich habe die vorliegende Arbeit selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt. Die Arbeit wurde bisher an keiner anderen Hochschule zur Erlangung eines akademischen Grades eingereicht. Die vorgelegten Druckexemplare und die dem Prüfer/der Prüferin zur Verfügung gestellte elektronische Version (PDF-Datei) der Arbeit sind identisch. Von den in §27 Abs. 6 BPO 2021 vorgesehenen Rechtsfolgen habe ich Kenntnis.
+
+% Erklärung für Studierende gemäß der Masterprüfungsordnung 2015 (Studienbeginn ab 01.10.2021)
+% Ich habe die vorliegende Arbeit selbstständig verfasst und keine anderen als die angegebenen Quellen und Hilfsmittel benutzt. Die Arbeit wurde bisher an keiner anderen Hochschule zur Erlangung eines akademischen Grades eingereicht. Die vorgelegten Druckexemplare und die dem Prüfer/der Prüferin zur Verfügung gestellte elektronische Version (PDF-Datei) der Arbeit sind identisch. Von den in §26 Abs. 6 MPO 2021 vorgesehenen Rechtsfolgen habe ich Kenntnis.
+
+\vspace*{1cm}
+\hspace*{4cm} Regensburg, den \submissiontime \hspace*{0.5cm}\hrulefill \\
+\hspace*{10.5cm} \myname \\
+
+\pagenumbering{gobble}
+
+
+
+
+\end{document}
+

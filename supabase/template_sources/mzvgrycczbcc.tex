@@ -1,0 +1,236 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Universita' degli Studi dell'Insubria
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper, 11pt, twoside]{book}
+\usepackage[a4paper]{geometry}
+\usepackage{lmodern}
+\usepackage[italian]{babel}
+\usepackage{textcomp}
+\usepackage{color}
+\usepackage{url}
+\usepackage{amsfonts}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{makeidx}
+\usepackage{fancyhdr}
+\usepackage[times]{quotchap}
+\usepackage{multirow}
+\usepackage{version}
+
+\usepackage{listings}
+\usepackage{color}
+\usepackage{xcolor}
+
+\definecolor{gray}{rgb}{0.9,0.9,0.9}
+
+%%modifiche per il codice
+\lstdefinestyle{basic}{  
+  basicstyle=\footnotesize\ttfamily,
+  numbers=left,
+  numberstyle=\tiny\color{orange}\ttfamily,
+  numbersep=5pt,
+  backgroundcolor=\color{white},
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  rulecolor=\color{black},
+  captionpos=b,
+  keywordstyle=\color{blue}\bf,
+  commentstyle=\color{gray},
+  stringstyle=\color{green},
+  keywordstyle={[2]\color{red}\bf},
+}
+
+
+\lstdefinelanguage{DebianBash}
+{
+  morekeywords={cd, apt-get, service, vagrant, docker-compose, docker, &&, 
+    time, curl, sudo, echo, set, psql, EOF, cat, if, then, echo, chmod, until, do,
+    sleep, done, firefox, git , pip, shovel, honcho},
+  morecomment=[l]{\#},
+  morestring=[b]",
+  alsodigit={-},
+  alsoletter={&}
+}
+
+\lstdefinestyle{customjava}{
+  	language=Java,
+  	frame=tlrb,
+  	aboveskip=3mm,
+  	belowskip=6mm,
+  	showstringspaces=false,
+  	columns=flexible,
+  	basicstyle={\small\ttfamily},
+  	numbers=left,
+    numberstyle=\tiny\color{orange}\ttfamily,
+    numbersep=5pt,
+  	keywordstyle=\color{purple},
+  	commentstyle=\color{orange},
+  	stringstyle=\color{blue},
+  	breaklines=true,
+  	breakatwhitespace=true
+  	tabsize=3
+}
+
+\lstdefinestyle{custompython}{
+  	language=Python,
+  	frame=tlrb,
+  	aboveskip=3mm,
+  	belowskip=6mm,
+  	showstringspaces=false,
+  	columns=flexible,
+  	basicstyle={\small\ttfamily},
+  	numbers=left,
+    numberstyle=\tiny\color{orange}\ttfamily,
+    numbersep=5pt,
+  	keywordstyle=\color{purple},
+  	commentstyle=\color{orange},
+  	stringstyle=\color{blue},
+  	breaklines=true,
+  	breakatwhitespace=true
+  	tabsize=3
+}
+
+
+%% Aggiunge una linea al di sotto di ogni sezione principale
+\usepackage[calcwidth]{titlesec}
+\titleformat{\section}[hang]{\sffamily\bfseries}
+ {\Large\thesection}{12pt}{\Large}[{\titlerule[0.4pt]}]
+
+%% Gestisce la grafica a seconda che si usi latex o pdflatex
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+\pdffalse % no pdflatex
+\else
+\pdfoutput=1 % pdflatex
+\pdftrue
+\fi
+%
+\ifpdf
+\usepackage[pdftex]{floatflt,graphicx}
+\DeclareGraphicsExtensions{.pdf,.mps,.png,.jpg}
+\usepackage[pdftex]{hyperref}
+\else
+\usepackage{floatflt,graphicx}
+\DeclareGraphicsExtensions{.eps}
+\fi
+\usepackage{subfigure}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[utf8]{inputenc} % per accenti
+
+%%tabella con linee colorate
+\usepackage{colortbl}
+
+%%%%%%%%%%%%% NUOVI COMANDI E IMPOSTAZIONI %%%%%%%%%%%
+\newenvironment{mcquote}
+  {\begin{list}{}{
+      \setlength{\rightmargin}{\leftmargin}}
+         \item[]``\ignorespaces}
+  {\unskip''\end{list}}
+  
+\newcommand{\mcchap}[2]{\protect{
+ \chapter{#1}
+ \label{#2}
+}}
+
+%% Gestione header: no header sulle dispari bianche
+\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else%
+    \hbox{}%
+    \thispagestyle{empty}%              % Empty header styles
+    \newpage%
+    \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother
+
+\newcommand{\codice}[1]{\protect\texttt{\small{#1}}}
+
+\newcommand{\mcproc}[1]{\ensuremath{\mbox{\sc #1}}}
+
+\newcommand{\mctodo}[1]{\protect{
+  \bigskip
+  \begin{tabular}{|p{13cm}} \textcolor{red}{\underline{TODO:}} \small{#1} \end{tabular}}
+}
+
+\newcommand{\mcnota}[1]{\protect{
+  \bigskip
+  \begin{tabular}{|p{13cm}} \underline{NOTA:} \small{#1} \end{tabular}}
+}
+
+\makeindex
+\linespread{1.1}
+\floatname{algorithm}{Algoritmo}
+\renewcommand{\listalgorithmname}{Elenco degli algiritmi}
+
+%%%%%%%%%%%%%%%% METADATI DOCUMENTO %%%%%%%%%%%%%%%%%%
+\date{}
+
+%%%%%%%%%%%%%%%%%% INIZIO DOCUMENTO %%%%%%%%%%%%%%%%%%
+\begin{document}
+    \pagestyle{empty}
+
+    %% Pagina del titolo
+    \input{copertina/copertina}
+
+    %% Dedica
+        \frontmatter{}
+        \begin{flushright}
+            \vspace*{0cm}
+            \vfill
+            \textit{ 
+            ``Uno dei miei giorni più produttivi è stato quando ho buttato via 1000 righe di codice.''\\ 
+            - Ken Thompson (Scienziato informatico, sviluppatore del sistema operativo UNIX)
+            }
+            \vspace{2.5cm}
+        \end{flushright}
+        \cleardoublepage
+    %% Indice ed elenchi
+        \pagenumbering{roman}
+        \setcounter{page}{1}
+        \setcounter{tocdepth}{2}
+        \tableofcontents
+        \listoffigures
+        \listoftables
+    %% Inizio capitoli
+        \mainmatter{}
+  
+    %% Capitoli
+        \pagestyle{fancy}
+        \renewcommand{\chaptermark}[1]{\markboth{#1}{}} 
+        \renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}} 
+        \fancyhf{} % delete current setting for header and footer 
+        \fancyhead[LE,RO]{\bfseries\thepage} 
+        \fancyhead[LO]{\bfseries\rightmark} 
+        \fancyhead[RE]{\bfseries\leftmark} 
+        \renewcommand{\headrulewidth}{0.8pt} 
+        \renewcommand{\footrulewidth}{0pt} 
+        %\renewcommand{\headheight}{13.59999pt}
+        \addtolength{\headheight}{0.5pt} % make space for the rule 
+        \fancypagestyle{plain}{% 
+        \fancyhead{} % get rid of headers on plain pages
+        \fancyfoot[C]{\bfseries \thepage}
+        \renewcommand{\headrulewidth}{0pt} % and the line 
+        } 
+
+        \cleardoublepage{}
+        \setcounter{page}{1}
+        \include{cap1/cap1}
+        \include{cap2/cap2}
+        \include{appendici/appendici}
+    
+        \appendix
+        \include{colophon/colophon}
+    
+    \backmatter{}
+
+    %% Bibliografia
+        \bibliography{biblio/biblio} 
+        \bibliographystyle{ieeetr}
+
+\end{document}

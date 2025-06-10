@@ -1,0 +1,283 @@
+%-------------------------------------------------------
+%-------------------------------------------------------
+%%%% utfpr-article.tex, 2019/12/05
+%%%% Copyright (C) 2016-2019 Luiz E. M. Lima (luizeduardomlima@gmail.com)
+%%%% Copyright (C) 2021 (adapted version - SEI-SICITE 2021 UTFPR-GP) 
+%%%% Authors: Andres Jessé Porfírio (andresporfirio@utfpr.edu.br), Hermano Pereira (hermanopereira@utfpr.edu.br),  Lyvia Regina Biagi Silva Bertachi (lyviar@utfpr.edu.br), Marizete Righi Cechin (mrcechin@utfpr.edu.br), Renata Luiza Stange Carneiro Gomes (rlgomes@utfpr.edu.br), Thalita Monteiro Obal (thalitaobal@utfpr.edu.br).
+%%
+%%%% Copyright (C) 2023 (adapted version - SEI-SICITE 2023 UTFPR-PG) 
+%%%% Authors: Alexandre Mellado (mellado@alunos.utfpr.edu.br), Gleifer Vaz Alves (gleifer@utfpr.edu.br)
+%%..............................................
+%% This work may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3 of this license or (at your
+%% option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX version
+%% 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The Current Maintainer of this work is Luiz E. M. Lima.
+%%
+%% This work consists of the files utfpr-article.sty and utfpr-article.tex.
+%%
+%% A brief description of this work is in readme.txt.
+
+%-------------------------------------------------------
+%-------------------------------------------------------
+
+%% Detecção e aviso sobre comandos obsoletos
+% \RequirePackage[l2tabu, orthodox]{nag}
+
+%% Passagem de opções para pacotes
+\PassOptionsToPackage{english, main = brazilian}{babel}%% Multilíngue
+\PassOptionsToPackage{hyperfootnotes = false}{hyperref}%% Hipertexto extendido
+
+%% Classe de documento e opções
+\documentclass[%% Opções: [*] comente para remover; [>] passada para pacotes
+  article,%% Tipo de documento: article, book, report, etc. [>]
+  a4paper,%% Tamanho de papel: a4paper, letterpaper, etc. [>]
+  11pt,%% Tamanho de fonte: 10pt, 11pt, 12pt, etc. [>]
+  fleqn,%% Alinhamento de equações à esquerda (comente para centralizado) [>]
+  oneside,%% Impressão: oneside (anverso) ou twoside (anverso e verso) [>]
+  % twocolumn,%% Texto em duas colunas (comente para uma coluna) [>]
+  chapter = TITLE,%% Títulos de capítulos em maiúsculas [*]
+  section = TITLE,%% Títulos de seções (secundárias) em maiúsculas [*]
+]{abntex2}
+
+%% Pacotes utilizados
+\usepackage[%% Opções
+  BibURLs = false,%% Links de URLs nas referências: true ou false
+  ABNTNum = none,%% Estilo numérico ABNT: none (AUTOR, ANO), dflt (1) e brkt [1]
+]{utfpr-article}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{setspace}
+\usepackage{titling}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{changepage}
+\usepackage{graphicx}
+\usepackage{background}
+\backgroundsetup{contents={\includegraphics[scale=0.70]{Logos/banner-sicite-2023.png}},
+	scale=0.625,placement=top,opacity=1,position={12.7cm,4.1cm}} 
+
+\thanksmarkseries{arabic}
+
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+%% Quadros
+%---------------------------------
+%Numbered environment
+\newcounter{quadro}[section]
+\newenvironment{quadro}[1][]{\refstepcounter{quadro}\par\smallskip
+   \noindent \footnotesize{\textbf{Quadro~\thequadro #1 -- } \rmfamily}{\smallskip}}
+
+%% Arquivo de referências
+\addbibresource{utfpr-article.bib}
+
+%% Informações do documento
+%%%% Título
+\titulo{
+O título do resumo expandido deve ser em caixa baixa e conter até duas linhas sem ponto final 
+ %(até 70 caracteres sem espaço, não deve conter caracteres especiais ou símbolos. Centralize.)
+}
+%%%% Título em outro idioma
+\titleinenglish{%
+The title of the expanded abstract must be in lower case and contain up to two lines without a period}
+%%%% Autor(es) e afiliação(ões)
+% SEI-SICITE - Nome Completo do Aluno de Iniciação Científica ou Tecnológica (orientado) (Obrigatório: exatamente como consta em seu documento oficial, RG)
+\autor{%
+Nome Completo do Bolsista Principal (sempre como primeiro autor)\thanks{%
+    \affil{Bolsista do(a) ... (inserir nome da Agência de Fomento, se houver). Nome da Instituição por Extenso, Município, Estado, País.}%
+    ~\email{xxxxxx@xxxxxxxx}.%
+    ~\lattes{xxxxxxxxxxxxxxxx}% 
+  }%
+  \and Nome Completo do(s) Coautor(es) (adicionar nota de rodapé dos co-autore(s), caso houver)%
+  \thanks{%
+    \affil{Bolsista do(a) ... (inserir nome da Agência de Fomento, se houver). Nome da Instituição por Extenso, Município, Estado, País.}%
+    ~\email{xxxxxx@xxxxxxxx}.%
+    ~\lattes{xxxxxxxxxxxxxxxx}% 
+  }%
+  \and Nome Completo do Orientador Principal (sempre como último autor)%
+  \thanks{%
+    \affil{Docente no Curso/Departamento/Programa. Nome da Instituição por Extenso, Município, Estado, País.}%
+    ~\email{xxxxxx@xxxxxxxx}.%
+    ~\lattes{xxxxxxxxxxxxxxxx}% 
+  }%
+}
+
+%%%% Câmpus: {SIGLA}; {NOME}
+%\campus{PG}{Campus Ponta Grossa}
+%%%% Departamento, coordenação, programa ou curso: [LOGO]; {SIGLA}; {NOME}
+%\departamento[depto]{DEPTO}{Departamento, Coordenação, Programa ou Curso}
+%%%% Local: {CIDADE, ESTADO, PAÍS}
+%\local{Ponta Grossa, Paraná, Brasil}
+
+%%%% Atenção! não alterar o campo \data{}
+\data{}
+
+%% criação de índices
+\makeindex%
+
+%%Espaçamento duplo
+
+%% Início do documento
+\begin{document}
+
+%\pretextual%% Elementos pré-textuais
+
+\begin{paginadetitulo}%% Página de título
+
+\begin{ambienteresumo}%% Resumo
+Você deve estruturar o resumo de modo a descrever o seu trabalho com simplicidade e objetividade. Tenha sempre em mente que o resumo é a apresentação do seu trabalho a leitores que provavelmente não estão familiarizados com alguns termos e expressões que podem ser comuns em sua área de estudo. O texto do resumo deve ser apresentado em um único parágrafo, sem recuo na primeira linha. A fonte usada deve ser Arial, com 10 pontos de tamanho e alinhamento justificado. O resumo deve ter entre 150 e 200 palavras: por exemplo, este texto possui exatamente 161 palavras. Na medida do possível, evite usar fórmulas, símbolos matemáticos e referências bibliográficas em seu resumo. Se ambos os resumos ultrapassarem a página inicial do documento, não há problema. Preferencialmente, procure apresentar o objetivo, o método de pesquisa, os principais resultados e as conclusões possíveis a partir do seu trabalho. Um bom resumo informa de maneira clara e objetiva o que será apresentado no texto.
+\palavraschave{palavra um;\ palavra dois;\ palavra três. (em  ordem alfabética).}%% Palavras-chave
+\end{ambienteresumo}
+
+\begin{ambienteresumo}[Abstract]%% Abstract
+\begin{otherlanguage*}{english}%% Idioma do abstract
+The abstract of your work, in addition to being part of this document, must be inserted in the Abstract field in the third step of submission on the portal https://eventos.utfpr.edu.br/. You should structure the abstract to describe your work simply and objectively. Always keep in mind that the abstract is the presentation of your work to readers who are probably unfamiliar with some terms and expressions. The text of the abstract must be presented in a single paragraph. The font used must be Arial, with 10-point size and justified alignment. The number of words may be modified due to the translation, for example, this text has exactly 167 words. As far as possible, avoid using formulas, mathematical symbols, and references in your abstract. It is okay if the two abstracts exceed the front page of the document. Preferably, try to present the objective, research method, main results and possible conclusions from your work. A good summary clearly and objectively informs what will be presented in the text.
+%Follow the same instructions presented on section \textit{RESUMO}. Translate here your \textit{RESUMO} to English. 
+\palavraschave[KEYWORDS]{keyword one; keyword two; keyword three. (Keep the order of words in Portuguese).}%% Keywords
+
+\blfootnote{\hfill \color{gray} \sffamily \large{seisicite.com.br \hspace{1cm} \thepage}}
+
+\end{otherlanguage*}
+\end{ambienteresumo}
+\end{paginadetitulo}
+\textual%% Elementos textuais
+
+\section{TÍTULO DE SEÇÃO DE NÍVEL 1}\label{sec:intro}
+
+A estrutura do trabalho pode ser dividida em seções à sua escolha, por exemplo: Introdução, Materiais e Métodos, Resultados e Discussões, Conclusão, Agradecimentos e Referências. Os itens obrigatórios são informações sobre financiamento, conflito de interesse e referências.
+
+Os Títulos das seções devem ser posicionados à esquerda e sem ponto final, com fonte Arial em caixa alta e negrito (como mostrado acima). Os títulos das seções de nível 2 seguem a mesma formatação, exceto pelo não uso do negrito (como mostrado abaixo).
+
+\subsection{TÍTULO DE SEÇÃO DE NÍVEL 2}
+
+O texto completo deve ser redigido em português e conter entre quatro e seis páginas de tamanho A4, incluindo nesta contagem as páginas com título, autores, resumo, abstract e referências.
+
+O corpo do texto deve apresentar fonte Arial de tamanho 12, alinhamento justificado, sendo a primeira linha de cada parágrafo deslocada 1,25 cm.
+
+Deve ser aplicado espaçamento simples entre as linhas em todo o trabalho e sem espaçamento entre parágrafos. As páginas devem ser numeradas na parte inferior à direita conforme o modelo deste documento.
+
+As citações devem obedecer ao sistema autor-data e estar de acordo com a norma NBR 10520 da Associação Brasileira de Normas Técnicas (ABNT). Citações diretas de até três linhas devem estar entre aspas e no fluxo do texto. Citações com mais de três linhas devem aparecer a partir de um deslocamento de 4 cm (a partir da margem esquerda) sem aspas.
+
+As referências utilizadas ao longo do trabalho devem ser listadas no final do trabalho de acordo com as instruções na seção Referências. Sugerimos o uso de programas de gestão de referências bibliográficas como o Zotero para garantir que as regras da ABNT sejam seguidas.
+
+A redação do texto pode ser feita em qualquer editor de textos como Google Docs, MS Word, LO Writer ou Overleaf (no caso de utilizar template em \LaTeX). Porém, o arquivo deve ser convertido em PDF para a submissão, para evitar problemas de formatação por incompatibilidade de versões de programas. Não serão aceitos para avaliação trabalhos em outro formato.
+
+Qualquer que seja o tipo de ilustração inserida no trabalho (fluxograma, gráfico, quadro, figura, imagem, tabela, entre outros), sua identificação deve aparecer na parte superior, em negrito, precedida da palavra designativa, seguida de seu número de ordem de ocorrência no texto, em algarismos arábicos, travessão e do respectivo título e com fonte de tamanho 10.
+
+Após a ilustração, na parte inferior, indicar a fonte consultada (mesmo sendo produção do próprio autor), legenda, notas e outras informações necessárias à sua compreensão (se houver).
+
+A ilustração deve ser citada no texto e inserida o mais próximo possível do trecho a que se refere. Ver, por exemplo, a Figura \ref{fig:grafico}.
+
+\begin{figure}[H]
+\centering%
+\caption{Exemplo de figura}%
+\label{fig:grafico}
+\includegraphics[width = 0.525\columnwidth]{./Figuras/grafico}
+\fonte{Indicar a fonte consultada (mesmo sendo produção do próprio autor).}
+\end{figure}
+
+%Figuras podem ser inseridas neste documento usando o ambiente \LaTeX\ \enquote{figure}, conforme exemplo no arquivo fonte deste modelo.
+
+%\subsubsection{Tabelas e quadros}\label{sssec:tabs}
+
+Tabelas e quadros devem estar centralizados e conter apenas dados imprescindíveis, evitando-se que sejam muito extensos, não repetindo dados já inseridos no texto, ou vice-versa. O formato pode ser observado na Tabela \ref{tab:resul}.
+
+\begin{table*}[!htb]
+\centering%
+\normalsize
+\caption{Exemplo de tabela.}%
+\label{tab:resul}
+\begin{tabular}{l | c }
+\toprule
+Idade   & Percentual \%    \\
+\midrule
+Até 20 anos & 0\\
+Entre 21 e 30 anos & 10\\
+Entre 31 e 40 anos & 20\\
+Entre 41 e 50 anos & 30\\
+Acima de 51 anos & 40\\
+\bottomrule
+\addlinespace
+\end{tabular}
+\fonte{Beltrano (2021).}
+\end{table*}
+
+%Para o uso de quadros, siga a estrutura demonstrada no Quadro \ref{quad:perfil}. Caso os dados sejam inéditos, provenientes de uma pesquisa dos próprios autores, use a fonte Autoria própria, seguida do ano que o quadro foi elaborado com base em \cite{IBGE2017}.
+
+No caso de quadros, deve ser seguida a estrutura demonstrada no Quadro \ref{quad:secoes}. Caso os dados sejam inéditos e provenientes de uma pesquisa realizada pelos próprios autores do trabalho, essa especificação deve constar na fonte com o ano da pesquisa de campo. Nesse caso a fonte deve ser: Elaborado pelos autores (2021). Caso o material seja elaborado a partir de dados secundários, informar: Elaborado pelos autores com base em \cite{IBGE2017}.
+
+%Deixe uma linha em branco entre o quadro e o texto.
+
+\begin{quadro}
+\centering%
+\textbf{Exemplo de quadro.}\\%
+\begin{tabular}{| c | c | c |}
+\hline
+\textbf{Seção}    & \textbf{Tipografia}    & \textbf{Exemplo}     \\
+\hline
+Seções primárias & Letras maiúsculas em negrito    & \textbf{SEÇÃO PRIMÁRIA}   \\
+\hline
+Seções secundárias & Letras maiúsculas sem negrito    & SEÇÃO SECUNDÀRIA   \\
+\hline
+\end{tabular}
+\vspace{.15cm}
+\fonte{Elaborado por autores (2022).}
+\label{quad:secoes}
+\end{quadro}
+
+\subsubsection{Material Suplementar}
+As equações matemáticas devem aparecer a partir de um deslocamento de 0,6 cm (a partir da margem esquerda). Números arábicos devem ser usados em equações, inseridos entre parênteses, como ilustrado na \cref{eq:Uxy}.
+As equações devem ser referenciadas por \cref{eq:Uxy} no meio ou no final da frase, ou por \Cref{eq:Uxy} quando usada no início de uma sentença.
+
+\begin{equation}\label{eq:Uxy}
+u = \beta \sin(\pi x)\frac{(e^{2x}-1)(e^y-1)}{(e^2-1)(e-1)}
+\end{equation}
+
+\subsubsection{Agradecimentos}
+
+Esta seção é \underline{obrigatória \textbf{na versão com autores}}, NÃO INCLUIR na versão sem autores. Ela serve para agradecer as instituições e pessoas que contribuíram para a realização do trabalho, especialmente órgãos fomento que viabilizaram recursos no formato de bolsa e auxílio financeiro. 
+
+\subsubsection{Disponibilidade de Código}
+
+Esta seção é opcional. Ela serve para declarar se o código desenvolvido está disponível para terceiros. Caso esteja, explicitar onde pode ser encontrado. Caso contrário, explicitar a razão para a indisponibilidade. Remova caso nenhum código tenha sido desenvolvido. 
+
+\subsubsection{Conflito de interesse}
+
+Esta seção é \underline{obrigatória}. Ela serve para os autores declararem se possuem ou não algum conflito de interesse. Não havendo, sugerimos declarar “Não há conflito de interesse”.
+
+\begin{center}
+    \textbf{$\ast$ Instruções para seção de referências}
+\end{center}
+
+%\raggedright{\textbf{Instruções para seção de referências}}
+
+A seção de Referências (abaixo) é \underline{obrigatória}. Todas as obras citadas no texto devem ser apresentadas no final do documento. As referências devem ser baseadas na norma \href{http://portal.utfpr.edu.br/alunos/normas-academicas/normas-para-trabalhos-academicos}{NBR 6023/2002}, norma da ABNT atualmente em vigor. Como sugestão utilize o Sistema de Gestão de Normas e Documentos Regulatórios (GEDWEB) da UTFPR (\url{https://webapp.utfpr.edu.br/bibservices/gedWeb}) e um software de gestão de referências bibliográficas como o Zotero.
+
+\textbf{Importante:} as referências serão alinhadas à esquerda do texto (não justificado), em ordem alfabética, espaçamento simples entre linhas, com espaçamento de 12 pontos antes e de 6 pontos depois. A ABNT recomenda seguir uma uniformidade. Portanto, defina se você utilizará o nome por extenso dos autores ou se irá abreviá-los. Ao definir, siga o mesmo padrão para todas as referências. 
+Exemplo ilustrativo na seção de Referências (abaixo), onde se utiliza  nome por extenso dos autores conforme as seguintes citações: 
+\cite{volpato2016autoria},
+\cite{schneider2020efeitos} e
+\cite{MEDEIROS_2021}.
+
+% Referências
+\printbibliography[title={\raggedright{Referências}}]
+
+%% Fim do documento
+\end{document}
+
+
+%-------------------------------------------------------
+%-------------------------------------------------------
