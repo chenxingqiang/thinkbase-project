@@ -1,106 +1,14 @@
-"""Optimization system implementation module."""
+"""Single-node workflow optimizers (pipeline, static, dynamic).
 
-import asyncio
-from typing import Dict, List, Any, Optional, Set
-from dataclasses import dataclass
-from datetime import datetime
-from agentflow.core.workflow_types import WorkflowConfig, WorkflowStep
+Moved from the legacy flat ``agentflow/core/optimization.py`` module,
+which was shadowed by this package and therefore unreachable.
+"""
+
+from typing import Any, Dict, List, Set
 import copy
 
-@dataclass
-class OptimizationMetrics:
-    """Metrics for optimization performance."""
-    optimization_time: float = 0.0
-    memory_reduction: float = 0.0
-    cost_reduction: float = 0.0
-    pipeline_reduction: float = 0.0
-    optimization_success: bool = False
-    execution_time: float = 0.0
-    
-    def __iter__(self):
-        """Make the class iterable."""
-        return iter([
-            self.optimization_time,
-            self.memory_reduction,
-            self.cost_reduction,
-            self.pipeline_reduction,
-            self.optimization_success,
-            self.execution_time
-        ])
-    
-    def __getitem__(self, key):
-        """Support dictionary-like access."""
-        return {
-            'optimization_time': self.optimization_time,
-            'memory_reduction': self.memory_reduction,
-            'cost_reduction': self.cost_reduction,
-            'pipeline_reduction': self.pipeline_reduction,
-            'optimization_success': self.optimization_success,
-            'execution_time': self.execution_time
-        }[key]
-
-@dataclass
-class ResourceUsage:
-    """Resource usage metrics."""
-    memory: float
-    cpu: float
-    network: float
-    storage: float
-
-class BaseOptimizer:
-    """Base class for optimizers."""
-    
-    def __init__(self):
-        self.metrics = OptimizationMetrics()
-        self.detailed_metrics_enabled = False
-    
-    def enable_detailed_metrics(self):
-        """Enable detailed metrics collection."""
-        self.detailed_metrics_enabled = True
-    
-    def get_optimization_metrics(self) -> Dict[str, float]:
-        """Get optimization metrics as a dictionary."""
-        return {
-            "optimization_time": self.metrics.optimization_time,
-            "memory_reduction": self.metrics.memory_reduction,
-            "cost_reduction": self.metrics.cost_reduction,
-            "pipeline_reduction": self.metrics.pipeline_reduction,
-            "optimization_success": float(self.metrics.optimization_success),
-            "execution_time": self.metrics.execution_time
-        }
-    
-    def get_detailed_metrics(self) -> Dict[str, Any]:
-        """Get detailed optimization metrics."""
-        if not self.detailed_metrics_enabled:
-            return {}
-        
-        return {
-            "optimization_time": self.metrics.optimization_time,
-            "memory_reduction": self.metrics.memory_reduction,
-            "cost_reduction": self.metrics.cost_reduction,
-            "pipeline_reduction": self.metrics.pipeline_reduction,
-            "optimization_success": self.metrics.optimization_success,
-            "execution_time": self.metrics.execution_time
-        }
-    
-    def measure_resource_usage(self, workflow: WorkflowConfig) -> ResourceUsage:
-        """Measure resource usage of a workflow."""
-        # Implementation would include actual resource measurement
-        return ResourceUsage(
-            memory=100.0,
-            cpu=50.0,
-            network=25.0,
-            storage=10.0
-        )
-    
-    def calculate_execution_cost(self, workflow: WorkflowConfig) -> float:
-        """Calculate execution cost of a workflow."""
-        # Implementation would include actual cost calculation
-        return 100.0
-    
-    def verify_optimization(self, workflow: WorkflowConfig) -> bool:
-        """Verify optimization results."""
-        return True
+from agentflow.core.base import BaseOptimizer
+from agentflow.core.workflow_types import WorkflowConfig
 
 class PipelineOptimizer(BaseOptimizer):
     """Pipeline optimization implementation."""

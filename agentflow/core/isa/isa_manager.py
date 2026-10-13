@@ -12,6 +12,14 @@ from ray.actor import ActorHandle
 
 logger = logging.getLogger(__name__)
 
+# Re-exported for convenience so that consumers can import the full ISA
+# vocabulary (instruction, type, status and result) from a single module.
+# ``InstructionStatus``/``InstructionResult`` canonical definitions live in
+# ``isa.types`` / ``isa.result`` respectively; they are deliberately not
+# redefined here to keep a single source of truth.
+from .types import InstructionStatus  # noqa: E402  (re-export)
+from .result import InstructionResult  # noqa: E402  (re-export)
+
 class InstructionType(str, Enum):
     """Types of instructions supported by the ISA"""
     BASIC = "basic"           # Single agent instruction

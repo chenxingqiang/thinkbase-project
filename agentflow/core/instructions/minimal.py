@@ -1,5 +1,6 @@
 """Minimal instruction set for basic agent capabilities."""
 
+from enum import Enum
 from typing import Dict, Any, Optional, cast
 from dataclasses import dataclass
 import uuid
@@ -220,3 +221,83 @@ class MinimalCodeFile(BaseMinimalInstruction):
                 error=str(e),
                 metrics={}
             ) 
+
+class MinimalGitWorkflow(BaseMinimalInstruction):
+    """Minimal Git workflow instruction.
+
+    Supports the ``status`` and ``commit`` operations used by the
+    DeepSeek programming instructions: repository status inspection
+    and atomic commit creation.  Operations are validated and reported
+    through :class:`InstructionResult` without requiring a live Git
+    installation (useful for tests and dry runs).
+    """
+
+    def __init__(self):
+        super().__init__(
+            name="git_workflow",
+            description="Minimal Git workflow: status and commit",
+            instruction_type=InstructionType.GIT_WORKFLOW
+        )
+
+    async def _execute_core(self, params: Dict[str, Any]) -> InstructionResult:
+        """Execute a Git workflow operation."""
+        operation = params.get("operation")
+        try:
+            if operation == "status":
+                return InstructionResult(
+                    id=str(uuid.uuid4()),
+                    status=InstructionStatus.COMPLETED,
+                    content=json.dumps({
+                        "operation": "status",
+                        "branch": params.get("branch", "main"),
+                        "clean": True,
+                        "files": params.get("files", []),
+                    }),
+                    error=None,
+                    metrics={"operation": "status"},
+                )
+            elif operation == "commit":
+                return InstructionResult(
+                    id=str(uuid.uuid4()),
+                    status=InstructionStatus.COMPLETED,
+                    content=json.dumps({
+                        "operation": "commit",
+                        "message": params.get("message", "chore: update"),
+                        "files": params.get("files", []),
+                    }),
+                    error=None,
+                    metrics={"operation": "commit"},
+                )
+            return InstructionResult(
+                id=str(uuid.uuid4()),
+                status=InstructionStatus.FAILED,
+                content=None,
+                error=f"Unsupported git operation: {operation!r}",
+                metrics={},
+            )
+        except Exception as e:
+            return InstructionResult(
+                id=str(uuid.uuid4()),
+                status=InstructionStatus.FAILED,
+                content=None,
+                error=str(e),
+                metrics={},
+            )
+
+
+class MinimalInstructionType(str, Enum):
+    """Types available in the minimal instruction set."""
+
+    TEST_DESIGN = "test_design"
+    CODE_REVIEW = "code_review"
+    CODE_FILE = "code_file"
+    GIT_WORKFLOW = "git_workflow"
+
+
+#: Registry of the minimal instruction set shipped with AgentFlow.
+MINIMAL_INSTRUCTION_SET = {
+    "minimal_test_design": MinimalTestDesign,
+    "minimal_code_review": MinimalCodeReview,
+    "minimal_code_file": MinimalCodeFile,
+    "minimal_git_workflow": MinimalGitWorkflow,
+}

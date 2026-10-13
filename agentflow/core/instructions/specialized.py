@@ -16,9 +16,16 @@ from transformers import (
     pipeline,
     AutoTokenizer,
     PreTrainedModel,
-    AutoModelForSeq2SeqGeneration,
     AutoModel
 )
+
+# ``AutoModelForSeq2SeqGeneration`` was removed in transformers 5.x;
+# import it when available and fall back to None otherwise (a clear
+# error is raised at use time).
+try:
+    from transformers import AutoModelForSeq2SeqGeneration
+except ImportError:  # pragma: no cover - depends on transformers version
+    AutoModelForSeq2SeqGeneration = None
 import ast
 import astroid
 from radon.complexity import cc_visit
@@ -44,6 +51,12 @@ class TextSummarizationInstruction(OptimizableInstruction):
         )
         self.model_name = "facebook/bart-large-cnn"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        if AutoModelForSeq2SeqGeneration is None:
+            raise RuntimeError(
+                "AutoModelForSeq2SeqGeneration is unavailable in this "
+                "transformers version; TextSummarizationInstruction "
+                "requires transformers<5"
+            )
         self.model = AutoModelForSeq2SeqGeneration.from_pretrained(self.model_name)
         self.summarizer = pipeline("summarization", model=self.model, tokenizer=self.tokenizer)
         
@@ -533,8 +546,30 @@ class EnhancedResponseParsingInstruction(ResponseParsingInstruction):
         
         return metrics
 
+class _SpecializedInstruction(BaseInstruction):
+    """Template-method adapter for the specialized instruction actors.
+
+    The nine specialized instructions below implement their logic in
+    ``_execute_impl`` (Dict in, ``InstructionResult`` out); this adapter
+    satisfies ``BaseInstruction``'s abstract ``execute`` contract by
+    delegating to it, so the classes stay concrete enough for
+    ``@ray.remote``.
+    """
+
+    async def execute(self, context):
+        """Delegate to the subclass ``_execute_impl``."""
+        if not isinstance(context, dict):
+            context = {"input": context}
+        return await self._execute_impl(context)
+
+    async def _execute_impl(self, context: Dict[str, Any]) -> "InstructionResult":
+        raise NotImplementedError(
+            f"{type(self).__name__} must implement _execute_impl"
+        )
+
+
 @ray.remote
-class ThinkingInstruction(BaseInstruction):
+class ThinkingInstruction(_SpecializedInstruction):
     """Instruction for managing AI thinking process."""
     
     def __init__(self):
@@ -756,7 +791,7 @@ class ThinkingInstruction(BaseInstruction):
         return decision
 
 @ray.remote
-class DataValidationInstruction(BaseInstruction):
+class DataValidationInstruction(_SpecializedInstruction):
     """Instruction for data validation and schema enforcement."""
     
     def __init__(self):
@@ -855,7 +890,7 @@ class DataValidationInstruction(BaseInstruction):
         self._validation_metrics["error_rate"] = self._validation_metrics["failed_validations"] / self._validation_metrics["total_validations"]
 
 @ray.remote
-class ModelTrainingInstruction(BaseInstruction):
+class ModelTrainingInstruction(_SpecializedInstruction):
     """Instruction for model training and evaluation."""
     
     def __init__(self):
@@ -970,7 +1005,7 @@ class ModelTrainingInstruction(BaseInstruction):
             ) / self._training_metrics["models_trained"]
 
 @ray.remote
-class ErrorRecoveryInstruction(BaseInstruction):
+class ErrorRecoveryInstruction(_SpecializedInstruction):
     """Instruction for error recovery and resilience."""
     
     def __init__(self):
@@ -1057,7 +1092,7 @@ class ErrorRecoveryInstruction(BaseInstruction):
         self._error_metrics["recovery_rate"] = self._error_metrics["successful_recoveries"] / self._error_metrics["total_recovery_attempts"]
 
 @ray.remote
-class PerformanceMonitoringInstruction(BaseInstruction):
+class PerformanceMonitoringInstruction(_SpecializedInstruction):
     """Instruction for performance monitoring and optimization."""
     
     def __init__(self):
@@ -1250,7 +1285,7 @@ class PerformanceMonitoringInstruction(BaseInstruction):
         ]
 
 @ray.remote
-class PipelineOrchestrationInstruction(BaseInstruction):
+class PipelineOrchestrationInstruction(_SpecializedInstruction):
     """Instruction for orchestrating instruction pipelines."""
     
     def __init__(self):
@@ -1584,7 +1619,7 @@ class PipelineOrchestrationInstruction(BaseInstruction):
         return False
 
 @ray.remote
-class NLPProcessingInstruction(BaseInstruction):
+class NLPProcessingInstruction(_SpecializedInstruction):
     """Instruction for natural language processing tasks."""
     
     def __init__(self):
@@ -1727,7 +1762,7 @@ class NLPProcessingInstruction(BaseInstruction):
             raise
 
 @ray.remote
-class MLOpsInstruction(BaseInstruction):
+class MLOpsInstruction(_SpecializedInstruction):
     """Instruction for MLOps tasks."""
     
     def __init__(self):
@@ -1903,7 +1938,7 @@ class MLOpsInstruction(BaseInstruction):
             raise
 
 @ray.remote
-class QualityAssuranceInstruction(BaseInstruction):
+class QualityAssuranceInstruction(_SpecializedInstruction):
     """Instruction for quality assurance tasks."""
     
     def __init__(self):

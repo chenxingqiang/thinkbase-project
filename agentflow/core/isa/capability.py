@@ -1,6 +1,6 @@
 """Advanced capability assessment and profiling system."""
 from typing import Dict, List, Optional, Set, Tuple, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 from enum import Enum
 from .formal import FormalInstruction
@@ -25,6 +25,14 @@ class CapabilityMetric:
     confidence: float
     metadata: Dict[str, Any]
 
+@dataclass
+class DomainScore:
+    """Aggregated score for one capability domain."""
+    score: float
+    confidence: float = 1.0
+    weight: float = 0.0
+    metrics: List[CapabilityMetric] = field(default_factory=list)
+
 class CapabilityProfile:
     """Advanced capability profiling system."""
     
@@ -32,21 +40,45 @@ class CapabilityProfile:
         self.config = config
         self.metrics: Dict[str, CapabilityMetric] = {}
         self.history: List[Dict[str, Any]] = []
+        # Per-domain aggregate scores keyed by domain value (e.g.
+        # "reasoning"); populated by assess_capabilities and consumed
+        # by the multi-agent coordinator.
+        self.capabilities: Dict[str, "DomainScore"] = {}
+        # Declared specializations (e.g. domain expertise tags).
+        self.specializations: List[str] = list(
+            config.get("specializations", [])
+        )
         
     def assess_capabilities(self,
                           instructions: List[FormalInstruction]) -> Dict[str, Any]:
         """Assess capabilities across all domains."""
         results = {}
         for domain in CapabilityDomain:
-            results[domain.value] = self._assess_domain(
-                domain,
-                instructions
+            assessment = self._assess_domain(domain, instructions)
+            results[domain.value] = assessment
+            self.capabilities[domain.value] = DomainScore(
+                score=assessment["score"],
+                weight=assessment["weight"],
+                metrics=assessment["metrics"],
             )
         
         # Update history
         self._update_history(instructions, results)
         
         return results
+
+    def get_overall_score(self) -> float:
+        """Weighted overall capability score across assessed domains."""
+        if not self.capabilities:
+            return 0.0
+        total_weight = sum(d.weight for d in self.capabilities.values())
+        if total_weight <= 0:
+            return sum(d.score for d in self.capabilities.values()) / len(
+                self.capabilities
+            )
+        return sum(
+            d.score * d.weight for d in self.capabilities.values()
+        ) / total_weight
     
     def _assess_domain(self,
                       domain: CapabilityDomain,

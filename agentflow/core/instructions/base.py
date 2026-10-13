@@ -480,8 +480,44 @@ class CacheableInstruction(BaseInstruction):
 
 InstructionResult = ExecutionResult
 
-class InstructionStatus(Enum):
-    DUMMY = "dummy"
+class InstructionStatus(str, Enum):
+    """Status of instruction execution.
+
+    Mirrors ``agentflow.core.isa.types.InstructionStatus`` so that all
+    instruction modules can uniformly report execution state.
+    """
+    SUCCESS = "success"
+    ERROR = "error"
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+    TIMEOUT = "timeout"
 
 class ValidationResult:
     pass
+
+# --- Lazy re-exports (PEP 562) -------------------------------------------
+# Some instruction classes (e.g. ``ParallelInstruction``) live in sibling
+# modules such as ``advanced.py``, which themselves import this module at
+# import time.  Re-exporting them eagerly here would create a circular
+# import, so the attribute is resolved lazily on first access instead.
+# This keeps ``from agentflow.core.instructions.base import
+# ParallelInstruction`` working without an import cycle.
+_LAZY_RE_EXPORTS = {
+    "ParallelInstruction": ".advanced",
+}
+
+def __getattr__(name: str) -> Any:
+    """Lazily re-export classes defined in sibling instruction modules."""
+    module_name = _LAZY_RE_EXPORTS.get(name)
+    if module_name is not None:
+        import importlib
+        module = importlib.import_module(module_name, __package__)
+        return getattr(module, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __dir__() -> List[str]:
+    """Include lazily re-exported names in ``dir()`` output."""
+    return sorted(set(globals().keys()) | set(_LAZY_RE_EXPORTS))

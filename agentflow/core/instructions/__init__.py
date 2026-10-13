@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional, Type, cast, Union
 from dataclasses import dataclass
 import importlib
 import inspect
+import logging
 import pkgutil
 import sys
 from pathlib import Path
@@ -178,14 +179,19 @@ RegisteredInstruction = Union[BaseInstruction, Instruction]
 
 def _register_module_instructions(module_name: str) -> None:
     """Register all instructions from a module.
-    
+
     Args:
         module_name: Full module name to register instructions from
     """
+    logger = logging.getLogger(__name__)
     try:
         module = importlib.import_module(module_name)
         for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj):
+                # Abstract classes cannot be instantiated and are meant to
+                # be subclassed, so they are never registered directly.
+                if inspect.isabstract(obj):
+                    continue
                 if issubclass(obj, BaseMinimalInstruction) and obj != BaseMinimalInstruction:
                     try:
                         # Create minimal instruction instance with proper type
@@ -196,13 +202,18 @@ def _register_module_instructions(module_name: str) -> None:
                         registry.register_minimal_instruction(cast(BaseMinimalInstruction, instance))
                         registry.register_instruction(cast(RegisteredInstruction, instance))
                     except Exception as e:
-                        print(f"Failed to register minimal instruction {name}: {str(e)}")
-                        
+                        # Incompatible constructors are expected for classes
+                        # that require explicit arguments; skip them quietly.
+                        logger.debug(
+                            "Skipped auto-registration of %s from %s: %s",
+                            name, module_name, e
+                        )
+
                 elif issubclass(obj, BaseInstruction) and obj != BaseInstruction:
                     try:
                         # Determine instruction type from class name
                         instruction_type = _get_instruction_type(obj.__name__)
-                        
+
                         # Create regular instruction instance
                         instance = obj(
                             name=name,
@@ -210,10 +221,15 @@ def _register_module_instructions(module_name: str) -> None:
                         )
                         registry.register_instruction(cast(RegisteredInstruction, instance))
                     except Exception as e:
-                        print(f"Failed to register instruction {name}: {str(e)}")
-                        
+                        # Incompatible constructors are expected for classes
+                        # that require explicit arguments; skip them quietly.
+                        logger.debug(
+                            "Skipped auto-registration of %s from %s: %s",
+                            name, module_name, e
+                        )
+
     except Exception as e:
-        print(f"Failed to process module {module_name}: {str(e)}")
+        logger.warning("Failed to process module %s: %s", module_name, e)
 
 def _get_instruction_type(class_name: str) -> InstructionType:
     """Determine instruction type from class name."""

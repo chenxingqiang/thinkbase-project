@@ -15,7 +15,7 @@ from ray.actor import ActorHandle
 from ray.util.actor_pool import ActorPool
 from ray._raylet import ObjectRef
 
-from agentflow.core.workflow_types import (
+from .workflow_types import (
     WorkflowStep,
     WorkflowConfig,
     WorkflowStepType,

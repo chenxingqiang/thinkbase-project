@@ -160,3 +160,46 @@ class ModelMetrics:
             field_name: getattr(self, field_name)
             for field_name in self.__dataclass_fields__
         } 
+
+class MetricsCollector:
+    """Accumulates named metric values over time.
+
+    Used by the distributed and federated optimizers to gather
+    per-worker / per-client measurements.
+    """
+
+    def __init__(self):
+        self._values: Dict[str, List[Any]] = {}
+        self._latest: Dict[str, Any] = {}
+
+    def record(self, name: str, value: Any) -> None:
+        """Record a value for the named metric."""
+        self._values.setdefault(name, []).append(value)
+        self._latest[name] = value
+
+    def get_values(self, name: str) -> List[Any]:
+        """Return all recorded values for the named metric."""
+        return list(self._values.get(name, []))
+
+    def get_metrics(self) -> Dict[str, Any]:
+        """Return the latest value of every recorded metric."""
+        return dict(self._latest)
+
+    def summary(self) -> Dict[str, Dict[str, float]]:
+        """Return per-metric min/mean/max summaries where numeric."""
+        out = {}
+        for name, vals in self._values.items():
+            nums = [v for v in vals if isinstance(v, (int, float))]
+            if nums:
+                out[name] = {
+                    "count": len(vals),
+                    "min": min(nums),
+                    "mean": sum(nums) / len(nums),
+                    "max": max(nums),
+                }
+        return out
+
+    def clear(self) -> None:
+        """Drop all recorded values."""
+        self._values = {}
+        self._latest = {}

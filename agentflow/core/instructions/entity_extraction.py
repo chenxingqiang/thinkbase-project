@@ -1,10 +1,11 @@
 """Entity extraction instruction implementation."""
 from typing import Dict, Any, List
 import ray
-from base import BaseInstruction, InstructionResult, InstructionStatus
+from .base import BaseInstruction, InstructionResult, InstructionStatus
+from .specialized import _SpecializedInstruction
 
 @ray.remote
-class EntityExtractionInstruction(BaseInstruction):
+class EntityExtractionInstruction(_SpecializedInstruction):
     """Instruction for entity extraction from text."""
     
     def __init__(self):

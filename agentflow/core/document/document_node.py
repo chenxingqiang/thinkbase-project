@@ -3,9 +3,9 @@
 from typing import Dict, Any, Optional
 import logging
 
-from core.node import AgentNode
-from core.ell.integration import ELLIntegration
-from ell import Message, MessageRole
+from agentflow.core.node import AgentNode
+from agentflow.ell.integration import ELLIntegration
+from agentflow.ell.types.message import Message, MessageRole
 
 logger = logging.getLogger(__name__)
 

@@ -7,7 +7,6 @@ import logging
 import json
 import time
 
-from agentflow.core.instructions.collaborative import CollaborationConfig
 
 from .base import (
     BaseInstruction,
@@ -46,15 +45,6 @@ class AgentSynchronizationInstruction(BaseInstruction):
                  metadata: Optional[InstructionMetadata] = None):
         super().__init__(
             name=name,
-            collab_config=CollaborationConfig(
-                required_capabilities=set(),
-                min_collaborators=0,
-                max_collaborators=1,
-                max_rounds=1,
-                min_consensus=0.0,
-                max_round_time=300.0,
-                timeout=300.0
-            )
         )
         self.coordination_config = coordination_config
         self.metrics = CoordinationMetrics()
@@ -112,18 +102,27 @@ class AgentSynchronizationInstruction(BaseInstruction):
     
     async def _wait_for_sync(self, sync_id: str, agent_id: str,
                             context: ExecutionContext):
-        """Wait for synchronization."""
+        """Wait for synchronization.
+
+        The barrier width is ``context.params["expected_participants"]``
+        when provided, otherwise ``coordination_config.max_participants``.
+        Agents are released once every expected participant is ready.
+        """
         sync_point = self.sync_points[sync_id]
         sync_point["ready"].add(agent_id)
         
         # Share agent data
         sync_point["data"][agent_id] = context.params.get("sync_data", {})
         
+        expected = int(context.params.get(
+            "expected_participants", self.coordination_config.max_participants
+        ))
+        
         start_time = time.time()
-        while len(sync_point["ready"]) < len(sync_point["participants"]):
+        while len(sync_point["ready"]) < expected:
             if time.time() - start_time > self.coordination_config.timeout_seconds:
                 raise TimeoutError("Synchronization timeout")
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.05)
     
     def _update_metrics(self, sync_id: str):
         """Update coordination metrics."""
@@ -152,15 +151,6 @@ class ResourceCoordinationInstruction(BaseInstruction):
                  metadata: Optional[InstructionMetadata] = None):
         super().__init__(
             name=name,
-            collab_config=CollaborationConfig(
-                required_capabilities=set(),
-                min_collaborators=0,
-                max_collaborators=1,
-                max_rounds=1,
-                min_consensus=0.0,
-                max_round_time=300.0,
-                timeout=300.0
-            ),
         )
         self.coordination_config = coordination_config
         self.resource_limits = resource_limits
@@ -257,15 +247,6 @@ class WorkflowCoordinationInstruction(BaseInstruction):
                  metadata: Optional[InstructionMetadata] = None):
         super().__init__(
             name=name,
-            collab_config=CollaborationConfig(
-                required_capabilities=set(),
-                min_collaborators=0,
-                max_collaborators=1,
-                max_rounds=1,
-                min_consensus=0.0,
-                max_round_time=300.0,
-                timeout=300.0
-            ),
             description="Coordinate agent workflows"
         )
         self.workflow_schema = workflow_schema
@@ -345,6 +326,11 @@ class WorkflowCoordinationInstruction(BaseInstruction):
             workflow["end_time"] = time.time()
         elif action == "update":
             workflow["data"].update(action_data)
+            # Keep a per-agent record so concurrent updates from
+            # different agents do not overwrite each other's
+            # contributions in the shared data view.
+            per_agent = workflow["data"].setdefault("_agent_updates", {})
+            per_agent[agent_id] = action_data
         
         # Record action
         workflow["actions"].append({
@@ -387,12 +373,17 @@ class WorkflowCoordinationInstruction(BaseInstruction):
         return True
     
     def _update_metrics(self, result: Dict[str, Any]):
-        """Update coordination metrics."""
+        """Update coordination metrics.
+
+        Every successfully processed action counts as a successful
+        coordination; the average-coordination-time statistic is only
+        advanced when a workflow reaches the ``completed`` state (the
+        only point at which a meaningful end-to-end duration exists).
+        """
         self.metrics.coordination_attempts += 1
+        self.metrics.successful_coordinations += 1
         
         if result.get("state") == "completed":
-            self.metrics.successful_coordinations += 1
-            
             # Update average coordination time
             workflow = self.active_workflows[result["workflow_id"]]
             coordination_time = workflow["end_time"] - workflow["start_time"]
@@ -404,4 +395,3 @@ class WorkflowCoordinationInstruction(BaseInstruction):
                 (current_total + coordination_time) /
                 self.metrics.successful_coordinations
             )
-</rewritten_file> 

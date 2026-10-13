@@ -5,7 +5,7 @@ import asyncio
 import logging
 from abc import ABC, abstractmethod
 
-from ell import LMPType, Message
+from agentflow.ell import LMPType, Message
 from agentflow.ell.integration import ELLIntegration
 
 logger = logging.getLogger(__name__)

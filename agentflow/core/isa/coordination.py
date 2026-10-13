@@ -1,6 +1,7 @@
 """Multi-agent Coordination and Security System."""
 from typing import Dict, Any, List, Optional, Set
 from dataclasses import dataclass
+import time
 import numpy as np
 from enum import Enum
 from .formal import FormalInstruction, InstructionType
@@ -147,11 +148,15 @@ class AgentCoordinator:
             "conflict_resolution": self._create_conflict_rules()
         }
         
-        # Define fallback strategies
+        # Define fallback strategies keyed by stage name (the stage
+        # executor looks up "{stage}_failure") and by failure type for
+        # direct programmatic access.
         plan["fallback"] = {
-            "agent_failure": self._create_fallback_strategy("agent_failure"),
+            "preparation_failure": self._create_fallback_strategy("coordination_failure"),
+            "execution_failure": self._create_fallback_strategy("agent_failure"),
             "validation_failure": self._create_fallback_strategy("validation_failure"),
-            "coordination_failure": self._create_fallback_strategy("coordination_failure")
+            "agent_failure": self._create_fallback_strategy("agent_failure"),
+            "coordination_failure": self._create_fallback_strategy("coordination_failure"),
         }
         
         return plan
@@ -422,12 +427,43 @@ class SecurityMonitor:
             raise SecurityViolation("Data sensitivity mismatch")
     
     def _validate_resource_access(self, task: Dict[str, Any]) -> bool:
-        """Validate resource access permissions."""
-        return True  # Implement actual validation logic
-    
+        """Validate resource access permissions.
+
+        When the coordinator config declares an ``allowed_resources``
+        set, every resource requested by the task must fall inside it.
+        Without such a declaration no restriction is enforced (open
+        default, matching the historical behaviour).
+        """
+        allowed = self.config.get("allowed_resources")
+        if allowed is None:
+            return True
+        allowed = set(allowed)
+        requested = task.get("resources", [])
+        if isinstance(requested, str):
+            requested = [requested]
+        return all(resource in allowed for resource in requested)
+
     def _get_data_sensitivity(self, task: Dict[str, Any]) -> int:
-        """Get data sensitivity level."""
-        return 0  # Implement actual sensitivity calculation
+        """Get data sensitivity level.
+
+        The task may declare sensitivity directly (``data_sensitivity``
+        as an int 0-3) or reference classified categories via
+        ``data_categories`` (e.g. ``["financial", "medical"]`` count as
+        highly sensitive).  0 means no special sensitivity.
+        """
+        declared = task.get("data_sensitivity")
+        if isinstance(declared, (int, float)):
+            return int(declared)
+
+        sensitive_categories = {"financial", "medical", "personal", "credentials"}
+        categories = task.get("data_categories", [])
+        if isinstance(categories, str):
+            categories = [categories]
+        if categories and set(categories) & sensitive_categories:
+            return SecurityLevel.HIGH.value
+        if categories:
+            return SecurityLevel.MEDIUM.value
+        return 0
 
 class SecurityError(Exception):
     """Security-related error."""

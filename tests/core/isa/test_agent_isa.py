@@ -5,8 +5,8 @@ from typing import Dict, Any
 from agentflow.core.isa.agent_isa import AgentISA, AgentISAConfig
 from agentflow.core.isa.instruction import Instruction, InstructionType
 
-async def test_function(param1: str, param2: int = 42) -> Dict[str, Any]:
-    """Test function for registration."""
+async def sample_function_for_registration(param1: str, param2: int = 42) -> Dict[str, Any]:
+    """Sample function used to test instruction registration."""
     return {"param1": param1, "param2": param2}
 
 class TestInstruction(Instruction):
@@ -48,11 +48,11 @@ def agent_isa_with_config():
 @pytest.mark.asyncio
 async def test_function_registration(agent_isa):
     """Test function registration as instruction."""
-    instruction_id = await agent_isa.register_function(test_function)
+    instruction_id = await agent_isa.register_function(sample_function_for_registration)
     
     assert instruction_id in agent_isa.instructions
     instruction = agent_isa.instructions[instruction_id]
-    assert instruction.name == "test_function"
+    assert instruction.name == "sample_function_for_registration"
     assert instruction.type == InstructionType.LLM_INTERACTION
 
 @pytest.mark.asyncio

@@ -82,11 +82,13 @@ class AgenticTransformer:
         # Create parameter type constraints
         param_constraints = {}
         for name, param in sig.parameters.items():
-            # Handle Any type correctly
-            base_type = (
-                param.annotation if param.annotation != Parameter.empty
-                else object  # Use object as base type for Any
-            )
+            if param.annotation == Parameter.empty:
+                raise TypeError(
+                    f"Parameter '{name}' of function '{func.__name__}' is "
+                    "missing a type annotation; agentic calling requires "
+                    "fully annotated signatures"
+                )
+            base_type = param.annotation
             param_constraints[name] = TypeConstraint(
                 base_type=base_type,
                 dependent_on=context_requirements.get(name) if context_requirements else None,
@@ -210,6 +212,14 @@ class ModelAdapter:
         }
 
     def _transform_type(self, type_: Type) -> str:
-        """Transform type to model-specific type."""
-        # Add model-specific type transformations
-        return str(type_) 
+        """Transform type to model-specific type name.
+
+        Renders builtin/simple types as bare names (``int``, ``str``)
+        and falls back to the qualified name for user-defined types.
+        """
+        if isinstance(type_, type):
+            module = getattr(type_, "__module__", "")
+            if module in ("builtins", "__builtin__"):
+                return type_.__name__
+            return f"{module}.{type_.__name__}"
+        return getattr(type_, "__name__", str(type_)) 

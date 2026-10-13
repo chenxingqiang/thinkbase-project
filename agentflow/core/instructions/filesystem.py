@@ -5,7 +5,7 @@ import os
 import shutil
 from pathlib import Path
 
-from base import FileSystemInstruction, InstructionResult, InstructionStatus
+from .base import FileSystemInstruction, InstructionResult, InstructionStatus
 
 class ListDirectoryInstruction(FileSystemInstruction):
     """List directory contents."""

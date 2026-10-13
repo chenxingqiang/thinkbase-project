@@ -115,12 +115,22 @@ class Instruction(ABC):
                  params: Dict[str, TypeConstraint],
                  description: Optional[str] = None,
                  cache_config: Optional[Dict[str, Any]] = None,
-                 parallel_config: Optional[Dict[str, Any]] = None):
+                 parallel_config: Optional[Dict[str, Any]] = None,
+                 side_effects: bool = True,
+                 outputs: Optional[List[str]] = None):
         self.id = id
         self.name = name
         self.type = type
         self.params = params
         self.description = description
+        # Semantic annotations used by the optimizer:
+        # - side_effects: whether execution mutates external state.
+        #   Defaults to True (conservative: never optimized away).
+        # - outputs: names of values produced by this instruction that
+        #   later instructions (or the final result) may consume.
+        self.side_effects = side_effects
+        self.outputs = list(outputs) if outputs else []
+        self.dependencies: List[str] = []
         self.context = InstructionContext(
             state={},
             type_env={},

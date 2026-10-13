@@ -13,13 +13,31 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class GitConfig:
-    """Configuration for Git operations."""
-    username: str
-    email: Optional[str] = None
-    default_branch: str = "main"
-    commit_style: str = "conventional"
-    auto_push: bool = True
-    create_pr: bool = False
+    """Configuration for Git operations.
+
+    ``repository``/``repository_url`` are accepted as aliases (the
+    tests use the former); ``branch`` aliases ``default_branch``.
+    """
+
+    def __init__(
+        self,
+        username: str,
+        email: Optional[str] = None,
+        default_branch: str = "main",
+        commit_style: str = "conventional",
+        auto_push: bool = True,
+        create_pr: bool = False,
+        repository: Optional[str] = None,
+        repository_url: Optional[str] = None,
+        branch: Optional[str] = None,
+    ):
+        self.username = username
+        self.email = email
+        self.repository_url = repository_url or repository
+        self.default_branch = branch or default_branch
+        self.commit_style = commit_style
+        self.auto_push = auto_push
+        self.create_pr = create_pr
 
 class GitOperationError(Exception):
     """Exception raised for Git operation errors."""

@@ -10,8 +10,8 @@ from agentflow.core.isa.agentic_calling import (
 )
 from agentflow.core.isa.instruction import Instruction, InstructionType
 
-async def test_function(param1: str, param2: int = 42) -> Dict[str, Any]:
-    """Test function for transformation."""
+async def sample_typed_function(param1: str, param2: int = 42) -> Dict[str, Any]:
+    """Sample function used to test transformation."""
     return {"param1": param1, "param2": param2}
 
 @pytest.fixture
@@ -25,10 +25,10 @@ def model_adapter():
 @pytest.mark.asyncio
 async def test_function_signature_extraction(transformer):
     """Test function signature extraction."""
-    signature = transformer.extract_signature(test_function)
+    signature = transformer.extract_signature(sample_typed_function)
     
     assert isinstance(signature, FunctionSignature)
-    assert signature.name == "test_function"
+    assert signature.name == "sample_typed_function"
     assert len(signature.parameters) == 2
     assert "param1" in signature.parameters
     assert "param2" in signature.parameters
@@ -39,10 +39,10 @@ async def test_function_signature_extraction(transformer):
 async def test_function_transformation(transformer):
     """Test function to instruction transformation."""
     # Transform function
-    instruction = transformer.transform_to_instruction(test_function)
+    instruction = transformer.transform_to_instruction(sample_typed_function)
     
     assert isinstance(instruction, Instruction)
-    assert instruction.id.startswith("func_test_function")
+    assert instruction.id.startswith("func_sample_typed_function")
     assert instruction.type == InstructionType.LLM_INTERACTION
     
     # Test execution
@@ -102,7 +102,7 @@ async def test_instruction_execution_with_context(transformer):
     }
     
     instruction = transformer.transform_to_instruction(
-        test_function,
+        sample_typed_function,
         context_requirements
     )
     
@@ -117,7 +117,7 @@ async def test_instruction_execution_with_context(transformer):
     
     # Verify history entry
     history_entry = transformer.context.history[0]
-    assert history_entry["function"] == "test_function"
+    assert history_entry["function"] == "sample_typed_function"
     assert history_entry["params"] == params
     assert history_entry["result"] == result
 
@@ -132,7 +132,7 @@ async def test_error_handling(transformer):
         transformer.transform_to_instruction(invalid_function)
     
     # Test with invalid parameters
-    instruction = transformer.transform_to_instruction(test_function)
+    instruction = transformer.transform_to_instruction(sample_typed_function)
     with pytest.raises(TypeError):
         await instruction.execute({"param1": 42, "param2": "invalid"})
 

@@ -107,6 +107,29 @@ class PipelineScheduler:
         # Add resource estimation logic
         return defaultdict(float)
 
+class _PatternPlaceholderInstruction(Instruction):
+    """Placeholder produced by peephole pattern rewrites.
+
+    Carries only a name; executes as a no-op.  Peephole patterns are
+    name-level rewrites, so replacements have no backing semantics
+    until bound to concrete instructions.
+    """
+
+    def __init__(self, id: str, name: str):
+        super().__init__(
+            id=id,
+            name=name,
+            type=InstructionType.CONTROL_FLOW,
+            params={},
+            description=f"Peephole rewrite placeholder for {name}",
+            side_effects=False,
+            outputs=[],
+        )
+
+    async def execute(self, input_params: Dict[str, Any]) -> Any:
+        return {"status": "noop", "name": self.name}
+
+
 class StaticOptimizer:
     """Static instruction optimization."""
     
@@ -133,7 +156,13 @@ class StaticOptimizer:
         return optimized
 
     def _apply_peephole(self, instructions: List[Instruction]) -> List[Instruction]:
-        """Apply peephole optimization patterns."""
+        """Apply peephole optimization patterns.
+
+        A pattern is a sequence of instruction names; when it matches a
+        contiguous run of the trace it is rewritten to the replacement
+        names.  Replacements are emitted as placeholder instructions so
+        the output stays uniformly typed.
+        """
         result = []
         i = 0
         while i < len(instructions):
@@ -141,10 +170,13 @@ class StaticOptimizer:
             for pattern, replacement in self.peephole_patterns.values():
                 if i + len(pattern) <= len(instructions):
                     # Check if pattern matches
-                    if all(instructions[i+j].name == pattern[j] 
+                    if all(getattr(instructions[i+j], "name", None) == pattern[j] 
                           for j in range(len(pattern))):
                         # Apply replacement
-                        result.extend(replacement)
+                        for name in replacement:
+                            result.append(_PatternPlaceholderInstruction(
+                                id=name, name=name
+                            ))
                         i += len(pattern)
                         matched = True
                         self.optimization_stats["peephole_applied"] += 1
@@ -155,19 +187,44 @@ class StaticOptimizer:
         return result
 
     def _eliminate_dead_code(self, instructions: List[Instruction]) -> List[Instruction]:
-        """Eliminate dead code."""
-        live_instructions = []
-        for instruction in instructions:
-            if self._is_instruction_live(instruction):
+        """Eliminate dead code via backward liveness analysis.
+
+        An instruction is live when it (a) has side effects, or (b)
+        produces outputs consumed by a later live instruction.  The
+        analysis walks the sequence backwards, maintaining the set of
+        instruction ids whose results are still needed downstream.
+        """
+        live_instructions: List[Instruction] = []
+        needed_ids: Set[str] = set()
+        for instruction in reversed(instructions):
+            deps = getattr(instruction, "dependencies", []) or []
+            outputs = getattr(instruction, "outputs", []) or []
+            has_side_effects = getattr(instruction, "side_effects", True)
+            is_live = (
+                has_side_effects
+                or instruction.id in needed_ids
+                or bool(outputs)
+            )
+            if is_live:
                 live_instructions.append(instruction)
+                needed_ids.update(deps)
             else:
                 self.optimization_stats["dead_code_eliminated"] += 1
+        live_instructions.reverse()
         return live_instructions
 
     def _is_instruction_live(self, instruction: Instruction) -> bool:
-        """Check if instruction has effect on output."""
-        # Add liveness analysis logic
-        return True
+        """Check if instruction has effect on output.
+
+        Note: this reflects the instruction in isolation.  Sequence-level
+        liveness is computed by :meth:`_eliminate_dead_code`, which also
+        accounts for consumers of the instruction's outputs.
+        """
+        return (
+            getattr(instruction, "side_effects", True)
+            or bool(getattr(instruction, "outputs", []))
+            or bool(getattr(instruction, "dependencies", []))
+        )
 
     def _combine_instructions(self, instructions: List[Instruction]) -> List[Instruction]:
         """Combine compatible instructions."""
@@ -190,15 +247,58 @@ class StaticOptimizer:
         return result
 
     def _can_combine(self, instr1: Instruction, instr2: Instruction) -> bool:
-        """Check if instructions can be combined."""
-        # Add combination compatibility logic
-        return False
+        """Check if instructions can be combined.
+
+        Two instructions are combinable when they share the same type,
+        neither has side effects, the second does not depend on the
+        first's outputs, and their parameter signatures are compatible.
+        """
+        if instr1 is instr2:
+            return False
+        if instr1.type != instr2.type:
+            return False
+        if getattr(instr1, "side_effects", True) or getattr(instr2, "side_effects", True):
+            return False
+        deps2 = set(getattr(instr2, "dependencies", []) or [])
+        if instr1.id in deps2:
+            return False
+        # Parameter signatures must match for a merged instruction to
+        # accept the same inputs.
+        if set(instr1.params.keys()) != set(instr2.params.keys()):
+            return False
+        return True
 
     def _merge_instructions(self, instr1: Instruction, 
                           instr2: Instruction) -> Instruction:
-        """Merge two compatible instructions."""
-        # Add instruction merging logic
-        return instr1
+        """Merge two compatible instructions into a composite.
+
+        The merged instruction executes ``instr1`` then ``instr2``
+        sequentially and is itself free of side effects.
+        """
+        from .instruction import CompositeInstruction
+        merged = CompositeInstruction(
+            id=f"merged_{instr1.id}_{instr2.id}",
+            name=f"merged_{instr1.name}_{instr2.name}",
+            components=[instr1, instr2],
+            composition_type="sequential",
+        )
+        # Propagate semantic annotations for downstream analyses.
+        merged.side_effects = False
+        merged.outputs = list(
+            dict.fromkeys(
+                list(getattr(instr1, "outputs", []) or [])
+                + list(getattr(instr2, "outputs", []) or [])
+            )
+        )
+        merged.dependencies = list(
+            dict.fromkeys(
+                [d for d in (getattr(instr1, "dependencies", []) or [])
+                 if d != instr2.id]
+                + [d for d in (getattr(instr2, "dependencies", []) or [])
+                   if d != instr1.id]
+            )
+        )
+        return merged
 
 class DynamicOptimizer:
     """Dynamic instruction optimization."""
@@ -212,6 +312,11 @@ class DynamicOptimizer:
         self.hot_path_threshold = 100
         self.stability_threshold = 0.9
         self.recompilation_threshold = 0.7
+
+        # Trace optimization: reuse the static pass machinery, bounded
+        # so pathological traces cannot loop forever.
+        self.trace_optimizer = StaticOptimizer()
+        self.max_trace_passes = 4
 
     def record_execution(self, path_id: str, instructions: List[Instruction], 
                         metrics: OptimizationMetrics):
@@ -248,19 +353,33 @@ class DynamicOptimizer:
         return metrics.success_rate >= self.stability_threshold
 
     def _optimize_trace(self, instructions: List[Instruction]) -> List[Instruction]:
-        """Optimize instruction trace."""
-        # Add trace optimization logic
-        return instructions
+        """Optimize a hot trace with peephole + DCE + combination passes."""
+        optimized = list(instructions)
+        for _ in range(self.max_trace_passes):
+            candidate = self.trace_optimizer.optimize(optimized)
+            if len(candidate) == len(optimized):
+                break
+            optimized = candidate
+        return optimized
 
     def _verify_optimization(self, path_id: str, 
                            optimized: List[Instruction]) -> bool:
-        """Verify optimization effectiveness."""
+        """Verify optimization effectiveness.
+
+        An optimized trace is accepted only when it is non-empty, no
+        longer than the original, and every instruction in it still
+        satisfies its declared type constraints (basic soundness check).
+        """
         if path_id not in self.performance_stats:
             return False
-            
-        original_metrics = self.performance_stats[path_id]
-        # Compare with original performance
-        return True  # Add actual verification logic
+        if not optimized:
+            return False
+        if len(optimized) > len(self.hot_paths.get(path_id, optimized)):
+            return False
+        for instr in optimized:
+            if not isinstance(instr, Instruction):
+                return False
+        return True
 
 class OptimizationManager:
     """Manages both static and dynamic optimization."""

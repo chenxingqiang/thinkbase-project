@@ -319,3 +319,189 @@ async def test_multi_agent_workflow(workflow_instruction):
     # Verify data updates
     for agent_id in agents:
         assert f"{agent_id}_processing" in str(workflow["data"]) 
+
+# ----------------------------------------------------------------------
+# Supplementary edge-case tests
+# ----------------------------------------------------------------------
+@pytest.mark.asyncio
+async def test_barrier_width_from_expected_participants(coordination_config):
+    """Barrier width can be pinned per call via expected_participants."""
+    instruction = AgentSynchronizationInstruction(
+        name="width_sync", coordination_config=coordination_config
+    )
+
+    async def arrive(agent_id, expected):
+        ctx = ExecutionContext(
+            params={
+                "sync_id": "width-1",
+                "agent_id": agent_id,
+                "sync_data": {"who": agent_id},
+                "expected_participants": expected,
+            },
+            state={},
+            metadata={},
+        )
+        return await instruction.execute(ctx)
+
+    # Two agents, barrier width explicitly 2: both release together.
+    r1, r2 = await asyncio.gather(arrive("a1", 2), arrive("a2", 2))
+    assert r1.success and r2.success
+    shared = r1.output["sync_data"]
+    assert {v["who"] for v in shared.values()} == {"a1", "a2"}
+
+
+@pytest.mark.asyncio
+async def test_single_agent_barriers_on_width_one(coordination_config):
+    """A single agent with expected_participants=1 releases immediately."""
+    instruction = AgentSynchronizationInstruction(
+        name="solo_sync", coordination_config=coordination_config
+    )
+    ctx = ExecutionContext(
+        params={
+            "sync_id": "solo-1",
+            "agent_id": "lone",
+            "sync_data": {},
+            "expected_participants": 1,
+        },
+        state={},
+        metadata={},
+    )
+    result = await instruction.execute(ctx)
+    assert result.success
+
+
+@pytest.mark.asyncio
+async def test_barrier_timeout_when_peer_missing(coordination_config):
+    """An agent waiting on a width-2 barrier with no peer must time out."""
+    fast_config = CoordinationConfig(timeout_seconds=0.2)
+    instruction = AgentSynchronizationInstruction(
+        name="timeout_sync", coordination_config=fast_config
+    )
+    ctx = ExecutionContext(
+        params={
+            "sync_id": "lonely-1",
+            "agent_id": "waiting",
+            "sync_data": {},
+            "expected_participants": 2,
+        },
+        state={},
+        metadata={},
+    )
+    result = await instruction.execute(ctx)
+    assert not result.success
+    assert any("timeout" in str(e["error"]).lower() for e in result.errors)
+    assert instruction.metrics.failed_coordinations == 1
+
+
+@pytest.mark.asyncio
+async def test_concurrent_resource_requests(coordination_config):
+    """Concurrent requests are limit-checked; only fitting ones succeed."""
+    instruction = ResourceCoordinationInstruction(
+        name="conc_resources",
+        coordination_config=coordination_config,
+        resource_limits={"cpu": 8.0},
+    )
+
+    async def request(agent_id, amount):
+        ctx = ExecutionContext(
+            params={"agent_id": agent_id, "resource_request": {"cpu": amount}},
+            state={},
+            metadata={},
+        )
+        return await instruction.execute(ctx)
+
+    results = await asyncio.gather(*[request(f"a{i}", 2.0) for i in range(5)])
+    # Exactly four 2.0-CPU requests fit within the limit of 8.0.
+    assert sum(1 for r in results if r.success) == 4
+    assert instruction.metrics.failed_coordinations == 1
+
+
+@pytest.mark.asyncio
+async def test_double_start_rejected(coordination_config):
+    """A second start on a running workflow is an invalid transition."""
+    instruction = WorkflowCoordinationInstruction(
+        name="ds_workflow", coordination_config=coordination_config, workflow_schema={}
+    )
+    ctx1 = ExecutionContext(
+        params={"workflow_id": "wf-ds", "agent_id": "a1", "action": "start"},
+        state={},
+        metadata={},
+    )
+    ctx2 = ExecutionContext(
+        params={"workflow_id": "wf-ds", "agent_id": "a2", "action": "start"},
+        state={},
+        metadata={},
+    )
+    assert (await instruction.execute(ctx1)).success
+    assert not (await instruction.execute(ctx2)).success
+
+
+@pytest.mark.asyncio
+async def test_research_team_scenario(coordination_config):
+    """Cross-instruction multi-agent scenario.
+
+    Three agents (1) meet at a barrier sharing findings, (2) claim
+    compute from a shared resource pool, and (3) drive a joint
+    workflow to completion.
+    """
+    sync = AgentSynchronizationInstruction("sync", coordination_config)
+    resources = ResourceCoordinationInstruction(
+        "resources", coordination_config, resource_limits={"gpu": 4.0}
+    )
+    workflow = WorkflowCoordinationInstruction(
+        "workflow", coordination_config, workflow_schema={}
+    )
+
+    # Stage 1: barrier with all three agents.
+    def sync_ctx(i):
+        return ExecutionContext(
+            params={
+                "sync_id": "research-sync",
+                "agent_id": f"researcher-{i}",
+                "sync_data": {"findings": i},
+                "expected_participants": 3,
+            },
+            state={},
+            metadata={},
+        )
+
+    findings = await asyncio.gather(*[sync.execute(sync_ctx(i)) for i in range(3)])
+    assert all(r.success for r in findings)
+    shared = findings[0].output["sync_data"]
+    assert {d["findings"] for d in shared.values()} == {0, 1, 2}
+
+    # Stage 2: shared resource pool — 3 x 1.0 GPU within limit 4.0.
+    def res_ctx(i):
+        return ExecutionContext(
+            params={
+                "agent_id": f"researcher-{i}",
+                "resource_request": {"gpu": 1.0},
+            },
+            state={},
+            metadata={},
+        )
+
+    allocations = await asyncio.gather(*[resources.execute(res_ctx(i)) for i in range(3)])
+    assert all(r.success for r in allocations)
+    assert resources.metrics.resource_utilization == pytest.approx(0.75)
+
+    # Stage 3: joint workflow lifecycle.
+    def wf_ctx(i, action, data=None):
+        params = {
+            "workflow_id": "research",
+            "agent_id": f"researcher-{i}",
+            "action": action,
+        }
+        if data is not None:
+            params["action_data"] = data
+        return ExecutionContext(params=params, state={}, metadata={})
+
+    assert (await workflow.execute(wf_ctx(0, "start"))).success
+    for i in range(3):
+        result = await workflow.execute(wf_ctx(i, "update", {"contributions": i + 1}))
+        assert result.success
+    final = await workflow.execute(wf_ctx(0, "complete"))
+    assert final.success
+    assert final.output["state"] == "completed"
+    participants = workflow.active_workflows["research"]["participants"]
+    assert participants == {"researcher-0", "researcher-1", "researcher-2"}

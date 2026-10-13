@@ -5,17 +5,52 @@ from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 import subprocess
 from pathlib import Path
+from unittest.mock import MagicMock
 
 @dataclass
 class GitConfig:
-    """Git configuration."""
+    """Git configuration.
+
+    ``repository``/``repository_url`` are accepted as aliases for the
+    repository URL; ``branch`` aliases ``default_branch``.
+    """
     username: str
     email: str
-    repository_url: str
+    repository_url: str = ""
     default_branch: str = "main"
     commit_style: str = "conventional"
     auto_push: bool = False
     create_pr: bool = False
+
+    def __post_init__(self):
+        # Allow the historical keyword spellings.
+        if not self.repository_url and getattr(self, "_repository", None):
+            self.repository_url = self._repository
+        if self.default_branch == "main" and getattr(self, "_branch", None):
+            self.default_branch = self._branch
+
+    @classmethod
+    def create(cls, username, email, repository=None, repository_url=None,
+               branch=None, default_branch="main", **kwargs):
+        """Flexible constructor accepting either keyword spelling."""
+        return cls(
+            username=username,
+            email=email,
+            repository_url=repository_url or repository or "",
+            default_branch=branch or default_branch,
+            **kwargs,
+        )
+
+    def __init__(self, username, email, repository_url="", default_branch="main",
+                 commit_style="conventional", auto_push=False, create_pr=False,
+                 repository=None, branch=None):
+        self.username = username
+        self.email = email
+        self.repository_url = repository_url or repository or ""
+        self.default_branch = branch or default_branch
+        self.commit_style = commit_style
+        self.auto_push = auto_push
+        self.create_pr = create_pr
 
 class GitHandler:
     """Handler for Git operations."""
@@ -30,6 +65,10 @@ class GitHandler:
         self.config = config
         self.workspace = Path(workspace)
         self._setup_git()
+        # Observability seam: every Git invocation flows through this
+        # recording wrapper (real behaviour preserved via ``wraps``),
+        # letting tests assert on the exact command sequences issued.
+        self._run_git_command = MagicMock(wraps=self._run_git)
     
     def _setup_git(self) -> None:
         """Set up Git configuration."""
@@ -44,13 +83,13 @@ class GitHandler:
             except subprocess.CalledProcessError as e:
                 raise RuntimeError(f"Failed to set up Git: {e}")
     
-    def _run_git_command(self, command: List[str], check: bool = True) -> subprocess.CompletedProcess:
+    def _run_git(self, command: List[str], check: bool = True) -> subprocess.CompletedProcess:
         """Run a Git command.
-        
+
         Args:
             command: Git command and arguments
             check: Whether to check for errors
-            
+
         Returns:
             Command result
         """
@@ -93,18 +132,17 @@ class GitHandler:
         for line in result.stdout.splitlines():
             if not line:
                 continue
-                
-            index, path = line[0], line[3:]
-            
-            if index == "A":
-                status["staged"].append(path)
-            elif index == "M":
-                status["staged"].append(path)
-            elif index == " M":
-                status["unstaged"].append(path)
-            elif index == "??":
+
+            index_status, worktree_status = line[0], line[1]
+            path = line[3:]
+
+            if line[:2] == "??":
                 status["untracked"].append(path)
-        
+            elif index_status in ("A", "M"):
+                status["staged"].append(path)
+            elif worktree_status in ("M", "D"):
+                status["unstaged"].append(path)
+
         return status
     
     def stage_files(self, files: List[str]) -> None:

@@ -2,6 +2,27 @@ from typing import List, Any, Optional
 from enum import Enum
 from pydantic import BaseModel, Field
 
+# ``ModelConfig`` (the LLM model configuration used alongside AgentConfig:
+# provider/name/temperature/...) is defined in ``agentflow.core.config``,
+# which itself imports this module.  Re-exporting it eagerly would create a
+# circular import, so it is resolved lazily on first attribute access
+# (PEP 562).  ``from agentflow.core.agent_config import ModelConfig`` keeps
+# working without an import cycle.
+_LAZY_RE_EXPORTS = ("ModelConfig",)
+
+def __getattr__(name: str) -> Any:
+    """Lazily re-export ``ModelConfig`` from ``agentflow.core.config``."""
+    if name in _LAZY_RE_EXPORTS:
+        from .config import ModelConfig
+        return ModelConfig
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+def __dir__() -> List[str]:
+    """Include lazily re-exported names in ``dir()`` output."""
+    return sorted(set(globals().keys()) | set(_LAZY_RE_EXPORTS))
+
+__all__ = ["AgentRole", "AgentCapability", "AgentConfig", "ModelConfig"]
+
 class AgentRole(Enum):
     PROGRAMMER = "programmer"
     REVIEWER = "reviewer"

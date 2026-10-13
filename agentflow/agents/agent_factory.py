@@ -27,6 +27,7 @@ class AgentFactory:
     _instance = None
     _agents: Dict[str, Agent] = {}
     _instruction_sets: Dict[str, InstructionSet] = {}
+    _agent_classes: Dict[str, type] = {}
     
     def __init__(self):
         """Initialize agent factory."""
@@ -43,6 +44,15 @@ class AgentFactory:
     def register_instruction_set(self, agent_type: str, instruction_set: InstructionSet) -> None:
         """Register an instruction set for an agent type."""
         self._instruction_sets[agent_type] = instruction_set
+
+    @classmethod
+    def register_agent(cls, agent_type: str, agent_class) -> None:
+        """Register a concrete Agent class for an agent type string.
+
+        Once registered, :meth:`create_agent` instantiates this class
+        instead of the base :class:`Agent` for the given type.
+        """
+        cls._agent_classes[agent_type] = agent_class
     
     def create_agent(self, config: Dict[str, Any]) -> Agent:
         """Create an agent with specified instructions.
@@ -56,7 +66,26 @@ class AgentFactory:
         Raises:
             ValueError: If agent type is not supported
         """
-        # Convert dict to AgentConfig
+        # Resolve the agent type string from either a sectioned or flat dict
+        if isinstance(config, dict):
+            agent_type = (
+                config.get("AGENT", {}).get("type")
+                or config.get("type")
+                or "generic"
+            )
+        else:
+            agent_type = getattr(config, "type", "generic")
+
+        # Instantiate the registered class for this type if present
+        agent_cls = self._agent_classes.get(agent_type, Agent)
+        agent = agent_cls(config)
+        if not isinstance(agent, Agent):
+            raise ValueError(
+                f"Registered class for {agent_type!r} is not an Agent"
+            )
+        return agent
+
+        # Legacy path below: instruction-set based construction
         agent_config = AgentConfig(**config)
         agent_type = agent_config.type
         
