@@ -30,20 +30,15 @@ from typing import Any, Dict, List, Optional, Union
 import numpy as np
 from pydantic import BaseModel, Field
 
-try:  # Ray is optional at import time; the tests require it at runtime.
-    import ray
-
-    _RAY_AVAILABLE = True
-except ImportError:  # pragma: no cover - Ray is installed in this project
-    ray = None
-    _RAY_AVAILABLE = False
-
+# Ray is imported lazily (see __getattr__ for RemoteAgent):
+# eagerly importing it costs ~2s for every process that loads Agent.
 from .state import AgentStatus
 from .config import AgentConfig
 from ..ell.integration import ELLIntegration
 from ..ell.types.message import Message, MessageRole, MessageType
-from ..transformations.pipeline import TransformationPipeline
-from ..transformations.advanced_strategies import AdvancedTransformationStrategy
+# TransformationPipeline / AdvancedTransformationStrategy are re-exported
+# lazily (see module __getattr__ below): importing them eagerly drags in
+# pandas+sklearn (~3s) for every process that merely imports Agent.
 
 # ``agentflow.core`` is undergoing an active refactor (the flat modules are
 # being turned into shims over ``agentflow.core.workflow``). The symbols
@@ -58,16 +53,6 @@ except Exception:  # pragma: no cover - fallback when core.exceptions is broken
 
     class ConfigurationError(Exception):  # type: ignore[no-redef]
         """Local fallback for the core configuration error."""
-
-try:
-    from ..core.isa.isa_manager import ISAManager
-except Exception:  # pragma: no cover
-    ISAManager = None  # type: ignore[assignment]
-
-try:
-    from ..core.isa.selector import InstructionSelector
-except Exception:  # pragma: no cover
-    InstructionSelector = None  # type: ignore[assignment]
 
 try:
     from ..core.model_config import ModelConfig
@@ -497,7 +482,13 @@ class Agent:
                 except Exception as error:  # noqa: BLE001
                     logger.debug("ELL configuration skipped: %s", error)
 
-            # ISA manager (optional component).
+            # ISA manager (optional component).  Imported lazily here:
+            # isa_manager imports Ray at module level, which costs ~2s
+            # for every process that merely constructs an Agent.
+            try:
+                from ..core.isa.isa_manager import ISAManager
+            except Exception:  # pragma: no cover
+                ISAManager = None  # type: ignore[assignment]
             try:
                 if not self._isa_manager and ISAManager is not None:
                     config_path = None
@@ -512,6 +503,10 @@ class Agent:
                 self._isa_manager = None
 
             # Instruction selector (optional component).
+            try:
+                from ..core.isa.selector import InstructionSelector
+            except Exception:  # pragma: no cover
+                InstructionSelector = None  # type: ignore[assignment]
             try:
                 if not self._instruction_selector and InstructionSelector is not None:
                     self._instruction_selector = InstructionSelector(self.config)
@@ -767,16 +762,32 @@ class _RemoteAgentBase:
         self._status = value
 
 
-if _RAY_AVAILABLE:
-    # A @ray.remote-decorated class exposes .remote() natively; calling
-    # RemoteAgent.remote() creates the actor handle.
-    RemoteAgent = ray.remote(_RemoteAgentBase)  # type: ignore[assignment]
-else:  # pragma: no cover - fallback when Ray is unavailable
+def __getattr__(name):
+    """Lazily re-export heavy module members (deps deferred to first use)."""
+    if name == "RemoteAgent":
+        # Ray is imported only when the remote-agent API is actually used.
+        try:
+            import ray
+        except ImportError:  # pragma: no cover - Ray is installed here
+            class _LocalRemoteAgent(_RemoteAgentBase):
+                """Local stand-in providing the Ray-style ``.remote()`` API."""
 
-    class RemoteAgent(_RemoteAgentBase):  # type: ignore[no-redef]
-        """Local stand-in providing the Ray-style ``.remote()`` API."""
+                @classmethod
+                def remote(cls, *args: Any, **kwargs: Any) -> "_LocalRemoteAgent":
+                    """Return a new instance, mimicking the Ray factory."""
+                    return cls(*args, **kwargs)
 
-        @classmethod
-        def remote(cls, *args: Any, **kwargs: Any) -> "RemoteAgent":
-            """Return a new instance, mimicking the Ray actor factory."""
-            return cls(*args, **kwargs)
+            RemoteAgent = _LocalRemoteAgent
+        else:
+            RemoteAgent = ray.remote(_RemoteAgentBase)
+        globals()["RemoteAgent"] = RemoteAgent
+        return RemoteAgent
+    if name in ("TransformationPipeline", "AdvancedTransformationStrategy"):
+        if name == "TransformationPipeline":
+            from ..transformations.pipeline import TransformationPipeline
+            return TransformationPipeline
+        from ..transformations.advanced_strategies import (
+            AdvancedTransformationStrategy,
+        )
+        return AdvancedTransformationStrategy
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

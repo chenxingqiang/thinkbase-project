@@ -3,9 +3,6 @@
 from typing import Dict, Any, List, Set, Optional, Union, Type, Callable
 import logging
 from dataclasses import dataclass
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from .adaptive_weights import AdaptiveWeights, WeightConfig
 from .isa.instruction import Instruction
 from .agent_config import AgentConfig
@@ -24,10 +21,28 @@ class InstructionScore:
     cache_hit_rate: float  # Cache effectiveness
     final_score: float  # Combined score
 
+
+def _ensure_heavy_deps() -> None:
+    """Lazily load numpy/sklearn on first use.
+
+    sklearn costs ~5s at import time; the selector is often constructed
+    but rarely needs the TF-IDF machinery, so keep the module import
+    cheap and pull the heavy deps in only when the selector is built.
+    """
+    if "TfidfVectorizer" not in globals():
+        import numpy as _np
+        from sklearn.feature_extraction.text import TfidfVectorizer as _tfidf
+        from sklearn.metrics.pairwise import cosine_similarity as _cos
+        globals().update(
+            np=_np, TfidfVectorizer=_tfidf, cosine_similarity=_cos
+        )
+
+
 class InstructionSelector:
     """Intelligent instruction selection and optimization"""
     
     def __init__(self):
+        _ensure_heavy_deps()
         self.vectorizer = TfidfVectorizer()
         # Fit with a dummy document to ensure it's always fitted
         self.vectorizer.fit(["dummy document"])
@@ -127,6 +142,7 @@ class InstructionSelector:
         return float(cosine_similarity(query_vector, instruction_vector)[0][0])
     
     def _calculate_success_rate(self, instruction_name: str) -> float:
+        _ensure_heavy_deps()
         """Calculate historical success rate"""
         # If instruction history doesn't exist, initialize it
         if instruction_name not in self.instruction_history:

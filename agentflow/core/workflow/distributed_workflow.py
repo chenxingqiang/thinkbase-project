@@ -7,7 +7,6 @@ import logging
 import ray
 import uuid
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from dataclasses import dataclass, field
 import time
 from pydantic import BaseModel
@@ -58,7 +57,7 @@ class TransformStep:
         self.step_config: Dict[str, Any] = {}
         self.dependencies: List[str] = []
         self.initialized: bool = False
-        self.scaler: Optional[StandardScaler] = None
+        self.scaler = None  # lazily typed as StandardScaler
         self.logger = logging.getLogger(f"{__name__}.TransformStep")
     
     async def initialize(self, step_id: str, config: Dict[str, Any], dependencies: Optional[List[str]] = None) -> bool:
@@ -79,6 +78,7 @@ class TransformStep:
         # Initialize scaler based on config
         params = self.step_config.get('params', {})
         if params.get('method') == 'standard':
+            from sklearn.preprocessing import StandardScaler
             self.scaler = StandardScaler(
                 with_mean=params.get('with_mean', True),
                 with_std=params.get('with_std', True)

@@ -117,11 +117,11 @@ class WorkflowEngine:
         from ..ell.integration import ELLIntegration
         self._ell = ELLIntegration()
         
-        from .isa.isa_manager import ISAManager
+        from ..isa.isa_manager import ISAManager
         self._isa_manager = ISAManager()
         await self._isa_manager.initialize()
         
-        from .instruction_selector import InstructionSelector
+        from ..instruction_selector import InstructionSelector
         self._instruction_selector = InstructionSelector()
         await self._instruction_selector.initialize()
 

@@ -1,12 +1,23 @@
 """Transform processor module."""
 
-import numpy as np
 from typing import Dict, Any, Union, Callable, List, Optional
 from dataclasses import dataclass
 from ..workflow_types import StepConfig
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import IsolationForest
 import logging
+
+_heavy = None
+
+
+def _ensure_heavy():
+    """Lazily import numpy/sklearn (only needed for ML transforms)."""
+    global _heavy
+    if _heavy is None:
+        import numpy as _np
+        from sklearn.preprocessing import StandardScaler as _ss
+        from sklearn.ensemble import IsolationForest as _if
+
+        _heavy = (_np, _ss, _if)
+    return _heavy
 
 logger = logging.getLogger(__name__)
 
@@ -178,18 +189,19 @@ class TransformProcessor(BaseProcessor):
 
     async def process(self, data: Union[Dict[str, Any], List[Dict[str, Any]]]) -> ProcessorResult:
         """Process data using the configured transformations."""
+        _np, _ss, _if = _ensure_heavy()
         try:
             # Ensure input data is correctly processed
             input_data = data if not isinstance(data, dict) or 'data' not in data else data['data']
             
             # Special handling for feature engineering strategy with numpy arrays
-            if self.strategy == "feature_engineering" and isinstance(input_data, np.ndarray):
+            if self.strategy == "feature_engineering" and isinstance(input_data, _np.ndarray):
                 # Use StandardScaler for feature engineering
                 with_mean = self.params.get("with_mean", True)
                 with_std = self.params.get("with_std", True)
                 
                 # Perform scaling
-                scaler = StandardScaler(with_mean=with_mean, with_std=with_std)
+                scaler = _ss(with_mean=with_mean, with_std=with_std)
                 output = scaler.fit_transform(input_data)
                 
                 return ProcessorResult(
@@ -202,14 +214,14 @@ class TransformProcessor(BaseProcessor):
                 )
             
             # Special handling for outlier removal strategy with numpy arrays
-            if self.strategy == "outlier_removal" and isinstance(input_data, np.ndarray):
+            if self.strategy == "outlier_removal" and isinstance(input_data, _np.ndarray):
                 # Use Isolation Forest for outlier removal
                 method = self.params.get("method", "isolation_forest")
                 threshold = self.params.get("threshold", 0.1)
                 
                 if method == "isolation_forest":
                     # Perform outlier detection
-                    clf = IsolationForest(contamination=threshold, random_state=42)
+                    clf = _if(contamination=threshold, random_state=42)
                     y_pred = clf.fit_predict(input_data)
                     
                     # Filter out outliers

@@ -59,11 +59,6 @@ _alias_module("agentflow.core.workflow.base_types", "agentflow.core.base_types")
 _alias_module("agentflow.core.workflow.config", "agentflow.core.config")
 _alias_module("agentflow.core.workflow.objective_handler", "agentflow.core.objective_handler")
 _alias_module("agentflow.core.workflow.context_manager", "agentflow.core.context.context_manager")
-_alias_module("agentflow.core.workflow.instruction_selector", "agentflow.core.instruction_selector")
-_alias_module("agentflow.core.workflow.isa", "agentflow.core.isa")
-_alias_module("agentflow.core.workflow.isa.isa_manager", "agentflow.core.isa.isa_manager")
-_alias_module("agentflow.core.workflow.processors", "agentflow.core.processors")
-_alias_module("agentflow.core.workflow.processors.transformers", "agentflow.core.processors.transformers")
 
 # ---------------------------------------------------------------------------
 # Stale double-dot relative imports (``..agents``, ``..ell``) used by the

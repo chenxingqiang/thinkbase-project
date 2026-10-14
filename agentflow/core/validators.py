@@ -5,14 +5,6 @@ from dataclasses import dataclass
 import json
 import re
 from datetime import datetime
-import numpy as np
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-import nltk
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.sentiment import SentimentIntensityAnalyzer
-from textblob import TextBlob
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import requests
 from typing import List, Tuple
 import json
@@ -150,6 +142,10 @@ class ModelPerformanceValidator(BaseValidator):
     """Validates machine learning model performance."""
     
     def validate(self, data: Dict[str, Any], criteria: Dict[str, Any]) -> ValidationResult:
+        # Heavy ML deps are imported lazily: loading sklearn at module
+        # import time cost ~6s for every process importing agentflow.
+        import numpy as np
+        from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
         try:
             metric_name = criteria.get("metric_name", "accuracy")
             threshold = criteria.get("threshold", 0.0)
@@ -300,6 +296,15 @@ class ResponseQualityValidator(BaseValidator):
     """Validates the quality of agent responses."""
     
     def validate(self, data: Dict[str, Any], criteria: Dict[str, Any]) -> ValidationResult:
+        # Lazy imports: nltk/textblob/sklearn are heavy (~5s) and only
+        # needed for this optional text-quality validator.
+        import numpy as np
+        import nltk
+        from nltk.tokenize import sent_tokenize, word_tokenize
+        from nltk.sentiment import SentimentIntensityAnalyzer
+        from textblob import TextBlob
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
         try:
             response_text = data.get("response", "")
             if not response_text:
@@ -402,6 +407,9 @@ class ConversationFlowValidator(BaseValidator):
     """Validates the flow and consistency of a conversation."""
     
     def validate(self, data: Dict[str, Any], criteria: Dict[str, Any]) -> ValidationResult:
+        # Lazy import of sklearn for the optional coherence analysis.
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
         try:
             conversation = data.get("messages", [])
             if not conversation:

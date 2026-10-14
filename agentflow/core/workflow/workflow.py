@@ -23,11 +23,8 @@ from .agent_config import AgentConfig
 from ..ell.types.message import Message, MessageRole, MessageType
 from .workflow_state import WorkflowStateManager
 from .metrics import MetricsManager, MetricType
-from .processors.transformers import TransformProcessor, ProcessorResult
+from ..processors.transformers import TransformProcessor, ProcessorResult
 from .enums import StepStatus
-import time
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import IsolationForest
 from ..agents.agent import AgentState
 
 if TYPE_CHECKING:
@@ -73,8 +70,8 @@ class WorkflowEngine:
         if not self._initialized:
             # Import components
             from ..ell.integration import ELLIntegration
-            from .isa.isa_manager import ISAManager
-            from .instruction_selector import InstructionSelector
+            from ..isa.isa_manager import ISAManager
+            from ..instruction_selector import InstructionSelector
             
             # Initialize components
             self._ell = ELLIntegration()
