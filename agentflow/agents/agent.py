@@ -641,14 +641,15 @@ class Agent:
         # Create message from input data.
         data = input_data.get("data", "")
         if isinstance(data, np.ndarray):
-            # Convert numpy array to list representation with each row
-            # on a new line.
-            data_str = "\n".join(str(row.tolist()) for row in data)
+            # Structured payloads keep the raw array so downstream
+            # consumers (and analysis pipelines) receive the actual
+            # matrix rather than a lossy stringification.
+            message_content: Any = {"data": data}
         else:
-            data_str = str(data)
+            message_content = str(data)
 
         message = Message(
-            content=data_str,
+            content=message_content,
             role=MessageRole.USER,
             type=MessageType.RESULT,
             metadata=input_data.get("metadata", {}),

@@ -111,8 +111,14 @@ class Message:
     content: Any = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     type: Optional[MessageType] = MessageType.TEXT
+    # ``text`` is accepted as an alias for ``content`` (some call sites
+    # build error messages with ``Message(..., text=...)``); when it is
+    # set and ``content`` is missing it is folded into ``content``.
+    text: Optional[str] = None
 
     def __post_init__(self) -> None:
+        if self.text is not None and self.content is None:
+            self.content = self.text
         # Coerce plain-string roles to MessageRole when possible so that
         # ``Message(role="user")`` and ``Message(role=MessageRole.USER)``
         # behave identically.

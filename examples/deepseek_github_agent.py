@@ -1,410 +1,286 @@
 """
 DeepSeek GitHub Agent implementation.
-This agent specializes in GitHub repository management and code operations.
+This agent specializes in GitHub repository management and code operations:
+it wires a DeepSeek provider (requirement analysis, test design, code
+generation, code review) together with a GitHandler for repository
+operations.
 """
 
-import json
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional
-from dataclasses import dataclass, field
-from enum import Enum, auto
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 from agentflow.core.memory import WorkingMemory
-from agentflow.core.instructions import (
-    BaseInstruction,
-    InstructionResult,
-    Pipeline
-)
-from agentflow.core.instructions.minimal import (
-    MINIMAL_INSTRUCTION_SET,
-    MinimalInstructionType
-)
-from agentflow.core.isa.types import InstructionStatus
-from agentflow.core.git_operations import GitConfig, GitOperationsHandler
 from agentflow.providers.deepseek import DeepSeekProvider, DeepSeekConfig
-from examples.deepseek_instructions import (
-    INSTRUCTION_REGISTRY,
-    DeepSeekInstructionType,
-    BaseDeepSeekInstruction,
-    RequirementAnalysisInstruction,
-    CodeAnalysisInstruction,
-    TestDesignInstruction,
-    CodeGenerationInstruction,
-    CodeReviewInstruction,
-    GitOperationsInstruction
-)
+from examples import git_handler as git_handler_module
+from examples.git_handler import GitConfig
 
 logger = logging.getLogger(__name__)
 
-class AgentState(Enum):
-    """Agent execution states."""
-    INITIALIZED = auto()
-    THINKING = auto()
-    PLANNING = auto()
-    EXECUTING = auto()
-    REVIEWING = auto()
-    COMPLETED = auto()
-    FAILED = auto()
-
-@dataclass
-class AgentMetrics:
-    """Metrics for agent operations."""
-    tokens_used: int = 0
-    latency: float = 0.0
-    success_rate: float = 0.0
-    error_count: int = 0
-    total_operations: int = 0
-    total_successes: int = 0
-    thinking_time: float = 0.0
-    execution_time: float = 0.0
-    git_metrics: Dict[str, Any] = field(default_factory=dict)
-
-@dataclass
-class AgentContext:
-    """Context for agent execution."""
-    state: AgentState = AgentState.INITIALIZED
-    current_task: Optional[Dict[str, Any]] = None
-    thinking_process: List[Dict[str, Any]] = field(default_factory=list)
-    execution_history: List[Dict[str, Any]] = field(default_factory=list)
-    metrics: AgentMetrics = field(default_factory=AgentMetrics)
-    workspace: Path = field(default_factory=lambda: Path("./workspace"))
-
-@dataclass
-class DeepSeekGitHubAgentConfig:
-    """Configuration for DeepSeek GitHub agent."""
-    repository_url: str
-    working_dir: str = field(default="./workspace")
-    model: str = field(default="deepseek-coder-33b-instruct")
-    temperature: float = field(default=0.7)
-    max_tokens: int = field(default=4096)
-    git_config: Optional[GitConfig] = None
-    username: str = field(default="deepseek-agent")
-    email: str = field(default="deepseek-agent@noreply.github.com")
-    agent_id: str = field(default="deepseek-github-agent")
-    agent_name: str = field(default="DeepSeek GitHub Agent")
 
 class DeepSeekGitHubAgent:
+    """An AI agent powered by DeepSeek for GitHub repository operations.
+
+    The agent combines two collaborators:
+
+    * a ``DeepSeekProvider``-compatible LLM provider for the development
+      workflow (analysis, test design, implementation, review), and
+    * a ``GitHandler`` for repository operations (init, commit, branch,
+      push, pull requests).
+
+    Args:
+        provider: LLM provider used for the development workflow. Defaults
+            to a ``DeepSeekProvider`` with the default configuration.
+        memory: ``WorkingMemory``-compatible store used to share the git
+            handler across agent operations. Defaults to a new
+            ``WorkingMemory``.
+        workspace: Path to the working directory for git operations.
+        github_config: Git configuration, either a ``GitConfig`` instance
+            or a plain dictionary of ``GitConfig`` fields.
     """
-    An AI agent powered by DeepSeek model for GitHub operations.
-    Implements TDD workflow and Git operations management.
-    """
-    
-    def __init__(self, config: DeepSeekGitHubAgentConfig):
-        """Initialize GitHub agent.
-        
-        Args:
-            config: Agent configuration
-        """
-        self.config = config
-        self.context = AgentContext()
-        self.context.workspace = Path(config.working_dir)
-        self.memory = WorkingMemory()
-        self.provider = None
-        self.pipeline = Pipeline(instructions=[])
-        self.git_handler = None
-        
-    def _register_instructions(self) -> None:
-        """Register available instructions."""
-        self.pipeline.instructions = [
-            RequirementAnalysisInstruction(),
-            CodeAnalysisInstruction(),
-            TestDesignInstruction(),
-            CodeGenerationInstruction(),
-            CodeReviewInstruction(),
-            GitOperationsInstruction()
-        ]
-    
-    async def think(self, thought: str) -> None:
-        """Record a thinking process.
-        
-        Args:
-            thought: Thought content
-        """
-        self.context.thinking_process.append({
-            "timestamp": asyncio.get_event_loop().time(),
-            "content": thought
-        })
-        
-    async def analyze_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze a task and create execution plan.
-        
-        Args:
-            task: Task specification
-            
-        Returns:
-            Analysis results
-        """
-        await self.think(f"Analyzing task: {task.get('description', '')}")
-        
-        try:
-            result = await self.pipeline.execute_instruction(
-                "requirement_analysis",
-                {
-                    "task": task,
-                    "context": self.context.__dict__
-                }
+
+    def __init__(
+        self,
+        provider: Optional[DeepSeekProvider] = None,
+        memory: Optional[WorkingMemory] = None,
+        workspace: Union[str, Path] = "./workspace",
+        github_config: Optional[Union[GitConfig, Dict[str, Any]]] = None,
+    ):
+        """Initialize the GitHub agent with its collaborators."""
+        self.provider = provider if provider is not None else DeepSeekProvider()
+        self.memory = memory if memory is not None else WorkingMemory()
+        self.workspace = Path(workspace)
+
+        if github_config is None:
+            github_config = GitConfig(
+                username="deepseek-agent",
+                email="deepseek-agent@noreply.github.com",
             )
-            
-            if isinstance(result, InstructionResult):
-                self._update_metrics(result.metrics)
-                return result.data
-            return result
-            
-        except Exception as e:
-            self.context.metrics.error_count += 1
-            return {
-                "status": "error",
-                "message": str(e)
-            }
-    
-    async def plan_implementation(self, analysis: Dict[str, Any]) -> List[BaseDeepSeekInstruction]:
-        """Plan implementation based on analysis.
-        
-        Args:
-            analysis: Task analysis
-            
-        Returns:
-            List of instructions to execute
-        """
-        await self.think("Planning implementation steps")
-        
-        # Create instruction sequence based on analysis
-        instructions = []
-        
-        if analysis.get("requires_tests", True):
-            instructions.append(TestDesignInstruction())
-            
-        if analysis.get("requires_code", True):
-            instructions.append(CodeGenerationInstruction())
-            
-        if analysis.get("requires_review", True):
-            instructions.append(CodeReviewInstruction())
-            
-        if analysis.get("requires_git", True):
-            instructions.append(GitOperationsInstruction())
-            
-        return instructions
-    
-    async def execute_instructions(self, instructions: List[BaseDeepSeekInstruction]) -> Dict[str, Any]:
-        """Execute a sequence of instructions.
-        
-        Args:
-            instructions: Instructions to execute
-            
-        Returns:
-            Execution results
-        """
-        results = {}
-        
-        for instruction in instructions:
-            await self.think(f"Executing instruction: {instruction.name}")
-            
-            try:
-                result = await instruction.execute({
-                    "context": self.context.__dict__,
-                    "previous_results": results
-                })
-                
-                if isinstance(result, InstructionResult):
-                    self._update_metrics(result.metrics)
-                    results[instruction.name] = result.data
-                else:
-                    results[instruction.name] = result
-                    
-            except Exception as e:
-                self.context.metrics.error_count += 1
-                results[instruction.name] = {
-                    "status": "error",
-                    "message": str(e)
-                }
-                
-        return results
-    
-    async def review_results(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        """Review execution results.
-        
-        Args:
-            results: Execution results
-            
-        Returns:
-            Review summary
-        """
-        await self.think("Reviewing execution results")
-        
-        try:
-            result = await self.pipeline.execute_instruction(
-                "code_review",
-                {
-                    "results": results,
-                    "context": self.context.__dict__
-                }
-            )
-            
-            if isinstance(result, InstructionResult):
-                self._update_metrics(result.metrics)
-                return result.data
-            return result
-            
-        except Exception as e:
-            self.context.metrics.error_count += 1
-            return {
-                "status": "error",
-                "message": str(e)
-            }
-    
-    async def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute a complete task.
-        
-        Args:
-            task: Task specification
-            
-        Returns:
-            Task execution results
-        """
-        self.context.current_task = task
-        self.context.state = AgentState.EXECUTING
-        
-        start_time = asyncio.get_event_loop().time()
-        
-        try:
-            # Analyze task
-            analysis = await self.analyze_task(task)
-            if "error" in analysis:
-                return analysis
-                
-            # Plan implementation
-            instructions = await self.plan_implementation(analysis)
-            
-            # Execute instructions
-            results = await self.execute_instructions(instructions)
-            
-            # Review results
-            review = await self.review_results(results)
-            
-            # Update execution history
-            self.context.execution_history.append({
-                "task": task,
-                "analysis": analysis,
-                "results": results,
-                "review": review,
-                "timestamp": asyncio.get_event_loop().time()
-            })
-            
-            self.context.state = AgentState.COMPLETED
-            return {
-                "status": "success",
-                "analysis": analysis,
-                "results": results,
-                "review": review
-            }
-            
-        except Exception as e:
-            self.context.state = AgentState.FAILED
-            self.context.metrics.error_count += 1
-            return {
-                "status": "error",
-                "message": str(e)
-            }
-            
-        finally:
-            end_time = asyncio.get_event_loop().time()
-            self.context.metrics.execution_time += (end_time - start_time)
-    
+        if isinstance(github_config, GitConfig):
+            git_config = github_config
+        else:
+            git_config = git_handler_module.GitConfig(**github_config)
+
+        # Reference GitHandler through the module so that
+        # ``patch("examples.git_handler.GitHandler")`` takes effect.
+        self.git_handler = git_handler_module.GitHandler(
+            config=git_config,
+            workspace=str(self.workspace),
+        )
+        self._initialized = False
+
+    # ------------------------------------------------------------------
+    # Lifecycle
+    # ------------------------------------------------------------------
     async def initialize(self) -> None:
-        """Initialize agent resources."""
-        try:
-            # Create workspace
-            self.context.workspace.mkdir(parents=True, exist_ok=True)
-            
-            # Initialize provider
-            self.provider = DeepSeekProvider(
-                config=DeepSeekConfig(
-                    model_name=self.config.model,
-                    temperature=self.config.temperature,
-                    max_tokens=self.config.max_tokens
-                )
-            )
-            
-            # Initialize Git handler
-            if self.config.git_config:
-                self.git_handler = GitOperationsHandler(self.config.git_config)
-                await self.memory.store("git_handler", self.git_handler)
-            
-            # Register instructions
-            self._register_instructions()
-            
-            self.context.state = AgentState.INITIALIZED
-            
-        except Exception as e:
-            self.context.state = AgentState.FAILED
-            raise RuntimeError(f"Failed to initialize agent: {str(e)}")
-    
+        """Initialize the agent.
+
+        Creates the workspace, initializes the git repository, and
+        registers the git handler in working memory.
+        """
+        self.workspace.mkdir(parents=True, exist_ok=True)
+        self.git_handler.init_repository()
+        await self.memory.store("git_handler", self.git_handler)
+        self._initialized = True
+
     async def cleanup(self) -> None:
         """Cleanup agent resources."""
-        if self.provider:
+        if self.provider is not None and hasattr(self.provider, "close"):
             await self.provider.close()
         await self.memory.clear()
-        await self.pipeline.cleanup()
-        
-    def _update_metrics(self, metrics: Dict[str, Any]) -> None:
-        """Update agent metrics.
-        
-        Args:
-            metrics: New metrics to update
+        self._initialized = False
+
+    # ------------------------------------------------------------------
+    # Development workflow (provider-backed)
+    # ------------------------------------------------------------------
+    async def analyze_repository(self) -> Dict[str, Any]:
+        """Analyze the current repository to derive requirements.
+
+        Returns:
+            Analysis results from the provider.
         """
-        self.context.metrics.latency += metrics.get("latency", 0.0)
-        self.context.metrics.tokens_used += metrics.get("tokens", 0)
-        self.context.metrics.total_operations += 1
-        self.context.metrics.total_successes += metrics.get("success", 1.0)
-        self.context.metrics.success_rate = (
-            self.context.metrics.total_successes / self.context.metrics.total_operations
-            if self.context.metrics.total_operations > 0
-            else 0.0
+        requirements = (
+            "Analyze the current repository state and identify "
+            "improvement opportunities"
         )
-        
-        # Update Git metrics if available
-        if git_metrics := metrics.get("git", {}):
-            self.context.metrics.git_metrics.update(git_metrics)
+        analysis = await self.provider.analyze_requirements(requirements)
+        return analysis if isinstance(analysis, dict) else {"analysis": analysis}
+
+    async def analyze_requirements(self, requirements: str) -> Dict[str, Any]:
+        """Analyze the given requirements.
+
+        Args:
+            requirements: Requirements text to analyze.
+
+        Returns:
+            Analysis results from the provider.
+        """
+        analysis = await self.provider.analyze_requirements(requirements)
+        return analysis if isinstance(analysis, dict) else {"analysis": analysis}
+
+    async def design_tests(self, analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Design test cases for the given analysis.
+
+        Args:
+            analysis: Requirement analysis produced by
+                ``analyze_requirements``.
+
+        Returns:
+            List of designed test cases.
+        """
+        test_cases = await self.provider.design_tests(analysis)
+        if isinstance(test_cases, list):
+            return test_cases
+        return [test_cases] if test_cases else []
+
+    async def implement_code(
+        self,
+        test_specs: List[Dict[str, Any]],
+        language: str = "python",
+    ) -> str:
+        """Implement code that satisfies the given test specifications.
+
+        Args:
+            test_specs: Test specifications from ``design_tests``.
+            language: Target programming language.
+
+        Returns:
+            Generated code as a string.
+        """
+        code = await self.provider.generate_code(str(test_specs), language=language)
+        return code if isinstance(code, str) else str(code)
+
+    async def review_code(self, code: str) -> Dict[str, Any]:
+        """Review the given code.
+
+        Args:
+            code: Code to review.
+
+        Returns:
+            Review results from the provider.
+        """
+        review = await self.provider.review_code(code)
+        return review if isinstance(review, dict) else {"review": review}
+
+    async def run_workflow(self, requirements: str, language: str = "python") -> Dict[str, Any]:
+        """Run the full TDD workflow: analyze, design, implement, review.
+
+        Args:
+            requirements: Requirements text to analyze.
+            language: Target programming language.
+
+        Returns:
+            Dictionary with analysis, test cases, implementation and review.
+        """
+        analysis = await self.analyze_requirements(requirements)
+        test_cases = await self.design_tests(analysis)
+        code = await self.implement_code(test_cases, language=language)
+        review = await self.review_code(code)
+        return {
+            "analysis": analysis,
+            "test_cases": test_cases,
+            "code": code,
+            "review": review,
+        }
+
+    # ------------------------------------------------------------------
+    # Git operations (handler-backed)
+    # ------------------------------------------------------------------
+    async def commit_changes(
+        self,
+        files: List[str],
+        message: str,
+        scope: Optional[str] = None,
+    ) -> str:
+        """Commit changes to the repository.
+
+        Args:
+            files: Files to commit.
+            message: Commit message.
+            scope: Optional conventional-commit scope.
+
+        Returns:
+            The commit hash.
+        """
+        handler = await self._get_git_handler()
+        return handler.create_commit(message=message, files=files, scope=scope)
+
+    def get_repository_status(self) -> Dict[str, Any]:
+        """Get the current repository status.
+
+        Returns:
+            Dictionary describing staged, unstaged and untracked files.
+        """
+        status = self.git_handler.get_status()
+        return status if isinstance(status, dict) else {"status": status}
+
+    def switch_branch(self, branch: str, create: bool = False) -> None:
+        """Switch to a repository branch.
+
+        Args:
+            branch: Branch name to switch to.
+            create: Whether to create the branch if it does not exist.
+        """
+        self.git_handler.switch_branch(branch, create)
+
+    def push_changes(self) -> None:
+        """Push committed changes to the remote repository."""
+        self.git_handler.push_changes()
+
+    def create_pull_request(self, title: str, body: str) -> None:
+        """Create a pull request.
+
+        Args:
+            title: Pull request title.
+            body: Pull request description.
+        """
+        self.git_handler.create_pull_request(title, body)
+
+    async def _get_git_handler(self):
+        """Resolve the git handler from memory, falling back to the local one."""
+        handler = await self.memory.retrieve("git_handler")
+        return handler if handler is not None else self.git_handler
+
+    # ------------------------------------------------------------------
+    # Observability
+    # ------------------------------------------------------------------
+    def get_metrics(self) -> Dict[str, Any]:
+        """Return the underlying provider's usage metrics when available."""
+        metrics = getattr(self.provider, "_metrics", None)
+        return dict(metrics) if isinstance(metrics, dict) else {}
+
 
 async def main():
-    """Main entry point."""
-    # Create configuration
-    config = DeepSeekGitHubAgentConfig(
-        repository_url="https://github.com/example/repo",
-        working_dir="./workspace",
-        git_config=GitConfig(
-            username="deepseek-agent",
-            email="deepseek-agent@noreply.github.com",
-            default_branch="main"
-        )
+    """Main entry point demonstrating the DeepSeek GitHub agent."""
+    agent = DeepSeekGitHubAgent(
+        provider=DeepSeekProvider(
+            config=DeepSeekConfig(model_name="deepseek-chat")
+        ),
+        memory=WorkingMemory(),
+        workspace="./workspace",
+        github_config={
+            "username": "deepseek-agent",
+            "email": "deepseek-agent@noreply.github.com",
+            "repository_url": "https://github.com/example/repo.git",
+            "default_branch": "main",
+        },
     )
-    
-    # Create agent
-    agent = DeepSeekGitHubAgent(config)
-    
+
     try:
-        # Initialize agent
         await agent.initialize()
-        
-        # Execute example task
-        task = {
-            "type": "code_generation",
-            "description": "Implement a simple calculator function",
-            "requirements": [
-                "Support basic arithmetic operations",
-                "Handle division by zero",
-                "Return results with proper type"
-            ]
-        }
-        
-        result = await agent.execute_task(task)
-        print(f"\nTask execution result: {json.dumps(result, indent=2)}")
-        
+
+        result = await agent.run_workflow(
+            "Implement a simple calculator function with division-by-zero handling"
+        )
+        print(f"Workflow result: {result}")
+
+        status = agent.get_repository_status()
+        print(f"Repository status: {status}")
+
     finally:
-        # Cleanup
         await agent.cleanup()
 
+
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())

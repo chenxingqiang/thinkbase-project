@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 from agentflow.core.instructions import (
     InstructionSpec,
-    InstructionType,
+    InstructionCategory,
     Pipeline
 )
 from agentflow.core.memory import WorkingMemory
@@ -107,28 +107,28 @@ class DeepSeekAgent:
         # Create instruction specifications
         specs = [
             InstructionSpec(
-                type=InstructionType.REQUIREMENT_ANALYSIS,
+                category=InstructionCategory.REQUIREMENT_ANALYSIS,
                 name="analyze_requirements",
                 description="Analyze code generation requirements",
                 inputs={"requirements": str},
                 outputs={"analysis": Dict[str, Any]}
             ),
             InstructionSpec(
-                type=InstructionType.TEST_DESIGN,
+                category=InstructionCategory.TEST_DESIGN,
                 name="design_tests",
                 description="Design test cases based on analysis",
                 inputs={"analysis": Dict[str, Any]},
                 outputs={"test_cases": List[Dict[str, Any]]}
             ),
             InstructionSpec(
-                type=InstructionType.CODE_GENERATION,
+                category=InstructionCategory.CODE_GENERATION,
                 name="implement_code",
                 description="Implement code based on test cases",
                 inputs={"test_specs": List[Dict[str, Any]]},
                 outputs={"code": str}
             ),
             InstructionSpec(
-                type=InstructionType.CODE_REVIEW,
+                category=InstructionCategory.CODE_REVIEW,
                 name="review_code",
                 description="Review and improve implemented code",
                 inputs={"code": str},
@@ -138,16 +138,16 @@ class DeepSeekAgent:
         
         # Add instructions to pipeline using registry
         for spec in specs:
-            if spec.type == InstructionType.REQUIREMENT_ANALYSIS:
+            if spec.category == InstructionCategory.REQUIREMENT_ANALYSIS:
                 instruction = RequirementAnalysisInstruction()
-            elif spec.type == InstructionType.TEST_DESIGN:
+            elif spec.category == InstructionCategory.TEST_DESIGN:
                 instruction = TestDesignInstruction()
-            elif spec.type == InstructionType.CODE_GENERATION:
+            elif spec.category == InstructionCategory.CODE_GENERATION:
                 instruction = CodeGenerationInstruction()
-            elif spec.type == InstructionType.CODE_REVIEW:
+            elif spec.category == InstructionCategory.CODE_REVIEW:
                 instruction = CodeReviewInstruction()
             else:
-                raise ValueError(f"No instruction registered for type: {spec.type}")
+                raise ValueError(f"No instruction registered for category: {spec.category}")
             
             await self.pipeline.add_instruction(instruction)
     

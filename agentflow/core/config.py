@@ -6,6 +6,7 @@ import asyncio
 import numpy as np
 from pydantic import BaseModel, Field, field_validator, ValidationError, ConfigDict, model_validator, PrivateAttr
 import os
+from pathlib import Path
 import yaml
 import copy
 import time
@@ -24,7 +25,10 @@ from .retry_policy import RetryPolicy
 from .exceptions import ConfigurationError as BaseConfigurationError, WorkflowExecutionError
 from .base_types import AgentType, AgentMode, AgentStatus, DictKeyType, MessageType
 from .workflow_types import WorkflowConfig, WorkflowStepType
-from .agent_config import AgentConfig
+# AgentConfig/ModelConfig are canonically defined in agent_config (which
+# has no config dependency); re-exported here for the historical
+# ``agentflow.core.config`` import path.
+from .agent_config import AgentConfig, ModelConfig
 
 # Re-export the ConfigurationError from exceptions
 ConfigurationError = BaseConfigurationError
@@ -825,45 +829,32 @@ class ResearchAgentConfig(BaseModel):
 
     @classmethod
     def from_yaml(cls, config_path: str, config_name: str, environment: str = 'default') -> 'ResearchAgentConfig':
-        """Load configuration from YAML using Hydra's configuration management."""
+        """Load configuration from ``<config_path>/<config_name>.yaml``.
+
+        The file is loaded directly from the caller-provided directory:
+        Hydra's ``initialize`` resolves ``config_path`` relative to the
+        calling module, which for a packaged module like this one silently
+        points at ``agentflow/core/config/agents`` instead of the requested
+        directory.  A direct load keeps the resolution predictable.
+        """
         try:
-            # Use Hydra's composition to merge configurations
-            with hydra.initialize(version_base=None, config_path=os.path.relpath(config_path)):
-                try:
-                    # Compose configuration across environments
-                    cfg = hydra.compose(
-                        config_name=config_name,
-                        overrides=[f'+group={environment}']
-                    )
-                except Exception as compose_error:
-                    raise ConfigurationError(f"Failed to compose configuration: {compose_error}")
-
-                # Convert to dictionary and validate
-                try:
-                    config_dict = OmegaConf.to_container(cfg, resolve=True)
-                    if not isinstance(config_dict, dict):
-                        config_dict = {}
-                except Exception as convert_error:
-                    raise ConfigurationError(f"Failed to convert configuration: {convert_error}")
-
-                # Convert all keys to strings to ensure proper type handling
-                str_config = {str(k): v for k, v in config_dict.items()}
-
-                # Validate configuration structure
-                try:
-                    # Create instance with validated dictionary
-                    instance = cls(**str_config)
-                except Exception as validation_error:
-                    raise ConfigurationError(f"Configuration validation failed: {validation_error}")
-
-                # Mask sensitive data for logging
-                masked_config = ConfigSecurityManager.mask_sensitive_fields(str_config)
-                logging.info(f"Loaded configuration: {masked_config}")
-
-                return instance
-
+            config_dir = Path(config_path)
+            config_file = config_dir / f"{config_name}.yaml"
+            if not config_file.is_file():
+                raise ConfigurationError(
+                    f"Configuration file {config_file} does not exist."
+                )
+            with open(config_file, "r", encoding="utf-8") as fh:
+                config_dict = yaml.safe_load(fh)
+            if not isinstance(config_dict, dict):
+                raise ConfigurationError(
+                    f"Configuration file {config_file} is not a mapping."
+                )
+            instance = cls(**{str(k): v for k, v in config_dict.items()})
+            return instance
+        except ConfigurationError:
+            raise
         except Exception as e:
-            # Log the error and raise a ConfigurationError
             logging.error(f"Configuration loading error: {e}")
             raise ConfigurationError(f"Failed to load configuration: {e}")
 
@@ -962,56 +953,4 @@ class DistributedConfig(BaseModel):
         extra = "allow"
         arbitrary_types_allowed = True
 
-class ModelConfig(BaseModel):
-    """Model configuration."""
-    provider: str = Field(default="openai")
-    name: str = Field(default="gpt-4")
-    temperature: float = Field(default=0.7)
-    max_tokens: int = Field(default=4096)
-    top_p: float = Field(default=1.0)
-    frequency_penalty: float = Field(default=0.0)
-    presence_penalty: float = Field(default=0.0)
-    stop: Optional[Union[str, List[str]]] = Field(default=None)
-    
-    def get(self, key: str, default: Any = None) -> Any:
-        """Get a configuration value.
-        
-        Args:
-            key: Configuration key
-            default: Default value if key not found
-            
-        Returns:
-            Configuration value
-        """
-        try:
-            return getattr(self, key)
-        except AttributeError:
-            return default
-            
-    def __getitem__(self, key: str) -> Any:
-        """Get a configuration value.
-        
-        Args:
-            key: Configuration key
-            
-        Returns:
-            Configuration value
-            
-        Raises:
-            KeyError: If key not found
-        """
-        try:
-            return getattr(self, key)
-        except AttributeError:
-            raise KeyError(key)
-            
-    def __contains__(self, key: str) -> bool:
-        """Check if key exists.
-        
-        Args:
-            key: Configuration key
-            
-        Returns:
-            bool: True if key exists
-        """
-        return hasattr(self, key)
+# ModelConfig is re-exported from agent_config at the top of this module.

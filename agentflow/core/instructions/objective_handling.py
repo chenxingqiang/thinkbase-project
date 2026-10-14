@@ -38,16 +38,39 @@ class ObjectiveConfig:
 class ObjectiveDecompositionInstruction(BaseInstruction):
     """Instruction for decomposing objectives into sub-tasks."""
     
-    def __init__(self, name: str, config: ObjectiveConfig):
+    def __init__(self,
+                 name: str,
+                 objective_config: ObjectiveConfig,
+                 metadata: Optional[InstructionMetadata] = None):
         """Initialize objective decomposition instruction.
         
         Args:
             name: Instruction name
-            config: Objective configuration
+            objective_config: Objective configuration
+            metadata: Optional instruction metadata
         """
-        super().__init__(name)
-        self.config = config
+        super().__init__(
+            name=name,
+            instruction_type=InstructionType.OBJECTIVE_HANDLING,
+            metadata=metadata,
+            description="Decompose objectives into sub-tasks"
+        )
+        self.objective_config = objective_config
+        # Backward-compatible alias
+        self.config = objective_config
         self.objectives: Dict[str, Dict[str, Any]] = {}
+        self.metrics = ObjectiveMetrics()
+    
+    @staticmethod
+    def _validate_objective(objective: Any) -> Optional[str]:
+        """Validate an objective, returning an error message if invalid."""
+        if not isinstance(objective, dict) or not objective:
+            return "Objective must be a non-empty dictionary"
+        if not objective.get("id"):
+            return "Objective is missing required field: id"
+        if not objective.get("type"):
+            return "Objective is missing required field: type"
+        return None
     
     async def execute(self, context: ExecutionContext) -> ExecutionResult:
         """Execute objective decomposition.
@@ -62,11 +85,12 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         try:
             # Extract objective
             objective = context.params.get("objective")
-            if not objective:
+            error = self._validate_objective(objective)
+            if error:
                 return ExecutionResult(
                     success=False,
-                    output={"error": "No objective provided"},
-                    errors=[{"error": "No objective provided"}]
+                    output={"error": error},
+                    errors=[{"error": error}]
                 )
             
             # Decompose objective
@@ -78,11 +102,11 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
             return ExecutionResult(
                 success=True,
                 output={
-                    "decomposition": decomposition,
+                    **decomposition,
                     "metrics": {
                         "objectives_count": objectives_count,
-                        "max_depth": self.config.max_depth,
-                        "max_children": self.config.max_children
+                        "max_depth": self.objective_config.max_depth,
+                        "max_children": self.objective_config.max_children
                     }
                 }
             )
@@ -105,10 +129,21 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         """
         # Check if objective should be decomposed
         if not self._should_decompose(objective):
-            return objective
+            return {
+                "id": objective.get("id"),
+                "type": objective.get("type"),
+                "description": objective.get("description"),
+                "requirements": objective.get("requirements", {}),
+                "sub_objectives": [],
+                "dependencies": [],
+                "depth": objective.get("depth", 0)
+            }
         
         # Create sub-objectives
         sub_objectives = self._create_sub_objectives(objective)
+        
+        # Track created objectives in metrics
+        self.metrics.objectives_created += len(sub_objectives)
         
         # Extract dependencies
         dependencies = self._extract_dependencies(sub_objectives)
@@ -117,6 +152,7 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
             "id": objective.get("id"),
             "type": objective.get("type"),
             "description": objective.get("description"),
+            "requirements": objective.get("requirements", {}),
             "sub_objectives": sub_objectives,
             "dependencies": dependencies,
             "depth": objective.get("depth", 0)
@@ -126,7 +162,7 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         """Check if objective should be decomposed."""
         # Check depth limit
         depth = objective.get("depth", 0)
-        if depth >= self.config.max_depth:
+        if depth >= self.objective_config.max_depth:
             return False
         
         # Check complexity
@@ -166,7 +202,7 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
             }
             components.append(component)
             
-        return components[:self.config.max_children]
+        return components[:self.objective_config.max_children]
     
     def _calculate_complexity(self, objective: Dict[str, Any]) -> float:
         """Calculate complexity of objective."""
@@ -232,11 +268,19 @@ class ObjectiveValidationInstruction(BaseInstruction):
             objective = context.params.get("objective")
             completion_data = context.params.get("completion_data")
             
-            if not objective or not completion_data:
+            obj_error = ObjectiveDecompositionInstruction._validate_objective(objective)
+            if obj_error:
                 return ExecutionResult(
                     success=False,
-                    output=None,
-                    errors=[{"error": "Missing objective or completion data"}]
+                    output={"error": obj_error},
+                    errors=[{"error": obj_error}]
+                )
+            
+            if not completion_data:
+                return ExecutionResult(
+                    success=False,
+                    output={"error": "Missing completion data"},
+                    errors=[{"error": "Missing completion data"}]
                 )
             
             # Validate completion
@@ -257,8 +301,10 @@ class ObjectiveValidationInstruction(BaseInstruction):
                 (self.metrics.objectives_completed + self.metrics.objectives_failed)
             )
             
+            # The execution itself succeeded; the validation outcome is
+            # reported through output["success"]
             return ExecutionResult(
-                success=validation_result.get("success", False),
+                success=True,
                 output=validation_result,
                 state_updates={"validation_result": validation_result},
                 metrics=self.metrics.__dict__
@@ -284,8 +330,9 @@ class ObjectiveValidationInstruction(BaseInstruction):
         rules = self._get_applicable_rules(objective)
         
         # Apply each rule
-        for rule in rules:
+        for rule_id, rule in rules:
             result = await self._apply_validation_rule(
+                rule_id,
                 rule,
                 objective,
                 completion_data,
@@ -304,13 +351,13 @@ class ObjectiveValidationInstruction(BaseInstruction):
         }
     
     def _get_applicable_rules(self,
-                            objective: Dict[str, Any]) -> List[Dict[str, Any]]:
+                            objective: Dict[str, Any]) -> List[Tuple[str, Dict[str, Any]]]:
         """Get validation rules applicable to objective."""
         applicable_rules = []
         
         for rule_id, rule in self.validation_rules.items():
             if self._is_rule_applicable(rule, objective):
-                applicable_rules.append(rule)
+                applicable_rules.append((rule_id, rule))
         
         return applicable_rules
     
@@ -331,6 +378,7 @@ class ObjectiveValidationInstruction(BaseInstruction):
         return True
     
     async def _apply_validation_rule(self,
+                                   rule_id: str,
                                    rule: Dict[str, Any],
                                    objective: Dict[str, Any],
                                    completion_data: Dict[str, Any],
@@ -352,7 +400,7 @@ class ObjectiveValidationInstruction(BaseInstruction):
             result = validation_func(required_data)
             
             return {
-                "rule_id": rule.get("id"),
+                "rule_id": rule_id or rule.get("id"),
                 "success": result.get("success", False),
                 "details": result.get("details", {}),
                 "timestamp": context.metadata.get("timestamp")
@@ -361,7 +409,7 @@ class ObjectiveValidationInstruction(BaseInstruction):
         except Exception as e:
             logger.error(f"Rule application failed: {str(e)}")
             return {
-                "rule_id": rule.get("id"),
+                "rule_id": rule_id or rule.get("id"),
                 "success": False,
                 "details": {"error": str(e)},
                 "timestamp": context.metadata.get("timestamp")
@@ -371,16 +419,24 @@ class ObjectiveValidationInstruction(BaseInstruction):
                              rule: Dict[str, Any],
                              objective: Dict[str, Any],
                              completion_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract data required for validation."""
+        """Extract data required for validation.
+
+        Required fields are exposed under their plain names so validation
+        functions can read e.g. ``data["progress"]`` directly; prefixed
+        aliases (``objective_*`` / ``completion_*``) are kept for backwards
+        compatibility.
+        """
         required_data = {}
         
         # Extract from objective
-        for field in rule.get("required_objective_fields", []):
-            required_data[f"objective_{field}"] = objective.get(field)
+        for field_name in rule.get("required_objective_fields", []):
+            required_data[field_name] = objective.get(field_name)
+            required_data[f"objective_{field_name}"] = objective.get(field_name)
         
         # Extract from completion data
-        for field in rule.get("required_completion_fields", []):
-            required_data[f"completion_{field}"] = completion_data.get(field)
+        for field_name in rule.get("required_completion_fields", []):
+            required_data[field_name] = completion_data.get(field_name)
+            required_data[f"completion_{field_name}"] = completion_data.get(field_name)
         
         return required_data
 
@@ -408,11 +464,19 @@ class ObjectiveProgressTrackingInstruction(BaseInstruction):
             objective = context.params.get("objective")
             progress_update = context.params.get("progress_update")
             
-            if not objective or not progress_update:
+            obj_error = ObjectiveDecompositionInstruction._validate_objective(objective)
+            if obj_error:
                 return ExecutionResult(
                     success=False,
-                    output=None,
-                    errors=[{"error": "Missing objective or progress update"}]
+                    output={"error": obj_error},
+                    errors=[{"error": obj_error}]
+                )
+            
+            if not progress_update:
+                return ExecutionResult(
+                    success=False,
+                    output={"error": "Missing progress update"},
+                    errors=[{"error": "Missing progress update"}]
                 )
             
             # Update progress

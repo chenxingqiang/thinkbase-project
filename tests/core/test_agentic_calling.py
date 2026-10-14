@@ -82,8 +82,8 @@ async def agent(agent_config):
 @pytest.mark.asyncio
 async def test_workflow_execution_basic(workflow_engine, agent):
     """Test basic workflow execution."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     workflow_id = await engine.register_workflow(agent_instance)
     input_data = {"message": "Test input", "data": "Test data content"}
@@ -97,15 +97,15 @@ async def test_workflow_execution_basic(workflow_engine, agent):
 @pytest.mark.asyncio
 async def test_empty_workflow(workflow_engine):
     """Test execution of empty workflow."""
-    engine = await anext(workflow_engine)
+    engine = workflow_engine
     with pytest.raises(WorkflowExecutionError):
         await engine.execute_workflow("nonexistent", {})
 
 @pytest.mark.asyncio
 async def test_workflow_error_handling(workflow_engine, agent):
     """Test error handling during workflow execution."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     workflow_id = await engine.register_workflow(agent_instance)
     
@@ -116,8 +116,8 @@ async def test_workflow_error_handling(workflow_engine, agent):
 @pytest.mark.asyncio
 async def test_workflow_timeout(workflow_engine, agent):
     """Test workflow timeout functionality."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     # Create workflow config with short timeout
     workflow_config = WorkflowConfig(
@@ -151,7 +151,7 @@ async def test_workflow_timeout(workflow_engine, agent):
 @pytest.mark.asyncio
 async def test_parallel_workflow_execution(workflow_engine, agent_config):
     """Test parallel workflow execution."""
-    engine = await anext(workflow_engine)
+    engine = workflow_engine
     agents = []
     workflow_ids = []
     
@@ -183,8 +183,8 @@ async def test_parallel_workflow_execution(workflow_engine, agent_config):
 @pytest.mark.asyncio
 async def test_workflow_cleanup(workflow_engine, agent):
     """Test workflow cleanup."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     workflow_id = await engine.register_workflow(agent_instance)
     input_data = {"message": "Test input", "data": "Test data content"}

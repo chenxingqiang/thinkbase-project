@@ -1,12 +1,28 @@
 from enum import Enum
 
 class StepStatus(str, Enum):
-    """Step status enum."""
+    """Step status enum (superset).
+
+    ``str()`` of a member returns its value (see ``__str__`` below), so
+    ``str(StepStatus.COMPLETED) == "completed"`` holds for callers that
+    interpolate statuses into messages and serialized payloads.
+    """
+
     PENDING = "pending"
     RUNNING = "running"
+    SUCCESS = "success"
     COMPLETED = "completed"
     FAILED = "failed"
+    CANCELLED = "cancelled"
+    PAUSED = "paused"
+    ERROR = "error"
+    INITIALIZED = "initialized"
     STOPPED = "stopped"
+    WAITING = "waiting"
+    SKIPPED = "skipped"
+
+    def __str__(self) -> str:
+        return self.value
     
 class NodeType(str, Enum):
     """Node type enum."""

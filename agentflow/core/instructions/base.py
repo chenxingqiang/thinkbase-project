@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 import asyncio
 import logging
 import os
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -67,32 +68,106 @@ class ExecutionContext:
 
 @dataclass
 class ExecutionResult:
-    """Result of instruction execution."""
-    success: bool
-    output: Dict[str, Any]
+    """Result of instruction execution.
+
+    Supports two equivalent construction styles:
+
+    * Legacy style: ``ExecutionResult(success=..., output=..., errors=[...],
+      state_updates=..., metrics=...)``
+    * Instruction style: ``InstructionResult(status=..., data=..., error=...,
+      metrics=...)``
+
+    ``InstructionResult`` is an alias of this class, and both views are kept
+    in sync automatically by ``__post_init__``.
+    """
+    # Legacy view
+    success: Optional[bool] = None
+    output: Dict[str, Any] = field(default_factory=dict)
     errors: List[Dict[str, Any]] = field(default_factory=list)
     state_updates: Dict[str, Any] = field(default_factory=dict)
-    metrics: Dict[str, Any] = field(default_factory=dict)
+    metrics: Any = field(default_factory=dict)
+    # Instruction-style view
+    status: Any = None
+    data: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        """Reconcile legacy and instruction-style views of the result."""
+        # --- status <-> success ---
+        if self.status is None:
+            if self.success is True:
+                self.status = InstructionStatus.COMPLETED
+            elif self.success is False:
+                self.status = InstructionStatus.FAILED
+            else:
+                self.status = InstructionStatus.PENDING
+        elif self.success is None:
+            self.success = self.status in (
+                InstructionStatus.COMPLETED, InstructionStatus.SUCCESS
+            )
+        # --- data <-> output ---
+        if self.data is None:
+            self.data = self.output
+        elif not self.output:
+            self.output = self.data
+        # --- error <-> errors ---
+        if self.error is None and self.errors:
+            first = self.errors[0]
+            self.error = first.get("error") if isinstance(first, dict) else str(first)
+        elif self.error is not None and not self.errors:
+            self.errors = [{"error": self.error}]
 
 @dataclass
 class InstructionMetrics:
-    """Metrics for instruction execution."""
-    total_executions: int = 0
-    successful_executions: int = 0
-    failed_executions: int = 0
-    total_execution_time: float = 0.0
-    cache_hits: int = 0
-    cache_misses: int = 0
-    
+    """Metrics for a single instruction execution."""
+    start_time: float = 0.0
+    end_time: float = 0.0
+    tokens_used: int = 0
+    memory_used: int = 0
+    cache_hit: bool = False
+    optimization_applied: bool = False
+    parallel_execution: bool = False
+
     @property
-    def success_rate(self) -> float:
-        """Calculate success rate."""
-        return self.successful_executions / self.total_executions if self.total_executions > 0 else 0.0
-    
+    def execution_time(self) -> float:
+        """Calculate total execution time."""
+        if self.end_time and self.start_time:
+            return self.end_time - self.start_time
+        return 0.0
+
     @property
-    def average_execution_time(self) -> float:
-        """Calculate average execution time."""
-        return self.total_execution_time / self.total_executions if self.total_executions > 0 else 0.0
+    def duration(self) -> float:
+        """Alias for execution_time."""
+        return self.execution_time
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert metrics to a plain dictionary."""
+        return {
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "execution_time": self.execution_time,
+            "tokens_used": self.tokens_used,
+            "memory_used": self.memory_used,
+            "cache_hit": self.cache_hit,
+            "optimization_applied": self.optimization_applied,
+            "parallel_execution": self.parallel_execution,
+        }
+
+    # Mapping protocol so metrics objects can be merged with dicts
+    def keys(self):
+        return self.to_dict().keys()
+
+    def __getitem__(self, key: str) -> Any:
+        return self.to_dict()[key]
+
+    def __iter__(self):
+        return iter(self.to_dict())
+
+    def __len__(self) -> int:
+        return len(self.to_dict())
+
+    def __contains__(self, key: object) -> bool:
+        return key in self.to_dict()
 
 class BaseInstruction(ABC):
     """Base class for all instructions."""
@@ -116,6 +191,17 @@ class BaseInstruction(ABC):
         self.description = description
         self.instruction_type = instruction_type or self._get_default_type()
         self.metadata = metadata or InstructionMetadata()
+        # Execution lifecycle state
+        self.status: InstructionStatus = InstructionStatus.PENDING
+        self.metrics: Optional[InstructionMetrics] = None
+        # Pre/post execution hooks
+        self._pre_hooks: List[Any] = []
+        self._post_hooks: List[Any] = []
+        # Aggregate execution counters (reported via to_dict/update_metrics)
+        self._execution_count: int = 0
+        self._success_count: int = 0
+        self._failure_count: int = 0
+        self._total_execution_time: float = 0.0
         self._metrics = InstructionMetrics()
         self._required_params: Set[str] = set()
         self._param_types: Dict[str, Type] = {}
@@ -138,27 +224,150 @@ class BaseInstruction(ABC):
             return InstructionType.ANALYSIS
         return InstructionType.CONTROL_FLOW
     
-    @abstractmethod
-    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+    async def execute(self, context: Any) -> ExecutionResult:
         """Execute instruction.
-        
+
+        Template method that drives the execution lifecycle. Subclasses
+        normally override ``_execute_impl`` and get this machinery for free;
+        they may also override ``execute`` itself for full control.
+
+        1. Run pre-hooks (instruction status is still ``PENDING``).
+        2. Transition status to ``RUNNING`` and invoke ``_execute_impl``.
+        3. Run post-hooks (instruction status is still ``RUNNING``).
+        4. Transition status to ``COMPLETED`` (or ``FAILED`` on error).
+
         Args:
-            context: Execution context
-            
+            context: Execution context (usually a plain dict)
+
         Returns:
             ExecutionResult: Execution results
-            
-        Raises:
-            ValueError: If required parameters are missing
-            TypeError: If parameter types are invalid
         """
-        if not await self.validate_context(context):
+        return await self._run_execution_lifecycle(context)
+
+    async def _run_execution_lifecycle(self, context: Any) -> ExecutionResult:
+        """Run the full execution lifecycle with hooks and status tracking."""
+        start_time = time.time()
+        if self.metrics is None:
+            self.metrics = InstructionMetrics()
+        self.metrics.start_time = start_time
+
+        def _fail(error: str) -> ExecutionResult:
+            self.status = InstructionStatus.FAILED
+            self.metrics.end_time = time.time()
+            self._execution_count += 1
+            self._failure_count += 1
+            self._total_execution_time += self.metrics.execution_time
             return ExecutionResult(
-                success=False,
-                output={},
-                errors=[{"error": "Context validation failed"}]
+                status=InstructionStatus.FAILED,
+                data={},
+                error=error,
+                metrics=self.metrics
             )
-        return ExecutionResult(success=True, output={})
+
+        try:
+            # 1. Pre-hooks run while the status is still PENDING
+            for hook in self._pre_hooks:
+                await hook(self, context)
+        except Exception as e:
+            return _fail(str(e))
+
+        # 2. Run the implementation
+        self.status = InstructionStatus.RUNNING
+        try:
+            impl_result = await self._execute_impl(context)
+        except Exception as e:
+            return _fail(str(e))
+
+        try:
+            # 3. Post-hooks run while the status is still RUNNING
+            for hook in self._post_hooks:
+                await hook(self, context)
+        except Exception as e:
+            return _fail(str(e))
+
+        # 4. Build the final result
+        if isinstance(impl_result, ExecutionResult):
+            result = impl_result
+            if result.status is None:
+                result.status = InstructionStatus.COMPLETED
+            if result.metrics is None:
+                result.metrics = self.metrics
+        elif isinstance(impl_result, dict):
+            result = ExecutionResult(
+                status=InstructionStatus.COMPLETED,
+                data=impl_result,
+                error=None,
+                metrics=self.metrics
+            )
+        elif impl_result is None:
+            result = ExecutionResult(
+                status=InstructionStatus.COMPLETED,
+                data={},
+                error=None,
+                metrics=self.metrics
+            )
+        else:
+            result = ExecutionResult(
+                status=InstructionStatus.COMPLETED,
+                data={"output": impl_result},
+                error=None,
+                metrics=self.metrics
+            )
+
+        if result.success:
+            self.status = InstructionStatus.COMPLETED
+            self._execution_count += 1
+            self._success_count += 1
+        else:
+            self.status = InstructionStatus.FAILED
+            self._execution_count += 1
+            self._failure_count += 1
+        self.metrics.end_time = time.time()
+        self._total_execution_time += self.metrics.execution_time
+        return result
+
+    async def _execute_impl(self, context: Any) -> Any:
+        """Execute the core instruction logic.
+
+        Subclasses override this to do real work. May return a plain dict
+        (wrapped into a completed result) or a ready-made ``ExecutionResult``.
+        """
+        return {}
+
+    def add_pre_hook(self, hook: Any) -> None:
+        """Add a hook executed before ``_execute_impl``.
+
+        The hook is awaited with ``(instruction, context)`` and runs while the
+        instruction status is still ``PENDING``.
+        """
+        self._pre_hooks.append(hook)
+
+    def add_post_hook(self, hook: Any) -> None:
+        """Add a hook executed after ``_execute_impl``.
+
+        The hook is awaited with ``(instruction, context)`` and runs while the
+        instruction status is still ``RUNNING``.
+        """
+        self._post_hooks.append(hook)
+
+    def _combine_results(self, results: List[Any]) -> Dict[str, Any]:
+        """Combine sub-instruction results into a single payload."""
+        combined: Dict[str, Any] = {"results": []}
+        state_updates: Dict[str, Any] = {}
+        errors: List[Dict[str, Any]] = []
+        for r in results:
+            if isinstance(r, ExecutionResult):
+                combined["results"].append(r.data)
+                state_updates.update(r.state_updates or {})
+                if r.errors:
+                    errors.extend(r.errors)
+            else:
+                combined["results"].append(r)
+        if state_updates:
+            combined["state_updates"] = state_updates
+        if errors:
+            combined["errors"] = errors
+        return combined
     
     async def validate_context(self, context: ExecutionContext) -> bool:
         """Validate execution context.
@@ -201,18 +410,18 @@ class BaseInstruction(ABC):
             return False
     
     def update_metrics(self, success: bool, execution_time: float) -> None:
-        """Update instruction metrics.
+        """Update aggregate instruction execution metrics.
         
         Args:
             success: Whether execution was successful
             execution_time: Time taken for execution
         """
-        self._metrics.total_executions += 1
-        self._metrics.total_execution_time += execution_time
+        self._execution_count += 1
+        self._total_execution_time += execution_time
         if success:
-            self._metrics.successful_executions += 1
+            self._success_count += 1
         else:
-            self._metrics.failed_executions += 1
+            self._failure_count += 1
     
     async def cleanup(self) -> None:
         """Clean up instruction resources.
@@ -293,71 +502,95 @@ class BaseInstruction(ABC):
                 "tags": list(self.metadata.tags)
             },
             "metrics": {
-                "total_executions": self._metrics.total_executions,
-                "successful_executions": self._metrics.successful_executions,
-                "failed_executions": self._metrics.failed_executions,
-                "total_execution_time": self._metrics.total_execution_time,
-                "success_rate": self._metrics.success_rate,
-                "average_execution_time": self._metrics.average_execution_time,
-                "cache_hits": self._metrics.cache_hits,
-                "cache_misses": self._metrics.cache_misses
+                "total_executions": self._execution_count,
+                "successful_executions": self._success_count,
+                "failed_executions": self._failure_count,
+                "total_execution_time": self._total_execution_time,
+                "success_rate": (
+                    self._success_count / self._execution_count
+                    if self._execution_count > 0 else 0.0
+                ),
+                "average_execution_time": (
+                    self._total_execution_time / self._execution_count
+                    if self._execution_count > 0 else 0.0
+                ),
+                "cache_hits": 0,
+                "cache_misses": 0
             }
         }
 
 class CompositeInstruction(BaseInstruction):
     """Composite instruction that contains multiple sub-instructions."""
-    
-    def __init__(self, name: str, description: str, components: List[BaseInstruction]):
+
+    def __init__(
+        self,
+        name: str,
+        description: str = "",
+        components: Optional[List[BaseInstruction]] = None
+    ):
         """Initialize composite instruction.
-        
+
         Args:
             name: Instruction name
-            description: Instruction description
-            components: List of component instructions
+            description: Optional instruction description
+            components: Optional list of component instructions
         """
         super().__init__(name=name, description=description)
-        self.components = components
-        
+        self.instructions: List[BaseInstruction] = list(components) if components else []
+        # Legacy alias: older consumers reference ``components``
+        self.components = self.instructions
+
         # Combine capabilities and dependencies
-        for component in self.components:
+        for component in self.instructions:
             self.metadata.capabilities.update(component.metadata.capabilities)
             self.metadata.dependencies.update(component.metadata.dependencies)
-    
-    async def execute(self, context: ExecutionContext) -> ExecutionResult:
+
+    def add_instruction(self, instruction: BaseInstruction) -> None:
+        """Add a sub-instruction."""
+        self.instructions.append(instruction)
+        self.metadata.capabilities.update(instruction.metadata.capabilities)
+        self.metadata.dependencies.update(instruction.metadata.dependencies)
+
+    def add_component(self, component: BaseInstruction) -> None:
+        """Legacy alias for :meth:`add_instruction`."""
+        self.add_instruction(component)
+
+    async def execute(self, context: Any) -> ExecutionResult:
         """Execute component instructions."""
-        try:
-            results = []
-            errors = []
-            state_updates = {}
-            
-            # Execute each component
-            for component in self.components:
-                result = await component.execute(context)
-                results.append(result)
-                
-                if not result.success:
-                    errors.extend(result.errors)
-                else:
-                    state_updates.update(result.state_updates)
-            
-            # Return combined results
+        return await super().execute(context)
+
+    async def _execute_impl(self, context: Any) -> Any:
+        """Execute each component and combine the results."""
+        results = []
+        errors = []
+        state_updates = {}
+
+        # Execute each component
+        for component in self.instructions:
+            result = await component.execute(context)
+            results.append(result)
+
+            if not getattr(result, "success", True):
+                errors.extend(getattr(result, "errors", None) or [])
+            else:
+                state_updates.update(getattr(result, "state_updates", None) or {})
+
+        if errors:
+            first = errors[0]
+            error_msg = first.get("error") if isinstance(first, dict) else str(first)
             return ExecutionResult(
-                success=len(errors) == 0,
-                output={"results": [r.output for r in results]},
-                errors=errors,
-                state_updates=state_updates
+                status=InstructionStatus.FAILED,
+                data=self._combine_results(results),
+                error=error_msg,
+                metrics={}
             )
-            
-        except Exception as e:
-            return ExecutionResult(
-                success=False,
-                output={},
-                errors=[{"error": str(e)}]
-            )
-    
+
+        # Return combined results
+        return self._combine_results(results)
+
     async def cleanup(self) -> None:
         """Clean up all components."""
-        for component in self.components:
+        for component in self.instructions:
             await component.cleanup()
 
     async def validate_context(self, context: ExecutionContext) -> bool:
@@ -407,8 +640,8 @@ class CompositeInstruction(BaseInstruction):
 class FileSystemInstruction(BaseInstruction):
     """Base class for file system operations."""
     
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, description: str = ""):
+        super().__init__(name, description)
         self.metadata.capabilities.add("filesystem_access")
 
     async def execute(self, context: ExecutionContext) -> ExecutionResult:
@@ -495,8 +728,16 @@ class InstructionStatus(str, Enum):
     CANCELLED = "cancelled"
     TIMEOUT = "timeout"
 
+@dataclass
 class ValidationResult:
-    pass
+    """Result of validating an instruction or its context.
+
+    Attributes:
+        is_valid: Whether the validation passed.
+        message: Human-readable explanation of the validation outcome.
+    """
+    is_valid: bool = True
+    message: str = ""
 
 # --- Lazy re-exports (PEP 562) -------------------------------------------
 # Some instruction classes (e.g. ``ParallelInstruction``) live in sibling

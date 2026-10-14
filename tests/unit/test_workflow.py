@@ -93,7 +93,7 @@ class TestWorkflowExecution:
         await engine.initialize()
         
         # Get the agent instance
-        agent = await test_agent
+        agent = test_agent
         
         # Register the agent
         await engine.register_workflow(agent, workflow_config)
@@ -127,7 +127,7 @@ class TestWorkflowExecution:
         await engine.initialize()
         
         # Get the agent instance
-        agent = await test_agent
+        agent = test_agent
         
         # Register the agent
         await engine.register_workflow(agent, workflow_config)
@@ -144,7 +144,7 @@ class TestWorkflowExecution:
         await engine.initialize()
         
         # Get the agent instance
-        agent = await test_agent
+        agent = test_agent
         
         # Register the agent
         await engine.register_workflow(agent, workflow_config)
@@ -173,7 +173,7 @@ class TestWorkflowExecution:
         await engine.initialize()
         
         # Get the agent instance
-        agent = await test_agent
+        agent = test_agent
         
         # Register the agent
         await engine.register_workflow(agent, workflow_config)

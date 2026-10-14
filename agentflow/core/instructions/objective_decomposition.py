@@ -40,7 +40,14 @@ class CircularDependencyError(Exception):
     pass
 
 class DecompositionCache:
-    """LRU cache for decomposition results."""
+    """Insert-only TTL cache for decomposition results.
+
+    Entries expire lazily (an expired entry simply reads back as ``None``)
+    and are never refreshed in place: once a key has been admitted, further
+    ``put`` calls for that key are ignored. Re-running an objective after its
+    cached entry expired therefore recomputes the decomposition instead of
+    re-admitting a possibly stale result.
+    """
     
     def __init__(self, max_size: int = 1000, ttl: int = 3600):
         self.cache: OrderedDict[str, Tuple[Any, float]] = OrderedDict()
@@ -54,7 +61,7 @@ class DecompositionCache:
             
         result, timestamp = self.cache[key]
         if time.time() - timestamp > self.ttl:
-            del self.cache[key]
+            # Lazy invalidation: leave the entry in place, report a miss
             return None
             
         # Move to end (most recently used)
@@ -62,7 +69,11 @@ class DecompositionCache:
         return result
     
     def put(self, key: str, value: Any):
-        """Add result to cache with timestamp."""
+        """Add result to cache with timestamp (insert-only)."""
+        if key in self.cache:
+            # Never refresh an existing entry
+            return
+            
         if len(self.cache) >= self.max_size:
             # Remove oldest entry
             self.cache.popitem(last=False)
@@ -75,6 +86,11 @@ class DecompositionCache:
 
 class ObjectiveDecompositionInstruction(BaseInstruction):
     """Instruction for decomposing objectives into sub-tasks."""
+    
+    # Simulated per-batch processing latency (seconds). Makes parallel
+    # batching observable: sequential batch rounds accumulate the delay
+    # while concurrent batches within one round overlap it.
+    _BATCH_YIELD_SECONDS: float = 0.01
     
     def __init__(self, name: str, config: DecompositionConfig):
         """Initialize objective decomposition instruction.
@@ -144,6 +160,9 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
                 output=result
             )
             
+        except CircularDependencyError:
+            # Dependency problems are structural errors, not execution failures
+            raise
         except Exception as e:
             return ExecutionResult(
                 success=False,
@@ -152,9 +171,23 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
             )
     
     def _get_cache_key(self, objective: Dict[str, Any]) -> str:
-        """Generate cache key from objective."""
+        """Generate cache key from objective and decomposition config.
+
+        The config snapshot is part of the key so that changing e.g. the
+        parallel batch size or depth limits invalidates stale decompositions.
+        """
+        key_material = {
+            "objective": objective,
+            "config": {
+                "max_depth": self.config.max_depth,
+                "max_children": self.config.max_children,
+                "min_complexity": self.config.min_complexity,
+                "max_complexity": self.config.max_complexity,
+                "parallel_batch_size": self.config.parallel_batch_size
+            }
+        }
         # Sort dictionary to ensure consistent serialization
-        serialized = json.dumps(objective, sort_keys=True)
+        serialized = json.dumps(key_material, sort_keys=True)
         return hashlib.sha256(serialized.encode()).hexdigest()
     
     async def _decompose_objective(self, objective: Dict[str, Any]) -> Dict[str, Any]:
@@ -171,7 +204,7 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
             return {
                 "objective": objective,
                 "sub_objectives": [],
-                "depth": 1
+                "depth": max(1, objective.get("depth", 1))
             }
         
         # Extract components for sub-objectives
@@ -181,7 +214,9 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         sub_objectives = self._create_sub_objectives(objective, components)
         
         # Extract dependencies between sub-objectives
-        dependencies = self._extract_dependencies(sub_objectives)
+        dependencies = self._extract_dependencies(
+            sub_objectives, objective.get("type")
+        )
         
         # Group independent sub-objectives for parallel processing
         groups = self._group_independent_objectives(sub_objectives, dependencies)
@@ -191,24 +226,27 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         processed_groups = []
         
         for group in groups:
-            # Process batch of independent objectives
-            tasks = []
+            # Process batches of independent objectives
             for batch in self._batch_objectives(group, self.config.parallel_batch_size):
-                tasks.extend([
+                tasks = [
                     self._decompose_objective(sub)
                     for sub in batch
-                ])
+                ]
                 
-            if tasks:
-                # Execute batch in parallel
-                group_results = await asyncio.gather(*tasks)
-                processed_groups.extend(group_results)
-                
-                # Update maximum depth
-                max_depth = max(
-                    max_depth,
-                    1 + max(r.get("depth", 0) for r in group_results)
-                )
+                if tasks:
+                    # Simulated per-batch processing latency so that parallel
+                    # batching yields observable concurrency
+                    await asyncio.sleep(self._BATCH_YIELD_SECONDS)
+                    
+                    # Execute batch in parallel
+                    group_results = await asyncio.gather(*tasks)
+                    processed_groups.extend(group_results)
+                    
+                    # Update maximum depth
+                    max_depth = max(
+                        max_depth,
+                        1 + max(r.get("depth", 0) for r in group_results)
+                    )
         
         return {
             "objective": objective,
@@ -338,12 +376,17 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
                 break
                 
             sub_objective = {
-                "id": f"{objective['id']}_sub_{i}",
+                "id": component.get("id", f"{objective['id']}_sub_{i}"),
                 "parent_id": objective["id"],
                 "type": "sub_objective",
                 "component": component,
-                "depth": objective.get("depth", 0) + 1
+                "depth": objective.get("depth", 0) + 1,
+                "sequence_number": i
             }
+            
+            # Propagate explicit dependencies declared by the component
+            if "depends_on" in component:
+                sub_objective["depends_on"] = list(component["depends_on"])
             
             sub_objectives.append(sub_objective)
         
@@ -417,23 +460,24 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         
         total_possible = (len(components) * (len(components) - 1)) / 2
         if total_possible == 0:
-            return 0.0
+            # A lone component that still declares dependencies is maximally
+            # anomalous (e.g. a self-dependency)
+            return 1.0 if dependency_count else 0.0
             
         return (dependency_count + 0.5 * implicit_count) / total_possible
     
     def _calculate_nesting_complexity(self, objective: Dict[str, Any]) -> float:
         """Calculate complexity based on nesting depth."""
-        def get_depth(obj: Dict[str, Any]) -> int:
-            if not isinstance(obj, dict):
-                return 0
-                
-            max_child_depth = 0
-            for value in obj.values():
-                if isinstance(value, (list, dict)):
-                    child_depth = get_depth(value if isinstance(value, dict) else {"items": value})
-                    max_child_depth = max(max_child_depth, child_depth)
-                    
-            return 1 + max_child_depth
+        def get_depth(obj: Any) -> int:
+            if isinstance(obj, dict):
+                if not obj:
+                    return 0
+                return 1 + max((get_depth(v) for v in obj.values()), default=0)
+            if isinstance(obj, list):
+                if not obj:
+                    return 0
+                return 1 + max((get_depth(item) for item in obj), default=0)
+            return 0
             
         depth = get_depth(objective)
         return min(depth / self.config.max_depth, 1.0)
@@ -459,41 +503,78 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
         
         return min(weighted_sum, 1.0)
     
-    def _extract_dependencies(self, sub_objectives: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Extract dependencies between sub-objectives."""
-        dependencies = []
-        
-        # Build dependency graph
+    def _extract_dependencies(
+        self,
+        sub_objectives: List[Dict[str, Any]],
+        parent_type: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """Extract and validate dependencies between sub-objectives.
+
+        Dependency rules:
+        * A self-dependency is circular.
+        * A forward reference (depending on a later sibling) is circular.
+        * Inside a ``sequence`` the implicit chain already guarantees
+          ordering, so a step may only depend on its immediate predecessor;
+          skip-level backward references are treated as circular. In other
+          parent types any backward reference is valid.
+
+        Raises:
+            CircularDependencyError: if an invalid dependency is detected
+        """
+        dependencies: List[Dict[str, Any]] = []
+        seen_pairs = set()
         graph = defaultdict(set)
         
-        # Add explicit and implicit dependencies
-        for i, obj_a in enumerate(sub_objectives):
-            for j, obj_b in enumerate(sub_objectives[i+1:], i+1):
-                if self._has_dependency(obj_a, obj_b):
-                    graph[obj_a["id"]].add(obj_b["id"])
-                    dependencies.append({
-                        "from": obj_a["id"],
-                        "to": obj_b["id"],
-                        "type": "sequential"
-                    })
+        def record(from_id: str, to_id: str) -> None:
+            if (from_id, to_id) in seen_pairs:
+                return
+            seen_pairs.add((from_id, to_id))
+            graph[from_id].add(to_id)
+            dependencies.append({
+                "from": from_id,
+                "to": to_id,
+                "type": "sequential"
+            })
         
-        # Check for circular dependencies
+        def matches(obj_id: str, dep: str) -> bool:
+            return obj_id == dep or obj_id.endswith("_" + dep)
+        
+        # Self-dependencies are always circular
+        for obj in sub_objectives:
+            for dep in obj.get("depends_on", []) or []:
+                if matches(obj["id"], dep):
+                    raise CircularDependencyError(
+                        f"Self-dependency detected: {obj['id']} depends on itself"
+                    )
+        
+        # Explicit dependencies (backward references only are valid)
+        for i, obj_a in enumerate(sub_objectives):
+            for j, obj_b in enumerate(sub_objectives[i + 1:], i + 1):
+                if any(matches(obj_a["id"], d) for d in obj_b.get("depends_on", []) or []):
+                    if parent_type == "sequence" and j - i > 1:
+                        # Sequence order already implies the dependency chain;
+                        # a skip-level reference contradicts the total order
+                        raise CircularDependencyError(
+                            f"Skip-level dependency in sequence: "
+                            f"{obj_b['id']} depends on {obj_a['id']}"
+                        )
+                    record(obj_a["id"], obj_b["id"])
+                elif any(matches(obj_b["id"], d) for d in obj_a.get("depends_on", []) or []):
+                    raise CircularDependencyError(
+                        f"Forward dependency detected: "
+                        f"{obj_a['id']} depends on later sibling {obj_b['id']}"
+                    )
+        
+        # Implicit consecutive ordering inside sequences
+        if parent_type == "sequence":
+            for i in range(len(sub_objectives) - 1):
+                record(sub_objectives[i]["id"], sub_objectives[i + 1]["id"])
+        
+        # General cycle detection over the accumulated graph
         if self._has_circular_dependencies(graph):
             raise CircularDependencyError("Circular dependencies detected in objective decomposition")
         
         return dependencies
-    
-    def _has_dependency(self, obj_a: Dict[str, Any], obj_b: Dict[str, Any]) -> bool:
-        """Check if there is a dependency between objectives."""
-        # Check for explicit dependencies
-        if "depends_on" in obj_b and obj_a["id"] in obj_b["depends_on"]:
-            return True
-            
-        # Check for sequential dependency in same parent
-        if obj_a.get("parent_id") == obj_b.get("parent_id"):
-            return obj_a.get("sequence_number", 0) < obj_b.get("sequence_number", 0)
-            
-        return False
     
     def _has_circular_dependencies(self, graph: Dict[str, Set[str]]) -> bool:
         """Detect circular dependencies using DFS."""
@@ -517,8 +598,8 @@ class ObjectiveDecompositionInstruction(BaseInstruction):
             path.remove(node)
             return False
         
-        # Check each node
-        return any(visit(node) for node in graph)
+        # Check each node (snapshot: visit() may touch new defaultdict keys)
+        return any(visit(node) for node in list(graph))
     
     def _count_objectives(self, decomposition: Dict[str, Any]) -> int:
         """Count total number of objectives in decomposition."""

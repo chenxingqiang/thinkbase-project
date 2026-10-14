@@ -7,7 +7,7 @@ which was shadowed by this package and therefore unreachable.
 from typing import Any, Dict, List, Set
 import copy
 
-from agentflow.core.base import BaseOptimizer
+from agentflow.core.base import BaseOptimizer, OptimizationMetrics
 from agentflow.core.workflow_types import WorkflowConfig
 
 class PipelineOptimizer(BaseOptimizer):

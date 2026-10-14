@@ -147,71 +147,67 @@ async def test_agent_status_transitions():
 @pytest.mark.asyncio
 async def test_agent_initialization(agent):
     """Test agent initialization."""
-    async for agent_instance in agent:
-        assert isinstance(agent_instance, Agent)
-        assert agent_instance.state.status == AgentStatus("initialized")
-        assert agent_instance._initialized
-        break
+    agent_instance = agent
+    assert isinstance(agent_instance, Agent)
+    assert agent_instance.state.status == AgentStatus("initialized")
+    assert agent_instance._initialized
 
 @pytest.mark.asyncio
 async def test_message_processing(agent, mock_ell):
     """Test message processing."""
-    async for agent_instance in agent:
-        assert isinstance(agent_instance, Agent)
+    agent_instance = agent
+    assert isinstance(agent_instance, Agent)
 
-        # Ensure the mock is properly set up
-        agent_instance._ell = mock_ell
+    # Ensure the mock is properly set up
+    agent_instance._ell = mock_ell
         
-        test_message = "Test message"
-        response = await agent_instance.process_message(test_message)
+    test_message = "Test message"
+    response = await agent_instance.process_message(test_message)
 
-        assert isinstance(response, str)
-        assert test_message in response  # Check if the test message is contained in the response
+    assert isinstance(response, str)
+    assert test_message in response  # Check if the test message is contained in the response
         
-        # Verify history is properly maintained
-        assert len(agent_instance.history) == 2  # Should have user message and assistant response
-        assert agent_instance.history[0]["content"] == test_message
-        assert agent_instance.history[0]["role"] == "user"
-        assert agent_instance.history[1]["content"] == test_message
-        assert agent_instance.history[1]["role"] == MessageRole.ASSISTANT
+    # Verify history is properly maintained
+    assert len(agent_instance.history) == 2  # Should have user message and assistant response
+    assert agent_instance.history[0]["content"] == test_message
+    assert agent_instance.history[0]["role"] == "user"
+    assert agent_instance.history[1]["content"] == test_message
+    assert agent_instance.history[1]["role"] == MessageRole.ASSISTANT
         
-        assert agent_instance.state.status in [AgentStatus.SUCCESS, AgentStatus.PROCESSING]
-        break
+    assert agent_instance.state.status in [AgentStatus.SUCCESS, AgentStatus.PROCESSING]
 
 @pytest.mark.asyncio
 async def test_error_handling(agent, mock_ell):
     """Test error handling."""
-    async for agent_instance in agent:
-        assert isinstance(agent_instance, Agent)
+    agent_instance = agent
+    assert isinstance(agent_instance, Agent)
 
-        # Set up mock to raise an exception
-        mock_ell.process_message.side_effect = Exception("Test error")
-        agent_instance._ell = mock_ell
+    # Set up mock to raise an exception
+    mock_ell.process_message.side_effect = Exception("Test error")
+    agent_instance._ell = mock_ell
 
-        with pytest.raises(Exception):
-            await agent_instance.process_message("Test message")
+    with pytest.raises(Exception):
+        await agent_instance.process_message("Test message")
 
-        assert agent_instance.state.status == "failed"
-        assert len(agent_instance.errors) == 1
-        assert agent_instance.state.last_error == "Test error"
-        break
+    assert agent_instance.state.status == "failed"
+    assert len(agent_instance.errors) == 1
+    assert agent_instance.state.last_error == "Test error"
 
 @pytest.mark.asyncio
 async def test_error_limit(agent, mock_ell):
     """Test error limit handling."""
-    async for agent_instance in agent:
-        assert isinstance(agent_instance, Agent)
+    agent_instance = agent
+    assert isinstance(agent_instance, Agent)
 
-        # Set up mock to raise an exception
-        mock_ell.process_message.side_effect = Exception("Test error")
-        agent_instance._ell = mock_ell
+    # Set up mock to raise an exception
+    mock_ell.process_message.side_effect = Exception("Test error")
+    agent_instance._ell = mock_ell
 
-        # Generate more errors than the limit
-        for i in range(agent_instance.max_errors + 5):
-            with pytest.raises(Exception):
-                await agent_instance.process_message("Test message")
+    # Generate more errors than the limit
+    for i in range(agent_instance.max_errors + 5):
+        with pytest.raises(Exception):
+            await agent_instance.process_message("Test message")
 
-        # Check that errors list is limited
-        assert len(agent_instance.errors) == agent_instance.max_errors
-        assert agent_instance.state.status == "failed"
-        break
+    # Check that errors list is limited
+    assert len(agent_instance.errors) == agent_instance.max_errors
+    assert agent_instance.state.status == "failed"

@@ -2,9 +2,6 @@
 
 from typing import Dict, List, Any, Optional, Tuple, Set, Coroutine, Awaitable, Callable, cast
 from dataclasses import dataclass, field
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import DBSCAN
 import asyncio
 import time
 import json
@@ -44,7 +41,7 @@ class InstructionTemplate:
 @dataclass
 class LearningConfig:
     """Configuration for learning system."""
-    min_pattern_support: int = 3
+    min_pattern_support: int = 2
     min_success_rate: float = 0.7
     enable_caching: bool = True
     cache_size: int = 1000
@@ -58,7 +55,6 @@ class PatternRecognizer:
     
     def __init__(self, config: Optional[LearningConfig] = None):
         self.config = config or LearningConfig()
-        self.vectorizer = TfidfVectorizer()
         self.patterns: Dict[str, DialoguePattern] = {}
         self.cache = InstructionCache(
             max_size=self.config.cache_size,
@@ -66,113 +62,133 @@ class PatternRecognizer:
         ) if self.config.enable_caching else None
         self.metrics = InstructionMetrics()
 
-    async def extract_patterns(self, dialogues: List[Dict[str, Any]]) -> List[DialoguePattern]:
-        """Extract patterns from dialogues using PCFG approach."""
+    def extract_patterns(self, dialogues: List[Dict[str, Any]]) -> List[DialoguePattern]:
+        """Extract recurring patterns from dialogues.
+
+        Deterministic grouping: dialogues are bucketed by their action
+        signature (the sorted set of system-turn contents), and each
+        bucket with at least ``min_pattern_support`` members whose
+        success rate clears ``min_success_rate`` is promoted into a
+        :class:`DialoguePattern`.  This replaces the earlier
+        TF-IDF/DBSCAN clustering, which was non-deterministic across
+        sklearn versions and failed small-sample inputs.
+        """
         start_time = time.time()
-        
+
         try:
             # Check cache if enabled
+            cache_key = None
             if self.cache:
                 cache_key = self._get_cache_key(dialogues)
                 cached_patterns = self.cache.get(cache_key)
                 if cached_patterns:
                     self._update_metrics(start_time, True, cache_hit=True)
                     return cached_patterns
-            
-            # Convert dialogues to feature vectors
-            dialogue_texts = [self._dialogue_to_text(d) for d in dialogues]
-            vectors = self.vectorizer.fit_transform(dialogue_texts)
-            
-            # Cluster similar dialogues
-            clustering = DBSCAN(
-                eps=0.3,
-                min_samples=self.config.min_pattern_support
-            )
-            labels = clustering.fit_predict(vectors)
-            
-            # Group dialogues by cluster
-            clusters = {}
-            for i, label in enumerate(labels):
-                if label == -1:  # Skip noise points
-                    continue
-                if label not in clusters:
-                    clusters[label] = []
-                clusters[label].append(dialogues[i])
-            
-            # Process clusters and extract patterns
+
+            groups: Dict[Tuple[str, ...], List[Dict[str, Any]]] = {}
+            for dialogue in dialogues:
+                signature = self._action_signature(dialogue)
+                groups.setdefault(signature, []).append(dialogue)
+
             patterns: List[DialoguePattern] = []
-            
-            if self.config.enable_parallel and clusters:
-                # Process clusters in parallel
-                async def process_clusters():
-                    tasks = []
-                    for cluster_dialogues in clusters.values():
-                        task = asyncio.create_task(
-                            self._extract_pattern_from_cluster(cluster_dialogues)
-                        )
-                        tasks.append(task)
-                    results = await asyncio.gather(*tasks)
-                    return [p for p in results if p is not None]
-                
-                patterns = await process_clusters()
-            else:
-                # Process sequentially
-                for cluster_dialogues in clusters.values():
-                    pattern = await self._extract_pattern_from_cluster(cluster_dialogues)
-                    if pattern is not None:
-                        patterns.append(pattern)
-            
+            for signature, group_dialogues in groups.items():
+                pattern = self._extract_pattern_from_cluster(
+                    signature, group_dialogues
+                )
+                if pattern is not None:
+                    patterns.append(pattern)
+
             # Store patterns in instance dictionary
             for pattern in patterns:
                 self.patterns[pattern.pattern_id] = pattern
-            
+
             # Cache results if enabled
-            if self.cache:
+            if self.cache and cache_key is not None:
                 self.cache.put(cache_key, patterns)
-            
+
             self._update_metrics(start_time, True)
             return patterns
-            
-        except Exception as e:
+
+        except Exception:
             self._update_metrics(start_time, False)
             raise
 
-    async def _extract_pattern_from_cluster(self, dialogues: List[Dict[str, Any]]) -> Optional[DialoguePattern]:
-        """Extract a pattern from a cluster of dialogues."""
+    def _action_signature(self, dialogue: Dict[str, Any]) -> Tuple[str, ...]:
+        """Bucketing key for a dialogue: its sorted system-turn contents."""
+        return tuple(sorted(
+            turn.get("content", "")
+            for turn in dialogue.get("turns", [])
+            if turn.get("role") == "system"
+        ))
+
+    def _extract_pattern_from_cluster(
+        self,
+        signature: Tuple[str, ...],
+        dialogues: List[Dict[str, Any]],
+    ) -> Optional[DialoguePattern]:
+        """Extract a pattern from one action-signature group."""
         if not dialogues:
             return None
-            
-        # Extract common elements
-        pattern = await self._find_common_elements(dialogues)
-        if not pattern:
+
+        components = self._find_common_components(dialogues)
+        if not components:
             return None
-            
-        # Validate pattern
+
+        pattern = DialoguePattern(
+            pattern_id=f"pattern_{len(self.patterns)}",
+            components=components,
+            frequency=len(dialogues),
+            success_rate=(
+                sum(1 for d in dialogues if d.get("success", False))
+                / len(dialogues)
+            ),
+            context_requirements=self._extract_context_requirements(dialogues),
+        )
+
         if not self._validate_pattern(pattern):
             return None
-            
         return pattern
 
-    async def _find_common_elements(self, dialogues: List[Dict[str, Any]]) -> Optional[DialoguePattern]:
-        """Find common elements across dialogues."""
+    def _find_common_components(
+        self, dialogues: List[Dict[str, Any]]
+    ) -> List[str]:
+        """Turn contents shared by every dialogue in the group.
+
+        The result keeps first-seen order so repeated extraction over
+        the same group is stable.
+        """
         if not dialogues:
-            return None
-            
-        # Extract common components
-        components = []
+            return []
+
+        common: Optional[Set[str]] = None
+        order: List[str] = []
         for dialogue in dialogues:
-            for turn in dialogue.get("turns", []):
-                if self._is_significant_turn(turn):
-                    components.append(turn["content"])
-        
-        # Create pattern
-        return DialoguePattern(
-            pattern_id=f"pattern_{len(self.patterns)}",
-            components=list(set(components)),
-            frequency=len(dialogues),
-            success_rate=sum(1 for d in dialogues if d.get("success", False)) / len(dialogues),
-            context_requirements=set(components)
-        )
+            contents = {
+                turn["content"]
+                for turn in dialogue.get("turns", [])
+                if self._is_significant_turn(turn)
+            }
+            if common is None:
+                common = contents
+                order = [
+                    turn["content"]
+                    for turn in dialogue.get("turns", [])
+                    if self._is_significant_turn(turn)
+                ]
+            else:
+                common &= contents
+        return [c for c in order if c in (common or set())]
+
+    def _extract_context_requirements(
+        self, dialogues: List[Dict[str, Any]]
+    ) -> Set[str]:
+        """Union of the context keys demanded by the group's dialogues."""
+        requirements: Set[str] = set()
+        for dialogue in dialogues:
+            context = dialogue.get("context", {})
+            if isinstance(context, dict):
+                requirements.update(context.keys())
+        return requirements
 
     def _dialogue_to_text(self, dialogue: Dict[str, Any]) -> str:
         """Convert dialogue to text for vectorization."""
@@ -186,7 +202,7 @@ class PatternRecognizer:
         """Check if dialogue turn is significant for pattern extraction."""
         role = cast(Optional[str], turn.get("role"))
         content = cast(Optional[str], turn.get("content"))
-        return role in ["user", "assistant"] and bool(content)
+        return role in ["system", "user", "assistant"] and bool(content)
 
     def _validate_pattern(self, pattern: DialoguePattern) -> bool:
         """Validate extracted pattern."""
@@ -226,7 +242,7 @@ class InstructionLearner:
         self.pattern_recognizer = PatternRecognizer()
         self.instruction_templates: Dict[str, InstructionTemplate] = {}
 
-    async def learn_from_dialogues(self, dialogues: List[Dict[str, Any]]) -> List[InstructionTemplate]:
+    def learn_from_dialogues(self, dialogues: List[Dict[str, Any]]) -> List[InstructionTemplate]:
         """Learn new instructions from dialogues.
         
         Args:
@@ -236,7 +252,7 @@ class InstructionLearner:
             List[InstructionTemplate]: List of learned instruction templates
         """
         # Extract patterns
-        patterns = await self.pattern_recognizer.extract_patterns(dialogues)
+        patterns = self.pattern_recognizer.extract_patterns(dialogues)
         
         # Convert patterns to instruction templates
         templates: List[InstructionTemplate] = []
@@ -298,7 +314,17 @@ class InstructionLearner:
         return []
 
     def create_instruction(self, template: InstructionTemplate) -> Instruction:
-        """Create executable instruction from template."""
+        """Create executable instruction from template.
+
+        Raises:
+            ValueError: If the template is structurally invalid (empty
+                name or missing type).
+        """
+        if not template.name:
+            raise ValueError("Instruction template requires a non-empty name")
+        if not isinstance(template.type, InstructionType):
+            raise ValueError("Instruction template requires a valid type")
+
         # Create a new instruction class for this template
         class LearnedInstruction(Instruction):
             def __init__(self, template: InstructionTemplate):
@@ -309,11 +335,19 @@ class InstructionLearner:
                     params=template.params,
                     description=f"Learned instruction from pattern {template.name}"
                 )
-                # Add conditions from template
+                # Add conditions from template: a precondition named
+                # ``requires_X`` (or a bare parameter name) demands the
+                # parameter ``X`` be present in the input state.
                 for pre in template.preconditions:
-                    self.add_precondition(lambda state: pre in state)
+                    required = pre.removeprefix("requires_")
+                    self.add_precondition(
+                        lambda state, required=required: required in state
+                    )
                 for post in template.postconditions:
-                    self.add_postcondition(lambda state: post in state)
+                    expected = post.removeprefix("produces_")
+                    self.add_postcondition(
+                        lambda state, expected=expected: expected in state
+                    )
 
             async def execute(self, input_params: Dict[str, Any]) -> Any:
                 # Implement execution logic

@@ -236,7 +236,7 @@ class MinimalGitWorkflow(BaseMinimalInstruction):
         super().__init__(
             name="git_workflow",
             description="Minimal Git workflow: status and commit",
-            instruction_type=InstructionType.GIT_WORKFLOW
+            instruction_type=MinimalInstructionType.GIT_WORKFLOW
         )
 
     async def _execute_core(self, params: Dict[str, Any]) -> InstructionResult:

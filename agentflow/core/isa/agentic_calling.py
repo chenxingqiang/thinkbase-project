@@ -214,12 +214,21 @@ class ModelAdapter:
     def _transform_type(self, type_: Type) -> str:
         """Transform type to model-specific type name.
 
-        Renders builtin/simple types as bare names (``int``, ``str``)
-        and falls back to the qualified name for user-defined types.
+        Renders builtin/simple types as bare names (``int``, ``str``),
+        typing generics with their arguments (``Dict[str, Any]``) and
+        user-defined types by their class name (``CustomType``).
         """
+        if getattr(type_, "__origin__", None) is not None:
+            # typing generic alias, e.g. Dict[str, Any] / List[int]
+            args = ", ".join(self._transform_type(a) for a in type_.__args__)
+            name = (
+                getattr(type_, "__name__", None)
+                or getattr(type_.__origin__, "__name__", str(type_.__origin__))
+            )
+            return f"{name}[{args}]"
         if isinstance(type_, type):
-            module = getattr(type_, "__module__", "")
-            if module in ("builtins", "__builtin__"):
-                return type_.__name__
-            return f"{module}.{type_.__name__}"
-        return getattr(type_, "__name__", str(type_)) 
+            return type_.__name__
+        name = getattr(type_, "__name__", None)
+        if name:
+            return name
+        return str(type_) 

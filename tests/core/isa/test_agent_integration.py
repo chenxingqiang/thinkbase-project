@@ -24,10 +24,11 @@ def sample_config():
         "WORKFLOW": {
             "max_iterations": 5
         },
-        "isa_config_path": "/Users/xingqiangchen/TASK/APOS/tests/core/isa/test_isa_config.json",
+        "isa_config_path": os.path.join(os.path.dirname(__file__), "test_isa_config.json"),
         "domain_config": {
             "instruction_set": ["research", "analyze", "summarize"],
-            "optimization_strategy": "rl"
+            "optimization_strategy": "rl",
+            "isa_config_path": os.path.join(os.path.dirname(__file__), "test_isa_config.json")
         }
     }
 

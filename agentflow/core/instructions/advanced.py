@@ -80,9 +80,20 @@ class AdvancedInstruction(BaseInstruction):
                     error=f"Postcondition check failed: {validation.message}"
                 )
             
+            # Pass through ready-made results; wrap plain payloads
+            if isinstance(result, InstructionResult):
+                if result.status is None:
+                    result.status = InstructionStatus.COMPLETED
+                return result
+            if isinstance(result, dict):
+                return InstructionResult(
+                    status=InstructionStatus.COMPLETED,
+                    data=result,
+                    error=None
+                )
             return InstructionResult(
                 status=InstructionStatus.COMPLETED,
-                data=result,
+                data={"output": result},
                 error=None
             )
             

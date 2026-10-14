@@ -1,14 +1,11 @@
 """Agent learning instruction implementations."""
 
-from typing import Dict, Any, List, Optional, Set, Union, Callable, cast
+from typing import Dict, Any, List, Optional, Set, Union, Callable
 from dataclasses import dataclass, field
 import asyncio
 import logging
 import json
 import numpy as np
-from scipy.sparse import csr_matrix
-from sklearn.cluster import DBSCAN
-from sklearn.feature_extraction.text import TfidfVectorizer
 import random
 
 from .base import (
@@ -38,6 +35,9 @@ class LearningConfig:
     max_iterations: int = 100
     learning_rate: float = 0.1
     adaptation_threshold: float = 0.8
+    # Reinforcement-learning parameters (shared defaults)
+    discount_factor: float = 0.95
+    exploration_rate: float = 0.1
 
 @dataclass
 class AgentLearningConfig:
@@ -65,7 +65,6 @@ class PatternLearningInstruction(BaseInstruction):
         self.learning_config = learning_config
         self.metrics = LearningMetrics()
         self.patterns: Dict[str, Dict[str, Any]] = {}
-        self.vectorizer = TfidfVectorizer()
     
     async def execute(self, context: ExecutionContext) -> ExecutionResult:
         """Execute pattern learning."""
@@ -105,55 +104,50 @@ class PatternLearningInstruction(BaseInstruction):
     
     async def _learn_patterns(self,
                             interactions: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
-        """Learn patterns from interactions."""
-        # Convert interactions to feature vectors
-        texts = [self._interaction_to_text(i) for i in interactions]
-        vectors = self.vectorizer.fit_transform(texts)
+        """Learn patterns from interactions.
+
+        Successful interactions are grouped by structural signature
+        (type plus content keys, with dict values reduced to their key
+        sets); recurring structures become patterns. The earlier
+        TF-IDF/DBSCAN clustering split near-identical structures over
+        numeric payload differences, so signature grouping is used
+        instead.
+        """
+        # Only successful interactions contribute learned patterns
+        candidates = [i for i in interactions if i.get("success", False)]
         
-        # Convert sparse matrix to dense array for DBSCAN
-        dense_vectors = cast(csr_matrix, vectors).toarray()
+        groups: Dict[str, List[Dict[str, Any]]] = {}
+        for interaction in candidates:
+            signature = self._interaction_signature(interaction)
+            groups.setdefault(signature, []).append(interaction)
         
-        # Cluster similar interactions
-        clustering = DBSCAN(
-            eps=0.3,
-            min_samples=self.learning_config.min_pattern_support
-        )
-        labels = clustering.fit_predict(dense_vectors)
-        
-        # Extract patterns from clusters
-        patterns = {}
-        for label in set(labels):
-            if label == -1:  # Noise points
+        patterns: Dict[str, Dict[str, Any]] = {}
+        for group_interactions in groups.values():
+            if len(group_interactions) < self.learning_config.min_pattern_support:
                 continue
             
-            cluster_interactions = [
-                i for i, l in zip(interactions, labels) if l == label
-            ]
-            
-            pattern = self._extract_pattern(cluster_interactions)
+            pattern = self._extract_pattern(group_interactions)
             if pattern:
                 pattern_id = f"pattern_{len(patterns)}"
                 patterns[pattern_id] = pattern
         
         return patterns
     
-    def _interaction_to_text(self, interaction: Dict[str, Any]) -> str:
-        """Convert interaction to text representation."""
-        components = []
+    def _interaction_signature(self, interaction: Dict[str, Any]) -> str:
+        """Build a structural signature for grouping similar interactions."""
+        parts = [str(interaction.get("type", "unknown"))]
         
-        # Add type
-        components.append(f"type:{interaction.get('type', 'unknown')}")
-        
-        # Add participants
-        participants = interaction.get("participants", [])
-        components.extend(f"participant:{p}" for p in participants)
-        
-        # Add content
         content = interaction.get("content", {})
-        for key, value in content.items():
-            components.append(f"{key}:{value}")
+        for key in sorted(content.keys()):
+            value = content[key]
+            if isinstance(value, dict):
+                parts.append(f"{key}:{{{','.join(sorted(value.keys()))}}}")
+            elif isinstance(value, (list, tuple)):
+                parts.append(f"{key}:list")
+            else:
+                parts.append(f"{key}:{value}")
         
-        return " ".join(components)
+        return "|".join(parts)
     
     def _extract_pattern(self,
                         interactions: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -325,17 +319,35 @@ class AdaptiveLearningInstruction(BaseInstruction):
 class ReinforcementLearningInstruction(BaseInstruction):
     """Instruction for reinforcement learning."""
     
-    def __init__(self, name: str, config: AgentLearningConfig):
+    def __init__(self,
+                 name: str,
+                 learning_config: LearningConfig,
+                 action_space: Optional[Dict[str, Any]] = None,
+                 reward_function: Optional[Callable[[Dict[str, Any]], float]] = None,
+                 metadata: Optional[InstructionMetadata] = None):
         """Initialize reinforcement learning instruction.
         
         Args:
             name: Instruction name
-            config: Learning configuration
+            learning_config: Learning configuration
+            action_space: Available actions and their prior values
+            reward_function: Maps an action-history entry to a reward
+            metadata: Optional instruction metadata
         """
-        super().__init__(name)
-        self.config = config
+        super().__init__(
+            name=name,
+            instruction_type=InstructionType.LLM_INTERACTION,
+            metadata=metadata,
+            description="Reinforcement learning"
+        )
+        self.learning_config = learning_config
+        # Backward-compatible alias
+        self.config = learning_config
+        self.action_space: Dict[str, Any] = dict(action_space) if action_space else {}
+        self.reward_function = reward_function
         self.q_table: Dict[str, Dict[str, float]] = {}
         self.action_history: List[Dict[str, Any]] = []
+        self.metrics = LearningMetrics()
     
     async def execute(self, context: ExecutionContext) -> ExecutionResult:
         """Execute reinforcement learning.
@@ -343,7 +355,8 @@ class ReinforcementLearningInstruction(BaseInstruction):
         Args:
             context: Execution context containing:
                 - state: Current state
-                - actions: Available actions
+                - actions: Available actions (defaults to action_space keys)
+                - action_history: Optional history to learn from
                 
         Returns:
             ExecutionResult: Learning results
@@ -351,7 +364,7 @@ class ReinforcementLearningInstruction(BaseInstruction):
         try:
             # Extract state and actions
             state = context.params.get("state")
-            actions = context.params.get("actions", [])
+            actions = context.params.get("actions") or list(self.action_space.keys())
             
             if not state or not actions:
                 return ExecutionResult(
@@ -362,6 +375,11 @@ class ReinforcementLearningInstruction(BaseInstruction):
             
             # Convert state to string for Q-table lookup
             state_key = self._state_to_key(state)
+            
+            # Learn from provided action history first
+            action_history = context.params.get("action_history")
+            if action_history:
+                await self._update_q_table(action_history)
             
             # Initialize Q-values for new state
             if state_key not in self.q_table:
@@ -379,50 +397,66 @@ class ReinforcementLearningInstruction(BaseInstruction):
                 "timestamp": context.metadata.get("timestamp", 0.0)
             })
             
-            # Calculate performance improvement
-            improvement = self._calculate_improvement()
+            # Update metrics
+            self.metrics.learning_iterations += 1
+            self.metrics.performance_improvement = self._calculate_improvement()
             
             return ExecutionResult(
                 success=True,
                 output={
                     "action": action,
                     "metrics": {
-                        "q_values": self.q_table[state_key],
+                        "q_values": dict(self.q_table[state_key]),
                         "exploration_rate": self.config.exploration_rate,
-                        "improvement": improvement
+                        "improvement": self.metrics.performance_improvement
                     }
-                }
+                },
+                metrics=self.metrics.__dict__
             )
             
         except Exception as e:
             return ExecutionResult(
                 success=False,
                 output={"error": str(e)},
-                errors=[{"error": str(e)}]
+                errors=[{"error": str(e)}],
+                metrics=self.metrics.__dict__
             )
     
     async def _update_q_table(self, action_history: List[Dict[str, Any]]):
         """Update Q-values based on action history."""
-        if len(action_history) < 2:
+        if not action_history:
             return
+        
+        all_actions = list(self.action_space.keys())
             
-        for i in range(len(action_history) - 1):
+        for i in range(len(action_history)):
             current = action_history[i]
-            next_state = action_history[i + 1]["state"]
+            next_state = current.get("next_state")
+            if next_state is None and i + 1 < len(action_history):
+                next_state = action_history[i + 1]["state"]
+            if next_state is None:
+                continue
             
             # Get current state and action
             state_key = self._state_to_key(current["state"])
             action = current["action"]
             
+            # Ensure Q-table entries exist for both states
+            next_state_key = self._state_to_key(next_state)
+            for key in (state_key, next_state_key):
+                if key not in self.q_table:
+                    self.q_table[key] = {a: 0.0 for a in all_actions}
+            if action not in self.q_table[state_key]:
+                continue  # Unknown action
+            
             # Calculate reward
             reward = self._calculate_reward(current, next_state)
             
             # Get next state's maximum Q-value
-            next_state_key = self._state_to_key(next_state)
-            if next_state_key in self.q_table:
-                next_max_q = max(self.q_table[next_state_key].values())
-            else:
-                next_max_q = 0.0
+            next_max_q = (
+                max(self.q_table[next_state_key].values())
+                if self.q_table[next_state_key] else 0.0
+            )
             
             # Update Q-value
             current_q = self.q_table[state_key][action]
@@ -451,7 +485,20 @@ class ReinforcementLearningInstruction(BaseInstruction):
         return str(sorted(state.items()))
     
     def _calculate_reward(self, action_data: Dict[str, Any], next_state: Dict[str, Any]) -> float:
-        """Calculate reward for action."""
+        """Calculate reward for action.
+
+        Prefers the explicit reward function, then a recorded ``reward``
+        field, and finally falls back to state improvement.
+        """
+        if self.reward_function is not None:
+            try:
+                return float(self.reward_function(action_data))
+            except Exception as e:
+                logger.warning(f"Reward function failed: {str(e)}")
+        
+        if "reward" in action_data:
+            return float(action_data["reward"])
+        
         # Simple reward based on state improvement
         current_value = sum(float(v) for v in action_data["state"].values() if isinstance(v, (int, float)))
         next_value = sum(float(v) for v in next_state.values() if isinstance(v, (int, float)))

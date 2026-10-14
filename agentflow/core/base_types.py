@@ -46,6 +46,9 @@ class AgentStatus(str, Enum):
     INITIALIZED = "initialized"
     COMPLETED = "completed"
     STOPPED = "stopped"
+
+    def __str__(self) -> str:
+        return self.value
     WAITING = "waiting"
 
     def __str__(self) -> str:

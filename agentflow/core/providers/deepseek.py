@@ -22,6 +22,20 @@ class DeepSeekConfig:
     stop_sequences: List[str] = field(default_factory=list)
     api_key: Optional[str] = None
     api_base: str = "https://api.deepseek.com/v1"
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "DeepSeekConfig":
+        """Build a config from a plain dictionary.
+
+        Accepts both the ``model_name`` spelling used by the dataclass and
+        the ``model`` spelling used by the DeepSeek API payloads, so callers
+        can pass raw configuration dictionaries straight through.
+        """
+        data = dict(data or {})
+        if "model_name" not in data and "model" in data:
+            data["model_name"] = data.pop("model")
+        known = set(cls.__dataclass_fields__)
+        return cls(**{k: v for k, v in data.items() if k in known})
     
 class DeepSeekMessage(BaseModel):
     """Message in DeepSeek API response."""
@@ -61,12 +75,16 @@ class DeepSeekResponse(BaseModel):
 class DeepSeekProvider:
     """Provider for interacting with DeepSeek models."""
     
-    def __init__(self, config: Optional[DeepSeekConfig] = None):
+    def __init__(self, config: Optional[Union[DeepSeekConfig, Dict[str, Any]]] = None):
         """Initialize DeepSeek provider.
         
         Args:
-            config: Optional configuration for the provider.
+            config: Optional configuration for the provider. May be a
+                ``DeepSeekConfig`` instance or a plain dictionary (the
+                ``model`` key is accepted as an alias of ``model_name``).
         """
+        if isinstance(config, dict):
+            config = DeepSeekConfig.from_dict(config)
         self.config = config or DeepSeekConfig()
         self._session: Optional[aiohttp.ClientSession] = None
         self._metrics = {
@@ -75,7 +93,46 @@ class DeepSeekProvider:
             "requests": 0,
             "errors": 0
         }
-        
+        # Async-iterator bookkeeping: the provider yields itself exactly once
+        # so that callers which treat it as an async generator (fixture-style
+        # ``anext(provider)`` / ``await provider.aclose()`` usage) work whether
+        # or not the surrounding harness already unwrapped the generator.
+        self._aiter_exhausted = False
+
+    # ------------------------------------------------------------------
+    # Async generator compatibility
+    # ------------------------------------------------------------------
+    def __aiter__(self) -> "DeepSeekProvider":
+        """Return self as an async iterator that yields the provider once."""
+        return self
+
+    async def __anext__(self) -> "DeepSeekProvider":
+        """Yield the provider itself once, then signal exhaustion."""
+        if self._aiter_exhausted:
+            raise StopAsyncIteration
+        self._aiter_exhausted = True
+        return self
+
+    async def aclose(self) -> None:
+        """Close the provider session (async-generator style teardown)."""
+        await self.close()
+
+    # ------------------------------------------------------------------
+    # Session lifecycle
+    # ------------------------------------------------------------------
+    @property
+    def session(self) -> Optional[aiohttp.ClientSession]:
+        """The underlying aiohttp session, if initialized."""
+        return self._session
+
+    async def initialize(self) -> None:
+        """Explicitly initialize the HTTP session."""
+        await self._ensure_session()
+
+    async def cleanup(self) -> None:
+        """Tear down the HTTP session."""
+        await self.close()
+
     async def _ensure_session(self) -> None:
         """Ensure aiohttp session is initialized."""
         if self._session is None:
@@ -88,12 +145,36 @@ class DeepSeekProvider:
         if self._session:
             await self._session.close()
             self._session = None
+
+    # ------------------------------------------------------------------
+    # API key validation
+    # ------------------------------------------------------------------
+    def _validate_api_key(self) -> None:
+        """Validate that the configured API key looks like a DeepSeek key.
+
+        Raises:
+            ValueError: If the key is missing or malformed.
+        """
+        api_key = self.config.api_key
+        if not api_key or not str(api_key).strip():
+            raise ValueError("Invalid API key: no API key configured")
+        if not str(api_key).startswith("sk-"):
+            raise ValueError(
+                "Invalid API key: expected a DeepSeek key starting with 'sk-'"
+            )
+
             
-    async def _make_request(self, prompt: str, is_retry: bool = False) -> DeepSeekResponse:
+    async def _make_request(self,
+                            prompt: Optional[str] = None,
+                            messages: Optional[List[Dict[str, str]]] = None,
+                            is_retry: bool = False) -> DeepSeekResponse:
         """Make a request to the DeepSeek API.
         
         Args:
-            prompt: The prompt to send to the model.
+            prompt: The prompt to send to the model (wrapped as a single
+                user message when ``messages`` is not given).
+            messages: Full chat message list to send. Takes precedence over
+                ``prompt``.
             is_retry: Whether this is a retry attempt.
             
         Returns:
@@ -108,11 +189,12 @@ class DeepSeekProvider:
             self._metrics["errors"] += 1
             raise RuntimeError("Failed to initialize session")
         
+        if messages is None:
+            messages = [{"role": "user", "content": prompt or ""}]
+        
         payload = {
             "model": self.config.model_name,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
+            "messages": messages,
             "temperature": self.config.temperature,
             "max_tokens": self.config.max_tokens,
             "top_p": self.config.top_p,
@@ -146,6 +228,55 @@ class DeepSeekProvider:
             logger.error(f"Error making DeepSeek API request: {str(e)}")
             raise
             
+    async def chat(self, messages: List[Dict[str, str]]) -> str:
+        """Run a chat completion against the DeepSeek chat endpoint.
+
+        Args:
+            messages: Chat messages, e.g.
+                ``[{"role": "user", "content": "Hello"}]``.
+
+        Returns:
+            The assistant reply text.
+
+        Raises:
+            ValueError: If the API key is missing/malformed or the API
+                rejects the credentials.
+        """
+        self._validate_api_key()
+        try:
+            response = await self._make_request(messages=messages)
+        except Exception as e:
+            message = str(e)
+            if "Unauthorized" in message or "Authentication" in message:
+                raise ValueError(f"Authentication failed: {message}") from e
+            raise
+        return response.text
+
+    async def generate(self, prompt: str, use_chat_endpoint: bool = True) -> str:
+        """Generate text for a single prompt.
+
+        Args:
+            prompt: The prompt to send.
+            use_chat_endpoint: Kept for API compatibility; DeepSeek only
+                exposes the chat completions endpoint, so both values use it.
+
+        Returns:
+            The generated text.
+
+        Raises:
+            ValueError: If the API key is missing/malformed or the request
+                fails.
+        """
+        self._validate_api_key()
+        try:
+            response = await self._make_request(prompt)
+        except Exception as e:
+            message = str(e)
+            if "Unauthorized" in message or "Authentication" in message:
+                raise ValueError(f"Authentication failed: {message}") from e
+            raise
+        return response.text
+
     async def generate_code(self, 
                           prompt: str,
                           language: str = "python",

@@ -83,9 +83,14 @@ class FileOperationsDemo:
                 "path": str(filepath)
             })
             
+            read_ok = result.status == InstructionStatus.COMPLETED.value
             return FileOperationResult(
-                success=result.status == InstructionStatus.COMPLETED.value,
-                message=f"File {filename} read successfully",
+                success=read_ok,
+                message=(
+                    f"File {filename} read successfully"
+                    if read_ok
+                    else f"Failed to read file {filename}"
+                ),
                 data=result.data,
                 metrics=result.metrics
             )
@@ -98,17 +103,33 @@ class FileOperationsDemo:
             )
     
     async def update_file(self, filename: str, content: str) -> FileOperationResult:
-        """Update file content."""
+        """Update file content.
+
+        Unlike creation, updating requires the file to already exist:
+        a missing file is an error, not an implicit create.
+        """
         try:
             filepath = self.workspace / filename
+            if not filepath.exists():
+                return FileOperationResult(
+                    success=False,
+                    message=f"Failed to update file: {filename} does not exist",
+                    data={},
+                    metrics={}
+                )
             result = await self.update_instruction.execute({
                 "path": str(filepath),
                 "content": content
             })
             
+            update_ok = result.status == "completed"
             return FileOperationResult(
-                success=result.status == "completed",
-                message=f"File {filename} updated successfully",
+                success=update_ok,
+                message=(
+                    f"File {filename} updated successfully"
+                    if update_ok
+                    else f"Failed to update file {filename}"
+                ),
                 data=result.data,
                 metrics=result.metrics
             )
@@ -126,9 +147,14 @@ class FileOperationsDemo:
                 "path": str(filepath)
             })
             
+            delete_ok = result.status == "completed"
             return FileOperationResult(
-                success=result.status == "completed",
-                message=f"File {filename} deleted successfully",
+                success=delete_ok,
+                message=(
+                    f"File {filename} deleted successfully"
+                    if delete_ok
+                    else f"Failed to delete file {filename}"
+                ),
                 data=result.data,
                 metrics=result.metrics
             )
@@ -168,10 +194,18 @@ class FileOperationsDemo:
                 "path": str(filepath)
             })
             
+            metadata_ok = result.status == "completed"
+            # Normalize stat()-style keys (created/modified) to the
+            # *_at naming used by the demo API.
+            metadata = dict(result.data or {})
+            if "created" in metadata:
+                metadata.setdefault("created_at", metadata["created"])
+            if "modified" in metadata:
+                metadata.setdefault("modified_at", metadata["modified"])
             return FileOperationResult(
-                success=result.status == "completed",
-                message=f"Metadata retrieved successfully",
-                data=result.data,
+                success=metadata_ok,
+                message="Metadata retrieved successfully" if metadata_ok else f"Failed to get metadata for {filename}",
+                data=metadata,
                 metrics=result.metrics
             )
         except Exception as e:
@@ -188,7 +222,14 @@ class FileOperationsDemo:
             # Read current content
             read_result = await self.read_file(filename)
             if not read_result.success:
-                return read_result
+                # Keep the edit-level failure context (the read failure
+                # is a cause, not the operation the caller asked about).
+                return FileOperationResult(
+                    success=False,
+                    message=f"Failed to edit file {filename}: could not read current content",
+                    data={},
+                    metrics=read_result.metrics
+                )
             
             current_content = read_result.data["content"]
             
@@ -207,7 +248,9 @@ class FileOperationsDemo:
                         data=result.data
                     )
                 
-                current_content = result.data["content"]
+                current_content = result.data.get("content")
+                if current_content is None and "lines" in result.data:
+                    current_content = "\n".join(result.data["lines"])
             
             # Update file with final content
             update_result = await self.update_file(filename, current_content)

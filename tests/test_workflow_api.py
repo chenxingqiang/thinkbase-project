@@ -42,16 +42,37 @@ class ServerManager:
         # Construct the command to run the server
         server_script = os.path.join(os.path.dirname(__file__), '..', 'agentflow', 'api', 'workflow_server.py')
 
-        # Start the server process
+        # Start the server process.  stdout/stderr go to a log file
+        # rather than captured pipes: the server logs at DEBUG level
+        # (ray/uvicorn startup), so a 64KB pipe would fill and block the
+        # server mid-request, hanging tests that await responses.  A log
+        # file keeps the server unblocked and the output debuggable.
+        server_log = os.path.join(
+            os.path.dirname(__file__), '..', 'logs', 'test_workflow_server.log'
+        )
+        os.makedirs(os.path.dirname(server_log), exist_ok=True)
+        log_handle = open(server_log, 'a', buffering=1)
+        self.log_handle = log_handle
+        # Force the server subprocess to start its own Ray cluster
+        # (RAY_ADDRESS=local) instead of auto-connecting to whatever
+        # cluster the parent pytest process left running: connecting to
+        # a stale GCS times out for 60s, pushing server startup past any
+        # sane wait bound.
+        server_env = dict(os.environ)
+        server_env["RAY_ADDRESS"] = "local"
         self.process = subprocess.Popen(
             [sys.executable, server_script, str(self.port)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            text=True,
+            env=server_env
         )
 
-        # Wait for the server to start
-        max_wait_time = 20  # Increased wait time
+        # Wait for the server to start.  Ray/uvicorn startup is slow
+        # under disk pressure (ray's file-system monitor warns past 95%
+        # capacity and worker spawn slows), so keep generous headroom
+        # before declaring failure.
+        max_wait_time = 60
         start_time = time.time()
 
         while time.time() - start_time < max_wait_time:
@@ -66,8 +87,14 @@ class ServerManager:
                 logger.warning(f"Connection attempt failed: {e}")
                 time.sleep(1)
 
-        # Print out process output for debugging
-        stdout, stderr = self.process.communicate()
+        # Print out process output for debugging.  communicate() must be
+        # bounded: the server process is likely still alive (slow start),
+        # so an unbounded wait would hang the test forever.
+        try:
+            stdout, stderr = self.process.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            self.process.kill()
+            stdout, stderr = self.process.communicate()
         logger.error(f"Server stdout: {stdout}")
         logger.error(f"Server stderr: {stderr}")
 
@@ -84,6 +111,8 @@ class ServerManager:
                 logger.debug(f"Server stderr: {stderr}")
             except subprocess.TimeoutExpired:
                 self.process.kill()
+            if getattr(self, 'log_handle', None):
+                self.log_handle.close()
             self.process = None
 
 @pytest.fixture(scope="module")
@@ -174,7 +203,7 @@ def test_sync_workflow_execution(server):
         }
     }
     
-    response = requests.post(url, json=request_data)
+    response = requests.post(url, json=request_data, timeout=30)
     
     if response.status_code != 200:
         logger.error(f"Full error response: {response.text}")
@@ -289,7 +318,7 @@ def test_async_workflow_execution(server):
         }
     }
     
-    async_response = requests.post(execute_url, json=request_data)
+    async_response = requests.post(execute_url, json=request_data, timeout=30)
     
     if async_response.status_code != 200:
         logger.error(f"Full async error response: {async_response.text}")
@@ -314,7 +343,7 @@ def test_invalid_workflow(server):
     }
 
     try:
-        response = requests.post(url, json=invalid_workflow_config)
+        response = requests.post(url, json=invalid_workflow_config, timeout=30)
         logger.debug(f"Invalid Workflow Response Status: {response.status_code}")
         logger.debug(f"Invalid Workflow Response Content: {response.text}")
 

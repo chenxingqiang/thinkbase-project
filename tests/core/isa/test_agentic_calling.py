@@ -11,7 +11,7 @@ from agentflow.core.isa.agentic_calling import (
 from agentflow.core.isa.instruction import Instruction, InstructionType
 
 async def sample_typed_function(param1: str, param2: int = 42) -> Dict[str, Any]:
-    """Sample function used to test transformation."""
+    """Test function for transformation."""
     return {"param1": param1, "param2": param2}
 
 @pytest.fixture

@@ -180,7 +180,7 @@ async def workflow_engine():
 @pytest.mark.asyncio
 async def test_workflow_initialization(workflow_engine):
     """Test workflow engine initialization."""
-    engine = await anext(workflow_engine)
+    engine = workflow_engine
     assert engine._initialized
     assert engine._ell is not None
     assert engine._isa_manager is not None
@@ -189,8 +189,8 @@ async def test_workflow_initialization(workflow_engine):
 @pytest.mark.asyncio
 async def test_agent_registration(workflow_engine, agent):
     """Test agent registration in workflow."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     workflow_id = await engine.register_workflow(agent_instance)
     assert workflow_id in engine.workflows
@@ -198,8 +198,8 @@ async def test_agent_registration(workflow_engine, agent):
 @pytest.mark.asyncio
 async def test_workflow_execution(workflow_engine, agent, mock_ell):
     """Test workflow execution."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     # Set up mock ELL
     agent_instance._ell = mock_ell
@@ -216,8 +216,8 @@ async def test_workflow_execution(workflow_engine, agent, mock_ell):
 @pytest.mark.asyncio
 async def test_workflow_error_handling(workflow_engine, agent, mock_ell):
     """Test workflow error handling."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     workflow_id = await engine.register_workflow(agent_instance)
     
@@ -231,7 +231,7 @@ async def test_workflow_error_handling(workflow_engine, agent, mock_ell):
 @pytest.mark.asyncio
 async def test_parallel_workflow_execution(workflow_engine, agent_config, mock_ell):
     """Test parallel workflow execution."""
-    engine = await anext(workflow_engine)
+    engine = workflow_engine
     agents = []
     workflow_ids = []
     
@@ -264,8 +264,8 @@ async def test_parallel_workflow_execution(workflow_engine, agent_config, mock_e
 @pytest.mark.asyncio
 async def test_workflow_cleanup(workflow_engine, agent, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test workflow cleanup."""
-    engine = await anext(workflow_engine)
-    agent_instance = await anext(agent)
+    engine = workflow_engine
+    agent_instance = agent
     
     workflow_id = await engine.register_workflow(agent_instance)
     

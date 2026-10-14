@@ -3,13 +3,9 @@
 
 # Abstract
 
-The rapid advancement of Large Language Models (LLMs) has enabled sophisticated AI agents, yet challenges persist in efficiently managing their behaviors, optimizing their performance, and assessing their capabilities. We present AgentISA, a novel instruction set architecture specifically designed for LLM-powered AI agents. Our architecture introduces three key innovations: (1) a formal instruction set with compositional semantics and verifiable properties, (2) an Agentic Calling mechanism that transforms traditional function calling into reusable agent instructions, and (3) an automatic instruction learning system that captures and optimizes interaction patterns from user dialogues.
+Large Language Models (LLMs) are increasingly deployed as autonomous agents, yet their behaviors are typically orchestrated through ad-hoc prompt engineering and per-provider function-calling interfaces. This makes agent behavior difficult to specify, analyze, and optimize systematically. We present AgentISA, an instruction set architecture for LLM-powered agents that treats agent behavior as a first-class compilable artifact. AgentISA contributes: (1) a formal instruction set with compositional semantics, a type system, and machine-checkable pre/post-conditions; (2) an Agentic Calling mechanism that lifts provider-specific function calling into reusable, cacheable agent instructions; (3) an automatic instruction learning system that mines recurring instruction patterns from interaction traces; and (4) a compiler and runtime applying classical optimization techniques—instruction fusion, dead-code elimination, pipeline scheduling, and dynamic hot-path specialization—to agent instruction streams.
 
-The architecture includes a comprehensive compiler infrastructure featuring instruction-level optimization, pipeline scheduling, and cross-model compatibility. Our implementation demonstrates significant improvements in practical applications: 68-81% reduction in API calls, 63-71% improvement in response time, and 14-67% cost savings across different components. Through extensive case studies in financial trading, healthcare diagnostics, and customer service automation, we validate the architecture's effectiveness in real-world scenarios.
-
-AgentISA provides formal guarantees for instruction composition and optimization, verified through both theoretical analysis and empirical evaluation. The architecture introduces a novel capability assessment framework that enables fine-grained comparison of different LLMs at the instruction level, offering quantitative metrics for model selection and optimization. We also present a theoretical foundation for analyzing emergent behaviors in multi-agent systems and establish formal bounds for performance and resource consumption.
-
-Our work contributes to the standardization of agent-LLM interactions and provides a foundation for future research in automated instruction optimization, cross-model capability assessment, and secure multi-agent coordination. The results demonstrate that AgentISA effectively bridges the gap between high-level agent behaviors and low-level system operations while maintaining efficiency, security, and scalability.
+We evaluate AgentISA with a reproducible microbenchmark suite that executes the real compiler, cache, and optimization-manager code paths against a mock LLM backend that counts simulated API calls and charges a fixed 80 ms simulated latency per call. On synthetic Zipf-distributed workloads (2,000 tasks, 5 random seeds), result caching reduces simulated API calls by 59.5%±0.3%, 67.9%±0.2%, and 79.6%±0.5% at Zipf exponents 0.5, 1.0, and 1.5, respectively. Static compilation reduces the effective instruction count by 34.2%±1.8% (sequence length 200; 35.4%±1.6% at length 1,000), with an ablation attributing 21.9%±3.5% to fusion alone and 24.1%±3.3% to dead-code elimination alone. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%. A suite of 43 multi-agent coordination and security tests provides functional validation of role assignment, capability-based agent selection, barrier synchronization, and authentication/authorization monitoring. We position these results honestly as microbenchmark evidence on synthetic workloads—not as production end-to-end measurements—and discuss the resulting threats to validity.
 
 # Keywords
 
@@ -26,193 +22,139 @@ Our work contributes to the standardization of agent-LLM interactions and provid
 
 # Research Highlights
 
-1. Novel instruction set architecture specifically designed for LLM-powered AI agents
-2. Automated instruction learning and optimization system reducing API calls by up to 81%
-3. Formal framework for cross-model capability assessment and comparison
-4. Theoretical foundations for instruction composition and multi-agent coordination
-5. Comprehensive compiler infrastructure with instruction-level optimization
+1. A formal instruction set architecture that makes LLM agent behavior compilable, analyzable, and optimizable
+2. Result caching reduces simulated API calls by 59.5–79.6% on synthetic Zipf workloads (5 seeds), with the reduction growing as workload skew increases
+3. Static compilation (fusion + dead-code elimination) reduces the effective instruction count by 34.2%±1.8%, validated by a per-pass ablation
+4. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%
+5. Agentic Calling lifts provider-specific function calling into reusable, portable agent instructions
 
-# Categories and Subject Descriptors
+# CCS Concepts
 
-According to ACM Computing Classification System:
-
-- D.3.4 [Programming Languages]: Compilers, Optimization
-- I.2.11 [Artificial Intelligence]: Distributed Artificial Intelligence—Multiagent systems
-- D.4.8 [Performance]: Modeling and prediction
-- K.6.4 [System Management]: Centralization/decentralization
-- F.3.1 [Logics and Meanings of Programs]: Specifying and Verifying and Reasoning about Programs
-
-# General Terms
-
-Algorithms, Design, Performance, Theory, Verification
+- **Software and its engineering → Compilers**: instruction selection, optimization, and scheduling applied to agent instruction streams
+- **Theory of computation → Program reasoning**: type safety and semantic-preservation proofs for instruction-level transformations
+- **Computing methodologies → Artificial intelligence**: LLM-based agents, tool use, and multi-agent coordination
+- **Computer systems organization → Architectures**: instruction set design and runtime support for agent execution
 
 # Funding Information
 
-This research was supported in part by grants from [Funding Organizations].
+No external funding was received for this work.
 
 # 1. Introduction
 
-Recent advances in Large Language Models (LLMs) have fundamentally transformed the artificial intelligence landscape, enabling unprecedented natural language understanding and generation capabilities [1, 2]. While these models excel at processing natural language inputs, their integration into practical agent systems presents unique challenges in terms of efficiency, cost management, and behavior standardization [3]. The emergence of function calling in models like GPT-4 [4] and Claude [5] has opened new possibilities for building AI agents, yet significant challenges remain in efficiently leveraging these capabilities at scale.
+Recent advances in Large Language Models (LLMs) have produced systems with strong natural language understanding, generation, and—through instruction tuning and human feedback—instruction-following capabilities [1, 2, 3, 4, 5, 6]. Building on these capabilities, a rapidly growing body of work couples LLMs with tools, memory, and control loops to construct autonomous agents [9, 10, 11, 12]. Yet the engineering substrate beneath these agents remains largely ad hoc: behaviors are specified as prompts and provider-specific function-calling schemas, which are difficult to specify precisely, analyze formally, or optimize systematically.
 
 ## Background and Motivation
 
-Function calling capabilities in LLMs represent a significant advancement in bridging natural language understanding with programmatic execution [6]. However, current approaches typically treat each interaction as an isolated event, leading to redundant API calls and increased operational costs. This limitation becomes particularly apparent in enterprise deployments, where Kojima et al. [7] report that up to 60% of LLM API calls follow recurring patterns that could potentially be optimized.
+Function calling—selecting an API from a declared tool set and emitting structured arguments—has become the dominant interface between LLMs and external systems [13, 14, 15]. Standardization efforts such as the Model Context Protocol [18] and evaluation harnesses such as the Berkeley Function Calling Leaderboard [17] are consolidating this interface layer. However, the unit of interaction remains the individual API call: each call is dispatched, priced, and forgotten independently, even when an agent repeatedly executes structurally identical work.
 
-The traditional function calling paradigm, while effective for simple API interactions, fails to capture the rich context and adaptive nature required for sophisticated agent behaviors [8]. Recent work by Zhang et al. [9] demonstrates that current agent architectures lack systematic mechanisms for accumulating and reusing successful interaction patterns, resulting in unnecessary computational overhead and reduced efficiency.
+This per-call statelessness stands in sharp contrast to how computing systems have historically handled repetitive execution. Classical compilers and hardware translate recurring patterns into cheaper forms—instruction fusion, dead-code elimination, caching, and trace-based dynamic optimization [33, 34]. Our motivating hypothesis is that these same techniques apply to LLM agent workloads: if agent behavior is expressed as an explicit instruction stream rather than as opaque prompts, then recurring patterns become visible to a compiler and can be optimized with well-understood, semantics-preserving transformations.
 
 ## Challenges in Current LLM-based Agent Systems
 
-Several critical challenges persist in current LLM-based agent systems:
+Five structural challenges motivate AgentISA:
 
-1. **Inefficient Resource Utilization**: Studies by Brown et al. [10] show that existing systems often require 3-5 LLM API calls to accomplish tasks that follow previously established patterns, leading to unnecessary computational overhead.
+1. **Per-call statelessness of tool interfaces.** Mainstream function-calling and tool-use protocols treat each call as an isolated event [13, 14, 18]. The provider has no notion of a *program* being executed, so repeated identical work incurs repeated cost; caching, when present, is a bolt-on afterthought rather than a semantic property of the execution model.
 
-2. **Limited Learning from User Interactions**: While LLMs demonstrate impressive few-shot learning capabilities [11], deployed agents typically lack mechanisms to systematically capture and reuse successful interaction patterns from real-world usage [12].
+2. **Experience that does not accumulate as executable structure.** Agent paradigms such as Reflexion [10] and Voyager [12] do accumulate experience, but as verbal reflections or skill libraries consumed by the model at inference time. The lessons are not reified as reusable, statically optimizable instructions that a compiler can fuse, schedule, or eliminate.
 
-3. **Inconsistent Behavior Specifications**: Chen et al. [13] highlight how the absence of a standardized instruction set for agent behaviors results in ad-hoc implementations that are difficult to maintain and optimize.
+3. **Absence of a shared behavioral contract.** Each multi-agent framework defines its own abstractions for roles, messages, and workflows [19, 20, 21, 22, 23, 24]. There is no instruction-level contract that is independent of any single framework, which fragments tooling and makes cross-framework analysis difficult.
 
-4. **High Operational Costs**: Recent analyses by Wilson et al. [14] indicate that API costs for LLM-based systems can constitute up to 70% of operational expenses in large-scale deployments.
+4. **Cost pressure at the wrong layer.** FrugalGPT [28] demonstrates that LLM inference cost is a first-order concern, and the serving-systems community has attacked this below the API boundary with paged attention, continuous batching, KV-cache-centric architectures, and attention kernels [38, 39, 40, 41]. What is missing is the complementary, above-the-API layer: reducing the *number and size* of calls an agent issues in the first place.
 
-5. **Integration Complexity**: Research by Lopez et al. [15] demonstrates that different LLMs often require distinct integration approaches, complicating the development of portable agent systems.
+5. **Integration complexity across providers.** Portability across LLM providers is handled today primarily at the library level [26, 27]. Agent logic written against one provider's function-calling surface does not transfer cleanly to another, and capability differences between providers are hard to reason about systematically [17].
 
 ## Research Objectives and Contributions
 
-This paper introduces AgentISA, a novel instruction set architecture designed specifically for LLM-powered AI agents. Our work makes several key contributions:
+This paper introduces AgentISA, an instruction set architecture that addresses these challenges by making agent behavior a first-class compilable artifact. Our contributions are:
 
-1. We propose an innovative Agentic Calling paradigm that transforms traditional function calling into reusable agent instructions, building upon recent advances in program synthesis [16] and automated reasoning [17].
+1. **A formal instruction set** for LLM agents with compositional semantics, a type system, and pre/post-conditions on every instruction (Section 3.1), together with proofs of Turing completeness (Theorem 3.1) and type safety (Theorem 3.2).
 
-2. We present an automatic instruction learning system that captures and formalizes successful interaction patterns from user dialogues, extending previous work on pattern mining in conversational AI [18].
+2. **Agentic Calling**, a mechanism that lifts provider-specific function calling into reusable, cacheable, semantically specified agent instructions, with a model-adapter layer for cross-provider portability (Section 3.2).
 
-3. We introduce a cost-effective execution model that significantly reduces API calls through intelligent instruction caching and reuse, demonstrating up to 70% reduction in operational costs compared to baseline implementations [19].
+3. **Automatic instruction learning**, which mines frequent instruction sequences from execution traces using frequency-based sequence mining and clustering, and promotes verified recurring patterns into first-class instructions (Section 3.3).
 
-4. We provide a comprehensive compiler infrastructure and runtime system that supports cross-model compatibility, incorporating recent advances in intermediate representation design [20] and dynamic optimization [21].
+4. **A compiler and runtime** that apply instruction selection, fusion, dead-code elimination, pipeline scheduling, and dynamic hot-path specialization to agent instruction streams (Sections 3.4 and 4), with semantic-preservation arguments for each transformation (Theorems 3.4–3.6, proofs in Appendix C).
 
-Our research addresses the fundamental challenge of bridging the gap between high-level agent behaviors and low-level system operations while maintaining efficiency and scalability. The proposed architecture enables the development of more sophisticated AI agents that can learn from user interactions, reduce operational costs, and maintain consistent behavior across different deployment scenarios.
+5. **An empirical microbenchmark evaluation** of the implemented system on synthetic Zipf-distributed workloads, reporting simulated API-call reduction from caching (59.5–79.6% depending on skew), effective instruction-count reduction from static compilation (34.2%±1.8% at sequence length 200), and trace shrinkage from dynamic optimization (65.8%±4.6%), each over 5 random seeds with full methodology disclosure (Section 5).
 
-The rest of this paper is organized as follows: Section 2 reviews related work in LLM-based systems and instruction set architectures. Section 3 details the design of AgentISA. Section 4 describes our implementation approach. Section 5 presents case studies and performance evaluations. Section 6 discusses limitations and future work, and Section 7 concludes the paper.
+6. **Multi-agent coordination infrastructure** with capability-based agent selection, execution planning, fallback strategies, and a security monitor enforcing authentication, authorization, resource-access, and data-sensitivity policies (Section 3.5 and Section 5.6), validated by 43 passing functional tests.
+
+We deliberately scope our empirical claims: all quantitative results come from microbenchmarks that exercise the real `agentflow.core.isa` implementation against a mock LLM backend on synthetic workloads. They establish that the optimizations are real and measurable in a controlled setting; they do not constitute production end-to-end measurements, and we discuss this limitation explicitly in Section 5.7.
+
+The rest of this paper is organized as follows: Section 2 reviews related work. Section 3 details the design of AgentISA. Section 4 describes the implementation. Section 5 presents the empirical evaluation. Section 6 discusses limitations and future work, and Section 7 concludes.
 
 # 2. Related Work
 
-Our work builds upon and extends several key research areas: large language models and their function calling capabilities, agent frameworks, instruction set architectures, and cost optimization techniques in LLM applications. This section provides a comprehensive review of these areas and positions our contributions within the existing literature.
+AgentISA draws on eight lines of work: foundation LLMs and their function-calling interfaces, reasoning-and-acting agent paradigms, tool-calling standardization, multi-agent frameworks, prompt compilation and cost optimization, agent benchmarks, classical compiler and architecture techniques, and LLM serving systems. We review each in turn and position our contributions.
 
-## 2.1 Large Language Models and Function Calling
+## 2.1 Foundation LLMs and Function Calling
 
-Large Language Models have evolved from simple sequence prediction models to sophisticated systems capable of complex reasoning and task execution [22]. The fundamental architecture of these models can be formalized as:
+Modern LLMs are autoregressive transformers trained at large scale [1, 2, 3, 4], with instruction tuning and reinforcement learning from human feedback making them reliable instruction followers [5, 6]. Their text distribution is conventionally factorized as:
 
 $$
 P(y|x) = \prod_{t=1}^{T} P(y_t|x, y_{<t}; \theta)
 $$
 
-where $x$ represents the input context, $y$ the generated output, and $θ$ the model parameters. Recent work by Davidson et al. [23] extends this framework to include function calling capabilities, introducing a structured output space:
+where $x$ is the input context, $y$ the generated output, and $\theta$ the model parameters. Function calling constrains this distribution to a structured output space:
 
 $$
 F(x) = \text{argmax}_{f \in \mathcal{F}} P(f|x, \mathcal{F})
 $$
 
-where $\mathcal{F}$ represents the set of available functions, and $F(x)$ is the selected function for input $x$.
+where $\mathcal{F}$ is the set of declared functions and $F(x)$ the selected call. GPT-4 [3], PaLM [2], and open models such as LLaMA [4] expose this capability with provider-specific schemas. AgentISA does not modify this layer; it treats any such interface as a *backend* to be targeted by a common instruction set, in the same way that a compiler targets multiple processor backends [33].
 
-Function calling in LLMs has evolved through several paradigms:
-
-1. Basic prompt-based function selection [24]
-2. Structured JSON output parsing [25]
-3. Dynamic function registration and discovery [26]
-
-However, as Thompson et al. [27] demonstrate, these approaches suffer from three key limitations:
-
-**Definition 2.1** (Function Call Overhead): Let τ be the time taken for a function call, then the total overhead $O$ for $n$ similar calls is:
+The cost structure of this layer motivates our work. If each call carries latency $\tau_i$ plus a context-switching overhead $\delta_i$ (prompt reconstruction, serialization, cache misses), then $n$ similar calls cost:
 
 $$
 O(n) = \sum_{i=1}^{n} (\tau_i + \delta_i)
 $$
 
-where $δ_i$ represents the context switching cost for each call.
+**Definition 2.1** (Function Call Overhead): The overhead of executing $n$ function calls is the sum of per-call latencies and per-call context reconstruction costs, as above. When successive calls are structurally identical, $\delta_i$ is pure waste—which is precisely the waste AgentISA's caching and fusion are designed to remove.
 
-## 2.2 Existing Agent Frameworks
+## 2.2 Reasoning and Agent Paradigms
 
-Current agent frameworks can be classified into three primary categories, as established by Liu et al. [28]:
+A second line of work enhances LLM reasoning at prompt time. Chain-of-thought prompting [7] and zero-shot reasoning [8] improve multi-step behavior by eliciting intermediate steps. ReAct interleaves reasoning traces with actions [9]; Reflexion adds verbal self-critique across episodes [10]; Tree of Thoughts explores deliberative search over thought trees [11]; and Voyager demonstrates open-ended skill acquisition in an embodied environment [12]. These paradigms define *what* an agent should do at the cognitive level. AgentISA is complementary: it defines *how* the resulting behaviors are represented, compiled, and executed as instructions. A ReAct loop, for instance, can be expressed as an AgentISA instruction sequence whose tool invocations become fused, cacheable agentic calls.
 
-1. **Reactive Agents**: Simple stimulus-response mappings
-2. **Deliberative Agents**: Planning-based decision making
-3. **Hybrid Agents**: Combining reactive and deliberative approaches
+## 2.3 Tool Calling and Interface Standardization
 
-These frameworks typically implement a decision cycle defined as:
+Toolformer trains models to interleave tool calls with text [13]; Gorilla connects models to large API corpora [14]; ToolLLM scales tool coverage to 16,000+ real-world APIs [15]; and HuggingGPT orchestrates model hubs for task solving [16]. On the standardization side, the Model Context Protocol defines an open specification for exposing tools and context to LLM applications [18], and the Berkeley Function Calling Leaderboard provides a systematic cross-model evaluation of function-calling accuracy [17].
 
-$$
-\pi(s_t) = \text{argmax}_{a \in A} Q(s_t, a)
-$$
+These efforts standardize the *interface*. AgentISA standardizes the *execution model above the interface*: it compiles a provider-independent instruction stream down to whatever interface a backend exposes. This distinction matters for portability—an AgentISA program compiled for two providers differs only in the final translation step (Section 3.2.3)—and for optimization, because interface-level standards alone cannot fuse or eliminate calls.
 
-where $s_t$ is the current state, $A$ is the action space, and $Q(s_t, a)$ represents the expected utility of action $a$ in state $s_t$.
+## 2.4 Multi-Agent Frameworks
 
-Recent work by Chen et al. [29] introduced formal verification methods for agent behaviors, proving the following key theorem:
+AutoGen frames agent applications as multi-agent conversations [19]; MetaGPT assigns standardized roles and workflows to agents [20]; AgentVerse facilitates multi-agent collaboration and studies emergent behaviors [21]; ChatDev organizes agents as a software-development organization [22]; CAMEL studies communicative agent societies [23]; and AutoGPT popularized autonomous goal-driven agents [24].
 
-**Theorem 2.1** (Agent Behavior Consistency): For an agent framework F with state space S and action space A, if F satisfies the Markov property and implements proper state transitions, then there exists a stable policy π* such that:
+AgentISA contributes a different artifact to this space: not a framework or orchestration philosophy, but an instruction-level substrate—capability profiles, coordination instructions with barrier semantics, and a security monitor—that any such framework could target. Concretely, our multi-agent layer (Section 3.5, Section 5.6) provides capability-based agent selection, execution planning with per-stage fallback strategies, and policy enforcement for authentication, authorization, resource access, and data sensitivity.
 
-$$
-\forall s \in S: \pi^*(s) = \text{argmax}_{a \in A} \sum_{s' \in S} P[s'|s,a](R(s,a,s') + \gamma V^*(s'))
-$$
+## 2.5 Prompt Compilation and Cost Optimization
 
-*Proof*: See Chen et al. [29] for the complete proof, which uses value iteration convergence properties.
+Closest to our compilation perspective are systems that *compile* LLM invocations. DSPy compiles declarative prompt programs into optimized pipelines via prompt search and fine-tuning [25]. LangChain [26] and LlamaIndex [27] provide library-level abstractions for chaining LLM calls and indexing context. FrugalGPT reduces cost through model cascades—answering with cheaper models when possible [28].
 
-## 2.3 Instruction Set Architectures
+AgentISA differs in the level at which optimization operates. DSPy optimizes *prompts*; FrugalGPT optimizes *model selection*; AgentISA optimizes *instruction streams*: instruction selection by dynamic programming over pattern covers, fusion, dead-code elimination, pipeline scheduling, result caching, and dynamic hot-path specialization (Sections 3.4 and 4). These are classical compiler transformations [33] applied to a new artifact, and they compose with—rather than replace—prompt-level and model-level optimization.
 
-Traditional instruction set architectures (ISAs) have evolved from von Neumann architectures to modern RISC and CISC designs [30]. In the context of AI agents, we can define an instruction set formally as:
+## 2.6 Benchmarks for Agent Systems
 
-**Definition 2.2** (Agent Instruction Set): An agent instruction set I is a tuple (Σ, Ω, Δ) where:
+AgentBench evaluates LLMs as agents across diverse environments [29]; GAIA tests general assistant abilities [30]; PlanBench probes planning and reasoning about change [31]; and SWE-bench measures resolution of real-world GitHub issues [32]. These benchmarks evaluate *end-to-end capability*. AgentISA's evaluation instead measures *subsystem behavior under controlled conditions*—API-call reduction under synthetic Zipf workloads, instruction-count reduction from compilation, and trace shrinkage from dynamic optimization (Section 5). We view the two as complementary: instruction-level metrics explain *where* end-to-end gains come from, and are reproducible without live model access.
 
-- Σ is the set of basic instructions
-- Ω is the set of composition rules
-- Δ is the set of state transition functions
+## 2.7 Classical Compiler and Architecture Techniques
 
-Martinez et al. [31] propose formal requirements for AI agent instructions:
+AgentISA's optimization machinery is deliberately classical. Instruction selection by tree-pattern matching with dynamic programming, peephole optimization, and data-flow-based dead-code elimination are standard compiler techniques [33]. Pipelining, hazard detection, and resource-constrained scheduling follow the classical architecture literature [34]; the RISC-V project demonstrates the value of open, well-specified instruction sets [35]. Type safety via progress-and-preservation is the standard technique of programming-language theory [36], and CompCert establishes that compiler correctness itself can be formally verified [37]. Our contribution is not a new compiler technique but the demonstration that this machinery transfers to LLM agent workloads, together with the semantic-preservation arguments adapted to instructions with pre/post-conditions (Appendix C).
 
-$$
-\forall i \in I: \exists \delta \in \Delta : \delta(s_t, i) \rightarrow s_{t+1}
-$$
+## 2.8 LLM Serving Systems
 
-This formalization ensures deterministic state transitions and reproducible agent behaviors.
+Below the API boundary, the serving community has made inference dramatically cheaper: PagedAttention manages KV memory like virtual memory [38]; Orca introduces continuous batching for transformer serving [39]; FlashAttention redesigns attention for IO-awareness [40]; and Mooncake proposes a KVCache-centric disaggregated architecture [41]. Energy analyses quantify the inference cost of large models [42]. This line of work and AgentISA are orthogonal layers of the same stack: serving systems make each call cheaper; AgentISA reduces how many calls an agent makes and how much redundant work each carries. The two compound multiplicatively.
 
-## 2.4 Cost Optimization in LLM Applications
+## 2.9 Research Gaps and Our Contributions
 
-Cost optimization in LLM applications has become increasingly critical as model sizes and API costs grow. Wilson et al. [32] formalize the cost optimization problem as:
+In summary, the literature leaves four gaps that AgentISA addresses:
 
-$$
-\min_{x \in X} \sum_{i=1}^{n} c_i(x_i) \text{ subject to } Q(x) \geq Q_{min}
-$$
+1. **No instruction-level contract for agent behavior.** Interfaces are standardized [13, 14, 18], and frameworks are numerous [19, 20, 21, 22, 23, 24], but no shared instruction set spans providers and frameworks.
+2. **No compiler for agent behavior.** Prompt-level compilation exists [25] and model-level cost reduction exists [28], but instruction-level fusion, elimination, scheduling, and caching do not.
+3. **No semantics-preserving account of agent optimization.** Serving work verifies kernels and schedulers, not agent-level transformations; we provide progress-and-preservation-style arguments for ours (Theorems 3.2, 3.4, 3.5, 3.6).
+4. **No reproducible instruction-level evaluation.** Existing benchmarks measure end-to-end capability [29, 30, 31, 32]; we contribute a seed-controlled microbenchmark suite with fully disclosed synthetic workloads and mock-backend instrumentation (Section 5).
 
-where:
-
-- $c_i(x_i)$ represents the cost of the i-th API call
-- $Q(x)$ represents the quality of results
-- $Q_{min}$ is the minimum acceptable quality threshold
-
-Recent research by Park et al. [33] introduces three key optimization strategies:
-
-1. **Caching and Reuse**: Implementing efficient caching mechanisms with theoretical bounds:
-
-   $$
-   E[C_{saved}] = \sum_{i=1}^{n} p_i c_i \text{ where } p_i = P(\text{cache hit for query } i)
-   $$
-
-2. **Request Batching**: Optimizing batch size b according to:
-
-   $$
-   b^* = \text{argmin}_{b \in B} \frac{L(b)}{T(b)} \text{ where } L(b) \text{ is latency and } T(b) \text{ is throughput}
-   $$
-
-3. **Dynamic Scaling**: Adjusting resource allocation based on load patterns.
-
-## 2.5 Research Gaps and Our Contributions
-
-While existing work provides valuable foundations, several critical gaps remain:
-
-1. No existing framework efficiently bridges function calling with agent instruction sets
-2. Current cost optimization approaches focus on individual API calls rather than pattern-based optimization
-3. Existing agent frameworks lack systematic instruction learning capabilities
-
-Our work addresses these gaps through the following innovations, as detailed in subsequent sections:
-
-1. Introduction of Agentic Calling (Section 3)
-2. Pattern-based instruction optimization (Section 4)
-3. Automated instruction learning from user interactions (Section 5)
+Our work addresses these gaps through: (1) the Agentic Calling abstraction (Section 3.2), (2) pattern-based instruction optimization (Section 3.4), (3) automated instruction learning from execution traces (Section 3.3), and (4) a microbenchmark evaluation with explicit validity threats (Section 5).
 
 # 3. AgentISA Design
 
@@ -237,7 +179,7 @@ where:
 - $\Delta$ is the transition function set
 - $\Phi$ is the verification function set
 
-Following Zhang et al. [34], we define the basic instruction format:
+Following the conventions of classical instruction set design [33, 34, 35], we define the basic instruction format:
 
 ```
 INSTRUCTION = {
@@ -265,16 +207,11 @@ $$\mathcal{R} = \{allocate, free, monitor\}$$
 
 **Theorem 3.1** (Instruction Completeness): The AgentISA instruction set is Turing complete.
 
-*Proof*: We show that AgentISA can simulate a Universal Turing Machine (UTM) through the following mapping:
-
-1. UTM tape ⟷ AgentISA state space Σ
-2. UTM head movements ⟷ AgentISA control flow instructions
-3. UTM state transitions ⟷ AgentISA transition functions
-(Complete proof in Appendix A)
+*Proof sketch*: We exhibit a translation from WHILE programs—already known to be Turing equivalent—to AgentISA instruction sequences, using a counting argument over instruction classes: state management instructions encode an unbounded store, and control-flow instructions encode sequential composition, conditional branching, and iteration. The full construction and simulation argument are given in Appendix A, following standard simulation techniques from the compiler literature [33] and the operational-semantics framework of Pierce [36].
 
 ### 3.1.2 Type System and Semantics
 
-The type system T is defined using dependent types [35]:
+The type system T uses dependent-type constructions in the style of Pierce [36]:
 
 **Definition 3.2** (AgentISA Type System):
 $$
@@ -299,14 +236,16 @@ Type safety is guaranteed through the following theorem:
 
 **Theorem 3.2** (Type Safety): Well-typed AgentISA programs cannot "go wrong".
 
-*Proof*: By progress and preservation lemmas:
+*Proof*: By the standard two-lemma technique—progress and preservation—as presented in Pierce [36]:
 
 1. Progress: ∀e,T. ⊢e:T ⟹ value(e) ∨ ∃e'. e→e'
 2. Preservation: ∀e,e',T. ⊢e:T ∧ e→e' ⟹ ⊢e':T
 
+Both lemmas are proved by simultaneous induction on typing derivations; the full proof, including the case analysis over instruction classes, is given in Appendix B.
+
 ### 3.1.3 LLM Integration Interface
 
-The LLM integration interface is defined through a protocol specified by:
+The LLM integration interface is defined through a protocol, playing the same role for agent backends that the Model Context Protocol plays for tool exposure [18]:
 
 $$
 \mathcal{P}_{LLM} = (Q, R, C, \psi)
@@ -319,7 +258,7 @@ where:
 - C: Context management functions
 - ψ: State transformation functions
 
-Following Kumar et al. [36], we define the interface protocol:
+Following the interface conventions of modern function-calling providers [3, 18], we define the interface protocol:
 
 ```
 Protocol LLMInterface {
@@ -349,7 +288,7 @@ $$
 \forall f \in F, \exists a \in A: \text{sem}(f) \equiv \text{sem}(a)
 $$
 
-The transformation process follows three steps [37]:
+The transformation process follows three steps, mirroring the signature-to-call conventions of function-calling interfaces [13, 14]:
 
 1. Function signature analysis
 2. Context embedding
@@ -379,6 +318,8 @@ $$
 
 where φ is the context interpretation function.
 
+*Proof*: The transformation $t$ re-encodes the context into the instruction's `context` field without altering the semantic interpretation: by the definition of $t$, the extracted instruction carries a verbatim copy of the source context, and $\phi$ is defined compositionally over context contents, so $\phi(t(c)) = \phi(c)$ holds by construction. The adapter's `validateContext` check (Section 3.2.3) enforces this invariant at runtime. ∎
+
 ### 3.2.3 Cross-model Compatibility
 
 Cross-model compatibility is achieved through an abstract interface layer:
@@ -391,7 +332,7 @@ Interface ModelAdapter {
 }
 ```
 
-Formal compatibility requirements [38]:
+Cross-model compatibility requirements follow the observation of cross-model function-calling studies [17] and open protocol efforts [18]: providers differ in surface syntax but can agree on semantics,
 
 $$
 \forall m_1, m_2 \in M: \text{out}(m_1) \equiv \text{out}(m_2) \text{ when } \text{in}(m_1) \equiv \text{in}(m_2)
@@ -401,26 +342,24 @@ $$
 
 ### 3.3.1 Dialogue Pattern Recognition
 
-Pattern recognition is formalized using probabilistic context-free grammars (PCFG):
+Pattern recognition in AgentISA is frequency-based and clustering-based rather than grammatical; it is implemented in `agentflow.core.isa.pattern_mining` and `agentflow.core.isa.instruction_learning`.
 
-**Definition 3.4** (Dialogue Pattern): A pattern p is defined as:
-$$
-p = (V, \Sigma, R, S, P)
-$$
+**Definition 3.4** (Instruction Sequence Pattern): A pattern $p$ over the instruction alphabet $I$ is a non-empty contiguous sequence $p = (i_1, \dots, i_k) \in I^k$ together with two frequency statistics:
 
-where:
+- **Support**: $sup(p) = P(p \text{ occurs as a contiguous subsequence in a randomly drawn trace})$
+- **Confidence**: $conf(p \Rightarrow j) = P(i_{t+1} = j \mid (i_{t-k+1}, \dots, i_t) = p)$
 
-- V: Non-terminal symbols
-- Σ: Terminal symbols
-- R: Production rules
-- S: Start symbol
-- P: Probability function
+A pattern is *frequent* if $sup(p) \geq \sigma_{min}$ and *predictive* if $\max_j conf(p \Rightarrow j) \geq \gamma_{min}$, for thresholds $\sigma_{min}, \gamma_{min} \in (0, 1]$.
 
-Pattern matching uses the Viterbi algorithm [39]:
+Pattern recognition proceeds in three stages:
 
-$$
-\delta_t(j) = \max_{i} [\delta_{t-1}(i)a_{ij}]b_j(o_t)
-$$
+1. **Frequent-sequence mining.** Candidate subsequences are enumerated from execution traces together with their occurrence counts; sequences below $\sigma_{min}$ are pruned, and successor statistics are accumulated for confidence estimation. The output is the set of frequent, predictive patterns.
+
+2. **Feature extraction and clustering.** Each trace (or dialogue) is embedded into a feature vector—for instruction traces, instruction-type histograms, pattern occurrence counts, and dependency-graph statistics; for dialogues, TF-IDF vectors over significant turns. Vectors are normalized and clustered: k-means over instruction-trace features, and density-based clustering (DBSCAN) over dialogue embeddings. Clusters summarize distinct behavioral modes (e.g., retrieval-heavy versus reasoning-heavy traces) and parameterize per-cluster optimization decisions (Section 3.4.4).
+
+3. **Pattern validation.** Each candidate pattern is checked for significance (frequency above threshold, non-trivial support, and—when derived from dialogues—an acceptable success rate among the dialogues exhibiting it) before it is promoted to a candidate instruction.
+
+This design is deliberately statistical: agent traces are short and noisy, and frequency statistics degrade gracefully where grammar induction would overfit. It also composes with the compiler—a frequent, verified pattern is exactly the candidate for promotion to a fused instruction (Section 3.4.4).
 
 ### 3.3.2 Instruction Extraction Pipeline
 
@@ -437,26 +376,24 @@ The instruction extraction process follows a sequential pipeline:
 
 ### 3.3.3 Instruction Optimization and Verification
 
-Optimization follows a formal verification process [40]:
+Optimization is coupled to verification, in the spirit of verified compilation [37] but at the granularity of individual instructions and transformations:
 
 **Definition 3.5** (Instruction Verification): An instruction i is valid if:
 $$
 \forall s \in S: \text{pre}(i,s) \implies \text{post}(i,\text{exec}(i,s))
 $$
 
-The verification process uses model checking with temporal logic:
+For instructions with finite, small state spaces, verification enumerates the reachable state space and checks the implication exhaustively; for larger state spaces, it checks a bounded set of symbolic states, which makes it a *bounded* verification procedure rather than a complete one. We state this honestly: Definition 3.5 defines validity, and our implementation approximates it by bounded exploration:
 
 $$
-M, s \models \phi \iff \forall \pi \in \text{Paths}(M,s): M, \pi \models \phi
+\forall s \in S_{bounded} \subseteq S: \text{pre}(i,s) \implies \text{post}(i,\text{exec}(i,s))
 $$
+
+where $S_{bounded}$ is the explored subset. Completeness of the check is traded for tractability, following the standard operational-semantics treatment of instruction meaning [36].
 
 **Theorem 3.4** (Optimization Soundness): Optimized instructions preserve semantic equivalence.
 
-*Proof*: By structural induction on instruction composition:
-
-1. Base case: Single instruction preservation
-2. Inductive step: Composition preservation
-(Complete proof in Appendix B)
+*Proof sketch*: By structural induction on instruction composition. The base case shows each atomic rewrite (fusion, elimination, combining) preserves the denotation of a single instruction; the inductive step lifts preservation through each composition operator of Definition 3.6. The full proof, including the per-rewrite case analysis, is given in Appendix C.
 
 Implementation details:
 
@@ -469,9 +406,9 @@ def verify_instruction(instruction, pre_condition, post_condition):
             assert post_condition(next_state)
 ```
 
-# 3.4 Instruction Organization and Optimization
+## 3.4 Instruction Organization and Optimization
 
-## 3.4.1 Instruction Composition
+### 3.4.1 Instruction Composition
 
 The AgentISA supports hierarchical instruction composition through a formal composition algebra:
 
@@ -486,18 +423,23 @@ $$
 \end{align*}
 $$
 
-Composition follows algebraic properties:
+Composition follows algebraic properties. Properties 1 and 3 hold for all instructions; Property 2 requires a side-effect-freeness restriction:
 
-1. **Associativity**:
+1. **Associativity** (all instructions, up to denotation):
    $$(i_1 \circ i_2) \circ i_3 = i_1 \circ (i_2 \circ i_3)$$
 
-2. **Distributivity**:
+2. **Distributivity** (only for side-effect-free instructions): Let $i_1, i_2, i_3$ be side-effect-free (pure) instructions, each denoting a state transformation that is independent of external state. For pure instructions, denotations are idempotent (applying the same update twice is equivalent to applying it once) and pairwise commutative (independent updates combine in any order), so both sides of
    $$i_1 \parallel (i_2 \circ i_3) = (i_1 \parallel i_2) \circ (i_1 \parallel i_3)$$
+   denote the same net state transformation. Formally, the pure denotations form an idempotent, commutative structure under update combination, and $\parallel$ distributes over $\circ$ within it.
 
 3. **Identity**:
    $$i \circ \epsilon = \epsilon \circ i = i$$
 
-## 3.4.2 Instruction Pipeline Design
+where $\epsilon$ is the empty (identity) instruction.
+
+**Remark** (necessity of the restriction): Distributivity fails for instructions with side effects. Consider $i_1$ a state-mutating instruction and $i_2 = i_3 = \epsilon$. The left side executes $i_1$ once; the right side executes $i_1$ twice ($i_1 \parallel i_2$ and again in $i_1 \parallel i_3$), so the two programs differ in the resulting state. The fusion and elimination rewrites of Section 3.4.4 therefore apply distributivity-based simplifications only after a purity check on the affected instructions; instructions declared `side_effects=True` are excluded from such rewrites.
+
+### 3.4.2 Instruction Pipeline Design
 
 We formalize the instruction pipeline as a directed acyclic graph (DAG):
 
@@ -529,7 +471,7 @@ Pipeline {
 
 *Proof*: By induction on pipeline stages and hazard resolution (details in Appendix C).
 
-## 3.4.3 Instruction Selection and Scheduling
+### 3.4.3 Instruction Selection and Scheduling
 
 Instruction selection follows a tree-pattern matching approach:
 
@@ -562,9 +504,9 @@ $$
 \end{align*}
 $$
 
-## 3.4.4 Static and Dynamic Optimization
+### 3.4.4 Static and Dynamic Optimization
 
-### Static Optimization
+#### Static Optimization
 
 Static optimization employs several techniques:
 
@@ -591,7 +533,7 @@ Static optimization employs several techniques:
    }
    ```
 
-### Dynamic Optimization
+#### Dynamic Optimization
 
 Dynamic optimization includes:
 
@@ -613,7 +555,7 @@ Dynamic optimization includes:
                trace.performance < expected_performance)
    ```
 
-## 3.4.5 Verification and Analysis
+### 3.4.5 Verification and Analysis
 
 Optimization correctness is ensured through:
 
@@ -624,9 +566,9 @@ $$
 
 **Proof Sketch**:
 
-1. Show semantic preservation for each atomic transformation
-2. Prove composition of transformations preserves semantics
-3. Demonstrate hazard-free execution in pipeline
+1. Show semantic preservation for each atomic transformation (Appendix C, Lemma C.1)
+2. Prove composition of transformations preserves semantics (Appendix C, Lemma C.2)
+3. Demonstrate hazard-free execution in pipeline (Appendix C, Theorem 3.5)
 
 Performance Model:
 $$
@@ -638,6 +580,39 @@ $$
 \text{optimization\_gain}(i) = \sum_{o \in \text{Opts}} \text{benefit}(o,i) \times \text{application\_rate}(o,i)
 $$
 
+## 3.5 Capability Assessment
+
+Agents are heterogeneous: an agent (or the model behind it) may be strong at reasoning but weak at tool use, or vice versa. To make such differences explicit—and to give the multi-agent coordinator of Section 5.6 a principled basis for agent selection—AgentISA includes a capability assessment subsystem, implemented as `CapabilityProfile` in `agentflow.core.isa.capability`.
+
+**Definition 3.9** (Capability Profile): A capability profile of an agent $a$ is a mapping from capability domains $D$ (e.g., reasoning, tool use, communication, memory) to domain scores:
+$$
+\text{Cap}(a) = \{(\text{dom}_k, s_k, w_k) \mid \text{dom}_k \in D\}
+$$
+
+where each domain carries a score $s_k \in [0, 1]$ and a weight $w_k \geq 0$ reflecting the domain's importance in the current deployment context.
+
+Assessment proceeds in three steps:
+
+1. **Domain metric computation.** For each domain, `assess_capabilities` computes a set of `CapabilityMetric` values from the agent's instruction set—e.g., for the reasoning domain, metrics derived from the prevalence and complexity of reasoning-type instructions.
+
+2. **Domain aggregation.** Metrics are aggregated into a per-domain `DomainScore`:
+$$
+s_k = \frac{\sum_{m \in M_k} w_m \cdot \text{norm}(m)}{\sum_{m \in M_k} w_m}
+$$
+
+where $M_k$ is the metric set of domain $k$, $w_m$ are metric weights, and $\text{norm}(\cdot)$ maps each metric to $[0, 1]$.
+
+3. **Overall score.** `get_overall_score` computes the weighted mean across assessed domains:
+$$
+S(a) = \frac{\sum_{k} w_k \, s_k}{\sum_{k} w_k}
+$$
+
+falling back to the unweighted mean when all weights are zero.
+
+Three properties of this design deserve emphasis. First, it is **static and instruction-derived**: scores are computed from declared instruction sets, not from live probes, so assessment is cheap, deterministic, and side-effect-free. Second, it is **compositional**: because scores summarize instructions, fusing or eliminating instructions during compilation (Section 3.4) changes the profile predictably, and the coordinator re-assesses after optimization. Third, it directly serves coordination: the agent-selection predicate in Section 5.6 chooses the highest-scoring agent above a capability threshold for each task, subject to the security policies of the `SecurityMonitor`.
+
+We state the scope of this subsystem honestly: `CapabilityProfile` assesses *declared instruction-level capability*, which correlates with—but does not measure—end-to-end task performance. Cross-model behavioral comparison at benchmark level is the domain of evaluation suites such as BFCL [17] and AgentBench [29]; the two views are complementary.
+
 # 4. Implementation
 
 This section presents the implementation and validation of the AgentISA framework, with particular emphasis on the compiler infrastructure and optimization techniques described in Section 3.4.
@@ -646,7 +621,7 @@ This section presents the implementation and validation of the AgentISA framewor
 
 ### 4.1.1 Instruction Selection Implementation
 
-We implement the tree-pattern matching algorithm defined in Theorem 3.5 using dynamic programming:
+We implement the tree-pattern matching approach of Section 3.4.3 (Definition 3.8) using dynamic programming over the IR tree, in the classical manner of bottom-up instruction selection [33]:
 
 ```python
 Input: IR tree T, Pattern set P
@@ -702,7 +677,7 @@ We validate the optimality of instruction selection through:
 
 ### 4.1.2 Pipeline Scheduling Implementation
 
-We implement the pipeline scheduler following the DAG model from Section 3.4.2:
+We implement the pipeline scheduler following the DAG model from Section 3.4.2, with hazard detection and resource-constrained issue in the style of classical pipeline scheduling [34]:
 
 ```python
 Input: Instruction sequence I
@@ -976,214 +951,224 @@ class PerformanceMonitor:
         )
 ```
 
-2. **Statistical Verification**:
-We verify optimization effectiveness through statistical analysis:
+2. **Weighted Improvement Metric**:
+Optimization effectiveness is summarized as a descriptive weighted mean of metric deltas:
 
 $$
-\text{Improvement} = \frac{\sum_{i=1}^n w_i(m_i^{\text{opt}} - m_i^{\text{base}}))}{\sum_{i=1}^n w_i}
+\text{Improvement} = \frac{\sum_{i=1}^n w_i(m_i^{\text{opt}} - m_i^{\text{base}})}{\sum_{i=1}^n w_i}
 $$
 
-where $m_i$ are performance metrics and $w_i$ are importance weights.
+where $m_i$ are performance metrics and $w_i$ are importance weights. This is a descriptive summary only; the evaluation protocol of Section 5.1.3 reports mean ± standard deviation and makes no inferential (hypothesis-test) claims.
 
 ### 4.3.3 Empirical Results
 
-Our implementation demonstrates the following improvements:
+We validate the implemented optimizations with the microbenchmark suite of Section 5, which drives the real compiler, cache, and optimization-manager code paths against a mock LLM backend. Summary of the results (all mean±stdev over 5 random seeds on synthetic Zipf workloads; full methodology and tables in Section 5):
 
-| Optimization          | Speedup | Memory Reduction | Verification Time |
-| --------------------- | ------- | ---------------- | ----------------- |
-| Instruction Combining | 1.45x   | 12%              | 2.3ms             |
-| Pipeline Scheduling   | 1.68x   | 8%               | 3.1ms             |
-| Hot Path Optimization | 2.12x   | -5%              | 1.8ms             |
+| Optimization                | Measured effect                                                       | Where reported |
+| --------------------------- | --------------------------------------------------------------------- | -------------- |
+| Result caching              | 59.5%–79.6% reduction in simulated API calls, increasing with Zipf skew | Section 5.2    |
+| Static compilation (fusion + DCE) | 34.2%±1.8% reduction in effective instruction count (length-200 sequences) | Section 5.3    |
+| Dynamic hot-path optimization | 65.8%±4.6% trace shrinkage on repeatedly executed traces              | Section 5.4    |
 
-Statistical significance: p < 0.001 for all improvements (n=1000 trials).
+These are microbenchmark measurements on synthetic workloads with simulated latency (80 ms per simulated call); they are not production end-to-end results. Section 5.7 discusses the threats to validity that this scoping implies.
 
-# 5. Case Studies
+# 5. Empirical Evaluation
 
-## 5.1 Practical Applications
+We evaluate AgentISA with a reproducible microbenchmark suite (`examples/benchmarks/isa_microbench.py`) and a functional test suite for the multi-agent layer. We state the scope up front: all quantitative results in this section come from synthetic workloads executed against a *mock* LLM backend that counts simulated API calls and charges simulated latency. They demonstrate that the optimizations are real, measurable, and reproducible in a controlled setting. They are **not** production end-to-end measurements, and no claim in this paper should be read as one. Section 5.7 discusses the threats to validity that follow.
 
-### 5.1.1 Task Automation Scenarios
+## 5.1 Methodology
 
-We implemented AgentISA in three distinct application domains to validate its effectiveness:
+### 5.1.1 Instrumentation: Mock LLM Backend
 
-1. **Financial Trading System**
-   - Task complexity: High-frequency trading decisions
-   - Agent composition: 12 specialized agents
-   - Performance metrics:
-     $$
-     \text{Decision Latency} = t_{decision} - t_{signal} < 100\text{ms}
-     $$
-     $$
-     \text{Accuracy Rate} = \frac{\text{Correct Decisions}}{\text{Total Decisions}} > 99.9\%
-     $$
+All experiments route model inference through a `MockLLMBackend` that (1) counts each `infer` call as one simulated LLM API round trip, and (2) charges a fixed 80 ms simulated latency per call to a simulated clock. The backend never sleeps and never contacts a live model, which makes every "API call" observable, deterministic given a seed, and reproducible without network access or inference spend. Crucially, everything *around* the backend is real: the cache, compiler, and optimizer are the production `agentflow.core.isa` implementations (`InstructionCache`, `InstructionCompiler`, `OptimizationManager`), exercised through the same code paths a deployment would use.
 
-2. **Healthcare Diagnostics**
-   - Implementation: Diagnostic reasoning system
-   - Agent structure: Hierarchical diagnosis tree
-   - Results:
+### 5.1.2 Workloads
 
-     | Metric     | Traditional | AgentISA | Improvement |
-     | ---------- | ----------- | -------- | ----------- |
-     | Accuracy   | 92.3%       | 97.8%    | +5.5%       |
-     | Latency    | 2.3s        | 0.8s     | -65.2%      |
-     | Cost/Query | $0.12       | $0.04    | -66.7%      |
+Workloads are synthetic and seed-controlled:
 
-3. **Customer Service Automation**
-   - Scale: 1M+ conversations/day
-   - Agent network: 8 specialized agents
-   - Performance:
-     $$
-     \text{Resolution Rate} = \frac{\text{Automated Resolutions}}{\text{Total Queries}} = 87.3\%
-     $$
+- **Caching**: 2,000 tasks drawn from a discrete distribution over 50 instruction templates × 20 parameter values, with task popularity following a Zipf distribution with exponent $s \in \{0.5, 1.0, 1.5\}$. Increasing $s$ concentrates popularity on fewer tasks, increasing reuse potential.
+- **Static compilation**: random instruction sequences of length 50, 200, and 1,000, compiled at optimization levels NONE, BASIC, ADVANCED, and AGGRESSIVE.
+- **Dynamic optimization**: instruction traces of length 100 executed repeatedly (100 iterations), with hot-path detection active.
+- **Ablation**: identical workloads with the fusion and dead-code-elimination passes enabled individually and jointly.
 
-### 5.1.2 Multi-agent Coordination
+### 5.1.3 Protocol and Statistics
 
-We implemented a novel coordination protocol based on AgentISA:
+Each configuration is run with 5 random seeds; we report mean ± sample standard deviation across seeds. These are **descriptive statistics only**: we make no hypothesis-test claims (no p-values, no significance tests) anywhere in this paper. The seed count suffices to show that the effects are stable across workload instantiations—the standard deviations are small relative to the means—but a formal inferential comparison against other systems is out of scope, because there is no baseline system that shares the mock-backend instrumentation.
 
-Algorithm 6: Multi-Agent Coordination
+## 5.2 Experiment 1: Result Caching
+
+**Research question**: How many simulated LLM API calls does AgentISA's result caching eliminate, as a function of workload skew?
+
+We execute 2,000 tasks per seed, once with caching disabled and once with the `InstructionCache` enabled, and measure simulated API calls at the backend. The reduction ratio and cache hit rate coincide by construction: every avoided call corresponds to exactly one cache hit.
+
+| Zipf exponent $s$ | Calls (no cache) | Calls (cached) | Reduction | Hit rate |
+| ----------------- | ---------------- | -------------- | --------- | -------- |
+| 0.5               | 2,000            | 810.4 ± 5.7    | 59.5% ± 0.3% | 59.5% ± 0.3% |
+| 1.0               | 2,000            | 642.0 ± 3.8    | 67.9% ± 0.2% | 67.9% ± 0.2% |
+| 1.5               | 2,000            | 408.0 ± 9.4    | 79.6% ± 0.5% | 79.6% ± 0.5% |
+
+**Interpretation.** The reduction grows monotonically with skew, from 59.5% under nearly uniform popularity ($s = 0.5$) to 79.6% under heavy concentration ($s = 1.5$). This matches the cache-aware expectation from Section 2.5: the upper bound on savings is the probability mass of repeated tasks, and Zipf skew directly controls that mass. In simulated latency terms, the cache saves 95,168 ± 455 ms, 108,640 ± 305 ms, and 127,360 ± 750 ms of simulated time at $s = 0.5, 1.0, 1.5$, respectively (avoided calls × 80 ms).
+
+Two caveats keep this honest. First, these are *simulated* calls against a mock backend: the reduction is exact for this workload family, but real deployments face cache-invalidation, prompt-context, and embedding-variability effects that the mock abstracts away. Second, the absolute number depends on the workload's reuse structure; workloads without repetition (e.g., each task unique) would see zero benefit. What the experiment establishes is the *mechanism and its sensitivity to skew*, not a universal constant.
+
+## 5.3 Experiment 2: Static Compilation
+
+**Research question**: How much does the compiler reduce instruction sequences, and what do the different optimization levels contribute?
+
+We compile random instruction sequences at four optimization levels and measure two distinct quantities. We separate them explicitly because they are easy to conflate:
+
+- **Effective instruction count**: the number of instructions that remain in the optimized program after fusion and dead-code elimination. This measures program size.
+- **Dispatch count**: the number of independent dispatch operations the runtime issues. Parallel grouping can fold several independent instructions into one dispatch *without changing the effective instruction count*.
+
+| Sequence length | Level    | Effective-instruction reduction | Dispatch count |
+| --------------- | -------- | -------------------------------- | --------------- |
+| 50              | NONE     | 0%                                | 50.0 ± 0.0      |
+| 50              | BASIC    | 32.8% ± 4.1%                      | 33.6 ± 2.1      |
+| 50              | ADVANCED | 32.8% ± 4.1%                      | 11.6 ± 2.9      |
+| 50              | AGGRESSIVE | 32.8% ± 4.1%                   | 11.6 ± 2.9      |
+| 200             | NONE     | 0%                                | 200.0 ± 0.0     |
+| 200             | BASIC    | 34.2% ± 1.8%                      | 131.6 ± 3.6      |
+| 200             | ADVANCED | 34.2% ± 1.8%                      | 44.4 ± 3.4       |
+| 200             | AGGRESSIVE | 34.2% ± 1.8%                   | 44.4 ± 3.4       |
+| 1,000           | NONE     | 0%                                | 1,000.0 ± 0.0    |
+| 1,000           | BASIC    | 35.4% ± 1.6%                      | 646.0 ± 16.4     |
+| 1,000           | ADVANCED | 35.4% ± 1.6%                      | 199.6 ± 21.4     |
+| 1,000           | AGGRESSIVE | 35.4% ± 1.6%                   | 199.6 ± 21.4     |
+
+**Interpretation.** Three observations:
+
+1. **Effective instruction count reduction is level-stable**: BASIC, ADVANCED, and AGGRESSIVE produce identical reductions (34.2% ± 1.8% at length 200). The fusion and DCE passes implemented at BASIC level already capture the available gains on these synthetic sequences; the higher levels add *scheduling* improvements, not additional elimination. We report this as-is rather than claiming monotonic gains across levels.
+
+2. **Dispatch count drops further with parallel grouping**: at length 200, dispatch falls from 131.6 (BASIC) to 44.4 (ADVANCED) while effective instruction reduction is unchanged. This is the dispatch-folding effect described above: independent instructions grouped into shared dispatches. Readers should interpret the 44.4 figure as a scheduling reduction, not a further program-size reduction.
+
+3. **Gains are stable across sequence lengths**: 32.8%, 34.2%, 35.4% at lengths 50, 200, 1,000 respectively, with the tightest variance at length 200 (±1.8%). Length does not materially change the opportunity structure of these synthetic sequences.
+
+Note again that effective-instruction reduction is a *program-size* metric. It translates to simulated API-call savings only where eliminated or fused instructions carry model inference; our caching experiment measures the complementary reuse effect.
+
+## 5.4 Experiment 3: Dynamic Hot-Path Optimization
+
+**Research question**: Does the dynamic optimizer detect and specialize repeatedly executed traces?
+
+We execute an instruction trace of length 100 for 100 iterations with hot-path detection active. Once a path is flagged hot (at iteration 50 in all seeds), the runtime forms an optimized trace and subsequent iterations execute the shrunken form.
+
+| Seed | Original length | Optimized length | Shrink ratio |
+| ---- | --------------- | ---------------- | ------------ |
+| 0    | 100             | 30               | 70.0%        |
+| 1    | 100             | 41               | 59.0%        |
+| 2    | 100             | 30               | 70.0%        |
+| 3    | 100             | 36               | 64.0%        |
+| 4    | 100             | 34               | 66.0%        |
+
+Across seeds, hot-path optimization shrinks the trace by **65.8% ± 4.6%**. The seed-to-seed spread (59.0%–70.0%) reflects the variability in which sub-sequences each synthetic trace makes hot; the effect is present in all five seeds. As with the static experiments, this measures trace-length reduction on synthetic traces—workload-controlled evidence that the detection-formation-reoptimization loop functions, not a wall-clock speedup claim.
+
+## 5.5 Ablation: Per-pass Contribution
+
+To attribute the static gains, we re-run the compiler with individual passes toggled:
+
+| Configuration   | Instruction-count reduction |
+| --------------- | ---------------------------- |
+| none            | 0%                           |
+| fusion only     | 21.9% ± 3.5%                 |
+| DCE only        | 24.1% ± 3.3%                 |
+| fusion + DCE    | 35.0% ± 3.7%                 |
+| all passes      | 35.0% ± 3.7%                 |
+
+**Interpretation.** Fusion alone removes 21.9% and DCE alone 24.1%; combined they remove 35.0%—less than the sum of their individual gains, because the passes partially overlap: sequences that are fusable are often also dead, so the second pass finds fewer targets after the first has run. The "all passes" row equals fusion+DCE on these workloads, consistent with Observation 1 in Section 5.3: no additional pass contributes measurable reduction here. We report the absence of additional gain rather than dressing the higher levels in unearned credit.
+
+## 5.6 Multi-Agent Coordination: Functional Validation
+
+The multi-agent layer—`AgentCoordinator`, `SecurityMonitor`, and the collaborative instruction set—is validated functionally by 43 tests, all passing. We present this as **qualitative functional validation**: the tests verify that the coordination behaviors exist and are correct, not that they are fast. No performance number should be inferred from this subsection.
+
+The coordination flow implemented by `AgentCoordinator`:
 
 ```
-Input: Agent set A, Task T
-Output: Coordinated solution S
+Input: Agent set A, Task list τs
+Output: Coordinated solutions S
 
-function COORDINATE-AGENTS(A, T)
-    G ← BUILD-COORDINATION-GRAPH(A)
-    P ← PARTITION-TASK(T, |A|)
-    
-    for each subtask t in P do
-        ag ← SELECT-OPTIMAL-AGENT(G, t)
-        ASSIGN-TASK(ag, t)
-        while not TASK-COMPLETED(t) do
-            if NEEDS-COLLABORATION(ag, t) then
-                helper ← FIND-HELPER-AGENT(G, ag, t)
-                COORDINATE-EXECUTION(ag, helper, t)
+function COORDINATE-AGENTS(A, τs)
+    for each task T in τs do
+        AUTHENTICATE(task issuer)              // SecurityMonitor
+        AUTHORIZE(task, role policy)           // SecurityMonitor
+        ag ← SELECT-BY-CAPABILITY(A, T)        // CapabilityProfile (Section 3.5)
+        plan ← BUILD-EXECUTION-PLAN(T)         // stages + coordination rules
+        for each stage in plan do
+            if stage fails and fallback(stage) exists then
+                EXECUTE-FALLBACK(stage)
+            else
+                EXECUTE-STAGE(stage, ag)
             end if
-        end while
+        end for
+        RECORD-HISTORY(T, outcome)
     end for
-    
-    return MERGE-SOLUTIONS(P)
 end function
 ```
 
-Results demonstrate significant improvements:
-$$
-\text{Coordination Efficiency} = \frac{\text{Parallel Execution Time}}{\text{Sequential Execution Time}} = 0.37
-$$
+What the 43 tests verify, grouped by subsystem:
 
-### 5.1.3 Enterprise Deployment Cases
+1. **Agent registration and role policies** (registration creates policies; permissions differ by role; security requirements differ by role; trust levels are bounded and reward declared specializations).
+2. **Task coordination** (successful coordination produces a solution; failed tasks are recorded in history; missing authentication and missing authorization raise; absence of suitable agents raises; agent selection respects a capability threshold; the selected coordinator is the highest-scoring agent).
+3. **Execution planning** (plans have stage structure with coordination rules; every stage has fallback keys; fallback strategies are differentiated; a fallback actually executes on stage failure; validators are reasoning-heavy non-coordinator agents).
+4. **SecurityMonitor** (valid tasks pass; missing authentication fails; missing authorization fails; violations are recorded with timestamps; declared data sensitivity is enforced; sensitive categories infer a high sensitivity level; benign categories pass at medium; resource access is open by default and restrictable by configuration).
+5. **Collaborative instructions** (barrier synchronization waits for the declared number of participants and times out when a peer is missing; width-one barriers resolve immediately; resource-allocation instructions reject over-allocation and serialize concurrent requests; the workflow state machine accepts valid actions, rejects invalid ones and double starts; a multi-agent research-team scenario runs end to end).
 
-We conducted three enterprise-scale deployments:
+These tests exercise the same production modules used elsewhere in the system and are fully deterministic (no LLM calls). They establish correctness of the coordination machinery under the tested conditions. What they do not establish is scalability under contention, crash recovery, or adversarial inputs beyond the policy checks above—all are future work (Section 6).
 
-1. **Global Manufacturing Company**
-   - Scale: 50,000 employees
-   - Integration points: 23 enterprise systems
-   - Cost reduction: 63% in API calls
-   - Performance improvement: 2.8x throughput
+## 5.7 Limitations and Threats to Validity
 
-2. **Financial Services Provider**
-   - Transaction volume: 2M/day
-   - Security compliance: SOC2, ISO27001
-   - Error reduction: 76%
-   - Cost savings: $1.2M/year
+We enumerate the limitations of the evaluation explicitly:
 
-3. **E-commerce Platform**
-   - Peak load: 100K concurrent users
-   - Integration: 5 LLM providers
-   - Response time improvement: 71%
-   - Resource utilization: 89%
+1. **Mock backend, not a live LLM.** The mock charges a constant 80 ms per simulated call and returns deterministic responses. This removes the variance and failures of real inference—desirable for isolating optimizer behavior, but it means the results say nothing about how caching interacts with real model nondeterminism, streaming, or provider rate limits.
 
-## 5.2 Performance Evaluation
+2. **Synthetic workloads.** Zipf-distributed synthetic tasks are a reasonable model of skewed agent workloads, but they are a model. The cache-reduction figures (59.5–79.6%) are exact for these workload families and should be read as *skew-sensitivity curves*, not as universal savings. A deployment with uniformly novel tasks would see near-zero cache benefit.
 
-### 5.2.1 API Call Reduction Metrics
+3. **No production end-to-end evaluation.** We have not deployed AgentISA in a production setting. Consequently this paper contains no latency-under-load, throughput, availability, or dollar-cost measurements, and we make no such claims.
 
-We measured API call reduction across different scenarios:
+4. **No real cost data.** All "latency" figures are simulated (avoided calls × 80 ms). Real cost depends on provider pricing, prompt sizes, and token accounting—none of which the mock models. Any dollar savings would require a separate, priced deployment study.
 
-$$
-\text{Reduction Ratio} = 1 - \frac{\text{API Calls}_{\text{AgentISA}}}{\text{API Calls}_{\text{Traditional}}}
-$$
+5. **Program-size metrics, not wall-clock time.** Effective-instruction reduction and dispatch-count reduction are structural metrics. They correlate with—but do not equal—wall-clock improvements, which depend on per-instruction cost, parallelism available in the runtime, and dispatch overhead.
 
-Results by operation type:
+6. **Descriptive statistics only.** Five seeds per configuration; mean ± sample stdev. No hypothesis tests, confidence intervals, or significance claims are made. The standard deviations indicate stability across seeds, nothing more.
 
-| Operation Type        | Reduction Ratio | p-value |
-| --------------------- | --------------- | ------- |
-| Query Processing      | 72.3%           | <0.001  |
-| Decision Making       | 68.7%           | <0.001  |
-| Information Retrieval | 81.2%           | <0.001  |
+7. **Functional, not performance, validation of coordination.** The 43 multi-agent tests verify behavioral correctness under deterministic conditions, not throughput or scalability.
 
-### 5.2.2 Response Time Analysis
-
-Response time improvements were measured using:
-
-$$
-\text{RTI} = \frac{1}{n}\sum_{i=1}^n \frac{t_{\text{traditional}}^i - t_{\text{AgentISA}}^i}{t_{\text{traditional}}^i}
-$$
-
-Results across different load conditions:
-
-- Light load (< 1000 req/s): 45% improvement
-- Medium load (1000-5000 req/s): 63% improvement
-- Heavy load (> 5000 req/s): 71% improvement
-
-### 5.2.3 Cost-effectiveness Comparison
-
-Cost analysis based on:
-$$
-\text{TCO} = C_{\text{API}} + C_{\text{Compute}} + C_{\text{Storage}} + C_{\text{Network}}
-$$
-
-Comparative results:
-
-| Cost Component | Traditional | AgentISA | Savings |
-| -------------- | ----------- | -------- | ------- |
-| API Calls      | $12.3K      | $4.1K    | 66.7%   |
-| Compute        | $8.7K       | $3.2K    | 63.2%   |
-| Storage        | $2.1K       | $1.8K    | 14.3%   |
-| Network        | $1.9K       | $0.7K    | 63.2%   |
+Despite these limitations, the evaluation achieves its purpose: it demonstrates, under fully disclosed and reproducible conditions, that each optimization mechanism is implemented, active, and produces the claimed structural effects on workloads designed to expose them.
 
 # 6. Discussion
 
 ## 6.1 System Limitations and Challenges
 
 1. **Instruction Set Completeness**
-   - Current limitations in handling certain complex reasoning patterns
-   - Need for domain-specific instruction extensions
-   - Challenge in maintaining consistency across extensions
+   - Certain complex reasoning patterns are not yet naturally expressible; domain-specific instruction extensions are likely needed
+   - Maintaining consistency of pre/post-conditions and typing rules across extensions remains an open engineering challenge
 
-2. **Performance Bottlenecks**
-   - Memory consumption in large-scale deployments
-   - Network latency in distributed scenarios
-   - Synchronization overhead in multi-agent coordination
+2. **Evaluation Scope**
+   - As detailed in Section 5.7, our quantitative evidence is microbenchmark-based: synthetic Zipf workloads against a mock LLM backend
+   - Production end-to-end evaluation—including real provider pricing, rate limits, and failure modes—is required before any deployment claim
 
-3. **Integration Challenges**
-   - Compatibility with legacy systems
-   - Version management across LLM updates
-   - API stability maintenance
+3. **Performance Bottlenecks**
+   - Cache memory consumption under large instruction universes
+   - Synchronization overhead in barrier-coordinated multi-agent execution
+   - Recompilation cost when hot-path thresholds are misconfigured
+
+4. **Integration Challenges**
+   - Adapter maintenance as provider function-calling surfaces evolve
+   - Version management of learned instructions across LLM updates
 
 ## 6.2 Security and Privacy Considerations
 
-We identified several critical security considerations:
+AgentISA's implemented security layer is the `SecurityMonitor` of Section 5.6, which enforces task-level authentication, role-based authorization, data-sensitivity classification, and configurable resource-access policies; the coordinator consults it before every assignment, and violations are recorded with timestamps. Beyond what is implemented, we identify the following as design considerations for hardening the architecture—not as claims about the current system:
 
-1. **Data Privacy**
-   - Instruction-level access control
-   - Data flow tracking
-   - Privacy-preserving computation
+1. **Data privacy**: instruction-level access control exists via authorization policies; end-to-end data-flow tracking and privacy-preserving computation remain future work (Section 6.3.6).
+2. **System security**: instruction pre/post-condition verification (Section 3.3.3) reduces mis-execution risk; secure multi-agent communication channels and audit-log integrity are not yet addressed.
+3. **Compliance**: deployments in regulated domains will require externally audited controls; the current system provides enforcement hooks, not certification.
 
-2. **System Security**
-   - Instruction verification mechanisms
-   - Secure multi-agent communication
-   - Attack surface reduction
-
-3. **Compliance Requirements**
-   - GDPR compliance measures
-   - HIPAA compatibility
-   - SOC2 certification requirements
-
-## 6.3 Future Research Directions (Extended)
+## 6.3 Future Research Directions
 
 ### 6.3.1 Theoretical Foundations
 
 1. **Formal Semantics of Agent Instructions**
 
-   Future research should establish a complete formal semantic framework:
+   A complete formal semantic framework would consolidate the type system and operational semantics of Section 3.1:
 
    $$
    \mathcal{F} = (L, \Sigma, \mathcal{R}, \mathcal{T})
@@ -1245,7 +1230,7 @@ We identified several critical security considerations:
 
    Dynamic optimization framework:
 
-   Algorithm 7: Context-Aware Optimization
+   Algorithm 6: Context-Aware Optimization
 
    ```
    Input: Instruction set I, Context history C
@@ -1284,54 +1269,24 @@ We identified several critical security considerations:
 
 1. **Asymptotic Analysis**
 
-   Theoretical bounds for instruction execution:
-
-   $$
-   T(n) = \begin{cases}
-   O(1) & \text{for basic instructions} \\
-   O(\log n) & \text{for composed instructions} \\
-   O(n) & \text{for recursive instructions}
-   \end{cases}
-   $$
+   A natural next step is deriving cost bounds per composition operator—e.g., when does iterative composition $i_1^*$ admit a closed-form cost model, and under what reuse structure does caching yield amortized $O(1)$ effective cost per task? Our microbenchmarks (Section 5) measure the constants empirically; the corresponding asymptotic theory remains open.
 
 2. **Resource Consumption Models**
 
-   Comprehensive resource model:
-
+   A calibrated resource model:
    $$
    R(i) = \alpha C_{cpu}(i) + \beta C_{mem}(i) + \gamma C_{io}(i)
    $$
 
-   where α, β, γ are platform-specific coefficients.
+   where α, β, γ are platform-specific coefficients that should be fitted against real deployments rather than assumed.
 
-### 6.3.4 Advanced Capability Assessment
+### 6.3.4 Capability Assessment: Extensions
 
-1. **Fine-grained Capability Metrics**
+The instruction-level capability assessment subsystem (`CapabilityProfile`, Section 3.5) is implemented and used by the coordinator. Two extensions remain future work:
 
-   Capability assessment framework:
+1. **Benchmark-calibrated metrics**: correlating static, instruction-derived domain scores with end-to-end benchmark performance, in the manner of function-calling evaluations [17] and agent benchmarks [29], so that weights $w_k$ are empirically grounded rather than configured by hand.
 
-   $$
-   \text{Cap}(M) = \sum_{k=1}^K w_k \cdot \text{perf}_k(M) \cdot \text{diff}_k
-   $$
-
-   where:
-   - $\text{perf}_k$: Performance on capability k
-   - $\text{diff}_k$: Task difficulty
-   - $w_k$: Importance weight
-
-2. **Cross-Model Comparison Framework**
-
-   Comparative analysis model:
-
-   $$
-   \Delta(M_1, M_2) = \begin{bmatrix}
-   \delta_{11} & \delta_{12} & \cdots \\
-   \delta_{21} & \delta_{22} & \cdots \\
-   \vdots & \vdots & \ddots
-   \end{bmatrix}
-   $$
-
-   where $\delta_{ij}$ represents capability difference in dimension (i,j).
+2. **Cross-model comparison matrices**: extending the per-agent profile to a pairwise comparison framework $\Delta(M_1, M_2)$ over capability dimensions, supporting systematic model selection for a given instruction workload.
 
 ### 6.3.5 Emergent Behavior Analysis
 
@@ -1349,7 +1304,7 @@ We identified several critical security considerations:
 
    Knowledge transfer model:
 
-   Algorithm 8: Knowledge Transfer
+   Algorithm 7: Knowledge Transfer
 
    ```
    Input: Source agents S, Target agent T
@@ -1396,157 +1351,293 @@ We identified several critical security considerations:
    - ε: Privacy budget
    - δᵢ: Privacy loss per operation
 
-These extended research directions provide a comprehensive roadmap for future development of AgentISA, with particular emphasis on theoretical foundations and formal guarantees. Each direction includes concrete mathematical frameworks and algorithms that can guide implementation and validation of future improvements.
-
-The theoretical analysis provides rigorous foundations for:
-
-1. Formal verification of agent behavior
-2. Performance bounds and optimization
-3. Security and privacy guarantees
-4. Cross-model capability assessment
-5. Emergent behavior analysis
-
-These extensions significantly strengthen the theoretical underpinnings of AgentISA while providing clear directions for practical implementation and future research.
+These directions form a roadmap for moving AgentISA from microbenchmark-validated infrastructure to a deployable, formally verified agent platform. None of the frameworks above is implemented today; they are stated with enough precision to be falsifiable and to guide subsequent work.
 
 # 7. Conclusion
 
-This paper presented AgentISA, a novel instruction set architecture for LLM-powered AI agents. Our main contributions include:
+This paper presented AgentISA, an instruction set architecture that treats LLM agent behavior as a first-class compilable artifact. Our contributions are:
 
-1. A formal framework for agent instruction specification and optimization
-2. An efficient implementation demonstrating significant performance improvements
-3. Comprehensive case studies validating practical effectiveness
+1. A formal instruction set with compositional semantics, a type system, and pre/post-conditions, together with proofs of Turing completeness (Theorem 3.1), type safety (Theorem 3.2), and semantic preservation for the optimization and scheduling transformations (Theorems 3.4–3.6).
+2. Agentic Calling, which lifts provider-specific function calling into reusable, portable, cacheable agent instructions.
+3. Automatic instruction learning based on frequency mining and clustering of execution traces.
+4. A compiler and runtime applying classical optimizations—fusion, dead-code elimination, scheduling, and dynamic hot-path specialization—to agent instruction streams.
+5. A multi-agent coordination layer with capability-based selection and a security monitor enforcing authentication, authorization, and data-sensitivity policies.
 
-Key achievements:
+The empirical evaluation is deliberately scoped and fully disclosed: a microbenchmark suite drives the real compiler, cache, and optimizer against a mock LLM backend on synthetic Zipf workloads, over 5 seeds per configuration. Under these conditions, result caching reduces simulated API calls by 59.5–79.6% (increasing with workload skew), static compilation reduces the effective instruction count by 34.2%±1.8% (with an ablation attributing 21.9%±3.5% to fusion and 24.1%±3.3% to dead-code elimination), and dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%. The multi-agent layer is validated by 43 passing functional tests. We have been explicit throughout about what these results are not: they are not production end-to-end measurements, and they do not include real latency or dollar-cost data.
 
-- 68-81% reduction in API calls
-- 63-71% improvement in response time
-- 14-67% cost savings across components
+AgentISA's longer-term significance is architectural: by giving agent behavior an instruction-level contract, it makes agent systems amenable to the same discipline that transformed hardware and compiler engineering—precise specification, portability across backends, and semantics-preserving optimization. Establishing the corresponding gains on production workloads, and hardening the formal guarantees into verified implementations, is the immediate next step.
 
-Future Impact:
+# Artifact Availability
 
-1. **Standardization**: AgentISA provides a foundation for standardizing agent-LLM interactions
+The AgentISA implementation (`agentflow.core.isa`), the microbenchmark suite (`examples/benchmarks/isa_microbench.py`), the raw results (`examples/benchmarks/isa_microbench_results.json`), and the 43 multi-agent functional tests (`tests/core/isa/test_coordination.py`, `tests/core/instructions/test_agent_coordination.py`) are available in the accompanying repository. Every number in Section 5 can be regenerated with:
 
-2. **Optimization**: Framework for continuous improvement of agent performance:
-   $$
-   \text{Potential} = \lim_{t \to \infty} \text{Performance}(t) - \text{Current}
-   $$
-
-3. **Innovation**: Platform for developing next-generation AI applications
-
-AgentISA opens new possibilities for efficient, scalable, and secure AI agent development, providing a solid foundation for future research and development in this rapidly evolving field.
+```
+./venv/bin/python examples/benchmarks/isa_microbench.py \
+    --experiments cache compiler dynamic ablation --seeds 5
+```
 
 # References
 
-[1] Brown, T., et al. 2020. Language Models are Few-Shot Learners. In NeurIPS 2020.
+[1] Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, Dario Amodei. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.
 
-[2] Chowdhery, A., et al. 2022. PaLM: Scaling Language Modeling with Pathways. arXiv preprint arXiv:2204.02311.
+[2] Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, Noah Fiedel. 2023. PaLM: Scaling Language Modeling with Pathways. JMLR 24(240):1–113. arXiv:2204.02311.
 
-[3] Smith, J., et al. 2023. Challenges in Deploying Large Language Models. In Proceedings of ACL 2023.
+[3] OpenAI. 2023. GPT-4 Technical Report. arXiv:2303.08774.
 
-[4] OpenAI. 2023. GPT-4 Technical Report. arXiv preprint arXiv:2303.08774.
+[4] Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, Guillaume Lample. 2023. LLaMA: Open and Efficient Foundation Language Models. arXiv:2302.13971.
 
-[5] Anthropic. 2023. Constitutional AI: A New Approach to AI Safety. Technical Report.
+[5] Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, Quoc V. Le. 2022. Finetuned Language Models Are Zero-Shot Learners. ICLR 2022 (Oral). arXiv:2109.01652.
 
-[6] Johnson, M., et al. 2023. Function Calling in Large Language Models. In EMNLP 2023.
+[6] Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, Ryan Lowe. 2022. Training language models to follow instructions with human feedback. NeurIPS 35. arXiv:2203.02155.
 
-[7] Kojima, R., et al. 2023. Pattern Analysis in LLM API Usage. In ICML 2023.
+[7] Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc V. Le, Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. NeurIPS 35, pp. 24824–24837. arXiv:2201.11903.
 
-[8] Zhang, L., et al. 2023. Beyond Function Calling: Towards Adaptive Agent Systems. In ICLR 2023.
+[8] Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, Yusuke Iwasaka. 2022. Large Language Models are Zero-Shot Reasoners. NeurIPS 35. arXiv:2205.11916.
 
-[9] Zhang, S., et al. 2023. Learning from Deployment: A Study of LLM-based Agents. In ACL 2023.
+[9] Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao. 2023. ReAct: Synergizing Reasoning and Acting in Language Models. ICLR 2023 (notable top 5%). arXiv:2210.03629.
 
-[10] Brown, A., et al. 2023. Resource Utilization in LLM-based Systems. In PLDI 2023.
+[10] Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao. 2023. Reflexion: Language Agents with Verbal Reinforcement Learning. NeurIPS 36. arXiv:2303.11366.
 
-[11] Miller, K., et al. 2023. Few-shot Learning in Production LLMs. In NeurIPS 2023.
+[11] Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, Karthik Narasimhan. 2023. Tree of Thoughts: Deliberate Problem Solving with Large Language Models. NeurIPS 36. arXiv:2305.10601.
 
-[12] Davis, R., et al. 2023. Pattern Learning in Deployed AI Systems. In AAAI 2023.
+[12] Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, Anima Anandkumar. 2023. Voyager: An Open-Ended Embodied Agent with Large Language Models. arXiv:2305.16291.
 
-[13] Chen, H., et al. 2023. Standardizing Agent Behavior Specifications. In OOPSLA 2023.
+[13] Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, Thomas Scialom. 2023. Toolformer: Language Models Can Teach Themselves to Use Tools. NeurIPS 36. arXiv:2302.04761.
 
-[14] Wilson, J., et al. 2023. Cost Analysis of LLM Deployments. In MLSys 2023.
+[14] Shishir G. Patil, Tianjun Zhang, Xin Wang, Joseph E. Gonzalez. 2023. Gorilla: Large Language Model Connected with Massive APIs. arXiv:2305.15334.
 
-[15] Lopez, M., et al. 2023. Integration Challenges in Multi-LLM Systems. In ASPLOS 2023.
+[15] Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, Sihan Zhao, Lauren Hong, Runchu Tian, Ruobing Xie, Jie Zhou, Mark Gerstein, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs. ICLR 2024 (Spotlight). arXiv:2307.16789.
 
-[16] Wang, R., et al. 2023. Program Synthesis for Agent Instruction Learning. In PLDI 2023.
+[16] Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, Yueting Zhuang. 2023. HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face. NeurIPS 36. arXiv:2303.17580.
 
-[17] Taylor, S., et al. 2023. Automated Reasoning in LLM-based Systems. In CAV 2023.
+[17] Shishir G. Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, Joseph E. Gonzalez. 2025. The Berkeley Function Calling Leaderboard (BFCL): From Tool Use to Agentic Evaluation of Large Language Models. ICML 2025.
 
-[18] Lee, K., et al. 2023. Pattern Mining in Conversational AI. In KDD 2023.
+[18] Anthropic. 2024. Introducing the Model Context Protocol. Anthropic announcement, November 25, 2024.
 
-[19] Anderson, P., et al. 2023. Optimizing LLM API Usage in Production. In SOSP 2023.
+[19] Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu, Li Jiang, Xiaoyun Zhang, Shaokun Zhang, Jiale Liu, Ahmed Hassan Awadallah, Ryen W. White, Doug Burger, Chi Wang. 2023. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation. arXiv:2308.08155. (Final version COLM 2024.)
 
-[20] Martinez, C., et al. 2023. IR Design for Language Model Integration. In CC 2023.
+[20] Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven Ka Shing Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, Lingfeng Xiao, Chenglin Wu, Jürgen Schmidhuber. 2024. MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework. ICLR 2024 (Oral). arXiv:2308.00352.
 
-[21] Thompson, E., et al. 2023. Dynamic Optimization in AI Systems. In ASPLOS 2023.
+[21] Weize Chen, Yusheng Su, Jingwei Zuo, Cheng Yang, Chenfei Yuan, Chi-Min Chan, Heyang Yu, Yaxi Lu, Yi-Hsin Hung, Chen Qian, Yujia Qin, Xin Cong, Ruobing Xie, Zhiyuan Liu, Maosong Sun, Jie Zhou. 2024. AgentVerse: Facilitating Multi-Agent Collaboration and Exploring Emergent Behaviors. ICLR 2024 (Poster). arXiv:2308.10848.
 
-# References (Continued from Section 1)
+[22] Chen Qian, Wei Liu, Hongzhang Liu, Nuo Chen, Yufan Dang, Jiahao Li, Cheng Yang, Weize Chen, Yusheng Su, Xin Cong, Juyuan Xu, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ChatDev: Communicative Agents for Software Development. ACL 2024, pp. 15174–15186. arXiv:2307.07924.
 
-[22] Davidson, T., et al. 2023. The Evolution of Large Language Models. ACM Computing Surveys.
+[23] Guohao Li, Hasan Abed Al Kader Hammoud, Hani Itani, Dmitrii Khizbullin, Bernard Ghanem. 2023. CAMEL: Communicative Agents for "Mind" Exploration of Large Language Model Society. NeurIPS 36. arXiv:2303.17760.
 
-[23] Zhang, K., et al. 2023. Function Calling in Language Models: A Formal Approach. In POPL 2023.
+[24] Significant Gravitas. 2023. AutoGPT. GitHub repository. https://github.com/Significant-Gravitas/AutoGPT
 
-[24] Anderson, R., et al. 2023. Prompt-Based Function Selection: A Survey. In ACL 2023.
+[25] Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, Zhiyuan Zhang, Keshav Santhanam, Sri Vardhamanan, Saiful Haq, Ashutosh Sharma, Thomas T. Joshi, Hanna Moazam, Heather Miller, Matei Zaharia, Christopher Potts. 2023. DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines. arXiv:2310.03714.
 
-[25] Kumar, S., et al. 2023. Structured Output Parsing in LLMs. In EMNLP 2023.
+[26] Chase, Harrison. 2022. LangChain. GitHub repository. https://github.com/langchain-ai/langchain
 
-[26] Liu, J., et al. 2023. Dynamic Function Discovery in Language Models. In ICLR 2023.
+[27] Liu, Jerry. 2022. LlamaIndex. GitHub repository. https://github.com/run-llama/llama_index
 
-[27] Thompson, M., et al. 2023. Analysis of Function Call Overhead in LLMs. In ASPLOS 2023.
+[28] Lingjiao Chen, Matei Zaharia, James Zou. 2023. FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance. arXiv:2305.05176.
 
-[28] Liu, Y., et al. 2023. A Taxonomy of AI Agent Frameworks. In AAAI 2023.
+[29] Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kaiwen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu Su, Huan Sun, Minlie Huang, Yuxiao Dong, Jie Tang. 2024. AgentBench: Evaluating LLMs as Agents. ICLR 2024. arXiv:2308.03688.
 
-[29] Chen, W., et al. 2023. Formal Verification of Agent Behaviors. In CAV 2023.
+[30] Grégoire Mialon, Clémentine Fourrier, Craig Swift, Thomas Wolf, Yann LeCun, Thomas Scialom. 2023. GAIA: a benchmark for General AI Assistants. arXiv:2311.12983. (Final version ICLR 2024.)
 
-[30] Martinez, R., et al. 2023. Modern Instruction Set Design. ACM TOCS.
+[31] Karthik Valmeekam, Matthew Marquez, Alberto Olmo, Sarath Sreedharan, Subbarao Kambhampati. 2023. PlanBench: An Extensible Benchmark for Evaluating Large Language Models on Planning and Reasoning about Change. NeurIPS 2023 Datasets and Benchmarks Track. arXiv:2206.10498.
 
-[31] Park, J., et al. 2023. Cost-Aware LLM Deployment. In SOSP 2023.
+[32] Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan. 2024. SWE-bench: Can Language Models Resolve Real-world GitHub Issues? ICLR 2024 (Oral). arXiv:2310.06770.
 
-[32] Wilson, K., et al. 2023. Optimizing LLM API Costs: A Comprehensive Study. In MLSys 2023.
+[33] Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman. 2006. Compilers: Principles, Techniques, and Tools (2nd ed.). Addison-Wesley.
 
-[33] Park, S., et al. 2023. Efficient Resource Utilization in LLM Applications. In OSDI 2023.
+[34] John L. Hennessy, David A. Patterson. 2017. Computer Architecture: A Quantitative Approach (6th ed.). Morgan Kaufmann.
 
-# References (Continued from Section 2)
+[35] David A. Patterson, Andrew Waterman. 2017. The RISC-V Reader: An Open Architecture Atlas. Strawberry Canyon.
 
-[34] Zhang, L., et al. 2023. Formal Specification of AI Agent Instructions. In POPL 2023.
+[36] Benjamin C. Pierce. 2002. Types and Programming Languages. MIT Press.
 
-[35] Chen, X., et al. 2023. Dependent Types for Agent Programming. In ICFP 2023.
+[37] Xavier Leroy. 2009. Formal verification of a realistic compiler. Communications of the ACM 52(7):107–115.
 
-[36] Kumar, R., et al. 2023. LLM Integration Protocols. In OSDI 2023.
+[38] Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, Ion Stoica. 2023. Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP '23. arXiv:2309.06180.
 
-[37] Wang, J., et al. 2023. Function-to-Agent Transformation Patterns. In PLDI 2023.
+[39] Gyeong-In Yu, Joo Seong Jeong, Geon-Woo Kim, Soojeong Kim, Byung-Gon Chun. 2022. Orca: A Distributed Serving System for Transformer-Based Generative Models. OSDI '22, pp. 521–538.
 
-[38] Miller, S., et al. 2023. Cross-Model Compatibility in AI Systems. In ASPLOS 2023.
+[40] Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré. 2022. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness. NeurIPS 35. arXiv:2205.14135.
 
-[39] Lee, H., et al. 2023. Pattern Recognition in Agent Dialogues. In ACL 2023.
+[41] Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation — A KVCache-centric Architecture for Serving LLM Chatbot. FAST '25, pp. 155–170. (Best Paper.)
 
-[40] Taylor, M., et al. 2023. Formal Verification of AI Instructions. In CAV 2023.
+[42] Siddharth Samsi, Dan Zhao, Joseph McDonald, Baolin Li, Adam Michaleas, Michael Jones, William Bergeron, Jeremy Kepner, Devesh Tiwari, Vijay Gadepally. 2023. From Words to Watts: Benchmarking the Energy Costs of Large Language Model Inference. arXiv:2310.03003.
 
-# References (Continued from Section 3)
+# Appendix A: Proof of Theorem 3.1 (Turing Completeness)
 
-[41] Wang, R., et al. 2023. Multi-Stage Code Generation for AI Agents. In CC 2023.
+## A.1 Strategy
 
-[42] Thompson, S., et al. 2023. Dynamic Adaptation in Agent Systems. In NIPS 2023.
+We prove that AgentISA can simulate any program in the WHILE language over the natural numbers. WHILE programs compute exactly the partial recursive functions—WHILE is Turing equivalent [33, 36]—so a sound simulation of WHILE by AgentISA establishes Turing completeness. The argument is a counting argument over instruction classes: the instruction classes of Definition 3.1 must jointly provide unbounded storage, sequential composition, conditional branching, and unbounded iteration. We show the control-flow class $\mathcal{C}$ and the state-management class $\mathcal{S}$ suffice; the LLM-interaction class $\mathcal{L}$ is not needed, making the result conservative with respect to the full instruction set.
 
-[43] Rodriguez, M., et al. 2023. Instruction Reuse in Production Systems. In SOSP 2023.
+## A.2 Source Language
 
-[44] Chen, K., et al. 2023. Performance Analysis of Agent Systems. In SIGMETRICS 2023.
+Let WHILE be the language
 
-# References (Continued from Section 3)
+$$
+P ::= x := x+1 \mid x := x-1 \mid x := y \mid \texttt{if } x = 0 \texttt{ then } P_1 \texttt{ else } P_2 \mid \texttt{while } x \neq 0 \texttt{ do } P \mid P_1 ; P_2
+$$
 
-[45] Harris, M., et al. 2023. Statistical Verification in Compiler Optimization. In PLDI 2023.
+over variables ranging over $\mathbb{N}$ (with predecessor cut off at 0), with the standard small-step semantics. Configurations are pairs $\langle P, \sigma \rangle$ with store $\sigma : Var \to \mathbb{N}$.
 
-[46] Chen, L., et al. 2023. Dynamic Pipeline Control in Agent Systems. In ASPLOS 2023.
+## A.3 Encoding
 
-[47] Wilson, K., et al. 2023. Trace-based Optimization for Agent Instructions. In CGO 2023.
+**(i) Store.** A WHILE store $\sigma$ is represented by the AgentISA state $s_\sigma \in \Sigma$, in the component managed by the state-management instructions: `store` writes $\sigma(x)$ into the state cell for $x$, `load` reads it, and `update` applies a unary arithmetic update. $\Sigma$ is unbounded, which is the crucial ingredient of the counting argument: $\mathcal{S}$ provides an unbounded store.
 
-[48] Zhang, P., et al. 2023. Formal Methods in Agent Compilation. In CAV 2023.
+**(ii) Statements.**
 
-# References (Continued from Section 4)
+| WHILE construct | AgentISA compilation |
+| --------------- | -------------------- |
+| $x := y$ | `load` $y$; `store` $x$ |
+| $x := x+1$ | `load` $x$; `update`$(+1)$; `store` $x$ |
+| $x := x-1$ | `load` $x$; `update`$(-1)$; `store` $x$ |
+| `if` $x = 0$ `then` $P_1$ `else` $P_2$ | `load` $x$; `branch`$(= 0?, \hat{P}_1, \hat{P}_2)$ |
+| `while` $x \neq 0$ `do` $P$ | `loop`(`load` $x$; `test`$(\neq 0)$; $\hat{P}$) |
+| $P_1 ; P_2$ | $\hat{P}_1 \circ \hat{P}_2$ (sequential composition) |
 
-[49] Smith, K., et al. 2023. Enterprise-Scale Agent Deployment. In SOSP 2023.
+where $\hat{P}$ denotes the compilation of $P$. The no-op `skip` compiles to the identity instruction $\epsilon$.
 
-[50] Wang, L., et al. 2023. Multi-Agent Coordination in LLM Systems. In NIPS 2023.
+## A.4 Simulation Lemma
 
-[51] Anderson, J., et al. 2023. Cost Analysis of LLM Applications. In OSDI 2023.
+**Lemma A.1.** For every WHILE configuration $\langle P, \sigma \rangle$ and its encoded AgentISA instruction sequence $\hat{P}$ started in state $s_\sigma$:
 
-[52] Martinez, R., et al. 2023. Security in Agent-Based Systems. In IEEE S&P 2023.
+(a) if $\langle P, \sigma \rangle \to \langle P', \sigma' \rangle$, then $\hat{P}$ executed from $s_\sigma$ reaches the encoding of $\langle P', \sigma' \rangle$ in finitely many AgentISA steps; and
+
+(b) if $P = \texttt{skip}$ (terminal), then $\hat{P}$ terminates.
+
+*Proof.* By structural induction on $P$:
+
+- **Assignments** (base cases). Each compiled sequence performs exactly the corresponding store update; (a) holds by executing the two or three instructions in order, (b) trivially.
+
+- **Conditional.** The `branch` instruction evaluates the zero test on the loaded value and transfers control to one of the compiled branch bodies. By the induction hypothesis applied to $P_1$ and $P_2$, each branch simulates its WHILE counterpart.
+
+- **Loop.** The WHILE unfolding identity `while x ≠ 0 do P ≡ if x = 0 then skip else (P ; while x ≠ 0 do P)` is simulated by the `loop` instruction's iteration: each iteration executes the guard test followed by $\hat{P}$. By induction on the number of executed iterations—the induction hypothesis applied to $P$ covers each body execution, and the guard test discharges the loop condition—the $k$-th WHILE iteration is matched by the $k$-th `loop` iteration.
+
+- **Sequence.** $\hat{P}_1 \circ \hat{P}_2$ executes $\hat{P}_1$ to completion, then $\hat{P}_2$; both simulations compose by the induction hypothesis.
+
+The case arguments above are the substantive reduction steps; expanding each into a fully formal induction over the small-step rules (matching each WHILE step against the transition functions $\delta \in \Delta$ of the corresponding AgentISA instructions) is mechanical and follows the template of textbook simulation arguments [33, 36]. We mark those expansions as routine and leave them to the reader. ∎
+
+## A.5 Conclusion
+
+By Lemma A.1, every WHILE-computable function is AgentISA-computable. Since WHILE is Turing equivalent—a classical result of computability theory, with WHILE serving as the standard imperative model in semantics texts such as [36]—AgentISA is Turing complete. ∎
+
+## A.6 Scope Remark
+
+Turing completeness is a deliberately weak property—any language with unbounded storage and branching attains it. Its role here is negative certification: the instruction set does not artificially constrain what agent programs can express, so no expressiveness objection can be raised against the architecture. The claim says nothing about efficiency, and it is established without the LLM-interaction class $\mathcal{L}$, so it is conservative with respect to the full instruction set of Definition 3.1.
+
+# Appendix B: Proof of Theorem 3.2 (Type Safety)
+
+We prove type safety by the standard syntactic technique of simultaneous progress and preservation, in the style of Pierce [36].
+
+## B.1 Core Calculus
+
+Restrict attention to the pure core of the instruction language: expressions over base types, $\lambda$-abstraction and application (whose $\beta$-reduction rule appears in Section 3.1.2), and the composition operators of Definition 3.6 applied to instructions carrying typed pre/post-conditions. The small-step relation $\rightarrow$ is generated by $\beta$-reduction, the context rule $E[e_1] \rightarrow E[e_1']$, and the per-instruction transition functions $\delta \in \Delta$. Effectful instructions are treated in B.7.
+
+## B.2 Lemma (Canonical Forms)
+
+If $\vdash v : T$ and $v$ is a value, then:
+
+- $T \in \{Bool, Int, String, Float\}$ implies $v$ is a literal of that type;
+- $T = \Pi(x:T_1).T_2$ implies $v = \lambda x{:}T_1.\,e$ with $\Gamma, x{:}T_1 \vdash e : T_2$;
+- $T = \Sigma(x:T_1).T_2$ implies $v = (v_1, v_2)$ with the components typed at the corresponding dependent types;
+- $T = \mu X.T$ implies $v$ is a rolled recursive value.
+
+*Proof.* By inspection of the typing rules: each type has exactly one value form, and the syntax of values is defined per type, so the case analysis is exhaustive. This is the standard canonical-forms lemma [36]. ∎
+
+## B.3 Lemma (Substitution)
+
+If $\Gamma, x{:}T' \vdash e : T$ and $\vdash v : T'$, then $\Gamma \vdash e[x := v] : T$.
+
+*Proof.* By induction on the derivation of $\Gamma, x{:}T' \vdash e : T$. All cases are standard; the only subtlety is variable capture in the $\Pi$-rule, handled by the usual $\alpha$-conversion convention. The case analysis is that of Pierce [36] and we do not duplicate it. ∎
+
+## B.4 Lemma (Progress)
+
+If $\vdash e : T$, then $e$ is a value or there exists $e'$ with $e \rightarrow e'$.
+
+*Proof.* By induction on the typing derivation:
+
+- **Literals and $\lambda$** are values.
+- **Application** $e_1\,e_2$ with $e_1 : \Pi(x:T_1).T_2$ and $e_2 : T_1$: by the induction hypothesis, either $e_1$ steps (then the context rule applies) or $e_1$ is a value, in which case B.2 gives $e_1 = \lambda x.\,e$; similarly $e_2$ either steps or is a value; when both are values, $\beta$-reduction applies. There is no stuck case, because the $\Pi$-type of $e_1$ and B.2 jointly guarantee a $\lambda$ in value position.
+- **Instruction composition** ($i_1 \circ i_2$, $i_1 \parallel i_2$, $i_1 \triangleright i_2$, $i_1^*$): the typing rule for composition encodes Hoare-style sequencing—the postcondition of the first component must imply the precondition of the second. Hence, whenever execution reaches a composed instruction, the state satisfies the required precondition, and by Definition 2.2 the transition functions are total on precondition-satisfying states ($\forall i \in I, \exists \delta \in \Delta: \delta(s_t, i) \rightarrow s_{t+1}$). For iteration, either the guard is false (terminal) or the body steps by the induction hypothesis. ∎
+
+## B.5 Lemma (Preservation)
+
+If $\vdash e : T$ and $e \rightarrow e'$, then $\vdash e' : T$.
+
+*Proof.* By induction on the typing derivation, with case analysis on the step:
+
+- **$\beta$:** $(\lambda x.\,e)\,v \rightarrow e[x := v]$. Typing gives the body typed under $\Gamma, x{:}T_1$ and the argument at $T_1$; by B.3, the substituted term types at $T_2 = T$.
+- **Context:** $E[e_1] \rightarrow E[e_1']$ with $e_1 \rightarrow e_1'$. By the induction hypothesis $e_1' : T_1$; an induction on the structure of $E$ re-types $E[e_1']$ at the original type.
+- **Instruction transitions:** the typing rule requires $post(i)$ to be a well-typed predicate of type $T$ over the state; since $i$'s transition function is certified to establish $post(i)$ (Definition 3.5, discharged per instruction by the bounded verification of Section 3.3.3), the reduct re-types at $T$.
+- **Composition operators:** each transition rule is typed by the sequencing rule of B.4; the reduct re-types by the induction hypothesis on the component derivations.
+
+The remaining instruction-class cases repeat this pattern with class-specific invariants; they are routine and omitted (the template is the standard preservation argument for the corresponding constructs [36]). ∎
+
+## B.6 Theorem 3.2
+
+By B.4, a well-typed closed term is a value or takes a step; by B.5, every step preserves typing. Hence no well-typed term reaches a stuck state: well-typed AgentISA programs cannot go wrong. ∎
+
+## B.7 Scope Remarks
+
+Two caveats state the theorem's boundaries honestly. First, B.4's appeal to totality of transition functions on precondition-satisfying states is an assumption about instruction *implementations*, discharged per instruction by the bounded verification of Section 3.3.3—not by the type system alone, and only as completely as that bounded check explores. Second, effectful instructions (LLM calls, resource allocation) can fail at runtime for reasons outside the type system (network errors, exhausted capacity); Theorem 3.2 covers the pure core and effectful instructions with checkable preconditions. Runtime failure handling for the remaining cases is the responsibility of the fallback machinery of Section 5.6, not of types.
+
+# Appendix C: Proofs of Theorems 3.4 and 3.5
+
+## C.1 Denotational Setup
+
+Fix the state space $\Sigma$. For a pure instruction $i$, let $\llbracket i \rrbracket : \Sigma \to \Sigma$ denote its denotation, total on states satisfying $pre(i)$. Program denotation is defined by structural recursion on the composition algebra of Definition 3.6:
+
+- $\llbracket i \rrbracket$ for atomic instructions (given);
+- $\llbracket p_1 \circ p_2 \rrbracket = \llbracket p_2 \rrbracket \circ \llbracket p_1 \rrbracket$ (note the order: $p_1$ executes first);
+- $\llbracket p_1 \parallel p_2 \rrbracket(\sigma) = \llbracket p_2 \rrbracket(\llbracket p_1 \rrbracket(\sigma))$ for pure $p_1, p_2$—the order is immaterial because pure updates commute on their domains;
+- $\llbracket p_1 \triangleright p_2 \rrbracket$ applies $p_2$ conditionally on $p_1$'s outcome;
+- $\llbracket p^* \rrbracket$ is the least fixed point of the corresponding functional.
+
+Write $p \equiv q$ iff $\llbracket p \rrbracket = \llbracket q \rrbracket$ on all states where both are defined.
+
+## C.2 Lemma C.1 (Atomic Rewrite Soundness)
+
+Each rewrite rule implemented by the optimizer (Section 3.4.4) preserves denotation.
+
+**(i) Fusion.** $i_1 \circ i_2 \rightarrow i_{12}$, where the compiler constructs $i_{12}$ with $pre(i_{12}) = pre(i_1)$, $post(i_{12}) = post(i_2)$, and a body implementing $\llbracket i_2 \rrbracket \circ \llbracket i_1 \rrbracket$ (intermediate bindings are named, so the composition is explicit). By construction $\llbracket i_{12} \rrbracket = \llbracket i_2 \rrbracket \circ \llbracket i_1 \rrbracket = \llbracket i_1 \circ i_2 \rrbracket$. The compiler applies fusion only when output types of $i_1$ match input types of $i_2$ and the pair is pure or order-insensitive, since denotational equality of the fused form presupposes order-insensitivity of intermediate effects.
+
+**(ii) Dead-code elimination.** Instruction $i$ is removed from $p$ when $Def(i) \cap Live_{out}(i) = \emptyset$, with liveness the standard fixpoint of $Live(i) = Use(i) \cup (Live_{out}(i) - Def(i))$ [33]. Claim: if $i$ is dead and side-effect-free, then $p \equiv p \setminus \{i\}$. Proof sketch: by induction on the suffix program following $i$, its denotation depends only on the live variables at $i$'s position; $i$ writes none of them, so removing $i$ cannot change any value subsequently read. The side-effect-freeness check is the same purity restriction as Definition 3.6's distributivity caveat—instructions declared `side_effects=True` are never eliminated.
+
+**(iii) Peephole combining.** Each rule $(s_1, \dots, s_k) \rightarrow s'$ carries the verification obligation $\forall \sigma: \llbracket s_1 \circ \dots \circ s_k \rrbracket(\sigma) = \llbracket s' \rrbracket(\sigma)$, checked at rule-definition time (Section 4.1.3). Instances: `LOAD; STORE` to the same location composes to `MOVE` (the value read is the value written); consecutive `QUERY` instructions with identical (instruction, params) pairs collapse to one cached query (this is the fusion instance underlying the caching measured in Section 5.2); consecutive `CONTEXT_UPDATE`s compose to a single update by associativity of the update function.
+
+*Proof.* Each case reduces to the construction of the rewritten instruction and the definition of liveness. The inner inductions—on the pair of bodies for (i), on suffix programs for (ii)—are routine and left to the reader. ∎
+
+## C.3 Lemma C.2 (Compositionality)
+
+Let $T$ be a program transform with $\llbracket T(p) \rrbracket = \llbracket p \rrbracket$ for all $p$. Then for any context $C[\cdot]$ built from the composition operators, $\llbracket C[T(p)] \rrbracket = \llbracket C[p] \rrbracket$.
+
+*Proof.* By structural induction on $C$. Each operator's denotation (C.1) is defined compositionally in its constituents' denotations, so substituting a denotationally equal constituent leaves the whole unchanged. The parallel case uses purity (commutativity of pure updates). The iteration case uses the defining property of least fixed points: if the functionals induced by $p$ and $T(p)$ are equal, then all finite approximants are equal (by the induction hypothesis), so their suprema—the least fixed points—are equal. ∎
+
+## C.4 Theorem 3.4 (Optimization Soundness)
+
+*Proof.* The compiler applies a finite sequence of rewrites $O = R_k \circ \dots \circ R_1$ (finiteness follows from compilation terminating; each pass is a bounded traversal). By induction on $k$: $k = 0$ is trivial. For the step, write $O = R \circ O'$. By the induction hypothesis $\llbracket O'(p) \rrbracket = \llbracket p \rrbracket$. A single application of rewrite rule $R$ preserves the denotation of the subprogram it rewrites (Lemma C.1), and Lemma C.2 lifts the preservation through any surrounding composition context. Hence $\llbracket R(O'(p)) \rrbracket = \llbracket O'(p) \rrbracket = \llbracket p \rrbracket$. ∎
+
+## C.5 Theorem 3.5 (Pipeline Correctness)
+
+Let $s$ be a valid instruction sequence and $S$ a schedule satisfying:
+
+- **(S1)** every instruction is dispatched exactly once;
+- **(S2)** for every dependency $(i_1, i_2) \in Deps$: $start(i_2) \geq end(i_1)$ (the constraint of Section 3.4.3);
+- **(S3)** instructions sharing a parallel dispatch group are pairwise non-interfering (no data hazard, no resource conflict);
+- **(S4)** commit is in program order.
+
+Then executing $s$ under $S$ yields the same final state as sequential execution: $\llbracket s \rrbracket_S = \llbracket s \rrbracket_{seq}$.
+
+*Proof.* Let $g_1, \dots, g_m$ be the dispatch groups of $S$ in commit order. We show the invariant
+
+$$I(t): \text{after committing } g_1, \dots, g_t, \text{ the architectural state equals the sequential state after executing all instructions in those groups.}$$
+
+- **Base** ($t = 0$): both sides are the initial state.
+- **Step**: assume $I(t)$. Every instruction in $g_{t+1}$ has its dependencies in earlier groups (by S2, since it is scheduled after them), which by $I(t)$ have completed and committed. Within the group, S3 gives pairwise non-interference: no instruction reads another group-member's output, and no two write the same location or resource. Hence the group's updates commute—for pure updates this is the diamond property, and for effectful instructions S3's resource-conflict exclusion forces serialization at the resource, again yielding a unique combined effect. The state after $g_{t+1}$ is therefore independent of the group's internal interleaving and equals the sequential execution of the same instructions from the state at $I(t)$.
+- By induction, $I(m)$ holds; by S1 no instruction was skipped or duplicated. ∎
+
+**Corollary (dispatch folding).** The ADVANCED and AGGRESSIVE levels fold independent instructions into shared dispatches (Section 5.3). A folded group satisfies S3 by construction, so by Theorem 3.5 the fold changes the *dispatch count* but neither the semantics nor—consistent with the measurement of Section 5.3—the effective instruction count.
+
+**Theorem 3.6** follows by the same machinery: every optimization in the pass pipeline is a finite composition of rewrites covered by Lemma C.1, and the argument of C.4 applies verbatim. ∎
+
+## C.6 Scope Remark
+
+The proofs assume the verification obligations of Sections 4.1.3 and 4.3.1 hold: peephole rules verified at definition time, and transformation equivalence checked by symbolic execution. Where an obligation is discharged only on bounded state spaces (Section 3.3.3), the guarantee is correspondingly bounded—rewrites verified on the explored subset are sound there, and the compiler restricts their application accordingly.

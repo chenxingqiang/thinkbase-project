@@ -59,6 +59,21 @@ class ContentBlock(BaseModel):
 class Message(BaseModel):
     """Message class for workflow communication."""
     
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_text_alias(cls, data: Any) -> Any:
+        """Accept ``text=`` as an alias for ``content``.
+
+        Several call sites construct error/assistant messages with a
+        ``text`` keyword; map it onto ``content`` so the payload is not
+        silently dropped.
+        """
+        if isinstance(data, dict):
+            text = data.pop("text", None)
+            if text is not None and not data.get("content"):
+                data["content"] = text
+        return data
+
     role: MessageRole = Field(description="Message role")
     content: Union[str, List[ContentBlock]] = Field(description="Message content")
     timestamp: datetime = Field(default_factory=datetime.now, description="Message timestamp")
@@ -240,23 +255,45 @@ class WorkflowStepType(str, Enum):
 
 
 class WorkflowStatus(str, Enum):
-    """Workflow status enum."""
+    """Workflow status enum (superset).
+
+    Covers the lifecycle states used across the workflow engine,
+    distributed execution, and the state manager; ``str()`` of a
+    member returns its value.
+    """
+
     PENDING = "pending"
     RUNNING = "running"
     SUCCESS = "success"
     FAILED = "failed"
+    CANCELLED = "cancelled"
+    PAUSED = "paused"
+    ERROR = "error"
     INITIALIZED = "initialized"
+    COMPLETED = "completed"
+    STOPPED = "stopped"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class WorkflowStepStatus(str, Enum):
-    """Workflow step status enum."""
+    """Workflow step status enum (superset, ``str()`` returns value)."""
     PENDING = "pending"
     RUNNING = "running"
-    COMPLETED = "completed"
     SUCCESS = "success"
+    COMPLETED = "completed"
     FAILED = "failed"
-    SKIPPED = "skipped"
+    CANCELLED = "cancelled"
+    PAUSED = "paused"
+    ERROR = "error"
     INITIALIZED = "initialized"
+    STOPPED = "stopped"
+    WAITING = "waiting"
+    SKIPPED = "skipped"
+
+    def __str__(self) -> str:
+        return self.value
 
 
 class WorkflowStrategy(str, Enum):
@@ -306,6 +343,18 @@ class StepConfig(BaseModel):
 
     strategy: str = Field(default=WorkflowStrategy.STANDARD)
     params: Dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("strategy", mode="before")
+    @classmethod
+    def _validate_strategy(cls, value: Any) -> Any:
+        if isinstance(value, WorkflowStrategy):
+            return value.value
+        valid = {s.value for s in WorkflowStrategy}
+        if isinstance(value, str) and value in valid:
+            return value
+        raise ValueError(
+            f"Invalid strategy {value!r}; expected one of {sorted(valid)}"
+        )
     retry_delay: float = Field(default=1.0)
     retry_backoff: float = Field(default=2.0)
     max_retries: int = Field(default=3)
@@ -485,7 +534,7 @@ class WorkflowConfig(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str = Field(default="default")
     description: str = Field(default="", description="Workflow description")
-    max_iterations: int = Field(default=10)
+    max_iterations: int = Field(default=10, ge=1)
     timeout: Optional[float] = None
     error_policy: ErrorPolicy = Field(default_factory=ErrorPolicy)
     steps: List[WorkflowStep] = Field(default_factory=list)

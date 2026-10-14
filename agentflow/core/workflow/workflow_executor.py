@@ -226,6 +226,11 @@ class WorkflowExecutor:
             )
         except asyncio.TimeoutError:
             raise TimeoutError(f"Workflow execution timed out after {self.config.timeout} seconds")
+        except WorkflowExecutionError:
+            # Propagate step-qualified errors unchanged so callers see
+            # the precise ``Step <id> failed: <cause>`` chain instead of
+            # an opaque wrapper.
+            raise
         except Exception as e:
             raise WorkflowExecutionError(f"Workflow execution failed: {str(e)}") from e
 

@@ -201,8 +201,10 @@ class DocumentGenerator:
             template_dir: Directory containing Jinja2 templates
             default_template: Default template to use if not specified
         """
+        # Templates live in ``agentflow/core/templates`` (shared with the
+        # template registry), not inside this module's subpackage.
         self.template_dir = template_dir or os.path.join(
-            os.path.dirname(__file__), 'templates'
+            os.path.dirname(os.path.dirname(__file__)), 'templates'
         )
         self.default_template = default_template
         
@@ -377,7 +379,7 @@ class DocumentGenerator:
         """
         if not template_dir:
             template_dir = os.path.join(
-                os.path.dirname(__file__), 'templates'
+                os.path.dirname(os.path.dirname(__file__)), 'templates'
             )
         
         return [f for f in os.listdir(template_dir) if f.endswith('.j2')]

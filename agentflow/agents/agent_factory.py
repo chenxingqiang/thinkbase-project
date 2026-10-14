@@ -3,6 +3,7 @@
 from typing import Dict, Any, Optional, List, Type, Set
 from pydantic import BaseModel
 import uuid
+from enum import Enum
 import logging
 
 from .config import AgentType, AgentConfig
@@ -54,64 +55,50 @@ class AgentFactory:
         """
         cls._agent_classes[agent_type] = agent_class
     
-    def create_agent(self, config: Dict[str, Any]) -> Agent:
-        """Create an agent with specified instructions.
-        
+    @classmethod
+    def create_agent(cls, config: Union[Dict[str, Any], Any]) -> Agent:
+        """Create an agent for the configured type.
+
+        Callable directly on the class (``AgentFactory.create_agent(config)``)
+        as well as on an instance.  The agent type is resolved from either
+        a sectioned dict (``config["AGENT"]["type"]``), a flat dict
+        (``config["type"]``) or an attribute on a configuration object;
+        enum values are normalized to their string form.  When a class was
+        registered for the type via :meth:`register_agent`, that class is
+        instantiated (it must be an ``Agent`` subclass); otherwise the base
+        ``Agent`` is created.
+
         Args:
-            config: Agent configuration
-            
+            config: Agent configuration (dict or configuration object)
+
         Returns:
             Agent: Created agent instance
-            
-        Raises:
-            ValueError: If agent type is not supported
         """
         # Resolve the agent type string from either a sectioned or flat dict
         if isinstance(config, dict):
             agent_type = (
-                config.get("AGENT", {}).get("type")
+                (config.get("AGENT") or {}).get("type")
                 or config.get("type")
                 or "generic"
             )
         else:
-            agent_type = getattr(config, "type", "generic")
+            agent_type = getattr(config, "type", "generic") or "generic"
+        if isinstance(agent_type, Enum):
+            agent_type = agent_type.value
 
         # Instantiate the registered class for this type if present
-        agent_cls = self._agent_classes.get(agent_type, Agent)
-        agent = agent_cls(config)
-        if not isinstance(agent, Agent):
-            raise ValueError(
-                f"Registered class for {agent_type!r} is not an Agent"
-            )
-        return agent
+        agent_cls = cls._agent_classes.get(agent_type)
+        if agent_cls is not None and agent_cls is not Agent:
+            agent = agent_cls(config)
+            if not isinstance(agent, Agent):
+                raise ValueError(
+                    f"Registered class for {agent_type!r} is not an Agent"
+                )
+            return agent
 
-        # Legacy path below: instruction-set based construction
-        agent_config = AgentConfig(**config)
-        agent_type = agent_config.type
-        
-        # Create base agent
-        agent = Agent(
-            id=str(uuid.uuid4()),
-            name=agent_config.name,
-            type=agent_type,
-            config=agent_config
-        )
-        
-        # Add instructions based on agent type
-        instruction_set = self._instruction_sets.get(agent_type)
-        if instruction_set:
-            if instruction_set.pattern_learning:
-                agent.add_instruction(instruction_set.pattern_learning)
-            if instruction_set.agent_learning:
-                agent.add_instruction(instruction_set.agent_learning)
-            if instruction_set.objective_handling:
-                agent.add_instruction(instruction_set.objective_handling)
-            for instruction in instruction_set.custom_instructions:
-                agent.add_instruction(instruction)
-        
-        # Store agent
-        self._agents[agent.id] = agent
-        
+        # Default path: base Agent over the configuration object
+        agent = Agent(config=config)
+        cls._agents[agent.id] = agent
         logger.info(f"Created agent {agent.id} of type {agent_type}")
         return agent
     

@@ -147,11 +147,16 @@ class WorkflowEngine:
         if not agent.config or not isinstance(agent.config, (dict, AgentConfig)):
             raise ValueError("Agent must have a configuration")
             
-        if not agent.config.workflow and not workflow_config:
+        # ``agent.config`` may be a plain dict, a _DictConfigView or an
+        # AgentConfig; use ``getattr`` so configs without the ``workflow``
+        # field (agent-constructed configs) resolve to None instead of
+        # raising AttributeError.
+        agent_workflow = getattr(agent.config, "workflow", None)
+        if not agent_workflow and not workflow_config:
             raise ValueError("Agent must have a workflow configuration")
             
         # Use provided workflow config or agent's workflow config
-        workflow = workflow_config if workflow_config else agent.config.workflow
+        workflow = workflow_config if workflow_config else agent_workflow
         
         # Convert to WorkflowConfig if needed
         if isinstance(workflow, dict):
@@ -167,7 +172,7 @@ class WorkflowEngine:
                     name="test_step",
                     type=WorkflowStepType.AGENT,  # Always use AGENT type in test mode
                     description="Default test step for test mode",
-                    config=StepConfig(strategy="default")
+                    config=StepConfig(strategy="standard")
                 )
             ]
         # Set all steps to AGENT type if in test mode
@@ -230,18 +235,52 @@ class WorkflowEngine:
             else:
                 result = await workflow.execute(context)
 
-            return result
+            return self._attach_result_summary(result)
         except WorkflowExecutionError as e:
-            # Special handling for test mode to match the exact error message
-            if is_test_context and 'Step' in str(e):
-                # Extract the specific step error message
-                step_error = str(e).split(': ', 1)[-1]
-                raise WorkflowExecutionError(step_error)
+            # Propagate the full, step-qualified error chain unchanged
+            # (``Step <id> failed: <cause>``) so callers can attribute
+            # failures to specific steps.
             raise
         except Exception as e:
             if isinstance(e, (WorkflowExecutionError, TimeoutError)):
                 raise
             raise WorkflowExecutionError(f"Workflow execution failed: {str(e)}") from e
+
+    @staticmethod
+    def _attach_result_summary(result: Dict[str, Any]) -> Dict[str, Any]:
+        """Attach a top-level ``content`` summary to a workflow result.
+
+        Callers (and tests) expect ``result["content"]`` to carry the
+        workflow's textual output.  The per-step payloads live under
+        ``result["steps"][step_id]["result"]``; this helper walks the
+        successful steps in order and concatenates their textual
+        payloads (``result``/``content``/``output`` values) into the
+        top-level summary without disturbing the original structure.
+        """
+        if not isinstance(result, dict) or "content" in result:
+            return result
+
+        steps = result.get("steps")
+        if not isinstance(steps, dict):
+            return result
+
+        fragments: List[str] = []
+        for step_id in sorted(steps):
+            step_payload = steps[step_id]
+            if not isinstance(step_payload, dict):
+                continue
+            step_result = step_payload.get("result")
+            if not isinstance(step_result, dict):
+                continue
+            for key in ("content", "result", "output"):
+                value = step_result.get(key)
+                if isinstance(value, str) and value:
+                    fragments.append(value)
+                    break
+
+        if fragments:
+            result["content"] = "\n".join(fragments)
+        return result
 
     async def cleanup(self) -> None:
         """Cleanup workflow engine resources.

@@ -162,14 +162,14 @@ def test_workflow_engine_init():
 @pytest.mark.asyncio
 async def test_invalid_workflow_config(workflow_engine):
     """Test invalid workflow configuration."""
-    engine = await workflow_engine
+    engine = workflow_engine
     with pytest.raises(ValueError):
         await engine.register_workflow(Agent(config=AgentConfig(name="test", type="research", model=ModelConfig(name="gpt-4", provider="openai"))), None)
 
 @pytest.mark.asyncio
 async def test_workflow_execution(workflow_engine, mock_ell, mock_isa_manager, mock_instruction_selector):
     """Test workflow execution."""
-    engine = await workflow_engine
+    engine = workflow_engine
     result = await engine.execute_workflow(engine.default_agent_id, {"data": "test_input"})
     
     assert result is not None
@@ -181,7 +181,7 @@ async def test_workflow_execution(workflow_engine, mock_ell, mock_isa_manager, m
 @pytest.mark.asyncio
 async def test_workflow_cleanup(workflow_engine):
     """Test workflow cleanup."""
-    engine = await workflow_engine
+    engine = workflow_engine
     await engine.cleanup()
     assert engine.status == "cleaned"
 

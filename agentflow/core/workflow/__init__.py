@@ -129,7 +129,11 @@ from .workflow_state import (  # noqa: E402
     WorkflowStateManager,
 )
 
-from .workflow_engine import WorkflowEngine  # noqa: E402
+# ``WorkflowEngine`` (the WorkflowInstance-based engine with
+# create/execute/register semantics) is the package's canonical engine;
+# the ``workflow_engine`` module remains importable for its own
+# consumers (the flat ``agentflow.core.workflow_engine`` shim).
+from .workflow import WorkflowEngine  # noqa: E402
 from .workflow_executor import (  # noqa: E402
     VALID_PROTOCOLS,
     VALID_STRATEGIES,

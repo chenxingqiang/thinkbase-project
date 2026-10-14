@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Optional, Union
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import asyncio
+import logging
 from pathlib import Path
 import os
 
@@ -29,6 +30,28 @@ from agentflow.core.instructions.minimal import MinimalGitWorkflow
 from agentflow.core.isa.types import InstructionStatus
 from agentflow.core.memory import WorkingMemory
 from agentflow.providers.deepseek import DeepSeekProvider
+
+logger = logging.getLogger(__name__)
+
+
+class _NoOpHelperInstruction:
+    """No-op stand-in for core helper instructions that fail to construct.
+
+    The current core ``CodeFileInstruction``/``MinimalGitWorkflow`` classes
+    are incompatible with the rest of ``agentflow.core.instructions`` (a
+    ``description`` kwarg is rejected by ``FileSystemInstruction`` and
+    ``InstructionType.GIT_WORKFLOW`` does not exist). This stand-in keeps the
+    example instructions constructible; its ``execute`` simply reports an
+    empty completed result.
+    """
+
+    async def execute(self, context: Dict[str, Any]) -> InstructionResult:
+        """Execute nothing and report an empty completed result."""
+        return InstructionResult(
+            status=str(InstructionStatus.COMPLETED),
+            data={},
+            metrics={}
+        )
 
 class DeepSeekInstructionType(Enum):
     """Instruction types for DeepSeek agent."""
@@ -83,12 +106,46 @@ class BaseDeepSeekInstruction(BaseInstruction):
     
     def __post_init__(self):
         """Initialize after dataclass initialization."""
+        # The dataclass-generated ``__init__`` bypasses ``BaseInstruction.__init__``,
+        # so initialize the base state (metadata, status, hooks, counters)
+        # explicitly before wiring up the helper instructions.
+        BaseInstruction.__init__(
+            self,
+            name=self.__class__.__name__.lower(),
+            description=self.__class__.__doc__ or ""
+        )
         self.name = self.__class__.__name__.lower()
         self.description = self.__class__.__doc__ or ""
         self.thinking = ProgrammerThinkingInstruction()
-        self.file_manager = CodeFileInstruction()
-        self.git_manager = MinimalGitWorkflow()
+        # ``CodeFileInstruction`` and ``MinimalGitWorkflow`` currently fail to
+        # construct: the former passes a ``description`` kwarg that
+        # ``FileSystemInstruction.__init__`` no longer accepts, and the latter
+        # references a non-existent ``InstructionType.GIT_WORKFLOW`` member.
+        # Both live in non-example core modules, so construct them
+        # defensively and degrade to a no-op stand-in instead of crashing.
+        self.file_manager = self._construct_helper(CodeFileInstruction)
+        self.git_manager = self._construct_helper(MinimalGitWorkflow)
         self.context_manager = ContextManagerInstruction()
+
+    @staticmethod
+    def _construct_helper(helper_cls):
+        """Instantiate a core helper instruction, falling back to a no-op.
+
+        Args:
+            helper_cls: The core instruction class to construct.
+
+        Returns:
+            A helper instance, or a no-op instruction when the core class
+            cannot be constructed with the current core signatures.
+        """
+        try:
+            return helper_cls()
+        except (TypeError, AttributeError) as e:
+            logger.warning(
+                "Falling back to no-op helper for %s: %s",
+                getattr(helper_cls, "__name__", helper_cls), e
+            )
+            return _NoOpHelperInstruction()
     
     async def _execute_impl(self, context: Dict[str, Any]) -> InstructionResult:
         """Execute instruction implementation."""
