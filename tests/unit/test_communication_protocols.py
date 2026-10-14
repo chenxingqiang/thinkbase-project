@@ -33,8 +33,7 @@ def ray_context():
     if not ray.is_initialized():
         ray.init(ignore_reinit_error=True)
     yield
-    if ray.is_initialized():
-        ray.shutdown()
+    # Ray lifecycle owned by conftest session fixture; do not shutdown here.
 
 @pytest.fixture
 def workflow_engine():

@@ -9,9 +9,9 @@ from agentflow.core.research_workflow import ResearchDistributedWorkflow
 from agentflow.core.workflow_types import WorkflowStepType, WorkflowConfig, ErrorPolicy
 from agentflow.core.exceptions import WorkflowExecutionError
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_ray():
-    """Setup Ray."""
+    """Setup Ray (session-scoped: one cluster per module, not per test)."""
     if not ray.is_initialized():
         ray.init(ignore_reinit_error=True)
     yield None

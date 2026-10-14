@@ -69,35 +69,33 @@ async def test_agent_cleanup_status():
 @pytest.mark.asyncio
 async def test_remote_agent_status():
     """Test remote agent status handling."""
-    # Initialize Ray if not already initialized
+    # Initialize Ray if not already initialized (no-op under the
+    # session-scoped cluster from tests/conftest.py).
     if not ray.is_initialized():
         ray.init(ignore_reinit_error=True)
+
+    # Create a remote agent reference
+    agent_ref = RemoteAgent.remote()  # type: ignore
     
-    try:
-        # Create a remote agent reference
-        agent_ref = RemoteAgent.remote()  # type: ignore
-        
-        # Get initial status using get_status_remote
-        status_str = ray.get(agent_ref.get_status_remote.remote())  # type: ignore
-        assert status_str == AgentStatus.INITIALIZED.value
-        
-        # Initialize
-        ray.get(agent_ref.initialize.remote())  # type: ignore
-        
-        # Check status after initialization
-        status_str = ray.get(agent_ref.get_status_remote.remote())  # type: ignore
-        assert status_str == AgentStatus.INITIALIZED.value
-        
-        # Cleanup
-        ray.get(agent_ref.cleanup.remote())  # type: ignore
-        
-        # Check status after cleanup
-        status_str = ray.get(agent_ref.get_status_remote.remote())  # type: ignore
-        assert status_str == AgentStatus.STOPPED.value
-    finally:
-        # Shutdown Ray
-        if ray.is_initialized():
-            ray.shutdown()
+    # Get initial status using get_status_remote
+    status_str = ray.get(agent_ref.get_status_remote.remote())  # type: ignore
+    assert status_str == AgentStatus.INITIALIZED.value
+    
+    # Initialize
+    ray.get(agent_ref.initialize.remote())  # type: ignore
+    
+    # Check status after initialization
+    status_str = ray.get(agent_ref.get_status_remote.remote())  # type: ignore
+    assert status_str == AgentStatus.INITIALIZED.value
+    
+    # Cleanup
+    ray.get(agent_ref.cleanup.remote())  # type: ignore
+    
+    # Check status after cleanup
+    status_str = ray.get(agent_ref.get_status_remote.remote())  # type: ignore
+    assert status_str == AgentStatus.STOPPED.value
+    # Note: Ray lifecycle is owned by the session-scoped fixture in
+    # tests/conftest.py; there is deliberately no ``ray.shutdown()`` here.
 
 @pytest.mark.asyncio
 async def test_agent_state_timing():

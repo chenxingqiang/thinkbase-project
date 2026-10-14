@@ -7,9 +7,9 @@ from typing import Dict, Any
 from agentflow.core.research_workflow import ResearchDistributedWorkflow
 from agentflow.core.workflow_types import WorkflowStepType
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_ray():
-    """Setup Ray."""
+    """Setup Ray (session-scoped: one cluster per module, not per test)."""
     if not ray.is_initialized():
         ray.init(ignore_reinit_error=True)
     yield None

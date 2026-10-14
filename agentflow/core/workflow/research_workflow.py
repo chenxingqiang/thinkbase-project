@@ -3,6 +3,7 @@
 from typing import Dict, Any, Optional, List, Union
 import logging
 import asyncio
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -69,8 +70,14 @@ class ResearchDistributedWorkflow(WorkflowEngine):
                 }
             }
             
-        # Create remote actor with workflow definition and config
-        workflow = RemoteWorkflow.options(name=workflow_def.get("name", "research_workflow")).remote(
+        # Create remote actor with workflow definition and config.  An
+        # unnamed workflow gets a unique actor name: ray actor names live
+        # in one cluster namespace, so two workflows without explicit
+        # names would otherwise collide with ActorAlreadyExistsError.
+        actor_name = workflow_def.get("name")
+        if not actor_name:
+            actor_name = f"research_workflow_{uuid.uuid4().hex[:8]}"
+        workflow = RemoteWorkflow.options(name=actor_name).remote(
             workflow_def["COLLABORATION"]["WORKFLOW"]  # Only pass the workflow definition
         )
         return workflow

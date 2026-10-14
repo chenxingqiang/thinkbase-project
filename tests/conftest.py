@@ -86,3 +86,28 @@ def mock_llm_response():
             "tokens": 10
         }
     }
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_ray_session():
+    """Share one Ray cluster across the whole test session.
+
+    Per-test ``ray.init()``/``ray.shutdown()`` costs ~10-13s each (the
+    slowest single item in the suite by far); a single session-scoped
+    cluster eliminates that entirely.  ``ignore_reinit_error=True`` keeps
+    module-level ``ray.init`` calls harmless no-ops, and each module's
+    teardown ``ray.shutdown()`` is idempotent, so the shared cluster is
+    only torn down once at session end.
+
+    The server spawned by tests/test_workflow_api.py is isolated with
+    ``RAY_ADDRESS=local``, so it does not try to join this cluster.
+    """
+    import ray
+    if not ray.is_initialized():
+        ray.init(
+            num_cpus=os.cpu_count() or 4,
+            ignore_reinit_error=True,
+            log_to_driver=False,
+        )
+    yield
+    if ray.is_initialized():
+        ray.shutdown()

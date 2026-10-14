@@ -38,8 +38,7 @@ class MockAgent:
 def ray_context():
     """Initialize Ray for performance testing"""
     ray.init(ignore_reinit_error=True, num_cpus=4)
-    yield
-    ray.shutdown()
+    yield  # Ray lifecycle owned by conftest session fixture
 
 def test_agent_single_workflow_performance(ray_context):
     """Test performance of a single agent workflow"""

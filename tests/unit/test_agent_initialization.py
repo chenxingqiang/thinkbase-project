@@ -19,8 +19,7 @@ def test_data_dir():
 def ray_context():
     """Initialize Ray for testing"""
     ray.init(ignore_reinit_error=True)
-    yield
-    ray.shutdown()
+    yield  # Ray lifecycle owned by conftest session fixture
 
 def test_agent_initialization(ray_context):
     """Test basic agent initialization"""
