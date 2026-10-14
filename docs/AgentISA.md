@@ -5,7 +5,7 @@
 
 Large Language Models (LLMs) are increasingly deployed as autonomous agents, yet their behaviors are typically orchestrated through ad-hoc prompt engineering and per-provider function-calling interfaces. This makes agent behavior difficult to specify, analyze, and optimize systematically. We present AgentISA, an instruction set architecture for LLM-powered agents that treats agent behavior as a first-class compilable artifact. AgentISA contributes: (1) a formal instruction set with compositional semantics, a type system, and machine-checkable pre/post-conditions; (2) an Agentic Calling mechanism that lifts provider-specific function calling into reusable, cacheable agent instructions; (3) an automatic instruction learning system that mines recurring instruction patterns from interaction traces; and (4) a compiler and runtime applying classical optimization techniques—instruction fusion, dead-code elimination, pipeline scheduling, and dynamic hot-path specialization—to agent instruction streams.
 
-We evaluate AgentISA with a reproducible microbenchmark suite that executes the real compiler, cache, and optimization-manager code paths against a mock LLM backend that counts simulated API calls and charges a fixed 80 ms simulated latency per call. On synthetic Zipf-distributed workloads (2,000 tasks, 5 random seeds), result caching reduces simulated API calls by 59.5%±0.3%, 67.9%±0.2%, and 79.6%±0.5% at Zipf exponents 0.5, 1.0, and 1.5, respectively. Static compilation reduces the effective instruction count by 34.2%±1.8% (sequence length 200; 35.4%±1.6% at length 1,000), with an ablation attributing 21.9%±3.5% to fusion alone and 24.1%±3.3% to dead-code elimination alone. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%. A suite of 43 multi-agent coordination and security tests provides functional validation of role assignment, capability-based agent selection, barrier synchronization, and authentication/authorization monitoring. We position these results honestly as microbenchmark evidence on synthetic workloads—not as production end-to-end measurements—and discuss the resulting threats to validity.
+We evaluate AgentISA with a reproducible microbenchmark suite that executes the real compiler, cache, and optimization-manager code paths against a mock LLM backend that counts simulated API calls and charges a fixed 80 ms simulated latency per call. On synthetic Zipf-distributed workloads (2,000 tasks, 5 random seeds), result caching reduces simulated API calls by 59.5%±0.3%, 67.9%±0.2%, and 79.6%±0.5% at Zipf exponents 0.5, 1.0, and 1.5, respectively. Static compilation reduces the effective instruction count by 34.2%±1.8% (sequence length 200; 35.4%±1.6% at length 1,000), with an ablation attributing 21.9%±3.5% to fusion alone and 24.1%±3.3% to dead-code elimination alone. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%. A scaled-down run against a live LLM gateway (200 tasks, one seed, one model; 1,040 real round trips) reproduces the exactly computed cache hit/miss sequence at every skew level and converts avoided calls into measured wall-clock and token savings, validating the caching mechanism end-to-end while remaining far short of production evidence. A suite of 43 multi-agent coordination and security tests provides functional validation of role assignment, capability-based agent selection, barrier synchronization, and authentication/authorization monitoring. We position these results honestly as microbenchmark evidence on synthetic workloads—not as production end-to-end measurements—and discuss the resulting threats to validity.
 
 # Keywords
 
@@ -27,6 +27,7 @@ We evaluate AgentISA with a reproducible microbenchmark suite that executes the 
 3. Static compilation (fusion + dead-code elimination) reduces the effective instruction count by 34.2%±1.8%, validated by a per-pass ablation
 4. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%
 5. Agentic Calling lifts provider-specific function calling into reusable, portable agent instructions
+6. Against a live LLM gateway the cache reproduces the exactly predicted hit/miss sequence, converting avoided calls into measured wall-clock (14-46% of the no-cache arm) and token savings
 
 # CCS Concepts
 
@@ -79,7 +80,7 @@ This paper introduces AgentISA, an instruction set architecture that addresses t
 
 6. **Multi-agent coordination infrastructure** with capability-based agent selection, execution planning, fallback strategies, and a security monitor enforcing authentication, authorization, resource-access, and data-sensitivity policies (Section 3.5 and Section 5.6), validated by 43 passing functional tests.
 
-We deliberately scope our empirical claims: all quantitative results come from microbenchmarks that exercise the real `agentflow.core.isa` implementation against a mock LLM backend on synthetic workloads. They establish that the optimizations are real and measurable in a controlled setting; they do not constitute production end-to-end measurements, and we discuss this limitation explicitly in Section 5.7.
+We deliberately scope our empirical claims: all quantitative results come from microbenchmarks that exercise the real `agentflow.core.isa` implementation against a mock LLM backend on synthetic workloads. They establish that the optimizations are real and measurable in a controlled setting; they do not constitute production end-to-end measurements, and we discuss this limitation explicitly in Section 5.8.
 
 The rest of this paper is organized as follows: Section 2 reviews related work. Section 3 details the design of AgentISA. Section 4 describes the implementation. Section 5 presents the empirical evaluation. Section 6 discusses limitations and future work, and Section 7 concludes.
 
@@ -970,11 +971,11 @@ We validate the implemented optimizations with the microbenchmark suite of Secti
 | Static compilation (fusion + DCE) | 34.2%±1.8% reduction in effective instruction count (length-200 sequences) | Section 5.3    |
 | Dynamic hot-path optimization | 65.8%±4.6% trace shrinkage on repeatedly executed traces              | Section 5.4    |
 
-These are microbenchmark measurements on synthetic workloads with simulated latency (80 ms per simulated call); they are not production end-to-end results. Section 5.7 discusses the threats to validity that this scoping implies.
+These are microbenchmark measurements on synthetic workloads with simulated latency (80 ms per simulated call); they are not production end-to-end results. Section 5.7 reports a scaled-down validation of the caching mechanism against a real LLM gateway, and Section 5.8 discusses the remaining threats to validity.
 
 # 5. Empirical Evaluation
 
-We evaluate AgentISA with a reproducible microbenchmark suite (`examples/benchmarks/isa_microbench.py`) and a functional test suite for the multi-agent layer. We state the scope up front: all quantitative results in this section come from synthetic workloads executed against a *mock* LLM backend that counts simulated API calls and charges simulated latency. They demonstrate that the optimizations are real, measurable, and reproducible in a controlled setting. They are **not** production end-to-end measurements, and no claim in this paper should be read as one. Section 5.7 discusses the threats to validity that follow.
+We evaluate AgentISA with a reproducible microbenchmark suite (`examples/benchmarks/isa_microbench.py`) and a functional test suite for the multi-agent layer. We state the scope up front: the quantitative results in Sections 5.2-5.5 come from synthetic workloads executed against a *mock* LLM backend that counts simulated API calls and charges simulated latency; Section 5.7 then repeats the caching experiment against a live LLM gateway at reduced scale. They demonstrate that the optimizations are real, measurable, and reproducible in a controlled setting. They are **not** production end-to-end measurements, and no claim in this paper should be read as one. Section 5.7 validates the caching mechanism end-to-end against a real LLM gateway at reduced scale, and Section 5.8 discusses the threats to validity that follow.
 
 ## 5.1 Methodology
 
@@ -1113,17 +1114,39 @@ What the 43 tests verify, grouped by subsystem:
 
 These tests exercise the same production modules used elsewhere in the system and are fully deterministic (no LLM calls). They establish correctness of the coordination machinery under the tested conditions. What they do not establish is scalability under contention, crash recovery, or adversarial inputs beyond the policy checks above—all are future work (Section 6).
 
-## 5.7 Limitations and Threats to Validity
+## 5.7 Real-LLM End-to-End Validation of Result Caching
+
+**Research question**: does the caching mechanism behave identically when the "model" is a real LLM behind a live gateway, and how much *measured* wall-clock time and token usage does it save?
+
+**Setup.** We replace the mock backend with a real model served by a local Anthropic-protocol gateway (TLS with an internal CA; alias `claude-glm-5.3-flash`, a hosted reasoning-capable GLM model; `max_tokens=64`). Requests are sequential HTTP calls (httpx, no proxy, 90 s timeout), with three bounded retries for transient failures — none occurred. Every other component is the production code path: the same `InstructionCache` protocol, the same instruction objects, the same workload generator and the same instruction pool (50 templates) and parameter space (20 values) as Section 5.2.
+
+**Scale.** Because each real round trip costs ~2.2 s, we reduce scale from 2,000 tasks x 5 seeds to **200 tasks x 1 seed** per Zipf level (s in {0.5, 1.0, 1.5}); the whole run is 1,040 real round trips in 39.4 minutes. The seed pins the task sequence exactly, so the workload is the same one the expectation below is computed from.
+
+**An exactness property.** A cache hit depends only on the (instruction, params) pair seen so far — not on what the model returns. The hit/miss sequence for a fixed workload is therefore *computable without any backend*. If the mechanism is correct, the real run must reproduce that sequence exactly. It does:
+
+| Zipf s | Expected hit rate (computed, no backend) | Observed hit rate | Calls (no cache -> cached) | Call reduction | Wall clock (no cache -> cached, ms) | Wall saved (ms) | Tokens saved |
+| ------ | ---------------------------------------- | ----------------- | --------------------------- | -------------- | ------------------------------------ | --------------- | ------------ |
+| 0.5    | 8.5%                                     | 8.5%              | 200 -> 183                  | 8.5%           | 472,276 -> 405,754                   | 66,522          | 1,445        |
+| 1.0    | 26.0%                                    | 26.0%             | 200 -> 148                  | 26.0%          | 455,946 -> 334,597                   | 121,349         | 4,420        |
+| 1.5    | 45.5%                                    | 45.5%             | 200 -> 109                  | 45.5%          | 450,330 -> 244,316                   | 206,014         | 7,735        |
+
+Per-call latency was stable across arms (p50 2.13-2.18 s, p95 3.06-3.54 s). Token savings are gateway-reported `usage` differences: every avoided call saves its input tokens plus the tokens the reasoning model generates before responding (output tokens were the binding constraint of `max_tokens=64` in every call).
+
+**Interpretation.** Three points. First, the mechanism transfers unchanged: observed hit rates match the computed expectation exactly at every skew level, so the synthetic results of Section 5.2 measure the cache, not an artifact of the mock. Second, avoided calls convert into measured time and tokens: 14.1%, 26.6%, and 45.8% of the no-cache arm's wall clock at s = 0.5, 1.0, 1.5. These measured savings track the call reduction but are not identical to it, because arms were measured sequentially and per-call latency drifted slightly between arms (the exact quantity is the call reduction; wall and token figures are measurements, not derivations). Third, the *absolute* hit rates here (8.5-45.5%) are lower than Section 5.2's (59.5-79.6%) purely because repetition accumulates with task count: at N = 200 these are the exact computed values for this workload family, and at N = 2,000 the same computation yields the Section 5.2 numbers. The dependence on N is a property of the workload, not the backend.
+
+**Scope of the claim.** This experiment validates the caching mechanism end-to-end: one gateway, one model, one seed, N = 200, sequential requests, no streaming. The compiler and dynamic-optimization experiments (Sections 5.3-5.5) are structural — they do not dispatch to the backend at all — so the real-LLM run does not re-execute them; their validity rests on the code-path and ablation arguments made there. Nothing in this section is a throughput, availability, or dollar-cost claim.
+
+## 5.8 Limitations and Threats to Validity
 
 We enumerate the limitations of the evaluation explicitly:
 
-1. **Mock backend, not a live LLM.** The mock charges a constant 80 ms per simulated call and returns deterministic responses. This removes the variance and failures of real inference—desirable for isolating optimizer behavior, but it means the results say nothing about how caching interacts with real model nondeterminism, streaming, or provider rate limits.
+1. **Mock backend, not a live LLM (partially addressed).** The mock charges a constant 80 ms per simulated call and returns deterministic responses. Section 5.7 addresses the *mechanism-transfer* part of this threat at reduced scale: against a live gateway, the cache reproduces the exactly computed hit/miss sequence, and avoided calls convert to measured time and tokens. What remains untested is caching under real model nondeterminism *across prompt variations*, streaming responses, and provider rate limits.
 
 2. **Synthetic workloads.** Zipf-distributed synthetic tasks are a reasonable model of skewed agent workloads, but they are a model. The cache-reduction figures (59.5–79.6%) are exact for these workload families and should be read as *skew-sensitivity curves*, not as universal savings. A deployment with uniformly novel tasks would see near-zero cache benefit.
 
 3. **No production end-to-end evaluation.** We have not deployed AgentISA in a production setting. Consequently this paper contains no latency-under-load, throughput, availability, or dollar-cost measurements, and we make no such claims.
 
-4. **No real cost data.** All "latency" figures are simulated (avoided calls × 80 ms). Real cost depends on provider pricing, prompt sizes, and token accounting—none of which the mock models. Any dollar savings would require a separate, priced deployment study.
+4. **No real cost data (token usage now measured; pricing still not modeled).** All latency figures in Sections 5.2-5.5 are simulated (avoided calls × 80 ms). Section 5.7 measures real wall-clock time and gateway-reported token usage at reduced scale, but no pricing is applied and no dollar-savings claim is made; a priced deployment study remains future work.
 
 5. **Program-size metrics, not wall-clock time.** Effective-instruction reduction and dispatch-count reduction are structural metrics. They correlate with—but do not equal—wall-clock improvements, which depend on per-instruction cost, parallelism available in the runtime, and dispatch overhead.
 
@@ -1142,7 +1165,7 @@ Despite these limitations, the evaluation achieves its purpose: it demonstrates,
    - Maintaining consistency of pre/post-conditions and typing rules across extensions remains an open engineering challenge
 
 2. **Evaluation Scope**
-   - As detailed in Section 5.7, our quantitative evidence is microbenchmark-based: synthetic Zipf workloads against a mock LLM backend
+   - As detailed in Section 5.8, our quantitative evidence is microbenchmark-based: synthetic Zipf workloads against a mock LLM backend
    - Production end-to-end evaluation—including real provider pricing, rate limits, and failure modes—is required before any deployment claim
 
 3. **Performance Bottlenecks**
@@ -1363,17 +1386,24 @@ This paper presented AgentISA, an instruction set architecture that treats LLM a
 4. A compiler and runtime applying classical optimizations—fusion, dead-code elimination, scheduling, and dynamic hot-path specialization—to agent instruction streams.
 5. A multi-agent coordination layer with capability-based selection and a security monitor enforcing authentication, authorization, and data-sensitivity policies.
 
-The empirical evaluation is deliberately scoped and fully disclosed: a microbenchmark suite drives the real compiler, cache, and optimizer against a mock LLM backend on synthetic Zipf workloads, over 5 seeds per configuration. Under these conditions, result caching reduces simulated API calls by 59.5–79.6% (increasing with workload skew), static compilation reduces the effective instruction count by 34.2%±1.8% (with an ablation attributing 21.9%±3.5% to fusion and 24.1%±3.3% to dead-code elimination), and dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%. The multi-agent layer is validated by 43 passing functional tests. We have been explicit throughout about what these results are not: they are not production end-to-end measurements, and they do not include real latency or dollar-cost data.
+The empirical evaluation is deliberately scoped and fully disclosed: a microbenchmark suite drives the real compiler, cache, and optimizer against a mock LLM backend on synthetic Zipf workloads, over 5 seeds per configuration. Under these conditions, result caching reduces simulated API calls by 59.5–79.6% (increasing with workload skew), static compilation reduces the effective instruction count by 34.2%±1.8% (with an ablation attributing 21.9%±3.5% to fusion and 24.1%±3.3% to dead-code elimination), and dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%. The multi-agent layer is validated by 43 passing functional tests. We have been explicit throughout about what these results are not: the Section 5.2-5.5 figures are microbenchmark evidence on synthetic workloads, not production end-to-end measurements. The Section 5.7 run against a live gateway validates the caching mechanism end-to-end and measures real wall-clock and token savings at reduced scale, but dollar-cost, throughput, and availability claims remain out of scope.
 
 AgentISA's longer-term significance is architectural: by giving agent behavior an instruction-level contract, it makes agent systems amenable to the same discipline that transformed hardware and compiler engineering—precise specification, portability across backends, and semantics-preserving optimization. Establishing the corresponding gains on production workloads, and hardening the formal guarantees into verified implementations, is the immediate next step.
 
 # Artifact Availability
 
-The AgentISA implementation (`agentflow.core.isa`), the microbenchmark suite (`examples/benchmarks/isa_microbench.py`), the raw results (`examples/benchmarks/isa_microbench_results.json`), and the 43 multi-agent functional tests (`tests/core/isa/test_coordination.py`, `tests/core/instructions/test_agent_coordination.py`) are available in the accompanying repository. Every number in Section 5 can be regenerated with:
+The AgentISA implementation (`agentflow.core.isa`), the microbenchmark suite (`examples/benchmarks/isa_microbench.py`), the real-LLM benchmark (`examples/benchmarks/isa_real_llm_bench.py`), the raw results (`examples/benchmarks/isa_microbench_results.json`, `examples/benchmarks/isa_real_llm_results.json`), and the 43 multi-agent functional tests (`tests/core/isa/test_coordination.py`, `tests/core/instructions/test_agent_coordination.py`) are available in the accompanying repository. The Section 5.2-5.5 numbers regenerate with:
 
 ```
 ./venv/bin/python examples/benchmarks/isa_microbench.py \
     --experiments cache compiler dynamic ablation --seeds 5
+```
+
+The Section 5.7 numbers regenerate against any Anthropic-protocol gateway (configure `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN`; the paper's run used a local alias for a hosted GLM reasoning model) with:
+
+```
+./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64
 ```
 
 # References
