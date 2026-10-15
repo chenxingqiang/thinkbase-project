@@ -171,7 +171,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.filenames = list(filenames)
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             lines: List[str] = []
             for name in self.filenames:
                 lines.extend(
@@ -192,7 +192,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.dependencies = ["ingest_logs"]
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             bad = sum(
                 1 for ln in input_params["ctx"]["raw_lines"]
                 if "level=" not in ln
@@ -210,7 +210,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.dependencies = ["ingest_logs"]
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             entries = []
             for ln in input_params["ctx"]["raw_lines"]:
                 parts = dict(p.split("=", 1) for p in ln.split(" ") if "=" in p)
@@ -233,7 +233,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.dependencies = ["normalize_entries"]
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             incidents = [
                 e for e in input_params["ctx"]["entries"]
                 if e["level"] in ("WARN", "ERROR")
@@ -256,7 +256,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.backend = backend
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             signatures = sorted({i["signature"] for i in input_params["ctx"]["incidents"]})
             cache_key = self._get_cache_key({"signatures": "|".join(signatures)})
             cached = self.cache.get(cache_key)
@@ -279,7 +279,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.dependencies = ["classify_signature"]
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             ctx = input_params["ctx"]
             by_severity: Dict[str, int] = {}
             by_component: Dict[str, int] = {}
@@ -311,7 +311,7 @@ def build_stream(backend: RuleClassifierBackend,
             self.sandbox = sandbox
 
         async def execute(self, input_params: Dict[str, Any]) -> Any:
-            start = time.perf_counter()
+            start = time.time()  # matches Instruction._update_metrics clock
             s = input_params["ctx"]["summary"]
             lines = [
                 "# Service Log Triage Report",
