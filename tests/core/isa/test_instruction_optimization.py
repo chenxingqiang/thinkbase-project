@@ -215,3 +215,31 @@ def test_pipeline_stage_latency(pipeline_scheduler):
     
     assert pipeline_scheduler.stage_latencies["fetch"] == 1.0
     assert pipeline_scheduler.stage_latencies["execute"] == 2.0 
+
+def test_combination_blocked_by_output_name_dependency(static_optimizer):
+    """A producer-consumer pair expressed via output names must not fuse.
+
+    Regression: ``_can_combine`` used to check only whether ``instr2``
+    depends on ``instr1.id``.  Dependencies following the compiler's
+    *output-name* convention slipped through, so fusing e.g. a
+    transform chain produced a composite whose second component
+    executed without the first component's outputs.
+    """
+    producer = TestInstruction("producer", "producer")
+    producer.side_effects = False
+    producer.outputs = ["entries"]
+    consumer = TestInstruction("consumer", "consumer", ["entries"])
+    consumer.side_effects = False
+    assert not static_optimizer._can_combine(producer, consumer)
+
+    # id-referenced dependency still blocks combination
+    by_id = TestInstruction("by_id", "by_id", ["producer"])
+    by_id.side_effects = False
+    assert not static_optimizer._can_combine(producer, by_id)
+
+    # independent pure steps still combine
+    a = TestInstruction("a", "a")
+    a.side_effects = False
+    b = TestInstruction("b", "b")
+    b.side_effects = False
+    assert static_optimizer._can_combine(a, b)

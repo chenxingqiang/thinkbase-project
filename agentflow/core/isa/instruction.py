@@ -277,17 +277,50 @@ class CompositeInstruction(Instruction):
                 return cached_result
             
             if self.composition_type == "sequential":
-                result = None
+                # Thread component results: in a sequential composition
+                # each component must see the outputs of its
+                # predecessors, and the composite yields the *union* of
+                # its components' dict outputs (later components may
+                # overwrite keys produced earlier -- that is sequential
+                # semantics).  A trailing non-dict result follows the
+                # last-component-wins convention.  Keeping only the
+                # last component's result, as this loop previously
+                # did, silently dropped every intermediate output.
+                merged = dict(input_params)
+                net_new: Dict[str, Any] = {}
+                last_value: Any = None
                 for component in self.components:
-                    result = await component.execute(input_params)
-                    
+                    result = await component.execute(merged)
+                    last_value = result
+                    if isinstance(result, dict):
+                        net_new.update(result)
+                        merged = {**merged, **result}
+                        # Thread into the wrapped-state convention
+                        # (``{"ctx": {...}``) used by run_stream-style
+                        # execution so nested steps see earlier
+                        # outputs.
+                        inner = merged.get("ctx")
+                        if isinstance(inner, dict):
+                            merged["ctx"] = {**inner, **result}
+                result = (
+                    last_value if not isinstance(last_value, dict)
+                    else (net_new or None)
+                )
+
             elif self.composition_type == "parallel":
                 tasks = [
                     lambda c=component: c.execute(input_params)
                     for component in self.components
                 ]
                 results = await self._execute_parallel(tasks)
-                result = results[-1] if results else None
+                # Parallel components act on disjoint state components
+                # (Definition 3.6, Property 2): merge every component's
+                # outputs; keeping only the last dropped the rest.
+                merged_result: Dict[str, Any] = {}
+                for r in results:
+                    if isinstance(r, dict):
+                        merged_result.update(r)
+                result = merged_result or (results[-1] if results else None)
                 
             else:
                 raise ValueError(f"Unsupported composition type: {self.composition_type}")

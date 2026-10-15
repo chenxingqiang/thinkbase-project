@@ -92,7 +92,14 @@ async def test_composite_instruction():
     assert component1.executed
     assert component2.executed
     assert component1.last_params == params
-    assert component2.last_params == params
+    # Sequential semantics: component2 must see component1's outputs
+    # merged into its params (regression: it used to receive the
+    # original params unchanged, which drops intermediate outputs).
+    assert component2.last_params == {
+        **params,
+        "status": "executed",  # component1's output, visible downstream
+        "params": params,
+    }
     assert result["status"] == "executed"
 
 @pytest.mark.asyncio
@@ -187,3 +194,71 @@ async def test_dependent_type_constraints():
     # Test invalid parameters
     invalid_params = {"param1": "test", "param2": -1}
     assert not instruction.validate_types(invalid_params) 
+
+class _Pure(Instruction):
+    """Minimal pure instruction for composite-semantics tests."""
+
+    def __init__(self, id: str, fn, outputs: list, deps: list = None):
+        super().__init__(
+            id=id, name=id, type=InstructionType.CONTROL_FLOW,
+            params={}, description=f"pure {id}",
+            side_effects=False, outputs=list(outputs),
+        )
+        self._fn = fn
+        self.dependencies = list(deps or [])
+
+    async def execute(self, input_params):
+        return self._fn(input_params)
+
+
+@pytest.mark.asyncio
+async def test_sequential_composite_threads_outputs():
+    """A sequential composite must thread component outputs.
+
+    Regression: the sequential branch used to execute every component
+    with the same input_params and return only the *last* component's
+    result, so (a) a component consuming a predecessor's output
+    crashed, and (b) intermediate outputs silently vanished.  The
+    composite must yield the union of its components' outputs.
+    """
+    first = _Pure("first", lambda p: {"v1": [1, 2]}, ["v1"])
+    second = _Pure(
+        "second",
+        lambda p: {"v2": [len(p["ctx"]["v1"])]},  # consumes v1
+        ["v2"], deps=["v1"],
+    )
+    comp = CompositeInstruction(
+        id="seq", name="seq",
+        components=[first, second], composition_type="sequential",
+    )
+    result = await comp.execute({"ctx": {}})
+    assert result == {"v1": [1, 2], "v2": [2]}
+
+
+@pytest.mark.asyncio
+async def test_sequential_composite_flat_params_threading():
+    """Flat params (no ctx wrapper) thread through components too."""
+    first = _Pure("f", lambda p: {"a": 1}, ["a"])
+    second = _Pure("s", lambda p: {"b": p["a"] + 1}, ["b"], deps=["a"])
+    comp = CompositeInstruction(
+        id="flat", name="flat",
+        components=[first, second], composition_type="sequential",
+    )
+    assert await comp.execute({}) == {"a": 1, "b": 2}
+
+
+@pytest.mark.asyncio
+async def test_parallel_composite_merges_all_outputs():
+    """Parallel components act on disjoint state: merge every output.
+
+    Regression: the parallel branch used to return results[-1] only,
+    dropping every component's outputs except the last one.
+    """
+    a = _Pure("a", lambda p: {"x": 1}, ["x"])
+    b = _Pure("b", lambda p: {"y": 2}, ["y"])
+    comp = CompositeInstruction(
+        id="par", name="par",
+        components=[a, b], composition_type="parallel",
+    )
+    result = await comp.execute({"ctx": {}})
+    assert result == {"x": 1, "y": 2}

@@ -262,6 +262,13 @@ class StaticOptimizer:
         deps2 = set(getattr(instr2, "dependencies", []) or [])
         if instr1.id in deps2:
             return False
+        # Dependencies may also reference *output names* (the compiler's
+        # convention): a producer-consumer pair expressed that way is
+        # not order-independent and must not fuse.  Without this check,
+        # fusing such a pair yields a composite whose second component
+        # executes without the first component's outputs.
+        if set(getattr(instr1, "outputs", []) or []) & deps2:
+            return False
         # Parameter signatures must match for a merged instruction to
         # accept the same inputs.
         if set(instr1.params.keys()) != set(instr2.params.keys()):
