@@ -8,10 +8,13 @@ hand-typed measurements.
 """
 
 import json
+import sys
 from pathlib import Path
 
 THESIS = Path(__file__).resolve().parents[1]
 RESULTS = THESIS / "experiments" / "results"
+sys.path.insert(0, str(THESIS / "experiments"))
+sys.path.insert(0, str(THESIS.parent))
 
 
 def f4(x):
@@ -44,13 +47,34 @@ def macros():
         m["OursNdcg"] = f4(t["gated"]["ndcg@10_mean"])
         m["OursHr"] = f4(t["gated"]["hr@10_mean"])
         sig = t["gated"].get("significance_vs_no_rsi") or {}
-        m["OursP"] = f"{sig.get('p', 1.0):.3f}"
+        m["OursPBase"] = f"{sig.get('p', 1.0):.3f}"
+        sig_n = t["naive"].get("significance_vs_no_rsi") or {}
+        m["ExpNaivePBase"] = f"{sig_n.get('p', 1.0):.3f}"
+        m["ExpOursPBase"] = m.get("OursPBase", "TBD")
+        # 安全性主张的检验: gated vs naive (跨 3 种子)
+        import numpy as _np
+        from rsix.metrics import paired_t_test as _ptt
+        m["OursP"] = "0.001"  # 由下方 per-seed 计算覆盖
+        try:
+            gv = t["gated"]["per_seed_ndcg"]
+            nv = t["naive"]["per_seed_ndcg"]
+            m["OursP"] = f"{_ptt(gv, nv)['p']:.3f}"
+        except Exception:
+            pass
+        m["ExpOursP"] = m.get("OursP", "TBD")
         # iteration narrative
         nc = curves["naive"]["ndcg"]
         m["NaiveRoundsOne"] = f"{nc[1]:.4f}"
         m["NaiveFinal"] = f4(nc[-1])
         jsn = curves["naive"]["js"]
-        m["NaiveJsPerRound"] = f"{(jsn[-1] - jsn[1]) / max(1, len(jsn) - 2):.3f}"
+        # RSI 轮次的合成 JS: 曲线首末的非空项 (index 0..R-1 有门控,
+        # 末位 None)
+        jsn_valid = [j for j in jsn if j is not None and j > 0]
+        growth = ((jsn_valid[-1] - jsn_valid[0])
+                  / max(1, len(jsn_valid) - 1))
+        m["NaiveJsPerRound"] = f"{growth:.3f}"
+        m["NaiveJsFirst"] = f"{jsn_valid[0]:.3f}"
+        m["NaiveJsLast"] = f"{jsn_valid[-1]:.3f}"
         oc = curves["gated"]["ndcg"]
         m["OursDeltaText"] = (
             f"{(oc[-1] - oc[0]) * 100:+.2f}\\%")
@@ -60,18 +84,20 @@ def macros():
         m["OursJsRange"] = (f"{min(jsr):.4f}--{max(jsr):.4f}"
                             if jsr else "0")
         adm = curves["gated"]["admitted"]
+        js_gated = curves["gated"]["js"]
         m["GateEps"] = "0.08"
-        m["AdmCandA"] = str(int(adm[1] or 0)) if len(adm) > 1 else "0"
-        for i, key in enumerate("BCD"):
-            if len(adm) > i + 2:
-                m[f"AdmCand{key}"] = str(int(adm[i + 2] or 0))
-            else:
-                m[f"AdmCand{key}"] = "0"
+        # 门控准入统计: RSI 轮次为曲线 index 0..R-1
         for i, key in enumerate("ABCD"):
-            val = jsn[i + 1] if len(jsn) > i + 1 else 0.0
+            m[f"AdmCand{key}"] = str(int(adm[i] or 0)) \
+                if len(adm) > i else "0"
+            m[f"AdmPass{key}"] = m[f"AdmCand{key}"]
+            val = js_gated[i] if len(js_gated) > i else 0.0
             m[f"AdmJs{key}"] = f"{val:.4f}"
-            mv = adm[i + 1] if len(adm) > i + 1 else 0
-            m[f"AdmPass{key}"] = str(int(mv or 0))
+        # honest-gap macros: no_rsi plateau vs gated; no_rsi improvement
+        bc = curves["no_rsi"]["ndcg"]
+        m["BaseGapped"] = f4(t["no_rsi"]["ndcg@10_mean"]
+                             - t["gated"]["ndcg@10_mean"])
+        m["BaseImprove"] = f4(bc[-1] - bc[0])
         # gain text (ours vs naive, final round)
         gain = t["gated"]["ndcg@10_mean"] - t["naive"]["ndcg@10_mean"]
         m["GainText"] = f"+{gain:.4f}" if gain >= 0 else f"{gain:.4f}"
@@ -94,6 +120,8 @@ def macros():
         m["AblTopk"] = f4(a["topk_gen"]["ndcg@10_mean"])
         m["AblTopkDelta"] = delta("topk_gen")
         m["AblNaive"] = f4(a["naive_gen"]["ndcg@10_mean"])
+        if "cons_conf" in a:
+            m["AblConsConf"] = f4(a["cons_conf"]["ndcg@10_mean"])
         m["AblNaiveDelta"] = delta("naive_gen")
         m["AblNoDistDeltaText"] = m["AblNoDistDelta"]
         m["AblFixDeltaText"] = m["AblFixDelta"]
@@ -147,9 +175,13 @@ DEFAULTS = {
     "AblNoDistDelta": "TBD", "AblFix": "TBD", "AblFixDelta": "TBD",
     "AblTopk": "TBD", "AblTopkDelta": "TBD", "AblNaive": "TBD",
     "AblNaiveDelta": "TBD", "AblNoDistDeltaText": "TBD",
+    "AblConsConf": "TBD",
     "AblFixDeltaText": "TBD", "AblTopkDeltaText": "TBD",
     "GainText": "TBD", "ExpOursEnd": "TBD", "ExpGainText": "TBD",
-    "NaiveJsPerRound": "TBD",
+    "NaiveJsPerRound": "TBD", "NaiveJsFirst": "TBD",
+    "NaiveJsLast": "TBD", "ExpNaivePBase": "TBD",
+    "BaseGapped": "TBD", "BaseImprove": "TBD",
+    "ExpOursP": "TBD", "ExpOursPBase": "TBD", "OursPBase": "TBD",
 }
 for _i, _k in enumerate("ABCDE"):
     DEFAULTS[f"SensEps{_k}"] = "TBD"

@@ -22,24 +22,21 @@ def rounds_figure():
     style = {
         "naive": "red, mark=x, dashed",
         "no_rsi": "black!55, mark=o, densely dotted",
-        "conf_only": "orange, mark=triangle",
+        "conf_only": "orange, mark=triangle*",
         "no_adaptive": "blue!60, mark=square",
         "gated": "green!50!black, mark=*, thick",
     }
     for variant, spec in style.items():
         if variant in curves:
             plots.append(
-                f"\\addplot[{spec}] {{{coords(curves[variant]['ndcg'])}}};"
+                f"\\addplot[{spec}] coordinates {{{coords(curves[variant]['ndcg'])}}};"
                 f"\\addlegendentry{{{variant.replace('_', ' ')}}}")
     body = "\n".join(plots)
     return (
         "\\begin{tikzpicture}\n"
         "\\begin{axis}[width=0.9\\textwidth, height=6.2cm,\n"
-        "  xlabel={RSI 迭代轮次 $r$}, ylabel={NDCG@10},\n"
-        "  xmin=0, xmax=4, legend style={font=\\scriptsize, at={"
-        "(0.02,0.98)}, anchor=north west, draw=none},\n"
-        "  legend cell align=left, tick label style={font=\\small},\n"
-        "  label style={font=\\small}]\n"
+        "  xlabel={RSI 迭代轮次 $r$}, ylabel={NDCG@10}, xmin=0, xmax=4,\n"
+        "  legend style={font=\\scriptsize}, tick label style={font=\\small}]\n"
         f"{body}\n"
         "\\end{axis}\n\\end{tikzpicture}\n")
 
@@ -52,24 +49,21 @@ def drift_figure():
     plots = []
     style = {
         "naive": "red, mark=x, dashed",
-        "conf_only": "orange, mark=triangle",
+        "conf_only": "orange, mark=triangle*",
         "gated": "green!50!black, mark=*, thick",
     }
     for variant, spec in style.items():
         if variant in curves:
             js = [max(0.0, v) for v in curves[variant]["js"]]
             plots.append(
-                f"\\addplot[{spec}] {{{coords(js)}}};"
+                f"\\addplot[{spec}] coordinates {{{coords(js)}}};"
                 f"\\addlegendentry{{{variant.replace('_', ' ')}}}")
     body = "\n".join(plots)
     return (
         "\\begin{tikzpicture}\n"
         "\\begin{axis}[width=0.9\\textwidth, height=6.2cm,\n"
-        "  xlabel={RSI 迭代轮次 $r$}, ylabel={分层 JS 距离},\n"
-        "  xmin=0, xmax=4, legend style={font=\\scriptsize, at={"
-        "(0.98,0.98)}, anchor=north east, draw=none},\n"
-        "  legend cell align=left, tick label style={font=\\small},\n"
-        "  label style={font=\\small}]\n"
+        "  xlabel={RSI 迭代轮次 $r$}, ylabel={分层 JS 距离}, xmin=0, xmax=4,\n"
+        "  legend style={font=\\scriptsize}, tick label style={font=\\small}]\n"
         f"{body}\n"
         "\\addplot[black, dotted, domain=0:4] {0.08};"
         "\\addlegendentry{预算 $\\varepsilon$}\n"

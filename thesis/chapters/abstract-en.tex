@@ -40,14 +40,27 @@ pseudo-label only when the model's top prediction is
 \emph{consistent} across views with confidence and margin above
 thresholds --- encoding robust beliefs instead of head preference.
 \item \textbf{Empirical validation and reproducible
-infrastructure.} Under leave-one-out full-ranking evaluation on
-MovieLens-100K with a GRU4Rec backbone, the full framework lifts
-NDCG@10 after \ExpRounds{} RSI rounds from \ExpNaiveEnd{} (naive)
-to \ExpOursEnd{} (\ExpGainText{}) with a flat, collapse-free
-iteration curve; ablations confirm both axes are necessary;
-paired $t$-tests ($p<0.05$) support the conclusions. All experiments
-are seeded, single-thread deterministic, and orchestrated as
-instruction streams reproducible from the command line.
+infrastructure.}Under leave-one-out full-ranking evaluation on
+MovieLens-100K with a GRU4Rec backbone and 3 seeds, the study
+yields three layers of conclusions. (i)~Naive self-training
+\emph{collapses}: NDCG@10 drops from \ExpNaiveStart{} to
+\ExpNaiveEnd{} over \ExpNaiveRounds{} rounds ($p=\ExpNaivePBase{}$)
+while the synthetic-distribution JS distance grows from
+\NaiveJsFirst{} to \NaiveJsLast{}. (ii)~The proposed framework
+converts collapse into \emph{controlled decay}: final NDCG@10 is
+\ExpOursEnd{}, exceeding naive by \ExpGainText{} (paired
+$t$-test $p=\ExpOursP{}$), with mixed-distribution drift locked
+at \OursJsRange{}---two orders of magnitude below naive; the
+ablation forms a monotone ladder (naive \NaiveNdcg{} $<$ fixed
+admission \FixNdcg{} $<$ confidence-only \ConfNdcg{} $<$ full
+\OursNdcg{}), each module contributing independent protection.
+(iii)~\emph{Honest boundary}: no RSI variant exceeds the
+continued-training plateau (\BaseNdcg{}, $p=\ExpOursPBase{}$),
+confirming the information-bound analysis---on a converged
+backbone, the value of RSI lies in controllability and safety,
+not net gain. All experiments are seeded, single-thread
+deterministic, and orchestrated as reproducible instruction
+streams.
 \end{enumerate}
 
 \medskip
