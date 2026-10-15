@@ -318,7 +318,7 @@ $$
 \forall c \in C: \phi(t(c)) = \phi(c)
 $$
 
-*Proof*: By the definition of $t$, the extracted instruction carries a verbatim copy of the source context; since $\phi$ is defined over context contents and the copy is content-identical, $\phi(t(c)) = \phi(c)$ holds by construction. This is a *design invariant of the extraction pipeline*: it holds because the implementation copies rather than re-encodes. At runtime, the adapter validates the structural shape of the carried context (types and required keys) before execution; what the runtime check enforces is structural conformance, not semantic preservation, which is guaranteed by the copy construction. ∎
+*Proof*: By the definition of $t$, the extracted instruction carries a verbatim copy of the source context; since $\phi$ is defined over context contents and the copy is content-identical, $\phi(t(c)) = \phi(c)$ holds by construction. This is a *design invariant of the extraction pipeline*: it holds because the implementation copies rather than re-encodes. At runtime, the shipped check is *post-hoc and constraint-based*: `verify_context_preservation(before, after)` evaluates the registered context constraints pairwise across the executed transition and reports violations; no pre-execution structural validation of the carried context ships (Section 3.2.3). Semantic preservation itself is guaranteed by the copy construction, not by the runtime check. ∎
 
 ### 3.2.3 Cross-model Compatibility
 
@@ -326,11 +326,13 @@ Cross-model compatibility is achieved through an abstract interface layer:
 
 ```
 Interface ModelAdapter {
-    translate: AgentInstruction → ModelSpecificCall
-    normalize: ModelSpecificResponse → AgentResponse
-    validateContext: Context → Boolean
+    translate: AgentInstruction → ModelSpecificCall      // shipped: translate_instruction
+    normalize: ModelSpecificResponse → AgentResponse    // specified, not yet shipped
+    validateContext: Context → Boolean                  // specified, not yet shipped
 }
 ```
+
+Of the three interface operations, only `translate` ships (as `ModelAdapter.translate_instruction`, with registered type transformations); response normalization and pre-execution context validation remain specified. What the shipped code does provide for context checking is *post-hoc*: `verify_context_preservation(before, after)` evaluates the registered context constraints pairwise across a transition.
 
 Cross-model compatibility requirements follow the observation of cross-model function-calling studies [17] and open protocol efforts [18]: providers differ in surface syntax but can agree on semantics,
 
