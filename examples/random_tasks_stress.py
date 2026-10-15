@@ -261,7 +261,14 @@ def formal_view(stream: List[Instruction]) -> List[FormalInstruction]:
 # Per-task battery
 # ---------------------------------------------------------------------------
 
-def compile_check(stream: List[Instruction]) -> Dict[str, Any]:
+def compile_check(stream: List[Instruction],
+                  guards: Optional[set] = None) -> Dict[str, Any]:
+    """Static-compile a stream and verify dataflow preservation.
+
+    ``guards`` is the set of instruction ids the task author knows to
+    be dead code (no outputs consumed downstream); when omitted, the
+    ``guard_`` prefix convention is used.
+    """
     compiler = InstructionCompiler({})
 
     def covered(compiled):
@@ -277,7 +284,8 @@ def compile_check(stream: List[Instruction]) -> Dict[str, Any]:
     spec_view = formal_view(stream)
     all_names = {i.id for i in stream}
     out: Dict[str, Any] = {}
-    guards = {i.id for i in stream if i.id.startswith("guard_")}
+    if guards is None:
+        guards = {i.id for i in stream if i.id.startswith("guard_")}
     for level in ("NONE", "AGGRESSIVE"):
         compiled = compiler.compile(
             spec_view, CompilationContext({"optimization_level": level}))
