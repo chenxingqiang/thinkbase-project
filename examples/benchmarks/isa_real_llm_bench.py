@@ -86,11 +86,15 @@ class RealLLMBackend:
 
     def __init__(self, base_url: str, api_key: str, ca_cert: Optional[str],
                  model: str, max_tokens: int, timeout: float = 90.0,
-                 transport: Optional[httpx.AsyncBaseTransport] = None):
+                 transport: Optional[httpx.AsyncBaseTransport] = None,
+                 temperature: Optional[float] = None,
+                 max_payload_chars: int = 2000):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.max_tokens = max_tokens
+        self.temperature = temperature
+        self.max_payload_chars = max_payload_chars
         self._client = httpx.AsyncClient(
             verify=ca_cert or True,
             trust_env=False,  # bypass any system proxy for the local gateway
@@ -109,11 +113,14 @@ class RealLLMBackend:
 
     async def infer(self, payload: str) -> str:
         """One real model round trip; transient errors retried, then raised."""
-        body = {
+        body: Dict[str, Any] = {
             "model": self.model,
             "max_tokens": self.max_tokens,
-            "messages": [{"role": "user", "content": payload[:2000]}],
+            "messages": [{"role": "user", "content":
+                          payload[: self.max_payload_chars]}],
         }
+        if self.temperature is not None:
+            body["temperature"] = self.temperature
         headers = {
             "x-api-key": self.api_key,
             "anthropic-version": "2023-06-01",

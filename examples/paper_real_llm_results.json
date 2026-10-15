@@ -1,0 +1,59 @@
+{
+ "checks": {
+  "static_compile_valid": true,
+  "cached_repeats": true,
+  "closed_loop_consistent": true,
+  "retrieval_deterministic": true,
+  "ell_export": true
+ },
+ "all_pass": true,
+ "answer_observation": {
+  "fresh_stack_calls": 6,
+  "fresh_kept_identical": false,
+  "fresh_answers_identical": false,
+  "note": "real-model answers compared empirically; temperature 0 was requested but byte-determinism is not guaranteed and not claimed"
+ },
+ "stream_length": 7,
+ "aggressive_effective": 6,
+ "eliminated": [
+  "citation_guard"
+ ],
+ "per_repeat_length": [
+  7,
+  7,
+  7,
+  6
+ ],
+ "per_repeat_calls": [
+  6,
+  0,
+  0,
+  0
+ ],
+ "real_usage": {
+  "api_calls": 12,
+  "input_tokens": 4393,
+  "output_tokens": 8304,
+  "wall_ms": 147817.9
+ },
+ "answers": {
+  "0": "The excerpts do not explicitly define what the result cache stores; they only describe a \"result caching\" mechanism that reduces simulated API calls, implying it reuses prior results instead of issuing new LLM calls [2]. Under the synthetic Zipf-distributed microbenchmark workloads (2,000 tasks, 5 seeds), result caching reduces simulated API calls by 59.5% \u00b1 0.3%, 67.9% \u00b1 0.2%, and 79.6% \u00b1 0.5% at Zipf exponents 0.5, 1.0, and 1.5, respectively [2], with savings increasing as workload skew increases [90]. These figures are microbenchmark evidence on synthetic workloads against a mock LLM backend, not production end-to-end measurements [90].",
+  "1": "The optimizer records executed traces and runs hot-path detection: once a repeatedly executed path crosses the hot-path threshold (in the experiment, the recording loop triggers at iteration 50, yielding ~51 recordings per seed), the path is flagged hot and the runtime forms an optimized trace [68][79]. Adoption is thus driven by frequency\u2014only streams seen repeatedly qualify for closed-loop hot-path adoption [79]. The safeguard is structural validation: the compiled stream's dataflow validity is asserted, meaning every step whose output is consumed downstream must survive compilation, so shrinkage cannot come from silently dropping live producers (only the eliminable guard step is removed) [79]. Notably, in the benchmark the optimized trace's length is measured but the trace is not executed [68].",
+  "2": "The paper states that the static compiler uses data-flow-based dead-code elimination, which\u2014along with tree-pattern-matching instruction selection and peephole optimization\u2014is a deliberately classical, standard compiler technique rather than a novel contribution [17]. The authors' claim is that this established optimization machinery transfers to LLM agent workloads [17]. Preservation is guaranteed not by new compiler techniques but by semantic-preservation arguments adapted to instructions with pre/post-conditions, detailed in Appendix C [17]."
+ },
+ "kept": {
+  "0": [
+   90,
+   2
+  ],
+  "1": [
+   68,
+   79,
+   9
+  ],
+  "2": [
+   17
+  ]
+ },
+ "report_sha256": "c1fdfd643e83"
+}
