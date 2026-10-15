@@ -79,3 +79,42 @@ JS 距离。
 \bottomrule
 \end{tabular}
 \end{table}
+
+
+\section{门控与生成的完整伪代码}
+算法~\ref{alg:gate} 给出双轴门控的完整流程（第三章
+\S\ref{sec:gate} 的可复现版本）。
+
+\begin{algorithm}[h]
+\caption{双轴保真度门控（score\_and\_filter）}
+\label{alg:gate}
+\begin{algorithmic}[1]
+\Require 候选 $C=\{(u,i,c)\}$，真实分布 $\bm{p}_{\mathrm{real}}$，
+分层函数 $\sigma$，预算 $\varepsilon$，权重 $\lambda$，$|\Dreal|=n$
+\State $\bm{p}_{\mathrm{real}} \gets$ 按层聚合真实交互频数并归一
+\State $C' \gets$ 层内 z 标准化：$z(u,i)=\frac{c-\mu_{\sigma(i)}}{s_{\sigma(i)}+\epsilon}$
+\State 剔除 $z < z_{\min}$ 的候选；按 $z$ 降序排序
+\State $A \gets \emptyset$
+\ForAll{$(u,i,z) \in C'$ 按序}
+  \State $\bm{p}_{\mathrm{proj}} \gets$ 层分布($A \cup \{(u,i)\}$)
+  \State $\bm{p}_{\mathrm{mix}} \gets
+    \frac{n\,\bm{p}_{\mathrm{real}} + \lambda|A \cup \{(u,i)\}|\,\bm{p}_{\mathrm{proj}}}
+         {n + \lambda|A \cup \{(u,i)\}|}$
+  \If{$D_{\mathrm{JS}}(\bm{p}_{\mathrm{mix}}, \bm{p}_{\mathrm{real}}) \le \varepsilon$}
+    \State $A \gets A \cup \{(u,i)\}$ \Comment{贪心插入}
+  \EndIf
+  \Comment{超预算则跳过该候选，继续扫描}
+\EndFor
+\State \Return $A$ 及统计（准入数、最终混合 JS、阈值）
+\end{algorithmic}
+\end{algorithm}
+
+\section{实验伦理与可复现声明}
+（1）数据合规：MovieLens 为 GroupLens 公开发布的研究数据集，
+本工作仅用于学术研究，不涉及任何用户身份信息。（2）算力透明
+：全部实验于单台 Apple Silicon CPU 完成，总计算量约 30 核时，
+不依赖任何 GPU 或外部 API，第三方可在同构设备上零成本复现。
+（3）复现承诺：仓库内含全部代码、种子与依赖版本；论文中每
+个实验数字对应 \texttt{results/} 下的 JSON 字段，宏注入脚本的
+输出与论文编译产物一一对应；任何与论文不符的复现差异视为
+bug 并欢迎报告。
