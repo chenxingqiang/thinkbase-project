@@ -1021,17 +1021,17 @@ We compile random instruction sequences at four optimization levels and measure 
 - **Effective instruction count**: the number of instructions that remain in the optimized program after fusion and dead-code elimination. This measures program size.
 - **Dispatch count**: the number of independent dispatch operations the runtime issues. Parallel grouping can fold several independent instructions into one dispatch *without changing the effective instruction count*.
 
-| Sequence length | Level    | Effective-instruction reduction | Dispatch count |
-| --------------- | -------- | -------------------------------- | --------------- |
-| 50              | NONE     | 0%                                | 50.0 ± 0.0      |
-| 50              | BASIC    | 32.8% ± 4.1%                      | 33.6 ± 2.1      |
-| 50              | ADVANCED | 32.8% ± 4.1%                      | 11.6 ± 2.9      |
-| 50              | AGGRESSIVE | 32.8% ± 4.1%                   | 11.6 ± 2.9      |
-| 200             | NONE     | 0%                                | 200.0 ± 0.0     |
-| 200             | BASIC    | 34.2% ± 1.8%                      | 131.6 ± 3.6      |
-| 200             | ADVANCED | 34.2% ± 1.8%                      | 44.4 ± 3.4       |
-| 200             | AGGRESSIVE | 34.2% ± 1.8%                   | 44.4 ± 3.4       |
-| 1,000           | NONE     | 0%                                | 1,000.0 ± 0.0    |
+| Sequence length | Level       | Effective-instruction reduction | Dispatch count |
+| --------------- | ----------- | ------------------------------ | -------------- |
+| 50              | NONE        | 0%                             | 50.0 ± 0.0     |
+| 50              | BASIC       | 32.8% ± 4.1%                   | 33.6 ± 2.1     |
+| 50              | ADVANCED    | 32.8% ± 4.1%                   | 11.6 ± 2.9     |
+| 50              | AGGRESSIVE  | 32.8% ± 4.1%                   | 11.6 ± 2.9     |
+| 200             | NONE        | 0%                             | 200.0 ± 0.0    |
+| 200             | BASIC       | 34.2% ± 1.8%                   | 131.6 ± 3.6    |
+| 200             | ADVANCED    | 34.2% ± 1.8%                   | 44.4 ± 3.4     |
+| 200             | AGGRESSIVE  | 34.2% ± 1.8%                   | 44.4 ± 3.4     |
+| 1,000           | NONE        | 0%                             | 1,000.0 ± 0.0  |
 | 1,000           | BASIC    | 35.4% ± 1.6%                      | 646.0 ± 16.4     |
 | 1,000           | ADVANCED | 35.4% ± 1.6%                      | 199.6 ± 21.4     |
 | 1,000           | AGGRESSIVE | 35.4% ± 1.6%                   | 199.6 ± 21.4     |
@@ -1392,7 +1392,15 @@ AgentISA's longer-term significance is architectural: by giving agent behavior a
 
 # Artifact Availability
 
-The AgentISA implementation (`agentflow.core.isa`), the microbenchmark suite (`examples/benchmarks/isa_microbench.py`), the real-LLM benchmark (`examples/benchmarks/isa_real_llm_bench.py`), the raw results (`examples/benchmarks/isa_microbench_results.json`, `examples/benchmarks/isa_real_llm_results.json`), and the 43 multi-agent functional tests (`tests/core/isa/test_coordination.py`, `tests/core/instructions/test_agent_coordination.py`) are available in the accompanying repository. The Section 5.2-5.5 numbers regenerate with:
+All artifacts are available in the accompanying repository:
+
+- the AgentISA implementation (`agentflow.core.isa`);
+- the microbenchmark suite (`examples/benchmarks/isa_microbench.py`);
+- the real-LLM benchmark (`examples/benchmarks/isa_real_llm_bench.py`);
+- the raw results (`examples/benchmarks/isa_microbench_results.json` and `examples/benchmarks/isa_real_llm_results.json`);
+- the 43 multi-agent functional tests (`tests/core/isa/test_coordination.py` and `tests/core/instructions/test_agent_coordination.py`).
+
+The Section 5.2-5.5 numbers regenerate with:
 
 ```
 ./venv/bin/python examples/benchmarks/isa_microbench.py \
@@ -1658,7 +1666,7 @@ Then executing $s$ under $S$ yields the same final state as sequential execution
 
 *Proof.* Let $g_1, \dots, g_m$ be the dispatch groups of $S$ in commit order. We show the invariant
 
-$$I(t): \text{after committing } g_1, \dots, g_t, \text{ the architectural state equals the sequential state after executing all instructions in those groups.}$$
+$$\begin{gathered} I(t): \text{after committing } g_1, \dots, g_t,\\ \text{the architectural state equals the sequential state after}\\ \text{executing all instructions in those groups.}\end{gathered}$$
 
 - **Base** ($t = 0$): both sides are the initial state.
 - **Step**: assume $I(t)$. Every instruction in $g_{t+1}$ has its dependencies in earlier groups (by S2, since it is scheduled after them), which by $I(t)$ have completed and committed. Within the group, S3 gives pairwise non-interference: no instruction reads another group-member's output, and no two write the same location or resource. Hence the group's updates commute—for pure updates this is the diamond property, and for effectful instructions S3's resource-conflict exclusion forces serialization at the resource, again yielding a unique combined effect. The state after $g_{t+1}$ is therefore independent of the group's internal interleaving and equals the sequential execution of the same instructions from the state at $I(t)$.
