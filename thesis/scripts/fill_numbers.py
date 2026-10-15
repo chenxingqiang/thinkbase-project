@@ -132,6 +132,7 @@ def macros():
         s = sens["table"]
         eps_keys = [k for k in s if k.startswith("eps=")]
         lam_keys = [k for k in s if k.startswith("lambda=")]
+        tau_keys = [k for k in s if k.startswith("tau=")]
         for i, key in enumerate("ABCDE"):
             if i < len(eps_keys):
                 m[f"SensEps{key}"] = eps_keys[i].split("=")[1]
@@ -139,6 +140,9 @@ def macros():
             if i < len(lam_keys):
                 m[f"SensLam{key}"] = lam_keys[i].split("=")[1]
                 m[f"SensLam{key}N"] = f4(s[lam_keys[i]]["final_ndcg"])
+            if i < len(tau_keys):
+                m[f"SensTau{key}"] = tau_keys[i].split("=")[1]
+                m[f"SensTau{key}N"] = f4(s[tau_keys[i]]["final_ndcg"])
 
     spr = load("sparsity.json")
     if spr:
@@ -188,6 +192,8 @@ for _i, _k in enumerate("ABCDE"):
     DEFAULTS[f"SensEps{_k}N"] = "TBD"
     DEFAULTS[f"SensLam{_k}"] = "TBD"
     DEFAULTS[f"SensLam{_k}N"] = "TBD"
+    DEFAULTS[f"SensTau{_k}"] = "TBD"
+    DEFAULTS[f"SensTau{_k}N"] = "TBD"
 for _k in ("Sparse", "Medium", "Dense"):
     DEFAULTS[f"Spr{_k}"] = "TBD"
     DEFAULTS[f"Spr{_k}N"] = "TBD"

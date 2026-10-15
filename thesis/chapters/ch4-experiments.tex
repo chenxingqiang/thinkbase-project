@@ -148,7 +148,7 @@ $），其余变体更低。这不是机制的失败，而是信息论意义上�
 这一边界同时指示了 RSI 的适用域：当真实数据无法继续扩充（数据
 授权耗尽、新场景冷启动、隐私约束禁止采集）而模型尚有容量时，
 受控的 RSI 才有正的期望收益；稀疏段分析（\S\ref{sec:sparsity}
-）将在用户分层上检验这一判断。
+）在用户分层上检验了这一判断——结果为阴性。
 
 \section{消融实验}
 表~\ref{tab:ablation} 按真实运行配置列出机制网格（生成器 $\times$
@@ -183,46 +183,89 @@ top-$k$ & 无门控（naive） & \AblNaive & 崩塌 \\
 准入的\emph{选择性}比准入的\emph{量}更重要：按裕度固定砍半保留
 了大量高裕度的头部样本。
 
-另一个诚实发现是\textbf{预算的耦合性}：top-$k$ 候选池在合成分
-布上漂移严重（JS 从 \NaiveJsFirst{} 起），但混入 54{,}433 条真
-实交互后被稀释到预算之下，双轴门控与仅置信门控产出\emph{逐种子
-完全相同}的轨迹。这意味着在强混合稀释的设定下，分布预算的真实
-角色是\emph{安全网}而非日常拦截器——它不常咬合，但在生成器退
-化、候选池集中漂移时接管准入。一致性生成器与预算的分工由此清
-晰：前者让候选池日常就健康，后者为前者失效的时刻兜底。
+\textbf{预算的普遍不咬合（机制网格的核心发现）。}机制网格补
+全后（一致性 $+$ 仅置信门控的行）出现了一个此前未见的整齐事实
+：该配置与完整框架\emph{逐种子完全相同}（\AblConsConf{} 对
+\AblFull{}，两种子序列无差异）。连同 top-$k$ 侧的对应行，整
+个网格中\textbf{分布预算没有改变过任何一次准入决策}——无论配
+哪种生成器、无论 $\varepsilon$ 取 $0.02$ 还是 $0.12$。两层原
+因：一致性候选池天然均衡，混合分布远低于预算；top-$k$ 候选池
+虽在合成分布上漂移严重（JS 从 \NaiveJsFirst{} 起），但混入
+54{,}433 条真实交互后被稀释到预算之下。
 
-\section{超参敏感性}
-表~\ref{tab:sens} 报告框架对三个关键超参的敏感性。
+由此给出保护效应的诚实分解：\textbf{生成器轴}（视图一致性）
+贡献了从 \AblTopk{} 到 \AblFull{} 的全部跃升；\textbf{置信轴}
+（分层裕度门控）贡献了从 \AblNaive{} 到 \AblNoDist{} 的全部跃
+升；\textbf{分布预算}在全部实测配置中的净效应为零。这不是机制
+失效而是其形态的澄清：预算是一个\emph{条件性安全机制}——它的
+设计目标是"候选池退化时接管准入"，而非"日常参与准入"。其约
+束力由单元测试在受控构造下验证（不平衡候选池在 $\varepsilon=
+0.01$ 下被削减到预算内），但在本文的任何集成配置中均未触发。
+论文如实报告：\emph{我们没有在集成实验中观察到预算被触发的
+配置}，其"接管"价值在此数据集上未获测量支持，属于设计层断言
+。
+
+这一发现同时修正了机制的叙事重心：保真度控制的\emph{实测}
+来源是"生成侧净化"（一致性）与"置信侧校准"（分层裕度），
+分布预算是第三位的设计冗余。对部署者的含义是：若追求最小代
+价，仅保留一致性生成与置信门控即可获得本文框架的全部实测保
+护；预算层仅在无法信任生成器质量时启用。
+
+\section{超参敏感性}\section{超参敏感性}
+表~\ref{tab:sens} 报告框架对三个关键超参的敏感性（单种子扫描，
+如实标注：形状分析用途，非显著性检验对象）。
 
 \begin{table}[t]
 \centering
-\caption{超参敏感性（\ExpRounds{} 轮后 NDCG@10，3 种子均值）。}
+\caption{超参敏感性（\ExpRounds{} 轮后 NDCG@10，种子 0）。
+$\varepsilon$ 为分布预算、$\lambda$ 为合成样本混合权重、$\tau$
+为伪标签置信阈值。}
 \label{tab:sens}
-\begin{tabular}{cccc}
+\begin{tabular}{cc@{\hspace{8mm}}cc@{\hspace{8mm}}cc}
 \toprule
-$\varepsilon$ & NDCG@10 & $\lambda$ & NDCG@10 \\
+$\varepsilon$ & NDCG@10 & $\lambda$ & NDCG@10 & $\tau$ & NDCG@10 \\
 \midrule
-\SensEpsA & \SensEpsAN & \SensLamA & \SensLamAN \\
-\SensEpsB & \SensEpsBN & \SensLamB & \SensLamBN \\
-\SensEpsC & \SensEpsCN & \SensLamC & \SensLamCN \\
-\SensEpsD & \SensEpsDN & \SensLamD & \SensLamDN \\
-\SensEpsE & \SensEpsEN & \SensLamE & \SensLamEN \\
+\SensEpsA & \SensEpsAN & \SensLamA & \SensLamAN & \SensTauA & \SensTauAN \\
+\SensEpsB & \SensEpsBN & \SensLamB & \SensLamBN & \SensTauB & \SensTauBN \\
+\SensEpsC & \SensEpsCN & \SensLamC & \SensLamCN & \SensTauC & \SensTauCN \\
+\SensEpsD & \SensEpsDN & --- & --- & --- & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+三个超参呈现三种截然不同的敏感形态，各自印证框架的机制定位。
+
+\textbf{$\varepsilon$ 完全不敏感}（四个数量级内的扫描结果逐位相
+同）：与消融发现一致——一致性生成器产出的候选池天然均衡，混
+合分布远低于预算，$\varepsilon$ 从未咬合。这不是缺陷而是定位的
+证据：$\varepsilon$ 是\emph{安全网参数}而非日常调节器，其价值在
+生成器退化时才显现（此时更小的 $\varepsilon$ 意味着更早的接管
+）。对部署者的含义是：$\varepsilon$ 无需精调，取保守值即可。
+
+\textbf{$\tau$ 呈温和正向}：收紧置信阈值（\SensTauC{}）相对默认
+值小幅改善，放宽（\SensTauA{}）亦不劣化——单种子幅度内该效应
+不具显著性，但方向符合"更严的准入 $\to$ 更准的伪标签"。实践中
+$\tau$ 的取值应以伪标签正确率的代理监控为准。
+
+\textbf{$\lambda \geq 2$ 开始损伤}：合成样本重复率的翻倍带来小幅
+但一致的性能下降，指示混合权重存在软上限——合成信号的边际信
+息量随复制次数递减而正则代价线性上升，$\lambda = 1$ 为该数据
+规模下的合理默认。
+
 \section{稀疏度分层分析}\label{sec:sparsity}
-按用户训练序列长度将测试用户分为稀疏（$\leq 20$）、中等
-（21--60）、稠密（$>60$）三层，表~\ref{tab:sparsity} 给出本文框
-架相对 no-RSI 基线的 NDCG@10 增益。
+按用户训练序列长度将测试用户分为稀疏（$\leq 20$ 条）、中等
+（21--60）、稠密（$>60$）三层，表~\ref{tab:sparsity} 给出本文框架
+相对 no-RSI 基线的逐用户 NDCG@10 增益（同一划分、同一种子，最终
+轮模型逐用户配对差）。
 
 \begin{table}[t]
 \centering
-\caption{稀疏度分层增益（本文框架 $-$ no-RSI，NDCG@10）。}
+\caption{稀疏度分层增益（本文框架 $-$ no-RSI，逐用户 NDCG@10 平均
+差，种子 0）。}
 \label{tab:sparsity}
 \begin{tabular}{lccc}
 \toprule
-用户层 & 稀疏 & 中等 & 稠密 \\
+ & 稀疏 & 中等 & 稠密 \\
 \midrule
 平均增益 & \SprSparse & \SprMedium & \SprDense \\
 用户数 & \SprSparseN & \SprMediumN & \SprDenseN \\
@@ -230,7 +273,23 @@ $\varepsilon$ & NDCG@10 & $\lambda$ & NDCG@10 \\
 \end{tabular}
 \end{table}
 
-\section{实验讨论}
+\textbf{假设未被证实。}本文最初的工作假设是"RSI 的收益集中在交互
+稀疏的用户段"——直觉上，稀疏用户的训练信号最少，自生成补充最
+可能产生增益。实测结果否定了这一假设：三个分层的增益均为零附近
+的微小负值（稀疏 \SprSparse{}、中等 \SprMedium{}、稠密
+\SprDense{}），且稠密段的损伤反而略大于稀疏段。两点解读：
+（1）稀疏用户的伪标签同样不携带新信息——模型对稀疏用户的预测
+置信度低，一致性门控下可用的伪标签更少，注入的信息增量不足以
+抵消其挤占的真实梯度；（2）稠密用户段的损伤源于其每轮被挤占的
+真实梯度质量最高（历史长的用户承担了更多的训练信号）。
+
+这一阴性结果与整体结论（\S 诚实边界）自洽，且进一步收窄了 RSI
+的适用域刻画：\emph{即便在监督最匮乏的用户段}，自生成数据也未能
+提供净增益——收益上界的约束是全局性的，不是分层的。对实践的指
+引是：RSI 的启用决策应基于"是否存在模型未消化完的外部数据"，
+而非"哪些用户段数据稀疏"。
+
+\section{实验讨论}\section{实验讨论}
 \textbf{机制的价值排序。}实验把框架的价值精确定位为三个递进层
 次。第一层是\emph{灾难防护}：naive 的 \NaiveNdcg{} 与 gated 的
 \OursNdcg{} 之间 \ExpGainText{} 的差距证明，没有保真度控制时自
