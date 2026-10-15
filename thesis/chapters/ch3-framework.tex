@@ -1,0 +1,217 @@
+\chapter{问题定义与保真度门控 RSI 框架设计}\label{ch:framework}
+
+\section{任务形式化}
+\subsection{序列推荐设定}
+设用户集 $\mathcal{U}$、物品集 $\mathcal{I}$，$|\mathcal{I}| =
+N$。用户 $u$ 的历史交互序列为 $S_u = (i_1, i_2, \dots, i_{|S_u|})$，
+按时间升序排列。序列推荐模型 $\model: S_u \mapsto \R^{N}$ 对全
+部物品打分，$(\model)_i(S_u)$ 越大表示物品 $i$ 越可能成为用户的下
+一次交互。训练目标为最小化真实下条目上的交叉熵：
+\begin{equation}\label{eq:ce}
+\mathcal{L}_{\mathrm{CE}}(\model; \Dreal) =
+-\frac{1}{|\Dreal|}\sum_{(u, i) \in \Dreal}
+\log \frac{\exp((\model)_i(S_u))}{\sum_{j \in \mathcal{I}}
+\exp((\model)_j(S_u))},
+\end{equation}
+其中 $\Dreal$ 为按留一法划分的训练交互集（每用户末次交互留作测
+试）。评测采用全量排序：将测试物品与全部未交互物品共同排序。
+
+\subsection{RSI 闭环的形式化}
+\begin{definition}[递归自改进闭环]\label{def:rsi}
+给定初始模型 $M^{(0)}$（在 $\Dreal$ 上预训练至收敛）、生成器
+$G$、校验器 $V$、筛选器 $F$ 与混合权重 $\lambda$，RSI 闭环按轮次
+$r = 1, 2, \dots, R$ 迭代：
+\begin{align}
+\Dsyn^{(r)} &= G\big(M^{(r-1)}\big) \subseteq
+\mathcal{U} \times \mathcal{I}
+\label{eq:gen}\\
+\tilde{\Dsyn}^{(r)} &= F\big(V(\Dsyn^{(r)}; \Dreal);\ \Dreal\big)
+\label{eq:gate}\\
+\Dmix &= \Dreal \cup \lambda\,\tilde{\Dsyn}^{(r)}
+\label{eq:mix}\\
+M^{(r)} &= \mathrm{Train}\big(M^{(r-1)}; \Dmix\big)
+\label{eq:train}
+\end{align}
+即：上一轮模型自生成候选样本（\ref{eq:gen}），校验器与筛选器依
+据真实数据 $\Dreal$ 评估并放行其中合格者（\ref{eq:gate}），
+按权重 $\lambda$ 与真实数据混合（\ref{eq:mix}）后，从上一轮参数
+出发继续训练得到后继模型（\ref{eq:train}）。
+\end{definition}
+
+\subsection{失败模式：朴素自训练的崩塌}
+\begin{definition}[朴素自训练，naive RSI]\label{def:naive}
+朴素方案取 $G$ 为每用户 top-$k$ 未交互物品、$V \equiv \top$（不
+做校验）、$F$ 放行全部候选。
+\end{definition}
+
+\begin{proposition}[头部自强化]\label{prop:collapse}
+设模型打分经 softmax 归一化为 $\bm{q}_u$，头部物品 $h$ 在多数用
+户上的预测概率满足 $q_{u,h} \geq \delta > q_{u,t}$（$t$ 为任意长
+尾物品）。则朴素方案下，每轮注入的正样本以头部为主：
+$\Pr[i = h \mid (u,i) \in \Dsyn] \geq \delta^k$ 量级；训练
+\eqref{eq:train} 进一步抬高头部得分，形成"生成偏头部 $\to$ 训练
+强化头部 $\to$ 生成更偏头部"的正反馈。多轮迭代下
+$\bm{p}_{\mathrm{syn}}$ 与 $\bm{p}_{\mathrm{real}}$ 的距离单调扩
+大，最终训练分布坍缩到少数头部物品，排序退化。
+\end{proposition}
+
+该命题在第四章以实验复现（朴素方案的 NDCG@10 随轮次单调崩塌，
+同时合成分布 JS 距离单调扩大）。命题亦说明：崩塌源于\emph{生成
+与训练的联合动力学}，仅在筛选环节做文章而不改变生成环节的偏袒
+结构，控制力有限——这正是本文同时设计生成器与门控器的原因。
+
+\section{框架总体设计}
+图~\ref{fig:framework} 给出框架全景。闭环每轮包含五个环节：
+多视图一致性生成（\S\ref{sec:gen}）、双轴保真度门控
+（\S\ref{sec:gate}）、加权混合（\S\ref{sec:mix}）、后继训练
+（\S\ref{sec:train}）与评估反馈（\S\ref{sec:feedback}）。相对
+于定义~\ref{def:rsi} 的抽象闭环，本文的关键设计在 $G$ 与
+$F \circ V$ 两处。
+
+\begin{figure}[t]
+\centering
+\input{figures/framework}
+\caption{保真度门控的 RSI 闭环框架。实线为数据流，虚线为反馈
+路径。$M^{(r-1)}$ 在 $K$ 个扰动视图上的预测经一致性检验生成伪标
+签候选；候选经置信轴（分层裕度）与分布轴（JS 预算）双重门控后
+与真实数据混合，训练后继模型 $M^{(r)}$；评估反馈更新阈值与预
+算。}
+\label{fig:framework}
+\end{figure}
+
+\section{多视图一致性伪标签生成}\label{sec:gen}
+\subsection{扰动视图}
+对用户序列 $S_u$ 构造 $K$ 个随机视图：以概率 $p_{\mathrm{drop}}$
+随机丢弃元素后取尾部比例 $\rho$ 的截断窗：
+\begin{equation}\label{eq:view}
+S_u^{(k)} = \mathrm{crop}_{\rho}\big(
+\{i \in S_u : b_i^{(k)} = 0\}\big),\quad
+b_i^{(k)} \sim \mathrm{Bernoulli}(p_{\mathrm{drop}}),\ k = 1..K .
+\end{equation}
+扰动参数 $(p_{\mathrm{drop}}, \rho)$ 取轻量档（如
+$(0.1, 0.9)$），保证视图与原序列语义相近。
+
+\subsection{一致性准入}
+记 $\bm{p}^{(k)} = \mathrm{softmax}(\model(S_u^{(k)}))$（已屏蔽
+历史物品）。伪标签 $(u, \hat{i})$ 的生成条件为：
+\begin{equation}\label{eq:consistency}
+\hat{i} = \arg\max_{j \in \mathcal{I} \setminus S_u}
+p_j^{(k)}\ \ \text{对全部 } k \text{ 一致},\quad
+\bar{p}_{\hat{i}} \geq \tau,\quad
+\bar{p}_{\hat{i}} - \bar{p}_{(2)} \geq m,
+\end{equation}
+其中 $\bar{p}_{j} = \frac{1}{K}\sum_k p^{(k)}_j$，
+$\bar{p}_{(2)}$ 为次高物品的平均概率。
+
+\subsection{为何一致性优于 top-$k$ 自生成}
+top-$k$ 生成直接采纳模型的头部偏好，编码的信息量为"模型已知自
+己相信什么"；一致性生成要求该信念在随机扰动下保持稳定，编码的
+是"模型对扰动鲁棒的信念"。后者与表示学习中的不变性原理
+~\cite{tarvainen2017mean,sohn2020fixmatch,berthelot2019mixmatch}
+一致：扰动一致性筛出的样本携带真实监督成分更高、头部偏袒更弱
+（第四章实验对比两种生成器的漂移与最终性能）。直觉上，扰动改变
+了序列上下文，若模型在不同上下文下仍给出同一预测，该预测更可能
+反映用户的稳定偏好而非物品的全局流行度。
+
+\section{双轴保真度门控}\label{sec:gate}
+\subsection{置信轴：分层裕度标准化}
+直接以置信度门控存在结构性偏袒：头部物品的预测置信度系统性偏
+高。本文将物品按真实训练集中的流行度等频划分为 $L$ 层（层 0 为
+头部五分位），在\emph{层内}对候选样本的预测裕度做 z 标准化：
+\begin{equation}\label{eq:znorm}
+z(u, i) = \frac{c(u, i) - \mu_{\sigma(i)}}{s_{\sigma(i)} + \epsilon},
+\end{equation}
+其中 $c(u,i)$ 为候选置信度（如 \eqref{eq:consistency} 的平均概
+率裕度），$\mu_{\sigma(i)}, s_{\sigma(i)}$ 为物品层 $\sigma(i)$
+内候选置信度的均值与标准差。准入要求 $z(u,i) \geq z_{\min}$。
+层内标准化使长尾物品按\emph{其层内的相对置信度}竞争，消除头部
+的结构性优势。
+
+\subsection{分布轴：JS 距离预算}
+定义自生成样本的分层分布
+$\bm{p}_{\mathrm{syn}} \in \Delta^{L-1}$（各流行度层中样本占
+比），真实交互的分层分布 $\bm{p}_{\mathrm{real}}$。分布轴要求
+\emph{混合}分布不偏离真实分布超过预算 $\varepsilon$：
+\begin{equation}\label{eq:jsbudget}
+D_{\mathrm{JS}}\!\left(
+\frac{n\,\bm{p}_{\mathrm{real}} +
+\lambda |\tilde{\Dsyn}| \bm{p}_{\tilde{\Dsyn}}}
+{n + \lambda|\tilde{\Dsyn}|},\ 
+\bm{p}_{\mathrm{real}}\right) \leq \varepsilon,
+\end{equation}
+其中 $n = |\Dreal|$。预算是\emph{自适应}的：门控按层内标准化置
+信度从高到低贪心注入候选，每注入一个样本即重估
+\eqref{eq:jsbudget}，超出预算则跳过该样本继续扫描。当候选池健
+康（漂移小）时准入更多样本，池恶化时自动收紧。
+
+\subsection{与置信门控的关系}
+纯置信门控（仅 \eqref{eq:znorm} 无 \eqref{eq:jsbudget}）控制
+\emph{单样本}质量，不控制\emph{集合}分布；纯预算门控反之。二
+者互补：前者保证每个注入样本有依据，后者保证注入集合整体不离
+真实分布。消融实验（第四章）分别去除两轴验证其必要性。
+
+\section{加权混合与后继训练}\label{sec:mix}
+通过门控的样本按权重 $\lambda$ 与真实数据混合。实现上以整数复
+制率 $\lceil \lambda \rceil$ 近似（$\lambda \leq 1$ 时取 1，
+后续由轮次训练轮数隐式缩放），后继训练从 $M^{(r-1)}$ 参数出发
+在 $\Dmix$ 上以较小学习率精调若干轮。权重 $\lambda$ 控制自生成
+信号对训练分布的影响强度，其敏感性在第四章分析。
+
+\section{评估反馈}\label{sec:feedback}
+每轮在留出测试集上全量排序评估 NDCG@10 与 HR@10，并记录门控统
+计（候选数、准入数、混合 JS 距离）。迭代曲线与漂移曲线共同构
+成闭环健康监控：若指标随轮次下降或 JS 距离超预算，则提示闭环
+失稳。
+
+\section{训练流程与算法}
+算法~\ref{alg:rsi} 汇总完整流程。
+
+\begin{algorithm}[t]
+\caption{保真度门控 RSI 闭环（单次实验运行）}
+\label{alg:rsi}
+\begin{algorithmic}[1]
+\Require 真实训练集 $\Dreal$，视图数 $K$，阈值 $\tau, m, z_{\min}$，
+预算 $\varepsilon$，权重 $\lambda$，轮数 $R$
+\State $M^{(0)} \gets \mathrm{Train}(\text{随机初始化}; \Dreal)$
+\Comment{预训练至平台}
+\State 计算流行度分层 $\sigma(\cdot)$ 与 $\bm{p}_{\mathrm{real}}$
+\For{$r = 1, \dots, R$}
+  \ForAll{用户 $u$，历史 $S_u$}
+    \State 依 \eqref{eq:view} 构造 $K$ 个视图，计算 $\bm{p}^{(k)}$
+    \State 若满足 \eqref{eq:consistency}：输出候选 $(u, \hat{i})$
+  \EndFor
+  \State 对候选做层内 z 标准化 \eqref{eq:znorm}，保留 $z \geq z_{\min}$
+  \State 按 $z$ 降序贪心注入，逐样本检查 JS 预算 \eqref{eq:jsbudget}
+  \State $\Dmix \gets \Dreal \cup \lambda\tilde{\Dsyn}^{(r)}$
+  \State $M^{(r)} \gets \mathrm{Train}(M^{(r-1)}; \Dmix)$
+  \Comment{小步长精调}
+  \State 评估并记录指标与门控统计
+\EndFor
+\State \Return 迭代历史 $\{M^{(r)}\}_{r=0}^{R}$ 与全部统计
+\end{algorithmic}
+\end{algorithm}
+
+\section{复杂度分析}
+设用户数 $U$、物品数 $N$、平均序列长度 $\ell$、GRU 前向代价
+$O(\ell d^2 + \ell d N)$（$d$ 为隐维度，含输出投影）。每轮：
+生成阶段 $K$ 次前向/用户，$O(UK(\ell d^2 + \ell dN))$；一致性
+与门控为线性扫描，$O(UKN)$；重训为若干轮全量训练。相对一轮训
+练，生成开销约放大 $K$ 倍前向——实验中 $K=3$ 时生成约占每轮总
+时间的 $30\%$。空间开销可忽略（候选与统计均为 $O(UK)$）。
+
+\section{误差累积的定性分析}
+崩塌的根源是\emph{无界的分布漂移}：每轮漂移 $\delta_r =
+D_{\mathrm{JS}}(\bm{p}_{\mathrm{mix}}^{(r)}, \bm{p}_{\mathrm{real}})$
+被训练放大并叠加。本文框架从两端施加约束：生成端，一致性条件削
+弱头部偏袒，使单轮漂移的\emph{来源}减小；门控端，预算
+\eqref{eq:jsbudget} 直接给出逐轮漂移上界 $\delta_r \leq
+\varepsilon$。在 $\varepsilon$ 有界且每轮以真实数据为主（
+$\lambda |\tilde{\Dsyn}| \ll n$）的设定下，后继训练的分布始终
+锚定在 $\Dreal$ 的 $\varepsilon$-邻域内，迭代不再发散。第四章
+的漂移曲线与消融结果与此分析一致。
+
+\section{本章小结}
+本章给出 RSI 闭环的形式化定义、朴素自训练的崩塌机理（命题
+~\ref{prop:collapse}），并提出针对性框架：多视图一致性生成改变
+信号的偏袒结构，双轴保真度门控从单样本与集合分布两端控制准入，
+JS 预算为逐轮漂移提供显式上界。

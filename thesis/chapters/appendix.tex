@@ -1,0 +1,81 @@
+\chapter{附录}
+
+\section{数据集统计}
+表~\ref{tab:dataset} 给出 MovieLens-100K 预处理后的统计量。
+
+\begin{table}[h]
+\centering
+\caption{MovieLens-100K 预处理统计。}
+\label{tab:dataset}
+\begin{tabular}{lc}
+\toprule
+统计量 & 数值 \\
+\midrule
+原始评分条数 & 100{,}000 \\
+正交互阈值 & 评分 $\geq 4$ \\
+正交互总数（划分前） & 55{,}375 \\
+用户数（重编号后） & 942 \\
+物品数（重编号后） & 1{,}447 \\
+训练交互数（留一后） & 54{,}433 \\
+测试用户数 & 942 \\
+用户序列长度 中位数/均值 & 40 / 57.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{环境与复现}
+\begin{itemize}
+\item 硬件：Apple Silicon CPU（单进程，2 线程）；无 GPU 依赖。
+\item 软件：Python 3.14，PyTorch 2.14，NumPy，SciPy。
+\item 复现：\texttt{cd thesis/experiments \&\& python run\_experiments.py}，
+生成 \texttt{results/*.json}；\texttt{python ../scripts/fill\_numbers.py}
+将数字注入 \LaTeX{}；\texttt{latexmk -xelatex main.tex} 编译。
+\item 每次运行的所有随机性由单一种子控制（模型初始化、负采
+样、视图扰动、批次顺序），同一种子的两次运行结果逐位一致。
+\end{itemize}
+
+\section{关键代码片段}
+生成与门控的核心实现（节选自 \texttt{rsix/generation.py} 与
+\texttt{rsix/fidelity.py}）：
+
+\begin{verbatim}
+def consistency_candidates(model, train, n_views=3,
+                           tau=0.01, margin=0.002):
+    for u, seen in train.items():
+        views = augment_views(seen, n_views, rng)
+        probs, tops = [], []
+        for v in views:
+            p = softmax(mask(model.rank(u, v), seen))
+            probs.append(p); tops.append(argmax(p))
+        if len(set(tops)) != 1:      # 视图不一致 -> 放弃
+            continue
+        if mean_top1 < tau or margin < m:  # 置信不足
+            continue
+        yield (u, tops[0])
+
+def score_and_filter(candidates, real_dist, eps):
+    cal = z_normalize_per_stratum(candidates)
+    for u, i in sorted(cal, key=lambda c: -c.z):
+        if js(mix_dist(real, admitted + [(u,i)]),
+              real_dist) <= eps:
+            admitted.append((u, i))
+\end{verbatim}
+
+\section{补充实验：门控准入统计}
+表~\ref{tab:admission} 报告完整框架各轮的候选数、准入数与实测
+JS 距离。
+
+\begin{table}[h]
+\centering
+\caption{门控准入统计（gated，种子 0）。}
+\label{tab:admission}
+\begin{tabular}{lcccc}
+\toprule
+轮次 & 1 & 2 & 3 & 4 \\
+\midrule
+候选数   & \AdmCandA & \AdmCandB & \AdmCandC & \AdmCandD \\
+准入数   & \AdmPassA & \AdmPassB & \AdmPassC & \AdmPassD \\
+实测 JS  & \AdmJsA & \AdmJsB & \AdmJsC & \AdmJsD \\
+\bottomrule
+\end{tabular}
+\end{table}

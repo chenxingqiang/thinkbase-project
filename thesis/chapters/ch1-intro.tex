@@ -1,0 +1,103 @@
+\chapter{绪论}\label{ch:intro}
+
+\section{研究背景与意义}
+推荐系统是现代信息服务的核心基础设施：电商、内容平台与社交网络
+均依赖个性化排序从海量候选中筛选用户可能感兴趣的内容。随着深度
+学习的发展，序列推荐模型——从基于循环神经网络的
+GRU4Rec~\cite{hidasi2016gru4rec}、基于自注意力的
+SASRec~\cite{kang2018sasrec} 与 BERT4Rec~\cite{sun2019bert4rec}，
+到图协同模型 NGCF~\cite{wang2019ngcf} 与对比学习方法
+SimGCL~\cite{yu2022simgcl}——已能从用户历史交互中学习细粒度的
+偏好表示。然而，监督信号的获取始终是推荐系统的结构性瓶颈：真实
+交互数据稀疏、新物品/新用户冷启动严重、人工标注隐式反馈的代价
+高昂。
+
+与此同时，大语言模型领域出现了一类新的训练范式：\textbf{递归自
+改进（Recursive Self-Improvement, RSI）}——模型\emph{自我生成}训
+练数据、\emph{自我评估}数据质量、\emph{自我迭代}优化参数，形成
+不依赖外部标注的闭环。代表性工作包括：Self-Refine~\cite%
+{madaan2023selfrefine} 通过自我反馈迭代精炼输出；
+STaR~\cite{zelikman2022star} 用模型自生成的推理路径构造监督信号；
+Self-Improve~\cite{huang2023selfimprove} 以自一致性多数投票生成
+高置信伪标注；Reflexion~\cite{shinn2023reflexion} 引入语言化自
+我反思信号；Self-Rewarding~\cite{yuan2024selfrewarding} 与
+SPIN~\cite{chen2024spin} 进一步将评判者与对手纳入自博弈闭环。这
+些工作共同表明：一个足够强的模型可以充当自身的数据引擎。
+
+将 RSI 范式迁移到推荐系统具有天然的吸引力：隐式反馈场景下"未观
+测 $\neq$ 负样本"，模型对未观测交互的预测本身携带信息，自生成样
+本相当于对模型知识的一种\emph{蒸馏回注}。对交互稀疏用户尤其如
+此——冷启动与长尾场景正是监督信号最匮乏、自生成补充最可能产生
+增益的位置。
+
+然而，RSI 闭环并非免费午餐。自我生成的训练信号存在系统性风险：
+模型倾向于强化自己已经相信的预测，而头部物品在预测分布中天然占
+优，于是"生成—训练—再生成"的闭环会形成\textbf{头部自强化正反
+馈}，随迭代轮次放大为分布漂移与性能崩塌；若再叠加对生成样本质量
+缺乏量化控制，低置信样本的持续混入将造成误差累积。如何在推荐场
+景中\emph{控制}自生成数据的保真度、使 RSI 闭环产生稳定增益而非
+崩塌，是本文研究的核心问题。
+
+\section{国内外研究现状概述}
+与本工作相关的研究可粗分为四条线。（1）\textbf{序列推荐}：
+GRU4Rec~\cite{hidasi2016gru4rec} 开创了会话级循环建模范式，
+SASRec~\cite{kang2018sasrec} 与 BERT4Rec~\cite{sun2019bert4rec}
+引入自注意力结构，成为当前序列推荐的主流骨干。（2）\textbf{自监
+督与数据增强推荐}：SGL~\cite{xie2022sgl}、SimGCL~\cite%
+{yu2022simgcl} 以对比学习挖掘自监督信号；
+CoSeRec~\cite{liu2021coserec} 系统研究了序列扰动增强。
+（3）\textbf{半监督学习中的自训练}：从
+Yarowsky~\cite{yarowsky1995wsd} 的经典自训练到伪标签
+~\cite{lee2013pseudo}、一致性正则
+Mean-Teacher~\cite{tarvainen2017mean}、MixMatch~\cite%
+{berthelot2019mixmatch} 与 FixMatch~\cite{sohn2020fixmatch}，置
+信门控与增强一致性已被证明是控制伪标签质量的有效手段。
+（4）\textbf{语言模型的递归自改进}：Self-Refine~\cite%
+{madaan2023selfrefine}、STaR~\cite{zelikman2022star}、
+Reflexion~\cite{shinn2023reflexion}、Self-Rewarding~\cite%
+{yuan2024selfrewarding}、SPIN~\cite{chen2024spin} 构成 RSI 的方
+法谱系。上述四条线的详细梳理与批判性分析见第二章。
+
+值得注意的是，现有工作在"推荐系统中的 RSI 闭环保真度控制"上存
+在明显空白：半监督学习的门控手段未与推荐场景的流行度偏差特性结
+合，而语言模型的 RSI 方法未处理推荐所特有的分布漂移模式。本文正
+是在这一空白处展开。
+
+\section{研究问题}\label{sec:questions}
+本文聚焦 RSI 闭环在序列推荐中的两个具体缺陷：
+
+\begin{description}
+\item[Q1 自生成数据分布漂移。] 模型自生成样本天然偏向其头部预
+测，随迭代轮次训练分布持续偏离真实交互分布；这一漂移能否被量化
+度量并在训练过程中被在线控制？
+\item[Q2 迭代误差累积与崩塌。] 朴素自训练闭环为何崩塌、崩塌的动
+力学是什么；何种生成与准入机制能将崩塌转化为稳定甚至正向的迭代
+轨迹？
+\end{description}
+
+\section{研究内容与创新点}
+针对上述问题，本文提出\textbf{保真度门控的递归自改进序列推荐框
+架}，创新点如下：
+
+\begin{enumerate}
+\item \textbf{RSI 闭环的形式化与失败模式复现}（第
+\ref{ch:framework} 章）：将 RSI 闭环形式化为五段迭代过程，给出分
+布漂移与误差累积的度量；在 MovieLens-100K 上复现朴素自训练的崩
+塌（NDCG@10 由 \ExpNaiveStart{} 崩塌至 \ExpNaiveEnd{}），并实证
+其头部自强化根源。
+\item \textbf{双轴保真度门控机制}：置信轴按流行度分层对预测裕度
+做 z 标准化，分布轴以分层 JS 距离预算在线控制混合分布漂移；两轴
+联合切断头部自强化正反馈。
+\item \textbf{多视图一致性伪标签生成}：以 $K$ 个扰动视图上预测的
+一致性为生成条件，使自生成样本编码扰动鲁棒信念而非头部偏好，为
+闭环提供非自强化的信息来源。
+\item \textbf{可复现实验基础设施}：全部实验以固定种子、单线程确
+定性的方式实现，并以指令流编排（生成—门控—混合—重训—评估的
+每轮各为一条可审计指令），实验结果可由命令行逐字节复现。
+\end{enumerate}
+
+\section{论文组织结构}
+全文共五章。第一章绪论，给出背景、问题与创新点；第二章相关基础
+与批判性综述；第三章问题形式化与框架设计，含机制推导与复杂度分
+析；第四章实验设计与结果分析，含主对比、消融、迭代过程分析与分
+布漂移可视化；第五章总结与展望。

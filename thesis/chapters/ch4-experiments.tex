@@ -1,0 +1,183 @@
+\chapter{实验设计与结果分析}\label{ch:exp}
+
+\section{实验环境}
+\subsection{硬件与软件}
+实验在一台 Apple Silicon 工作站（Apple M 系列 CPU）上完成，全部
+模型以 CPU 单进程训练（\texttt{torch.set\_num\_threads(2)}），保
+证同一种子下结果逐位可复现。软件环境：Python 3.14、PyTorch
+2.14、NumPy/SciPy。全部实验代码、配置与随机种子随论文一并提交，
+任何表格数字均可由
+\texttt{python run\_experiments.py} 一条命令复现。
+
+\subsection{数据集与预处理}
+数据集采用公开的 \textbf{MovieLens-100K}~\cite{harper2015ml}：
+943 名用户、1{,}682 部电影、10 万条评分。预处理规则：评分
+$\geq 4$ 视为正交互（显式偏好），得 942 用户、1{,}447 物品、
+54{,}433 条训练前正交互；用户与物品 id 紧致重编号；按用户时间
+戳排序构成序列。划分采用\textbf{留一法}（leave-one-out）：每用
+户按时间最后一条交互留作测试，其余为训练——严格的时间外推设
+定，无任何未来信息泄漏。
+
+\subsection{基线模型}
+基线覆盖三个层次：
+（1）非个性化基线 \textbf{ItemPop}（按训练集物品流行度排序）；
+（2）经典隐因子排序 \textbf{BPR-MF}~\cite{rendle2009bpr}（64 维，
+Adam，60 轮）；
+（3）序列推荐骨干 \textbf{GRU4Rec}~\cite{hidasi2016gru4rec}（64
+维 GRU + 绑定输出嵌入，交叉熵全量 softmax，预训练 60 轮）——
+RSI 各变体的宿主模型，保证"增益来自闭环设计而非骨干差异"。
+消融对照包含朴素自训练（naive）、仅置信门控（conf-only）、固定
+准入率（no-adaptive）与本文完整框架（gated）。
+
+\subsection{评估协议}
+全量排序（full ranking）：每用户的测试物品与其全部未交互物品
+（约 1{,}400 个候选）共同排序，无负采样~\cite{dacrema2019worrying}。
+指标为 NDCG@10 与 HR@10；每个实验运行 3 个随机种子
+（$\{0,1,2\}$），报告均值与标准差，主对比采用配对 $t$ 检验
+（按种子配对）。
+
+\section{主对比实验}
+表~\ref{tab:main} 给出 \ExpRounds{} 轮 RSI 迭代后的最终性能
+（均值 $\pm$ 标准差，3 种子）。
+
+\begin{table}[t]
+\centering
+\caption{主对比实验：MovieLens-100K 留一法全量排序，GRU4Rec 骨干，
+\ExpRounds{} 轮 RSI 迭代后性能（3 种子均值 $\pm$ 标准差；
+$^{\dagger}$ 表示相对 no-RSI 基线的配对 $t$ 检验
+$p<0.05$）。}
+\label{tab:main}
+\begin{tabular}{lcc}
+\toprule
+方法 & NDCG@10 & HR@10 \\
+\midrule
+ItemPop          & \PopNdcg & \PopHr \\
+BPR-MF           & \BprNdcg & \BprHr \\
+GRU4Rec（no RSI）& \BaseNdcg & \BaseHr \\
+\midrule
++ naive 自训练   & \NaiveNdcg & \NaiveHr \\
++ conf-only 门控 & \ConfNdcg & \ConfHr \\
++ 固定准入率     & \FixNdcg & \FixHr \\
++ 本文框架       & \OursNdcg$^{\dagger}$ & \OursHr \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{迭代过程分析：崩塌与稳定}
+图~\ref{fig:rounds} 展示各方法 NDCG@10 随迭代轮次的变化（3 种子
+均值），图~\ref{fig:drift} 展示对应的合成分布漂移（JS 距离）。
+
+\begin{figure}[t]
+\centering
+\input{figures/rounds}
+\caption{RSI 迭代曲线（NDCG@10 $\times$ 轮次，3 种子均值）。朴素
+自训练单调崩塌；本文框架的曲线平稳且保持增益。}
+\label{fig:rounds}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\input{figures/drift}
+\caption{自生成样本的分布漂移（流行度分层 JS 距离 $\times$ 轮
+次）。朴素方案的漂移随轮次单调扩大；门控方案被预算约束在
+$\varepsilon$ 内。}
+\label{fig:drift}
+\end{figure}
+
+\subsection{朴素自训练的崩塌动力学}
+naive 方案的崩塌呈现清晰的两阶段：前两轮指标快速下滑
+（\NaiveRoundsOne{}），随后加速坍缩至接近随机的水平
+（\NaiveFinal{}）。与之同步（图~\ref{fig:drift}）的是合成分布
+JS 距离的\emph{单调}扩大——每轮约 \NaiveJsPerRound{} 量级——验
+证了命题~\ref{prop:collapse} 的头部自强化机理：漂移不是噪声，
+而是被训练放大的系统性偏移。
+
+\subsection{门控框架的稳定迭代}
+本文框架的迭代曲线始终平稳：最终轮相对第 0 轮的变化为
+\OursDeltaText{}，且任一轮次间的波动不超过 \OursMaxStep{}。其
+漂移曲线被预算 $\varepsilon = \GateEps{}$ 显式压住（实测逐轮
+JS 距离 \OursJsRange{}），与第三章"预算提供逐轮漂移上界"的分
+析一致。
+
+\section{消融实验}
+表~\ref{tab:ablation} 验证框架各模块的必要性。
+
+\begin{table}[t]
+\centering
+\caption{消融实验（\ExpRounds{} 轮后 NDCG@10，3 种子均值）。
+完整框架去除任一模块均导致性能下降或失稳。}
+\label{tab:ablation}
+\begin{tabular}{lcc}
+\toprule
+配置 & NDCG@10 & 相对完整框架 \\
+\midrule
+完整框架（一致性生成 + 双轴门控） & \AblFull & — \\
+\quad 去分布预算（仅置信轴）       & \AblNoDist & \AblNoDistDelta \\
+\quad 去自适应准入（固定 50\%）    & \AblFix & \AblFixDelta \\
+\quad 去 consistency 生成（top-$k$ 生成）& \AblTopk & \AblTopkDelta \\
+\quad 全去（naive 自训练）         & \AblNaive & \AblNaiveDelta \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+消融结果呈现阶梯结构：分布预算贡献 \AblNoDistDeltaText{}、自适
+应准入贡献 \AblFixDeltaText{}、一致性生成贡献 \AblTopkDeltaText{}
+——三个模块针对第三章归纳的三点局限各有独立贡献，缺一不可。
+
+\section{超参敏感性}
+表~\ref{tab:sens} 报告框架对三个关键超参的敏感性。
+
+\begin{table}[t]
+\centering
+\caption{超参敏感性（\ExpRounds{} 轮后 NDCG@10，3 种子均值）。}
+\label{tab:sens}
+\begin{tabular}{cccc}
+\toprule
+$\varepsilon$ & NDCG@10 & $\lambda$ & NDCG@10 \\
+\midrule
+\SensEpsA & \SensEpsAN & \SensLamA & \SensLamAN \\
+\SensEpsB & \SensEpsBN & \SensLamB & \SensLamBN \\
+\SensEpsC & \SensEpsCN & \SensLamC & \SensLamCN \\
+\SensEpsD & \SensEpsDN & \SensLamD & \SensLamDN \\
+\SensEpsE & \SensEpsEN & \SensLamE & \SensLamEN \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{稀疏度分层分析}
+按用户训练序列长度将测试用户分为稀疏（$\leq 20$）、中等
+（21--60）、稠密（$>60$）三层，表~\ref{tab:sparsity} 给出本文框
+架相对 no-RSI 基线的 NDCG@10 增益。
+
+\begin{table}[t]
+\centering
+\caption{稀疏度分层增益（本文框架 $-$ no-RSI，NDCG@10）。}
+\label{tab:sparsity}
+\begin{tabular}{lccc}
+\toprule
+用户层 & 稀疏 & 中等 & 稠密 \\
+\midrule
+平均增益 & \SprSparse & \SprMedium & \SprDense \\
+用户数 & \SprSparseN & \SprMediumN & \SprDenseN \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{实验讨论}
+\textbf{优势。}框架的价值不在绝对峰值——在充分训练的骨干上，
+RSI 的边际增益本身有限——而在\emph{轨迹形态}：它把朴素自训练的
+单调崩塌转化为预算内的平稳迭代，使 RSI 从"危险的训练技巧"变为
+"可控的训练选项"。门控的分层标准化同时给出一个可解释视角：准入
+样本的层分布与真实分布的偏离被显式约束，偏差不再隐性累积。
+
+\textbf{局限性。}（1）增益规模依赖骨干模型欠拟合程度：当骨干已
+在其数据上限附近时（如充分训练的 BPR-MF），自生成信号无增量信
+息可用，框架退化为"无害"而非"有益"；（2）全量排序下的生成开销
+约为训练的 $K$ 倍前向，大规模工业场景需近似；（3）本文的预算
+是分层一阶统计量上的约束，未刻画高阶交互分布的漂移；（4）单数
+据集（ML-100K）验证，跨域稳健性待考察。
+
+\section{本章小结}
+本章以完全可复现的方式验证了三个论断：朴素 RSI 因头部自强化而
+崩塌（且漂移可测、崩塌可归因）；双轴门控 + 一致性生成将崩塌转
+化为预算内的平稳迭代；各模块的消融贡献相互独立、缺一不可。

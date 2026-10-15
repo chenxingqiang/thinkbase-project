@@ -1,0 +1,97 @@
+% !TeX program = xelatex
+% RSI 硕士学位论文 — GB/T 7713.1-2006 结构
+% 编译: latexmk -xelatex main.tex
+% fontset=fandol: TeX Live 自带字体, 不扫描系统字体, 可复现
+\documentclass[12pt, a4paper, openany, fontset=fandol]{ctexbook}
+
+% ----------------------- 页面与版式 -----------------------
+\usepackage[top=2.8cm, bottom=2.8cm, left=3.0cm, right=2.6cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[C]{\small RSI：保真度门控的递归自改进序列推荐框架}
+\fancyfoot[C]{\small\thepage}
+\usepackage{emptypage}
+
+% ----------------------- 数学与算法 -----------------------
+\usepackage{amsmath, amssymb, amsthm, bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ----------------------- 图表 -----------------------
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric,
+                fit, backgrounds, calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{booktabs}        % 三线表
+\usepackage{multirow}
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf}
+
+% ----------------------- 引用与链接 -----------------------
+\usepackage[numbers, sort&compress]{natbib}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=blue,
+            urlcolor=blue]{hyperref}
+
+% ----------------------- 计数与定理环境 -----------------------
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{lemma}[theorem]{引理}
+\newtheorem{definition}[theorem]{定义}
+\newtheorem{assumption}[theorem]{假设}
+\newtheorem{proposition}[theorem]{命题}
+\newtheorem{example}[theorem]{例}
+
+% ----------------------- 符号速记 -----------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Dset}{\mathcal{D}}
+\newcommand{\Dreal}{\Dset_{\mathrm{real}}}
+\newcommand{\Dsyn}{\Dset_{\mathrm{syn}}}
+\newcommand{\Dmix}{\Dset_{\mathrm{mix}}^{(r)}}
+\newcommand{\model}{M_{\theta}}
+\newcommand{\modelr}{\model^{(r)}}
+\newcommand{\dist}{\mathrm{JS}}
+\newcommand{\Exp}{\mathbb{E}}
+\newcommand{\grad}{\nabla_{\theta}}
+
+% 实验结果占位宏（由 scripts/fill_numbers.py 注入真实数字）
+\input{chapters/numbers}
+
+\begin{document}
+
+% ======================= 前置部分 =======================
+\frontmatter
+\input{chapters/cover}
+\input{chapters/declaration}
+\input{chapters/abstract-cn}
+\input{chapters/abstract-en}
+
+{\pagestyle{empty}
+\tableofcontents
+\clearpage
+\listoffigures
+\addcontentsline{toc}{chapter}{插图清单}
+\clearpage
+\listoftables
+\addcontentsline{toc}{chapter}{表格清单}
+\clearpage}
+\input{chapters/symbols}
+
+% ======================= 正文部分 =======================
+\mainmatter
+\input{chapters/ch1-intro}
+\input{chapters/ch2-related}
+\input{chapters/ch3-framework}
+\input{chapters/ch4-experiments}
+\input{chapters/ch5-conclusion}
+
+% ======================= 后置部分 =======================
+\backmatter
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+\input{chapters/appendix}
+\input{chapters/acknowledgements}
+
+\end{document}

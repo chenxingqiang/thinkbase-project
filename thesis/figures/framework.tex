@@ -1,0 +1,44 @@
+% RSI 闭环框架图 (TikZ)
+\begin{tikzpicture}[
+  node distance=10mm and 14mm,
+  box/.style={draw, rounded corners=2pt, align=center,
+              minimum height=9mm, inner sep=4pt, font=\small},
+  data/.style={box, fill=blue!8},
+  model/.style={box, fill=orange!15},
+  gate/.style={box, fill=green!12},
+  gen/.style={box, fill=red!10},
+  arrow/.style={-{Stealth[length=2.2mm]}, thick},
+  back/.style={-{Stealth[length=2.2mm]}, thick, dashed},
+  lbl/.style={font=\scriptsize, text=black!60},
+]
+
+% 顶行: 闭环主体
+\node[model] (prev) {$M^{(r-1)}$\\上一轮模型};
+\node[gen, right=of prev] (views) {多视图一致性生成\\$K$ 个扰动视图 $\to$ 伪标签};
+\node[gate, right=of views] (gate) {双轴保真度门控\\置信轴 + JS 预算};
+\node[data, right=of gate] (mix) {加权混合\\$\Dmix = \Dreal \cup \lambda\,\tilde{\Dsyn}$};
+\node[model, right=of mix] (next) {$M^{(r)}$\\后继模型};
+
+\draw[arrow] (prev) -- node[lbl, above]{$G(\cdot)$} (views);
+\draw[arrow] (views) -- node[lbl, above]{候选 $\Dsyn^{(r)}$} (gate);
+\draw[arrow] (gate) -- node[lbl, above]{$\tilde{\Dsyn}^{(r)}$} (mix);
+\draw[arrow] (mix) -- node[lbl, above]{$V \circ F$} (next);
+
+% 真实数据锚定
+\node[data, below=16mm of gate] (real) {$\Dreal$ 真实交互数据\\$\bm{p}_{\mathrm{real}}$, 分层 $\sigma(\cdot)$};
+\draw[arrow] (real) -- node[lbl, right]{门控依据} (gate);
+\draw[arrow] (real) -- node[lbl, below]{混合锚定} (mix);
+
+% 闭环反馈
+\draw[back] (next.south) -- ++(0,-7mm) -| node[lbl, pos=0.12, below]{下一轮 $r{+}1$} (prev.south);
+
+% 评估反馈
+\node[box, below=13mm of mix] (eval) {评估反馈\\NDCG/HR + 漂移监控};
+\draw[back] (next.south) |- (eval.east);
+\draw[back] (eval.west) -| node[lbl, pos=0.75, below]{更新预算 $\varepsilon$} (gate.south);
+
+% 门控内部标注
+\node[lbl, below=2mm of gate, text width=42mm, align=center]
+  {层内 $z$ 标准化 \\ $D_{\mathrm{JS}}(\text{混合}, \text{真实}) \le \varepsilon$};
+
+\end{tikzpicture}

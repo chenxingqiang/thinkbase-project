@@ -1,0 +1,57 @@
+% English abstract
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Recursive Self-Improvement (RSI) is a paradigm in which a model
+forms a closed loop of \emph{self-generating data, self-assessing
+quality, and self-iterating its training}. In large language models,
+mechanisms such as self-refinement and self-taught reasoning have
+demonstrated sustained gains without extra human annotation; bringing
+this paradigm to sequential recommendation promises relief from
+structural bottlenecks such as interaction sparsity, long-tail
+under-exposure, and expensive annotation. Existing RSI practice,
+however, exposes two systematic defects: \emph{distribution drift}
+of self-generated data --- models reinforce their own head
+predictions, and the bias amplifies across iterations --- and
+\emph{accumulated error} from admitting unquantified low-fidelity
+samples, which collapses performance after several rounds.
+
+This thesis studies fidelity control of self-generated data inside
+the RSI loop for sequential recommendation. The contributions are:
+
+\begin{enumerate}
+\item \textbf{Formalization and failure reproduction.} We model the
+RSI loop as a generator--fidelity-verifier--filter--successor--
+feedback process, formalize drift and error accumulation, and
+reproduce the collapse of naive self-training on MovieLens-100K
+(NDCG@10 drops from \ExpNaiveStart{} to \ExpNaiveEnd{} over
+\ExpNaiveRounds{} rounds), attributing it to head
+self-reinforcement rather than random noise.
+\item \textbf{A two-axis fidelity gate.} A confidence axis
+z-normalizes prediction margins within popularity strata,
+removing the structural bias of confidence toward head items; a
+distribution axis measures synthetic-to-real drift by the
+Jensen--Shannon distance over popularity strata and enforces an
+adaptive admission budget $\varepsilon$. Only samples passing both
+axes are admitted, cutting the head self-reinforcement feedback.
+\item \textbf{Multi-view consistency pseudo-labels.} Borrowing from
+FixMatch in semi-supervised learning, we build $K$ perturbed views
+of each user's history (item dropout and tail crop) and emit a
+pseudo-label only when the model's top prediction is
+\emph{consistent} across views with confidence and margin above
+thresholds --- encoding robust beliefs instead of head preference.
+\item \textbf{Empirical validation and reproducible
+infrastructure.} Under leave-one-out full-ranking evaluation on
+MovieLens-100K with a GRU4Rec backbone, the full framework lifts
+NDCG@10 after \ExpRounds{} RSI rounds from \ExpNaiveEnd{} (naive)
+to \ExpOursEnd{} (\ExpGainText{}) with a flat, collapse-free
+iteration curve; ablations confirm both axes are necessary;
+paired $t$-tests ($p<0.05$) support the conclusions. All experiments
+are seeded, single-thread deterministic, and orchestrated as
+instruction streams reproducible from the command line.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Keywords:} recursive self-improvement; sequential
+recommendation; self-generated data; distribution drift; fidelity
+control; semi-supervised learning; pseudo-labeling
+
