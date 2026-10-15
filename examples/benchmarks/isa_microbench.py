@@ -28,10 +28,14 @@ import asyncio
 import json
 import random
 import statistics
+import sys
 import time
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+# Make the repo package importable regardless of how the script is invoked.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from agentflow.core.isa.compiler import (
     CompilationContext,

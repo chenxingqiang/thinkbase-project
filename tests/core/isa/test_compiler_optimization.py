@@ -144,6 +144,61 @@ class TestDeadCodeElimination:
 class TestParallelization:
     """ADVANCED level groups independent instructions."""
 
+    def test_same_output_write_write_hazard_not_grouped(self, compiler, aggressive_ctx):
+        """Two pure instructions writing the same output do not commute.
+
+        Folding them into one dispatch group would violate the
+        non-interference condition (Theorem 3.5's S3): the group's
+        denotation would depend on write order.  The grouping check
+        must reject write-write overlaps.
+        """
+        a = make_instr("a", InstructionType.LLM, side_effects=False, outputs=["v"])
+        b = make_instr("b", InstructionType.LLM, side_effects=False, outputs=["v"])
+        c = make_instr("c", InstructionType.CONTROL, side_effects=True)
+        c.dependencies = ["v"]
+        out = run_pass(compiler, [a, b, c], "parallel_execution")
+        # No parallel wrapper: all three must dispatch separately.
+        assert len(out) == 3
+        assert all(not (i.metadata.get("is_parallel")) for i in out)
+
+    def test_effectful_instruction_never_starts_group(self, compiler, aggressive_ctx):
+        """An effectful instruction must never share a dispatch group.
+
+        The old grouping logic let a side-effectful instruction *open*
+        a group that subsequent pure instructions then joined, so a
+        "parallel" block could contain an effectful member whose
+        non-interference with the rest was never established
+        (Theorem 3.5's S3).  Effectful instructions must dispatch
+        alone.
+        """
+        eff = make_instr("eff", InstructionType.STATE, side_effects=True)
+        p1 = make_instr("p1", InstructionType.LLM, side_effects=False, outputs=["v1"])
+        sink = make_instr("sink", InstructionType.CONTROL, side_effects=True)
+        sink.dependencies = ["v1"]
+        out = run_pass(compiler, [eff, p1, sink], "parallel_execution")
+        # Three dispatches, no wrapper at all.
+        assert len(out) == 3
+        for item in out:
+            assert not item.metadata.get("is_parallel")
+
+    def test_fusion_preserves_external_dependencies(self, compiler, basic_ctx):
+        """A fused instruction keeps the union of its components' deps.
+
+        Fusion drops the pair's internal dependency (there is none, by
+        the fusibility precondition), but external dependencies must
+        survive — otherwise liveness and grouping analyses would see a
+        node whose data dependencies vanished (it could be grouped
+        with its own producer).
+        """
+        a = make_instr("a", InstructionType.LLM, side_effects=False,
+                       outputs=["x"], dependencies=["w"])
+        b = make_instr("b", InstructionType.LLM, side_effects=False,
+                       outputs=["y"], dependencies=["z"])
+        out = run_pass(compiler, [a, b], "instruction_fusion")
+        fused = next(i for i in out if i.name.startswith("fused_"))
+        assert sorted(fused.dependencies) == ["w", "z"]
+        assert sorted(fused.metadata.get("outputs", [])) == ["x", "y"]
+
     def test_independent_grouped_into_parallel_block(self, compiler, aggressive_ctx):
         a = make_instr("a", InstructionType.LLM, side_effects=False, outputs=["x1"])
         b = make_instr("b", InstructionType.LLM, side_effects=False, outputs=["x2"])

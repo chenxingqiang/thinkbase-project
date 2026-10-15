@@ -96,6 +96,40 @@ async def test_composite_instruction():
     assert result["status"] == "executed"
 
 @pytest.mark.asyncio
+async def test_composite_cache_serves_falsy_results():
+    """A falsy-but-present cache entry must be served as a hit.
+
+    The cache protocol uses ``None`` as its miss sentinel, so a cached
+    result of ``0``, ``""``, or ``{}`` is a hit.  Gating on truthiness
+    would silently re-execute (and re-charge) those results.
+    """
+    class FalsyInstruction(Instruction):
+        def __init__(self):
+            super().__init__(
+                id="falsy", name="falsy", type=InstructionType.CONTROL_FLOW,
+                params={}, description="returns 0",
+            )
+            self.executions = 0
+
+        async def execute(self, input_params: Dict[str, Any]) -> Any:
+            self.executions += 1
+            return 0
+
+    inner = FalsyInstruction()
+    composite = CompositeInstruction(
+        id="c", name="c_falsy", components=[inner],
+        cache_config={"max_size": 10, "ttl": 60},
+    )
+
+    first = await composite.execute({"x": 1})
+    second = await composite.execute({"x": 1})
+
+    assert first == 0
+    assert second == 0
+    assert inner.executions == 1  # second call served from cache
+    assert composite.metrics.cache_hits == 1
+
+@pytest.mark.asyncio
 async def test_instruction_error_handling(test_instruction):
     """Test instruction error handling."""
     # Add a failing precondition

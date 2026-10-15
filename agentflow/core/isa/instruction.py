@@ -272,7 +272,7 @@ class CompositeInstruction(Instruction):
             # Check cache
             cache_key = self._get_cache_key(input_params)
             cached_result = self.cache.get(cache_key)
-            if cached_result:
+            if cached_result is not None:
                 self._update_metrics(start_time, True, cache_hit=True)
                 return cached_result
             

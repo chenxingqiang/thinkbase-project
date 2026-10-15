@@ -1,4 +1,18 @@
-"""Pipeline infrastructure for instruction execution."""
+"""Pipeline infrastructure for instruction execution.
+
+.. warning::
+    **This module is an unwired skeleton.** It is *not* part of the
+    runtime execution path: the executed dispatch path is the compiler's
+    sequential / parallel-grouped stream (see ``compiler.py`` and
+    ``instruction_optimization.py``). ``PipelineController`` has never
+    been driven by production code and its ``process_instruction``
+    raises on first use (the hazard detector expects
+    ``pipeline_state`` entries to be instruction objects with a
+    ``.dependencies`` attribute, but ``__init__`` fills them with
+    ``None``). It is retained as design scaffolding for the
+    cycle-accurate scheduler specified in Section 4.2 of the paper
+    (specified, not implemented). Do not import it for real execution.
+"""
 from typing import Dict, Any, List, Optional, Set
 from dataclasses import dataclass
 from enum import Enum

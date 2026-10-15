@@ -537,8 +537,8 @@ class BehavioralMiner:
         if n_clusters < 2:
             return [[i for i in range(len(features))]]
             
-        # Perform clustering
-        kmeans = KMeans(n_clusters=n_clusters)
+        # Perform clustering (fixed random_state for reproducibility)
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
         labels = kmeans.fit_predict(scaled_features)
         
         # Group indices by cluster

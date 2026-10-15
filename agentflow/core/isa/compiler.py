@@ -184,15 +184,35 @@ class InstructionCompiler:
                   instr1: FormalInstruction,
                   instr2: FormalInstruction,
                   context: CompilationContext) -> Optional[FormalInstruction]:
-        """Try to fuse two instructions."""
+        """Try to fuse two instructions.
+
+        The fused instruction carries the union of the components'
+        *external* dependencies: ``instr2``'s dependencies that are
+        satisfied by ``instr1``'s outputs are internal to the fusion and
+        dropped; everything else must survive, or downstream liveness
+        and parallel-grouping analyses would see a node whose data
+        dependencies have vanished (it could then, e.g., be grouped
+        with its own producer).
+        """
         if not self._are_fusible(instr1, instr2):
             return None
-            
-        return FormalInstruction(
+
+        fused = FormalInstruction(
             name=f"fused_{instr1.name}_{instr2.name}",
             type=instr1.type,
             metadata=self._merge_metadata(instr1, instr2)
         )
+        internal = set(
+            getattr(instr2, "dependencies", []) or []
+        ).intersection(instr1.metadata.get("outputs", []) or [])
+        fused.dependencies = [
+            dep for dep in dict.fromkeys(
+                list(getattr(instr1, "dependencies", []) or [])
+                + list(getattr(instr2, "dependencies", []) or [])
+            )
+            if dep not in internal
+        ]
+        return fused
     
     def _has_side_effects(self, instr: FormalInstruction) -> bool:
         """Check whether an instruction has observable side effects.
@@ -269,11 +289,17 @@ class InstructionCompiler:
         for other in group:
             other_deps = set(getattr(other, "dependencies", []) or [])
             other_outputs = set(other.metadata.get("outputs", []) or [])
-            # Anti-dependency / flow dependency in either direction.
+            # Anti-dependency / flow dependency in either direction ...
             if (instr_deps & other_outputs
                     or other_deps & instr_outputs
                     or other.id in instr_deps
                     or instr.id in other_deps):
+                return False
+            # ... plus write-write hazards: two pure instructions that
+            # declare the same output do not commute, so folding them
+            # into one dispatch group would violate non-interference
+            # (Theorem 3.5's S3 condition).
+            if instr_outputs & other_outputs:
                 return False
         return True
 
@@ -384,21 +410,34 @@ class InstructionCompiler:
     def _identify_parallel_groups(self,
                                 instructions: List[FormalInstruction],
                                 context: CompilationContext) -> List[List[FormalInstruction]]:
-        """Identify groups of instructions that can run in parallel."""
+        """Identify groups of instructions that can run in parallel.
+
+        A group only ever contains side-effect-free instructions: an
+        effectful instruction cannot *join* a group (``_can_parallelize``
+        rejects it) and, crucially, cannot *start* one either — the
+        previous version let an effectful instruction open a group that
+        subsequent pure instructions then joined, producing dispatch
+        groups whose non-interference (Theorem 3.5's S3) was never
+        established.  Effectful instructions are always dispatched
+        alone.
+        """
         groups = []
         current_group = []
-        
+
         for instr in instructions:
-            if self._can_parallelize(instr, current_group):
+            if current_group and self._can_parallelize(instr, current_group):
                 current_group.append(instr)
             else:
                 if current_group:
                     groups.append(current_group)
                 current_group = [instr]
-                
+                if self._has_side_effects(instr):
+                    groups.append(current_group)
+                    current_group = []
+
         if current_group:
             groups.append(current_group)
-            
+
         return groups
     
     @staticmethod

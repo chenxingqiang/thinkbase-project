@@ -31,10 +31,14 @@ import json
 import os
 import random
 import statistics
+import sys
 import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+# Make the repo package importable regardless of how the script is invoked.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import httpx
 
