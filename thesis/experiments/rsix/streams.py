@@ -233,9 +233,15 @@ def build_experiment_stream(config: Dict[str, Any],
                 "report_written": hashlib.sha256(
                     payload.encode()).hexdigest()}
 
+    # Declare every ctx key the writer reads at runtime: the compiler's
+    # dataflow graph is built from these edges, and an undeclared read is
+    # a latent DCE hazard (the producer could be legally eliminated).
+    _write_deps = [f"metrics_r{r}" for r in range(rounds + 1)]
+    _write_deps += [f"gate_stats_r{r}" for r in range(rounds)]
+    _write_deps += ["last_mix"]
     stream.append(_instruction(
         "write_results", IsaType.STATE_MANAGEMENT, _write,
-        deps=[f"metrics_r{rounds}"], outputs=[], side_effects=True,
+        deps=_write_deps, outputs=[], side_effects=True,
         description="Persist the round-by-round history"))
     return stream
 
