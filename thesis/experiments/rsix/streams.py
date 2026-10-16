@@ -31,13 +31,44 @@ from .metrics import evaluate
 
 def _instruction(id: str, itype: IsaType, execute: Callable, *,
                  deps: List[str], outputs: List[str], side_effects: bool,
-                 description: str = "") -> Instruction:
-    """(p, self) -> result factory, mirroring the suites' pattern."""
+                 description: str = "",
+                 post: Optional[Callable[[Dict[str, Any], Any],
+                                         Optional[str]]] = None
+                 ) -> Instruction:
+    """(p, self) -> result factory, mirroring the suites' pattern.
+
+    ``post`` (when given) is an invariant checker with signature
+    ``(ctx, result) -> None-or-violation-message``; ``None`` means the
+    postcondition holds.  Preconditions are the declared dataflow
+    itself (every dep must be present in ctx) and are verified through
+    the AgentISA-native ``verify_conditions``; postconditions are
+    registered in the instruction's native context record and enforced
+    by this wrapper at runtime -- the base class only auto-verifies
+    preconditions, so the wrapper is the documented evaluation point
+    for the post-state.
+    """
+
+    def _check_deps(state: Dict[str, Any]) -> bool:
+        ctx = state.get("ctx", {})
+        return all(d in ctx for d in deps)
 
     class _Step(Instruction):
         async def execute(self, input_params: Dict[str, Any]) -> Any:
+            # Phi: precondition = declared dataflow is resolvable.
+            if not self.verify_conditions(input_params):
+                missing = [d for d in deps
+                           if d not in input_params.get("ctx", {})]
+                raise RuntimeError(
+                    f"[{id}] precondition violated: missing ctx keys "
+                    f"{missing} (dataflow declared but not produced)")
             start = time.time()
             result = execute(input_params, self)
+            # Phi: postcondition = invariant over the post-state.
+            if post is not None:
+                why = post(input_params.get("ctx", {}), result)
+                if why is not None:
+                    raise RuntimeError(
+                        f"[{id}] postcondition violated: {why}")
             self._update_metrics(start, True)
             return result
 
@@ -45,8 +76,72 @@ def _instruction(id: str, itype: IsaType, execute: Callable, *,
                  description=description or id,
                  side_effects=side_effects, outputs=outputs)
     step.dependencies = list(deps)
+    step.add_precondition(_check_deps)
+    if post is not None:
+        # Native record for the formal view; evaluated by the wrapper
+        # above (the base runtime only pre-verifies).
+        step.add_postcondition(
+            lambda state, _p=post: _p(state.get("ctx", {}), None) is None)
     step.sandbox = None
     return step
+
+
+def check_gate_invariant(variant: str, eps: float, rkey: str):
+    """Postcondition factory for the gate step, per experiment variant.
+
+    For ``gated`` this machine-checks INV-1 -- the mixed distribution
+    must stay inside the eps budget on every round of every run -- and
+    for the baselines it pins their defining behavior (naive admits
+    everything, no_rsi admits nothing).
+    """
+
+    def post(ctx, res):
+        admitted = res[f"admitted_{rkey}"]
+        stats = res[f"gate_stats_{rkey}"]
+        n_c, n_a = stats["n_candidates"], stats["n_admitted"]
+        if n_a > n_c:
+            return f"admitted {n_a} > candidates {n_c}"
+        if variant == "naive" and n_a != n_c:
+            return f"naive must admit everything ({n_a}/{n_c})"
+        if variant == "no_rsi" and n_a != 0:
+            return f"no_rsi must admit nothing (got {n_a})"
+        if variant in ("conf_only", "no_adaptive"):
+            if "synthetic_js_distance" not in stats:
+                return f"{variant}: missing synthetic_js_distance stat"
+        if variant == "gated":
+            js = stats.get("mixed_js_distance")
+            if js is None or js > eps + 1e-9:
+                return f"INV-1 violated: mixed JS {js} > eps {eps}"
+        if len(admitted) != n_a:
+            return f"admitted list ({len(admitted)}) != stat ({n_a})"
+        return None
+
+    return post
+
+
+def check_mix_invariant(rkey: str):
+    """Postcondition factory for the mix step: mixture bookkeeping.
+
+    The synthetic-event count must equal admitted x repetition factor
+    (the checkable form of the mixing guarantee INV-2), and the real
+    data must survive the mixture untouched.
+    """
+
+    def post(ctx, res):
+        book = res["last_mix"]
+        n_adm = len(ctx[f"admitted_{rkey}"])
+        reps = max(1, round(ctx["gate"].mix_lambda))
+        expect = n_adm * reps
+        if book["synthetic_events"] != expect:
+            return (f"mixture bookkeeping broken: synthetic="
+                    f"{book['synthetic_events']} expected={expect}")
+        if book["real_events"] <= 0:
+            return "mixture lost the real data (real_events<=0)"
+        if not res["train"]:
+            return "mixed training set is empty"
+        return None
+
+    return post
 
 
 def build_experiment_stream(config: Dict[str, Any],
@@ -61,7 +156,9 @@ def build_experiment_stream(config: Dict[str, Any],
         lambda p, s: {"interactions": data_mod.load_interactions(
             Path(config["data_path"]))},
         deps=[], outputs=["interactions"], side_effects=True,
-        description="Read the rating file (positive interactions)"))
+        description="Read the rating file (positive interactions)",
+        post=lambda ctx, res: None if res["interactions"]
+        else "ingested interaction list is empty"))
 
     def _split(p, s):
         triples = p["ctx"]["interactions"]
@@ -71,12 +168,24 @@ def build_experiment_stream(config: Dict[str, Any],
         return {"train": train, "test": test, "n_items": n_items,
                 "pop": pop, "n_users": n_users}
 
+    def _split_post(ctx, res):
+        train, test = res["train"], res["test"]
+        if not train:
+            return "split produced an empty training set"
+        if not 0 < len(test) <= res["n_users"]:
+            return f"test size {len(test)} outside (0, n_users]"
+        for u, t in test.items():
+            if t in train.get(u, []):
+                return f"leakage: test item of user {u} is in its train seq"
+        return None
+
     stream.append(_instruction(
         "build_split", IsaType.CONTROL_FLOW, _split,
         deps=["interactions"], outputs=["train", "test", "n_items",
                                         "pop", "n_users"],
         side_effects=False,
-        description="Leave-one-out split + item popularity"))
+        description="Leave-one-out split + item popularity",
+        post=_split_post))
 
     def _fit_gate(p, s):
         gate = fid.FidelityGate(
@@ -86,10 +195,20 @@ def build_experiment_stream(config: Dict[str, Any],
         ).fit(p["ctx"]["pop"])
         return {"gate": gate}
 
+    def _gate_fit_post(ctx, res):
+        g = res["gate"]
+        total = float(np.asarray(g.real_dist).sum())
+        if len(np.asarray(g.real_dist)) < 2:
+            return "gate strata degenerate (<2 strata)"
+        if abs(total - 1.0) > 1e-6:
+            return f"gate real distribution not normalized (sum={total})"
+        return None
+
     stream.append(_instruction(
         "fit_fidelity_gate", IsaType.CONTROL_FLOW, _fit_gate,
         deps=["pop"], outputs=["gate"], side_effects=False,
-        description="Fit popularity strata + real distribution"))
+        description="Fit popularity strata + real distribution",
+        post=_gate_fit_post))
 
     # ---- per-round closed loop -----------------------------------------
     for r in range(rounds + 1):
@@ -114,13 +233,22 @@ def build_experiment_stream(config: Dict[str, Any],
                     f"metrics_{rkey}": metrics, "last_model": model,
                     "info": info}
 
+        def _train_post(ctx, res, rkey=rkey):
+            m = res[f"metrics_{rkey}"]
+            for k in ("ndcg@10", "hr@10"):
+                v = m.get(k)
+                if not isinstance(v, (int, float)) or not 0.0 <= v <= 1.0:
+                    return f"metric {k} out of contract: {v!r}"
+            return None
+
         stream.append(_instruction(
             f"train_round_{r}", IsaType.CONTROL_FLOW, _train_round,
             deps=["train", "test"], outputs=[f"model_{rkey}",
                                              f"metrics_{rkey}",
                                              "last_model"],
             side_effects=False,
-            description=f"Round {r}: train + evaluate"))
+            description=f"Round {r}: train + evaluate",
+            post=_train_post))
 
         if r == rounds:
             break
@@ -147,11 +275,31 @@ def build_experiment_stream(config: Dict[str, Any],
             return {"candidates": cands,
                     "gen_stats": {"users": 0, "candidates": len(cands)}}
 
+        def _gen_post(ctx, res, r=r):
+            cands = res["candidates"]
+            if not isinstance(cands, list):
+                return f"candidates not a list: {type(cands)}"
+            # per-user cap depends on the generator: consistency emits
+            # at most one pseudo-label per user; topk emits <= topk.
+            kind = config.get("generator",
+                              "consistency" if variant == "gated"
+                              else "topk")
+            cap = (len(ctx["train"]) if kind == "consistency"
+                   else config.get("topk", 10) * len(ctx["train"]))
+            if len(cands) > cap:
+                return (f"candidates {len(cands)} exceed per-generator "
+                        f"cap {cap} ({kind})")
+            for c in cands:
+                if len(c) != 4:
+                    return f"malformed candidate tuple: {c!r}"
+            return None
+
         stream.append(_instruction(
             f"generate_{rkey}", IsaType.LLM_INTERACTION, _generate,
             deps=["last_model", "train"], outputs=["candidates"],
             side_effects=False,
-            description=f"Round {r}: model self-generates candidates"))
+            description=f"Round {r}: model self-generates candidates",
+            post=_gen_post))
 
         def _gate(p, s, r=r, rkey=rkey):
             ctx = p["ctx"]
@@ -182,6 +330,12 @@ def build_experiment_stream(config: Dict[str, Any],
                 admitted, st = gate.score_and_filter(cands, real_n)
                 stats = {"n_candidates": st["n_candidates"],
                          "n_admitted": st["n_admitted"],
+                         # unambiguous key consumed by the INV-1
+                         # postcondition checker
+                         "mixed_js_distance": st["mixed_js_distance"],
+                         # legacy alias: agg()/figures read "js" over
+                         # the committed result JSONs; for gated it IS
+                         # the mixed JS
                          "js": st["mixed_js_distance"]}
             return {f"admitted_{rkey}": admitted,
                     f"gate_stats_{rkey}": stats}
@@ -191,7 +345,9 @@ def build_experiment_stream(config: Dict[str, Any],
             deps=["candidates", "gate", "pop"], outputs=[f"admitted_{rkey}",
                                                         f"gate_stats_{rkey}"],
             side_effects=False,
-            description=f"Round {r}: fidelity gate over candidates"))
+            description=f"Round {r}: fidelity gate over candidates",
+            post=check_gate_invariant(variant, config.get("eps", 0.08),
+                                      rkey)))
 
         def _mix(p, s, r=r, rkey=rkey):
             ctx = p["ctx"]
@@ -209,7 +365,8 @@ def build_experiment_stream(config: Dict[str, Any],
             f"mix_{rkey}", IsaType.CONTROL_FLOW, _mix,
             deps=["train", f"admitted_{rkey}", "gate"],
             outputs=["train", "last_mix"], side_effects=False,
-            description=f"Round {r}: mix real + synthetic training data"))
+            description=f"Round {r}: mix real + synthetic training data",
+            post=check_mix_invariant(rkey)))
 
     def _write(p, s):
         ctx = p["ctx"]
@@ -239,10 +396,17 @@ def build_experiment_stream(config: Dict[str, Any],
     _write_deps = [f"metrics_r{r}" for r in range(rounds + 1)]
     _write_deps += [f"gate_stats_r{r}" for r in range(rounds)]
     _write_deps += ["last_mix"]
+    def _write_post(ctx, res):
+        sha = res.get("report_written", "")
+        if len(sha) != 64 or any(c not in "0123456789abcdef" for c in sha):
+            return f"report sha256 contract broken: {sha!r}"
+        return None
+
     stream.append(_instruction(
         "write_results", IsaType.STATE_MANAGEMENT, _write,
         deps=_write_deps, outputs=[], side_effects=True,
-        description="Persist the round-by-round history"))
+        description="Persist the round-by-round history",
+        post=_write_post))
     return stream
 
 
