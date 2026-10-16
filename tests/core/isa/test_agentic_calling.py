@@ -153,3 +153,107 @@ async def test_model_adapter_type_handling():
         pass
         
     assert adapter._transform_type(CustomType) == "CustomType" 
+
+class TestValidateContext:
+    """Pre-execution context validation (paper Section 3.2.3)."""
+
+    def test_single_argument_constraint_applied_directly(self):
+        t = AgenticTransformer()
+        t.add_context_constraint("budget", lambda v: v >= 0)
+        assert t.validate_context({"budget": 10}) is True
+        assert t.validate_context({"budget": -1}) is False
+
+    def test_pairwise_constraint_applied_reflexively(self):
+        t = AgenticTransformer()
+        # A pairwise predicate is applied reflexively -- (v, v) -- so a
+        # constraint that inspects its second argument decides the verdict.
+        t.add_context_constraint("level", lambda before, after: after >= 0)
+        assert t.validate_context({"level": 5}) is True
+        assert t.validate_context({"level": -3}) is False
+
+    def test_reflexive_identity_constraint_always_holds(self):
+        t = AgenticTransformer()
+        # (v, v) trivially satisfies a symmetric relation like after >= before,
+        # so reflexive validation passes for every value -- by definition.
+        t.add_context_constraint("counter", lambda before, after: after >= before)
+        assert t.validate_context({"counter": -3}) is True
+        assert t.validate_context({"counter": 7}) is True
+
+    def test_missing_key_vacuously_satisfied(self):
+        t = AgenticTransformer()
+        t.add_context_constraint("absent", lambda v: False)
+        assert t.validate_context({"other": 1}) is True
+
+    def test_multiple_constraints_all_must_hold(self):
+        t = AgenticTransformer()
+        t.add_context_constraint("a", lambda v: v > 0)
+        t.add_context_constraint("b", lambda v: v < 10)
+        assert t.validate_context({"a": 1, "b": 2}) is True
+        assert t.validate_context({"a": 1, "b": 20}) is False
+        assert t.validate_context({"a": -1, "b": 2}) is False
+
+    def test_non_callable_constraint_fails_validation(self):
+        t = AgenticTransformer()
+        t.add_context_constraint("x", "not-a-callable")
+        assert t.validate_context({"x": 1}) is False
+
+    def test_consistent_with_preservation_semantics(self):
+        t = AgenticTransformer()
+        t.add_context_constraint("monotone", lambda before, after: after >= before)
+        # A state that fails reflexive validation must also fail the
+        # preservation check against itself, and vice versa.
+        assert t.validate_context({"monotone": 1}) is True
+        assert t.verify_context_preservation({"monotone": 1}, {"monotone": 1}) is True
+
+
+class TestNormalizeResponse:
+    """Response normalization (paper Section 3.2.3)."""
+
+    def test_anthropic_protocol_shape(self):
+        adapter = ModelAdapter("gateway-model")
+        raw = {
+            "model": "glm-5.3",
+            "content": [
+                {"type": "text", "text": "hello"},
+                {"type": "tool_use", "id": "t1", "name": "f"},
+            ],
+            "usage": {"input_tokens": 12, "output_tokens": 34},
+        }
+        resp = adapter.normalize_response(raw)
+        assert resp.content == "hello"
+        assert len(resp.tool_calls) == 1
+        assert resp.tool_calls[0]["name"] == "f"
+        assert resp.usage["input_tokens"] == 12
+        assert resp.usage["output_tokens"] == 34
+        assert resp.model == "glm-5.3"
+        assert resp.raw is raw
+
+    def test_openai_protocol_shape(self):
+        adapter = ModelAdapter("gateway-model")
+        raw = {
+            "choices": [
+                {"message": {"content": "hi", "tool_calls": [{"id": "c1"}]}}
+            ],
+            "usage": {"prompt_tokens": 7, "completion_tokens": 9},
+            "model": "gpt-x",
+        }
+        resp = adapter.normalize_response(raw)
+        assert resp.content == "hi"
+        assert resp.tool_calls == [{"id": "c1"}]
+        assert resp.usage["input_tokens"] == 7
+        assert resp.usage["output_tokens"] == 9
+        assert resp.model == "gpt-x"
+
+    def test_common_key_passthrough(self):
+        adapter = ModelAdapter("gateway-model")
+        resp = adapter.normalize_response({"text": "plain", "model": "m"})
+        assert resp.content == "plain"
+        assert resp.model == "m"
+        assert resp.usage == {}
+
+    def test_non_dict_passthrough(self):
+        adapter = ModelAdapter("gateway-model")
+        resp = adapter.normalize_response("bare string")
+        assert resp.content == "bare string"
+        assert resp.model == "gateway-model"
+        assert resp.raw == "bare string"

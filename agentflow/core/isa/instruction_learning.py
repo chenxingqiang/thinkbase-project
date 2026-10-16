@@ -26,6 +26,18 @@ class DialoguePattern:
     success_rate: float
     context_requirements: Set[str]
     metrics: InstructionMetrics = field(default_factory=InstructionMetrics)
+    # -- Composite-replay provenance (Section 3.3). ----------------------
+    # When the pattern was mined from instruction *traces* (rather than
+    # from dialogues), these carry the recurring constituent subsequence
+    # itself, the dataflow edges between its members, the output names
+    # the subsequence was observed to produce, and the external inputs
+    # it consumes -- everything a promoted learned instruction needs in
+    # order to replay real behavior instead of shipping a stub body.
+    # Patterns mined from dialogues leave them at their defaults.
+    instruction_sequence: Optional[List[Instruction]] = None
+    dataflow_edges: List[Tuple[str, str]] = field(default_factory=list)
+    produced_outputs: Optional[List[str]] = None
+    external_inputs: Optional[List[str]] = None
 
 @dataclass
 class InstructionTemplate:
@@ -37,6 +49,11 @@ class InstructionTemplate:
     postconditions: List[str]
     cache_config: Optional[Dict[str, Any]] = None
     parallel_config: Optional[Dict[str, Any]] = None
+    # Constituent instruction sequence for composite replay.  ``None``
+    # (or empty) means the template was mined without recorded bodies;
+    # instructions created from such a template refuse to execute.
+    components: Optional[List[Instruction]] = None
+    dataflow_edges: List[Tuple[str, str]] = field(default_factory=list)
 
 @dataclass
 class LearningConfig:
@@ -49,6 +66,45 @@ class LearningConfig:
     enable_parallel: bool = True
     parallel_batch_size: int = 10
     max_parallel_tasks: int = 100
+
+@dataclass
+class _TraceEntry:
+    """Normalized per-step record of an executed instruction."""
+    instruction: Instruction
+    success: bool
+    # Output names this step produced, in production (first-seen) order:
+    # the keys of its observed dict result, or its declared ``outputs``
+    # when no result was recorded.
+    output_keys: List[str]
+
+async def record_trace(
+    stream: List[Instruction],
+    initial_ctx: Optional[Dict[str, Any]] = None,
+) -> List[Dict[str, Any]]:
+    """Execute ``stream`` sequentially and record a mining-ready trace.
+
+    Follows the run_stream execution convention: every instruction
+    receives ``{"ctx": <shared state>}`` and its dict outputs are merged
+    into the shared state for later steps.  The caller's
+    ``initial_ctx`` is copied, never mutated.  Each recorded entry is a
+    dict ``{"instruction": ..., "success": True, "outputs": {...}}`` as
+    consumed by :meth:`PatternRecognizer.extract_instruction_patterns`;
+    a step that raises propagates its exception and is not recorded.
+    """
+    ctx: Dict[str, Any] = dict(initial_ctx or {})
+    trace: List[Dict[str, Any]] = []
+    for instr in stream:
+        result = await instr.execute({"ctx": ctx})
+        entry: Dict[str, Any] = {
+            "instruction": instr,
+            "success": True,
+            "outputs": {},
+        }
+        if isinstance(result, dict):
+            entry["outputs"] = dict(result)
+            ctx.update(result)
+        trace.append(entry)
+    return trace
 
 class PatternRecognizer:
     """Dialogue pattern recognition system."""
@@ -234,6 +290,199 @@ class PatternRecognizer:
         else:
             self.metrics.cache_misses += 1
 
+    # ------------------------------------------------------------------
+    # Instruction-trace mining (composite replay, Section 3.3)
+    # ------------------------------------------------------------------
+
+    def extract_instruction_patterns(
+        self, traces: List[List[Any]]
+    ) -> List[DialoguePattern]:
+        """Mine recurring contiguous instruction subsequences from traces.
+
+        Each trace is a sequence of per-step records -- either a bare
+        :class:`Instruction` or a dict as produced by
+        :func:`record_trace` (``{"instruction", "success", "outputs"}``).
+        All contiguous windows of two or more steps are enumerated and
+        keyed by their instruction-id sequence.  A key qualifies when it
+        occurs at least ``min_pattern_support`` times across all traces
+        and its occurrences succeed at rate at least
+        ``min_success_rate`` (an occurrence succeeds when every one of
+        its steps did).  Keys that occur contiguously inside another
+        qualifying key are pruned, so only *maximal* recurring
+        sequences are promoted.
+
+        The procedure is fully deterministic: windows are enumerated in
+        (trace, start, length) order, promotion order is longest-first
+        then first occurrence, and pattern ids are derived from a
+        content hash of the id sequence -- the same traces therefore
+        promote the same patterns, with the same ids, in the same
+        order, across independent runs.
+        """
+        start_time = time.time()
+        try:
+            sequences = [self._normalize_trace(trace) for trace in traces]
+
+            occurrences: Dict[
+                Tuple[str, ...], List[Tuple[int, int, List[_TraceEntry]]]
+            ] = {}
+            for trace_idx, entries in enumerate(sequences):
+                for length in range(2, len(entries) + 1):
+                    for start in range(len(entries) - length + 1):
+                        window = entries[start:start + length]
+                        key = tuple(entry.instruction.id for entry in window)
+                        occurrences.setdefault(key, []).append(
+                            (trace_idx, start, window)
+                        )
+
+            qualifying = {
+                key: occs for key, occs in occurrences.items()
+                if len(occs) >= self.config.min_pattern_support
+                and self._window_success_rate(occs)
+                >= self.config.min_success_rate
+            }
+            promoted_keys = [
+                key for key in qualifying
+                if not any(
+                    key != other
+                    and self._is_contiguous_subsequence(key, other)
+                    for other in qualifying
+                )
+            ]
+            promoted_keys.sort(
+                key=lambda k: (-len(k), occurrences[k][0][0], occurrences[k][0][1], k)
+            )
+
+            patterns: List[DialoguePattern] = []
+            for key in promoted_keys:
+                pattern = self._pattern_from_window(key, occurrences[key])
+                if pattern is not None:
+                    patterns.append(pattern)
+            for pattern in patterns:
+                self.patterns[pattern.pattern_id] = pattern
+
+            self._update_metrics(start_time, True)
+            return patterns
+        except Exception:
+            self._update_metrics(start_time, False)
+            raise
+
+    def _normalize_trace(self, trace: List[Any]) -> List[_TraceEntry]:
+        """Normalize a raw trace into per-step records.
+
+        Dict records carry the observed success flag and the observed
+        output keys; bare instructions default to success with their
+        declared ``outputs``.
+        """
+        entries: List[_TraceEntry] = []
+        for record in trace or []:
+            if isinstance(record, dict):
+                instruction = record.get("instruction")
+                if not isinstance(instruction, Instruction):
+                    raise ValueError(
+                        "Trace record dicts must carry an 'instruction' entry"
+                    )
+                success = bool(record.get("success", True))
+                outputs = record.get("outputs")
+                if isinstance(outputs, dict):
+                    output_keys = list(outputs.keys())
+                else:
+                    output_keys = list(getattr(instruction, "outputs", []) or [])
+            else:
+                instruction = record
+                if not isinstance(instruction, Instruction):
+                    raise ValueError(
+                        "Trace records must be Instructions or dicts"
+                    )
+                success = True
+                output_keys = list(getattr(instruction, "outputs", []) or [])
+            entries.append(_TraceEntry(instruction, success, output_keys))
+        return entries
+
+    @staticmethod
+    def _window_success_rate(
+        occurrences: List[Tuple[int, int, List[_TraceEntry]]]
+    ) -> float:
+        """Fraction of a window's occurrences whose steps all succeeded."""
+        if not occurrences:
+            return 0.0
+        successful = sum(
+            1 for _, _, window in occurrences
+            if all(entry.success for entry in window)
+        )
+        return successful / len(occurrences)
+
+    @staticmethod
+    def _is_contiguous_subsequence(
+        needle: Tuple[str, ...], haystack: Tuple[str, ...]
+    ) -> bool:
+        """Whether ``needle`` occurs contiguously inside ``haystack``."""
+        n, h = len(needle), len(haystack)
+        if n == 0 or n > h:
+            return False
+        return any(
+            tuple(haystack[i:i + n]) == needle for i in range(h - n + 1)
+        )
+
+    def _pattern_from_window(
+        self,
+        key: Tuple[str, ...],
+        occurrences: List[Tuple[int, int, List[_TraceEntry]]],
+    ) -> DialoguePattern:
+        """Build a replayable pattern from a promoted window.
+
+        The constituent sequence is taken from the *first* occurrence
+        (deterministic).  The pattern records the dataflow edges
+        between its members (producer id -> consumer id), the output
+        names it was observed to produce (first-seen order), and its
+        external inputs: dependencies satisfied by neither an earlier
+        member's outputs nor an earlier member's id.  The pattern id is
+        a content hash of the instruction-id sequence, so promotion is
+        reproducible across recognizer instances and runs.
+        """
+        _, _, window = occurrences[0]
+        components = [entry.instruction for entry in window]
+
+        producer_of: Dict[str, str] = {}
+        dataflow_edges: List[Tuple[str, str]] = []
+        produced_outputs: List[str] = []
+        external_inputs: List[str] = []
+
+        for position, entry in enumerate(window):
+            instruction = entry.instruction
+            earlier_ids = {
+                prior.instruction.id for prior in window[:position]
+            }
+            for dep in list(getattr(instruction, "dependencies", []) or []):
+                edge: Optional[Tuple[str, str]] = None
+                if dep in producer_of:
+                    edge = (producer_of[dep], instruction.id)
+                elif dep in earlier_ids:
+                    edge = (dep, instruction.id)
+                elif dep not in external_inputs:
+                    external_inputs.append(dep)
+                if edge is not None and edge not in dataflow_edges:
+                    dataflow_edges.append(edge)
+            for out in entry.output_keys:
+                if out not in producer_of:
+                    producer_of[out] = instruction.id
+                if out not in produced_outputs:
+                    produced_outputs.append(out)
+
+        pattern_id = "pattern_" + hashlib.sha256(
+            json.dumps(list(key)).encode()
+        ).hexdigest()[:12]
+        return DialoguePattern(
+            pattern_id=pattern_id,
+            components=[instruction.name for instruction in components],
+            frequency=len(occurrences),
+            success_rate=self._window_success_rate(occurrences),
+            context_requirements=set(external_inputs),
+            instruction_sequence=components,
+            dataflow_edges=dataflow_edges,
+            produced_outputs=produced_outputs,
+            external_inputs=external_inputs,
+        )
+
 class InstructionLearner:
     """Instruction learning and optimization system."""
     
@@ -264,6 +513,34 @@ class InstructionLearner:
         
         return templates
 
+    def learn_from_traces(self, traces: List[List[Any]]) -> List[InstructionTemplate]:
+        """Learn replayable instructions from execution traces.
+
+        Mirrors :meth:`learn_from_dialogues`, but mines recurring
+        contiguous instruction subsequences; each promoted template
+        carries its constituent sequence (with the dataflow edges
+        between its members), so the instruction built from it executes
+        by composite replay instead of refusing.
+
+        Args:
+            traces: List of traces; each trace is a list of per-step
+                records as produced by :func:`record_trace`.
+
+        Returns:
+            List[InstructionTemplate]: Promoted templates, in
+                deterministic promotion order.
+        """
+        patterns = self.pattern_recognizer.extract_instruction_patterns(traces)
+
+        templates: List[InstructionTemplate] = []
+        for pattern in patterns:
+            template = self._pattern_to_template(pattern)
+            if template:
+                self.instruction_templates[template.name] = template
+                templates.append(template)
+
+        return templates
+
     def _pattern_to_template(self, pattern: DialoguePattern) -> Optional[InstructionTemplate]:
         """Convert dialogue pattern to instruction template."""
         try:
@@ -285,32 +562,61 @@ class InstructionLearner:
                 type=instr_type,
                 params=params,
                 preconditions=preconditions,
-                postconditions=postconditions
+                postconditions=postconditions,
+                components=pattern.instruction_sequence,
+                dataflow_edges=pattern.dataflow_edges
             )
         except Exception:
             return None
 
     def _determine_instruction_type(self, pattern: DialoguePattern) -> InstructionType:
-        """Determine instruction type from pattern."""
-        # Add logic to determine instruction type
+        """Determine instruction type from pattern.
+
+        Trace-mined patterns replay a constituent sequence: the shared
+        type when every member agrees, otherwise CONTROL_FLOW (the type
+        the composite machinery uses for sequential composition).
+        Dialogue-mined patterns keep the existing LLM_INTERACTION
+        default.
+        """
+        sequence = pattern.instruction_sequence
+        if sequence:
+            types = {instruction.type for instruction in sequence}
+            if len(types) == 1:
+                return next(iter(types))
+            return InstructionType.CONTROL_FLOW
         return InstructionType.LLM_INTERACTION
 
     def _extract_parameters(self, pattern: DialoguePattern) -> Dict[str, Any]:
         """Extract parameters from pattern."""
         params = {}
-        # Add parameter extraction logic
+        # Trace mining derives no type information for the external
+        # inputs; they are captured as preconditions instead.
         return params
 
     def _generate_preconditions(self, pattern: DialoguePattern) -> List[str]:
-        """Generate preconditions from pattern."""
-        conditions = []
-        for req in pattern.context_requirements:
-            conditions.append(f"requires_{req}")
-        return conditions
+        """Generate preconditions from pattern.
+
+        Preconditions name the data keys the instruction requires.
+        Trace-mined patterns list their external inputs in mined
+        order; dialogue-mined patterns sort their context requirements
+        so promotion is reproducible across runs.
+        """
+        if pattern.external_inputs is not None:
+            return [f"requires_{req}" for req in pattern.external_inputs]
+        return [
+            f"requires_{req}"
+            for req in sorted(pattern.context_requirements)
+        ]
 
     def _generate_postconditions(self, pattern: DialoguePattern) -> List[str]:
-        """Generate postconditions from pattern."""
-        # Add postcondition generation logic
+        """Generate postconditions from pattern.
+
+        Trace-mined patterns declare every output name the mined
+        subsequence was observed to produce (first-seen order);
+        dialogue-mined patterns declare none.
+        """
+        if pattern.produced_outputs is not None:
+            return [f"produces_{out}" for out in pattern.produced_outputs]
         return []
 
     def create_instruction(self, template: InstructionTemplate) -> Instruction:
@@ -328,13 +634,25 @@ class InstructionLearner:
         # Create a new instruction class for this template
         class LearnedInstruction(Instruction):
             def __init__(self, template: InstructionTemplate):
+                declared_outputs = [
+                    post.removeprefix("produces_")
+                    for post in template.postconditions
+                ]
                 super().__init__(
                     id=f"learned_{template.name}",
                     name=template.name,
                     type=template.type,
                     params=template.params,
-                    description=f"Learned instruction from pattern {template.name}"
+                    description=f"Learned instruction from pattern {template.name}",
+                    cache_config=template.cache_config,
+                    parallel_config=template.parallel_config,
+                    outputs=declared_outputs,
                 )
+                self.template = template
+                self.components = (
+                    list(template.components) if template.components else []
+                )
+                self.dataflow_edges = list(template.dataflow_edges)
                 # Add conditions from template: a precondition named
                 # ``requires_X`` (or a bare parameter name) demands the
                 # parameter ``X`` be present in the input state.
@@ -350,14 +668,83 @@ class InstructionLearner:
                     )
 
             async def execute(self, input_params: Dict[str, Any]) -> Any:
-                # Implement execution logic
-                if not self.validate_types(input_params):
-                    raise TypeError("Invalid parameter types")
-                if not self.verify_conditions(input_params):
-                    raise ValueError("Preconditions not met")
-                
-                # Execute the learned behavior
-                # This would be implemented based on the pattern
-                return {"status": "executed", "params": input_params}
+                """Execute by composite replay of the mined subsequence.
 
-        return LearnedInstruction(template) 
+                When the template carries its constituent instruction
+                sequence, replay is plain sequential composition: the
+                components run in mined order against one shared
+                context built from the inputs (run_stream convention),
+                each component's dict outputs merge into that context,
+                and the keys the template's ``produces_X``
+                postconditions declare are returned.  Nothing smarter
+                happens -- no generalization beyond the recorded
+                subsequence.  A template mined without bodies refuses
+                to execute rather than silently no-opping.
+                """
+                start_time = time.time()
+                try:
+                    if not self.validate_types(input_params):
+                        raise TypeError("Invalid parameter types")
+
+                    # Shared replay context: the wrapped ``{"ctx": ...}``
+                    # convention when the caller uses it, the flat
+                    # parameter dict otherwise.  Copied, never mutated
+                    # in place for the caller.
+                    if isinstance(input_params.get("ctx"), dict):
+                        replay_ctx = dict(input_params["ctx"])
+                    else:
+                        replay_ctx = dict(input_params)
+
+                    # Preconditions speak about the data the sequence
+                    # consumes: the replay context, plus any sibling
+                    # parameters the caller passed alongside it.
+                    condition_state = {
+                        **{k: v for k, v in input_params.items() if k != "ctx"},
+                        **replay_ctx,
+                    }
+                    if not self.verify_conditions(condition_state):
+                        raise ValueError("Preconditions not met")
+
+                    if not self.components:
+                        raise NotImplementedError(
+                            f"Learned instruction '{self.name}' has no "
+                            "constituent instruction sequence to replay: "
+                            "its template was mined without execution "
+                            "bodies. Re-mine the pattern from instruction "
+                            "traces (InstructionLearner.learn_from_traces) "
+                            "to attach a replayable body."
+                        )
+
+                    produced: Dict[str, Any] = {}
+                    for component in self.components:
+                        result = await component.execute({"ctx": replay_ctx})
+                        if isinstance(result, dict):
+                            replay_ctx.update(result)
+                            produced.update(result)
+
+                    declared = [
+                        post.removeprefix("produces_")
+                        for post in self.template.postconditions
+                    ]
+                    if declared:
+                        missing = [
+                            key for key in declared if key not in replay_ctx
+                        ]
+                        if missing:
+                            raise RuntimeError(
+                                f"Learned instruction '{self.name}' failed "
+                                f"to produce declared output(s) {missing} "
+                                f"after replaying {len(self.components)} "
+                                "constituent instructions"
+                            )
+                        result_out = {key: replay_ctx[key] for key in declared}
+                    else:
+                        result_out = dict(produced)
+
+                    self._update_metrics(start_time, True)
+                    return result_out
+                except Exception:
+                    self._update_metrics(start_time, False)
+                    raise
+
+        return LearnedInstruction(template)

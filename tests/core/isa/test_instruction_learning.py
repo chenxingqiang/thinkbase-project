@@ -128,7 +128,7 @@ async def test_pattern_to_template_conversion(instruction_learner):
 
 @pytest.mark.asyncio
 async def test_learned_instruction_execution(instruction_learner, sample_dialogues):
-    """Test execution of learned instructions."""
+    """Learned instructions without constituent bodies refuse to execute."""
     # Learn from dialogues
     instruction_learner.learn_from_dialogues(sample_dialogues)
     
@@ -136,12 +136,13 @@ async def test_learned_instruction_execution(instruction_learner, sample_dialogu
     template = next(iter(instruction_learner.instruction_templates.values()))
     instruction = instruction_learner.create_instruction(template)
     
-    # Execute instruction
+    # Dialogue-mined templates carry no constituent instruction
+    # sequence, so executing the learned instruction must raise
+    # explicitly rather than silently no-op: composite replay needs a
+    # mined body (see test_learned_replay.py for the replay path).
     params = {"param1": "test", "param2": 42}
-    result = await instruction.execute(params)
-    assert isinstance(result, dict)
-    assert "status" in result
-    assert "params" in result
+    with pytest.raises(NotImplementedError, match="no constituent"):
+        await instruction.execute(params)
 
 def test_pattern_recognition_thresholds(pattern_recognizer):
     """Test pattern recognition thresholds."""

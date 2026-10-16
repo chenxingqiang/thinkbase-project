@@ -183,18 +183,136 @@ class AgenticTransformer:
                     return False
         return True
 
+    def validate_context(self, context: Dict[str, Any]) -> bool:
+        """Pre-execution validation of a single context state.
+
+        Complements :meth:`verify_context_preservation` (which checks a
+        *transition*) by checking one state *before* dispatch. Each
+        registered constraint whose key is present in ``context`` is
+        evaluated: two-argument pairwise predicates are applied
+        reflexively -- ``(value, value)`` -- so a state passes only if
+        it satisfies its own transition relation; single-argument
+        predicates are applied directly. Constraints whose key is
+        absent from ``context`` are vacuously satisfied, mirroring the
+        shipped preservation semantics (paper Section 3.2.3).
+        """
+        for name, constraint in self.context.constraints.items():
+            if name not in context:
+                continue
+            value = context[name]
+            try:
+                params = list(signature(constraint).parameters.values())
+                positional = [
+                    p for p in params
+                    if p.kind in (Parameter.POSITIONAL_ONLY,
+                                  Parameter.POSITIONAL_OR_KEYWORD)
+                ]
+                has_varargs = any(
+                    p.kind == Parameter.VAR_POSITIONAL for p in params
+                )
+            except (TypeError, ValueError):
+                return False
+            if has_varargs:
+                # Arity unknowable; try the pairwise form, fall back to
+                # the single-value form.
+                try:
+                    ok = constraint(value, value)
+                except TypeError:
+                    ok = constraint(value)
+            elif len(positional) >= 2:
+                ok = constraint(value, value)
+            else:
+                ok = constraint(value)
+            if not ok:
+                return False
+        return True
+
+@dataclass
+class AgentResponse:
+    """Canonical, provider-neutral response envelope (paper Section 3.2.3).
+
+    ``ModelAdapter.normalize_response`` folds provider-specific response
+    payloads into this form so downstream instruction code never branches
+    on provider syntax. ``raw`` always retains the unmodified payload.
+    """
+    content: Any = None
+    tool_calls: List[Any] = field(default_factory=list)
+    usage: Dict[str, Any] = field(default_factory=dict)
+    model: str = ""
+    raw: Any = None
+
 class ModelAdapter:
     """Cross-model compatibility adapter."""
-    
+
     def __init__(self, model_type: str):
         self.model_type = model_type
         self.transformations = {}
 
-    def register_transformation(self, source_type: str, 
+    def register_transformation(self, source_type: str,
                               target_type: str,
                               transform_func: Callable[[Any], Any]):
         """Register a type transformation between models."""
         self.transformations[(source_type, target_type)] = transform_func
+
+    def normalize_response(self, model_response: Any) -> AgentResponse:
+        """Normalize a provider-specific response into an AgentResponse.
+
+        Recognizes the two dominant wire shapes -- the Anthropic protocol
+        (``content`` blocks with ``usage.input_tokens``/``output_tokens``)
+        and the OpenAI protocol (``choices[0].message`` with
+        ``usage.prompt_tokens``/``completion_tokens``) -- and passes
+        anything else through with ``content`` taken from the first
+        common key present (``text``/``output``/``content``/``result``).
+        The canonical ``usage`` dict always exposes ``input_tokens`` and
+        ``output_tokens`` keys (copied from whichever protocol shape the
+        payload carries; absent otherwise). ``raw`` is never modified.
+        """
+        usage: Dict[str, Any] = {}
+        tool_calls: List[Any] = []
+        model = ""
+        if isinstance(model_response, dict):
+            raw_usage = model_response.get("usage") or {}
+            if not isinstance(raw_usage, dict):
+                raw_usage = {}
+            usage = dict(raw_usage)
+            if "input_tokens" not in usage and "prompt_tokens" in raw_usage:
+                usage["input_tokens"] = raw_usage["prompt_tokens"]
+            if "output_tokens" not in usage and "completion_tokens" in raw_usage:
+                usage["output_tokens"] = raw_usage["completion_tokens"]
+            model = model_response.get("model") or ""
+
+            if "choices" in model_response and isinstance(
+                    model_response["choices"], list) and model_response["choices"]:
+                # OpenAI-protocol shape
+                message = model_response["choices"][0].get("message", {})
+                content = message.get("content")
+                tool_calls = list(message.get("tool_calls") or [])
+            elif isinstance(model_response.get("content"), list):
+                # Anthropic-protocol shape: typed content blocks
+                blocks = model_response["content"]
+                texts = [b.get("text", "") for b in blocks
+                         if isinstance(b, dict) and b.get("type") == "text"]
+                content = "\n".join(texts) if texts else blocks
+                tool_calls = [b for b in blocks
+                              if isinstance(b, dict)
+                              and b.get("type") == "tool_use"]
+            else:
+                for key in ("text", "output", "content", "result"):
+                    if key in model_response:
+                        content = model_response[key]
+                        break
+                else:
+                    content = model_response
+        else:
+            content = model_response
+        return AgentResponse(
+            content=content,
+            tool_calls=tool_calls,
+            usage=usage,
+            model=model or self.model_type,
+            raw=model_response,
+        )
+
 
     def translate_instruction(self, instruction: Instruction) -> Dict[str, Any]:
         """Translate instruction to model-specific format."""
