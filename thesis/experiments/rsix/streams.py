@@ -21,7 +21,11 @@ from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 
-from agentflow.core.isa.instruction import Instruction, InstructionType as IsaType
+import numbers
+
+from agentflow.core.isa.instruction import (Instruction,
+                                             InstructionType as IsaType,
+                                             TypeConstraint)
 
 from . import data as data_mod
 from . import fidelity as fid
@@ -33,27 +37,56 @@ def _instruction(id: str, itype: IsaType, execute: Callable, *,
                  deps: List[str], outputs: List[str], side_effects: bool,
                  description: str = "",
                  post: Optional[Callable[[Dict[str, Any], Any],
-                                         Optional[str]]] = None
+                                         Optional[str]]] = None,
+                 dep_types: Optional[Dict[str, TypeConstraint]] = None
                  ) -> Instruction:
     """(p, self) -> result factory, mirroring the suites' pattern.
 
-    ``post`` (when given) is an invariant checker with signature
-    ``(ctx, result) -> None-or-violation-message``; ``None`` means the
-    postcondition holds.  Preconditions are the declared dataflow
-    itself (every dep must be present in ctx) and are verified through
-    the AgentISA-native ``verify_conditions``; postconditions are
-    registered in the instruction's native context record and enforced
-    by this wrapper at runtime -- the base class only auto-verifies
-    preconditions, so the wrapper is the documented evaluation point
-    for the post-state.
+    Three AgentISA layers are wired per instruction:
+
+    * ``T`` (types): ``dep_types`` maps dataflow edges to
+      ``TypeConstraint``s; they compose into ONE dependent type on the
+      ``ctx`` parameter (Def 3.2: the type of ctx depends on a
+      predicate over its contents) and are checked through the
+      AgentISA-native ``validate_types`` before execution.
+    * ``Phi-pre`` (preconditions): the declared dataflow itself --
+      every dep must be present in ctx -- verified through the native
+      ``verify_conditions``.
+    * ``Phi-post`` (postconditions): ``post`` is an invariant checker
+      with signature ``(ctx, result) -> None-or-violation-message``;
+      ``None`` means the postcondition holds.  Registered in the
+      native context record and enforced by this wrapper (the base
+      class only auto-verifies preconditions, so the wrapper is the
+      documented evaluation point for the post-state).
     """
+
+    dep_map = dict(dep_types or {})
 
     def _check_deps(state: Dict[str, Any]) -> bool:
         ctx = state.get("ctx", {})
         return all(d in ctx for d in deps)
 
+    def _ctx_typed(ctx: Dict[str, Any]) -> bool:
+        for d, tc in dep_map.items():
+            if d not in ctx or not _conforms(ctx[d], tc):
+                return False
+        return True
+
     class _Step(Instruction):
         async def execute(self, input_params: Dict[str, Any]) -> Any:
+            # T: the typed dataflow contract on ctx (native path).
+            if not self.validate_types(input_params):
+                ctx = input_params.get("ctx", {})
+                why = "ctx is not a dict"
+                for d, tc in dep_map.items():
+                    if d not in ctx:
+                        why = f"missing ctx key '{d}'"
+                        break
+                    if not _conforms(ctx[d], tc):
+                        why = f"ctx['{d}'] violates its type contract"
+                        break
+                raise RuntimeError(
+                    f"[{id}] type check failed: {why}")
             # Phi: precondition = declared dataflow is resolvable.
             if not self.verify_conditions(input_params):
                 missing = [d for d in deps
@@ -72,7 +105,9 @@ def _instruction(id: str, itype: IsaType, execute: Callable, *,
             self._update_metrics(start, True)
             return result
 
-    step = _Step(id=id, name=id, type=itype, params={},
+    step = _Step(id=id, name=id, type=itype,
+                 params={"ctx": TypeConstraint(dict,
+                                               dependent_on=_ctx_typed)},
                  description=description or id,
                  side_effects=side_effects, outputs=outputs)
     step.dependencies = list(deps)
@@ -84,6 +119,93 @@ def _instruction(id: str, itype: IsaType, execute: Callable, *,
             lambda state, _p=post: _p(state.get("ctx", {}), None) is None)
     step.sandbox = None
     return step
+
+
+def _conforms(value, tc: TypeConstraint) -> bool:
+    """Single-value form of the base class's validate_types logic."""
+    try:
+        if value is None:
+            return bool(tc.nullable)
+        if not isinstance(value, tc.base_type):
+            return False
+        if tc.dependent_on is not None and not tc.dependent_on(value):
+            return False
+        if tc.validation is not None and not tc.validation(value):
+            return False
+        return True
+    except Exception:
+        return False
+
+
+def _is_int_pair(v) -> bool:
+    return (isinstance(v, (tuple, list)) and len(v) == 2
+            and all(isinstance(x, numbers.Integral) for x in v))
+
+
+def _is_int_quad(v) -> bool:
+    return (isinstance(v, (tuple, list)) and len(v) == 4
+            and isinstance(v[0], numbers.Integral)
+            and isinstance(v[1], numbers.Integral)
+            and isinstance(v[2], numbers.Real)
+            and isinstance(v[3], numbers.Real))
+
+
+# Shared edge contracts: each declared dependency of a step carries a
+# TypeConstraint -- Def 3.2's dependent types realized as predicates
+# over the value flowing on that dataflow edge.
+T_INTERACTIONS = TypeConstraint(
+    list, dependent_on=lambda v: all(_is_int_pair(t) for t in v))
+T_SEQUENCES = TypeConstraint(
+    dict, dependent_on=lambda v: all(
+        isinstance(k, numbers.Integral)
+        and isinstance(seq, list)
+        and all(isinstance(i, numbers.Integral) for i in seq)
+        for k, seq in v.items()))
+T_TEST_MAP = TypeConstraint(
+    dict, dependent_on=lambda v: all(
+        isinstance(k, numbers.Integral) and isinstance(i, numbers.Integral)
+        for k, i in v.items()))
+T_POP = TypeConstraint(
+    np.ndarray, dependent_on=lambda v: v.ndim == 1 and v.size > 0
+    and bool(np.all(np.isfinite(v))) and bool(np.all(v >= 0)))
+def _gate_fitted(g) -> bool:
+    """Total predicate: a fitted gate carries a positive 1-D real
+    distribution over strata.  Never raises, including on the
+    constructed-but-unfitted gate (real_dist is None)."""
+    if not (hasattr(g, "real_dist") and hasattr(g, "score_and_filter")):
+        return False
+    rd = getattr(g, "real_dist", None)
+    if rd is None:
+        return False
+    try:
+        arr = np.asarray(rd)
+        return arr.ndim == 1 and arr.dtype.kind in "fi" \
+            and float(arr.sum()) > 0.0
+    except Exception:
+        return False
+
+
+T_GATE = TypeConstraint(object, dependent_on=_gate_fitted)
+T_CANDIDATES = TypeConstraint(
+    list, dependent_on=lambda v: all(_is_int_quad(t) for t in v))
+T_ADMITTED = TypeConstraint(
+    list, dependent_on=lambda v: all(_is_int_pair(t) for t in v))
+T_GATE_STATS = TypeConstraint(
+    dict, dependent_on=lambda st: (
+        isinstance(st.get("n_candidates"), numbers.Integral)
+        and isinstance(st.get("n_admitted"), numbers.Integral)))
+T_METRICS = TypeConstraint(
+    dict, dependent_on=lambda m: all(
+        isinstance(m.get(k), numbers.Real) and 0.0 <= m[k] <= 1.0
+        for k in ("ndcg@10", "hr@10")))
+T_MODEL = TypeConstraint(
+    object, dependent_on=lambda m: callable(getattr(m, "fit", None))
+    and callable(getattr(m, "rank", None)))
+T_MIXBOOK = TypeConstraint(
+    dict, dependent_on=lambda b: (
+        isinstance(b.get("real_events"), numbers.Integral)
+        and isinstance(b.get("synthetic_events"), numbers.Integral)
+        and b["real_events"] >= 0 and b["synthetic_events"] >= 0))
 
 
 def check_gate_invariant(variant: str, eps: float, rkey: str):
@@ -185,7 +307,8 @@ def build_experiment_stream(config: Dict[str, Any],
                                         "pop", "n_users"],
         side_effects=False,
         description="Leave-one-out split + item popularity",
-        post=_split_post))
+        post=_split_post,
+        dep_types={"interactions": T_INTERACTIONS}))
 
     def _fit_gate(p, s):
         gate = fid.FidelityGate(
@@ -208,7 +331,8 @@ def build_experiment_stream(config: Dict[str, Any],
         "fit_fidelity_gate", IsaType.CONTROL_FLOW, _fit_gate,
         deps=["pop"], outputs=["gate"], side_effects=False,
         description="Fit popularity strata + real distribution",
-        post=_gate_fit_post))
+        post=_gate_fit_post,
+        dep_types={"pop": T_POP}))
 
     # ---- per-round closed loop -----------------------------------------
     for r in range(rounds + 1):
@@ -248,7 +372,8 @@ def build_experiment_stream(config: Dict[str, Any],
                                              "last_model"],
             side_effects=False,
             description=f"Round {r}: train + evaluate",
-            post=_train_post))
+            post=_train_post,
+            dep_types={"train": T_SEQUENCES, "test": T_TEST_MAP}))
 
         if r == rounds:
             break
@@ -299,7 +424,8 @@ def build_experiment_stream(config: Dict[str, Any],
             deps=["last_model", "train"], outputs=["candidates"],
             side_effects=False,
             description=f"Round {r}: model self-generates candidates",
-            post=_gen_post))
+            post=_gen_post,
+            dep_types={"last_model": T_MODEL, "train": T_SEQUENCES}))
 
         def _gate(p, s, r=r, rkey=rkey):
             ctx = p["ctx"]
@@ -347,7 +473,9 @@ def build_experiment_stream(config: Dict[str, Any],
             side_effects=False,
             description=f"Round {r}: fidelity gate over candidates",
             post=check_gate_invariant(variant, config.get("eps", 0.08),
-                                      rkey)))
+                                      rkey),
+            dep_types={"candidates": T_CANDIDATES,
+                       "gate": T_GATE, "pop": T_POP}))
 
         def _mix(p, s, r=r, rkey=rkey):
             ctx = p["ctx"]
@@ -366,7 +494,10 @@ def build_experiment_stream(config: Dict[str, Any],
             deps=["train", f"admitted_{rkey}", "gate"],
             outputs=["train", "last_mix"], side_effects=False,
             description=f"Round {r}: mix real + synthetic training data",
-            post=check_mix_invariant(rkey)))
+            post=check_mix_invariant(rkey),
+            dep_types={"train": T_SEQUENCES,
+                       f"admitted_{rkey}": T_ADMITTED,
+                       "gate": T_GATE}))
 
     def _write(p, s):
         ctx = p["ctx"]
@@ -402,11 +533,15 @@ def build_experiment_stream(config: Dict[str, Any],
             return f"report sha256 contract broken: {sha!r}"
         return None
 
+    _write_types = {f"metrics_r{r}": T_METRICS for r in range(rounds + 1)}
+    _write_types.update({f"gate_stats_r{r}": T_GATE_STATS
+                         for r in range(rounds)})
+    _write_types["last_mix"] = T_MIXBOOK
     stream.append(_instruction(
         "write_results", IsaType.STATE_MANAGEMENT, _write,
         deps=_write_deps, outputs=[], side_effects=True,
         description="Persist the round-by-round history",
-        post=_write_post))
+        post=_write_post, dep_types=_write_types))
     return stream
 
 
