@@ -144,14 +144,14 @@ executes the real compiler, cache, and optimization-manager code paths
 against a mock LLM backend that counts simulated API calls and charges a
 fixed 80 ms simulated latency per call. On synthetic Zipf-distributed
 workloads (2,000 tasks, 5 random seeds), result caching reduces
-simulated API calls by 59.5\%\$\pm\(0.3%, 67.9%
-\)\pm\(0.2%, and 79.6%
-\)\pm\(0.5% at Zipf exponents 0.5, 1.0, and 1.5, respectively. Static compilation reduces the effective instruction count by 34.2%
-\)\pm\(1.8% (sequence length 200; 35.4%
-\)\pm\(1.6% at length 1,000), with an ablation attributing 21.9%
-\)\pm\(3.5% to fusion alone and 24.1%
-\)\pm\(3.3% to dead-code elimination alone. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%
-\)\pm\$4.6\%. Two live-gateway experiments extend the validation beyond
+simulated API calls by 59.5\% \(\pm\) 0.3\%, 67.9\% \(\pm\) 0.2\%, and
+79.6\% \(\pm\) 0.5\% at Zipf exponents 0.5, 1.0, and 1.5, respectively.
+Static compilation reduces the effective instruction count by 34.2\%
+\(\pm\) 1.8\% (sequence length 200; 35.4\% \(\pm\) 1.6\% at length
+1,000), with an ablation attributing 21.9\% \(\pm\) 3.5\% to fusion
+alone and 24.1\% \(\pm\) 3.3\% to dead-code elimination alone. Dynamic
+hot-path optimization shrinks repeatedly executed traces by 65.8\%
+\(\pm\) 4.6\%. Two live-gateway experiments extend the validation beyond
 the mock: a scaled-down caching run (200 tasks, one seed, one model;
 1,040 real round trips) reproduces exactly the computed cache hit/miss
 statistics at every skew level and converts avoided calls into measured
@@ -217,11 +217,11 @@ resulting threats to validity.
   workload skew increases
 \item
   Static compilation (fusion + dead-code elimination) reduces the
-  effective instruction count by 34.2\%\$\pm\$1.8\%, validated by a
+  effective instruction count by 34.2\% \(\pm\) 1.8\%, validated by a
   per-pass ablation
 \item
   Dynamic hot-path optimization shrinks repeatedly executed traces by
-  65.8\%\$\pm\$4.6\%
+  65.8\% \(\pm\) 4.6\%
 \item
   Agentic Calling lifts provider-specific function calling into
   reusable, portable agent instructions
@@ -390,18 +390,19 @@ compilable artifact. Our contributions are:
   \textbf{An empirical evaluation} of the implemented system on
   synthetic Zipf-distributed workloads, reporting simulated API-call
   reduction from caching (59.5--79.6\% depending on skew), effective
-  instruction-count reduction from static compilation
-  (34.2\%\$\pm\(1.8% at sequence length 200), and trace shrinkage from dynamic optimization (65.8%
-  \)\pm\$4.6\%), each over 5 random seeds with full methodology
-  disclosure; two live-gateway experiments (Sections 5.7-5.7.1) in which
-  the cache reproduces the computed hit/miss statistics with measured
-  wall-clock and token savings, and the compiled, hot-path-adopted
-  stream issues zero redundant live calls with byte-identical artifacts,
-  with a MODELED-on-measured pricing comparison; and a four-task,
-  four-shape system-level workload characterization (Sections 5.2-5.8)
-  that composes static compilation, cached repeated execution,
-  closed-loop hot-path adoption, and byte-identical re-execution on
-  realistic (non-synthetic) instruction streams.
+  instruction-count reduction from static compilation (34.2\% \(\pm\)
+  1.8\% at sequence length 200), and trace shrinkage from dynamic
+  optimization (65.8\% \(\pm\) 4.6\%), each over 5 random seeds with
+  full methodology disclosure; two live-gateway experiments (Sections
+  5.7-5.7.1) in which the cache reproduces the computed hit/miss
+  statistics with measured wall-clock and token savings, and the
+  compiled, hot-path-adopted stream issues zero redundant live calls
+  with byte-identical artifacts, with a MODELED-on-measured pricing
+  comparison; and a four-task, four-shape system-level workload
+  characterization (Sections 5.2-5.8) that composes static compilation,
+  cached repeated execution, closed-loop hot-path adoption, and
+  byte-identical re-execution on realistic (non-synthetic) instruction
+  streams.
 \item
   \textbf{Multi-agent coordination infrastructure} with capability-based
   agent selection, execution planning, fallback strategies, and a
@@ -1322,9 +1323,9 @@ Static optimization employs several techniques:
 
 \begin{verbatim}
 Combine Rules {
-  LOAD followed by STORE $\rightarrow$ MOVE
-  Multiple CONTEXT_UPDATE $\rightarrow$ Single UPDATE
-  Sequential QUERY $\rightarrow$ Batch QUERY
+  LOAD followed by STORE → MOVE
+  Multiple CONTEXT_UPDATE → Single UPDATE
+  Sequential QUERY → Batch QUERY
 }
 \end{verbatim}
 \end{enumerate}
@@ -2005,11 +2006,10 @@ Where reported
 \endlastfoot
 Result caching & 59.5\%--79.6\% reduction in simulated API calls,
 increasing with Zipf skew & Section 5.2 \\
-Static compilation (fusion + DCE) &
-34.2\%\$\pm\(1.8% reduction in effective instruction count (length-200 sequences) | Section 5.3    |
-| Dynamic hot-path optimization | 65.8%
-\)\pm\$4.6\% trace shrinkage on repeatedly executed traces & Section
-5.4 \\
+Static compilation (fusion + DCE) & 34.2\% \(\pm\) 1.8\% reduction in
+effective instruction count (length-200 sequences) & Section 5.3 \\
+Dynamic hot-path optimization & 65.8\% \(\pm\) 4.6\% trace shrinkage on
+repeatedly executed traces & Section 5.4 \\
 \end{longtable}
 }
 
@@ -2251,7 +2251,7 @@ Dispatch count
 \item
   \textbf{Gains are stable across sequence lengths}: 32.8\%, 34.2\%,
   35.4\% at lengths 50, 200, 1,000 respectively, with the tightest
-  variance at length 1,000 (\$\pm\$1.6\%). Length does not materially
+  variance at length 1,000 (\(\pm\) 1.6\%). Length does not materially
   change the opportunity structure of these synthetic sequences.
 \end{enumerate}
 
@@ -2600,8 +2600,8 @@ realizations 1-6 executed the full seven-instruction stream,
 realizations 7-50 the shrunken six-instruction form with
 \texttt{check\_format} eliminated --- 306 instruction executions against
 arm (a)'s 350, a 12.6\% reduction in executed instructions attributable
-to compilation and hot-path adoption (the per-stream shrink is 14.3\%,
-7\$\rightarrow\$6; the realized saving is diluted by the six full-form
+to compilation and hot-path adoption (the per-stream shrink is 14.3\%, 7
+\(\rightarrow\) 6; the realized saving is diluted by the six full-form
 realizations before adoption) and reported separately from the cache's
 call savings. Static compilation of the same stream: NONE 7
 \(\rightarrow\) AGGRESSIVE 6 effective instructions, dataflow preserved.
@@ -3104,7 +3104,7 @@ Directions}\label{future-research-directions}
 \begin{verbatim}
 Type Capability = {
   Basic: {Perception, Action, Memory}
-  Composite: Basic $\rightarrow$ Basic
+  Composite: Basic → Basic
   Emergent: P(Composite)
 }
 \end{verbatim}
@@ -3156,8 +3156,8 @@ function OPTIMIZE-CONTEXT(I, C)
     Let M be a context-performance model, R the rewrite rules
     for each context c in C do
         if PREDICT-PERFORMANCE(M, I, c) < THRESHOLD then
-            candidates $\leftarrow$ GENERATE-VARIANTS(I, R)
-            I $\leftarrow$ SELECT-BEST(candidates, c)
+            candidates ← GENERATE-VARIANTS(I, R)
+            I ← SELECT-BEST(candidates, c)
             UPDATE-MODEL(M, I, c)
         end if
     end for
@@ -3205,9 +3205,8 @@ Bounds}\label{theoretical-performance-bounds}
   R(i) = \alpha C_{cpu}(i) + \beta C_{mem}(i) + \gamma C_{io}(i)
   \]
 
-  where \(\alpha\), \(\beta\), \(\gamma\) are platform-specific
-  coefficients that should be fitted against real deployments rather
-  than assumed.
+  where α, β, γ are platform-specific coefficients that should be fitted
+  against real deployments rather than assumed.
 \end{enumerate}
 
 \subsubsection{Capability Assessment:
@@ -3335,24 +3334,23 @@ microbenchmark suite drives the real compiler, cache, and optimizer
 against a mock LLM backend on synthetic Zipf workloads, over 5 seeds per
 configuration. Under these conditions, result caching reduces simulated
 API calls by 59.5--79.6\% (increasing with workload skew), static
-compilation reduces the effective instruction count by
-34.2\%\$\pm\(1.8% (with an ablation attributing 21.9%
-\)\pm\(3.5% to fusion and 24.1%
-\)\pm\(3.3% to dead-code elimination), and dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%
-\)\pm\$4.6\%. The multi-agent layer is validated by 43 passing
-functional tests. We have been explicit throughout about what these
-results are not: the Section 5.2-5.5 figures are microbenchmark evidence
-on synthetic workloads, not production end-to-end measurements. The
-Section 5.7 run against a live gateway validates the caching mechanism
-end-to-end and measures real wall-clock and token savings at reduced
-scale, but dollar-cost, throughput, and availability claims remain out
-of scope. Section 5.7.1 extends the live-gateway validation to
-compilation and hot-path adoption (zero redundant live calls,
-byte-identical artifacts, and a MODELED-on-measured priced comparison
-that is explicitly not a dollar-savings claim), and Section 5.8's
-four-task, four-shape characterization shows the composition behavior is
-not an artifact of one stream's structure (12.5--25.0\% per-task compile
-shrink).
+compilation reduces the effective instruction count by 34.2\% \(\pm\)
+1.8\% (with an ablation attributing 21.9\% \(\pm\) 3.5\% to fusion and
+24.1\% \(\pm\) 3.3\% to dead-code elimination), and dynamic hot-path
+optimization shrinks repeatedly executed traces by 65.8\% \(\pm\) 4.6\%.
+The multi-agent layer is validated by 43 passing functional tests. We
+have been explicit throughout about what these results are not: the
+Section 5.2-5.5 figures are microbenchmark evidence on synthetic
+workloads, not production end-to-end measurements. The Section 5.7 run
+against a live gateway validates the caching mechanism end-to-end and
+measures real wall-clock and token savings at reduced scale, but
+dollar-cost, throughput, and availability claims remain out of scope.
+Section 5.7.1 extends the live-gateway validation to compilation and
+hot-path adoption (zero redundant live calls, byte-identical artifacts,
+and a MODELED-on-measured priced comparison that is explicitly not a
+dollar-savings claim), and Section 5.8's four-task, four-shape
+characterization shows the composition behavior is not an artifact of
+one stream's structure (12.5--25.0\% per-task compile shrink).
 
 AgentISA's longer-term significance is architectural: by giving agent
 behavior an instruction-level contract, it makes agent systems amenable
@@ -3613,7 +3611,7 @@ sequence \(\hat{P}\) started in state \(s_\sigma\):
   and \(P_2\), each branch simulates its WHILE counterpart.
 \item
   \textbf{Loop.} The WHILE unfolding identity
-  \texttt{while\ x\ \$\textbackslash{}neq\$\ 0\ do\ P\ \$\textbackslash{}equiv\$\ if\ x\ =\ 0\ then\ skip\ else\ (P\ ;\ while\ x\ \$\textbackslash{}neq\$\ 0\ do\ P)}
+  \texttt{while\ x\ ≠\ 0\ do\ P\ ≡\ if\ x\ =\ 0\ then\ skip\ else\ (P\ ;\ while\ x\ ≠\ 0\ do\ P)}
   is simulated by the \texttt{loop} instruction's iteration: each
   iteration loads \(x\) and executes the trailing \texttt{branch}, which
   dispatches to \(\hat{P}\) when \(x \neq 0\) and to \(\epsilon\) (loop

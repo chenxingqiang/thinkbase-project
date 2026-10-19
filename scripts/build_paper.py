@@ -62,6 +62,21 @@ UNICODE_TO_MATH = {
 }
 
 
+def space_math_edges(part: str) -> str:
+    """Guard pandoc's tex_math_dollars rule: a closing $ must not be
+    followed by a digit.  When a converted $\\pm$-style wrapper is glued
+    to a digit (``59.5%$\\pm$0.3%``), pandoc refuses the pairing, demotes
+    the dollars to literal ``\\$``, and swallows surrounding text into
+    math spans where ``%`` turns into a line-eating LaTeX comment -- this
+    silently corrupted the PDF abstract as ``59.5%$±0.3±0.2...`` with
+    every headline number between the ±values deleted.  Insert protective
+    spaces whenever a converted wrapper is glued to a digit on either
+    edge (also normalises typography to ``59.5% ± 0.3%``)."""
+    part = re.sub(r"(\$\\[A-Za-z]+\$)(?=[0-9])", r"\1 ", part)
+    part = re.sub(r"(?<=[0-9%])(\$\\[A-Za-z]+\$)", r" \1", part)
+    return part
+
+
 def replace_text_unicode(md: str) -> str:
     """Apply UNICODE_TO_MATH outside fenced code blocks."""
     parts = re.split(r"(^```.*?$)", md, flags=re.M | re.S)
@@ -74,9 +89,18 @@ def replace_text_unicode(md: str) -> str:
         if in_code:
             out.append(part)
             continue
-        for ch, tex in UNICODE_TO_MATH.items():
-            part = part.replace(ch, tex)
-        out.append(part)
+        # Inline code spans (`...`) are typeset verbatim, so Unicode math
+        # inside them must stay literal (rendered by the mono font) rather
+        # than being wrapped in $...$, which would display as literal
+        # "$\neq$" text in the PDF.
+        segs = re.split(r"(`[^`\n]*`)", part)
+        for j, seg in enumerate(segs):
+            if seg.startswith("`"):
+                continue
+            for ch, tex in UNICODE_TO_MATH.items():
+                seg = seg.replace(ch, tex)
+            segs[j] = space_math_edges(seg)
+        out.append("".join(segs))
     return "".join(out)
 
 
@@ -151,6 +175,17 @@ def build_body_md(text: str) -> tuple[str, str]:
 
     body_md = replace_text_unicode(body_md)
     abstract_tex_md = replace_text_unicode(abstract)
+
+    # A closing math $ glued to a digit makes pandoc mispair the dollars
+    # and silently ship a corrupted PDF (see space_math_edges).  Fail the
+    # build loudly instead of discovering it in the rendered abstract.
+    for _name, _text in (("body", body_md), ("abstract", abstract_tex_md)):
+        _m = re.search(r"\$\\[A-Za-z]+\$[0-9]", _text)
+        if _m:
+            raise SystemExit(
+                f"FATAL: {_name}: math dollar glued to digit would "
+                f"mispair pandoc math: {_m.group(0)!r}"
+            )
 
     yaml = (
         "---\n"
@@ -227,7 +262,9 @@ def main() -> int:
     if log.exists():
         problems = [
             ln for ln in log.read_text(errors="replace").splitlines()
-            if "Missing character" in ln or "Overfull \\hbox" in ln
+            if ("Missing character" in ln or "Overfull \\hbox" in ln
+                or "Missing $ inserted" in ln
+                or "Undefined control sequence" in ln)
         ]
         for ln in problems[:15]:
             print("WARN:", ln.strip())
