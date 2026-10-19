@@ -120,59 +120,39 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Large Language Models (LLMs) are increasingly deployed as autonomous
-agents, yet their behaviors are typically orchestrated through ad-hoc
-prompt engineering and per-provider function-calling interfaces. This
-makes agent behavior difficult to specify, analyze, and optimize
-systematically. We present AgentISA, an instruction set architecture for
-LLM-powered agents that treats agent behavior as a first-class
-compilable artifact. AgentISA contributes: (1) a formal instruction set
-with compositional semantics, a type system, and pre/post-conditions,
-checked for pure instructions by a shipped bounded verification checker
-and enforced per dispatch by the runtime; (2) an Agentic Calling
-mechanism that lifts provider-specific function calling into reusable,
-cacheable agent instructions; (3) an automatic instruction learning
-system that mines recurring instruction patterns from interaction traces
-and promotes them as executable composite-replay instructions; and (4) a
-compiler and runtime applying classical optimization
-techniques---instruction fusion, dead-code elimination, pipeline
+Large Language Models are increasingly deployed as autonomous agents,
+yet their behavior is orchestrated through ad-hoc prompt engineering and
+per-provider function calling, making it difficult to specify, analyze,
+and optimize systematically. We present AgentISA, an instruction set
+architecture that treats agent behavior as a first-class compilable
+artifact: (1) a formal instruction set with compositional semantics, a
+type system, and pre/post-conditions---checked for pure instructions by
+a shipped bounded verification checker and enforced per dispatch by the
+runtime; (2) Agentic Calling, lifting provider-specific function calling
+into reusable, cacheable instructions; (3) instruction learning that
+mines recurring patterns from traces and promotes them as
+composite-replay instructions; and (4) a compiler and runtime applying
+classical optimization---fusion, dead-code elimination, pipeline
 scheduling, and dynamic hot-path specialization---to agent instruction
 streams.
 
-We evaluate AgentISA with a reproducible microbenchmark suite that
-executes the real compiler, cache, and optimization-manager code paths
-against a mock LLM backend that counts simulated API calls and charges a
-fixed 80 ms simulated latency per call. On synthetic Zipf-distributed
-workloads (2,000 tasks, 5 random seeds), result caching reduces
-simulated API calls by 59.5\% \(\pm\) 0.3\%, 67.9\% \(\pm\) 0.2\%, and
-79.6\% \(\pm\) 0.5\% at Zipf exponents 0.5, 1.0, and 1.5, respectively.
-Static compilation reduces the effective instruction count by 34.2\%
-\(\pm\) 1.8\% (sequence length 200; 35.4\% \(\pm\) 1.6\% at length
-1,000), with an ablation attributing 21.9\% \(\pm\) 3.5\% to fusion
-alone and 24.1\% \(\pm\) 3.3\% to dead-code elimination alone. Dynamic
-hot-path optimization shrinks repeatedly executed traces by 65.8\%
-\(\pm\) 4.6\%. Two live-gateway experiments extend the validation beyond
-the mock: a scaled-down caching run (200 tasks, one seed, one model;
-1,040 real round trips) reproduces exactly the computed cache hit/miss
-statistics at every skew level and converts avoided calls into measured
-wall-clock and token savings; and a compilation/hot-path run (50
-realizations) shows the compiled, hot-path-adopted stream issuing zero
-redundant live calls and reproducing every artifact byte-for-byte, with
-a MODELED-on-measured priced comparison in which the result cache cuts
-modeled cost by 56\% on this run's completion-heavy token mix versus
-3.3\% for a modeled provider prompt cache. A four-task, four-shape
-system-level workload characterization (linear, fan-out, wide-fan-in,
-and two-branch-convergence streams; 12 repeated realizations each) shows
-uniform result-cache reuse and closed-loop hot-path adoption across
-dependency shapes, with per-task compile shrink of 12.5--25.0\%
-calibrating the synthetic headline and byte-identical re-execution
-throughout. A suite of 43 multi-agent coordination and security tests
-provides functional validation of role assignment, capability-based
-agent selection, barrier synchronization, and
-authentication/authorization monitoring. We position these results
-honestly as controlled-setting evidence on synthetic and seed-controlled
-workloads---not as production end-to-end measurements---and discuss the
-resulting threats to validity.
+We evaluate AgentISA on three fronts. A reproducible microbenchmark
+suite drives the real compiler, cache, and optimizer against a mock LLM
+backend: result caching reduces simulated API calls by 59.5--79.6\% on
+synthetic Zipf workloads (2,000 tasks, 5 seeds), growing with skew;
+static compilation reduces the effective instruction count by 34.2\%
+(35.4\% at sequence length 1,000), split between fusion and dead-code
+elimination by ablation; dynamic hot-path optimization shrinks
+repeatedly executed traces by 65.8\%. Two live-gateway experiments
+extend the validation beyond the mock: the cache reproduces the computed
+hit/miss statistics at every skew level and converts avoided calls into
+measured wall-clock and token savings, and the compiled,
+hot-path-adopted stream issues zero redundant live calls with
+byte-identical artifacts. A four-task system-level characterization
+(12.5--25.0\% per-task compile shrink) calibrates the synthetic
+headline, and 43 multi-agent coordination and security tests provide
+functional validation. We position these results honestly as
+controlled-setting evidence, not as production end-to-end measurements.
 \end{abstract}
 
 \section*{Keywords}\label{keywords}
@@ -226,18 +206,13 @@ resulting threats to validity.
   Agentic Calling lifts provider-specific function calling into
   reusable, portable agent instructions
 \item
-  Two live-gateway experiments (Sections 5.7-5.7.1): the cache
-  reproduces the computed hit/miss statistics, converting avoided calls
-  into measured wall-clock (14--46\% of the no-cache arm) and token
-  savings; and the compiled, hot-path-adopted stream issues zero
-  redundant live calls with byte-identical artifacts, with a
-  MODELED-on-measured priced comparison
+  Live-gateway spot checks (Sections 5.7--5.7.1): observed cache hit
+  rates match the computed expectation exactly, and the compiled,
+  hot-path-adopted stream issues zero redundant live calls with
+  byte-identical artifacts
 \item
-  A four-task, four-shape system-level workload characterization
-  (Section 5.8) shows 12.5--25.0\% per-task compile shrink with
-  byte-identical re-execution, and the shipped bounded checker verifies
-  pure instructions against Definition 3.5 while learned instructions
-  execute by composite replay
+  A four-task system-level characterization calibrates the synthetic
+  headline (12.5--25.0\% per-task compile shrink, Section 5.8)
 \end{enumerate}
 
 \section*{CCS Concepts}\label{ccs-concepts}
@@ -359,13 +334,13 @@ compilable artifact. Our contributions are:
 \item
   \textbf{A formal instruction set} for LLM agents with compositional
   semantics, a type system, and pre/post-conditions on every instruction
-  (Section 3.1), carrying two deliberately modest sanity results that we
-  state as design rationale rather than headline novelty: Turing
-  completeness (Theorem 3.1), read as negative certification that the
-  instruction set does not constrain expressiveness, and type safety for
-  the pure core (Theorem 3.2), which fixes the well-formedness
-  obligation that the runtime enforces and the bounded checker of
-  Section 3.3.3 extends to executed instructions.
+  (Section 3.1). Two deliberately modest sanity results are stated as
+  design rationale rather than headline novelty: Turing completeness
+  (Theorem 3.1), read as negative certification that the instruction set
+  does not constrain expressiveness, and type safety for the pure core
+  (Theorem 3.2), which fixes the well-formedness obligation that the
+  runtime enforces and the bounded checker of Section 3.3.3 extends to
+  executed instructions.
 \item
   \textbf{Agentic Calling}, a mechanism that lifts provider-specific
   function calling into reusable, cacheable, semantically specified
@@ -387,22 +362,17 @@ compilable artifact. Our contributions are:
   4), with semantic-preservation arguments for each transformation
   (Theorems 3.4--3.6, proofs in Appendix C).
 \item
-  \textbf{An empirical evaluation} of the implemented system on
-  synthetic Zipf-distributed workloads, reporting simulated API-call
-  reduction from caching (59.5--79.6\% depending on skew), effective
-  instruction-count reduction from static compilation (34.2\% \(\pm\)
-  1.8\% at sequence length 200), and trace shrinkage from dynamic
-  optimization (65.8\% \(\pm\) 4.6\%), each over 5 random seeds with
-  full methodology disclosure; two live-gateway experiments (Sections
-  5.7-5.7.1) in which the cache reproduces the computed hit/miss
-  statistics with measured wall-clock and token savings, and the
-  compiled, hot-path-adopted stream issues zero redundant live calls
-  with byte-identical artifacts, with a MODELED-on-measured pricing
-  comparison; and a four-task, four-shape system-level workload
-  characterization (Sections 5.2-5.8) that composes static compilation,
-  cached repeated execution, closed-loop hot-path adoption, and
-  byte-identical re-execution on realistic (non-synthetic) instruction
-  streams.
+  \textbf{An empirical evaluation} of the implemented system, with full
+  methodology disclosure. On synthetic Zipf-distributed workloads (5
+  random seeds each), caching reduces simulated API calls by
+  59.5--79.6\% depending on skew, static compilation reduces the
+  effective instruction count by 34.2\% \(\pm\) 1.8\% (sequence length
+  200), and dynamic optimization shrinks repeatedly executed traces by
+  65.8\% \(\pm\) 4.6\%. Two live-gateway experiments (Sections
+  5.7--5.7.1) validate the cache and the compiled pipeline against a
+  real LLM gateway, and a four-task system-level characterization
+  (Section 5.8) composes the mechanisms on realistic (non-synthetic)
+  instruction streams.
 \item
   \textbf{Multi-agent coordination infrastructure} with capability-based
   agent selection, execution planning, fallback strategies, and a
@@ -411,14 +381,11 @@ compilable artifact. Our contributions are:
   Section 5.6), validated by 43 passing functional tests.
 \end{enumerate}
 
-We deliberately scope our empirical claims: the microbenchmark results
-exercise the real \texttt{agentflow.core.isa} implementation against a
-mock LLM backend on synthetic workloads; the live-gateway experiments of
-Sections 5.7-5.7.1 and the system-level characterization of Section 5.8
-extend them at reduced scale on realistic streams. None of these
-constitute production end-to-end measurements; they establish that the
-optimizations are real and measurable in controlled and live-gateway
-settings, and we discuss these limitations explicitly in Section 5.9.
+Our empirical claims are scoped accordingly: Sections 5.2--5.5 exercise
+the real \texttt{agentflow.core.isa} implementation against a mock LLM
+backend on synthetic workloads, and Sections 5.7--5.8 extend the
+validation at reduced scale on realistic streams. None of these are
+production end-to-end measurements (threats to validity in Section 5.9).
 
 The rest of this paper is organized as follows: Section 2 reviews
 related work. Section 3 details the design of AgentISA. Section 4
@@ -935,27 +902,26 @@ Interface ModelAdapter {
 }
 \end{verbatim}
 
-All three interface operations ship: \texttt{translate} as
+All three interface operations ship. \texttt{translate} is
 \texttt{ModelAdapter.translate\_instruction} (with registered type
-transformations); \texttt{normalize} as
+transformations). \texttt{normalize} is
 \texttt{ModelAdapter.normalize\_response}, which folds the two dominant
-wire shapes --- the Anthropic protocol (typed \texttt{content} blocks
-with \texttt{usage.input\_tokens}/\texttt{output\_tokens}) and the
-OpenAI protocol (\texttt{choices{[}0{]}.message} with
-\texttt{usage.prompt\_tokens}/\texttt{completion\_tokens}) --- into a
+wire shapes---the Anthropic protocol (typed \texttt{content} blocks with
+\texttt{usage.input\_tokens}/\texttt{output\_tokens}) and the OpenAI
+protocol (\texttt{choices{[}0{]}.message} with
+\texttt{usage.prompt\_tokens}/\texttt{completion\_tokens})---into a
 canonical \texttt{AgentResponse} envelope (content, tool calls, usage,
 model, raw), so downstream instruction code never branches on provider
-syntax; and \texttt{validateContext} as
+syntax. \texttt{validateContext} is
 \texttt{AgenticTransformer.validate\_context}, the pre-execution
 complement of the shipped post-hoc
-\texttt{verify\_context\_preservation(before,\ after)} --- it evaluates
-the registered context constraints against a single state before
-dispatch, applying two-argument pairwise predicates reflexively,
-\((v, v)\), so a state passes only if each present key's value satisfies
-the constraint reflexively (single-argument predicates apply directly;
-constraints that are non-reflexive by design, e.g.~strict growth, are
-not detectable pre-execution), and leaving constraints over absent keys
-vacuously satisfied in line with the preservation semantics.
+\texttt{verify\_context\_preservation(before,\ after)}: it evaluates the
+registered context constraints against a single state before dispatch,
+applying two-argument pairwise predicates reflexively, \((v, v)\)
+(single-argument predicates apply directly), and leaving constraints
+over absent keys vacuously satisfied in line with the preservation
+semantics. Constraints that are non-reflexive by design, e.g.~strict
+growth, are not detectable pre-execution.
 
 Cross-model compatibility requirements follow the observation of
 cross-model function-calling studies {[}17{]} and open protocol efforts
@@ -2025,18 +1991,10 @@ remaining threats to validity.
 
 We evaluate AgentISA with a reproducible microbenchmark suite
 (\texttt{examples/benchmarks/isa\_microbench.py}) and a functional test
-suite for the multi-agent layer. We state the scope up front: the
-quantitative results in Sections 5.2-5.5 come from synthetic workloads
-executed against a \emph{mock} LLM backend that counts simulated API
-calls and charges simulated latency. They demonstrate that the
-optimizations are real, measurable, and reproducible in a controlled
-setting. They are \textbf{not} production end-to-end measurements, and
-no claim in this paper should be read as one. Section 5.7 repeats the
-caching experiment against a live LLM gateway at reduced scale, Section
-5.7.1 extends the live-gateway check to compilation and hot-path
-adoption, Section 5.8 demonstrates the composed mechanisms on four
-system-level tasks, and Section 5.9 discusses the threats to validity
-that follow.
+suite for the multi-agent layer, under the scope fixed at the end of
+Section 4.3: Sections 5.2--5.5 run against the mock backend; Sections
+5.7--5.8 extend the validation to a live LLM gateway and four
+system-level tasks; Section 5.9 discusses the threats to validity.
 
 \subsection{Methodology}\label{methodology}
 
@@ -2449,17 +2407,16 @@ the expectation below is computed from.
 (instruction, params) pair seen so far --- not on what the model
 returns. The production \texttt{InstructionCache} is LRU with a TTL, so
 in general a hit also depends on wall-clock time and capacity; under
-this benchmark's configuration none of that can bind ---
-\texttt{max\_size} = 100,000 with at most 200 distinct keys per arm,
-\texttt{ttl} = 3,600 s with every cache-enabled arm completing in under
-seven minutes (the no-cache arms run to 7.9 minutes; all are far below
-the 3,600 s TTL), a fresh cache per arm, and failed calls never cached
---- so the hit/miss decisions are a pure function of the (instruction,
-params) sequence. The hit/miss sequence for a fixed workload is
-therefore \emph{computable without any backend}. If the mechanism is
-correct, the real run must reproduce that sequence exactly; at the
-granularity the artifact records --- per-arm hit rates and call counts
---- it does:
+this benchmark's configuration none of that can bind: \texttt{max\_size}
+= 100,000 with at most 200 distinct keys per arm, \texttt{ttl} = 3,600 s
+with every cache-enabled arm completing in under seven minutes (the
+no-cache arms run to 7.9 minutes---far below the 3,600 s TTL), a fresh
+cache per arm, and failed calls never cached. Hit/miss decisions are
+therefore a pure function of the (instruction, params) sequence, and the
+hit/miss sequence for a fixed workload is \emph{computable without any
+backend}. If the mechanism is correct, the real run must reproduce that
+sequence exactly; at the granularity the artifact records --- per-arm
+hit rates and call counts --- it does:
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -2552,17 +2509,17 @@ gateway configuration of Section 5.7 (same base URL, internal-CA TLS,
 alias \texttt{claude-glm-5.3-flash}, sequential httpx, 90 s timeout,
 three bounded retries) but raises \texttt{max\_tokens} to 512 (Section
 5.7 used 64) so that completions dominate the priced comparison; replies
-still bind at the cap, as below behind a pluggable backend: the real
-gateway when reachable, and otherwise a deterministic mock with the same
-protocol that counts calls, accounts tokens from template sizes, and
-charges the constant 80 ms simulated call latency --- so the identical
-validation runs offline and online. The task is the service-log triage
-shape of Section 5.8: a seven-instruction stream with one cacheable
-LLM-type step (\texttt{classify\_signature}, one model call per distinct
-incident-signature batch) and the same kind of planted dead guard
-(\texttt{check\_format}), executed over repeated realizations drawn from
-a seeded truncated-Zipf distribution over a fixed universe of 40 task
-instances.
+still bind at the cap, as below. The harness runs behind a pluggable
+backend: the real gateway when reachable, and otherwise a deterministic
+mock with the same protocol that counts calls, accounts tokens from
+template sizes, and charges the constant 80 ms simulated call
+latency---so the identical validation runs offline and online. The task
+is the service-log triage shape of Section 5.8: a seven-instruction
+stream with one cacheable LLM-type step (\texttt{classify\_signature},
+one model call per distinct incident-signature batch) and the same kind
+of planted dead guard (\texttt{check\_format}), executed over repeated
+realizations drawn from a seeded truncated-Zipf distribution over a
+fixed universe of 40 task instances.
 
 \textbf{Arms and protocol.} Arm (a) is the unoptimized authored stream.
 Arm (b) drives the \emph{same} stream through the production machinery:
@@ -2626,18 +2583,18 @@ real-deployment behavior remain untested.
 \textbf{A priced comparison (MODELED on measured tokens).} The harness
 prices the measured token counts of the run above under three modes:
 \emph{no optimization} (every realization re-queries at full price),
-\emph{AgentISA result caching} (first occurrences only --- the measured
+\emph{AgentISA result caching} (first occurrences only---the measured
 behavior of both arms), and a \emph{provider prompt cache} (MODELED:
 every realization queries, but repeat prompts bill their input tokens as
-prompt-cache reads at 0.1x the input price --- configurable ---
-mirroring Anthropic's published prompt-caching read discount (its 1.25x
-cache-write premium and 1024-token minimum cacheable prefix are not
-modeled; both omissions favor the provider-cache baseline, so the
-comparison is conservative for us), while completions always bill at
-full price). List prices are parameterized stand-ins (\$3/M input,
-\$15/M output by default) because the serving gateway's actual pricing
-is unknown; token counts are measurements, the pricing overlay is a
-model, and no dollar-savings claim is made:
+prompt-cache reads at 0.1x the input price---configurable---mirroring
+Anthropic's published prompt-caching read discount, with completions
+always billed at full price). Two simplifications---omitting Anthropic's
+1.25x cache-write premium and its 1024-token minimum cacheable
+prefix---both favor the provider-cache baseline, so the comparison is
+conservative for us. List prices are parameterized stand-ins (\$3/M
+input, \$15/M output by default) because the serving gateway's actual
+pricing is unknown. Token counts are measurements, the pricing overlay
+is a model, and no dollar-savings claim is made:
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -2688,27 +2645,38 @@ head-to-head against it is claimed.
 Characterization}\label{system-level-workload-characterization}
 
 The experiments above measure individual mechanisms on synthetic
-sequences. To show the mechanisms composing on \emph{realistic
-system-level tasks}---and to make the implemented closed-loop
-optimization claims of Section 3.4.4 checkable rather than
-aspirational---we provide a seed-controlled workload characterization
+sequences. To make the mechanisms' composition---and the implemented
+closed-loop optimization claims of Section 3.4.4---checkable rather than
+aspirational, we provide a seed-controlled workload characterization
 (\texttt{examples/system\_task\_workload.py},
 \texttt{tests/system/test\_system\_task\_workload.py}; the original
 single-task demonstration lives on as
 \texttt{examples/system\_task\_demo.py}) built from \textbf{four tasks
 with genuinely different dependency shapes}, each realized end-to-end
-against sandbox-resident files: the original \textbf{service-log triage}
-(a seven-instruction linear stream, described below in full),
-\textbf{csv-etl-anomaly} (an eight-instruction fan-out pipeline: ingest
-CSV shards, schema guard, parse, per-column statistics, per-row
-signature construction, per-row anomaly triage, aggregate, write),
-\textbf{report-merge} (a seven-instruction wide-fan-in task: ingest five
-markdown reports, header guard, dedupe, per-line signatures, cacheable
-cross-report consistency check, merge, write), and
-\textbf{regression-diff} (an eight-instruction two-branch convergence
-task: parallel baseline/candidate log ingests, guard, normalize, diff,
-classify hunks, aggregate, write). The full characterization of all four
-tasks follows the detailed walk-through of the triage task.
+against sandbox-resident files:
+
+\begin{itemize}
+\tightlist
+\item
+  the original \textbf{service-log triage}: a seven-instruction linear
+  stream, described below in full;
+\item
+  \textbf{csv-etl-anomaly}: an eight-instruction fan-out pipeline
+  (ingest CSV shards, schema guard, parse, per-column statistics,
+  per-row signature construction, per-row anomaly triage, aggregate,
+  write);
+\item
+  \textbf{report-merge}: a seven-instruction wide-fan-in task (ingest
+  five markdown reports, header guard, dedupe, per-line signatures,
+  cacheable cross-report consistency check, merge, write);
+\item
+  \textbf{regression-diff}: an eight-instruction two-branch convergence
+  task (parallel baseline/candidate log ingests, guard, normalize, diff,
+  classify hunks, aggregate, write).
+\end{itemize}
+
+The full characterization of all four tasks follows the detailed
+walk-through of the triage task.
 
 \textbf{The triage task's instruction stream} (seven instructions over
 sandbox-resident files):
@@ -2851,31 +2819,32 @@ fresh-stack SHA) \\
 \end{longtable}
 }
 
-Every task passes the same structural assertions: static compilation
-preserves the dataflow (the guard is never dropped outright---the
-eliminated set is empty in all four tasks; the reduction is fusion: the
-guard merges into its successor, and in csv-etl-anomaly a second
-adjacent pure pair (per-column statistics with row-signature
+Every task passes the same structural assertions. Static compilation
+preserves the dataflow: the guard is never dropped outright (the
+eliminated set is empty in all four tasks), and the reduction is
+fusion---the guard merges into its successor. In csv-etl-anomaly a
+second adjacent pure pair (per-column statistics with row-signature
 construction) also fuses, which is why its shrink reaches 25.0\% with a
-single planted guard); the first realization pays all model calls and
-every subsequent realization hits the result cache (zero calls; the
-91.7\% hit rate is 11 of 12 realizations by construction---one cacheable
-step, identical seeded draws---so the four rows share it structurally,
-not as independent observations); the hot path is adopted at realization
-7 in all four tasks (full form for realizations 1--6, shrunken form for
-7--12); and the optimized form reproduces the report byte-for-byte on a
+single planted guard. The first realization pays all model calls and
+every subsequent realization hits the result cache; the 91.7\% hit rate
+is 11 of 12 realizations by construction (one cacheable step, identical
+seeded draws), so the four rows share it structurally, not as
+independent observations. The hot path is adopted at realization 7 in
+all four tasks (full form for realizations 1--6, shrunken form for
+7--12), and the optimized form reproduces the report byte-for-byte on a
 fresh workspace, as does a completely fresh stack---new instructions,
-new cache, new workspace, same seed---for every task (SHA-256 equality).
-The mechanisms behave uniformly across the four dependency shapes: the
-guard/fusion shrink varies with stream structure (12.5--25.0\%), while
-reuse and closed-loop adoption are invariant under the fixed protocol
-(12 seeded realizations, threshold 5, one cacheable step per task)---the
-compile shrink is the only shape-dependent quantity, which is what one
-wants from an infrastructure claim. These remain four seed-controlled,
-hand-constructed tasks, not a production workload study; what the
-characterization adds over the original single-task demonstration is
-evidence that the composition behavior is not an artifact of one
-stream's structure.
+new cache, new workspace, same seed (SHA-256 equality).
+
+The mechanisms behave uniformly across the four dependency shapes: reuse
+and closed-loop adoption are invariant under the fixed protocol (12
+seeded realizations, threshold 5, one cacheable step per task), while
+the guard/fusion shrink varies with stream structure
+(12.5--25.0\%)---the compile shrink is the only shape-dependent
+quantity, which is what one wants from an infrastructure claim. These
+remain four seed-controlled, hand-constructed tasks, not a production
+workload study; what the characterization adds over the original
+single-task demonstration is evidence that the composition behavior is
+not an artifact of one stream's structure.
 
 \subsection{Limitations and Threats to
 Validity}\label{limitations-and-threats-to-validity}
@@ -3329,28 +3298,15 @@ contributions are:
   data-sensitivity policies.
 \end{enumerate}
 
-The empirical evaluation is deliberately scoped and fully disclosed: a
-microbenchmark suite drives the real compiler, cache, and optimizer
-against a mock LLM backend on synthetic Zipf workloads, over 5 seeds per
-configuration. Under these conditions, result caching reduces simulated
-API calls by 59.5--79.6\% (increasing with workload skew), static
-compilation reduces the effective instruction count by 34.2\% \(\pm\)
-1.8\% (with an ablation attributing 21.9\% \(\pm\) 3.5\% to fusion and
-24.1\% \(\pm\) 3.3\% to dead-code elimination), and dynamic hot-path
-optimization shrinks repeatedly executed traces by 65.8\% \(\pm\) 4.6\%.
-The multi-agent layer is validated by 43 passing functional tests. We
-have been explicit throughout about what these results are not: the
-Section 5.2-5.5 figures are microbenchmark evidence on synthetic
-workloads, not production end-to-end measurements. The Section 5.7 run
-against a live gateway validates the caching mechanism end-to-end and
-measures real wall-clock and token savings at reduced scale, but
-dollar-cost, throughput, and availability claims remain out of scope.
-Section 5.7.1 extends the live-gateway validation to compilation and
-hot-path adoption (zero redundant live calls, byte-identical artifacts,
-and a MODELED-on-measured priced comparison that is explicitly not a
-dollar-savings claim), and Section 5.8's four-task, four-shape
-characterization shows the composition behavior is not an artifact of
-one stream's structure (12.5--25.0\% per-task compile shrink).
+The evaluation shows the optimizations are real and measurable under
+controlled conditions: 59.5--79.6\% simulated-call reduction from
+caching, 34.2\% instruction-count reduction from static compilation,
+65.8\% trace shrink from hot-path optimization (Sections 5.2--5.5),
+live-gateway spot checks of the cache and the compiled pipeline
+(Sections 5.7--5.7.1), a four-task system-level characterization
+(Section 5.8), and 43 functional tests for the multi-agent layer. These
+are microbenchmark and controlled-setting results, not production
+end-to-end measurements; the threats to validity of Section 5.9 stand.
 
 AgentISA's longer-term significance is architectural: by giving agent
 behavior an instruction-level contract, it makes agent systems amenable
