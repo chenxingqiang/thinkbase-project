@@ -3,9 +3,9 @@
 
 # Abstract
 
-Large Language Models are increasingly deployed as autonomous agents, yet their behavior is orchestrated through ad-hoc prompt engineering and per-provider function calling, making it difficult to specify, analyze, and optimize systematically. We present AgentISA, an instruction set architecture that treats agent behavior as a first-class compilable artifact: (1) a formal instruction set with compositional semantics, a type system, and pre/post-conditions—checked for pure instructions by a shipped bounded verification checker and enforced per dispatch by the runtime; (2) Agentic Calling, lifting provider-specific function calling into reusable, cacheable instructions; (3) instruction learning that mines recurring patterns from traces and promotes them as composite-replay instructions; and (4) a compiler and runtime applying classical optimization—fusion, dead-code elimination, pipeline scheduling, and dynamic hot-path specialization—to agent instruction streams.
+Large Language Models are increasingly deployed as autonomous agents, yet their behavior is orchestrated through ad-hoc prompt engineering and per-provider function calling, making it difficult to specify, analyze, and optimize systematically. We present AgentISA, an instruction set architecture that treats agent behavior as a first-class compilable artifact: (1) a formal instruction set with compositional semantics, a type system, and pre/post-conditions—checked offline for pure instructions by a shipped bounded verification checker and bracketed at runtime by pre-dispatch context validation; (2) Agentic Calling, lifting provider-specific function calling into reusable, cacheable instructions; (3) instruction learning that mines recurring patterns from traces and promotes them as composite-replay instructions; and (4) a compiler and runtime applying classical optimization—fusion, dead-code elimination, pipeline scheduling, and dynamic hot-path specialization—to agent instruction streams.
 
-We evaluate AgentISA on three fronts. A reproducible microbenchmark suite drives the real compiler, cache, and optimizer against a mock LLM backend: result caching reduces simulated API calls by 59.5–79.6% on synthetic Zipf workloads (2,000 tasks, 5 seeds), growing with skew; static compilation reduces the effective instruction count by 34.2% (35.4% at sequence length 1,000), split between fusion and dead-code elimination by ablation; dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%. Two live-gateway experiments extend the validation beyond the mock: the cache reproduces the computed hit/miss statistics at every skew level and converts avoided calls into measured wall-clock and token savings, and the compiled, hot-path-adopted stream issues zero redundant live calls with byte-identical artifacts. A four-task system-level characterization (12.5–25.0% per-task compile shrink) calibrates the synthetic headline, and 43 multi-agent coordination and security tests provide functional validation. We position these results honestly as controlled-setting evidence, not as production end-to-end measurements.
+We evaluate AgentISA on four fronts. A reproducible microbenchmark suite drives the real compiler, cache, and optimizer against a mock LLM backend: result caching reduces simulated API calls by 59.5–79.6% on synthetic Zipf workloads (2,000 tasks, 5 seeds), a saving that grows with skew; static compilation reduces the effective instruction count by 34.2% (35.4% at sequence length 1,000), with an independent-draw ablation attributing the shrink to fusion and dead-code elimination (a replication, not a decomposition; Section 5.5); dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%. Two real-gateway experiments extend the validation beyond the mock: the cache reproduces the computed hit/miss statistics at every skew level and converts avoided calls into measured wall-clock and token savings, and the compiled, hot-path-adopted stream issues zero new gateway calls with byte-identical artifacts (cache-mediated). A four-task system-level characterization (12.5–25.0% per-task compile shrink) calibrates the synthetic headline, and 43 multi-agent coordination and security tests provide functional validation. We position these results as controlled-setting evidence, not as production end-to-end measurements.
 
 # Keywords
 
@@ -15,19 +15,19 @@ We evaluate AgentISA on three fronts. A reproducible microbenchmark suite drives
 - Compiler Optimization
 - Multi-agent Systems
 - Agentic Calling
-- Automated Instruction Learning
+- Automatic Instruction Learning
 - Cross-model Capability Assessment
 - Formal Methods
-- Performance Optimization
+- Result Caching
 
 # Research Highlights
 
 1. A formal instruction set architecture that makes LLM agent behavior compilable, analyzable, and optimizable
 2. Result caching reduces simulated API calls by 59.5–79.6% on synthetic Zipf workloads (5 seeds), with the reduction growing as workload skew increases
-3. Static compilation (fusion + dead-code elimination) reduces the effective instruction count by 34.2%±1.8%, validated by a per-pass ablation
+3. Static compilation (fusion + dead-code elimination) reduces the effective instruction count by 34.2%±1.8%, attributed to fusion and dead-code elimination by an independent-draw ablation (a replication, not a decomposition; Section 5.5)
 4. Dynamic hot-path optimization shrinks repeatedly executed traces by 65.8%±4.6%
 5. Agentic Calling lifts provider-specific function calling into reusable, portable agent instructions
-6. Live-gateway spot checks (Sections 5.7–5.7.1): observed cache hit rates match the computed expectation exactly, and the compiled, hot-path-adopted stream issues zero redundant live calls with byte-identical artifacts
+6. Real-gateway validations (Sections 5.7 and 5.7.1): observed cache hit rates match the computed expectation exactly, and the compiled, hot-path-adopted stream issues zero new gateway calls with byte-identical artifacts (cache-mediated)
 7. A four-task system-level characterization calibrates the synthetic headline (12.5–25.0% per-task compile shrink, Section 5.8)
 
 # CCS Concepts
@@ -47,7 +47,7 @@ Recent advances in Large Language Models (LLMs) have produced systems with stron
 
 ## Background and Motivation
 
-Function calling—selecting an API from a declared tool set and emitting structured arguments—has become the dominant interface between LLMs and external systems [13, 14, 15]. Standardization efforts such as the Model Context Protocol [18] and evaluation harnesses such as the Berkeley Function Calling Leaderboard [17] are consolidating this interface layer. However, the unit of interaction remains the individual API call: each call is dispatched, priced, and forgotten independently, even when an agent repeatedly executes structurally identical work.
+Function calling—selecting an API from a declared tool set and emitting structured arguments—has become the dominant interface between LLMs and external systems [13, 14, 15]. Standardization efforts such as the Model Context Protocol [18] are consolidating this interface layer, while evaluation harnesses such as the Berkeley Function Calling Leaderboard [17] measure it. However, the unit of interaction remains the individual API call: each call is dispatched, priced, and forgotten independently, even when an agent repeatedly executes structurally identical work.
 
 This per-call statelessness stands in sharp contrast to how computing systems have historically handled repetitive execution. Classical compilers and hardware translate recurring patterns into cheaper forms—instruction fusion, dead-code elimination, caching, and trace-based dynamic optimization [33, 34, 45]. Our motivating hypothesis is that these same techniques apply to LLM agent workloads: if agent behavior is expressed as an explicit instruction stream rather than as opaque prompts, then recurring patterns become visible to a compiler and can be optimized with well-understood, semantics-preserving transformations.
 
@@ -57,7 +57,7 @@ Five structural challenges motivate AgentISA:
 
 1. **Per-call statelessness of tool interfaces.** Mainstream function-calling and tool-use protocols treat each call as an isolated event [13, 14, 18]. The provider has no notion of a *program* being executed, so repeated identical work incurs repeated cost; caching, when present, is a bolt-on afterthought rather than a semantic property of the execution model.
 
-2. **Experience that does not accumulate as executable structure.** Agent paradigms such as Reflexion [10] and Voyager [12] do accumulate experience, but as verbal reflections or skill libraries consumed by the model at inference time. The lessons are not reified as reusable, statically optimizable instructions that a compiler can fuse, schedule, or eliminate.
+2. **Experience that does not accumulate as compiler-visible instruction structure.** Agent paradigms such as Reflexion [10] and Voyager [12] do accumulate experience, but as verbal reflections or skill libraries consumed by the model at inference time. The lessons are not reified as reusable, statically optimizable instructions that a compiler can fuse, schedule, or eliminate.
 
 3. **Absence of a shared behavioral contract.** Each multi-agent framework defines its own abstractions for roles, messages, and workflows [19, 20, 21, 22, 23, 24]. There is no instruction-level contract that is independent of any single framework, which fragments tooling and makes cross-framework analysis difficult.
 
@@ -69,7 +69,7 @@ Five structural challenges motivate AgentISA:
 
 This paper introduces AgentISA, an instruction set architecture that addresses these challenges by making agent behavior a first-class compilable artifact. Our contributions are:
 
-1. **A formal instruction set** for LLM agents with compositional semantics, a type system, and pre/post-conditions on every instruction (Section 3.1). Two deliberately modest sanity results are stated as design rationale rather than headline novelty: Turing completeness (Theorem 3.1), read as negative certification that the instruction set does not constrain expressiveness, and type safety for the pure core (Theorem 3.2), which fixes the well-formedness obligation that the runtime enforces and the bounded checker of Section 3.3.3 extends to executed instructions.
+1. **A formal instruction set** for LLM agents with compositional semantics, a type system, and pre/post-conditions on every instruction (Section 3.1). Two deliberately modest sanity results are stated as design rationale rather than headline novelty: Turing completeness (Theorem 3.1), read as negative certification that the instruction set does not constrain expressiveness, and type safety for the pure core (Theorem 3.2), which fixes the well-formedness obligation that the offline bounded checker discharges for pure instructions (Section 3.3.3) and that the runtime brackets with pre-dispatch context validation.
 
 2. **Agentic Calling**, a mechanism that lifts provider-specific function calling into reusable, cacheable, semantically specified agent instructions, with a model-adapter layer for cross-provider portability (Section 3.2).
 
@@ -77,7 +77,7 @@ This paper introduces AgentISA, an instruction set architecture that addresses t
 
 4. **A compiler and runtime** that apply instruction selection, fusion, dead-code elimination, pipeline scheduling, and dynamic hot-path specialization to agent instruction streams (Sections 3.4 and 4), with semantic-preservation arguments for each transformation (Theorems 3.4–3.6, proofs in Appendix C).
 
-5. **An empirical evaluation** of the implemented system, with full methodology disclosure. On synthetic Zipf-distributed workloads (5 random seeds each), caching reduces simulated API calls by 59.5–79.6% depending on skew, static compilation reduces the effective instruction count by 34.2%±1.8% (sequence length 200), and dynamic optimization shrinks repeatedly executed traces by 65.8%±4.6%. Two live-gateway experiments (Sections 5.7–5.7.1) validate the cache and the compiled pipeline against a real LLM gateway, and a four-task system-level characterization (Section 5.8) composes the mechanisms on realistic (non-synthetic) instruction streams.
+5. **An empirical evaluation** of the implemented system, with full methodology disclosure. On synthetic Zipf-distributed workloads (5 random seeds each), caching reduces simulated API calls by 59.5–79.6% depending on skew, static compilation reduces the effective instruction count by 34.2%±1.8% (sequence length 200), and dynamic optimization shrinks repeatedly executed traces by 65.8%±4.6%. Two real-gateway experiments (Sections 5.7 and 5.7.1) validate the cache and the compiled pipeline against a real LLM gateway, and a four-task system-level characterization (Section 5.8) composes the mechanisms on realistic (non-synthetic) instruction streams.
 
 6. **Multi-agent coordination infrastructure** with capability-based agent selection, execution planning, fallback strategies, and a security monitor enforcing authentication, authorization, resource-access, and data-sensitivity policies (Section 3.5 and Section 5.6), validated by 43 passing functional tests.
 
@@ -131,13 +131,13 @@ AgentISA contributes a different artifact to this space: not a framework or orch
 
 ## 2.5 Prompt Compilation and Cost Optimization
 
-Closest to our compilation perspective are systems that *compile* LLM invocations. DSPy compiles declarative prompt programs into optimized pipelines via prompt search and fine-tuning [25]. LangChain [26] and LlamaIndex [27] provide library-level abstractions for chaining LLM calls and indexing context. FrugalGPT reduces cost through model cascades—answering with cheaper models when possible [28].
+Closest to our compilation perspective is DSPy, which compiles declarative prompt programs into optimized pipelines via prompt search and fine-tuning [25]. LangChain [26] and LlamaIndex [27] provide library-level abstractions for chaining LLM calls and indexing context. FrugalGPT reduces cost through model cascades—answering with cheaper models when possible [28].
 
 AgentISA differs in the level at which optimization operates. DSPy optimizes *prompts*; FrugalGPT optimizes *model selection*; AgentISA optimizes *instruction streams*: instruction selection by dynamic programming over pattern covers, fusion, dead-code elimination, pipeline scheduling, result caching, and dynamic hot-path specialization (Sections 3.4 and 4). These are classical compiler transformations [33] applied to a new artifact, and they compose with—rather than replace—prompt-level and model-level optimization.
 
 ## 2.6 Benchmarks for Agent Systems
 
-AgentBench evaluates LLMs as agents across diverse environments [29]; GAIA tests general assistant abilities [30]; PlanBench probes planning and reasoning about change [31]; and SWE-bench measures resolution of real-world GitHub issues [32]. These benchmarks evaluate *end-to-end capability*. AgentISA's evaluation instead measures *subsystem behavior under controlled conditions*—API-call reduction under synthetic Zipf workloads, instruction-count reduction from compilation, and trace shrinkage from dynamic optimization (Section 5). We view the two as complementary: instruction-level metrics explain *where* end-to-end gains come from, and are reproducible without live model access.
+AgentBench evaluates LLMs as agents across diverse environments [29]; GAIA tests general assistant abilities [30]; PlanBench probes planning and reasoning about change [31]; and SWE-bench measures resolution of real-world GitHub issues [32]. These benchmarks evaluate *end-to-end capability*. AgentISA's evaluation instead measures *subsystem behavior under controlled conditions*—API-call reduction under synthetic Zipf workloads, instruction-count reduction from compilation, and trace shrinkage from dynamic optimization (Section 5). We view the two as complementary: instruction-level metrics can attribute end-to-end gains to specific mechanisms when such gains are measured, and are reproducible without live model access.
 
 ## 2.7 Classical Compiler and Architecture Techniques
 
@@ -152,11 +152,11 @@ Below the API boundary, the serving community has made inference dramatically ch
 In summary, the literature leaves four gaps that AgentISA addresses:
 
 1. **No instruction-level contract for agent behavior.** Interfaces are standardized [13, 14, 18], and frameworks are numerous [19, 20, 21, 22, 23, 24], but no shared instruction set spans providers and frameworks.
-2. **No compiler for agent behavior.** Prompt-level compilation exists [25] and model-level cost reduction exists [28], and *caching itself is well-trodden ground*—at the response level (GPTCache [46]), at the KV-prefix level (RadixAttention/SGLang [47]), and at the provider prompt-caching level. What none of these layers expose is an *instruction-level* contract: caching there is an optimization of model serving, invisible to and unaffecting the agent program's structure. Instruction-level fusion, elimination, and scheduling—with cacheability as a declared property of the instruction set—have not, to our knowledge, been demonstrated.
+2. **No compiler for agent behavior.** Prompt-level compilation exists [25] and model-level cost reduction exists [28], and *caching itself is well-trodden ground*—at the response level (GPTCache [46]), at the KV-prefix level (RadixAttention/SGLang [47]), and at the provider prompt-caching level. What none of these layers expose is an *instruction-level* contract: caching there is an optimization of model serving—invisible to the agent program's structure, and without effect on it. Instruction-level fusion, elimination, and scheduling—with cacheability as a declared property of the instruction set—have not, to our knowledge, been demonstrated.
 3. **No semantics-preserving account of agent optimization.** Serving work verifies kernels and schedulers, not agent-level transformations; we provide progress-and-preservation-style arguments for ours (Theorems 3.2, 3.4, 3.5, 3.6).
-4. **No reproducible instruction-level evaluation.** Existing benchmarks measure end-to-end capability [29, 30, 31, 32]; we contribute a seed-controlled microbenchmark suite with fully disclosed synthetic workloads and mock-backend instrumentation (Section 5).
+4. **No reproducible instruction-level evaluation.** Existing benchmarks measure end-to-end capability [29, 30, 31, 32]; we contribute a seed-controlled evaluation: a microbenchmark suite with fully disclosed synthetic workloads and mock-backend instrumentation, extended by real-gateway and system-level validations (Section 5).
 
-Our work addresses these gaps through: (1) the formal instruction set with the Agentic Calling abstraction (Sections 3.1-3.2), (2) pattern-based instruction optimization (Section 3.4), (3) semantic-preservation arguments for our transformations (Theorems 3.2, 3.4-3.6; Appendices B-C), (4) a reproducible evaluation spanning synthetic microbenchmarks and live-gateway validation (Section 5), plus automated instruction learning from execution traces (Section 3.3).
+Our work addresses these gaps through: (1) the formal instruction set with the Agentic Calling abstraction (Sections 3.1–3.2), (2) pattern-based instruction optimization (Section 3.4), (3) semantic-preservation arguments for our transformations (Theorems 3.2, 3.4–3.6; Appendices B–C), (4) automated instruction learning from execution traces (Section 3.3), and (5) a reproducible evaluation spanning synthetic microbenchmarks, real-gateway validation, and a system-level workload characterization (Sections 5.2–5.8).
 
 # 3. AgentISA Design
 
@@ -207,15 +207,15 @@ $$\mathcal{L} = \{query, response, context\}$$
 4. **Resource Management Instructions**:
 $$\mathcal{R} = \{allocate, free, monitor\}$$
 
-Two sanity results anchor the instruction-set definition. Neither introduces new machinery—both are standard arguments from the semantics literature [33, 36]—and we state them for the roles they play in the architecture: Theorem 3.1 certifies that the instruction set does not artificially constrain what agent programs can express, and Theorem 3.2 fixes the well-formedness obligation that the runtime's type and precondition checks enforce on every dispatch.
+Two sanity results anchor the instruction-set definition. Neither introduces new machinery—the simulation technique from the compiler literature [33], the type-safety technique from the semantics literature [36]—and we state them for the roles they play in the architecture: Theorem 3.1 certifies that the instruction set does not artificially constrain what agent programs can express, and Theorem 3.2 fixes the well-formedness obligation that the offline bounded checker discharges for pure instructions (Section 3.3.3) and that the runtime brackets with pre-dispatch context validation (Section 3.2.3).
 
-**Theorem 3.1** (Instruction Completeness): The AgentISA instruction set is Turing complete.
+**Theorem 3.1** (Turing Completeness): The AgentISA instruction set is Turing complete.
 
 *Proof sketch*: We exhibit a translation from WHILE programs—already known to be Turing equivalent—to AgentISA instruction sequences, using a sufficiency (simulation) argument over instruction classes: state management instructions encode an unbounded store, and control-flow instructions encode sequential composition, conditional branching, and iteration. The full construction and simulation argument are given in Appendix A, following standard simulation techniques from the compiler literature [33] and the operational-semantics framework of Pierce [36].
 
 ### 3.1.2 Type System and Semantics
 
-The type system T uses dependent-type constructions in the style of Pierce [36]:
+The type system T extends the simply-typed discipline of Pierce [36] with dependent-type constructions ($\Pi$, $\Sigma$, $\mu$):
 
 **Definition 3.2** (AgentISA Type System):
 $$
@@ -238,31 +238,18 @@ $$
 
 The pure core carries a standard type-safety argument—progress and preservation, in the style of Pierce [36]—discharging the well-formedness role fixed in Section 3.1 and extended to the shipped instruction set by the bounded checker of Section 3.3.3:
 
-**Theorem 3.2** (Type Safety for the Pure Core): Well-typed programs in the pure core calculus of Appendix B—the $\lambda$-fragment (base types, dependent $\Pi$/$\Sigma$ types, recursion) plus the composition operators applied to instructions carrying typed pre/post-conditions—cannot "go wrong", under the per-instruction validity obligation of Definition 3.5 (pre/post-conditions), with transition functions assumed total on precondition-satisfying states (Appendix B.7). Effectful instruction classes are embedded via their typed pre/post-conditions and covered to the extent their preconditions are checkable.
+**Theorem 3.2** (Type Safety for the Pure Core): Well-typed programs in the pure core calculus of Appendix B—the $\lambda$-fragment (base types, dependent $\Pi$/$\Sigma$ types, recursion) plus the composition operators applied to instructions carrying typed pre/post-conditions—cannot "go wrong", under the per-instruction validity obligation of Definition 3.5 (stated in Section 3.3.3 below; pre/post-conditions), with transition functions assumed total on precondition-satisfying states (Appendix B.7). Effectful instruction classes are embedded via their typed pre/post-conditions and covered to the extent their preconditions are checkable.
 
 *Proof sketch*: By the standard two-lemma technique—progress and preservation—as presented in Pierce [36]:
 
 1. Progress: $\forall e, T.\ \vdash e : T \implies \mathrm{value}(e) \lor \exists e'.\ e \to e'$
 2. Preservation: $\forall e, e', T.\ \vdash e : T \land e \to e' \implies \vdash e' : T$
 
-Both lemmas are proved by simultaneous induction on typing derivations; the full proof, including the case analysis over instruction classes, is given in Appendix B.
+Both lemmas are proved by induction over the derivations of the merged judgment system of Appendix B (term typing plus contracted instruction typing), with a joint argument for the composition cases. For instruction steps, progress follows from the Definition 3.5 validity obligation plus the standing totality assumption, and preservation from the postcondition typing; composition operators are handled by the chained invariant $post(i_1) \Rightarrow pre(i_2)$ (Appendix B).
 
 ### 3.1.3 LLM Integration Interface
 
-The LLM integration interface is defined through a protocol, playing the same role for agent backends that the Model Context Protocol plays for tool exposure [18]:
-
-$$
-\mathcal{P}_{LLM} = (Q, R, C, \psi)
-$$
-
-where:
-
-- Q: Query space
-- R: Response space
-- C: Context management functions
-- ψ: State transformation functions
-
-Following the interface conventions of modern function-calling providers [3, 18], we define the interface protocol:
+The LLM integration interface is defined through a protocol, playing the same role for agent backends that the Model Context Protocol plays for tool exposure [18]. Its components correspond to the interface conventions of modern function-calling providers [3, 18] as follows—$\mathcal{P}_{LLM} = (Q, R, C, \psi)$ with $Q \leftrightarrow$ QueryFormat (query space, JSON Schema), $R \leftrightarrow$ ResponseFormat (response space, JSON Schema), $C$ the context-management functions (whose implementation surface today exposes the context window size, ContextWindow: Integer), and $\psi \leftrightarrow$ StateMapping: Map<AgentState, LLMContext> (state transformation functions):
 
 ```
 Protocol LLMInterface {
@@ -286,7 +273,7 @@ $$
 
 where $F$ is the function call space and $A$ is the agent instruction space.
 
-The transformation preserves semantic equivalence:
+$\mathcal{T}$ is required to preserve call semantics, and this holds by construction for the three-step process below: the synthesized instruction records the function signature verbatim, embeds the context verbatim (Theorem 3.3), and delegates execution to the original call. We therefore state preservation as a property of the construction rather than a separately proved theorem:
 
 $$
 \forall f \in F: \text{sem}(\mathcal{T}(f)) \equiv \text{sem}(f)
@@ -313,15 +300,15 @@ where:
 - δ: State transition function
 - F: Set of final states
 
-Context preservation is guaranteed through:
+Extraction-time context preservation is guaranteed by construction (Theorem 3.3); at runtime it is only monitored:
 
-**Theorem 3.3** (Context Preservation): Let $c$ be a context, $\phi$ the context interpretation function (defined compositionally over context *contents*—the keys and values the context carries), and $t$ the extraction transformation that embeds $c$ verbatim into an instruction's `context` field. Then:
+**Theorem 3.3** (Context Preservation): Let $\phi$ be the context interpretation function (defined compositionally over context *contents*—the keys and values the context carries), and $t$ the extraction transformation that embeds a context $c$ verbatim into an instruction's `context` field. Then, for every $c \in C$:
 
 $$
-\forall c \in C: \phi(t(c)) = \phi(c)
+\phi(t(c)) = \phi(c)
 $$
 
-*Proof*: By the definition of $t$, the extracted instruction carries a verbatim copy of the source context; since $\phi$ is defined over context contents and the copy is content-identical, $\phi(t(c)) = \phi(c)$ holds by construction. This is a *design invariant of the extraction pipeline*: it holds because the implementation copies rather than re-encodes. At runtime the shipped checks are constraint-based and bracket the transition: `AgenticTransformer.validate_context` evaluates the registered context constraints against a single state before dispatch (Section 3.2.3), and `verify_context_preservation(before, after)` evaluates them pairwise across the executed transition and reports violations; neither performs structural validation of the carried context. Semantic preservation itself is guaranteed by the copy construction, not by the runtime checks. ∎
+*Proof*: By the definition of $t$, the extracted instruction carries a verbatim copy of the source context; since $\phi$ is defined over context contents and the copy is content-identical, $\phi(t(c)) = \phi(c)$ holds by construction. This is a *design invariant of the extraction pipeline*: it holds because the implementation copies rather than re-encodes. At runtime the shipped checks are constraint-based and bracket the transition: `AgenticTransformer.validate_context` checks the registered context constraints pre-dispatch, and `verify_context_preservation(before, after)` re-checks them pairwise across the executed transition and reports violations (mechanics in Section 3.2.3); neither performs structural validation of the carried context. Theorem 3.3's extraction-time preservation is discharged by the copy construction; preservation across an executed transition is *monitored, not guaranteed*, by the runtime checks. ∎
 
 ### 3.2.3 Cross-model Compatibility
 
@@ -335,12 +322,12 @@ Interface ModelAdapter {
 }
 ```
 
-All three interface operations ship. `translate` is `ModelAdapter.translate_instruction` (with registered type transformations). `normalize` is `ModelAdapter.normalize_response`, which folds the two dominant wire shapes—the Anthropic protocol (typed `content` blocks with `usage.input_tokens`/`output_tokens`) and the OpenAI protocol (`choices[0].message` with `usage.prompt_tokens`/`completion_tokens`)—into a canonical `AgentResponse` envelope (content, tool calls, usage, model, raw), so downstream instruction code never branches on provider syntax. `validateContext` is `AgenticTransformer.validate_context`, the pre-execution complement of the shipped post-hoc `verify_context_preservation(before, after)`: it evaluates the registered context constraints against a single state before dispatch, applying two-argument pairwise predicates reflexively, $(v, v)$ (single-argument predicates apply directly), and leaving constraints over absent keys vacuously satisfied in line with the preservation semantics. Constraints that are non-reflexive by design, e.g. strict growth, are not detectable pre-execution.
+All three interface operations ship. `translate` is `ModelAdapter.translate_instruction` (with registered type transformations). `normalize` is `ModelAdapter.normalize_response`, which folds the two dominant wire shapes—the Anthropic protocol (typed `content` blocks with `usage.input_tokens`/`output_tokens`) and the OpenAI protocol (`choices[0].message` with `usage.prompt_tokens`/`completion_tokens`)—into a canonical `AgentResponse` envelope (content, tool calls, usage, model, raw), so downstream instruction code never branches on provider syntax. `validateContext` is `AgenticTransformer.validate_context`, the pre-execution complement of the shipped post-hoc `verify_context_preservation(before, after)`: it evaluates the registered context constraints against a single state before dispatch, applying two-argument pairwise predicates reflexively, $(v, v)$ (single-argument predicates apply directly), and leaving constraints over absent keys vacuously satisfied in line with the preservation semantics—so key *deletion* goes unreported, a blind spot analogous to the non-reflexive constraints below. Constraints that are non-reflexive by design, e.g. strict growth, are not detectable pre-execution.
 
-Cross-model compatibility requirements follow the observation of cross-model function-calling studies [17] and open protocol efforts [18]: providers differ in surface syntax but can agree on semantics,
+Motivated by the observation of cross-model function-calling studies [17] and open protocol efforts [18]—providers differ in surface syntax but can agree on semantics—we require the following of the *adapter layer* (not of the models themselves; taking $m_1 = m_2$ would demand determinism, which no LLM provides), for $\mathbb{M}$ the set of provider adapters:
 
 $$
-\forall m_1, m_2 \in M: \text{out}(m_1) \equiv \text{out}(m_2) \text{ when } \text{in}(m_1) \equiv \text{in}(m_2)
+\forall m_1, m_2 \in \mathbb{M}: \text{out}(m_1) \equiv \text{out}(m_2) \text{ when } \text{in}(m_1) \equiv \text{in}(m_2)
 $$
 
 ## 3.3 Automatic Instruction Learning
@@ -358,46 +345,46 @@ A pattern is *frequent* if $sup(p) \geq \sigma_{min}$ and *predictive* if $\max_
 
 Pattern recognition proceeds in three stages:
 
-1. **Frequent-sequence mining.** Candidate subsequences are enumerated from execution traces together with their occurrence counts; sequences below $\sigma_{min}$ are pruned, and successor statistics are accumulated for confidence estimation. The output is the set of frequent, predictive patterns.
+1. **Frequent-sequence mining.** Candidate subsequences are enumerated from execution traces together with their occurrence counts; successor statistics are accumulated alongside, and sequences below $\sigma_{min}$ are pruned together with their statistics—so confidence is estimated only over frequent sequences. The output is the set of frequent, predictive patterns.
 
-2. **Behavior grouping.** The shipped `PatternRecognizer` groups dialogues deterministically by *action signature*—the sorted set of system-turn contents—and promotes each signature bucket with sufficient support and success rate into a pattern. An earlier prototype used TF-IDF embeddings with density-based clustering (DBSCAN) and k-means over instruction-trace feature vectors; we abandoned it for production use because it was non-deterministic across library versions and degenerate on the small, short samples that agent traces actually provide. (A k-means view over instruction-trace features remains available in `pattern_mining`, with fixed `random_state` for reproducibility.) Each signature bucket is behaviorally homogeneous by construction (identical action sets). Promotions split by source: trace-mined promotions execute by **composite replay** rather than as placeholders—the mined pattern carries its constituent instruction sequence together with the dataflow edges between its members, and the learned instruction's `execute` body re-runs that sequence in mined order against a shared context built from its inputs, merging each constituent's outputs and returning the keys its `produces_X` postconditions declare; dialogue-mined templates, which carry no recorded instruction body, raise `NotImplementedError` rather than silently no-opping. Promotion is deterministic: pattern identity is derived from the mined instruction-id sequence, so the same traces promote the same instructions, in the same order, across runs. Replay semantics are plain sequential composition—nothing smarter—so a learned instruction reproduces the outputs of its recorded subsequence on the same inputs but does not generalize to unseen parameter values; no automated cluster-to-optimizer decision path exists yet.
+2. **Behavior grouping.** The shipped `PatternRecognizer` groups dialogues deterministically by *action signature*—the sorted set of system-turn contents—and promotes each signature bucket with sufficient support into a pattern—and, for dialogue-derived buckets, an acceptable success rate. An earlier prototype used TF-IDF embeddings with density-based clustering (DBSCAN) and k-means over instruction-trace feature vectors; we abandoned it for production use because it was non-deterministic across library versions and degenerate on the small, short samples that agent traces actually provide. (A k-means view over instruction-trace features remains available in `pattern_mining`, with fixed `random_state` for reproducibility.) Each signature bucket groups same-kinded behaviors by construction (identical action *sets*; argument values and turn counts may differ). Promotions split by source: trace-mined promotions execute by **composite replay** rather than as placeholders—the mined pattern carries its constituent instruction sequence together with the dataflow edges between its members, and the learned instruction's `execute` body re-runs that sequence in mined order against a shared context built from its inputs, merging each constituent's outputs and returning the keys its `produces_X` postconditions declare; dialogue-mined templates, which carry no recorded instruction body, raise `NotImplementedError` rather than silently no-opping. Promotion is deterministic: pattern identity is derived from the mined instruction-id sequence, so the same traces promote the same instructions, in the same order, across runs. Replay semantics are plain sequential composition—nothing smarter—so a learned instruction reproduces the outputs of its recorded subsequence on the same inputs but does not generalize to unseen parameter values; no automated mining-to-optimization decision path exists yet (promotion is a developer decision).
 
-3. **Pattern validation.** Each candidate pattern is checked for significance (frequency above threshold, non-trivial support, and—when derived from dialogues—an acceptable success rate among the dialogues exhibiting it) before it is promoted to a candidate instruction.
+3. **Pattern validation.** Each candidate pattern is checked for significance—support above $\sigma_{min}$ (the frequency threshold of stage 1) and, for dialogue-derived patterns, an acceptable success rate among the dialogues exhibiting it—before it is promoted to a candidate instruction.
 
 This design is deliberately statistical: agent traces are short and noisy, and frequency statistics degrade gracefully where grammar induction would overfit. It also composes with the compiler—a frequent, verified pattern is exactly the candidate for promotion to a fused instruction (Section 3.4.4).
 
 ### 3.3.2 Instruction Extraction Pipeline
 
-The instruction extraction process follows the sequential pipeline of Section 3.3.1 (as shipped):
+The instruction extraction process is the three-stage pipeline of Section 3.3.1, instantiated as shipped (stage names from Section 3.3.1 in parentheses):
 
-1. **Pattern Detection**: frequent-sequence mining over execution traces, accumulating support and confidence statistics; sequences below the support threshold are pruned.
+1. **Pattern Detection** (frequent-sequence mining): frequent-sequence mining over execution traces, accumulating support and confidence statistics; sequences below the support threshold are pruned.
 
-2. **Instruction Formation**: deterministic action-signature grouping promotes validated patterns into composite-replay candidates; the extracted template carries the recorded constituent sequence and its dataflow edges.
+2. **Instruction Formation** (behavior grouping): deterministic action-signature grouping promotes validated patterns into composite-replay candidates; the extracted template carries the recorded constituent sequence and its dataflow edges.
 
-3. **Optimization and Validation**: threshold and success-rate checks gate promotion, and the standard optimization passes of Section 3.4 apply to any resulting stream.
+3. **Optimization and Validation** (pattern validation and optimization): threshold and success-rate checks gate promotion, and the standard optimization passes of Section 3.4 apply to any resulting stream.
 
 ### 3.3.3 Instruction Optimization and Verification
 
-Optimization is coupled to verification, in the spirit of verified compilation [37] but at the granularity of individual instructions and transformations:
+Optimization is coupled to verification: where verified-compilation efforts such as [37] verify the transformations of a whole compiler, AgentISA's verification targets a different granularity—the validity of individual instructions and the obligations of individual rewrites:
 
 **Definition 3.5** (Instruction Verification): An instruction i is valid if:
 $$
 \forall s \in S: \text{pre}(i,s) \implies \text{post}(i,\text{exec}(i,s))
 $$
 
-For pure instructions with finite, small state spaces, the shipped checker (`agentflow.core.isa.bounded_checker`) enumerates the candidate input states derived from the declared parameter constraints — exhaustively for finite domains such as `bool` and enum parameters — and checks the implication on each state; for larger or non-enumerable spaces it probes a bounded, deterministically sampled set of states (default cap 256), which makes it a *bounded* verification procedure rather than a complete one. We state the implementation status plainly: Definition 3.5 defines validity, and the bounded checker is now **shipped code**: for every pure (side-effect-free) instruction the checker generates the bounded state space, filters it by well-typedness and by the declared preconditions, executes the instruction, and evaluates three obligations on each surviving state — progress (execution must not raise where the precondition holds), preservation (declared outputs must be present and well-typed), and the postcondition itself. Side-effectful instructions are never executed by the checker and are reported as out of scope, so their validity obligation remains discharged by construction and testing rather than mechanically. Theorem 3.2 is stated conditionally on this obligation, and Theorems 3.4–3.6 carry the separate rewrite obligations of Appendix C.6; for state spaces beyond the enumeration bound the condition remains substantive rather than discharged (Appendices B.7 and C.6):
+For pure instructions with finite, small state spaces, the shipped checker (`agentflow.core.isa.bounded_checker`) enumerates the candidate input states derived from the declared parameter constraints — exhaustively for finite domains such as `bool` and enum parameters — and checks the implication on each state; for larger or non-enumerable spaces it probes a bounded, deterministically sampled set of states (default cap 256), which makes it a *bounded* verification procedure rather than a complete one. We state the implementation status plainly: Definition 3.5 defines validity, and the bounded checker is now **shipped code**: for every pure (side-effect-free) instruction the checker generates the bounded state space, filters it by well-typedness and by the declared preconditions, executes the instruction, and evaluates three obligations on each surviving state — progress (execution must not raise where the precondition holds), preservation (declared outputs must be present and well-typed), and the postcondition itself. Side-effectful instructions are never executed by the checker and are reported as out of scope, so their validity obligation is not mechanically checked; it is delegated to authoring-time unit tests and review. Theorem 3.2 is stated conditionally on this obligation, and Theorems 3.4–3.6 carry the separate rewrite obligations of Appendix C.7; for state spaces beyond the enumeration bound the condition remains substantive rather than discharged (Appendices B.7 and C.7):
 
 $$
 \forall s \in S_{bounded} \subseteq S: \text{pre}(i,s) \implies \text{post}(i,\text{exec}(i,s))
 $$
 
-where $S_{bounded}$ is the explored subset. Completeness of the check is traded for tractability, following the standard operational-semantics treatment of instruction meaning [36].
+where $S_{bounded}$ is the explored subset. Completeness of the check is traded for tractability—the standard bounded-exploration compromise; the operational-semantics treatment of instruction meaning itself follows [36].
 
-**Theorem 3.4** (Optimization Soundness): Optimized instructions preserve semantic equivalence.
+**Theorem 3.4** (Optimization Soundness): Every atomic rewrite of the pass pipeline—fusion (Appendix C.2's rule, applied by the combining pass), dead-code elimination, and instruction combining (Section 3.4.4)—preserves the denotation of the instruction sequence it transforms: $\text{sem}(r(i)) \equiv \text{sem}(i)$, read as the partial equivalence of C.1.
 
 *Proof sketch*: By structural induction on instruction composition. The base case shows each atomic rewrite (fusion, elimination, combining) preserves the denotation of a single instruction; the inductive step lifts preservation through each composition operator of Definition 3.6. The full proof, including the per-rewrite case analysis, is given in Appendix C.
 
-The shipped checker (`agentflow.core.isa.bounded_checker.verify_instruction`) implements Definition 3.5 directly: it enumerates the bounded state space, filters by the declared preconditions, executes only pure instructions (side-effectful ones are returned as skipped, never executed), and reports violations structurally:
+The shipped checker (`agentflow.core.isa.bounded_checker.verify_instruction`) implements Definition 3.5 on the bounded state space exactly as described above (enumerate, filter by preconditions, execute only pure instructions); it reports violations structurally:
 
 ```python
 def verify_instruction(instruction, pre_condition, post_condition):
@@ -427,6 +414,8 @@ $$
 \end{align*}
 $$
 
+Their denotations (sequential execution; parallel interleaving under disjoint state footprints; guarded execution of $i_2$ on $i_1$'s triggering outcome; zero-or-more iterations of $i_1$) are fixed in Appendix C.1.
+
 Composition follows algebraic properties. Properties 1 and 3 hold for all instructions; Property 2 requires a stronger restriction than side-effect-freeness alone:
 
 1. **Associativity** (all instructions, up to denotation):
@@ -434,7 +423,7 @@ Composition follows algebraic properties. Properties 1 and 3 hold for all instru
 
 2. **Distributivity** (only for pure instructions with pairwise disjoint state footprints): Let $i_1, i_2, i_3$ be side-effect-free instructions whose denotations act on pairwise disjoint state components (declared outputs distinct and read sets disjoint from the other members' writes). Their updates are then independent state writes: re-applying $i_1$ overwrites its own cells with the same values (the double application is idempotent in effect), and updates to disjoint cells commute, so both sides of
    $$i_1 \parallel (i_2 \circ i_3) = (i_1 \parallel i_2) \circ (i_1 \parallel i_3)$$
-   denote the same net state transformation. *The disjointness restriction is necessary*: purity alone does not imply idempotence. A pure `update(+1)` instruction applied twice increments twice, so for instructions sharing a state component the law fails (see the Remark below).
+   denote the same net state transformation. *The disjointness restriction is necessary*: purity alone does not imply idempotence. A pure `update(+1)` instruction applied twice increments twice (pure here means free of *external* side effects; writes to declared state cells are permitted), so for instructions sharing a state component the law fails (see the Remark below).
 
 3. **Identity**:
    $$i \circ \epsilon = \epsilon \circ i = i$$
@@ -473,7 +462,7 @@ Pipeline {
 
 **Theorem 3.5** (Pipeline Correctness): For any valid instruction sequence $s$ and any schedule $S$ satisfying conditions S1-S4 of Appendix C.5—each instruction dispatched exactly once, dependencies respected, dispatch groups pairwise non-interfering, commit in program order—pipeline execution preserves program semantics.
 
-*Proof*: By induction on pipeline stages and hazard resolution (details in Appendix C).
+*Proof*: By induction over the dispatch groups of $S$ in commit order, under the invariant that the architectural state after committing each prefix of groups equals the sequential state after the same instructions; S1–S4 supply exactly-once dispatch, dependency order, group commutativity, and in-order commit (details in Appendix C.5).
 
 ### 3.4.3 Instruction Selection and Scheduling
 
@@ -481,23 +470,23 @@ Instruction selection follows a tree-pattern matching approach:
 
 **Definition 3.8** (Selection Pattern):
 $$
-\pi = (T, C, \text{cost}, \text{code})
+\pi = (\tau, C, \text{cost}, \text{code})
 $$
 
 where:
 
-- T: Tree pattern
-- C: Context constraints
+- $\tau$: a tree pattern over the IR (unrelated to the type-system symbol $T$ of Definition 3.2)
+- $C$: context constraints on the surrounding state
 - cost: Cost function
 - code: Generated code
 
-The selection process is formalized as:
+Given an IR tree $t$ to cover, the selection process is formalized as:
 
 $$
-\text{Select}(t) = \argmin_{\pi \in \Pi} \{\text{cost}(\pi) \mid \text{matches}(\pi.T, t) \land \text{satisfies}(t, \pi.C)\}
+\text{Select}(t) = \argmin_{\pi \in \Pi} \{\text{cost}(\pi) \mid \text{matches}(\pi.\tau, t) \land \text{satisfies}(t, \pi.C)\}
 $$
 
-Scheduling optimization problem:
+Scheduling optimization problem (with $\text{delay}(i)$ the incurred stall of $i$, $\text{active}(t)$ the instructions running at time $t$, $\text{res}(i)$ the resource demand of $i$, and Capacity the resource bound):
 
 $$
 \begin{align*}
@@ -532,6 +521,8 @@ Static optimization employs several techniques:
 
    ```
    Combine Rules {
+     // LOAD/STORE/MOVE are textbook mnemonics, illustrative
+     // only; they are not shipped opcode names
      LOAD followed by STORE → MOVE
      Multiple CONTEXT_UPDATE → Single UPDATE
      Sequential QUERY → Batch QUERY
@@ -564,11 +555,11 @@ $$
 
 **Proof Sketch**:
 
-1. Show semantic preservation for each atomic transformation (Appendix C, Lemma C.1)
-2. Prove composition of transformations preserves semantics (Appendix C, Lemma C.2)
-3. Demonstrate hazard-free execution in pipeline (Appendix C, Theorem 3.5)
+1. Show semantic preservation for each atomic transformation (the atomic-rewrite lemma, Appendix C.2)
+2. Prove composition of transformations preserves semantics (the compositionality lemma, Appendix C.3)
+3. Note that hazard-free pipeline execution is *not* part of this theorem—it is Theorem 3.5 (Appendix C.5), invoked separately; this theorem's contribution is the rewrite layer (steps 1–2).
 
-Performance Model:
+**Performance Model** (specified; the benchmarks of Section 5 measure latency and token counts directly and do not evaluate it):
 $$
 \text{Perf}(p) = \sum_{i \in p} (\text{base\_cost}(i) + \text{overhead}(i) - \text{optimization\_gain}(i))
 $$
@@ -582,7 +573,7 @@ $$
 
 Agents are heterogeneous: an agent (or the model behind it) may be strong at reasoning but weak at tool use, or vice versa. To make such differences explicit—and to give the multi-agent coordinator of Section 5.6 a principled basis for agent selection—AgentISA includes a capability assessment subsystem, implemented as `CapabilityProfile` in `agentflow.core.isa.capability`.
 
-**Definition 3.9** (Capability Profile): A capability profile of an agent $a$ is a mapping from capability domains $D$ (the shipped enum carries eight domains: reasoning, memory, generation, optimization, specialization, coordination, security, robustness) to domain scores:
+**Definition 3.9** (Capability Profile): A capability profile of an agent $a$ maps each capability domain $D$ (the shipped enum carries eight domains: reasoning, memory, generation, optimization, specialization, coordination, security, robustness) to a score–weight pair:
 $$
 \text{Cap}(a) = \{(\text{dom}_k, s_k, w_k) \mid \text{dom}_k \in D\}
 $$
@@ -607,7 +598,7 @@ $$
 S(a) = \frac{\sum_{k} w_k \, s_k}{\sum_{k} w_k}
 $$
 
-falling back to the unweighted mean when all weights are zero.
+with $S(a)$ falling back to the unweighted mean when all weights are zero.
 
 Three properties of this design deserve emphasis. First, it is **static rather than live-probing**: assessment is designed to be cheap, deterministic, and side-effect-free, though the shipped metric extraction is the stub disclosed above and exercised scores are injected. Second, it is **compositional**: because scores summarize instructions, fusing or eliminating instructions during compilation (Section 3.4) changes the profile predictably, and a production deployment would re-assess after optimization (the shipped coordinator does not yet do so). Third, it directly serves coordination: the agent-selection predicate in Section 5.6 chooses the highest-scoring agent above a capability threshold for each task, subject to the security policies of the `SecurityMonitor`—with the tests injecting scores directly, as disclosed above.
 
@@ -621,14 +612,14 @@ This section presents the implementation and validation of the AgentISA framewor
 
 ### 4.1.1 Instruction Selection Implementation
 
-We *specify* the tree-pattern matching approach of Section 3.4.3 (Definition 3.8) as dynamic programming over the IR tree, in the classical manner of bottom-up instruction selection [33]. **The shipped compiler does not yet implement this selector**: its current selection step is a heuristic matcher (name-overlap scoring over the instruction catalogue), and none of the benchmark numbers in Section 5 depend on tree-pattern selection. The specified algorithm is:
+We *specify* the tree-pattern matching approach of Section 3.4.3 (Definition 3.8) as dynamic programming over the IR tree, in the classical manner of bottom-up instruction selection [33]. **The shipped compiler does not yet implement this selector**: its current selection step is a heuristic matcher—name-overlap scoring over the instruction catalogue—whose compact listing is deferred to the source (`agentflow.core.isa.selection`); the DP listing below is the *specified* optimal selector, and none of the benchmark numbers in Section 5 depend on tree-pattern selection. The specified algorithm is:
 
 ```python
 Input: IR tree T, Pattern set P
 Output: Optimal pattern selection S
 
 function MATCH-TREE(T, P)
-    Let costs[n] = ∞ for all nodes n in T
+    costs[n] ← ∞ for all nodes n in T
     Let selected[n] = ∅ for all nodes n in T
     
     function MATCH-SUBTREE(node)
@@ -665,23 +656,25 @@ end function
 
 We state the optimality property of the specified algorithm, for patterns whose context constraints are *local* (a pattern's feasibility depends only on the node and its immediate operands):
 
-**Theorem 4.1** (Selection Optimality, specified algorithm): Given a set of context-local patterns P and an IR tree T, the MATCH-TREE algorithm finds the minimal cost covering.
+**Theorem 4.1** (Selection Optimality, specified algorithm): Given a set of context-local patterns P and an IR tree T, the MATCH-TREE algorithm computes the minimal covering cost; the covering itself is read off the `selected` table afterwards, by walking from the root and skipping subtrees spanned by the chosen pattern.
 
-*Proof*: By induction on tree height:
+*Proof*: By induction on tree height, assuming a covering of T exists (if no pattern matches a node its cost is $\infty$ and no covering exists):
 
-1. Base case: Leaf nodes select optimal patterns directly
-2. Inductive step: For a node n with children c₁...cₙ:
+1. Base case (a leaf has no children): the recurrence degenerates to a plain argmin over the patterns matching the leaf, which is optimal for a single node.
+2. Inductive step: For a node $v$ with children $c_1, \dots, c_k$:
    $$
-   \text{cost}(n) = \min_{p \in P} \left\{p.\text{cost} + \sum_{\substack{c \in \text{children}(n) \\ c \notin \text{covered}(p)}} \text{cost}(c)\right\}
+   \text{cost}(v) = \min_{p \in P} \left\{p.\text{cost} + \sum_{\substack{c \in \text{children}(v) \\ c \notin \text{covered}(p)}} \text{cost}(c)\right\}
    $$
 
-The recurrence sums only over children not already covered by the selected pattern—summing over all children would double-count the cost of subtrees the pattern spans, so the optimality claim holds for single-node patterns as written and for multi-node patterns only under this recurrence.
+   By the induction hypothesis, each $\text{cost}(c)$ is the minimal covering cost of the corresponding subtree; the recurrence takes each candidate pattern's cost plus the (already optimal) costs of the children the candidate does not span, so the minimum over candidate patterns is the minimal covering cost at $v$—the minimum over disjoint pattern choices is optimal.
+
+The recurrence sums only over children not covered by the candidate pattern $p$—summing over all children would double-count the cost of subtrees the pattern spans. Section 3.4.3's per-node argmin is therefore exact for single-node patterns; multi-node patterns require this covering recurrence.
 
 The recurrence requires that a pattern's feasibility at a node not depend on the covers chosen for other subtrees; context constraints that couple sibling subtrees break this optimal-substructure property, which is why the statement restricts to context-local patterns. This theorem is a property of the specified algorithm, not of the shipped heuristic selector; no optimality claim is made for the implementation.
 
 ### 4.1.2 Pipeline Scheduling Implementation
 
-We *specify* the pipeline scheduler following the DAG model from Section 3.4.2, with hazard detection and resource-constrained issue in the style of classical pipeline scheduling [34]. **This cycle-accurate scheduler is design-level**: the executed runtime path is the sequential and parallel-grouped dispatch produced by the compiler's grouping pass (Section 4.1.3); no benchmark in Section 5 exercises a cycle-accurate schedule. The specified scheduler is:
+We *specify* the pipeline scheduler following the instruction-scheduling formulation of Section 3.4.3 (Deps and resource capacity) and the correctness conditions of Theorem 3.5 (Section 3.4.2), with hazard detection and resource-constrained issue in the style of classical pipeline scheduling [34]. **This cycle-accurate scheduler is design-level**: the executed runtime path is the sequential and parallel-grouped dispatch produced by the compiler's grouping pass (Section 4.1.3); no benchmark in Section 5 exercises a cycle-accurate schedule. The specified scheduler is:
 
 ```python
 Input: Instruction sequence I
@@ -713,15 +706,15 @@ function SCHEDULE-PIPELINE(I)
 end function
 ```
 
-Schedule verification follows the formal model:
+Schedule verification checks the dependency-ordering condition (S2) of the formal model (Theorem 3.5, Appendix C.5), with the edge convention of Section 3.4.3—$(i_1, i_2) \in \text{Deps}$ means $i_1$ must finish before $i_2$ starts; S1 (exactly-once dispatch) and S4 (in-order commit) hold by construction of the scheduling loop, and S3 (group non-interference) is enforced by the grouping check:
 
 $$
-\forall i_1, i_2 \in \text{Schedule}: \text{depends}(i_1, i_2) \implies \text{slot}(i_1) < \text{slot}(i_2)
+\forall (i_1, i_2) \in \text{Deps}: \text{slot}(i_2) > \text{slot}(i_1)
 $$
 
 ### 4.1.3 Static Optimization Implementation
 
-We implement the optimization passes defined in Section 3.4.4. The shipped rule set registers no peephole patterns; the passes that fire in the benchmarks are fusion, dead-code elimination, and parallel grouping, so every peephole obligation below is currently dormant but stated for completeness:
+We implement the optimization passes defined in Section 3.4.4. The passes that fire in the benchmarks are fusion (the instruction-combining pass of Section 3.4.4, whose full listing appears below), dead-code elimination (the shipped two-level design of Section 3.4.4), and parallel grouping (described with its measurement in Section 5.3). The shipped rule set registers no peephole patterns, so every peephole obligation below is currently dormant but stated for completeness:
 
 1. **Peephole Optimization**:
 
@@ -749,12 +742,12 @@ Each peephole rule carries a correctness *obligation*, discharged as part of rul
 
 $$
 \begin{align*}
-&\forall p \in \text{Patterns}, i \in \text{Instructions}: \\
-&\text{matches}(p, i) \implies \text{sem}(\text{replace}(p, i)) \equiv \text{sem}(i)
+&\forall p \in \text{Patterns}, w \in \text{Instructions}^{\text{len}(p)}: \\
+&\text{matches}(p, w) \implies \text{sem}(\text{replace}(p, w)) \equiv \text{sem}(w)
 \end{align*}
 $$
 
-No automated equivalence checker ships with the current rule set (there are no rules to check); Section 4.3.1 specifies the symbolic-execution checker that a populated rule set would require.
+As stated above, the shipped rule set is empty, so the equivalence checker is dormant; Section 4.3.1 specifies the symbolic-execution checker a populated rule set would require.
 
 2. **Instruction Combining**:
 
@@ -780,7 +773,7 @@ def combine_instructions(self, insts: List[Instruction]) -> List[Instruction]:
 
 ### 4.2.1 Dynamic Pipeline Control
 
-Design of the dynamic pipeline controller (**specified, not implemented**—the shipped dynamic machinery is the hot-path detection and trace optimization of Section 4.2.2; a skeleton module exists but is not wired into the runtime):
+Design of the dynamic pipeline controller (**specified, not implemented**—the shipped dynamic machinery is the counter/threshold hot-path detector and the trace re-optimization described in Section 3.4.4 (both discussed in Section 4.2.2; measured in Sections 5.4 and 5.8); a skeleton module exists but is not wired into the runtime):
 
 ```python
 class PipelineController:
@@ -818,20 +811,20 @@ $$
 
 ### 4.2.2 Dynamic Optimization Implementation
 
-The *shipped* mechanism is the counter/threshold detector described in Section 3.4.4: a monotone count per exact `path_id`, crossed against a configurable threshold with a last-recorded-success-rate gate. What the benchmarks measure (Sections 5.4 and 5.8) is this mechanism. The following is the *specified* detector—exponential moving average over a window, frequency normalized by total executions, and trace formation from hot-path regions—which generalizes the shipped counter to workloads with trace diversity; it is **not yet implemented**:
+The *shipped* mechanism is the counter/threshold detector described in Section 3.4.4: a monotone count per exact `path_id`, crossed against a configurable threshold with a last-recorded-success-rate gate. What the benchmarks measure (Sections 5.4 and 5.8) is this mechanism. The following is the *specified* detector—exponential moving average over a window, frequency normalized by recent execution share, and trace formation from hot-path regions; it is **not yet implemented**. Together with the block-granular trace formation below it addresses workloads with trace diversity; the detector itself remains exact-path-keyed (the limitation of Section 3.4.4—that similar but non-identical sequences never accumulate a count—still applies to it):
 
 1. **Hot Path Detection** (specified):
 
 ```python
-Input: Execution path P, Threshold θ, Window size w
+Input: Execution path P, Threshold θ, EMA decay γ (γ = 2/(w+1) for window w; γ is unrelated to the α stability bound of Section 3.4.4)
 Output: Boolean indicating if P is hot
 
-function DETECT-HOT-PATH(P, θ, w)
-    Let counter be an exponential moving average with window w
+function DETECT-HOT-PATH(P, θ, γ)
+    Let counter be an exponential moving average with decay γ
     
     function UPDATE-COUNTERS(path)
         h ← COMPUTE-PATH-HASH(path)
-        counter[h] ← counter[h] × (1 - α) + 1
+        counter[h] ← counter[h] × (1 - γ) + 1
         
         if IS-PATH-HOT(path) then
             TRIGGER-OPTIMIZATION(path)
@@ -840,7 +833,7 @@ function DETECT-HOT-PATH(P, θ, w)
     
     function IS-PATH-HOT(path)
         h ← COMPUTE-PATH-HASH(path)
-        freq ← counter[h] / TOTAL-EXECUTIONS()
+        freq ← counter[h] / Σ_{h'} counter[h']   // recent execution share, not cumulative total
         stab ← COMPUTE-STABILITY(path)
         return freq > θ and stab > STABILITY-THRESHOLD
     end function
@@ -850,7 +843,7 @@ function DETECT-HOT-PATH(P, θ, w)
 end function
 ```
 
-Hot-path score is computed from the frequency already normalized in the pseudocode above (freq(path) = counter[path]/total_exec, so no second normalization is applied), blended with recent stability through an exponential-moving-average coefficient $\beta$ (distinct from the $\alpha$ stability bound of Section 3.4.4):
+The decision rule of the pseudocode is the threshold predicate IS-PATH-HOT (frequency above θ and stability above the stability threshold); it computes no score. A *ranking variant*—specified, not part of the decision rule—can order candidate paths by the heuristic score below, reusing the frequency already normalized in the pseudocode (freq(path) = counter[h]/Σ counter, so no second normalization) blended with recent stability through a static stability weight $\beta$:
 
 $$
 \text{score}(\text{path}) = \text{freq}(\text{path}) \cdot \beta \cdot \text{stab}(\text{path})
@@ -880,8 +873,8 @@ function BUILD-TRACE(H)
     for each block B in H do
         if SHOULD-INCLUDE(B) then
             APPEND-TO-TRACE(T, B)
-        else if SHOULD-SPLIT(B) then
-            break
+        else
+            break   // any block not selected terminates the trace
         end if
     end for
     
@@ -890,21 +883,17 @@ function BUILD-TRACE(H)
 end function
 ```
 
-Trace validity is verified through:
+Trace validity is *defined* by the conjunction of three properties (H the loop header of the region, tail the last block of the trace); VERIFY-TRACE-PROPERTIES checks them:
 
 $$
-\text{Valid}(\text{trace}) \iff \begin{cases}
-\text{Entry}(\text{trace}) \text{ is dominated by header} \\
-\text{Exit}(\text{trace}) \text{ post-dominates tail} \\
-\text{NoSideExit}(\text{trace}) \text{ except tail}
-\end{cases}
+\text{Valid}(\text{trace}) \iff \text{Entry}(\text{trace}) \text{ dominated by } H \,\wedge\, \text{Exit}(\text{trace}) \text{ post-dominates tail} \,\wedge\, \text{NoSideExit}(\text{trace}) \text{ except tail}
 $$
 
 ## 4.3 Optimization Verification
 
 ### 4.3.1 Static Analysis
 
-We *specify* verification of the static optimizations from Section 3.4.4 (a symbolic-execution equivalence checker over transformation path pairs). **No automated checker ships with the current rule set**—the shipped peephole table is empty, so the obligation is dormant—and the theorems of Section 3.4.5 are conditional on discharging it when rules are introduced (Appendix C.6):
+We *specify* verification of the static optimizations from Section 3.4.4 (a symbolic-execution equivalence checker over transformation path pairs). As stated in Section 4.1.3, the shipped peephole table is empty and this obligation is dormant; the soundness theorems (Theorems 3.4–3.6) are conditional on discharging it when rules are introduced (Appendix C.7):
 
 ```python
 Input: Original CFG O, Transformed CFG T
@@ -916,7 +905,8 @@ function VERIFY-TRANSFORMATION(O, T)
     P₂ ← SYMBOLIC-EXECUTE(T)
     
     function VERIFY-EQUIVALENCE(path₁, path₂)
-        for each symbolic state σ do
+        // σ ranges over the symbolic states Σ explored on both paths
+        for each symbolic state σ ∈ Σ do
             if EVALUATE(path₁, σ) ≠ EVALUATE(path₂, σ) then
                 return false
             end if
@@ -924,8 +914,14 @@ function VERIFY-TRANSFORMATION(O, T)
         return true
     end function
     
-    // Verify all path pairs
-    for each (p₁, p₂) in ZIP(P₁, P₂) do
+    // Paths must pair one-to-one; a length mismatch means the
+    // transformation added or removed a symbolic path — reject.
+    if LENGTH(P₁) ≠ LENGTH(P₂) then
+        return false
+    end if
+    
+    // Verify all path pairs, paired by the transformation's path map
+    for each (p₁, p₂) in PATH-MAP(P₁, P₂) do
         if not VERIFY-EQUIVALENCE(p₁, p₂) then
             return false
         end if
@@ -943,7 +939,7 @@ $$
 
 ### 4.3.2 Dynamic Analysis
 
-Runtime verification implements:
+The runtime *monitors* optimizations through a single mechanism (no result-correctness oracle is defined at runtime—correctness of LLM-instruction results is not decidable in general and is delegated to the authoring-time verification of Section 3.3.3; the monitor below is a specified, not shipped, component):
 
 1. **Performance Monitoring**:
 
@@ -958,31 +954,23 @@ class PerformanceMonitor:
         
         return Metrics(
             latency=(end - start),
-            resource_usage=self.measure_resources(),
-            correctness=self.verify_result(result, instruction)
+            resource_usage=self.measure_resources()
         )
 ```
 
-2. **Weighted Improvement Metric**:
-Optimization effectiveness is summarized as a descriptive weighted mean of metric deltas:
-
-$$
-\text{Improvement} = \frac{\sum_{i=1}^n w_i(m_i^{\text{opt}} - m_i^{\text{base}})}{\sum_{i=1}^n w_i}
-$$
-
-where $m_i$ are performance metrics and $w_i$ are importance weights. This is a descriptive summary only; the evaluation protocol of Section 5.1.3 reports mean ± standard deviation and makes no inferential (hypothesis-test) claims.
+The evaluation protocol of Section 5.1.3 reports per-metric mean ± standard deviation and makes no inferential (hypothesis-test) claims; no aggregate weighted-mean score is computed.
 
 ### 4.3.3 Empirical Results
 
-We validate the implemented optimizations with the microbenchmark suite of Section 5, which drives the real compiler, cache, and optimization-manager code paths against a mock LLM backend. Summary of the results (all mean±stdev over 5 random seeds on synthetic Zipf workloads; full methodology and tables in Section 5):
+We validate the implemented optimizations with the microbenchmark suite of Section 5, which drives the real compiler, cache, and optimization-manager code paths against a mock LLM backend. Summary of the results (all mean ± standard deviation over 5 random seeds on synthetic Zipf workloads; full methodology and tables in Section 5):
 
 | Optimization                | Measured effect                                                       | Where reported |
 | --------------------------- | --------------------------------------------------------------------- | -------------- |
-| Result caching              | 59.5%–79.6% reduction in simulated API calls, increasing with Zipf skew | Section 5.2    |
+| Result caching              | 59.5% ± 0.3% (s = 0.5) to 79.6% ± 0.5% (s = 1.5) reduction in simulated API calls, increasing with Zipf exponent | Section 5.2    |
 | Static compilation (fusion + DCE) | 34.2%±1.8% reduction in effective instruction count (length-200 sequences) | Section 5.3    |
 | Dynamic hot-path optimization | 65.8%±4.6% trace shrinkage on repeatedly executed traces              | Section 5.4    |
 
-These are microbenchmark measurements on synthetic workloads with simulated latency (80 ms per simulated call); they are not production end-to-end results. Section 5.7 reports a scaled-down validation of the caching mechanism against a real LLM gateway, Section 5.7.1 extends the live-gateway validation to compilation and hot-path adoption, Section 5.8 a four-task system-level characterization, and Section 5.9 the remaining threats to validity.
+These are microbenchmark measurements on synthetic workloads with simulated latency (80 ms per simulated call); they are not production end-to-end results. Section 5.7 reports a scaled-down validation of the caching mechanism against a real LLM gateway, Section 5.7.1 extends the real-gateway validation to compilation and hot-path adoption, Section 5.8 a four-task system-level characterization, and Section 5.9 the remaining threats to validity.
 
 # 5. Empirical Evaluation
 
@@ -1000,16 +988,16 @@ Workloads are synthetic and seed-controlled:
 
 - **Caching**: 2,000 tasks drawn from a discrete distribution over 50 instruction templates × 20 parameter values, with task popularity following a Zipf distribution with exponent $s \in \{0.5, 1.0, 1.5\}$. Increasing $s$ concentrates popularity on fewer tasks, increasing reuse potential.
 - **Static compilation**: random instruction sequences of length 50, 200, and 1,000 (each slot dead with probability 0.25, pure with probability 0.55, side-effectful otherwise; a final side-effectful sink consumes all pure outputs), compiled at optimization levels NONE, BASIC, ADVANCED, and AGGRESSIVE. The planted dead/pure structure is what gives DCE and fusion targets to find; the measured reductions are properties of this workload family.
-- **Dynamic optimization**: instruction traces of length 100 recorded for up to 200 iterations per seed, with hot-path detection active (threshold 50 recordings). The recording loop terminates at the hot-path trigger—iteration 50 in all seeds—so each seed contributes ~51 recordings.
+- **Dynamic optimization**: instruction traces of length 100 recorded for up to 200 iterations per seed, with hot-path detection active (threshold 50 recordings). The recording loop terminates at the hot-path trigger—iteration 50 in all seeds—so each seed contributes exactly 51 recordings (the 50 that build the count plus the triggering one).
 - **Ablation**: an independent workload draw with the same distribution parameters as the static-compilation experiment (length 200, 5 seeds, dead 0.25 / pure 0.55, but seed base 4,000 rather than 2,000), with the fusion and dead-code-elimination passes enabled individually and jointly. Because the draw is independent, the all-passes total (35.0%) is a replication of the 34.2% headline of Section 5.3, not a decomposition of that exact number.
 
 ### 5.1.3 Protocol and Statistics
 
-Each configuration is run with 5 random seeds; we report mean ± sample standard deviation across seeds. These are **descriptive statistics only**: we make no hypothesis-test claims (no p-values, no significance tests) anywhere in this paper. The seed count suffices to show that the effects are stable across workload instantiations—the standard deviations are small relative to the means—but a formal inferential comparison against other systems is out of scope, because there is no baseline system that shares the mock-backend instrumentation.
+Each synthetic-workload configuration (Sections 5.2–5.5) is run with 5 random seeds; we report mean ± sample standard deviation across seeds. These are **descriptive statistics only**: we make no hypothesis-test claims (no p-values, no significance tests) anywhere in this paper. The seed count suffices to show that the effects are stable across workload instantiations—the standard deviations are small relative to the means—but a formal inferential comparison against other systems is out of scope, because there is no baseline system that shares the mock-backend instrumentation.
 
 ## 5.2 Experiment 1: Result Caching
 
-**Research question**: How many simulated LLM API calls does AgentISA's result caching eliminate, as a function of workload skew?
+**Research question.** How many simulated LLM API calls does AgentISA's result caching eliminate, as a function of workload skew?
 
 We execute 2,000 tasks per seed, once with caching disabled and once with the `InstructionCache` enabled, and measure simulated API calls at the backend. The reduction ratio and cache hit rate coincide by construction: every avoided call corresponds to exactly one cache hit.
 
@@ -1019,13 +1007,13 @@ We execute 2,000 tasks per seed, once with caching disabled and once with the `I
 | 1.0               | 2,000            | 642.0 ± 3.8    | 67.9% ± 0.2% | 67.9% ± 0.2% |
 | 1.5               | 2,000            | 408.0 ± 9.4    | 79.6% ± 0.5% | 79.6% ± 0.5% |
 
-**Interpretation.** The reduction grows monotonically with skew, from 59.5% under nearly uniform popularity ($s = 0.5$) to 79.6% under heavy concentration ($s = 1.5$). This matches the cache-aware expectation from Section 2.5: the upper bound on savings is the probability mass of repeated tasks, and Zipf skew directly controls that mass. In simulated latency terms, the cache saves 95,168 ± 455 ms, 108,640 ± 305 ms, and 127,360 ± 750 ms of simulated time at $s = 0.5, 1.0, 1.5$, respectively (avoided calls × 80 ms).
+**Interpretation.** The reduction grows monotonically with skew, from 59.5% under mild skew ($s = 0.5$) to 79.6% under heavy concentration ($s = 1.5$). This matches the cache-aware expectation: the upper bound on savings is the probability mass of repeated tasks, and Zipf skew directly controls that mass. In simulated latency terms the savings are the avoided-call counts × 80 ms ($s = 0.5/1.0/1.5$: 95,168 ± 455 / 108,640 ± 305 / 127,360 ± 750 ms)—derived, not separately measured.
 
 Two caveats keep this honest. First, these are *simulated* calls against a mock backend: the reduction is exact for this workload family, but real deployments face cache-invalidation, prompt-context, and embedding-variability effects that the mock abstracts away. Second, the absolute number depends on the workload's reuse structure; workloads without repetition (e.g., each task unique) would see zero benefit. What the experiment establishes is the *mechanism and its sensitivity to skew*, not a universal constant.
 
 ## 5.3 Experiment 2: Static Compilation
 
-**Research question**: How much does the compiler reduce instruction sequences, and what do the different optimization levels contribute?
+**Research question.** How much does the compiler reduce instruction sequences, and what do the different optimization levels contribute?
 
 We compile random instruction sequences at four optimization levels and measure two distinct quantities. We separate them explicitly because they are easy to conflate:
 
@@ -1034,22 +1022,22 @@ We compile random instruction sequences at four optimization levels and measure 
 
 | Sequence length | Level       | Effective-instruction reduction | Dispatch count |
 | --------------- | ----------- | ------------------------------ | -------------- |
-| 50              | NONE        | 0%                             | 50.0 ± 0.0     |
+| 50              | NONE        | 0% ± 0.0                           | 50.0 ± 0.0     |
 | 50              | BASIC       | 32.8% ± 4.1%                   | 33.6 ± 2.1     |
 | 50              | ADVANCED    | 32.8% ± 4.1%                   | 19.0 ± 4.1     |
 | 50              | AGGRESSIVE  | 32.8% ± 4.1%                   | 19.0 ± 4.1     |
-| 200             | NONE        | 0%                             | 200.0 ± 0.0    |
+| 200             | NONE        | 0% ± 0.0                           | 200.0 ± 0.0    |
 | 200             | BASIC       | 34.2% ± 1.8%                   | 131.6 ± 3.6    |
 | 200             | ADVANCED    | 34.2% ± 1.8%                   | 74.0 ± 6.3     |
 | 200             | AGGRESSIVE  | 34.2% ± 1.8%                   | 74.0 ± 6.3     |
-| 1,000           | NONE        | 0%                             | 1,000.0 ± 0.0  |
+| 1,000           | NONE        | 0% ± 0.0                           | 1,000.0 ± 0.0  |
 | 1,000           | BASIC       | 35.4% ± 1.6%                   | 646.0 ± 16.4   |
 | 1,000           | ADVANCED    | 35.4% ± 1.6%                   | 344.6 ± 31.6   |
 | 1,000           | AGGRESSIVE  | 35.4% ± 1.6%                   | 344.6 ± 31.6   |
 
 **Interpretation.** Three observations:
 
-1. **Effective instruction count reduction is level-stable**: BASIC, ADVANCED, and AGGRESSIVE produce identical reductions (34.2% ± 1.8% at length 200). The fusion and DCE passes implemented at BASIC level already capture the available gains on these synthetic sequences; the higher levels add *scheduling* improvements, not additional elimination. We report this as-is rather than claiming monotonic gains across levels.
+1. **Effective instruction count reduction is level-stable**: BASIC, ADVANCED, and AGGRESSIVE produce identical reductions (34.2% ± 1.8% at length 200). The fusion and DCE passes implemented at BASIC level already capture the available gains on these synthetic sequences; the higher levels add *scheduling* improvements (dispatch folding), not additional elimination—and on these workloads ADVANCED and AGGRESSIVE coincide, their extra passes finding no further targets; they would differ only on streams carrying combinable patterns. We report this as-is rather than claiming monotonic gains across levels.
 
 2. **Dispatch count drops further with parallel grouping**: at length 200, dispatch falls from 131.6 (BASIC) to 74.0 (ADVANCED) while effective instruction reduction is unchanged. This is the dispatch-folding effect described above: adjacent side-effect-free instructions with disjoint dependencies and outputs grouped into shared dispatches. Readers should interpret the 74.0 figure as a scheduling reduction, not a further program-size reduction. (An earlier implementation folded more aggressively—44.4 at length 200—but could place side-effectful instructions into shared groups whose non-interference was never established; the sounder grouping reported here folds less, and Appendix C.5's dispatch-folding corollary now matches the implementation exactly.)
 
@@ -1059,9 +1047,9 @@ Note again that effective-instruction reduction is a *program-size* metric. It t
 
 ## 5.4 Experiment 3: Dynamic Hot-Path Optimization
 
-**Research question**: Does the dynamic optimizer detect and specialize repeatedly executed traces?
+**Research question.** Does the dynamic optimizer detect and specialize repeatedly executed traces?
 
-We record an instruction trace of length 100 for up to 200 iterations per seed with hot-path detection active; the recording loop terminates at the trigger (iteration 50 in all seeds, ~51 recordings per seed). Once a path is flagged hot, the runtime forms an optimized trace. **This experiment measures the length of that optimized trace**—the benchmark does not execute it. Whether an optimized trace, when actually executed, preserves the task's observable output is established separately, at task level, by the system-level characterization of Section 5.8 (which re-executes hot-path-optimized instruction streams and verifies byte-identical output).
+We record an instruction trace of length 100 for up to 200 iterations per seed with hot-path detection active; the recording loop terminates at the trigger (iteration 50 in all seeds, 51 recordings per seed: the 50 counted plus the trigger). Once a path is flagged hot, the runtime forms an optimized trace. **This experiment measures the length of that optimized trace**—the benchmark does not execute it. Whether an optimized trace, when actually executed, preserves the task's observable output is established separately, at task level, by the system-level characterization of Section 5.8 (which re-executes hot-path-optimized instruction streams and verifies byte-identical output).
 
 | Seed | Original length | Optimized length | Shrink ratio |
 | ---- | --------------- | ---------------- | ------------ |
@@ -1079,13 +1067,13 @@ To attribute the static gains, we re-run the compiler with individual passes tog
 
 | Configuration   | Instruction-count reduction |
 | --------------- | ---------------------------- |
-| none            | 0%                           |
+| NONE            | 0% ± 0.0                   |
 | fusion only     | 21.9% ± 3.5%                 |
 | DCE only        | 24.1% ± 3.3%                 |
 | fusion + DCE    | 35.0% ± 3.7%                 |
 | all passes      | 35.0% ± 3.7%                 |
 
-**Interpretation.** Fusion alone removes 21.9% and DCE alone 24.1%; combined they remove 35.0%—less than the sum of their individual gains, because the passes partially overlap: sequences that are fusable are often also dead, so the second pass finds fewer targets after the first has run. The "all passes" row equals fusion+DCE on these workloads, consistent with Observation 1 in Section 5.3: no additional pass contributes measurable reduction here. We report the absence of additional gain rather than dressing the higher levels in unearned credit. One caveat follows from the workload construction: because the ablation draws its sequences independently (Section 5.1.2), its fusion+DCE total (35.0% ± 3.7%) is a replication of—not a decomposition into—the 34.2% ± 1.8% headline of Section 5.3; the two numbers differ because they average over different random draws of the same distribution. And because the workloads plant dead instructions at rate 0.25 by construction, DCE's per-pass share is near-tautological for this family—it measures that the pass finds the planted dead code, which is precisely its function.
+**Interpretation.** Fusion alone removes 21.9% and DCE alone 24.1%; combined they remove 35.0%—less than the sum of their individual gains, because the passes partially overlap: sequences that are fusable are often also dead, so the second pass finds fewer targets after the first has run. The "all passes" row equals fusion+DCE on these workloads, consistent with the level-stability observation in Section 5.3: no additional pass contributes measurable reduction here. We report the absence of additional gain rather than dressing the higher levels in unearned credit. One caveat follows from the workload construction: because the ablation draws its sequences independently (Section 5.1.2), its fusion+DCE total (35.0% ± 3.7%) is a replication of—not a decomposition into—the 34.2% ± 1.8% headline of Section 5.3; the two numbers differ because they average over different random draws of the same distribution. And because the workloads plant dead instructions at rate 0.25 by construction, DCE's per-pass share is near-tautological for this family—it measures that the pass finds the planted dead code, which is precisely its function.
 
 ## 5.6 Multi-Agent Coordination: Functional Validation
 
@@ -1103,14 +1091,18 @@ function COORDINATE-AGENTS(A, τs)
         AUTHORIZE(task, role policy)           // SecurityMonitor
         ag ← SELECT-BY-CAPABILITY(A, T)        // CapabilityProfile (Section 3.5)
         plan ← BUILD-EXECUTION-PLAN(T)         // stages + coordination rules
+        task-outcome ← success
         for each stage in plan do
-            if stage fails and fallback(stage) exists then
-                EXECUTE-FALLBACK(stage)
-            else
-                EXECUTE-STAGE(stage, ag)
+            stage-outcome ← EXECUTE-STAGE(stage, ag)
+            if stage-outcome failed and fallback(stage) exists then
+                stage-outcome ← EXECUTE-FALLBACK(stage)
+            end if
+            if stage-outcome failed then
+                task-outcome ← failed
+                break
             end if
         end for
-        RECORD-HISTORY(T, outcome)
+        RECORD-HISTORY(T, task-outcome)
     end for
 end function
 ```
@@ -1127,13 +1119,13 @@ These tests exercise the same production modules used elsewhere in the system an
 
 ## 5.7 Real-LLM End-to-End Validation of Result Caching
 
-**Research question**: does the caching mechanism behave identically when the "model" is a real LLM behind a live gateway, and how much *measured* wall-clock time and token usage does it save?
+**Research question.** Does the caching mechanism behave identically when the "model" is a real LLM behind a live gateway, and how much *measured* wall-clock time and token usage does it save?
 
 **Setup.** We replace the mock backend with a real model served by a local Anthropic-protocol gateway (TLS with an internal CA; alias `claude-glm-5.3-flash`, a hosted reasoning-capable GLM model; `max_tokens=64`). Requests are sequential HTTP calls (httpx, no proxy, 90 s timeout), with three bounded retries for transient failures — none occurred. Every other component is the production code path: the same `InstructionCache` protocol, the same instruction objects, the same workload generator and the same instruction pool (50 templates) and parameter space (20 values) as Section 5.2.
 
 **Scale.** Because each real round trip costs ~2.2 s, we reduce scale from 2,000 tasks × 5 seeds to **200 tasks × 1 seed** per Zipf level (s in {0.5, 1.0, 1.5}); the whole run is 1,040 measured experiment round trips (plus one preflight round trip that validates connectivity before timing begins) in 39.4 minutes. The seed pins the task sequence exactly, so the workload is the same one the expectation below is computed from.
 
-**An exactness property.** A cache hit depends only on the (instruction, params) pair seen so far — not on what the model returns. The production `InstructionCache` is LRU with a TTL, so in general a hit also depends on wall-clock time and capacity; under this benchmark's configuration none of that can bind: `max_size` = 100,000 with at most 200 distinct keys per arm, `ttl` = 3,600 s with every cache-enabled arm completing in under seven minutes (the no-cache arms run to 7.9 minutes—far below the 3,600 s TTL), a fresh cache per arm, and failed calls never cached. Hit/miss decisions are therefore a pure function of the (instruction, params) sequence, and the hit/miss sequence for a fixed workload is *computable without any backend*. If the mechanism is correct, the real run must reproduce that sequence exactly; at the granularity the artifact records — per-arm hit rates and call counts — it does:
+**An exactness property.** A cache hit depends only on the (instruction, params) pair seen so far — not on what the model returns. The production `InstructionCache` is LRU with a TTL, so in general a hit also depends on wall-clock time and capacity; under this benchmark's configuration none of that can bind: `max_size` = 100,000 with at most 200 distinct keys per arm, `ttl` = 3,600 s with every cache-enabled arm completing in under seven minutes (the no-cache arms run to 7.9 minutes and never consult a cache), a fresh cache per arm, and failed calls never cached. Hit/miss decisions are therefore a pure function of the (instruction, params) sequence, and the hit/miss sequence for a fixed workload is *computable without any backend*. If the mechanism is correct, the real run must reproduce that sequence exactly; at the granularity the artifact records — per-arm hit rates and call counts — it does:
 
 | Zipf s | Expected hit rate (computed, no backend) | Observed hit rate | Calls (no cache -> cached) | Call reduction | Wall clock (no cache -> cached, ms) | Wall saved (ms) | Tokens saved |
 | ------ | ---------------------------------------- | ----------------- | --------------------------- | -------------- | ------------------------------------ | --------------- | ------------ |
@@ -1141,11 +1133,11 @@ These tests exercise the same production modules used elsewhere in the system an
 | 1.0    | 26.0%                                    | 26.0%             | 200 -> 148                  | 26.0%          | 455,946 -> 334,597                   | 121,349         | 4,420        |
 | 1.5    | 45.5%                                    | 45.5%             | 200 -> 109                  | 45.5%          | 450,330 -> 244,316                   | 206,014         | 7,735        |
 
-Per-call latency was stable across arms (p50 2.13-2.21 s, p95 3.06-3.54 s). Token savings are gateway-reported `usage` differences: every avoided call saves its input tokens plus the tokens the reasoning model generates before responding (output tokens were the binding constraint of `max_tokens=64` in every call).
+Per-call latency was stable across arms (p50 2.13–2.21 s, p95 3.06–3.54 s). Token savings are gateway-reported `usage` differences: every avoided call saves its input tokens plus the tokens the reasoning model generates before responding (output tokens were the binding constraint of `max_tokens=64` in every call).
 
-**Interpretation.** Three points. First, the mechanism transfers unchanged: observed hit rates match the computed expectation exactly at every skew level, so the synthetic results of Section 5.2 measure the cache, not an artifact of the mock. Second, avoided calls convert into measured time and tokens: 14.1%, 26.6%, and 45.8% of the no-cache arm's wall clock at s = 0.5, 1.0, 1.5. These measured savings track the call reduction but are not identical to it, because arms were measured sequentially and per-call latency drifted slightly between arms (the exact quantity is the call reduction; wall and token figures are measurements, not derivations). Third, the *absolute* hit rates here (8.5-45.5%) are lower than Section 5.2's (59.5-79.6%) purely because repetition accumulates with task count: at N = 200 these are the exact computed values for this workload family, and at N = 2,000 the same computation yields the Section 5.2 numbers. The dependence on N is a property of the workload, not the backend.
+**Interpretation.** Three points. First, the mechanism transfers unchanged: observed hit rates match the computed expectation exactly at every skew level, so the synthetic results of Section 5.2 measure the cache, not an artifact of the mock. Second, avoided calls convert into measured time and tokens: 14.1%, 26.6%, and 45.8% of the no-cache arm's wall clock at s = 0.5, 1.0, 1.5. These measured savings track the call reduction but are not identical to it, because arms were measured sequentially and per-call latency drifted slightly between arms (the exact quantity is the call reduction; wall and token figures are measurements, not derivations). Third, the *absolute* hit rates here (8.5–45.5%) are lower than Section 5.2's (59.5–79.6%) purely because repetition accumulates with task count: at N = 200 these are the exact computed values for this workload family, and at N = 2,000 the same computation yields the Section 5.2 numbers. The dependence on N is a property of the workload, not the backend.
 
-**Scope of the claim.** This experiment validates the caching mechanism end-to-end: one gateway, one model, one seed, N = 200, sequential requests, no streaming. The artifact records per-arm aggregate hit rates and call counts; per-position sequence identity follows from the deterministic cache decisions under the conditions above, but is not separately logged. The compiler and dynamic-optimization experiments (Sections 5.3-5.5) are structural — they do not dispatch to the backend at all; Section 5.7.1 below extends the live-gateway validation to them through a cache-mediated protocol, and otherwise their validity rests on the code-path and ablation arguments made there. Nothing in this section is a throughput, availability, or dollar-cost claim.
+**Scope of the claim.** This experiment validates the caching mechanism end-to-end: one gateway, one model, one seed, N = 200, sequential requests, no streaming. The artifact records per-arm aggregate hit rates and call counts; per-position sequence identity follows from the deterministic cache decisions under the conditions above, but is not separately logged. The compiler and dynamic-optimization experiments (Sections 5.3–5.5) are structural — they do not dispatch to the backend at all; Section 5.7.1 below extends the real-gateway validation to them through a cache-mediated protocol, and otherwise their validity rests on the code-path and ablation arguments made there. Nothing in this section is a throughput, availability, or dollar-cost claim.
 
 ### 5.7.1 Real-Gateway Validation of Compilation and Hot-Path Optimization
 
@@ -1157,11 +1149,11 @@ Per-call latency was stable across arms (p50 2.13-2.21 s, p95 3.06-3.54 s). Toke
 
 **Scale.** Tiny scale: 50 task realizations × 1 seed × Zipf s = 1.0. The workload contains 22 distinct signature batches, so the entire run is 23 gateway round trips (one preflight plus 22 live calls, all issued by arm (a)) in 4.4 minutes of wall time — a bounded validation run, not the 200 × 3-skew sweep of Section 5.7.
 
-**Results.** All checks pass. Arm (a) — the live reference run — made exactly the 22 first-occurrence calls the backend-free computation predicts and served the other 28 realizations from the result cache (hit rate 56.0%), consuming 4,027 prompt and 11,264 gateway-reported completion tokens in 260.2 s of measured call latency. Arm (b) — compiled, hot-path-adopted — made zero new gateway calls (all 50 realizations hit the warmed keys) and reproduced every artifact byte-for-byte. The hot path was adopted at realization 7 (threshold 5): realizations 1-6 executed the full seven-instruction stream, realizations 7-50 the shrunken six-instruction form with `check_format` eliminated — 306 instruction executions against arm (a)'s 350, a 12.6% reduction in executed instructions attributable to compilation and hot-path adoption (the per-stream shrink is 14.3%, 7→6; the realized saving is diluted by the six full-form realizations before adoption) and reported separately from the cache's call savings. Static compilation of the same stream: NONE 7 → AGGRESSIVE 6 effective instructions, dataflow preserved.
+**Results.** All checks pass. Arm (a) — the live reference run — made exactly the 22 first-occurrence calls the backend-free computation predicts and served the other 28 realizations from the result cache (hit rate 56.0%), consuming 4,027 prompt and 11,264 gateway-reported completion tokens in 260.2 s of measured call latency. Arm (b) — compiled, hot-path-adopted — made zero new gateway calls (all 50 realizations hit the warmed keys) and reproduced every artifact byte-for-byte. The hot path was adopted at realization 7 (threshold 5; adoption lands two realizations past the threshold because the counter must strictly exceed it and recording follows execution, as in Section 5.8): realizations 1–6 executed the full seven-instruction stream, realizations 7–50 the shrunken six-instruction form with `check_format` absorbed into its successor by fusion — 306 instruction executions against arm (a)'s 350, a 12.6% reduction in executed instructions attributable to the adopted shrunken trace (the per-stream shrink is 14.3%, 7→6; the realized saving is diluted by the six full-form realizations before adoption; the static compiler alone reproduces the 7→6 shrink at AGGRESSIVE, so the two mechanisms' contributions are not separated) and reported separately from the cache's call savings. Static compilation of the same stream: NONE 7 → AGGRESSIVE 6 effective instructions, dataflow preserved.
 
 **What this does and does not show.** The byte-identity property is cache-mediated by design: the cached classification values entered the artifacts once, through arm (a) — values that on this alias are fallback-derived, as explained below — and arm (b) is proven to compute the same keys and consume the same values. This validates the stream transformation, not model determinism, which is not guaranteed at temperature 0 and is not claimed. On this gateway alias the reasoning model's replies bind at `max_tokens` in every call — as Section 5.7 reported at `max_tokens=64`, and as a diagnostic call at 1,500 tokens still did — so the classify step's severity values come from its deterministic fallback; what is validated against the live model is the mechanism chain (key computation, cache decisions, call and token accounting, artifact identity), not classification quality. The run covers one gateway, one model, one seed, one skew level, sequential requests, no streaming; multi-model, multi-seed, and real-deployment behavior remain untested.
 
-**A priced comparison (MODELED on measured tokens).** The harness prices the measured token counts of the run above under three modes: *no optimization* (every realization re-queries at full price), *AgentISA result caching* (first occurrences only—the measured behavior of both arms), and a *provider prompt cache* (MODELED: every realization queries, but repeat prompts bill their input tokens as prompt-cache reads at 0.1x the input price—configurable—mirroring Anthropic's published prompt-caching read discount, with completions always billed at full price). Two simplifications—omitting Anthropic's 1.25x cache-write premium and its 1024-token minimum cacheable prefix—both favor the provider-cache baseline, so the comparison is conservative for us. List prices are parameterized stand-ins ($3/M input, $15/M output by default) because the serving gateway's actual pricing is unknown. Token counts are measurements, the pricing overlay is a model, and no dollar-savings claim is made:
+**A priced comparison (costs MODELED—computed from a pricing overlay rather than observed—on measured tokens).** The harness prices the measured token counts of the run above under three modes: *no optimization* (every realization re-queries at full price), *AgentISA result caching* (first occurrences only—the measured behavior of both arms), and a *provider prompt cache* (MODELED: every realization queries, but repeat prompts bill their input tokens as prompt-cache reads at 0.1x the input price—configurable—mirroring Anthropic's published prompt-caching read discount, with completions always billed at full price). Two simplifications—omitting Anthropic's 1.25x cache-write premium and its 1024-token minimum cacheable prefix—both favor the provider-cache baseline, so the comparison is conservative for us. List prices are parameterized stand-ins ($3/M input, $15/M output by default) because the serving gateway's actual pricing is unknown. Token counts are measurements, the pricing overlay is a model, and no dollar-savings claim is made:
 
 | Pricing mode (real-gateway run, s = 1.0) | Calls | Input tokens (full / cache-read) | Output tokens | Modeled cost |
 | -- | -- | -- | -- | -- |
@@ -1169,7 +1161,7 @@ Per-call latency was stable across arms (p50 2.13-2.21 s, p95 3.06-3.54 s). Toke
 | AgentISA result caching | 22 | 4,027 / 0 | 11,264 | $0.1810 |
 | Provider prompt cache (MODELED) | 50 | 4,027 / 4,991 | 25,600 | $0.3976 |
 
-On this run's token mix the result cache cuts modeled cost by 56.0% — it removes whole calls, completions included — while the modeled provider prompt cache cuts only 3.3%, because the reasoning model's completion tokens dominate and a discount on input reads cannot touch them; the ranking of the two caching strategies is a function of the input/output token mix, not a constant. On the deterministic mock at paper scale (200 tasks × 1 seed × 3 Zipf levels, template-accounted tokens, same modes and prices) the result cache cuts modeled cost by 80.1%, 81.6%, and 85.1% at s = 0.5, 1.0, 1.5, while the modeled provider prompt cache cuts 28.9-31.4% — there the short completions do not dominate, so the input-side discount matters more; both columns remain MODELED-on-measured in both cases. GPTCache, an external cache layer, is explicitly out of scope this pass; no head-to-head against it is claimed.
+On this run's token mix the result cache cuts modeled cost by 56.0% — it removes whole calls, completions included — while the modeled provider prompt cache cuts only 3.3%, because the reasoning model's completion tokens dominate and a discount on input reads cannot touch them; the ranking of the two caching strategies is a function of the input/output token mix, not a constant. On the deterministic mock at paper scale (200 tasks × 1 seed × 3 Zipf levels, template-accounted tokens, same modes and prices) the result cache cuts modeled cost by 80.1%, 81.6%, and 85.1% at s = 0.5, 1.0, 1.5, while the modeled provider prompt cache cuts 28.9–31.4% — there the short completions do not dominate, so the input-side discount matters more; both columns remain MODELED-on-measured in both cases. GPTCache, an external cache layer, is explicitly out of scope this pass; no head-to-head against it is claimed.
 
 ## 5.8 System-Level Workload Characterization
 
@@ -1201,16 +1193,16 @@ The full characterization of all four tasks follows the detailed walk-through of
 - **Closed-loop hot-path adoption.** The repeated stream crosses the hot-path threshold at the sixth recording (the counter must strictly exceed the threshold, and recording follows execution, so adoption lands at realization threshold+2); the runtime then *adopts* the optimized form automatically, and repeats 7–12 execute the shrunken 6-instruction stream (instruction executions per repeat: `[7,7,7,7,7,7,6,6,6,6,6,6]`). Executed on a fresh workspace, the optimized form reproduces the report byte-for-byte—the optimization is semantics-preserving on the real task, not only on synthetic sequences.
 - **Full-stack determinism.** A completely fresh stack—new instructions, new cache, new workspace, same seed—reproduces the report byte-for-byte (SHA-256 equality).
 
-**Calibrating the synthetic headline.** The dynamic hot-path experiment of Section 5.4 reports 65.8% trace shrink on planted-dead synthetic traces; the four realistic tasks show **12.5–25.0%** (one planted guard in a seven- or eight-instruction stream, plus one additional live-pure fusion pair in csv-etl-anomaly). We regard the latter as the more honest expectation for "ordinary" pipelines that merely carry defensive redundancy rather than planted waste, and we state both: the synthetic figure is an upper bound under the skew/planting parameters we control, not a typical-case estimate. Developing this demonstration also served its audit purpose: constructing a realistic (non-synthetic) dependency shape exposed two grouping/fusion soundness gaps in the compiler—side-effectful instructions opening dispatch groups, and fused instructions losing their external dependencies—which are now fixed with regression tests; the dispatch-folding numbers of Section 5.3 reflect the corrected (more conservative) grouping.
+**Calibrating the synthetic headline.** The dynamic hot-path experiment of Section 5.4 reports 65.8% trace shrinkage on synthetic traces with planted dead instructions; the four realistic tasks show **12.5–25.0%** (one planted guard in a seven- or eight-instruction stream, plus one additional live-pure fusion pair in csv-etl-anomaly). We state both figures rather than privilege either: the 12.5–25.0% number reflects the dead-check density we planted (one guard per seven- to eight-instruction stream), so it calibrates the shrink to a stated density assumption, not to observed ordinary-pipeline waste; the synthetic figure is an upper bound under the skew/planting parameters we control, not a typical-case estimate. Developing this demonstration also served its audit purpose: constructing a realistic (non-synthetic) dependency shape exposed two grouping/fusion soundness gaps in the compiler—side-effectful instructions opening dispatch groups, and fused instructions losing their external dependencies—which are now fixed with regression tests; the dispatch-folding numbers of Section 5.3 reflect the corrected (more conservative) grouping.
 
 **The four-task characterization.** All four tasks run the identical closed-loop battery (`examples/system_task_workload.py`, `characterize()`, 12 repeated realizations each, hot-path threshold 5, one planted dead guard each, one cacheable LLM-type step each backed by a deterministic rule stand-in that counts simulated model calls):
 
-| Task (shape) | Instrs | NONE → AGGR eff. | Dead guard | Calls 1st / re-runs | Cache hit | Hot-path | Reports byte-identical |
+| Task (shape) | Instrs | NONE → AGGRESSIVE effective count | Dead guard | Calls 1st / re-runs | Cache hit | Hot-path | Reports byte-identical |
 | -- | -- | -- | -- | -- | -- | -- | -- |
-| log triage (linear, 7) | 7 | 7 → 6 (−14.3%) | `check_syntax` | 50 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
-| csv-etl-anomaly (fan-out, 8) | 8 | 8 → 6 (−25.0%) | `check_schema` | 14 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
-| report-merge (wide fan-in, 7) | 7 | 7 → 6 (−14.3%) | `check_headers` | 16 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
-| regression-diff (two-branch, 8) | 8 | 8 → 7 (−12.5%) | `check_formats` | 240 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
+| log triage (linear, 7) | 7 | 7 → 6 (-14.3%) | `check_syntax` | 50 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
+| csv-etl-anomaly (fan-out, 8) | 8 | 8 → 6 (-25.0%) | `check_schema` | 14 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
+| report-merge (wide fan-in, 7) | 7 | 7 → 6 (-14.3%) | `check_headers` | 16 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
+| regression-diff (two-branch, 8) | 8 | 8 → 7 (-12.5%) | `check_formats` | 240 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
 
 Every task passes the same structural assertions. Static compilation preserves the dataflow: the guard is never dropped outright (the eliminated set is empty in all four tasks), and the reduction is fusion—the guard merges into its successor. In csv-etl-anomaly a second adjacent pure pair (per-column statistics with row-signature construction) also fuses, which is why its shrink reaches 25.0% with a single planted guard. The first realization pays all model calls and every subsequent realization hits the result cache; the 91.7% hit rate is 11 of 12 realizations by construction (one cacheable step, identical seeded draws), so the four rows share it structurally, not as independent observations. The hot path is adopted at realization 7 in all four tasks (full form for realizations 1–6, shrunken form for 7–12), and the optimized form reproduces the report byte-for-byte on a fresh workspace, as does a completely fresh stack—new instructions, new cache, new workspace, same seed (SHA-256 equality).
 
@@ -1220,17 +1212,17 @@ The mechanisms behave uniformly across the four dependency shapes: reuse and clo
 
 We enumerate the limitations of the evaluation explicitly:
 
-1. **Mock backend, not a live LLM (partially addressed).** The mock charges a constant 80 ms per simulated call and returns deterministic responses. Section 5.7 addresses the *mechanism-transfer* part of this threat at reduced scale: against a live gateway, the cache reproduces the recorded hit/miss statistics, and avoided calls convert to measured time and tokens. Section 5.7.1 extends live-gateway coverage to compilation and hot-path adoption: over 50 realizations, the compiled, hot-path-adopted stream issued zero new gateway calls against the result cache warmed by the unoptimized stream (identical cache keys, hence identical prompts) and reproduced every artifact byte-for-byte — a cache-mediated identity that validates the stream transformation, not model determinism. The system-level characterization of Section 5.8 composes the mechanisms on four realistic tasks, but each task's classification-type step is backed by a deterministic rule-based stand-in that only counts (simulated) model calls—it is not evidence about live-model behavior. What remains untested across Sections 5.7 and 5.7.1 is multi-model and multi-seed behavior, real deployment, caching under real model nondeterminism *across prompt variations*, streaming responses, and provider rate limits.
+1. **Mock backend, not a live LLM.** The mock charges a constant 80 ms per simulated call and returns deterministic responses; the real-gateway experiments address the mechanism-transfer part of this threat at reduced scale. Section 5.7 shows the *mechanism-transfer* part of this threat at reduced scale: against a live gateway, the cache reproduces the recorded hit/miss statistics, and avoided calls convert to measured time and tokens. Section 5.7.1 extends real-gateway coverage to compilation and hot-path adoption: over 50 realizations, the compiled, hot-path-adopted stream issued zero new gateway calls against the result cache warmed by the unoptimized stream (identical cache keys, hence identical prompts) and reproduced every artifact byte-for-byte — a cache-mediated identity that validates the stream transformation, not model determinism. The system-level characterization of Section 5.8 composes the mechanisms on four realistic tasks, but each task's classification-type step is backed by a deterministic rule-based stand-in that only counts (simulated) model calls—it is not evidence about live-model behavior. What remains untested across Sections 5.7, 5.7.1, and 5.8 is multi-model and multi-seed behavior, real deployment, caching under real model nondeterminism *across prompt variations*, streaming responses, and provider rate limits.
 
-2. **Synthetic workloads (partially addressed at task level).** Zipf-distributed synthetic tasks are a reasonable model of skewed agent workloads, but they are a model. The cache-reduction figures (59.5–79.6%) are exact for these workload families and should be read as *skew-sensitivity curves*, not as universal savings. A deployment with uniformly novel tasks would see near-zero cache benefit. Section 5.8 adds a four-task, four-shape system-level characterization (linear, fan-out, wide-fan-in, and two-branch convergence streams); its 12.5–25.0% per-task compile shrink calibrates the 65.8% synthetic headline downward, and its uniform reuse and closed-loop adoption under the fixed protocol (12 seeded realizations, threshold 5) show the composition behavior is not an artifact of one stream's structure—but the four tasks remain seed-controlled, hand-constructed characterization streams, not a production workload study.
+2. **Synthetic workloads.** Zipf-distributed synthetic tasks are a reasonable model of skewed agent workloads, but they are a model, and the task-level characterization of Section 5.8 only partially addresses this. The cache-reduction figures (59.5–79.6%) are exact for these workload families and should be read as *skew-sensitivity curves*, not as universal savings. A deployment with uniformly novel tasks would see near-zero cache benefit. Section 5.8 adds a four-task, four-shape system-level characterization (linear, fan-out, wide-fan-in, and two-branch convergence streams); its 12.5–25.0% per-task compile shrink calibrates the 65.8% synthetic headline downward, and its uniform reuse and closed-loop adoption under the fixed protocol (12 seeded realizations, threshold 5) show the composition behavior is not an artifact of one stream's structure—but the four tasks remain seed-controlled, hand-constructed characterization streams, not a production workload study.
 
 3. **No production end-to-end evaluation.** We have not deployed AgentISA in a production setting. Consequently this paper contains no latency-under-load, throughput, availability, or dollar-cost measurements, and we make no such claims.
 
-4. **No real cost data (token usage measured; pricing now MODELED on measured tokens).** All latency figures in Sections 5.2-5.5 are simulated (avoided calls × 80 ms). Section 5.7 measures real wall-clock time and gateway-reported token usage at reduced scale, and Section 5.7.1 prices its own measured tokens (its 22-call reference run) under three modes — no optimization, AgentISA result caching, and a modeled provider prompt cache with a parameterized cache-read discount (default 0.1, after Anthropic's published prompt-caching economics). The resulting costs are MODELED-on-measured: token counts are measurements, prices are configurable list-price stand-ins (the serving gateway's actual pricing is unknown), and no dollar-savings claim is made. A head-to-head against a production external cache (GPTCache — explicitly out of scope this pass) and a priced deployment study under real provider pricing remain future work.
+4. **No real cost data (token usage measured; pricing now MODELED on measured tokens).** All latency figures in Sections 5.2–5.5 are simulated (avoided calls × 80 ms). Section 5.7 measures real wall-clock time and gateway-reported token usage at reduced scale, and Section 5.7.1 prices its own measured tokens (its 22-call reference run) under three modes — no optimization, AgentISA result caching, and a modeled provider prompt cache with a parameterized cache-read discount (default 0.1, after Anthropic's published prompt-caching economics). The resulting costs are MODELED-on-measured: token counts are measurements, prices are configurable list-price stand-ins (the serving gateway's actual pricing is unknown), and no dollar-savings claim is made. A head-to-head against a production external cache (GPTCache — explicitly out of scope this pass) and a priced deployment study under real provider pricing remain future work.
 
 5. **Program-size metrics, not wall-clock time.** Effective-instruction reduction and dispatch-count reduction are structural metrics. They correlate with—but do not equal—wall-clock improvements, which depend on per-instruction cost, parallelism available in the runtime, and dispatch overhead.
 
-6. **Descriptive statistics only.** Five seeds per configuration; mean ± sample stdev. No hypothesis tests, confidence intervals, or significance claims are made. The standard deviations indicate stability across seeds, nothing more.
+6. **Descriptive statistics only.** Five seeds per configuration in the synthetic experiments (Sections 5.2–5.5); the real-gateway and system-level runs are single-seed by design. No hypothesis tests, confidence intervals, or significance claims are made. The standard deviations indicate stability across seeds, nothing more.
 
 7. **Functional, not performance, validation of coordination.** The 43 multi-agent tests verify behavioral correctness under deterministic conditions, not throughput or scalability.
 
@@ -1240,12 +1232,12 @@ Despite these limitations, the evaluation achieves its purpose: it demonstrates,
 
 ## 6.1 System Limitations and Challenges
 
-1. **Instruction Set Completeness**
+1. **Instruction-set coverage**
    - Certain complex reasoning patterns are not yet naturally expressible; domain-specific instruction extensions are likely needed
    - Maintaining consistency of pre/post-conditions and typing rules across extensions remains an open engineering challenge
 
 2. **Evaluation Scope**
-   - As detailed in Section 5.9, our quantitative evidence is primarily microbenchmark-based (Sections 5.2-5.5), supplemented by live-gateway spot checks (Sections 5.7 and 5.7.1) and a seed-controlled four-task characterization (Section 5.8)
+   - As detailed in Section 5.9, our quantitative evidence is primarily microbenchmark-based (Sections 5.2–5.5), supplemented by real-gateway spot checks (Sections 5.7 and 5.7.1) and a seed-controlled four-task characterization (Section 5.8)
    - Production end-to-end evaluation—including real provider pricing, rate limits, and failure modes—is required before any deployment claim
 
 3. **Performance Bottlenecks**
@@ -1264,7 +1256,7 @@ Despite these limitations, the evaluation achieves its purpose: it demonstrates,
 AgentISA's implemented security layer is the `SecurityMonitor` of Section 5.6, which enforces task-level authentication, role-based authorization, data-sensitivity classification, and configurable resource-access policies; the coordinator consults it before every assignment, and violations are recorded with timestamps. Beyond what is implemented, we identify the following as design considerations for hardening the architecture—not as claims about the current system:
 
 1. **Data privacy**: instruction-level access control exists via authorization policies; end-to-end data-flow tracking and privacy-preserving computation remain future work (Section 6.3.6).
-2. **System security**: instruction pre/post-condition verification (Section 3.3.3) reduces mis-execution risk; secure multi-agent communication channels and audit-log integrity are not yet addressed.
+2. **System security**: instruction pre/post-condition verification (Section 3.3.3) checks pure instructions' contracts against bounded state spaces, reducing mis-execution risk there; secure multi-agent communication channels and audit-log integrity are not yet addressed.
 3. **Compliance**: deployments in regulated domains will require externally audited controls; the current system provides enforcement hooks, not certification.
 
 ## 6.3 Future Research Directions
@@ -1280,10 +1272,10 @@ AgentISA's implemented security layer is the `SecurityMonitor` of Section 5.6, w
    Development of compositional proof systems for agent behaviors:
 
    $$
-   \frac{\{P_1\}S_1\{Q_1\} \quad \{P_2\}S_2\{Q_2\}}{\{P_1 \land P_2\}S_1 \parallel S_2\{Q_1 \land Q_2\}}
+   \frac{\{P_1\}S_1\{Q_1\} \quad \{P_2\}S_2\{Q_2\} \quad \text{disjoint}(S_1, S_2)}{\{P_1 \land P_2\}S_1 \parallel S_2\{Q_1 \land Q_2\}}
    $$
 
-   This enables formal verification of complex agent systems through:
+   The disjointness side condition mirrors the $\parallel$-typing rule of Definition 3.6; without it the conjunction of preconditions does not guarantee either component's precondition during interleaving. This enables formal verification of complex agent systems through:
    - Modular verification
    - Parallel composition rules
    - Temporal property preservation
@@ -1310,7 +1302,7 @@ AgentISA's implemented security layer is the `SecurityMonitor` of Section 5.6, w
 
 1. **Self-Modifying Instructions**
 
-   Formal model for instruction evolution:
+   Formal model for instruction evolution (f is left abstract—the sketch names the inputs, not a concrete update rule):
 
    $$
    I_{t+1} = f(I_t, \text{Performance}_t, \text{Context}_t)
@@ -1348,7 +1340,7 @@ AgentISA's implemented security layer is the `SecurityMonitor` of Section 5.6, w
    \phi_{A \rightarrow B}: I_A \rightarrow I_B
    $$
 
-   Properties:
+   Target properties (stated as goals, not delivered guarantees):
    - Semantic preservation
    - Performance bounds
    - Capability awareness
@@ -1366,11 +1358,11 @@ AgentISA's implemented security layer is the `SecurityMonitor` of Section 5.6, w
    R(i) = \alpha C_{cpu}(i) + \beta C_{mem}(i) + \gamma C_{io}(i)
    $$
 
-   where α, β, γ are platform-specific coefficients that should be fitted against real deployments rather than assumed.
+   where $\alpha, \beta, \gamma$ are platform-specific coefficients that should be fitted against real deployments rather than assumed.
 
 ### 6.3.4 Capability Assessment: Extensions
 
-The instruction-level capability assessment subsystem (`CapabilityProfile`, Section 3.5) is implemented and used by the coordinator. Two extensions remain future work:
+The instruction-level capability assessment subsystem (`CapabilityProfile`, Section 3.5) ships in part—aggregation and the coordinator's threshold selection are implemented and used, while instruction-level metric extraction remains a specified stub. Two extensions remain future work:
 
 1. **Benchmark-calibrated metrics**: correlating static, instruction-derived domain scores with end-to-end benchmark performance, in the manner of function-calling evaluations [17] and agent benchmarks [29], so that weights $w_k$ are empirically grounded rather than configured by hand.
 
@@ -1396,7 +1388,7 @@ The instruction-level capability assessment subsystem (`CapabilityProfile`, Sect
    \text{Secure}(P) \iff \forall s_1, s_2: L(s_1) = L(s_2) \implies L(\llbracket P \rrbracket s_1) = L(\llbracket P \rrbracket s_2)
    $$
 
-   where L represents security levels.
+   where $L$ assigns security levels to states and outputs—the classical noninterference property, stated here for terminating runs (divergence and channel leakage out of scope).
 
 2. **Privacy-Preserving Computation**
 
@@ -1407,8 +1399,8 @@ The instruction-level capability assessment subsystem (`CapabilityProfile`, Sect
    $$
 
    where:
-   - ε: Privacy budget
-   - δᵢ: Privacy loss per operation
+   - ε: the overall privacy budget
+   - δᵢ: the per-operation privacy-loss parameter—this is the shape of differential-privacy composition theorems; identifying concrete mechanisms (hence concrete δ values) is future work
 
 These directions form a roadmap for moving AgentISA from controlled-setting-validated infrastructure to a deployable, formally verified agent platform. None of the frameworks above is implemented today; Sections 6.3.3 and 6.3.4 are stated precisely enough to be falsifiable, while the remaining sketches are programmatic and guide subsequent work.
 
@@ -1416,13 +1408,13 @@ These directions form a roadmap for moving AgentISA from controlled-setting-vali
 
 This paper presented AgentISA, an instruction set architecture that treats LLM agent behavior as a first-class compilable artifact. Our contributions are:
 
-1. A formal instruction set with compositional semantics, a type system, and pre/post-conditions, with sanity results stated as design rationale (Turing completeness as negative certification, Theorem 3.1; pure-core type safety, Theorem 3.2) and semantic-preservation arguments for the optimization and scheduling transformations (Theorems 3.4–3.6).
+1. A formal instruction set with compositional semantics, a type system, and pre/post-conditions, with sanity results stated as design rationale (Turing completeness as negative certification, Theorem 3.1; pure-core type safety, Theorem 3.2; extraction-time context preservation, Theorem 3.3) and semantic-preservation arguments for the optimization and scheduling transformations (Theorems 3.4–3.6).
 2. Agentic Calling, which lifts provider-specific function calling into reusable, portable, cacheable agent instructions.
-3. Automatic instruction learning based on frequency mining and clustering of execution traces.
+3. Automatic instruction learning based on frequency mining and deterministic action-signature grouping of execution traces.
 4. A compiler and runtime applying classical optimizations—fusion, dead-code elimination, scheduling, and dynamic hot-path specialization—to agent instruction streams.
 5. A multi-agent coordination layer with capability-based selection and a security monitor enforcing authentication, authorization, and data-sensitivity policies.
 
-The evaluation shows the optimizations are real and measurable under controlled conditions: 59.5–79.6% simulated-call reduction from caching, 34.2% instruction-count reduction from static compilation, 65.8% trace shrink from hot-path optimization (Sections 5.2–5.5), live-gateway spot checks of the cache and the compiled pipeline (Sections 5.7–5.7.1), a four-task system-level characterization (Section 5.8), and 43 functional tests for the multi-agent layer. These are microbenchmark and controlled-setting results, not production end-to-end measurements; the threats to validity of Section 5.9 stand.
+The evaluation shows the optimizations are real and measurable under controlled conditions: 59.5–79.6% simulated-call reduction from caching, 34.2% instruction-count reduction from static compilation, 65.8% trace shrinkage from hot-path optimization (Sections 5.2–5.5), real-gateway validations of the cache and the compiled pipeline (Sections 5.7 and 5.7.1), a four-task system-level characterization (Section 5.8), and 43 functional tests for the multi-agent layer. These are microbenchmark and controlled-setting results, not production end-to-end measurements; the threats to validity of Section 5.9 stand.
 
 AgentISA's longer-term significance is architectural: by giving agent behavior an instruction-level contract, it makes agent systems amenable to the same discipline that transformed hardware and compiler engineering—precise specification, portability across backends, and semantics-preserving optimization. Establishing the corresponding gains on production workloads, and hardening the conditional sanity results and semantic-preservation arguments into mechanically verified implementations, is the immediate next step.
 
@@ -1446,7 +1438,22 @@ The Section 5.2-5.5 numbers regenerate with:
     --experiments cache compiler dynamic ablation --seeds 5
 ```
 
-The Section 5.8 demonstration (and its saved results) regenerates with:
+The Section 5.7 real-gateway run regenerates with:
+
+```
+./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64 \
+    --output examples/benchmarks/isa_real_llm_results.json
+```
+
+(requires a reachable gateway; the base URL, API key, and CA certificate are passed per deployment). The Section 5.7.1 harness regenerates with:
+
+```
+./venv/bin/python examples/paper_real_llm_compiler_test.py \
+    --backend real --scale paper
+```
+
+(the `mock` backend reproduces the offline variant; `--scale paper` selects the 50-realization, 40-instance protocol of the paper run). The Section 5.8 demonstration (and its saved results) regenerates with:
 
 ```
 ./venv/bin/python examples/system_task_demo.py \
@@ -1497,7 +1504,7 @@ The Section 5.7 numbers regenerate against any Anthropic-protocol gateway (confi
 
 [16] Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, Yueting Zhuang. 2023. HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face. NeurIPS 36. arXiv:2303.17580.
 
-[17] Shishir G. Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, Joseph E. Gonzalez. 2025. The Berkeley Function Calling Leaderboard (BFCL): From Tool Use to Agentic Evaluation of Large Language Models. Proceedings of ICML 2025. arXiv:2408.12946.
+[17] Shishir G. Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, Joseph E. Gonzalez. 2025. The Berkeley Function Calling Leaderboard (BFCL): From Tool Use to Agentic Evaluation of Large Language Models. ICML 2025. arXiv:2408.12946.
 
 [18] Anthropic. 2024. Introducing the Model Context Protocol. Anthropic announcement, November 25, 2024.
 
@@ -1539,21 +1546,21 @@ The Section 5.7 numbers regenerate against any Anthropic-protocol gateway (confi
 
 [37] Xavier Leroy. 2009. Formal verification of a realistic compiler. Communications of the ACM 52(7):107–115.
 
-[38] Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, Ion Stoica. 2023. Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP '23. arXiv:2309.06180.
+[38] Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, Ion Stoica. 2023. Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023. arXiv:2309.06180.
 
 [39] Gyeong-In Yu, Joo Seong Jeong, Geon-Woo Kim, Soojeong Kim, Byung-Gon Chun. 2022. Orca: A Distributed Serving System for Transformer-Based Generative Models. OSDI '22, pp. 521–538.
 
 [40] Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré. 2022. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness. NeurIPS 35. arXiv:2205.14135.
 
-[41] Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation — A KVCache-centric Architecture for Serving LLM Chatbot. FAST '25, pp. 155–170. (Best Paper.)
+[41] Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation—A KVCache-centric Architecture for Serving LLM Chatbot. FAST '25, pp. 155–170. (Best Paper.)
 
 [42] Siddharth Samsi, Dan Zhao, Joseph McDonald, Baolin Li, Adam Michaleas, Michael Jones, William Bergeron, Jeremy Kepner, Devesh Tiwari, Vijay Gadepally. 2023. From Words to Watts: Benchmarking the Energy Costs of Large Language Model Inference. arXiv:2310.03003.
 
-[43] Hanne Riis Nielson, Flemming Nielson. 1999. Semantics with Applications: A Formal Introduction. Wiley. (Revised 2007 edition: <https://www.cs.ru.nl/~hanne/semantics.pdf>.)
+[43] Hanne Riis Nielson, Flemming Nielson. 1992. Semantics with Applications: A Formal Introduction. Wiley. (Springer 2007 retitled edition: Semantics with Applications: An Appetizer.)
 
 [44] Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. Section 3.3 (the Church–Turing thesis and equivalence of computational models).
 
-[45] Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. Proceedings of PLDI 2000, pp. 1–12. <https://doi.org/10.1145/349299.349303.>
+[45] Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. PLDI 2000, pp. 1–12. <https://doi.org/10.1145/349299.349303>
 
 [46] Zilliz and community contributors. 2023. GPTCache: An Open-Source Library for Specifying and Implementing Semantics-Aware Caches for LLM Applications. Open-source release and technical report. https://github.com/zilliztech/GPTCache.
 
@@ -1563,7 +1570,7 @@ The Section 5.7 numbers regenerate against any Anthropic-protocol gateway (confi
 
 ## A.1 Strategy
 
-We prove that AgentISA can simulate any program in the WHILE language over the natural numbers. WHILE programs compute exactly the partial recursive functions—WHILE is Turing equivalent [43, 44]—so a sound simulation of WHILE by AgentISA establishes Turing completeness. The argument is a sufficiency (simulation) argument over instruction classes: the instruction classes of Definition 3.1 must jointly provide unbounded storage, sequential composition, conditional branching, and unbounded iteration. We show the control-flow class $\mathcal{C}$ and the state-management class $\mathcal{S}$ suffice; the LLM-interaction class $\mathcal{L}$ is not needed, making the result conservative with respect to the full instruction set.
+We prove that AgentISA can simulate any program in the WHILE language over the natural numbers. WHILE programs compute exactly the partial recursive functions—WHILE is Turing equivalent [43, 44]—so a sound simulation of WHILE by AgentISA establishes Turing completeness. The argument is a sufficiency (simulation) argument over instruction classes: the instruction classes of Definition 3.1 must jointly provide unbounded storage, sequential composition, conditional branching, and unbounded iteration. We show the control-flow class $\mathcal{C}$ and the state-management class $\mathcal{S}$ suffice; neither effectful class (the LLM-interaction class $\mathcal{L}$ nor the resource class $\mathcal{R}$) is needed, making the result conservative with respect to the full instruction set.
 
 ## A.2 Source Language
 
@@ -1579,7 +1586,7 @@ over variables ranging over $\mathbb{N}$ (with predecessor cut off at 0), with t
 
 **(i) Store.** A WHILE store $\sigma$ is represented by the AgentISA state $s_\sigma \in \Sigma$, in the component managed by the state-management instructions. Each variable $x$ occupies a dedicated cell; cells hold unbounded naturals, so $\Sigma$ provides an unbounded store—the crucial ingredient of the sufficiency argument.
 
-**(ii) Instruction semantics (as used here).** Five instructions suffice for the encoding, with the following operational meaning:
+**(ii) Instruction semantics (as used here).** The state-management component of $\Sigma$ carries, alongside the variable cells, an **evaluation stack**; the five encoding instructions below operate on that stack. Five instructions suffice for the encoding, with the following operational meaning:
 
 - `load` $x$: pushes the contents of the cell for $x$ onto the evaluation stack;
 - `store` $x$: pops the top of the evaluation stack into the cell for $x$;
@@ -1604,7 +1611,7 @@ where $\hat{P}$ denotes the compilation of $P$. The no-op `skip` compiles to the
 
 **Lemma A.1.** For every WHILE configuration $\langle P, \sigma \rangle$ and its encoded AgentISA instruction sequence $\hat{P}$ started in state $s_\sigma$:
 
-(a) if $\langle P, \sigma \rangle \to \langle P', \sigma' \rangle$, then $\hat{P}$ executed from $s_\sigma$ reaches the encoding of $\langle P', \sigma' \rangle$ in finitely many AgentISA steps; and
+(a) if $\langle P, \sigma \rangle \to \langle P', \sigma' \rangle$, then the AgentISA machine, started at configuration $(\hat{P}, s_\sigma)$ (remaining instruction sequence, $\Sigma$-state), reaches the configuration $(\hat{P}', s_{\sigma'})$—remaining sequence $\hat{P}'$ the encoding of the residual program $P'$, state $s_{\sigma'}$ the encoding of $\sigma'$—in finitely many steps; and
 
 (b) if $P = \texttt{skip}$ (terminal), then $\hat{P}$ terminates.
 
@@ -1626,34 +1633,43 @@ By Lemma A.1, every WHILE-computable function is AgentISA-computable. Since WHIL
 
 ## A.6 Scope Remark
 
-Turing completeness is a deliberately weak property—any language with unbounded storage and branching attains it. Its role here is negative certification: the instruction set does not artificially constrain what agent programs can express, so no expressiveness objection can be raised against the architecture. The claim says nothing about efficiency, and it is established without the LLM-interaction class $\mathcal{L}$, so it is conservative with respect to the full instruction set of Definition 3.1.
+Turing completeness is a deliberately weak property—any language with unbounded storage, branching, and unbounded iteration attains it. Its role here is negative certification: the instruction set does not artificially constrain what agent programs can express, so no expressiveness objection can be raised against the architecture. The claim says nothing about efficiency, and it is established without the LLM-interaction class $\mathcal{L}$, so it is conservative with respect to the full instruction set of Definition 3.1.
 
 # Appendix B: Proof of Theorem 3.2 (Type Safety)
 
-We prove type safety by the standard syntactic technique of simultaneous progress and preservation, in the style of Pierce [36].
+We prove type safety for the pure core by progress and preservation, in the style of Pierce [36]. The proof runs over a **merged judgment system**: the term typing judgment $\vdash e : T$ for $\lambda$-terms, and the instruction judgment $\vdash i\ \mathit{ok}[pre(i), post(i)]$ for instructions and their compositions (both defined in B.1). Progress and preservation are each proved by induction over the derivations of this merged system: the $\lambda$-cases are the standard TAPL argument on term derivations; the instruction cases are discharged by the standing totality assumption and the per-operator premises of B.1(ii), with a joint runtime invariant threaded through the composition cases.
 
 ## B.1 Core Calculus
 
-Restrict attention to the pure core of the instruction language: expressions over base types, $\lambda$-abstraction and application (whose $\beta$-reduction rule appears in Section 3.1.2), and the composition operators of Definition 3.6 applied to instructions carrying typed pre/post-conditions. The small-step relation $\rightarrow$ is generated by $\beta$-reduction, the context rule $E[e_1] \rightarrow E[e_1']$, and the per-instruction transition functions $\delta \in \Delta$. Effectful instructions are treated in B.7.
+Restrict attention to the pure core of the instruction language: expressions over base types, dependent $\Pi/\Sigma$ pairs, recursion ($\mu$), $\lambda$-abstraction and application (whose $\beta$-reduction rule appears in Section 3.1.2), and the composition operators of Definition 3.6 applied to instructions carrying typed pre/post-conditions. The small-step relation $\rightarrow$ is generated by $\beta$-reduction, the context rule $E[e_1] \rightarrow E[e_1']$, and, for each instruction $i$, its **fixed per-instruction** transition function $\delta_i$. Effectful instructions are treated in B.7.
 
-Two elements of the setup are used tacitly below and stated here once:
+The two judgment forms:
 
-- **Embedding.** Instructions are embedded as expressions via their typed pre/post-conditions: an instruction $i$ with $pre(i)$ and $post(i)$ over state types behaves as a state transformer whose typing rule is the usual Hoare-logic-inspired rule
-  $$\frac{s \models pre(i) \qquad \delta(s, i) \models post(i)}{\Gamma \vdash \text{run}(i, s)}$$
-  where the premise is exactly the per-instruction validity obligation of Definition 3.5.
-- **Composition typing rules.** For instructions $i_1, i_2$ carrying pre/post-conditions, the operators of Definition 3.6 type by
-  $$\frac{post(i_1) \Rightarrow pre(i_2)}{\Gamma \vdash i_1 \circ i_2} \qquad \frac{pre(i_1) \Leftrightarrow pre(i_2) \quad \text{disjoint state footprints}}{\Gamma \vdash i_1 \parallel i_2}$$
-  $$\frac{pre(i_1) \Rightarrow pre(i_2)}{\Gamma \vdash i_1 \triangleright i_2} \qquad \frac{\Gamma \vdash i \qquad \text{guard closed under } post(i)}{\Gamma \vdash i^*}$$
-  and these rules are generated from—do not add to—the semantics of Definition 3.6.
+(i) **Term typing** $\vdash e : T$ — the usual rules over base types, extended with the dependent $\Pi/\Sigma$ introduction forms of Definition 3.2.
 
-## B.2 Lemma (Canonical Forms)
+(ii) **Instruction typing** $\vdash i\ \mathit{ok}[pre(i), post(i)]$ — read "$i$ is a well-contracted state transformer": $pre(i)$ and $post(i)$ are well-typed predicates over the state type, and the Definition 3.5 obligation $\forall s \models pre(i): \delta_i(s) \models post(i)$ is discharged per instruction, offline, by the bounded verification of Section 3.3.3. Instructions are **not values and never stuck**: totality on precondition-satisfying states is a standing assumption — for each instruction $i$ with its transition function $\delta_i$, $\delta_i(s)$ is defined whenever $s \models pre(i)$.
+
+Composition rules, for instructions $i_1, i_2$ carrying contracts:
+
+$$\frac{\vdash i_1\ \mathit{ok} \qquad \vdash i_2\ \mathit{ok} \qquad post(i_1) \Rightarrow pre(i_2)}{\vdash i_1 \circ i_2\ \mathit{ok}[pre(i_1),\, post(i_2)]}$$
+
+$$\frac{\vdash i_1\ \mathit{ok} \qquad \vdash i_2\ \mathit{ok} \qquad pre(i_1) \Leftrightarrow pre(i_2) \quad \text{disjoint state footprints}}{\vdash i_1 \parallel i_2\ \mathit{ok}[pre(i_1),\, post(i_1) \wedge post(i_2)]}$$
+
+$$\frac{\vdash i_1\ \mathit{ok} \qquad \vdash i_2\ \mathit{ok} \qquad post(i_1)\big|_{\text{trigger}} \Rightarrow pre(i_2)}{\vdash i_1 \triangleright i_2\ \mathit{ok}[pre(i_1),\, post(i_1) \wedge (\text{trigger} \Rightarrow post(i_2))]}$$
+
+$$\frac{\vdash i\ \mathit{ok} \qquad \text{guard closed under } post(i) \qquad \text{guard} \Rightarrow pre(i)}{\vdash i^*\ \mathit{ok}[\text{guard},\, post(i)]}$$
+
+Two premises deserve note. The $\triangleright$ premise is evaluated **on the outcome of $i_1$ that triggers $i_2$**: $i_1$'s execution can otherwise destroy $pre(i_2)$, so the implication the runtime invariant needs is $post(i_1)$ restricted to the triggering outcome, not $pre(i_1) \Rightarrow pre(i_2)$ on the initial state. The $i^*$ premise adds $\text{guard} \Rightarrow pre(i)$ because the loop body re-enters: on every re-iteration the guard holds, so the body's precondition must hold whenever the loop has not terminated. These rules are generated from—do not add to—the semantics of Definition 3.6.
+
+## B.2 Canonical Forms
 
 If $\vdash v : T$ and $v$ is a value, then:
 
 - $T \in \{Bool, Int, String, Float\}$ implies $v$ is a literal of that type;
 - $T = \Pi(x:T_1).T_2$ implies $v = \lambda x{:}T_1.\,e$ with $\Gamma, x{:}T_1 \vdash e : T_2$;
 - $T = \Sigma(x:T_1).T_2$ implies $v = (v_1, v_2)$ with the components typed at the corresponding dependent types;
-- $T = \mu X.T$ implies $v$ is a rolled recursive value.
+- $T = \mu X.T$ implies $v$ is a rolled recursive value;
+- no instruction or instruction composition is a value (B.1(ii)): instructions are contracted state transformers, not term-level values.
 
 *Proof.* By inspection of the typing rules: each type has exactly one value form, and the syntax of values is defined per type, so the case analysis is exhaustive. This is the standard canonical-forms lemma [36]. ∎
 
@@ -1661,28 +1677,36 @@ If $\vdash v : T$ and $v$ is a value, then:
 
 If $\Gamma, x{:}T' \vdash e : T$ and $\vdash v : T'$, then $\Gamma \vdash e[x := v] : T$.
 
-*Proof.* By induction on the derivation of $\Gamma, x{:}T' \vdash e : T$. All cases are standard; the only subtlety is variable capture in the $\Pi$-rule, handled by the usual $\alpha$-conversion convention. The case analysis is that of Pierce [36] and we do not duplicate it. ∎
+*Proof.* By induction on the derivation of $\Gamma, x{:}T' \vdash e : T$. The non-dependent cases are the case analysis of Pierce [36], which we do not duplicate. The dependent $\Pi/\Sigma$ cases additionally require synchronizing the substitution into the second component's type ($T_2[x := v]$), as in the $\beta$-case of B.5 — the standard dependent-type substitution bookkeeping, not covered by the non-dependent treatment in [36]. ∎
 
 ## B.4 Lemma (Progress)
 
 If $\vdash e : T$, then $e$ is a value or there exists $e'$ with $e \rightarrow e'$.
 
-*Proof.* By induction on the typing derivation:
+*Proof.* By induction on the derivation. The $\lambda$-term cases:
 
 - **Literals and $\lambda$** are values.
 - **Application** $e_1\,e_2$ with $e_1 : \Pi(x:T_1).T_2$ and $e_2 : T_1$: by the induction hypothesis, either $e_1$ steps (then the context rule applies) or $e_1$ is a value, in which case B.2 gives $e_1 = \lambda x.\,e$; similarly $e_2$ either steps or is a value; when both are values, $\beta$-reduction applies. There is no stuck case, because the $\Pi$-type of $e_1$ and B.2 jointly guarantee a $\lambda$ in value position.
-- **Instruction composition** ($i_1 \circ i_2$, $i_1 \parallel i_2$, $i_1 \triangleright i_2$, $i_1^*$): the typing rule for composition encodes Hoare-style sequencing—the postcondition of the first component must imply the precondition of the second. The runtime invariant—each reached composition's precondition holds—is maintained by joint induction with preservation, using $post(i_1) \Rightarrow pre(i_2)$ together with the Definition 3.5 obligation that $\delta$ establishes $post(i)$; typing alone guarantees only the initial state, and **totality on precondition-satisfying states is a standing assumption of the calculus** ($\forall i \in I, \exists \delta \in \Delta: \delta(s_t, i) \rightarrow s_{t+1}$ whenever $s_t \models pre(i)$; Definition 3.5's validity obligation, with scope discussed in B.7). For iteration, either the guard is false (terminal) or the body steps by the induction hypothesis. ∎
+
+The instruction cases admit no stuck state by construction. Instructions step by the standing totality assumption of B.1(ii) whenever their precondition holds. Compositions maintain the runtime invariant **each reached component's precondition holds**, per operator:
+
+- **Sequencing $\circ$:** $pre(i_1)$ holds initially (the composition's contract); after $i_1$ executes, $post(i_1) \Rightarrow pre(i_2)$ re-establishes the invariant for $i_2$.
+- **Parallel $\parallel$:** disjoint state footprints keep each component's precondition valid throughout the interleaving — neither component writes what the other's precondition or postcondition reads.
+- **Guarded $\triangleright$:** on the triggering outcome of $i_1$, the strengthened premise $post(i_1)\big|_{\text{trigger}} \Rightarrow pre(i_2)$ re-establishes $pre(i_2)$; on the non-triggering outcome, $i_2$ does not run.
+- **Iteration $i^*$:** the body re-enters only while the guard holds, and the premise $\text{guard} \Rightarrow pre(i)$ makes each re-entry legitimate; when the guard fails, the loop is terminal.
+
+The invariant is threaded jointly with B.5: each individual step preserves the invariant by the per-operator argument above. For iteration, either the guard is false (terminal) or the body's precondition holds by $\text{guard} \Rightarrow pre(i)$, and the body steps by the induction hypothesis on the component derivation. ∎
 
 ## B.5 Lemma (Preservation)
 
 If $\vdash e : T$ and $e \rightarrow e'$, then $\vdash e' : T$.
 
-*Proof.* By induction on the typing derivation, with case analysis on the step:
+*Proof.* By induction on the derivation, with case analysis on the step:
 
-- **$\beta$:** $(\lambda x.\,e)\,v \rightarrow e[x := v]$. Typing gives the body typed under $\Gamma, x{:}T_1$ and the argument at $T_1$; by B.3, the substituted term types at $T_2 = T$.
+- **$\beta$:** $(\lambda x.\,e)\,v \rightarrow e[x := v]$. The application rule types the redex at $T_2[x := v]$; by B.3, the substituted term $e[x := v]$ types at $T_2[x := v]$, which is exactly the type the application rule assigned (the dependent-type bookkeeping; when $x$ does not occur in $T_2$ this degenerates to the usual $T_2 = T$).
 - **Context:** $E[e_1] \rightarrow E[e_1']$ with $e_1 \rightarrow e_1'$. By the induction hypothesis $e_1' : T_1$; an induction on the structure of $E$ re-types $E[e_1']$ at the original type.
-- **Instruction transitions:** the typing rule requires $post(i)$ to be a well-typed predicate of type $T$ over the state; since $i$'s transition function is certified to establish $post(i)$ (Definition 3.5, discharged per instruction by the bounded verification of Section 3.3.3), the reduct re-types at $T$.
-- **Composition operators:** each transition rule is typed by the sequencing rule of B.4; the reduct re-types by the induction hypothesis on the component derivations.
+- **Instruction transitions:** the instruction's $\mathit{ok}$ judgment (B.1(ii)) certifies that $\delta_i$ establishes $post(i)$ from any $pre(i)$-satisfying state (discharged offline by the bounded verification of Section 3.3.3), so the reduct re-types at the postcondition.
+- **Composition operators:** each operator's step is typed by its B.1(ii) rule; the reduct's contract follows from the operator's stated conclusion (for $\circ$, $post(i_2)$; for $\parallel$, the conjunction; for $\triangleright$, the trigger-restricted conjunction; for $i^*$, $post(i)$), by the induction hypothesis on the component derivations.
 
 The remaining instruction-class cases repeat this pattern with class-specific invariants; they are routine and omitted (the template is the standard preservation argument for the corresponding constructs [36]). ∎
 
@@ -1698,29 +1722,29 @@ Two caveats state the theorem's boundaries honestly. First, B.4's appeal to tota
 
 ## C.1 Denotational Setup
 
-Fix the state space $\Sigma$. For a pure instruction $i$, let $\llbracket i \rrbracket : \Sigma \to \Sigma$ denote its denotation, total on states satisfying $pre(i)$. Program denotation is defined by structural recursion on the composition algebra of Definition 3.6:
+Fix the state space $\Sigma$ (Definition 3.1's state space—not the dependent-type constructor $\Sigma$ of Definition 3.2). For a pure instruction $i$, let $\llbracket i \rrbracket : \Sigma \rightharpoonup \Sigma$ denote its denotation, a partial function total on states satisfying $pre(i)$. Program denotation is defined by structural recursion on the composition algebra of Definition 3.6:
 
 - $\llbracket i \rrbracket$ for atomic instructions (given);
 - $\llbracket p_1 \circ p_2 \rrbracket = \llbracket p_2 \rrbracket \circ \llbracket p_1 \rrbracket$ (note the order: $p_1$ executes first);
 - $\llbracket p_1 \parallel p_2 \rrbracket(\sigma) = \llbracket p_2 \rrbracket(\llbracket p_1 \rrbracket(\sigma))$ for pure $p_1, p_2$ with disjoint state footprints (as the $\parallel$-typing rule requires)—the order is immaterial because updates to disjoint cells commute on their domains;
-- $\llbracket p_1 \triangleright p_2 \rrbracket$ applies $p_2$ conditionally on $p_1$'s outcome;
+- $\llbracket p_1 \triangleright p_2 \rrbracket(\sigma) = \llbracket p_2 \rrbracket(\llbracket p_1 \rrbracket(\sigma))$ when $p_1$'s outcome at $\sigma$ is the trigger, and $\llbracket p_1 \rrbracket(\sigma)$ otherwise (the denotation is defined on $\Sigma + \text{outcome}$, with $p_2$ applied conditionally on the trigger tag);
 - $\llbracket p^* \rrbracket$ is the least fixed point of the corresponding functional.
 
 Write $p \equiv q$ iff $\llbracket p \rrbracket = \llbracket q \rrbracket$ on all states where both are defined.
 
-## C.2 Lemma C.1 (Atomic Rewrite Soundness)
+## C.2 Lemma (Atomic Rewrite Soundness)
 
 Each rewrite rule implemented by the optimizer (Section 3.4.4) preserves denotation.
 
-**(i) Fusion.** $i_1 \circ i_2 \rightarrow i_{12}$, with $pre(i_{12}) = pre(i_1)$, $post(i_{12}) = post(i_2)$, and $i_{12}$'s body stipulated to compute $\llbracket i_2 \rrbracket \circ \llbracket i_1 \rrbracket$ (intermediate bindings named, so the composition is explicit). The denotational claim is then an instance of the associativity of function composition: a body computing $\llbracket i_2 \rrbracket \circ \llbracket i_1 \rrbracket$ denotes, by C.1's definition of $\circ$, exactly $\llbracket i_1 \circ i_2 \rrbracket$. **Two honest boundaries.** First, this is an equality *of the rewrite algebra*: it holds of the fused form whose body computes the composite. The shipped compiler produces a formal fused *node* (merged metadata and dependencies) without generating an executable composite body—code generation for fused nodes is not implemented—so what the benchmarks measure is the structural fusion of the formal stream, and the executable-fusion claim would additionally require the codegen step. Second, the compiler applies fusion only when output types of $i_1$ match input types of $i_2$ and both members are pure, since denotational equality of the fused form presupposes order-insensitivity of intermediate effects, and the shipped gate achieves it via purity (the pure or order-insensitive alternative is specified, not implemented).
+**(i) Fusion.** $i_1 \circ i_2 \rightarrow i_{12}$, with $pre(i_{12}) = pre(i_1)$, $post(i_{12}) = post(i_2)$, and $i_{12}$'s body stipulated to compute $\llbracket i_2 \rrbracket \circ \llbracket i_1 \rrbracket$ (intermediate bindings named, so the composition is explicit). The denotational claim is then an instance of the definition of $\circ$ (C.1): a body computing $\llbracket i_2 \rrbracket \circ \llbracket i_1 \rrbracket$ denotes exactly $\llbracket i_1 \circ i_2 \rrbracket$ (the associativity of function composition is what fuses *three or more* consecutive instructions). **Two honest boundaries.** First, this is an equality *of the rewrite algebra*: it holds of the fused form whose body computes the composite. The shipped compiler produces a formal fused *node* (merged metadata and dependencies) without generating an executable composite body—code generation for fused nodes is not implemented—so what the benchmarks measure is the structural fusion of the formal stream, and the executable-fusion claim would additionally require the codegen step. Second, the compiler applies fusion only when output types of $i_1$ match input types of $i_2$ and both members are pure, since denotational equality of the fused form presupposes order-insensitivity of intermediate effects, and the shipped gate achieves it via purity (the pure or order-insensitive alternative is specified, not implemented).
 
-**(ii) Dead-code elimination.** Instruction $i$ is removed from $p$ when $Def(i) \cap Live_{out}(i) = \emptyset$, with liveness the standard fixpoint of $Live(i) = Use(i) \cup (Live_{out}(i) - Def(i))$ [33]. Claim: if $i$ is dead and side-effect-free, then $p \equiv p \setminus \{i\}$. Proof sketch: by induction on the suffix program following $i$, its denotation depends only on the live variables at $i$'s position; $i$ writes none of them, so removing $i$ cannot change any value subsequently read. The side-effect-freeness gate matches the purity restriction of Definition 3.6 (Property 2 and the Remark following it)—instructions declared `side_effects=True` are never eliminated.
+**(ii) Dead-code elimination.** Instruction $i$ is removed from $p$ when $Def(i) \cap Live_{out}(i) = \emptyset$, with liveness the standard fixpoint of $Live_{in}(i) = Use(i) \cup (Live_{out}(i) - Def(i))$ [33]. Claim: if $i$ is dead and side-effect-free, then $p \equiv p \setminus \{i\}$. Proof sketch: by induction on the suffix program following $i$, its denotation depends only on the live variables at $i$'s position; $i$ writes none of them, so removing $i$ cannot change any value subsequently read. The side-effect-freeness gate matches the purity restriction of Definition 3.6 (Property 2 and the Remark following it)—instructions declared `side_effects=True` are never eliminated.
 
-**(iii) Peephole combining.** Each rule $(s_1, \dots, s_k) \rightarrow s'$ carries the verification obligation $\forall \sigma: \llbracket s_1 \circ \dots \circ s_k \rrbracket(\sigma) = \llbracket s' \rrbracket(\sigma)$, to be discharged at rule-definition time (Section 4.1.3). Candidate instances, *illustrative only—the shipped optimizer registers none of them*: `LOAD; STORE` to the same location composes to `MOVE` (the value read is the value written); consecutive `QUERY` instructions with identical (instruction, params) pairs collapse to one query whose result is reused (an obligation about a *compile-time* rewrite; the caching measured in Section 5.2 is a different, *runtime* mechanism—a result cache consulted at execution time—and its numbers do not evidence this rule); consecutive `CONTEXT_UPDATE`s compose to a single update by associativity of the update function.
+**(iii) Peephole combining.** Each rule $(s_1, \dots, s_k) \rightarrow s'$ carries the verification obligation $\forall \sigma: \llbracket s_1 \circ \dots \circ s_k \rrbracket(\sigma) = \llbracket s' \rrbracket(\sigma)$, to be discharged at rule-definition time (Section 4.1.3). Candidate instances, *illustrative only—the shipped optimizer registers none of them*: `LOAD A; STORE B` composes to `MOVE A→B` (degenerate to the identity when A = B, since the value read is the value written; the general rule of Section 3.4.4); consecutive `QUERY` instructions with identical (instruction, params) pairs collapse to one query whose result is reused (the batch-QUERY rule of Section 3.4.4, specialized to identical pairs) (an obligation about a *compile-time* rewrite; the caching measured in Section 5.2 is a different, *runtime* mechanism—a result cache consulted at execution time—and its numbers do not evidence this rule); consecutive `CONTEXT_UPDATE`s compose to a single update by associativity of the update function.
 
 *Proof.* Each case reduces to the construction of the rewritten instruction and the definition of liveness. The inner inductions—on the pair of bodies for (i), on suffix programs for (ii)—are routine and left to the reader. ∎
 
-## C.3 Lemma C.2 (Compositionality)
+## C.3 Lemma (Compositionality)
 
 Let $T$ be a program transform with $\llbracket T(p) \rrbracket = \llbracket p \rrbracket$ for all $p$. Then for any context $C[\cdot]$ built from the composition operators, $\llbracket C[T(p)] \rrbracket = \llbracket C[p] \rrbracket$.
 
@@ -1728,7 +1752,7 @@ Let $T$ be a program transform with $\llbracket T(p) \rrbracket = \llbracket p \
 
 ## C.4 Theorem 3.4 (Optimization Soundness)
 
-*Proof.* The compiler applies a finite sequence of rewrites $O = R_k \circ \dots \circ R_1$ (finiteness follows from compilation terminating; each pass is a bounded traversal). By induction on $k$: $k = 0$ is trivial. For the step, write $O = R \circ O'$. By the induction hypothesis $\llbracket O'(p) \rrbracket = \llbracket p \rrbracket$. A single application of rewrite rule $R$ preserves the denotation of the subprogram it rewrites (Lemma C.1), and Lemma C.2 lifts the preservation through any surrounding composition context. Hence $\llbracket R(O'(p)) \rrbracket = \llbracket O'(p) \rrbracket = \llbracket p \rrbracket$. ∎
+*Proof.* Read all equalities below as the partial-equivalence $\equiv$ of C.1 (equality on all states where both sides are defined), since the DCE rule preserves denotation only on the defined domain and can strictly enlarge it. The compiler applies a finite sequence of rewrites $O = R_k \circ \dots \circ R_1$ (finiteness follows from compilation terminating; each pass is a bounded traversal). By induction on $k$: $k = 0$ is trivial. For the step, write $O = R \circ O'$. By the induction hypothesis $\llbracket O'(p) \rrbracket \equiv \llbracket p \rrbracket$. Two routes, by rule kind. **Fusion and peephole** are local subprogram rewrites: the atomic-rewrite lemma (C.2) preserves the denotation of the subprogram it rewrites, and the compositionality lemma (C.3) lifts the preservation through any surrounding composition context. **Dead-code elimination** is not local—liveness is computed over the whole surrounding program—so it is handled at pass level directly by C.2(ii)'s whole-program argument ($p \equiv p \setminus \{i\}$), not through the lifting template. Hence $\llbracket R(O'(p)) \rrbracket \equiv \llbracket O'(p) \rrbracket \equiv \llbracket p \rrbracket$. ∎
 
 ## C.5 Theorem 3.5 (Pipeline Correctness)
 
@@ -1741,18 +1765,22 @@ Let $s$ be a valid instruction sequence and $S$ a schedule satisfying:
 
 Then executing $s$ under $S$ yields the same final state as sequential execution: $\llbracket s \rrbracket_S = \llbracket s \rrbracket_{seq}$.
 
-*Proof.* Let $g_1, \dots, g_m$ be the dispatch groups of $S$ in commit order. We show the invariant
+*Proof.* Let $g_1, \dots, g_m$ be the dispatch groups of $S$ in commit order. By S4, groups commit in program order and group commits do not interleave, so the union $\bigcup_{j \leq t} g_j$ of committed groups is always a program-order prefix—"executing all instructions in those groups" below means executing that prefix sequentially. We show the invariant
 
 $$\begin{gathered} I(t): \text{after committing } g_1, \dots, g_t,\\ \text{the architectural state equals the sequential state after}\\ \text{executing all instructions in those groups.}\end{gathered}$$
 
 - **Base** ($t = 0$): both sides are the initial state.
 - **Step**: assume $I(t)$. Every instruction in $g_{t+1}$ has its dependencies in earlier groups (by S2, since it is scheduled after them), which by $I(t)$ have completed and committed. Within the group, S3 gives pairwise non-interference: no instruction reads another group-member's output, and no two write the same location or resource. Hence the group's updates commute—for pure updates this is the diamond property, and for effectful instructions, S3's exclusion of shared resources makes their effects independent, so the combined effect is unique regardless of interleaving. The state after $g_{t+1}$ is therefore independent of the group's internal interleaving and equals the sequential execution of the same instructions from the state at $I(t)$.
-- By induction, $I(m)$ holds; by S1 no instruction was skipped or duplicated. ∎
+- By induction, $I(m)$ holds; by S1 no instruction was skipped or duplicated.
+
+This completes the induction over all dispatch groups, hence the proof. ∎
 
 **Corollary (dispatch folding).** The ADVANCED and AGGRESSIVE levels fold instructions into shared dispatches (Section 5.3). A folded group satisfies S3 by construction: the grouping check admits only side-effect-free instructions whose dependencies and declared outputs are pairwise disjoint, so the group's members act on disjoint state components and their updates commute (Definition 3.6, Property 2). By Theorem 3.5 the fold changes the *dispatch count* but neither the semantics nor—consistent with the measurement of Section 5.3—the effective instruction count.
 
-**Theorem 3.6** follows by the same machinery: every optimization in the pass pipeline is a finite composition of rewrites covered by Lemma C.1, and the argument of C.4 applies verbatim. ∎
+## C.6 Theorem 3.6 (Pass-Pipeline Soundness)
 
-## C.6 Scope Remark
+Every optimization in the pass pipeline is a finite composition of rewrites covered by the atomic-rewrite lemma (C.2) or by the dispatch-folding corollary of Theorem 3.5 (C.5)—the grouping pass is a fold, not a local rewrite—and the argument of C.4 applies verbatim to each rewrite layer. ∎
 
-Theorems 3.4 and 3.5 are *conditional*: they hold of transformations whose verification obligations (Sections 4.1.3 and 4.3.1) are discharged. As stated there, those obligations are **specified but not yet mechanically discharged**—the shipped optimizer registers no peephole rules (the peephole obligation is dormant, and the fusion/DCE/grouping passes are argued directly in C.2 and C.5 rather than through the symbolic-execution checker), and the symbolic-execution equivalence checker itself is a specification (Section 4.3.1). Where an obligation is discharged only on bounded state spaces (Section 3.3.3), the guarantee is correspondingly bounded—rewrites verified on the explored subset are sound there, and the compiler restricts their application accordingly. What the shipped implementation does provide is empirical semantics-preservation at task level: the system-level demonstration of Section 5.8 re-executes an optimized stream and checks byte-identical output.
+## C.7 Scope Remark
+
+Theorems 3.4–3.6 are *conditional*: they hold of transformations whose verification obligations (Sections 4.1.3 and 4.3.1) are discharged. As stated there, those obligations are **specified but not yet mechanically discharged**—the shipped optimizer registers no peephole rules (the peephole obligation is dormant, and the fusion/DCE/grouping passes are argued directly in C.2 and C.5 rather than through the symbolic-execution checker), and the symbolic-execution equivalence checker itself is a specification (Section 4.3.1). Where an obligation is discharged only on bounded state spaces (Section 3.3.3), the guarantee is correspondingly bounded: rewrites verified on the explored subset are sound there. No such rewrite is registered today; when one is, its application must be restricted to the explored subset (that restriction is a dormant obligation of the future rule set, not shipped behavior). What the shipped implementation does provide is empirical semantics-preservation at task level: the system-level demonstration of Section 5.8 re-executes an optimized stream and checks byte-identical output.
