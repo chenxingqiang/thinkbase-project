@@ -141,26 +141,26 @@ drives the real compiler, cache, and optimizer against a mock LLM
 backend: result caching reduces simulated API calls by 59.5--79.6\% on
 synthetic Zipf workloads (2,000 tasks, 5 seeds), a saving that grows
 with skew; static compilation reduces the effective instruction count by
-34.2\% (35.4\% at sequence length 1,000), with an independent-draw
-ablation attributing the shrink to fusion and dead-code elimination (a
-replication, not a decomposition; Section 5.5); dynamic hot-path
-optimization shrinks repeatedly executed traces by 65.8\%. Two
-real-gateway experiments extend the validation beyond the mock: the
-cache reproduces the computed hit/miss statistics at every skew level
-and converts avoided calls into measured wall-clock and token savings,
-and the compiled, hot-path-adopted stream issues zero new gateway calls
-with byte-identical artifacts (cache-mediated). A four-task system-level
-characterization (12.5--25.0\% per-task compile shrink) calibrates the
-synthetic headline, and 43 multi-agent coordination and security tests
-provide functional validation. We position these results as
-controlled-setting evidence, not as production end-to-end measurements.
-The shipped prototype implements result caching, the static passes that
-fire in the benchmarks (fusion, dead-code elimination, parallel
-grouping), and threshold-triggered trace re-optimization; tree-pattern
-instruction selection, cycle-accurate pipeline scheduling, and
-symbolic-equivalence checking remain specified components rather than
-fully implemented mechanisms, and capability metric extraction is a
-stub---no claim in this paper rests on them.
+34.2\% (35.4\% at sequence length 1,000), with a same-seed ablation
+decomposing the shrink into fusion (21.6\%) and dead-code elimination
+(24.5\%), the two passes overlapping by 11.9 points (Section 5.5);
+dynamic hot-path optimization shrinks repeatedly executed traces by
+65.8\%. Two real-gateway experiments extend the validation beyond the
+mock: the cache reproduces the computed hit/miss statistics at every
+skew level and converts avoided calls into measured wall-clock and token
+savings, and the compiled, hot-path-adopted stream issues zero new
+gateway calls with byte-identical artifacts (cache-mediated). A
+four-task system-level characterization (12.5--25.0\% per-task compile
+shrink) calibrates the synthetic headline, and 43 multi-agent
+coordination and security tests provide functional validation. We
+position these results as controlled-setting evidence, not as production
+end-to-end measurements. The shipped prototype implements result
+caching, the static passes that fire in the benchmarks (fusion,
+dead-code elimination, parallel grouping), and threshold-triggered trace
+re-optimization; tree-pattern instruction selection, cycle-accurate
+pipeline scheduling, and symbolic-equivalence checking remain specified
+components rather than fully implemented mechanisms, and capability
+metric extraction is a stub---no claim in this paper rests on them.
 \end{abstract}
 
 \section*{Keywords}\label{keywords}
@@ -205,9 +205,9 @@ stub---no claim in this paper rests on them.
   workload skew increases
 \item
   Static compilation (fusion + dead-code elimination) reduces the
-  effective instruction count by 34.2\% \(\pm\) 1.8\%, attributed to
-  fusion and dead-code elimination by an independent-draw ablation (a
-  replication, not a decomposition; Section 5.5)
+  effective instruction count by 34.2\% \(\pm\) 1.8\%, decomposed by a
+  same-seed paired ablation into fusion (21.6\%) and dead-code
+  elimination (24.5\%), with a −11.9-point overlap (Section 5.5)
 \item
   Dynamic hot-path optimization shrinks repeatedly executed traces by
   65.8\% \(\pm\) 4.6\%
@@ -1505,8 +1505,15 @@ Section 5.6; the instruction-level metric extraction is a specified
 stub---the seventeen \texttt{\_measure\_*} functions currently return
 0.0---so \texttt{assess\_capabilities} has no production call site yet,
 and the tests of Section 5.6 inject \texttt{DomainScore} values directly
-rather than deriving them through this pipeline. An earlier version of
-the aggregation double-counted: domain weights entered both the
+rather than deriving them through this pipeline. The pipeline's
+\emph{mechanics} are pinned by unit tests
+(\texttt{tests/core/isa/test\_capability\_pipeline.py}): end-to-end
+assessment over a real instruction list produces well-formed results for
+all eight domains with stub-zero scores, the domain aggregation is the
+confidence-weighted mean with the weight deliberately absent (a
+regression test for the double-weighting defect fixed above), and the
+top-level weighted mean applies weights exactly once. An earlier version
+of the aggregation double-counted: domain weights entered both the
 per-domain score and the overall mean, which would cap an end-to-end
 assessment well below the coordinator's 0.7 threshold. The aggregation
 has been fixed to apply the weight only at the top level (equations
@@ -2126,7 +2133,8 @@ Fusion + DCE static passes (implemented, fire in benchmarks) & Static
 compilation, 4 levels, 3 lengths (Section 5.3) \\
 Hot-path detection and adoption (implemented) & Dynamic trace
 re-optimization (Section 5.4) \\
-Pass-level attribution (independent draw) & Ablation (Section 5.5) \\
+Pass-level attribution (paired + independent) & Ablation (Section
+5.5) \\
 Coordination + security & 43 functional tests (Section 5.6) \\
 Cache, compilation, hot-path adoption (live gateway) & Real-gateway
 validations (Sections 5.7, 5.7.1) \\
@@ -2203,13 +2211,14 @@ Workloads are synthetic and seed-controlled:
   contributes exactly 51 recordings (the 50 that build the count plus
   the triggering one).
 \item
-  \textbf{Ablation}: an independent workload draw with the same
-  distribution parameters as the static-compilation experiment (length
-  200, 5 seeds, dead 0.25 / pure 0.55, but seed base 4,000 rather than
-  2,000), with the fusion and dead-code-elimination passes enabled
-  individually and jointly. Because the draw is independent, the
-  all-passes total (35.0\%) is a replication of the 34.2\% headline of
-  Section 5.3, not a decomposition of that exact number.
+  \textbf{Ablations}: two arms. The primary arm is \emph{paired}: it
+  re-compiles the same sequences as the static-compilation experiment
+  (identical seed base 2,000) with fusion and dead-code-elimination
+  toggled individually and jointly, yielding a same-input decomposition
+  of the 34.2\% headline. The secondary arm is an \emph{independent}
+  draw with the same distribution parameters but seed base 4,000,
+  serving as a replication on fresh sequences (its all-passes total,
+  35.0\%, agrees with the headline within one standard deviation).
 \end{itemize}
 
 \subsubsection{Protocol and Statistics}\label{protocol-and-statistics}
@@ -2220,9 +2229,11 @@ seeds. These are \textbf{descriptive statistics only}: we make no
 hypothesis-test claims (no p-values, no significance tests) anywhere in
 this paper. Five seeds characterize variability across the tested
 workload instances; they do not establish statistical significance or
-population-level generality. A formal inferential comparison against
-other systems is out of scope, because there is no baseline system that
-shares the mock-backend instrumentation.
+population-level generality. The naive response-cache baseline of
+Section 5.2 shares the mock-backend instrumentation and is reported
+alongside the treatment; a formal \emph{inferential} comparison against
+full external systems remains out of scope, and no such significance
+claim is made.
 
 \subsubsection{Metric Terminology}\label{metric-terminology}
 
@@ -2241,8 +2252,9 @@ conflated; each is defined once here and used consistently:
   runtime count.
 \item
   \textbf{Trace shrinkage}---shorter instruction traces after hot-path
-  re-optimization (Section 5.4); measured on recorded traces, not
-  re-executed ones.
+  re-optimization (Section 5.4); the shrink is a trace-length
+  measurement, with the optimized trace's executed-state identity
+  verified separately in the same section.
 \item
   \textbf{Cache hit rate / call reduction}---the fraction of calls
   served from the result cache; on this benchmark the call-reduction
@@ -2326,6 +2338,24 @@ Reduction = hit rate
 1.0 & 2,000 & 642.0 \(\pm\) 3.8 & 67.9\% \(\pm\) 0.2\% \\
 1.5 & 2,000 & 408.0 \(\pm\) 9.4 & 79.6\% \(\pm\) 0.5\% \\
 \end{longtable}
+
+\textbf{Naive response-cache baseline.} A third arm runs an app-level
+\emph{response} cache keyed on the exact request payload string---what
+an exact-match cache in front of the backend (the response-level caching
+of GPTCache's exact mode, or an HTTP response cache) keys
+on---implemented as a plain dict with no AgentISA machinery. It issues
+810.4 \(\pm\) 5.7 / 642.0 \(\pm\) 3.8 / 408.0 \(\pm\) 9.4 calls at
+\(s = 0.5/1.0/1.5\): \textbf{parity with the \texttt{InstructionCache}
+to the digit}, because on this workload the (instruction, params) key is
+already canonical. Parity is the finding, stated plainly: at the level
+of call reduction on this workload, the instruction-level cache adds
+nothing over exact-response caching. What the instruction level adds is
+the compile-time transformations of Sections 5.3 and 5.5---fusion and
+dead-code elimination, which reduce the program before any request is
+issued and which a response cache cannot express because it sees request
+strings, not instruction semantics. Semantic and embedding-based caching
+(GPTCache's approximate mode {[}46{]}) remains out of scope: no
+head-to-head against approximate matching is claimed.
 
 \textbf{Interpretation.} The reduction grows monotonically with skew,
 from 59.5\% under mild skew (\(s = 0.5\)) to 79.6\% under heavy
@@ -2474,25 +2504,52 @@ output is established separately, at task level, by the system-level
 characterization of Section 5.8 (which re-executes hot-path-optimized
 instruction streams and verifies byte-identical output).
 
-\begin{longtable}[]{@{}llll@{}}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0580}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2174}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2319}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1739}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3188}}@{}}
 \caption{Hot-path trace shrinkage per seed (length-100 traces, detection
-threshold 50 recordings; each seed contributes exactly 51
-recordings).}\tabularnewline
+threshold 50 recordings; each seed contributes exactly 51 recordings).
+The replay column records the executed-state identity check: the
+optimized trace, re-executed against an independent state, reproduces
+the original trace's final state exactly in every seed.}\tabularnewline
 \toprule\noalign{}
-Seed & Original length & Optimized length & Shrink ratio \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Original length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Optimized length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shrink ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Replay state identical
+\end{minipage} \\
 \midrule\noalign{}
 \endfirsthead
 \toprule\noalign{}
-Seed & Original length & Optimized length & Shrink ratio \\
+\begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Original length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Optimized length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shrink ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Replay state identical
+\end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0 & 100 & 30 & 70.0\% \\
-1 & 100 & 41 & 59.0\% \\
-2 & 100 & 30 & 70.0\% \\
-3 & 100 & 36 & 64.0\% \\
-4 & 100 & 34 & 66.0\% \\
+0 & 100 & 30 & 70.0\% & yes \\
+1 & 100 & 41 & 59.0\% & yes \\
+2 & 100 & 30 & 70.0\% & yes \\
+3 & 100 & 36 & 64.0\% & yes \\
+4 & 100 & 34 & 66.0\% & yes \\
 \end{longtable}
 
 Across seeds, hot-path optimization shrinks the trace by \textbf{65.8\%
@@ -2502,22 +2559,38 @@ effect is present in all five seeds. As with the static experiments,
 this measures trace-length reduction on synthetic
 traces---workload-controlled evidence that the
 detection-formation-reoptimization loop functions, not a wall-clock
-speedup claim. The optimized traces are \emph{not re-executed here}; the
-semantic-preservation check on optimized-and-re-executed streams is a
-property of Section 5.8's four-task characterization (whose 12.5--25.0\%
-shrink is a different, milder workload than this section's 65.8\%), not
-of these synthetic traces.
+speedup claim.
+
+\textbf{Replay verification.} Each seed's optimized trace \emph{is}
+re-executed: every instruction reads its declared dependencies from a
+threaded state dict and returns deterministic bindings for its declared
+outputs (side-effectful instructions additionally leave per-id markers),
+and the final state of the optimized trace is compared with that of the
+original trace executed the same way. Across all five seeds the states
+are identical (5/5; recorded per seed as
+\texttt{replay\_state\_identical} in the results file), so the 65.8\%
+shrinkage carries an executed-equality check at trace level---on the
+deterministic mock, not against a live model. This is the same style of
+check as Section 5.8's task-level byte-identity, applied to the
+synthetic traces themselves; what remains untested for these traces is
+live-model behavior, which no mock experiment can address.
 
 \subsection{Ablation: Per-pass
 Contribution}\label{ablation-per-pass-contribution}
 
-To attribute the static gains, we re-run the compiler with individual
-passes toggled:
+To attribute the static gains we run two ablations. The primary one is
+\textbf{paired}: it compiles the \emph{same} sequences as Section 5.3
+(identical seed base 2000 and generator), with fusion and
+dead-code-elimination toggled individually and jointly, so
+per-configuration differences are same-input paired differences---an
+exact decomposition of the headline rather than a replication across
+independent draws:
 
 \begin{longtable}[]{@{}ll@{}}
-\caption{Per-pass instruction-count reduction on an independent workload
-draw (length 200, 5 seeds, seed base 4,000; a replication of, not a
-decomposition into, the Section 5.3 headline).}\tabularnewline
+\caption{Paired per-pass decomposition on the Section 5.3 sequences
+(length 200, 5 seeds, identical seed base); the fusion + DCE row
+reproduces the Section 5.3 headline exactly because the inputs are
+identical.}\tabularnewline
 \toprule\noalign{}
 Configuration & Instruction-count reduction \\
 \midrule\noalign{}
@@ -2528,30 +2601,35 @@ Configuration & Instruction-count reduction \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-NONE & 0\% \(\pm\) 0.0 \\
-fusion only & 21.9\% \(\pm\) 3.5\% \\
-DCE only & 24.1\% \(\pm\) 3.3\% \\
-fusion + DCE & 35.0\% \(\pm\) 3.7\% \\
-all passes & 35.0\% \(\pm\) 3.7\% \\
+NONE & 0.0\% \(\pm\) 0.0\% \\
+fusion only & 21.6\% \(\pm\) 1.2\% \\
+DCE only & 24.5\% \(\pm\) 2.6\% \\
+fusion + DCE & 34.2\% \(\pm\) 1.8\% \\
 \end{longtable}
 
-\textbf{Interpretation.} Fusion alone removes 21.9\% and DCE alone
-24.1\%; combined they remove 35.0\%---less than the sum of their
-individual gains, because the passes partially overlap: sequences that
-are fusable are often also dead, so the second pass finds fewer targets
-after the first has run. The ``all passes'' row equals fusion+DCE on
-these workloads, consistent with the level-stability observation in
-Section 5.3: no additional pass contributes measurable reduction here.
-We report the absence of additional gain rather than dressing the higher
-levels in unearned credit. One caveat follows from the workload
-construction: because the ablation draws its sequences independently
-(Section 5.1.2), its fusion+DCE total (35.0\% \(\pm\) 3.7\%) is a
-replication of---not a decomposition into---the 34.2\% \(\pm\) 1.8\%
-headline of Section 5.3; the two numbers differ because they average
-over different random draws of the same distribution. And because the
-workloads plant dead instructions at rate 0.25 by construction, DCE's
-per-pass share is near-tautological for this family---it measures that
-the pass finds the planted dead code, which is precisely its function.
+The fusion+DCE row is 34.2\% \(\pm\) 1.8\%---the headline number itself,
+confirming that these two passes account for the entire static gain at
+length 200. The \textbf{paired interaction} (fusion+DCE − fusion − DCE,
+computed per seed) is −11.9\% \(\pm\) 2.0\% (per-seed
+−14.5/−9.5/−13.0/−12.0/−10.5 points): the passes overlap, because dead
+slots break fusion chains and fused pairs absorb neighbors that DCE
+would otherwise have removed individually, so the sum of the single-pass
+gains (46.1 points) overstates the joint effect by 11.9 points.
+
+The secondary ablation is the earlier \textbf{independent-draw
+replication} (seed base 4,000, same distribution): fusion alone 21.9\%
+\(\pm\) 3.5\%, DCE alone 24.1\% \(\pm\) 3.3\%, fusion+DCE and all passes
+35.0\% \(\pm\) 3.7\%. It reproduces the paired structure on fresh
+sequences---the single-pass shares agree within one standard
+deviation---so the decomposition is not an artifact of one particular
+draw. The ``all passes'' configuration equals fusion+DCE on these
+workloads, consistent with the level-stability observation in Section
+5.3: no additional pass contributes measurable reduction here. We report
+the absence of additional gain rather than dressing the higher levels in
+unearned credit. And because the workloads plant dead instructions at
+rate 0.25 by construction, DCE's per-pass share is near-tautological for
+this family---it measures that the pass finds the planted dead code,
+which is precisely its function.
 
 \subsection{Multi-Agent Coordination: Functional
 Validation}\label{multi-agent-coordination-functional-validation}
@@ -3234,19 +3312,22 @@ We enumerate the limitations of the evaluation explicitly:
 \item
   \textbf{Mock backend, not a live LLM.} \emph{The mock's limits:} it
   charges a constant 80 ms per simulated call and returns deterministic
-  responses. \emph{What the real-gateway experiments cover:} against a
-  live gateway, the cache reproduces the computed hit/miss statistics
-  and converts avoided calls into measured time and tokens (Section
-  5.7), and the compiled, hot-path-adopted stream issues zero new
-  gateway calls with byte-identical artifacts (Section 5.7.1)---a
-  cache-mediated identity validating the stream transformation, not
-  model determinism. \emph{Still not covered:} multi-model and
-  multi-seed behavior, real deployment, caching under model
-  nondeterminism \emph{across prompt variations}, streaming responses,
-  provider rate limits, and live-model task quality (the four-task
-  characterization's classification steps are deterministic rule-based
-  stand-ins, and the 5.7.1 gateway run fell back to the deterministic
-  classifier).
+  responses. \emph{What the mock itself covers beyond counting:} the
+  hot-path replay verification of Section 5.4 re-executes each optimized
+  trace and checks final-state identity (5/5 seeds), and the naive-cache
+  baseline of Section 5.2 runs on the same instrumentation. \emph{What
+  the real-gateway experiments cover:} against a live gateway, the cache
+  reproduces the computed hit/miss statistics and converts avoided calls
+  into measured time and tokens (Section 5.7), and the compiled,
+  hot-path-adopted stream issues zero new gateway calls with
+  byte-identical artifacts (Section 5.7.1)---a cache-mediated identity
+  validating the stream transformation, not model determinism.
+  \emph{Still not covered:} multi-model and multi-seed behavior, real
+  deployment, caching under model nondeterminism \emph{across prompt
+  variations}, streaming responses, provider rate limits, and live-model
+  task quality (the four-task characterization's classification steps
+  are deterministic rule-based stand-ins, and the 5.7.1 gateway run fell
+  back to the deterministic classifier).
 \item
   \textbf{Synthetic workloads.} Zipf-distributed synthetic tasks are a
   reasonable model of skewed agent workloads, but they are a model, and
@@ -3281,9 +3362,11 @@ We enumerate the limitations of the evaluation explicitly:
   economics). The resulting costs are MODELED-on-measured: token counts
   are measurements, prices are configurable list-price stand-ins (the
   serving gateway's actual pricing is unknown), and no dollar-savings
-  claim is made. A head-to-head against a production external cache
-  (GPTCache---explicitly out of scope this pass) and a priced deployment
-  study under real provider pricing remain future work.
+  claim is made. Section 5.2's baseline is an \emph{exact-match}
+  response cache, and its parity finding is reported; a head-to-head
+  against \emph{approximate} (semantic/embedding) caching (GPTCache's
+  approximate mode---explicitly out of scope this pass) and a priced
+  deployment study under real provider pricing remain future work.
 \item
   \textbf{Program-size metrics, not wall-clock time.}
   Effective-instruction reduction and dispatch-count reduction are
@@ -4389,14 +4472,22 @@ exactly \(\llbracket i_1 \circ i_2 \rrbracket\) (the associativity of
 function composition is what fuses \emph{three or more} consecutive
 instructions). \textbf{Two honest boundaries.} First, this is an
 equality \emph{of the rewrite algebra}: it holds of the fused form whose
-body computes the composite. The shipped compiler produces a formal
-fused \emph{node} (merged metadata and dependencies) without generating
-an executable composite body---code generation for fused nodes is not
-implemented---so what the benchmarks measure is the structural fusion of
-the formal stream, and the executable-fusion claim would additionally
-require the codegen step. Second, the compiler applies fusion only when
-output types of \(i_1\) match input types of \(i_2\) and both members
-are pure, since denotational equality of the fused form presupposes
+body computes the composite. The shipped \emph{formal compiler} (the
+static path of the Section 5.3 benchmarks) produces a formal fused
+\emph{node} (merged metadata and dependencies) without generating an
+executable composite body---code generation for fused nodes is not
+implemented---so what those benchmarks measure is the structural fusion
+of the formal stream, and the executable-fusion claim would additionally
+require the codegen step. The \emph{Instruction-level} merge path (the
+dynamic optimizer of Sections 4.2 and 5.4) does carry an executable
+body---the \texttt{CompositeInstruction} replay construction---and its
+differential property (composite execution equals constituent-sequence
+execution; the fusion gate refuses producer--consumer pairs) is pinned
+by unit tests and exercised by the trace-replay identity of Section 5.4
+(5/5 seeds). A fused \emph{single} executable body distinct from replay
+remains specified. Second, the compiler applies fusion only when output
+types of \(i_1\) match input types of \(i_2\) and both members are pure,
+since denotational equality of the fused form presupposes
 order-insensitivity of intermediate effects, and the shipped gate
 achieves it via purity (the pure or order-insensitive alternative is
 specified, not implemented).
@@ -4598,10 +4689,16 @@ exactly one of three levels, which we keep separate throughout:
 pipeline scheduler's cycle-accurate extension, tree-pattern instruction
 selection (Section 4.1.2); \emph{(ii) implemented with checks}---the
 optimizer passes (fusion, DCE, grouping) with their pass-level arguments
-in C.2/C.5 and the runtime monitors; \emph{(iii) empirically
-validated}---task-level re-execution with byte-identical outputs
-(Section 5.8) and the caching/compilation measurements of Section 5. A
-statement at one level is never used to imply a guarantee at a stronger
-level.
+in C.2/C.5, the runtime monitors, and differential unit tests pinning
+the fusion property this appendix argues (fused-composite execution
+equals constituent-sequence execution; the fusion gate refuses
+producer--consumer pairs;
+\texttt{tests/core/isa/test\_fusion\_differential.py}); \emph{(iii)
+empirically validated}---trace-level replay identity on the mock
+(Section 5.4: optimized traces re-executed, final states identical in
+5/5 seeds), task-level re-execution with byte-identical outputs (Section
+5.8), and the caching/compilation measurements of Section 5 (including
+the exact-response-cache parity baseline of Section 5.2). A statement at
+one level is never used to imply a guarantee at a stronger level.
 
 \end{document}

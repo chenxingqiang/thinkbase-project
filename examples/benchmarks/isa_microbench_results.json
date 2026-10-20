@@ -28,6 +28,10 @@
           "mean": 0.5948,
           "stdev": 0.0028416544476765034
         },
+        "api_calls_naive_response_cache": {
+          "mean": 810.4,
+          "stdev": 5.683308895353129
+        },
         "cache_hit_rate": {
           "mean": 0.5948,
           "stdev": 0.0028416544476765836
@@ -50,6 +54,10 @@
         "reduction_ratio": {
           "mean": 0.6789999999999999,
           "stdev": 0.0019039432764660078
+        },
+        "api_calls_naive_response_cache": {
+          "mean": 642,
+          "stdev": 3.8078865529319543
         },
         "cache_hit_rate": {
           "mean": 0.679,
@@ -74,6 +82,10 @@
           "mean": 0.7959999999999999,
           "stdev": 0.0046904157598234245
         },
+        "api_calls_naive_response_cache": {
+          "mean": 408,
+          "stdev": 9.38083151964686
+        },
         "cache_hit_rate": {
           "mean": 0.796,
           "stdev": 0.004690415759823443
@@ -84,7 +96,7 @@
         }
       }
     ],
-    "wall_time_s": 0.141
+    "wall_time_s": 0.144
   },
   {
     "experiment": "compiler",
@@ -250,7 +262,7 @@
         }
       }
     ],
-    "wall_time_s": 0.247
+    "wall_time_s": 0.265
   },
   {
     "experiment": "dynamic",
@@ -268,38 +280,53 @@
         "original_len": 100,
         "optimized_len": 30,
         "shrink_ratio": 0.7,
-        "optimized_at_iteration": 50
+        "optimized_at_iteration": 50,
+        "replay_state_identical": true
       },
       {
         "seed": 1,
         "original_len": 100,
         "optimized_len": 41,
         "shrink_ratio": 0.5900000000000001,
-        "optimized_at_iteration": 50
+        "optimized_at_iteration": 50,
+        "replay_state_identical": true
       },
       {
         "seed": 2,
         "original_len": 100,
         "optimized_len": 30,
         "shrink_ratio": 0.7,
-        "optimized_at_iteration": 50
+        "optimized_at_iteration": 50,
+        "replay_state_identical": true
       },
       {
         "seed": 3,
         "original_len": 100,
         "optimized_len": 36,
         "shrink_ratio": 0.64,
-        "optimized_at_iteration": 50
+        "optimized_at_iteration": 50,
+        "replay_state_identical": true
       },
       {
         "seed": 4,
         "original_len": 100,
         "optimized_len": 34,
         "shrink_ratio": 0.6599999999999999,
-        "optimized_at_iteration": 50
+        "optimized_at_iteration": 50,
+        "replay_state_identical": true
       }
     ],
-    "wall_time_s": 0.016
+    "replay_verification": {
+      "all_seeds_state_identical": true,
+      "checked_states": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    "wall_time_s": 0.018
   },
   {
     "experiment": "ablation",
@@ -346,6 +373,60 @@
         }
       }
     ],
-    "wall_time_s": 0.035
+    "wall_time_s": 0.036
+  },
+  {
+    "experiment": "paired_ablation",
+    "config": {
+      "seeds": 5,
+      "length": 200,
+      "p_dead": 0.25,
+      "p_pure": 0.55,
+      "seed_base": 2000,
+      "paired_with": "compiler(length=200)"
+    },
+    "data": [
+      {
+        "configuration": "none",
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        }
+      },
+      {
+        "configuration": "fusion_only",
+        "instruction_count_reduction": {
+          "mean": 0.21599999999999997,
+          "stdev": 0.012449899597988744
+        }
+      },
+      {
+        "configuration": "dce_only",
+        "instruction_count_reduction": {
+          "mean": 0.245,
+          "stdev": 0.026220221204253814
+        }
+      },
+      {
+        "configuration": "fusion+dce",
+        "instruction_count_reduction": {
+          "mean": 0.34199999999999997,
+          "stdev": 0.018234582528810484
+        }
+      }
+    ],
+    "paired_interaction": {
+      "definition": "(fusion+dce) - fusion_only - dce_only, per seed",
+      "mean": -0.119,
+      "stdev": 0.019811612756158968,
+      "per_seed": [
+        -0.14500000000000002,
+        -0.09499999999999997,
+        -0.13,
+        -0.12,
+        -0.10499999999999998
+      ]
+    },
+    "wall_time_s": 0.01
   }
 ]

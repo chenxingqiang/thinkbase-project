@@ -229,6 +229,7 @@ async def run_cache_experiment(seeds: int, zipf_values: List[float],
 
     for zipf_s in zipf_values:
         no_cache_calls, with_cache_calls, hit_rates, sim_ms = [], [], [], []
+        naive_calls = []
         for seed in range(seeds):
             rng = random.Random(1000 + seed)
             workload = zipf_workload(rng, n_tasks, n_instructions, n_param_values, zipf_s)
@@ -240,6 +241,22 @@ async def run_cache_experiment(seeds: int, zipf_values: List[float],
             for idx, params in workload:
                 await instrs[idx].execute(params)
             no_cache_calls.append(backend.api_calls)
+
+            # Baseline 2: naive app-level response cache keyed on the exact
+            # request payload string (what an exact-match response cache in
+            # front of the backend keys on).  No AgentISA machinery: plain
+            # dict, intercept-before-execute, store-after-miss.
+            backend.reset()
+            instrs = [MockLLMInstruction(backend, f"i{i}", use_cache=False)
+                      for i in range(n_instructions)]
+            response_cache: Dict[str, str] = {}
+            for idx, params in workload:
+                payload = f"{instrs[idx].name}:{sorted(params.items())}"
+                if payload in response_cache:
+                    continue
+                await instrs[idx].execute(params)
+                response_cache[payload] = "response"
+            naive_calls.append(backend.api_calls)
 
             # Treatment: InstructionCache enabled.
             backend.reset()
@@ -271,6 +288,10 @@ async def run_cache_experiment(seeds: int, zipf_values: List[float],
             "reduction_ratio": {
                 "mean": statistics.mean(reduction),
                 "stdev": statistics.stdev(reduction) if seeds > 1 else 0.0,
+            },
+            "api_calls_naive_response_cache": {
+                "mean": statistics.mean(naive_calls),
+                "stdev": statistics.stdev(naive_calls) if seeds > 1 else 0.0,
             },
             "cache_hit_rate": {
                 "mean": statistics.mean(hit_rates),
@@ -326,6 +347,20 @@ def run_compiler_experiment(seeds: int, lengths: List[int]) -> Dict[str, Any]:
 # Experiment 3: dynamic hot-path optimization
 # --------------------------------------------------------------------------
 
+async def _execute_trace(trace: List[Instruction]) -> Dict[str, Any]:
+    """Execute a trace against a fresh state dict, threading results.
+
+    Each instruction returns (rather than mutates) its new bindings;
+    the harness folds them into the state, so a rewrite that preserves
+    dataflow yields an identical final state.
+    """
+    state: Dict[str, Any] = {}
+    for instr in trace:
+        result = await instr.execute(state)
+        if isinstance(result, dict):
+            state.update(result)
+    return state
+
 def run_dynamic_experiment(seeds: int, trace_length: int,
                            iterations: int, hot_threshold: int) -> Dict[str, Any]:
     """Measure trace shrinkage once a path goes hot.
@@ -344,18 +379,20 @@ def run_dynamic_experiment(seeds: int, trace_length: int,
     for seed in range(seeds):
         rng = random.Random(3000 + seed)
         # Build a typed Instruction trace with mix of live/dead/pure.
-        from tests_bench_support import BenchInstruction  # local helper
+        # StatefulBenchInstruction executes against a threaded state dict,
+        # enabling the replay-verification check below.
+        from tests_bench_support import StatefulBenchInstruction
         trace: List[Instruction] = []
         for i in range(trace_length - 1):
             r = rng.random()
             if r < 0.3:
-                trace.append(BenchInstruction(f"d{i}", side_effects=False))
+                trace.append(StatefulBenchInstruction(f"d{i}", side_effects=False))
             elif r < 0.8:
-                trace.append(BenchInstruction(f"p{i}", side_effects=False,
-                                              outputs=[f"v{i}"]))
+                trace.append(StatefulBenchInstruction(f"p{i}", side_effects=False,
+                                                      outputs=[f"v{i}"]))
             else:
-                trace.append(BenchInstruction(f"e{i}", side_effects=True))
-        sink = BenchInstruction("sink", side_effects=True)
+                trace.append(StatefulBenchInstruction(f"e{i}", side_effects=True))
+        sink = StatefulBenchInstruction("sink", side_effects=True)
         sink.dependencies = [f"v{i}" for i in range(trace_length - 1)
                              if trace[i].outputs]
         trace.append(sink)
@@ -374,13 +411,29 @@ def run_dynamic_experiment(seeds: int, trace_length: int,
                 break
         final = manager.dynamic_optimizer.optimize_hot_path(path_id)
         shrink = 1.0 - len(final) / len(trace) if final else 0.0
+
+        # Replay verification (E6): execute the original and the optimized
+        # trace over independent state dicts and compare the final states.
+        # A semantics-preserving rewrite (DCE removes only no-output,
+        # no-effect instructions; fusion merges only order-independent pure
+        # pairs) must reproduce the original state exactly.
+        original_state = asyncio.run(_execute_trace(trace))
+        optimized_state = (asyncio.run(_execute_trace(final))
+                           if final else dict(original_state))
         results["data"].append({
             "seed": seed,
             "original_len": len(trace),
             "optimized_len": len(final) if final else len(trace),
             "shrink_ratio": shrink,
             "optimized_at_iteration": optimized_at,
+            "replay_state_identical": original_state == optimized_state,
         })
+    results["replay_verification"] = {
+        "all_seeds_state_identical": all(
+            d.get("replay_state_identical", False) for d in results["data"]
+        ),
+        "checked_states": [d.get("replay_state_identical") for d in results["data"]],
+    }
     return results
 
 
@@ -426,6 +479,69 @@ def run_ablation_experiment(seeds: int, length: int) -> Dict[str, Any]:
 
 
 # --------------------------------------------------------------------------
+# Experiment 5: paired ablation (same seeds and sequences as the static
+# compiler experiment, so per-pass contributions decompose the Section 5.3
+# headline exactly instead of replicating it on an independent draw)
+# --------------------------------------------------------------------------
+
+def run_paired_ablation(seeds: int, length: int) -> Dict[str, Any]:
+    """Per-pass decomposition on the *same* sequences as the compiler run.
+
+    Uses the compiler experiment's seed base (2000 + seed) and the same
+    ``synthetic_formal_sequence`` generator, so for each seed the four
+    configurations (none / fusion-only / DCE-only / fusion+DCE) see an
+    identical instruction sequence.  Differences between configurations
+    are then paired per-seed differences: an exact decomposition, not a
+    replication across independent draws.
+    """
+    results: Dict[str, Any] = {"experiment": "paired_ablation", "config": {
+        "seeds": seeds, "length": length, "p_dead": 0.25, "p_pure": 0.55,
+        "seed_base": 2000, "paired_with": "compiler(length=200)",
+    }, "data": []}
+
+    compiler = InstructionCompiler({})
+    configs = {
+        "none": [],
+        "fusion_only": ["instruction_fusion"],
+        "dce_only": ["dead_code_elimination"],
+        "fusion+dce": ["instruction_fusion", "dead_code_elimination"],
+    }
+    per_seed: Dict[str, List[float]] = {name: [] for name in configs}
+    for seed in range(seeds):
+        rng = random.Random(2000 + seed)  # identical draw to compiler experiment
+        seq = synthetic_formal_sequence(rng, length, p_dead=0.25, p_pure=0.55)
+        for name, passes in configs.items():
+            ir = compiler.ir_builder.build(seq)
+            ctx = CompilationContext({"optimization_level": "AGGRESSIVE"})
+            for pass_name, pass_fn in compiler.optimization_passes.items():
+                if pass_name in passes:
+                    ir = pass_fn(ir, ctx)
+            count = effective_instruction_count(ir.instructions)
+            per_seed[name].append(1.0 - count / len(seq))
+    for name in configs:
+        results["data"].append({
+            "configuration": name,
+            "instruction_count_reduction": {
+                "mean": statistics.mean(per_seed[name]),
+                "stdev": statistics.stdev(per_seed[name]) if seeds > 1 else 0.0,
+            },
+        })
+    # Paired interaction: (fusion+dce) - fusion - DCE, per seed.
+    interactions = [
+        fdc - f - d
+        for f, d, fdc in zip(per_seed["fusion_only"], per_seed["dce_only"],
+                             per_seed["fusion+dce"])
+    ]
+    results["paired_interaction"] = {
+        "definition": "(fusion+dce) - fusion_only - dce_only, per seed",
+        "mean": statistics.mean(interactions),
+        "stdev": statistics.stdev(interactions) if seeds > 1 else 0.0,
+        "per_seed": interactions,
+    }
+    return results
+
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -433,7 +549,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="AgentISA honest microbenchmarks")
     parser.add_argument("--experiments", nargs="+",
                         default=["cache", "compiler", "dynamic", "ablation"],
-                        choices=["cache", "compiler", "dynamic", "ablation"])
+                        choices=["cache", "compiler", "dynamic", "ablation",
+                                 "paired_ablation"])
     parser.add_argument("--seeds", type=int, default=5)
     parser.add_argument("--output", type=str,
                         default="isa_microbench_results.json")
@@ -456,6 +573,8 @@ def main() -> None:
                 seeds=args.seeds, trace_length=100, iterations=200,
                 hot_threshold=50,
             )
+        elif experiment == "paired_ablation":
+            res = run_paired_ablation(seeds=args.seeds, length=200)
         else:
             res = run_ablation_experiment(seeds=args.seeds, length=200)
         res["wall_time_s"] = round(time.perf_counter() - t0, 3)
