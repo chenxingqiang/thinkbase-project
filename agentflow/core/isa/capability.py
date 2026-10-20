@@ -90,7 +90,7 @@ class CapabilityProfile:
         return {
             "metrics": metrics,
             "weight": weight,
-            "score": self._compute_weighted_score(metrics, weight)
+            "score": self._compute_weighted_score(metrics)
         }
     
     def _compute_domain_metrics(self,
@@ -130,17 +130,23 @@ class CapabilityProfile:
         return weights.get(domain, 0.0)
     
     def _compute_weighted_score(self,
-                              metrics: List[CapabilityMetric],
-                              weight: float) -> float:
-        """Compute weighted score for metrics."""
+                              metrics: List[CapabilityMetric]) -> float:
+        """Compute the confidence-weighted mean of metric values.
+
+        The domain weight is deliberately NOT applied here: it enters only
+        once, at the top level (``get_overall_score``). Folding it into the
+        per-domain score as well double-counts it, which an earlier version
+        of this method did.
+        """
         if not metrics:
             return 0.0
-            
-        total_score = sum(
-            metric.value * metric.confidence
-            for metric in metrics
-        )
-        return total_score * weight / len(metrics)
+
+        total_conf = sum(metric.confidence for metric in metrics)
+        if total_conf <= 0:
+            return sum(metric.value for metric in metrics) / len(metrics)
+        return sum(
+            metric.value * metric.confidence for metric in metrics
+        ) / total_conf
     
     def _assess_reasoning(self,
                          instructions: List[FormalInstruction]) -> List[CapabilityMetric]:

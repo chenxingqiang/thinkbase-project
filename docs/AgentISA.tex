@@ -154,6 +154,13 @@ characterization (12.5--25.0\% per-task compile shrink) calibrates the
 synthetic headline, and 43 multi-agent coordination and security tests
 provide functional validation. We position these results as
 controlled-setting evidence, not as production end-to-end measurements.
+The shipped prototype implements result caching, the static passes that
+fire in the benchmarks (fusion, dead-code elimination, parallel
+grouping), and threshold-triggered trace re-optimization; tree-pattern
+instruction selection, cycle-accurate pipeline scheduling, and
+symbolic-equivalence checking remain specified components rather than
+fully implemented mechanisms, and capability metric extraction is a
+stub---no claim in this paper rests on them.
 \end{abstract}
 
 \section*{Keywords}\label{keywords}
@@ -174,9 +181,9 @@ controlled-setting evidence, not as production end-to-end measurements.
 \item
   Agentic Calling
 \item
-  Automatic Instruction Learning
+  Trace-based Instruction Learning
 \item
-  Cross-model Capability Assessment
+  Capability-based Agent Coordination
 \item
   Formal Methods
 \item
@@ -206,7 +213,7 @@ controlled-setting evidence, not as production end-to-end measurements.
   65.8\% \(\pm\) 4.6\%
 \item
   Agentic Calling lifts provider-specific function calling into
-  reusable, portable agent instructions
+  reusable, provider-independent agent instructions
 \item
   Real-gateway validations (Sections 5.7 and 5.7.1): observed cache hit
   rates match the computed expectation exactly, and the compiled,
@@ -350,7 +357,7 @@ compilable artifact. Our contributions are:
   agent instructions, with a model-adapter layer for cross-provider
   portability (Section 3.2).
 \item
-  \textbf{Automatic instruction learning}, which mines recurring
+  \textbf{Trace-based instruction learning}, which mines recurring
   instruction patterns from interaction traces using frequency-based
   sequence mining and deterministic behavior grouping, and promotes
   validated recurring patterns into candidate instructions whose
@@ -444,10 +451,15 @@ C(n) = \sum_{i=1}^{n} (\tau_i + \omega_i)
 
 \textbf{Definition 2.1} (Function Call Overhead): The overhead of
 executing \(n\) function calls is \(C(n)\), the sum of per-call
-latencies and per-call context reconstruction costs. When successive
-calls are structurally identical, \(\omega_i\) is pure waste---which is
-precisely the waste AgentISA's caching and fusion are designed to
-remove.
+latencies and per-call context reconstruction costs. When repeated calls
+carry identical semantic inputs and satisfy the cache-validity
+conditions of Section 3.2, the repeated context-construction cost
+\(\omega_i\) is avoidable---which is precisely the cost AgentISA's
+caching and fusion are designed to remove. Structural similarity alone
+does not make a re-invocation waste: if an input's dependencies have
+changed or the call probes external state, re-execution has semantic
+meaning, and the cache-validity conditions---not structural
+identity---are what license reuse.
 
 \subsection{Reasoning and Agent
 Paradigms}\label{reasoning-and-agent-paradigms}
@@ -609,14 +621,12 @@ In summary, the literature leaves four gaps that AgentISA addresses:
   extended by real-gateway and system-level validations (Section 5).
 \end{enumerate}
 
-Our work addresses these gaps through: (1) the formal instruction set
-with the Agentic Calling abstraction (Sections 3.1--3.2), (2)
-pattern-based instruction optimization (Section 3.4), (3)
-semantic-preservation arguments for our transformations (Theorems 3.2,
-3.4--3.6; Appendices B--C), (4) automated instruction learning from
-execution traces (Section 3.3), and (5) a reproducible evaluation
-spanning synthetic microbenchmarks, real-gateway validation, and a
-system-level workload characterization (Sections 5.2--5.8).
+AgentISA addresses these four gaps directly---the instruction set and
+Agentic Calling abstraction (Sections 3.1--3.2), instruction-level
+optimization with semantic-preservation arguments (Section 3.4, Theorems
+3.2 and 3.4--3.6, Appendices B--C), trace-derived instruction learning
+(Section 3.3), and a seed-controlled evaluation (Sections 5.2--5.8); the
+full contribution list is in Section 1 and is not repeated here.
 
 \section{AgentISA Design}\label{agentisa-design}
 
@@ -898,8 +908,10 @@ transition is \emph{monitored, not guaranteed}, by the runtime checks.
 \subsubsection{Cross-model
 Compatibility}\label{cross-model-compatibility}
 
-Cross-model compatibility is achieved through an abstract interface
-layer:
+Cross-model \emph{protocol} compatibility---not behavioral equivalence
+of models---is achieved through an abstract interface layer
+(provider-independent instruction representation with provider-specific
+adapters):
 
 \begin{verbatim}
 Interface ModelAdapter {
@@ -934,17 +946,31 @@ pre-execution.
 
 Motivated by the observation of cross-model function-calling studies
 {[}17{]} and open protocol efforts {[}18{]}---providers differ in
-surface syntax but can agree on semantics---we require the following of
-the \emph{adapter layer} (not of the models themselves; taking
-\(m_1 = m_2\) would demand determinism, which no LLM provides), for
-\(\mathbb{M}\) the set of provider adapters:
+surface syntax but can agree on \emph{protocol shape}---the requirement
+is a \textbf{protocol-level contract on the adapter layer}, not a claim
+of behavioral equivalence between models. For \(\mathbb{M}\) the set of
+provider adapters, each \(m \in \mathbb{M}\) provides a request
+normalizer \(\text{norm}_{in}(m)\) and a response normalizer
+\(\text{norm}_{out}(m)\) such that:
 
 \[
-\forall m_1, m_2 \in \mathbb{M}: \text{out}(m_1) \equiv \text{out}(m_2) \text{ when } \text{in}(m_1) \equiv \text{in}(m_2)
+\forall m \in \mathbb{M}: \text{norm}_{in}(m), \text{norm}_{out}(m) \text{ are total on the supported request and response classes,}
 \]
 
-\subsection{Automatic Instruction
-Learning}\label{automatic-instruction-learning}
+mapping every supported raw request into the unified instruction-side
+schema and every supported raw response into the unified result schema,
+with declared types preserved and errors classified into a common error
+taxonomy---so that downstream instruction code never branches on
+provider syntax. This is deliberately weaker than a semantic-output
+equivalence: nothing here implies that two models given the same
+normalized input return the same semantic content (taking \(m_1 = m_2\)
+would already demand determinism, which no LLM provides), and
+cross-model \emph{behavioral} comparison is an empirical question at
+benchmark level (Section 3.5, {[}17, 29{]}), not something an interface
+definition can deliver.
+
+\subsection{Trace-Based Instruction
+Learning}\label{trace-based-instruction-learning}
 
 \subsubsection{Dialogue Pattern
 Recognition}\label{dialogue-pattern-recognition}
@@ -952,7 +978,18 @@ Recognition}\label{dialogue-pattern-recognition}
 Pattern recognition in AgentISA is frequency-based and deterministic
 (action-signature grouping) rather than grammatical; it is implemented
 in \texttt{agentflow.core.isa.pattern\_mining} and
-\texttt{agentflow.core.isa.instruction\_learning}.
+\texttt{agentflow.core.isa.instruction\_learning}. To prevent
+over-reading: the subsystem is a \textbf{discovery-and-replay pipeline,
+not an autonomous learning loop}. Its five stages are (i) trace-derived
+pattern mining (this section), (ii) dialogue-derived template extraction
+(§3.3.2---templates carry no recorded instruction body and raise
+\texttt{NotImplementedError} if executed), (iii) candidate validation
+(support and success-rate thresholds), (iv) \emph{developer-controlled}
+promotion (mining never edits the optimizer's rule set; a human decides
+which candidates become instructions), and (v) composite replay (a
+promoted instruction re-runs its recorded subsequence on the same
+inputs; it does not generalize to unseen parameter values). Stages
+(i)--(iii) and (v) ship; stage (iv) is deliberately manual.
 
 \textbf{Definition 3.4} (Instruction Sequence Pattern): A pattern \(p\)
 over the instruction alphabet \(I\) is a non-empty contiguous sequence
@@ -1005,18 +1042,17 @@ Pattern recognition proceeds in three stages:
   sequence together with the dataflow edges between its members, and the
   learned instruction's \texttt{execute} body re-runs that sequence in
   mined order against a shared context built from its inputs, merging
-  each constituent's outputs and returning the keys its
-  \texttt{produces\_X} postconditions declare; dialogue-mined templates,
-  which carry no recorded instruction body, raise
-  \texttt{NotImplementedError} rather than silently no-opping. Promotion
-  is deterministic: pattern identity is derived from the mined
-  instruction-id sequence, so the same traces promote the same
-  instructions, in the same order, across runs. Replay semantics are
-  plain sequential composition---nothing smarter---so a learned
-  instruction reproduces the outputs of its recorded subsequence on the
-  same inputs but does not generalize to unseen parameter values; no
-  automated mining-to-optimization decision path exists yet (promotion
-  is a developer decision).
+  each constituent's outputs and returning the keys declared by its
+  \texttt{produces\_X} postconditions; dialogue-mined templates, which
+  carry no recorded instruction body, raise \texttt{NotImplementedError}
+  rather than silently no-opping. Promotion is deterministic: pattern
+  identity is derived from the mined instruction-id sequence, so the
+  same traces promote the same instructions, in the same order, across
+  runs. Replay semantics are plain sequential composition---nothing
+  smarter---so a learned instruction reproduces the outputs of its
+  recorded subsequence on the same inputs but does not generalize to
+  unseen parameter values; no automated mining-to-optimization decision
+  path exists yet (promotion is a developer decision).
 \item
   \textbf{Pattern validation.} Each candidate pattern is checked for
   significance---support above \(\sigma_{min}\) (the frequency threshold
@@ -1103,6 +1139,20 @@ is traded for tractability---the standard bounded-exploration
 compromise; the operational-semantics treatment of instruction meaning
 itself follows {[}36{]}.
 
+The guarantee therefore comes in two explicitly separate layers.
+\textbf{Layer 1 (theory, conditional):} Theorem 3.2 and the type-safety
+results of Appendix B hold for every program whose instructions satisfy
+Definition 3.5 \emph{on all of \(S\)}, under the total-definedness
+premise of Appendix B.7---this is a mathematical statement about a proof
+obligation, not about the checker. \textbf{Layer 2 (implemented
+verification):} the shipped checker discharges that obligation only on
+\(S_{bounded}\) (exhaustive enumeration for small finite domains;
+deterministic bounded sampling with cap 256 otherwise) and only for pure
+instructions; side-effectful instructions are reported out of scope and
+their obligation is delegated to unit tests and review. Success of the
+bounded check is evidence toward, not a proof of, Layer 1's premise; no
+claim in this paper equates the two.
+
 \textbf{Theorem 3.4} (Optimization Soundness): Every atomic rewrite of
 the pass pipeline---fusion (Appendix C.2's rule, applied by the
 combining pass), dead-code elimination, and instruction combining
@@ -1160,8 +1210,9 @@ triggering outcome; zero-or-more iterations of \(i_1\)) are fixed in
 Appendix C.1.
 
 Composition follows algebraic properties. Properties 1 and 3 hold for
-all instructions; Property 2 requires a stronger restriction than
-side-effect-freeness alone:
+all instructions; Property 2 is a \emph{conditional} law---purity and
+pairwise footprint disjointness together do \emph{not} suffice, and
+idempotence of \(i_1\) must be assumed separately:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1169,35 +1220,51 @@ side-effect-freeness alone:
   \textbf{Associativity} (all instructions, up to denotation):
   \[(i_1 \circ i_2) \circ i_3 = i_1 \circ (i_2 \circ i_3)\]
 \item
-  \textbf{Distributivity} (only for pure instructions with pairwise
-  disjoint state footprints): Let \(i_1, i_2, i_3\) be side-effect-free
-  instructions whose denotations act on pairwise disjoint state
-  components (declared outputs distinct and read sets disjoint from the
-  other members' writes). Their updates are then independent state
-  writes: re-applying \(i_1\) overwrites its own cells with the same
-  values (the double application is idempotent in effect), and updates
-  to disjoint cells commute, so both sides of
+  \textbf{Distributivity} (conditional on idempotent \(i_1\) and
+  pairwise-disjoint footprints): the law
   \[i_1 \parallel (i_2 \circ i_3) = (i_1 \parallel i_2) \circ (i_1 \parallel i_3)\]
-  denote the same net state transformation. \emph{The disjointness
-  restriction is necessary}: purity alone does not imply idempotence. A
-  pure \texttt{update(+1)} instruction applied twice increments twice
-  (pure here means free of \emph{external} side effects; writes to
-  declared state cells are permitted), so for instructions sharing a
-  state component the law fails (see the Remark below).
+  holds under two premises that must be stated separately. \textbf{(a)
+  Idempotence of \(i_1\)}:
+  \(\delta_{i_1} \circ \delta_{i_1} = \delta_{i_1}\) on the
+  precondition-satisfying states---\(i_1\)'s writes must not change the
+  values its own subsequent execution reads (a constant overwrite of its
+  declared outputs qualifies; a read-modify-write of a cell it also
+  reads does not). \textbf{(b) Pairwise footprint disjointness}: the
+  denotations of \(i_1, i_2, i_3\) act on pairwise disjoint state
+  components (declared outputs distinct, read sets disjoint from the
+  other members' writes). Under (a), the second execution of \(i_1\) on
+  the right-hand side reproduces the first's writes; under (b), \(i_2\)
+  and \(i_3\) cannot perturb \(i_1\)'s inputs between its two
+  occurrences; disjoint updates commute, so both sides denote the same
+  net state transformation.
+
+  \emph{Both premises are necessary, and neither follows from the other
+  or from purity.} That purity does not imply idempotence is the sharper
+  failure: a pure \texttt{update(+1)} instruction applied twice
+  increments twice (pure means free of \emph{external} side effects;
+  writes to declared state cells are permitted). Taking \(i_1\) as such
+  an update and \(i_2 = i_3 = \epsilon\) (the identity, with an empty
+  footprint, so premise (b) holds vacuously), the left side executes
+  \(i_1\) once and the right side twice: from \(x = 0\) the two sides
+  yield \(x = 1\) and \(x = 2\). The law therefore fails for a pure
+  instruction whose footprints are disjoint from every other
+  participant's---only premise (a) rules this out. Conversely, without
+  (b), a write of \(i_2\) into a cell \(i_1\) reads changes \(i_1\)'s
+  second execution even when \(i_1\) is idempotent.
 \item
   \textbf{Identity}: \[i \circ \epsilon = \epsilon \circ i = i\]
 \end{enumerate}
 
 where \(\epsilon\) is the empty (identity) instruction.
 
-\textbf{Remark} (necessity of the restriction): distributivity also
-fails for side-effectful instructions---re-applying a state-mutating
-\(i_1\) (with \(i_2 = i_3 = \epsilon\)) executes it once on the left and
-twice on the right, so the two programs differ in the resulting state.
-Accordingly, the shipped compiler gates parallel grouping on purity plus
-disjoint dependencies and disjoint outputs, excludes
-\texttt{side\_effects=True} instructions from all such rewrites, and
-applies no general distributivity-based simplification.
+\textbf{Remark} (implementation consequence): distributivity also fails
+for side-effectful instructions, for the same double-execution reason.
+Because the law is doubly conditional, the shipped compiler does not
+rely on it at all: parallel grouping is gated on purity plus disjoint
+dependencies and disjoint outputs, \texttt{side\_effects=True}
+instructions are excluded from all such rewrites, and no
+distributivity-based simplification is applied. The law is stated for
+the algebra's completeness, not as a license for rewrites.
 
 \subsubsection{Instruction Pipeline
 Design}\label{instruction-pipeline-design}
@@ -1291,9 +1358,8 @@ resource bound):
 \subsubsection{Static and Dynamic
 Optimization}\label{static-and-dynamic-optimization}
 
-\paragraph{Static Optimization}\label{static-optimization}
-
-Static optimization employs several techniques:
+\textbf{Static optimization.} Static optimization employs several
+techniques:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1335,11 +1401,9 @@ Combine Rules {
 \end{verbatim}
 \end{enumerate}
 
-\paragraph{Dynamic Optimization}\label{dynamic-optimization}
-
-Dynamic optimization in the shipped runtime is
-\textbf{repetition-triggered and threshold-based}; it does not (yet)
-respond to load or performance signals. Its actual mechanism:
+\textbf{Dynamic optimization.} Dynamic optimization in the shipped
+runtime is \textbf{repetition-triggered and threshold-based}; it does
+not (yet) respond to load or performance signals. Its actual mechanism:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1441,12 +1505,14 @@ Section 5.6; the instruction-level metric extraction is a specified
 stub---the seventeen \texttt{\_measure\_*} functions currently return
 0.0---so \texttt{assess\_capabilities} has no production call site yet,
 and the tests of Section 5.6 inject \texttt{DomainScore} values directly
-rather than deriving them through this pipeline. One consequence is a
-known wart of the shipped aggregation: because domain weights enter both
-the per-domain score and the overall mean, an end-to-end assessment
-would double-count weights and cap the overall score well below the
-coordinator's 0.7 threshold; the injected-score tests bypass this, and
-the wart is recorded here rather than hidden.
+rather than deriving them through this pipeline. An earlier version of
+the aggregation double-counted: domain weights entered both the
+per-domain score and the overall mean, which would cap an end-to-end
+assessment well below the coordinator's 0.7 threshold. The aggregation
+has been fixed to apply the weight only at the top level (equations
+below); the injected-score tests of Section 5.6 bypass the metric
+pipeline regardless, because the instruction-level metric extraction
+remains the stub disclosed above.
 
 Assessment proceeds in three steps:
 
@@ -1463,18 +1529,19 @@ Assessment proceeds in three steps:
   derive domain scores from injected metrics.
 \item
   \textbf{Domain aggregation.} Metrics are aggregated into a per-domain
-  \texttt{DomainScore}, matching the shipped
-  \texttt{\_compute\_weighted\_score}: \[
-  s_k = w_k \cdot \frac{\sum_{m \in M_k} v_m \cdot \text{conf}_m}{|M_k|}
+  \texttt{DomainScore} as a confidence-weighted mean, matching the
+  shipped \texttt{\_compute\_weighted\_score}: \[
+  s_k = \frac{\sum_{m \in M_k} v_m \cdot \text{conf}_m}{\sum_{m \in M_k} \text{conf}_m}
   \]
 \end{enumerate}
 
 where \(M_k\) is the metric set of domain \(k\), \(v_m\) the metric
-value, \(\text{conf}_m\) its confidence, and \(w_k\) the domain weight;
-an empty metric set scores \(0\). (Note that the shipped form folds the
-domain weight into \(s_k\) and the top-level
-\texttt{get\_overall\_score} multiplies by the weights again---the
-double-counting recorded above.)
+value, and \(\text{conf}_m\) its confidence; an empty metric set scores
+\(0\), and a zero total confidence degenerates to the unweighted mean.
+The domain weight \(w_k\) is deliberately absent here---it enters only
+once, at the top level (an earlier shipped form folded it into \(s_k\)
+as well, double-counting it; Section 5.6's tests were unaffected because
+they inject \texttt{DomainScore} values directly).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1669,13 +1736,24 @@ schedule. The specified scheduler is:
 Schedule verification checks the dependency-ordering condition (S2) of
 the formal model (Theorem 3.5, Appendix C.5), with the edge convention
 of Section 3.4.3---\((i_1, i_2) \in \text{Deps}\) means \(i_1\) must
-finish before \(i_2\) starts; S1 (exactly-once dispatch) and S4
-(in-order commit) hold by construction of the scheduling loop, and S3
-(group non-interference) is enforced by the grouping check:
+finish before \(i_2\) starts. The check as written,
 
 \[
-\forall (i_1, i_2) \in \text{Deps}: \text{slot}(i_2) > \text{slot}(i_1)
+\forall (i_1, i_2) \in \text{Deps}: \text{slot}(i_2) > \text{slot}(i_1),
 \]
+
+is equivalent to \(start(i_2) \geq end(i_1)\) only under the
+\textbf{unit-slot model} the shipped scheduler assumes: one slot per
+cycle, every instruction occupying exactly one slot, so
+\(start(i) = \text{slot}(i) \cdot c\) and
+\(end(i) = (\text{slot}(i) + 1) \cdot c\) for cycle length \(c\). If
+instructions with multi-cycle latencies were admitted, the slot
+comparison would have to be replaced by an explicit \(start\)/\(end\)
+comparison (or slots generalized to intervals); the pipeline scheduler
+that would need this remains the specified component of Section 4.1.2.
+S1 (exactly-once dispatch) and S4 (in-order commit) hold by construction
+of the scheduling loop, and S3 (group non-interference) is enforced by
+the grouping check.
 
 \subsubsection{Static Optimization
 Implementation}\label{static-optimization-implementation}
@@ -2013,46 +2091,51 @@ aggregate weighted-mean score is computed.
 
 \subsubsection{Empirical Results}\label{empirical-results}
 
-We validate the implemented optimizations with the microbenchmark suite
+The implemented optimizations are validated by the microbenchmark suite
 of Section 5, which drives the real compiler, cache, and
-optimization-manager code paths against a mock LLM backend. Summary of
-the results (all mean \(\pm\) standard deviation over 5 random seeds on
-synthetic Zipf workloads; full methodology and tables in Section 5):
+optimization-manager code paths against a mock LLM backend. We keep all
+numbers in Section 5 and state only the mechanism-to-experiment map
+here:
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2455}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.6273}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1273}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5149}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4851}}@{}}
+\caption{Mechanism-to-experiment map; every measurement is a
+controlled-setting result, detailed in Section 5.}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
-Optimization
+Mechanism (implementation status)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Measured effect
+Experiment
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mechanism (implementation status)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Where reported
+Experiment
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Result caching & 59.5\% \(\pm\) 0.3\% (s = 0.5) to 79.6\% \(\pm\) 0.5\%
-(s = 1.5) reduction in simulated API calls, increasing with Zipf
-exponent & Section 5.2 \\
-Static compilation (fusion + DCE) & 34.2\% \(\pm\) 1.8\% reduction in
-effective instruction count (length-200 sequences) & Section 5.3 \\
-Dynamic hot-path optimization & 65.8\% \(\pm\) 4.6\% trace shrinkage on
-repeatedly executed traces & Section 5.4 \\
+Result caching (implemented) & Mock-backend caching, 3 skew levels
+(Section 5.2) \\
+Fusion + DCE static passes (implemented, fire in benchmarks) & Static
+compilation, 4 levels, 3 lengths (Section 5.3) \\
+Hot-path detection and adoption (implemented) & Dynamic trace
+re-optimization (Section 5.4) \\
+Pass-level attribution (independent draw) & Ablation (Section 5.5) \\
+Coordination + security & 43 functional tests (Section 5.6) \\
+Cache, compilation, hot-path adoption (live gateway) & Real-gateway
+validations (Sections 5.7, 5.7.1) \\
+Whole-system composition & Four-task characterization (Section 5.8) \\
 \end{longtable}
-}
 
-These are microbenchmark measurements on synthetic workloads with
-simulated latency (80 ms per simulated call); they are not production
-end-to-end results. Section 5.7 reports a scaled-down validation of the
-caching mechanism against a real LLM gateway, Section 5.7.1 extends the
-real-gateway validation to compilation and hot-path adoption, Section
-5.8 a four-task system-level characterization, and Section 5.9 the
-remaining threats to validity.
+All measurements are controlled-setting results on synthetic workloads
+(simulated 80 ms per call); production end-to-end claims are out of
+scope, and Section 5.9 states the threats to validity.
 
 \section{Empirical Evaluation}\label{empirical-evaluation}
 
@@ -2094,12 +2177,24 @@ Workloads are synthetic and seed-controlled:
   on fewer tasks, increasing reuse potential.
 \item
   \textbf{Static compilation}: random instruction sequences of length
-  50, 200, and 1,000 (each slot dead with probability 0.25, pure with
-  probability 0.55, side-effectful otherwise; a final side-effectful
-  sink consumes all pure outputs), compiled at optimization levels NONE,
-  BASIC, ADVANCED, and AGGRESSIVE. The planted dead/pure structure is
-  what gives DCE and fusion targets to find; the measured reductions are
-  properties of this workload family.
+  50, 200, and 1,000, generated by \texttt{synthetic\_formal\_sequence}
+  (\texttt{examples/benchmarks/isa\_microbench.py}; the generator is
+  short enough to audit line by line). Each of the first \(n-1\) slots
+  is drawn independently: with probability 0.25 a \emph{dead}
+  instruction (side-effect-free, \textbf{no declared outputs, hence no
+  consumers anywhere in the sequence}---it is removable by construction,
+  and this removability is planted, not inferred); with probability 0.55
+  a \emph{pure} instruction (side-effect-free, one declared output
+  \(v_i\), consumed \textbf{only by the final sink}---fusable when
+  adjacent to a same-type pure neighbor); otherwise a
+  \emph{side-effectful} instruction (always live, never fused, never
+  removed). The \(n\)-th slot is always a side-effectful \emph{final
+  sink} whose dependency list is exactly the set of all pure outputs, so
+  every pure instruction has a downstream consumer and no pure output is
+  deleted as dead. These three attributes are disjoint and jointly
+  exhaustive per slot, and the DCE/fusion targets they plant are what
+  the passes find; the measured reductions are properties of this
+  workload family, not of arbitrary agent programs.
 \item
   \textbf{Dynamic optimization}: instruction traces of length 100
   recorded for up to 200 iterations per seed, with hot-path detection
@@ -2123,11 +2218,49 @@ Each synthetic-workload configuration (Sections 5.2--5.5) is run with 5
 random seeds; we report mean \(\pm\) sample standard deviation across
 seeds. These are \textbf{descriptive statistics only}: we make no
 hypothesis-test claims (no p-values, no significance tests) anywhere in
-this paper. The seed count suffices to show that the effects are stable
-across workload instantiations---the standard deviations are small
-relative to the means---but a formal inferential comparison against
+this paper. Five seeds characterize variability across the tested
+workload instances; they do not establish statistical significance or
+population-level generality. A formal inferential comparison against
 other systems is out of scope, because there is no baseline system that
 shares the mock-backend instrumentation.
+
+\subsubsection{Metric Terminology}\label{metric-terminology}
+
+The paper reports several distinct quantities that must not be
+conflated; each is defined once here and used consistently:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Effective-instruction reduction}---fewer \emph{effective}
+  instructions in the compiled program (static compilation, Sections
+  5.3/5.5); a property of the instruction stream, not of execution time.
+\item
+  \textbf{Dispatch-count reduction}---fewer dispatch operations at
+  runtime, including parallel grouping's folding (Section 5.3); a
+  runtime count.
+\item
+  \textbf{Trace shrinkage}---shorter instruction traces after hot-path
+  re-optimization (Section 5.4); measured on recorded traces, not
+  re-executed ones.
+\item
+  \textbf{Cache hit rate / call reduction}---the fraction of calls
+  served from the result cache; on this benchmark the call-reduction
+  ratio equals the hit rate by construction (Section 5.2).
+\item
+  \textbf{Simulated latency saving}---avoided-call counts \(\times\) the
+  mock's fixed 80 ms (Section 5.2); derived, not measured.
+\item
+  \textbf{Measured latency/token saving}---wall-clock time and token
+  counts against the real gateway (Sections 5.7--5.7.1); measured.
+\end{itemize}
+
+For context preservation (Theorem 3.3): \emph{extraction-time context
+preservation} is the copy invariance of the extraction step;
+\emph{runtime context validation} is the pre/post-dispatch constraint
+checking of the monitor. They are different properties with different
+coverage (Section 3.2.2 discloses the deletion blind spot of the runtime
+side).
 
 \subsection{Experiment 1: Result
 Caching}\label{experiment-1-result-caching}
@@ -2140,13 +2273,29 @@ with the \texttt{InstructionCache} enabled, and measure simulated API
 calls at the backend. The reduction ratio and cache hit rate coincide by
 construction: every avoided call corresponds to exactly one cache hit.
 
-{\def\LTcaptype{none} % do not increment counter
+\textbf{Cache-key contract.} The shipped result cache keys an entry on
+the (instruction, params) pair---deliberately \emph{not} on model
+identity/version, prompt-template version, tool schema, decoding
+parameters, or ambient context. This is sound only when those factors
+are held fixed, which every benchmark here guarantees by construction
+(single model alias, fixed prompt templates, fixed decoding
+configuration, fresh cache per arm); the classifier-keyed step of
+Section 5.7.1 likewise hashes exactly the input dictionary its prompt is
+built from, under the same fixed-configuration discipline. A deployment
+that changes any of these factors must invalidate or namespace the cache
+accordingly (the production cache already isolates by TTL, LRU capacity,
+and never-cached failures, but it does not detect semantic-configuration
+drift); modeling cache validity across \emph{varying} model versions or
+prompts is future work and is not exercised by any number in this paper.
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2656}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2500}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2188}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1406}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1250}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2537}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2388}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2090}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2985}}@{}}
+\caption{Simulated API calls with and without the result cache (2,000
+tasks per seed, 5 seeds, mean \(\pm\) sample standard deviation;
+reduction equals hit rate by construction).}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Zipf exponent \(s\)
@@ -2155,22 +2304,28 @@ Calls (no cache)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Calls (cached)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Reduction
+Reduction = hit rate
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf exponent \(s\)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Hit rate
+Calls (no cache)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction = hit rate
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0.5 & 2,000 & 810.4 \(\pm\) 5.7 & 59.5\% \(\pm\) 0.3\% & 59.5\% \(\pm\)
-0.3\% \\
-1.0 & 2,000 & 642.0 \(\pm\) 3.8 & 67.9\% \(\pm\) 0.2\% & 67.9\% \(\pm\)
-0.2\% \\
-1.5 & 2,000 & 408.0 \(\pm\) 9.4 & 79.6\% \(\pm\) 0.5\% & 79.6\% \(\pm\)
-0.5\% \\
+0.5 & 2,000 & 810.4 \(\pm\) 5.7 & 59.5\% \(\pm\) 0.3\% \\
+1.0 & 2,000 & 642.0 \(\pm\) 3.8 & 67.9\% \(\pm\) 0.2\% \\
+1.5 & 2,000 & 408.0 \(\pm\) 9.4 & 79.6\% \(\pm\) 0.5\% \\
 \end{longtable}
-}
 
 \textbf{Interpretation.} The reduction grows monotonically with skew,
 from 59.5\% under mild skew (\(s = 0.5\)) to 79.6\% under heavy
@@ -2214,12 +2369,26 @@ they are easy to conflate:
   instruction count}.
 \end{itemize}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2143}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1571}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4286}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2000}}@{}}
+\caption{Effective-instruction-count reduction by optimization level and
+sequence length (5 seeds, mean \(\pm\) sample standard deviation;
+planted dead 0.25 / pure 0.55 workload).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sequence length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective-instruction reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch count
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Sequence length
@@ -2247,7 +2416,6 @@ Dispatch count
 1,000 & ADVANCED & 35.4\% \(\pm\) 1.6\% & 344.6 \(\pm\) 31.6 \\
 1,000 & AGGRESSIVE & 35.4\% \(\pm\) 1.6\% & 344.6 \(\pm\) 31.6 \\
 \end{longtable}
-}
 
 \textbf{Interpretation.} Three observations:
 
@@ -2306,8 +2474,14 @@ output is established separately, at task level, by the system-level
 characterization of Section 5.8 (which re-executes hot-path-optimized
 instruction streams and verifies byte-identical output).
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}llll@{}}
+\caption{Hot-path trace shrinkage per seed (length-100 traces, detection
+threshold 50 recordings; each seed contributes exactly 51
+recordings).}\tabularnewline
+\toprule\noalign{}
+Seed & Original length & Optimized length & Shrink ratio \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 Seed & Original length & Optimized length & Shrink ratio \\
 \midrule\noalign{}
@@ -2320,7 +2494,6 @@ Seed & Original length & Optimized length & Shrink ratio \\
 3 & 100 & 36 & 64.0\% \\
 4 & 100 & 34 & 66.0\% \\
 \end{longtable}
-}
 
 Across seeds, hot-path optimization shrinks the trace by \textbf{65.8\%
 \(\pm\) 4.6\%}. The seed-to-seed spread (59.0\%--70.0\%) reflects the
@@ -2329,7 +2502,11 @@ effect is present in all five seeds. As with the static experiments,
 this measures trace-length reduction on synthetic
 traces---workload-controlled evidence that the
 detection-formation-reoptimization loop functions, not a wall-clock
-speedup claim.
+speedup claim. The optimized traces are \emph{not re-executed here}; the
+semantic-preservation check on optimized-and-re-executed streams is a
+property of Section 5.8's four-task characterization (whose 12.5--25.0\%
+shrink is a different, milder workload than this section's 65.8\%), not
+of these synthetic traces.
 
 \subsection{Ablation: Per-pass
 Contribution}\label{ablation-per-pass-contribution}
@@ -2337,8 +2514,14 @@ Contribution}\label{ablation-per-pass-contribution}
 To attribute the static gains, we re-run the compiler with individual
 passes toggled:
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}ll@{}}
+\caption{Per-pass instruction-count reduction on an independent workload
+draw (length 200, 5 seeds, seed base 4,000; a replication of, not a
+decomposition into, the Section 5.3 headline).}\tabularnewline
+\toprule\noalign{}
+Configuration & Instruction-count reduction \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 Configuration & Instruction-count reduction \\
 \midrule\noalign{}
@@ -2351,7 +2534,6 @@ DCE only & 24.1\% \(\pm\) 3.3\% \\
 fusion + DCE & 35.0\% \(\pm\) 3.7\% \\
 all passes & 35.0\% \(\pm\) 3.7\% \\
 \end{longtable}
-}
 
 \textbf{Interpretation.} Fusion alone removes 21.9\% and DCE alone
 24.1\%; combined they remove 35.0\%---less than the sum of their
@@ -2493,7 +2675,6 @@ backend}. If the mechanism is correct, the real run must reproduce that
 sequence exactly; at the granularity the artifact records---per-arm hit
 rates and call counts---it does:
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0359}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2395}}
@@ -2503,6 +2684,29 @@ rates and call counts---it does:
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2156}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0898}}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0719}}@{}}
+\caption{Real-gateway cache behavior against the computed expectation
+(200 sequential requests, single seed, three Zipf levels, single
+model).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expected hit rate (computed, no backend)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Observed hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (no cache -\textgreater{} cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Call reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall clock (no cache -\textgreater{} cached, ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tokens saved
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Zipf s
@@ -2532,7 +2736,6 @@ Tokens saved
 1.5 & 45.5\% & 45.5\% & 200 -\textgreater{} 109 & 45.5\% & 450,330
 -\textgreater{} 244,316 & 206,014 & 7,735 \\
 \end{longtable}
-}
 
 Per-call latency was stable across arms (p50 2.13--2.21 s, p95
 3.06--3.54 s). Token savings are gateway-reported \texttt{usage}
@@ -2677,13 +2880,29 @@ input, \$15/M output by default) because the serving gateway's actual
 pricing is unknown. Token counts are measurements, the pricing overlay
 is a model, and no dollar-savings claim is made:
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Measured calls and tokens with a MODELED pricing overlay
+(real-gateway run, s = 1.0, 50 realizations; the price column is a
+model, not a quote).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Pricing mode (real-gateway run, s = 1.0)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Input tokens (full / cache-read)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Output tokens
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Modeled cost
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Pricing mode (real-gateway run, s = 1.0)
@@ -2705,7 +2924,6 @@ AgentISA result caching & 22 & 4,027 / 0 & 11,264 & \$0.1810 \\
 Provider prompt cache (MODELED) & 50 & 4,027 / 4,991 & 25,600 &
 \$0.3976 \\
 \end{longtable}
-}
 
 On this run's token mix the result cache cuts modeled cost by
 56.0\%---it removes whole calls, completions included---while the
@@ -2722,14 +2940,36 @@ both columns remain MODELED-on-measured in both cases. GPTCache, an
 external cache layer, is explicitly out of scope this pass; no
 head-to-head against it is claimed.
 
-\subsection{System-Level Workload
-Characterization}\label{system-level-workload-characterization}
+\textbf{What the real-gateway experiments do and do not establish.}
+Three layers, kept separate: (1) \emph{gateway integration
+correctness}---requests reach the gateway, the cache governs calls, and
+call/token statistics are recorded faithfully: \textbf{established} by
+Sections 5.7 and 5.7.1. (2) \emph{Workflow semantic preservation}---the
+optimized stream computes the same cache keys and consumes the same
+cached values as the unoptimized one, yielding byte-identical artifacts:
+\textbf{established as a cache-mediated identity}, which validates the
+stream transformation, not model determinism (two independent model
+invocations could differ; the experiment never compares them). (3)
+\emph{Real-model task quality}---whether the model's classification
+output is good: \textbf{not established here}; the reasoning alias
+returned results at the token ceiling and the classify step fell back to
+a deterministic rule, so no statement about live-model output quality is
+made anywhere in this paper. The abstract, highlights, and conclusion
+state only layers (1) and (2).
+
+\subsection{Controlled Four-Task System-Level
+Characterization}\label{controlled-four-task-system-level-characterization}
 
 The experiments above measure individual mechanisms on synthetic
-sequences. To make the mechanisms' composition---and the implemented
-closed-loop optimization claims of Section 3.4.4---checkable rather than
-aspirational, we provide a seed-controlled workload characterization
-(\texttt{examples/system\_task\_workload.py},
+sequences. This section is a \emph{controlled four-task system-level
+characterization}---a functional demonstration under a fixed closed-loop
+protocol (same task, 12 realizations, one cacheable step each), not a
+generalization experiment; the identical 91.7\% hit-rate row in the
+runtime table below is a property of that protocol, not four independent
+cache observations. To make the mechanisms' composition---and the
+implemented closed-loop optimization claims of Section 3.4.4---checkable
+rather than aspirational, we provide a seed-controlled workload
+characterization (\texttt{examples/system\_task\_workload.py},
 \texttt{tests/system/test\_system\_task\_workload.py}; the original
 single-task demonstration lives on as
 \texttt{examples/system\_task\_demo.py}) built from \textbf{four tasks
@@ -2855,31 +3095,91 @@ identical closed-loop battery
 guard each, one cacheable LLM-type step each backed by a deterministic
 rule stand-in that counts simulated model calls):
 
-{\def\LTcaptype{none} % do not increment counter
+\emph{Structure (compile-time):}
+
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Compile-time structure of the four tasks (12 realizations each;
+shrink is the NONE \(\rightarrow\) AGGRESSIVE effective-instruction
+reduction).}\tabularnewline
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Task (shape)
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Instrs
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-NONE \(\rightarrow\) AGGRESSIVE effective count
+Effective count NONE \(\rightarrow\) AGGRESSIVE
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shrink
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Dead guard
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Task (shape)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Instrs
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective count NONE \(\rightarrow\) AGGRESSIVE
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shrink
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dead guard
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+log triage (linear, 7) & 7 & 7 \(\rightarrow\) 6 & -14.3\% &
+\texttt{check\_syntax} \\
+csv-etl-anomaly (fan-out, 8) & 8 & 8 \(\rightarrow\) 6 & -25.0\% &
+\texttt{check\_schema} \\
+report-merge (wide fan-in, 7) & 7 & 7 \(\rightarrow\) 6 & -14.3\% &
+\texttt{check\_headers} \\
+regression-diff (two-branch, 8) & 8 & 8 \(\rightarrow\) 7 & -12.5\% &
+\texttt{check\_formats} \\
+\end{longtable}
+
+\emph{Execution (runtime, 12 realizations each):}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Runtime behavior of the four tasks (12 realizations each;
+classification-type steps are backed by deterministic rule
+stand-ins).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Task
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Calls 1st / re-runs
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Cache hit
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Hot-path
+Hot-path adopted
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reports byte-identical
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Task
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls 1st / re-runs
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cache hit
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hot-path adopted
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Reports byte-identical
 \end{minipage} \\
@@ -2887,20 +3187,15 @@ Reports byte-identical
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-log triage (linear, 7) & 7 & 7 \(\rightarrow\) 6 (-14.3\%) &
-\texttt{check\_syntax} & 50 / 0 & 91.7\% & repeat 7 & yes (12/12 +
-fresh-stack SHA) \\
-csv-etl-anomaly (fan-out, 8) & 8 & 8 \(\rightarrow\) 6 (-25.0\%) &
-\texttt{check\_schema} & 14 / 0 & 91.7\% & repeat 7 & yes (12/12 +
-fresh-stack SHA) \\
-report-merge (wide fan-in, 7) & 7 & 7 \(\rightarrow\) 6 (-14.3\%) &
-\texttt{check\_headers} & 16 / 0 & 91.7\% & repeat 7 & yes (12/12 +
-fresh-stack SHA) \\
-regression-diff (two-branch, 8) & 8 & 8 \(\rightarrow\) 7 (-12.5\%) &
-\texttt{check\_formats} & 240 / 0 & 91.7\% & repeat 7 & yes (12/12 +
-fresh-stack SHA) \\
+log triage & 50 / 0 & 91.7\% & repeat 7 & yes (12/12 + fresh-stack
+SHA) \\
+csv-etl-anomaly & 14 / 0 & 91.7\% & repeat 7 & yes (12/12 + fresh-stack
+SHA) \\
+report-merge & 16 / 0 & 91.7\% & repeat 7 & yes (12/12 + fresh-stack
+SHA) \\
+regression-diff & 240 / 0 & 91.7\% & repeat 7 & yes (12/12 + fresh-stack
+SHA) \\
 \end{longtable}
-}
 
 Every task passes the same structural assertions. Static compilation
 preserves the dataflow: the guard is never dropped outright (the
@@ -2937,28 +3232,21 @@ We enumerate the limitations of the evaluation explicitly:
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Mock backend, not a live LLM.} The mock charges a constant 80
-  ms per simulated call and returns deterministic responses; the
-  real-gateway experiments address the mechanism-transfer part of this
-  threat at reduced scale. Section 5.7 shows the
-  \emph{mechanism-transfer} part of this threat at reduced scale:
-  against a live gateway, the cache reproduces the recorded hit/miss
-  statistics, and avoided calls convert to measured time and tokens.
-  Section 5.7.1 extends real-gateway coverage to compilation and
-  hot-path adoption: over 50 realizations, the compiled,
-  hot-path-adopted stream issued zero new gateway calls against the
-  result cache warmed by the unoptimized stream (identical cache keys,
-  hence identical prompts) and reproduced every artifact
-  byte-for-byte---a cache-mediated identity that validates the stream
-  transformation, not model determinism. The system-level
-  characterization of Section 5.8 composes the mechanisms on four
-  realistic tasks, but each task's classification-type step is backed by
-  a deterministic rule-based stand-in that only counts (simulated) model
-  calls---it is not evidence about live-model behavior. What remains
-  untested across Sections 5.7, 5.7.1, and 5.8 is multi-model and
-  multi-seed behavior, real deployment, caching under real model
+  \textbf{Mock backend, not a live LLM.} \emph{The mock's limits:} it
+  charges a constant 80 ms per simulated call and returns deterministic
+  responses. \emph{What the real-gateway experiments cover:} against a
+  live gateway, the cache reproduces the computed hit/miss statistics
+  and converts avoided calls into measured time and tokens (Section
+  5.7), and the compiled, hot-path-adopted stream issues zero new
+  gateway calls with byte-identical artifacts (Section 5.7.1)---a
+  cache-mediated identity validating the stream transformation, not
+  model determinism. \emph{Still not covered:} multi-model and
+  multi-seed behavior, real deployment, caching under model
   nondeterminism \emph{across prompt variations}, streaming responses,
-  and provider rate limits.
+  provider rate limits, and live-model task quality (the four-task
+  characterization's classification steps are deterministic rule-based
+  stand-ins, and the 5.7.1 gateway run fell back to the deterministic
+  classifier).
 \item
   \textbf{Synthetic workloads.} Zipf-distributed synthetic tasks are a
   reasonable model of skewed agent workloads, but they are a model, and
@@ -3096,9 +3384,17 @@ AgentISA's implemented security layer is the \texttt{SecurityMonitor} of
 Section 5.6, which enforces task-level authentication, role-based
 authorization, data-sensitivity classification, and configurable
 resource-access policies; the coordinator consults it before every
-assignment, and violations are recorded with timestamps. Beyond what is
-implemented, we identify the following as design considerations for
-hardening the architecture---not as claims about the current system:
+assignment, and violations are recorded with timestamps. One shipped
+default deserves an explicit call-out: \textbf{resource access is open
+by default} and restrictable by configuration---a fail-open stance that
+shifts the security burden onto whoever writes the policy set. A
+hardened deployment should invert it to fail-closed (deny on
+unregistered resources, unknown sensitivity, or incomplete policy),
+which the current checks do not do; the 43 functional tests validate the
+implemented checks under configured policies, not the default posture,
+and nothing in this paper constitutes a security certification. Beyond
+what is implemented, we identify the following as design considerations
+for hardening the architecture---not as claims about the current system:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -3120,6 +3416,20 @@ hardening the architecture---not as claims about the current system:
 
 \subsection{Future Research
 Directions}\label{future-research-directions}
+
+Readers pressed for time need only the first tier. \textbf{Directly
+motivated by this paper's exposed gaps:} 6.3.1 (unifying the formal
+semantics and discharging the conditional theorems---the response to
+Sections 3.3.3 and C.7's specified-vs-shipped split), 6.3.4 (calibrating
+capability scores against end-to-end performance---the response to
+Section 3.5's stub disclosure), and the real-workload evaluation named
+in 6.3.3's first item (the response to Section 5.9).
+\textbf{Longer-term, with no current implementation link:} 6.3.2
+(self-modifying and context-aware instruction sets---their formulas are
+sketches, as marked inline), 6.3.5 (emergence metrics, cross-agent
+transfer), and the privacy composition of 6.3.6. We keep the longer-term
+items brief and flag them as such rather than inflating them into
+proposals.
 
 \subsubsection{Theoretical Foundations}\label{theoretical-foundations}
 
@@ -3338,24 +3648,16 @@ Extensions}\label{security-and-privacy-extensions}
 \item
   \textbf{Privacy-Preserving Computation}
 
-  Privacy guarantee framework:
-
-  \[
-  \text{PrivacyLoss}(M) \leq \epsilon + \sum_{i=1}^n \delta_i
-  \]
-
-  where:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \(\varepsilon\): the overall privacy budget
-  \item
-    \(\delta\)\(_{i}\): the per-operation privacy-loss parameter---this
-    is the shape of differential-privacy composition theorems;
-    identifying concrete mechanisms (hence concrete \(\delta\) values)
-    is future work
-  \end{itemize}
+  A direction, not a delivered mechanism: if agent computations over
+  sensitive data were routed through per-step differentially private
+  mechanisms, the overall loss would follow a \emph{composition theorem}
+  over the per-mechanism \((\epsilon_i, \delta_i)\) parameters. We
+  deliberately state no bound here: which composition theorem applies,
+  and which concrete mechanisms (hence parameter values) the runtime
+  would expose, are open design choices---any formula written now would
+  be decoration rather than a guarantee. The direction is listed because
+  the instruction contract is the natural place to carry such
+  annotations once the mechanisms exist.
 \end{enumerate}
 
 These directions form a roadmap for moving AgentISA from
@@ -3383,10 +3685,11 @@ contributions are:
   optimization and scheduling transformations (Theorems 3.4--3.6).
 \item
   Agentic Calling, which lifts provider-specific function calling into
-  reusable, portable, cacheable agent instructions.
+  reusable, provider-independent, cacheable agent instructions.
 \item
-  Automatic instruction learning based on frequency mining and
-  deterministic action-signature grouping of execution traces.
+  Trace-based instruction learning based on frequency mining and
+  deterministic action-signature grouping of execution traces, with
+  developer-controlled promotion and composite replay.
 \item
   A compiler and runtime applying classical optimizations---fusion,
   dead-code elimination, scheduling, and dynamic hot-path
@@ -3402,10 +3705,27 @@ controlled conditions: 59.5--79.6\% simulated-call reduction from
 caching, 34.2\% instruction-count reduction from static compilation,
 65.8\% trace shrinkage from hot-path optimization (Sections 5.2--5.5),
 real-gateway validations of the cache and the compiled pipeline
-(Sections 5.7 and 5.7.1), a four-task system-level characterization
-(Section 5.8), and 43 functional tests for the multi-agent layer. These
-are microbenchmark and controlled-setting results, not production
-end-to-end measurements; the threats to validity of Section 5.9 stand.
+(Sections 5.7 and 5.7.1, gateway-integration and cache-mediated-identity
+layers only), a four-task system-level characterization (Section 5.8),
+and 43 functional tests for the multi-agent layer. These are
+microbenchmark and controlled-setting results, not production end-to-end
+measurements; the threats to validity of Section 5.9 stand.
+
+\textbf{Implementation status of the contributions.} For auditability,
+the five contributions above split by status: \emph{implemented and
+exercised by the benchmarks}---the instruction set and contracts,
+Agentic Calling, result caching, fusion/DCE/grouping, hot-path detection
+and adoption, the coordination layer with injected-score capability
+selection, and the security monitor (43 tests); \emph{implemented with
+known limits}---the bounded checker (pure instructions, bounded state
+spaces only), runtime context validation (deletion blind spot
+disclosed), and pattern mining with composite replay
+(developer-controlled promotion, no generalization beyond recorded
+parameters); \emph{specified, not implemented}---tree-pattern
+instruction selection, cycle-accurate pipeline scheduling,
+symbolic-equivalence checking, and capability metric extraction.
+Theorems 3.4--3.6 are conditional arguments for the implemented passes;
+the specified components carry no verification claim.
 
 AgentISA's longer-term significance is architectural: by giving agent
 behavior an instruction-level contract, it makes agent systems amenable
@@ -3419,7 +3739,37 @@ implementations, is the immediate next step.
 \section*{Artifact Availability}\label{artifact-availability}
 \addcontentsline{toc}{section}{Artifact Availability}
 
-All artifacts are available in the accompanying repository:
+All artifacts are available in the repository accompanying this
+submission (anonymized for review). Reproducibility anchors:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Version}: every number in Section 5 is generated from the
+  exact repository state whose build produces this PDF; the artifact's
+  \texttt{git\ rev-parse\ HEAD} at submission time is recorded in the
+  repository's top-level \texttt{REPRODUCING.md}, alongside the
+  dependency lock file and the Python/system versions used for the
+  reported runs.
+\item
+  \textbf{Clean-environment regeneration}: from a fresh clone,
+  \texttt{python\ -m\ pytest\ tests/core/isa/test\_coordination.py\ tests/core/instructions/test\_agent\_coordination.py\ tests/system/\ -q}
+  reproduces the functional-test counts, and the commands listed at the
+  end of this section regenerate each results table from scratch
+  (including the real-gateway runs, whose configuration---endpoint
+  aliasing, model id, decoding parameters---is documented inline in the
+  harness with a mock-backend fallback for environments without gateway
+  credentials).
+\item
+  \textbf{Claim-to-code map}: \texttt{REPRODUCING.md} also carries a
+  table mapping each paper claim to the implementing module, the test
+  that exercises it, and the raw-results file that backs its numbers,
+  flagging the specified-only components (symbolic-equivalence checker,
+  tree-pattern selection, cycle-accurate scheduling, capability metric
+  extraction) explicitly.
+\end{itemize}
+
+The artifact contents are:
 
 \begin{itemize}
 \tightlist
@@ -3508,22 +3858,22 @@ a hosted GLM reasoning model) with:
 \bibitem{ref2} Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, Noah Fiedel. 2023. PaLM: Scaling Language Modeling with Pathways. JMLR 24(240):1–113. arXiv:2204.02311.
 \bibitem{ref3} OpenAI. 2023. GPT-4 Technical Report. arXiv:2303.08774.
 \bibitem{ref4} Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, Guillaume Lample. 2023. LLaMA: Open and Efficient Foundation Language Models. arXiv:2302.13971.
-\bibitem{ref5} Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, Quoc V. Le. 2022. Finetuned Language Models Are Zero-Shot Learners. ICLR 2022 (Oral). arXiv:2109.01652.
+\bibitem{ref5} Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, Quoc V. Le. 2022. Finetuned Language Models Are Zero-Shot Learners. ICLR 2022. arXiv:2109.01652.
 \bibitem{ref6} Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, Ryan Lowe. 2022. Training language models to follow instructions with human feedback. NeurIPS 35. arXiv:2203.02155.
 \bibitem{ref7} Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc V. Le, Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. NeurIPS 35, pp. 24824–24837. arXiv:2201.11903.
 \bibitem{ref8} Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, Yusuke Iwasawa. 2022. Large Language Models are Zero-Shot Reasoners. NeurIPS 35. arXiv:2205.11916.
-\bibitem{ref9} Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao. 2023. ReAct: Synergizing Reasoning and Acting in Language Models. ICLR 2023 (notable top 5\%). arXiv:2210.03629.
+\bibitem{ref9} Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao. 2023. ReAct: Synergizing Reasoning and Acting in Language Models. ICLR 2023. arXiv:2210.03629.
 \bibitem{ref10} Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao. 2023. Reflexion: Language Agents with Verbal Reinforcement Learning. NeurIPS 36. arXiv:2303.11366.
 \bibitem{ref11} Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, Karthik Narasimhan. 2023. Tree of Thoughts: Deliberate Problem Solving with Large Language Models. NeurIPS 36. arXiv:2305.10601.
 \bibitem{ref12} Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, Anima Anandkumar. 2023. Voyager: An Open-Ended Embodied Agent with Large Language Models. arXiv:2305.16291.
 \bibitem{ref13} Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, Thomas Scialom. 2023. Toolformer: Language Models Can Teach Themselves to Use Tools. NeurIPS 36. arXiv:2302.04761.
 \bibitem{ref14} Shishir G. Patil, Tianjun Zhang, Xin Wang, Joseph E. Gonzalez. 2023. Gorilla: Large Language Model Connected with Massive APIs. arXiv:2305.15334.
-\bibitem{ref15} Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, Sihan Zhao, Lauren Hong, Runchu Tian, Ruobing Xie, Jie Zhou, Mark Gerstein, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs. ICLR 2024 (Spotlight). arXiv:2307.16789.
+\bibitem{ref15} Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, Sihan Zhao, Lauren Hong, Runchu Tian, Ruobing Xie, Jie Zhou, Mark Gerstein, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs. ICLR 2024. arXiv:2307.16789.
 \bibitem{ref16} Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, Yueting Zhuang. 2023. HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face. NeurIPS 36. arXiv:2303.17580.
 \bibitem{ref17} Shishir G. Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, Joseph E. Gonzalez. 2025. The Berkeley Function Calling Leaderboard (BFCL): From Tool Use to Agentic Evaluation of Large Language Models. ICML 2025. arXiv:2408.12946.
 \bibitem{ref18} Anthropic. 2024. Introducing the Model Context Protocol. Anthropic announcement, November 25, 2024.
 \bibitem{ref19} Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu, Li Jiang, Xiaoyun Zhang, Shaokun Zhang, Jiale Liu, Ahmed Hassan Awadallah, Ryen W. White, Doug Burger, Chi Wang. 2023. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation. arXiv:2308.08155. (Final version COLM 2024.)
-\bibitem{ref20} Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven Ka Shing Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, Lingfeng Xiao, Chenglin Wu, Jürgen Schmidhuber. 2024. MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework. ICLR 2024 (Oral). arXiv:2308.00352.
+\bibitem{ref20} Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven Ka Shing Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, Lingfeng Xiao, Chenglin Wu, Jürgen Schmidhuber. 2024. MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework. ICLR 2024. arXiv:2308.00352.
 \bibitem{ref21} Weize Chen, Yusheng Su, Jingwei Zuo, Cheng Yang, Chenfei Yuan, Chi-Min Chan, Heyang Yu, Yaxi Lu, Yi-Hsin Hung, Chen Qian, Yujia Qin, Xin Cong, Ruobing Xie, Zhiyuan Liu, Maosong Sun, Jie Zhou. 2024. AgentVerse: Facilitating Multi-Agent Collaboration and Exploring Emergent Behaviors. ICLR 2024 (Poster). arXiv:2308.10848.
 \bibitem{ref22} Chen Qian, Wei Liu, Hongzhang Liu, Nuo Chen, Yufan Dang, Jiahao Li, Cheng Yang, Weize Chen, Yusheng Su, Xin Cong, Juyuan Xu, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ChatDev: Communicative Agents for Software Development. ACL 2024, pp. 15174–15186. arXiv:2307.07924.
 \bibitem{ref23} Guohao Li, Hasan Abed Al Kader Hammoud, Hani Itani, Dmitrii Khizbullin, Bernard Ghanem. 2023. CAMEL: Communicative Agents for "Mind" Exploration of Large Language Model Society. NeurIPS 36. arXiv:2303.17760.
@@ -3535,7 +3885,7 @@ a hosted GLM reasoning model) with:
 \bibitem{ref29} Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kaiwen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu Su, Huan Sun, Minlie Huang, Yuxiao Dong, Jie Tang. 2024. AgentBench: Evaluating LLMs as Agents. ICLR 2024. arXiv:2308.03688.
 \bibitem{ref30} Grégoire Mialon, Clémentine Fourrier, Craig Swift, Thomas Wolf, Yann LeCun, Thomas Scialom. 2023. GAIA: a benchmark for General AI Assistants. arXiv:2311.12983. (Final version ICLR 2024.)
 \bibitem{ref31} Karthik Valmeekam, Matthew Marquez, Alberto Olmo, Sarath Sreedharan, Subbarao Kambhampati. 2023. PlanBench: An Extensible Benchmark for Evaluating Large Language Models on Planning and Reasoning about Change. NeurIPS 2023 Datasets and Benchmarks Track. arXiv:2206.10498.
-\bibitem{ref32} Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan. 2024. SWE-bench: Can Language Models Resolve Real-world GitHub Issues? ICLR 2024 (Oral). arXiv:2310.06770.
+\bibitem{ref32} Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan. 2024. SWE-bench: Can Language Models Resolve Real-world GitHub Issues? ICLR 2024. arXiv:2310.06770.
 \bibitem{ref33} Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman. 2006. Compilers: Principles, Techniques, and Tools (2nd ed.). Addison-Wesley.
 \bibitem{ref34} John L. Hennessy, David A. Patterson. 2017. Computer Architecture: A Quantitative Approach (6th ed.). Morgan Kaufmann.
 \bibitem{ref35} David A. Patterson, Andrew Waterman. 2017. The RISC-V Reader: An Open Architecture Atlas. Strawberry Canyon.
@@ -3544,7 +3894,7 @@ a hosted GLM reasoning model) with:
 \bibitem{ref38} Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, Ion Stoica. 2023. Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023. arXiv:2309.06180.
 \bibitem{ref39} Gyeong-In Yu, Joo Seong Jeong, Geon-Woo Kim, Soojeong Kim, Byung-Gon Chun. 2022. Orca: A Distributed Serving System for Transformer-Based Generative Models. OSDI '22, pp. 521–538.
 \bibitem{ref40} Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré. 2022. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness. NeurIPS 35. arXiv:2205.14135.
-\bibitem{ref41} Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation—A KVCache-centric Architecture for Serving LLM Chatbot. FAST '25, pp. 155–170. (Best Paper.)
+\bibitem{ref41} Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation—A KVCache-centric Architecture for Serving LLM Chatbot. FAST '25, pp. 155–170.
 \bibitem{ref42} Siddharth Samsi, Dan Zhao, Joseph McDonald, Baolin Li, Adam Michaleas, Michael Jones, William Bergeron, Jeremy Kepner, Devesh Tiwari, Vijay Gadepally. 2023. From Words to Watts: Benchmarking the Energy Costs of Large Language Model Inference. arXiv:2310.03003.
 \bibitem{ref43} Hanne Riis Nielson, Flemming Nielson. 1992. Semantics with Applications: A Formal Introduction. Wiley. (Springer 2007 retitled edition: Semantics with Applications: An Appetizer.)
 \bibitem{ref44} Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. Chapter 3 (the Church–Turing thesis and equivalence of computational models).
@@ -3626,10 +3976,19 @@ following operational meaning:
 \textbf{(iii) Statements.} Each WHILE statement compiles to the AgentISA
 sequence below (notation defined after the table):
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.4286}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5714}}@{}}
+\caption{Compilation of WHILE statements to AgentISA sequences
+(\(\hat{P}\) is the compilation of \(P\)).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+WHILE construct
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+AgentISA compilation
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 WHILE construct
@@ -3653,7 +4012,6 @@ AgentISA compilation
 \(P_1 ; P_2\) & \(\hat{P}_1 \circ \hat{P}_2\) (sequential
 composition) \\
 \end{longtable}
-}
 
 where \(\hat{P}\) denotes the compilation of \(P\). The no-op
 \texttt{skip} compiles to the identity instruction \(\epsilon\); the
@@ -4214,5 +4572,36 @@ shipped behavior). What the shipped implementation does provide is
 empirical semantics-preservation at task level: the system-level
 demonstration of Section 5.8 re-executes an optimized stream and checks
 byte-identical output.
+
+\textbf{Observation model.} The theorems' equality is \emph{partial
+equivalence} (C.1: \(\llbracket p \rrbracket = \llbracket q \rrbracket\)
+on states where both are defined), and the observation model should be
+read accordingly. \textbf{Observed:} the final state of declared state
+cells, the declared outputs (the instruction's product keys), and---for
+theorems covering effectful instructions (C.5)---the externally visible
+effects, in program order. \textbf{Deliberately not observed:} the
+\emph{domain of definition} itself. Because equivalence is only partial,
+a rewrite may extend definedness---DCE is the canonical example (C.4):
+deleting an instruction that would have failed can turn a previously
+undefined run into a defined one. If program failure or exception
+behavior were part of the observation model, this would violate
+preservation; it is therefore stated explicitly that failure behavior is
+outside what Theorems 3.4--3.6 preserve, and any deployment for which
+failures are observable (e.g., a pipeline contract that treats
+exceptions as data) needs a strengthened equivalence and must re-derive
+the theorems under it. Internal traces---the sequence of instructions
+executed---are likewise not observed; only the net transformation is.
+
+\textbf{Three status levels.} Each mechanism in this paper falls into
+exactly one of three levels, which we keep separate throughout:
+\emph{(i) specified}---the symbolic-execution equivalence checker, the
+pipeline scheduler's cycle-accurate extension, tree-pattern instruction
+selection (Section 4.1.2); \emph{(ii) implemented with checks}---the
+optimizer passes (fusion, DCE, grouping) with their pass-level arguments
+in C.2/C.5 and the runtime monitors; \emph{(iii) empirically
+validated}---task-level re-execution with byte-identical outputs
+(Section 5.8) and the caching/compilation measurements of Section 5. A
+statement at one level is never used to imply a guarantee at a stronger
+level.
 
 \end{document}
