@@ -12,7 +12,10 @@ the commit hash is recorded below at submission time.
 - Runtime: Python 3.14, dependencies as pinned in `venv/` and the project
   lock file; pytest 9.x.
 - Build: `python3 scripts/build_paper.py` regenerates `docs/AgentISA.tex`
-  and `docs/AgentISA.pdf` from `docs/AgentISA.md`.
+  and `docs/AgentISA.pdf` (main paper, ACM `acmart` sigconf two-column)
+  plus `docs/AgentISA_supplementary.tex` and
+  `docs/AgentISA_supplementary.pdf` (Appendices A--H) from
+  `docs/AgentISA.md` and `docs/AgentISA_supplementary.md`.
 
 ## Functional tests
 
