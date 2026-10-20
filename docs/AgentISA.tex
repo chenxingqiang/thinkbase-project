@@ -434,17 +434,18 @@ way that a compiler targets multiple processor backends {[}33{]}.
 
 The cost structure of this layer motivates our work. If each call
 carries latency \(\tau_i\) plus a context-switching overhead
-\(\delta_i\) (prompt reconstruction, serialization, cache misses), then
-\(n\) similar calls cost:
+\(\omega_i\) (prompt reconstruction, serialization, cache misses; the
+symbol \(\delta\) is reused in Appendix B for per-instruction transition
+functions---the two are unrelated), then \(n\) similar calls cost:
 
 \[
-C(n) = \sum_{i=1}^{n} (\tau_i + \delta_i)
+C(n) = \sum_{i=1}^{n} (\tau_i + \omega_i)
 \]
 
 \textbf{Definition 2.1} (Function Call Overhead): The overhead of
 executing \(n\) function calls is \(C(n)\), the sum of per-call
 latencies and per-call context reconstruction costs. When successive
-calls are structurally identical, \(\delta_i\) is pure waste---which is
+calls are structurally identical, \(\omega_i\) is pure waste---which is
 precisely the waste AgentISA's caching and fusion are designed to
 remove.
 
@@ -1071,18 +1072,18 @@ valid if: \[
 
 For pure instructions with finite, small state spaces, the shipped
 checker (\texttt{agentflow.core.isa.bounded\_checker}) enumerates the
-candidate input states derived from the declared parameter constraints
---- exhaustively for finite domains such as \texttt{bool} and enum
-parameters --- and checks the implication on each state; for larger or
-non-enumerable spaces it probes a bounded, deterministically sampled set
-of states (default cap 256), which makes it a \emph{bounded}
+candidate input states derived from the declared parameter
+constraints---exhaustively for finite domains such as \texttt{bool} and
+enum parameters---and checks the implication on each state; for larger
+or non-enumerable spaces it probes a bounded, deterministically sampled
+set of states (default cap 256), which makes it a \emph{bounded}
 verification procedure rather than a complete one. We state the
 implementation status plainly: Definition 3.5 defines validity, and the
 bounded checker is now \textbf{shipped code}: for every pure
 (side-effect-free) instruction the checker generates the bounded state
 space, filters it by well-typedness and by the declared preconditions,
 executes the instruction, and evaluates three obligations on each
-surviving state --- progress (execution must not raise where the
+surviving state---progress (execution must not raise where the
 precondition holds), preservation (declared outputs must be present and
 well-typed), and the postcondition itself. Side-effectful instructions
 are never executed by the checker and are reported as out of scope, so
@@ -2175,8 +2176,8 @@ Hit rate
 from 59.5\% under mild skew (\(s = 0.5\)) to 79.6\% under heavy
 concentration (\(s = 1.5\)). This matches the cache-aware expectation:
 the upper bound on savings is the probability mass of repeated tasks,
-and Zipf skew directly controls that mass. In simulated latency terms
-the savings are the avoided-call counts \(\times\) 80 ms
+and the Zipf exponent directly controls that mass. In simulated latency
+terms the savings are the avoided-call counts \(\times\) 80 ms
 (\(s = 0.5/1.0/1.5\): 95,168 \(\pm\) 455 / 108,640 \(\pm\) 305 / 127,360
 \(\pm\) 750 ms)---derived, not separately measured.
 
@@ -2463,9 +2464,9 @@ how much \emph{measured} wall-clock time and token usage does it save?
 a local Anthropic-protocol gateway (TLS with an internal CA; alias
 \texttt{claude-glm-5.3-flash}, a hosted reasoning-capable GLM model;
 \texttt{max\_tokens=64}). Requests are sequential HTTP calls (httpx, no
-proxy, 90 s timeout), with three bounded retries for transient failures
---- none occurred. Every other component is the production code path:
-the same \texttt{InstructionCache} protocol, the same instruction
+proxy, 90 s timeout), with three bounded retries for transient
+failures---none occurred. Every other component is the production code
+path: the same \texttt{InstructionCache} protocol, the same instruction
 objects, the same workload generator and the same instruction pool (50
 templates) and parameter space (20 values) as Section 5.2.
 
@@ -2478,19 +2479,19 @@ The seed pins the task sequence exactly, so the workload is the same one
 the expectation below is computed from.
 
 \textbf{An exactness property.} A cache hit depends only on the
-(instruction, params) pair seen so far --- not on what the model
-returns. The production \texttt{InstructionCache} is LRU with a TTL, so
-in general a hit also depends on wall-clock time and capacity; under
-this benchmark's configuration none of that can bind: \texttt{max\_size}
-= 100,000 with at most 200 distinct keys per arm, \texttt{ttl} = 3,600 s
+(instruction, params) pair seen so far---not on what the model returns.
+The production \texttt{InstructionCache} is LRU with a TTL, so in
+general a hit also depends on wall-clock time and capacity; under this
+benchmark's configuration none of that can bind: \texttt{max\_size} =
+100,000 with at most 200 distinct keys per arm, \texttt{ttl} = 3,600 s
 with every cache-enabled arm completing in under seven minutes (the
 no-cache arms run to 7.9 minutes and never consult a cache), a fresh
 cache per arm, and failed calls never cached. Hit/miss decisions are
 therefore a pure function of the (instruction, params) sequence, and the
 hit/miss sequence for a fixed workload is \emph{computable without any
 backend}. If the mechanism is correct, the real run must reproduce that
-sequence exactly; at the granularity the artifact records --- per-arm
-hit rates and call counts --- it does:
+sequence exactly; at the granularity the artifact records---per-arm hit
+rates and call counts---it does:
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
@@ -2561,19 +2562,19 @@ sequential requests, no streaming. The artifact records per-arm
 aggregate hit rates and call counts; per-position sequence identity
 follows from the deterministic cache decisions under the conditions
 above, but is not separately logged. The compiler and
-dynamic-optimization experiments (Sections 5.3--5.5) are structural ---
-they do not dispatch to the backend at all; Section 5.7.1 below extends
-the real-gateway validation to them through a cache-mediated protocol,
-and otherwise their validity rests on the code-path and ablation
-arguments made there. Nothing in this section is a throughput,
-availability, or dollar-cost claim.
+dynamic-optimization experiments (Sections 5.3--5.5) are
+structural---they do not dispatch to the backend at all; Section 5.7.1
+below extends the real-gateway validation to them through a
+cache-mediated protocol, and otherwise their validity rests on the
+code-path and ablation arguments made there. Nothing in this section is
+a throughput, availability, or dollar-cost claim.
 
 \subsubsection{Real-Gateway Validation of Compilation and Hot-Path
 Optimization}\label{real-gateway-validation-of-compilation-and-hot-path-optimization}
 
 \textbf{Research question.} Do static compilation and closed-loop
 hot-path adoption preserve the observable semantics of an instruction
-stream when the stream's LLM step is served by a real model --- and what
+stream when the stream's LLM step is served by a real model---and what
 do the mechanisms measurably save on a live gateway?
 
 \textbf{Setup.} A dedicated harness
@@ -2606,8 +2607,8 @@ performs every live round trip; arm (b) then executes the same draws
 against the result cache that arm (a) warmed. The classify step's cache
 key is the sha256 of exactly the input dictionary its prompt is built
 from, so arm (b) issuing \emph{zero} new gateway calls proves it
-computed identical keys --- hence constructed identical prompts and
-consumed identical values --- and its final artifacts must come out
+computed identical keys---hence constructed identical prompts and
+consumed identical values---and its final artifacts must come out
 byte-for-byte equal; any perturbation of the LLM step's inputs by the
 optimization would surface as a cache miss (a live call) and/or artifact
 divergence.
@@ -2615,23 +2616,23 @@ divergence.
 \textbf{Scale.} Tiny scale: 50 task realizations \(\times\) 1 seed
 \(\times\) Zipf s = 1.0. The workload contains 22 distinct signature
 batches, so the entire run is 23 gateway round trips (one preflight plus
-22 live calls, all issued by arm (a)) in 4.4 minutes of wall time --- a
+22 live calls, all issued by arm (a)) in 4.4 minutes of wall time---a
 bounded validation run, not the 200 \(\times\) 3-skew sweep of Section
 5.7.
 
-\textbf{Results.} All checks pass. Arm (a) --- the live reference run
---- made exactly the 22 first-occurrence calls the backend-free
+\textbf{Results.} All checks pass. Arm (a)---the live reference
+run---made exactly the 22 first-occurrence calls the backend-free
 computation predicts and served the other 28 realizations from the
 result cache (hit rate 56.0\%), consuming 4,027 prompt and 11,264
 gateway-reported completion tokens in 260.2 s of measured call latency.
-Arm (b) --- compiled, hot-path-adopted --- made zero new gateway calls
-(all 50 realizations hit the warmed keys) and reproduced every artifact
+Arm (b)---compiled, hot-path-adopted---made zero new gateway calls (all
+50 realizations hit the warmed keys) and reproduced every artifact
 byte-for-byte. The hot path was adopted at realization 7 (threshold 5;
 adoption lands two realizations past the threshold because the counter
 must strictly exceed it and recording follows execution, as in Section
 5.8): realizations 1--6 executed the full seven-instruction stream,
 realizations 7--50 the shrunken six-instruction form with
-\texttt{check\_format} absorbed into its successor by fusion --- 306
+\texttt{check\_format} absorbed into its successor by fusion---306
 instruction executions against arm (a)`s 350, a 12.6\% reduction in
 executed instructions attributable to the adopted shrunken trace (the
 per-stream shrink is 14.3\%, 7 \(\rightarrow\) 6; the realized saving is
@@ -2644,20 +2645,20 @@ dataflow preserved.
 
 \textbf{What this does and does not show.} The byte-identity property is
 cache-mediated by design: the cached classification values entered the
-artifacts once, through arm (a) --- values that on this alias are
-fallback-derived, as explained below --- and arm (b) is proven to
-compute the same keys and consume the same values. This validates the
-stream transformation, not model determinism, which is not guaranteed at
+artifacts once, through arm (a)---values that on this alias are
+fallback-derived, as explained below---and arm (b) is proven to compute
+the same keys and consume the same values. This validates the stream
+transformation, not model determinism, which is not guaranteed at
 temperature 0 and is not claimed. On this gateway alias the reasoning
-model's replies bind at \texttt{max\_tokens} in every call --- as
-Section 5.7 reported at \texttt{max\_tokens=64}, and as a diagnostic
-call at 1,500 tokens still did --- so the classify step's severity
-values come from its deterministic fallback; what is validated against
-the live model is the mechanism chain (key computation, cache decisions,
-call and token accounting, artifact identity), not classification
-quality. The run covers one gateway, one model, one seed, one skew
-level, sequential requests, no streaming; multi-model, multi-seed, and
-real-deployment behavior remain untested.
+model's replies bind at \texttt{max\_tokens} in every call---as Section
+5.7 reported at \texttt{max\_tokens=64}, and as a diagnostic call at
+1,500 tokens still did---so the classify step's severity values come
+from its deterministic fallback; what is validated against the live
+model is the mechanism chain (key computation, cache decisions, call and
+token accounting, artifact identity), not classification quality. The
+run covers one gateway, one model, one seed, one skew level, sequential
+requests, no streaming; multi-model, multi-seed, and real-deployment
+behavior remain untested.
 
 \textbf{A priced comparison (costs MODELED---computed from a pricing
 overlay rather than observed---on measured tokens).} The harness prices
@@ -2706,16 +2707,16 @@ Provider prompt cache (MODELED) & 50 & 4,027 / 4,991 & 25,600 &
 \end{longtable}
 }
 
-On this run's token mix the result cache cuts modeled cost by 56.0\% ---
-it removes whole calls, completions included --- while the modeled
-provider prompt cache cuts only 3.3\%, because the reasoning model's
-completion tokens dominate and a discount on input reads cannot touch
-them; the ranking of the two caching strategies is a function of the
-input/output token mix, not a constant. On the deterministic mock at
+On this run's token mix the result cache cuts modeled cost by
+56.0\%---it removes whole calls, completions included---while the
+modeled provider prompt cache cuts only 3.3\%, because the reasoning
+model's completion tokens dominate and a discount on input reads cannot
+touch them; the ranking of the two caching strategies is a function of
+the input/output token mix, not a constant. On the deterministic mock at
 paper scale (200 tasks \(\times\) 1 seed \(\times\) 3 Zipf levels,
 template-accounted tokens, same modes and prices) the result cache cuts
 modeled cost by 80.1\%, 81.6\%, and 85.1\% at s = 0.5, 1.0, 1.5, while
-the modeled provider prompt cache cuts 28.9--31.4\% --- there the short
+the modeled provider prompt cache cuts 28.9--31.4\%---there the short
 completions do not dominate, so the input-side discount matters more;
 both columns remain MODELED-on-measured in both cases. GPTCache, an
 external cache layer, is explicitly out of scope this pass; no
@@ -2765,26 +2766,26 @@ sandbox-resident files):
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  \texttt{ingest\_logs} --- read six 400-line log files from the sandbox
+  \texttt{ingest\_logs}---read six 400-line log files from the sandbox
   workspace (sandbox I/O, side-effectful);
 \item
-  \texttt{check\_syntax} --- a defensive guard that validates the
-  ingested format; on this workload it never rejects (a \emph{planted
-  dead guard}, standing in for the belt-and-braces checks real pipelines
+  \texttt{check\_syntax}---a defensive guard that validates the ingested
+  format; on this workload it never rejects (a \emph{planted dead
+  guard}, standing in for the belt-and-braces checks real pipelines
   carry);
 \item
-  \texttt{normalize\_entries} --- parse and normalize lines;
+  \texttt{normalize\_entries}---parse and normalize lines;
 \item
-  \texttt{extract\_incidents} --- lift normalized entries into incident
+  \texttt{extract\_incidents}---lift normalized entries into incident
   records;
 \item
-  \texttt{classify\_signature} --- triage-classify each incident
+  \texttt{classify\_signature}---triage-classify each incident
   (LLM-type, cacheable, backed by a deterministic rule-based stand-in
   that counts simulated model calls);
 \item
-  \texttt{aggregate\_triage} --- summarize by severity class;
+  \texttt{aggregate\_triage}---summarize by severity class;
 \item
-  \texttt{write\_report} --- write the triage report to the sandbox
+  \texttt{write\_report}---write the triage report to the sandbox
   (side-effectful).
 \end{enumerate}
 
@@ -2947,8 +2948,8 @@ We enumerate the limitations of the evaluation explicitly:
   hot-path adoption: over 50 realizations, the compiled,
   hot-path-adopted stream issued zero new gateway calls against the
   result cache warmed by the unoptimized stream (identical cache keys,
-  hence identical prompts) and reproduced every artifact byte-for-byte
-  --- a cache-mediated identity that validates the stream
+  hence identical prompts) and reproduced every artifact
+  byte-for-byte---a cache-mediated identity that validates the stream
   transformation, not model determinism. The system-level
   characterization of Section 5.8 composes the mechanisms on four
   realistic tasks, but each task's classification-type step is backed by
@@ -2986,15 +2987,15 @@ We enumerate the limitations of the evaluation explicitly:
   simulated (avoided calls \(\times\) 80 ms). Section 5.7 measures real
   wall-clock time and gateway-reported token usage at reduced scale, and
   Section 5.7.1 prices its own measured tokens (its 22-call reference
-  run) under three modes --- no optimization, AgentISA result caching,
-  and a modeled provider prompt cache with a parameterized cache-read
+  run) under three modes---no optimization, AgentISA result caching, and
+  a modeled provider prompt cache with a parameterized cache-read
   discount (default 0.1, after Anthropic's published prompt-caching
   economics). The resulting costs are MODELED-on-measured: token counts
   are measurements, prices are configurable list-price stand-ins (the
   serving gateway's actual pricing is unknown), and no dollar-savings
   claim is made. A head-to-head against a production external cache
-  (GPTCache --- explicitly out of scope this pass) and a priced
-  deployment study under real provider pricing remain future work.
+  (GPTCache---explicitly out of scope this pass) and a priced deployment
+  study under real provider pricing remain future work.
 \item
   \textbf{Program-size metrics, not wall-clock time.}
   Effective-instruction reduction and dispatch-count reduction are
@@ -3206,7 +3207,7 @@ Evolution}\label{advanced-instruction-set-evolution}
   Programmatic sketch (primitives like the performance model and variant
   generator are future work, not implemented machinery):
 
-  \textbf{Context-aware optimization} --- for each observed context,
+  \textbf{Context-aware optimization}---for each observed context,
   predict the current instruction set's performance against a threshold,
   and if it falls short, select a best rewrite variant for that context
   and accumulate it into the set, returning the accumulated set:
@@ -3455,7 +3456,7 @@ All artifacts are available in the accompanying repository:
   \texttt{tests/core/instructions/test\_agent\_coordination.py}).
 \end{itemize}
 
-The Section 5.2-5.5 numbers regenerate with:
+The Section 5.2--5.5 numbers regenerate with:
 
 \begin{verbatim}
 ./venv/bin/python examples/benchmarks/isa_microbench.py \
@@ -3546,7 +3547,7 @@ a hosted GLM reasoning model) with:
 \bibitem{ref41} Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation—A KVCache-centric Architecture for Serving LLM Chatbot. FAST '25, pp. 155–170. (Best Paper.)
 \bibitem{ref42} Siddharth Samsi, Dan Zhao, Joseph McDonald, Baolin Li, Adam Michaleas, Michael Jones, William Bergeron, Jeremy Kepner, Devesh Tiwari, Vijay Gadepally. 2023. From Words to Watts: Benchmarking the Energy Costs of Large Language Model Inference. arXiv:2310.03003.
 \bibitem{ref43} Hanne Riis Nielson, Flemming Nielson. 1992. Semantics with Applications: A Formal Introduction. Wiley. (Springer 2007 retitled edition: Semantics with Applications: An Appetizer.)
-\bibitem{ref44} Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. Section 3.3 (the Church–Turing thesis and equivalence of computational models).
+\bibitem{ref44} Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. Chapter 3 (the Church–Turing thesis and equivalence of computational models).
 \bibitem{ref45} Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. PLDI 2000, pp. 1–12. <https://doi.org/10.1145/349299.349303>
 \bibitem{ref46} Zilliz and community contributors. 2023. GPTCache: An Open-Source Library for Specifying and Implementing Semantics-Aware Caches for LLM Applications. Open-source release and technical report. https://github.com/zilliztech/GPTCache.
 \bibitem{ref47} Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Sun, Jeff Huang, Cody Hao Yu, Shiyi Cao, Christos Kozyrakis, Ion Stoica, Joseph E. Gonzalez, Clark Barrett, Ying Sheng. 2024. SGLang: Efficient Execution of Structured Language Model Programs. NeurIPS 37. arXiv:2312.07104.
@@ -3767,19 +3768,19 @@ The two judgment forms:
 \begin{enumerate}
 \def\labelenumi{(\roman{enumi})}
 \item
-  \textbf{Term typing} \(\vdash e : T\) --- the usual rules over base
+  \textbf{Term typing} \(\vdash e : T\)---the usual rules over base
   types, extended with the dependent \(\Pi/\Sigma\) introduction forms
   of Definition 3.2.
 \item
-  \textbf{Instruction typing} \(\vdash i\ \mathit{ok}[pre(i), post(i)]\)
-  --- read ``\(i\) is a well-contracted state transformer'': \(pre(i)\)
-  and \(post(i)\) are well-typed predicates over the state type, and the
-  Definition 3.5 obligation
-  \(\forall s \models pre(i): \delta_i(s) \models post(i)\) is
-  discharged per instruction, offline, by the bounded verification of
+  \textbf{Instruction typing}
+  \(\vdash i\ \mathit{ok}[pre(i), post(i)]\)---read ``\(i\) is a
+  well-contracted state transformer'': \(pre(i)\) and \(post(i)\) are
+  well-typed predicates over the state type, and the Definition 3.5
+  obligation \(\forall s \models pre(i): \delta_i(s) \models post(i)\)
+  is discharged per instruction, offline, by the bounded verification of
   Section 3.3.3. Instructions are \textbf{not values and never stuck}:
-  totality on precondition-satisfying states is a standing assumption
-  --- for each instruction \(i\) with its transition function
+  totality on precondition-satisfying states is a standing
+  assumption---for each instruction \(i\) with its transition function
   \(\delta_i\), \(\delta_i(s)\) is defined whenever
   \(s \models pre(i)\).
 \end{enumerate}
@@ -3842,7 +3843,7 @@ If \(\Gamma, x{:}T' \vdash e : T\) and \(\vdash v : T'\), then
 analysis of Pierce {[}36{]}, which we do not duplicate. The dependent
 \(\Pi/\Sigma\) cases additionally require synchronizing the substitution
 into the second component's type (\(T_2[x := v]\)), as in the
-\(\beta\)-case of B.5 --- the standard dependent-type substitution
+\(\beta\)-case of B.5---the standard dependent-type substitution
 bookkeeping, not covered by the non-dependent treatment in {[}36{]}.
 \(\blacksquare\)
 
@@ -3882,7 +3883,7 @@ precondition holds. Compositions maintain the runtime invariant
   \(i_2\).
 \item
   \textbf{Parallel \(\parallel\):} disjoint state footprints keep each
-  component's precondition valid throughout the interleaving --- neither
+  component's precondition valid throughout the interleaving---neither
   component writes what the other's precondition or postcondition reads.
 \item
   \textbf{Guarded \(\triangleright\):} on the triggering outcome of
@@ -3959,9 +3960,9 @@ an assumption about instruction \emph{implementations}, not something
 the type system alone discharges. The per-instruction mechanism intended
 to discharge it is the bounded verification of Section 3.3.3, which is
 now shipped code: the checker mechanically discharges the obligation for
-pure instructions on the state spaces it can enumerate --- exhaustively
-for small enumerable domains, by deterministic bounded sampling beyond
---- while side-effectful instructions and state spaces beyond the
+pure instructions on the state spaces it can enumerate---exhaustively
+for small enumerable domains, by deterministic bounded sampling
+beyond---while side-effectful instructions and state spaces beyond the
 enumeration bound remain covered by hand argument and unit tests rather
 than by the mechanical check. The theorem is conditional on the
 obligation being (or becoming) true of each instruction, to the extent
@@ -3972,8 +3973,7 @@ instructions with checkable preconditions. Runtime failure handling for
 the remaining cases is the responsibility of the fallback machinery of
 Section 5.6, not of types.
 
-\section{Proofs of Theorems 3.4 and
-3.5}\label{proofs-of-theorems-3.4-and-3.5}
+\section{Proofs of Theorems 3.4--3.6}\label{proofs-of-theorems-3.43.6}
 
 \subsection{Denotational Setup}\label{denotational-setup}
 
