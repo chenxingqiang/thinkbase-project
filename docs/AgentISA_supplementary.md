@@ -2,7 +2,7 @@
 
 # Abstract
 
-This document is the supplementary material for *AgentISA: Formal Instruction Set Design for LLM Agents*. It contains the appendices referenced by the main paper: Appendix A (the Turing-completeness construction for Theorem 3.1), Appendix B (the type-safety proof for Theorem 3.2), and Appendix C (the semantic-preservation lemmas and proofs of Theorems 3.4–3.6, with the scope remarks of C.7). Section and theorem numbers follow the main paper.
+This document is the supplementary material for *AgentISA: Formal Instruction Set Design for LLM Agents*. It contains the appendices referenced by the main paper: Appendix A (the Turing-completeness construction for Theorem 3.1), Appendix B (the type-safety proof for Theorem 3.2), Appendix C (the semantic-preservation lemmas and proofs of Theorems 3.4–3.6, with the scope remarks of C.7), Appendix D (component listings), Appendix E (formal sketches for future directions), Appendix F (artifact-regeneration commands), Appendix G (the priced-comparison protocol), Appendix H (the four-task characterization in full detail), and Appendix I (the extension-experiment protocols and detailed tables behind Sections 5.10–5.11). Section and theorem numbers follow the main paper.
 
 # Appendix A: Proof of Theorem 3.1 (Turing Completeness)
 
@@ -222,17 +222,19 @@ Every optimization in the pass pipeline is a finite composition of rewrites cove
 
 ## C.7 Scope Remark
 
-Theorems 3.4–3.6 are *conditional*: they hold of transformations whose verification obligations (Sections 4.1.3 and 4.3.1) are discharged. As stated there, those obligations are **specified but not yet mechanically discharged**—the shipped optimizer registers no peephole rules (the peephole obligation is dormant, and the fusion/DCE/grouping passes are argued directly in C.2 and C.5 rather than through the symbolic-execution checker), and the symbolic-execution equivalence checker itself is a specification (Section 4.3.1). Where an obligation is discharged only on bounded state spaces (Section 3.3.3), the guarantee is correspondingly bounded: rewrites verified on the explored subset are sound there. No such rewrite is registered today; when one is, its application must be restricted to the explored subset (that restriction is a dormant obligation of the future rule set, not shipped behavior). What the shipped implementation does provide is empirical semantics-preservation at task level: the system-level demonstration of Section 5.8 re-executes an optimized stream and checks byte-identical output.
+Theorems 3.4–3.6 are *conditional*: they hold of transformations whose verification obligations (Sections 4.1.3 and 4.3.1) are discharged. As stated there, those obligations are **specified but not yet mechanically discharged**—the shipped optimizer registers no peephole rules (the peephole obligation is dormant, and the fusion/DCE/grouping passes are argued directly in C.2 and C.5 rather than through the symbolic-execution checker), and the symbolic-execution equivalence checker itself is a specification (Section 4.3.1). Where an obligation is discharged only on bounded state spaces (Section 3.3.3), the guarantee is correspondingly bounded: rewrites verified on the explored subset are sound there. No such rewrite is registered in the default configuration; when one is—through the approval-gated promotion path of the main paper's Section 3.3.1, or future rule authoring—its application must be restricted to the explored subset (that restriction remains a dormant obligation, not enforced by the shipped gate). What the shipped implementation does provide is empirical semantics-preservation at task level: the system-level demonstration of Section 5.8 re-executes an optimized stream and checks byte-identical output.
 
 **Observation model.** The theorems' equality is *partial equivalence* (C.1: $\llbracket p \rrbracket = \llbracket q \rrbracket$ on states where both are defined), and the observation model should be read accordingly. **Observed:** the final state of declared state cells, the declared outputs (the instruction's product keys), and—for theorems covering effectful instructions (C.5)—the externally visible effects, in program order. **Deliberately not observed:** the *domain of definition* itself. Because equivalence is only partial, a rewrite may extend definedness—DCE is the canonical example (C.4): deleting an instruction that would have failed can turn a previously undefined run into a defined one. If program failure or exception behavior were part of the observation model, this would violate preservation; it is therefore stated explicitly that failure behavior is outside what Theorems 3.4–3.6 preserve, and any deployment for which failures are observable (e.g., a pipeline contract that treats exceptions as data) needs a strengthened equivalence and must re-derive the theorems under it. Internal traces—the sequence of instructions executed—are likewise not observed; only the net transformation is.
 
-**Three status levels.** Each mechanism in this paper falls into exactly one of three levels, which we keep separate throughout: *(i) specified*—the symbolic-execution equivalence checker, the pipeline scheduler's cycle-accurate extension, tree-pattern instruction selection (Section 4.1.2); *(ii) implemented with checks*—the optimizer passes (fusion, DCE, grouping) with their pass-level arguments in C.2/C.5, the runtime monitors, and differential unit tests pinning the fusion property this appendix argues (fused-composite execution equals constituent-sequence execution; the fusion gate refuses producer–consumer pairs; `tests/core/isa/test_fusion_differential.py`); *(iii) empirically validated*—trace-level replay identity on the mock (Section 5.4: optimized traces re-executed, final states identical in 5/5 seeds), task-level re-execution with byte-identical outputs (Section 5.8), and the caching/compilation measurements of Section 5 (including the exact-response-cache parity baseline of Section 5.2). A statement at one level is never used to imply a guarantee at a stronger level.
+**Three status levels.** Each mechanism in this paper falls into exactly one of three levels, which we keep separate throughout: *(i) specified*—the symbolic-execution equivalence checker, the pipeline scheduler's cycle-accurate extension, block-granular trace formation (Sections 4.1.2 and 4.2.2); *(ii) implemented with checks*—the optimizer passes (fusion, DCE, grouping) with their pass-level arguments in C.2/C.5, the runtime monitors, and differential unit tests pinning the fusion property this appendix argues (fused-composite execution equals constituent-sequence execution; the fusion gate refuses producer–consumer pairs; `tests/core/isa/test_fusion_differential.py`); *(iii) empirically validated*—trace-level replay identity on the mock (Section 5.4: optimized traces re-executed, final states identical in 5/5 seeds), task-level re-execution with byte-identical outputs (Section 5.8), and the caching/compilation measurements of Section 5 (including the exact-response-cache parity baseline of Section 5.2). A statement at one level is never used to imply a guarantee at a stronger level.
 
-# Appendix D: Specified-Only Component Listings
+# Appendix D: Component Listings
 
-This appendix carries the algorithm listings that the main paper specifies but does not ship (or ships dormant), moved from its Section 4 to respect the page limit. Each listing keeps its original framing; implementation status statements are unchanged. The shipped selection step (the heuristic name-overlap matcher) remains in the source module `agentflow.core.isa.instruction_selector`.
+This appendix carries the algorithm listings moved from the main paper to respect the page limit; each listing keeps its original framing. Two listings formerly specified-only now describe shipped opt-in components, updated in place: D.1 (the MATCH-TREE selector: `selection_strategy="dp"` in `agentflow.core.isa.instruction_selector`, default heuristic) and D.4 (the EMA hot-path detector: `detection_mode="ema"` in `agentflow.core.isa.instruction_optimization`). The remainder stay as labeled—specified-only (D.2, D.3, D.5–D.7, D.9) or shipped (D.8, D.10, and D.11, the bounded-checker listing relocated from the main paper's Section 3.3.3). The default selection step (the heuristic name-overlap matcher) remains in the source module `agentflow.core.isa.instruction_selector`.
 
-## D.1 Specified Tree-Pattern Instruction Selection (MATCH-TREE)
+## D.1 Tree-Pattern Instruction Selection (MATCH-TREE)
+
+Implementation status: shipped as the opt-in selector of `agentflow.core.isa.instruction_selector` (`selection_strategy="dp"`, engaging only on inputs carrying an `ir_tree`; the default remains the heuristic matcher). `_match_tree` follows the listing's recurrence—candidate-pattern cost plus the optimal subtrees of unspanned children, memoized top-down—and exposes `(costs, selected)` through `TreeSelectionResult`; matching is root-op equality (case-insensitive) with each catalogue pattern's `params["spanned_child_ops"]` spanning whole child subtrees, and the covering is read root-first, skipping spanned subtrees.
 
 Input: IR tree T, pattern set P; output: optimal pattern selection S.
 
@@ -276,7 +278,7 @@ function MATCH-TREE(T, P)
 end function
 ```
 
-**Theorem 4.1** (Selection Optimality, specified algorithm): given a set of context-local patterns P and an IR tree T, the MATCH-TREE algorithm computes the minimal covering cost; the covering itself is read off the `selected` table afterwards, by walking from the root and skipping subtrees spanned by the chosen pattern.
+**Theorem 4.1** (Selection Optimality, shipped opt-in selector): given a set of context-local patterns P and an IR tree T, the MATCH-TREE algorithm computes the minimal covering cost; the covering itself is read off the `selected` table afterwards, by walking from the root and skipping subtrees spanned by the chosen pattern.
 
 *Proof*: By induction on tree height, assuming a covering of T exists (if no pattern matches a node its cost is $\infty$ and no covering exists):
 
@@ -290,7 +292,7 @@ end function
 
 The recurrence sums only over children not covered by the candidate pattern $p$—summing over all children would double-count the cost of subtrees the pattern spans. Section 3.4.3's per-node argmin is therefore exact for single-node patterns; multi-node patterns require this covering recurrence.
 
-The recurrence requires that a pattern's feasibility at a node not depend on the covers chosen for other subtrees; context constraints that couple sibling subtrees break this optimal-substructure property, which is why the statement restricts to context-local patterns. This theorem is a property of the specified algorithm, not of the shipped heuristic selector; no optimality claim is made for the implementation.
+The recurrence requires that a pattern's feasibility at a node not depend on the covers chosen for other subtrees; context constraints that couple sibling subtrees break this optimal-substructure property, which is why the statement restricts to context-local patterns. This theorem is a property of the shipped opt-in selector, not of the default heuristic; no optimality claim is made for the default path.
 
 ## D.2 Specified Cycle-Accurate Pipeline Scheduler (SCHEDULE-PIPELINE)
 
@@ -356,7 +358,7 @@ class PipelineController:
                 self.resource_monitor.release(resources)
 ```
 
-## D.4 Specified Hot-Path Detector (DETECT-HOT-PATH)
+## D.4 Hot-Path Detector (DETECT-HOT-PATH)
 
 Input: execution path P, threshold θ, EMA decay γ (γ = 2/(w+1) for window w; γ is unrelated to the α stability bound of the main paper's Section 3.4.4); output: Boolean indicating if P is hot.
 
@@ -388,9 +390,19 @@ function DETECT-HOT-PATH(P, θ, γ)
 end function
 ```
 
+Implementation status: shipped as the opt-in `detection_mode="ema"` of `agentflow.core.isa.instruction_optimization`, wired through `AgentISAConfig.hot_path_detection`/`ema_window`/`ema_threshold`/`max_tracked_paths` (defaults exact / 10 / 0.5 / 1,000). Implementation-fidelity notes: the detector remains exact-path-keyed (no similarity merging); a path's EMA counter must exceed a single fresh observation before its share is evaluated (a cold-start debounce, so the first recorded path cannot self-trigger at share 1.0); the share denominator sums the counters of LRU-tracked paths, and eviction shrinks it; the stability gate reuses the shipped `>=` predicate rather than the listing's strict `>`; windows below 2 are rejected (γ = 1 would be memoryless). Trace formation (D.5) remains specified, not shipped.
+
 ## D.5 Specified Trace Formation (BUILD-TRACE)
 
-Input: hot path H; output: optimized trace T.
+Input: hot path H; output: optimized trace T. Trace validity is *defined* by the conjunction of three properties (H the loop header of the region, tail the last block of the trace); VERIFY-TRACE-PROPERTIES checks them:
+
+$$
+\begin{aligned}
+\text{Valid}(\text{trace}) \iff {}& \text{Entry}(\text{trace}) \text{ dominated by } H \\
+\wedge\;& \text{Exit}(\text{trace}) \text{ post-dominates tail} \\
+\wedge\;& \text{NoSideExit}(\text{trace}) \text{ except tail}
+\end{aligned}
+$$
 
 ```python
 Input: Hot path H
@@ -481,6 +493,8 @@ class PerformanceMonitor:
 
 ## D.8 Shipped Peephole Optimizer (Empty Pattern Table)
 
+Status: shipped in `agentflow.core.isa.auto_promotion` (flag `auto_approve`, default `False`; with `min_support = 2` and `min_success_rate = 0.7`). The optimizer itself is the `optimize` loop of `agentflow.core.isa.instruction_optimization`, whose pattern table is populated through `add_peephole_pattern`; the table ships empty by design, because mined composites reach it only through the audited `AutoPromotionEngine` gate—candidates must clear the support and all-steps-succeeded thresholds, and are then proposed for human approval rather than applied, unless `auto_approve` is enabled. The Section 5.11 replay experiment does *not* run behind this gate: its composite is mined and promoted through the learner's own threshold-validated path (`InstructionLearner.learn_from_traces` → `create_instruction`, Appendix I.2.6), leaving the optimizer's rule set untouched. The approval-gated engine itself ships and is exercised by its unit suite (`tests/core/isa/test_auto_promotion.py`), not by any Section 5 experiment.
+
 ```python
 class PeepholeOptimizer:
     def optimize(self, instructions: List[Instruction]) -> List[Instruction]:
@@ -520,6 +534,8 @@ end function
 ```
 
 ## D.10 Shipped Coordination Flow and Fusion Pass Listings
+
+Status: shipped in `agentflow.core.isa.coordination` (flag `strict`, default `False`)—`SecurityMonitor(config, strict: bool = False)` runs the policy checks in the fail-open default posture, and the opt-in fail-closed mode is reached through `AgentCoordinator(config, security_strict: bool = False)`; both default to fail-open, and the paired posture matrix exercising the difference is documented in Appendix I.2.4.
 
 The coordination flow implemented by `AgentCoordinator` (authenticate, authorize, select by capability, plan stages with fallback, execute, record history), referenced by the main paper's Section 5.6:
 
@@ -569,9 +585,36 @@ def combine_instructions(self, insts: List[Instruction]) -> List[Instruction]:
     return self.verify_combinations(combined)
 ```
 
+The illustrative candidate rule set referenced by the main paper's Section 3.4.4 (textbook mnemonics, explicitly *not* shipped opcode names; specified, not registered—the shipped write path is the audited promotion gate of the main paper's Sections 3.3.1 and 4.1.3):
+
+```
+Combine Rules {
+  // LOAD/STORE/MOVE are textbook mnemonics, illustrative
+  // only; they are not shipped opcode names
+  LOAD followed by STORE → MOVE
+  Multiple CONTEXT_UPDATE → Single UPDATE
+  Sequential QUERY → Batch QUERY
+}
+```
+
+## D.11 Shipped Bounded-Checker Listing (verify_instruction)
+
+Relocated from the main paper's Section 3.3.3 to respect the page limit; the shipped module is `agentflow.core.isa.bounded_checker`.
+
+```python
+def verify_instruction(instruction, pre_condition, post_condition):
+    if instruction.side_effects: return skipped(instruction)  # never executed
+    state_space = generate_state_space(instruction)  # bounded: exhaustive or seeded, cap 256
+    for state in state_space.states:
+        if pre_condition(state):
+            next_state = execute(instruction, state)
+            check(progress, preservation, post_condition, next_state)  # structured violation reporting
+    return verdict  # checked_states, exhaustive, violations by kind, passed
+```
+
 # Appendix E: Formal Sketches for Future Directions
 
-Sketches referenced by the main paper's Section 6.3; all are future work with no current implementation.
+Sketches referenced by the main paper (Sections 3.4 and 6.3); all are future work or specified-only, with no current implementation.
 
 ## E.1 Stated Sketches
 
@@ -602,6 +645,20 @@ $$
 
 **Resource consumption model** (Section 6.3.3, item 2): $R(i) = \alpha C_{cpu}(i) + \beta C_{mem}(i) + \gamma C_{io}(i)$ with platform-specific coefficients.
 
+**Instruction scheduling formulation** (Section 3.4.3, the specified, not shipped, scheduler's objective): minimize the total stall $\sum_i \text{delay}(i)$ subject to $\text{start}(i_2) \geq \text{end}(i_1)$ for every dependency pair $(i_1, i_2) \in \text{Deps}$ and $\sum_{i \in \text{active}(t)} \text{res}(i) \leq \text{Capacity}$ at every time $t$.
+
+**Performance model** (Section 3.4.5, specified; the benchmarks of Section 5 measure latency and token counts directly and do not evaluate it):
+
+$$
+\text{Perf}(p) = \sum_{i \in p} (\text{base\_cost}(i) + \text{overhead}(i) - \text{optimization\_gain}(i))
+$$
+
+where optimization gain is
+
+$$
+\text{optimization\_gain}(i) = \sum_{o \in \text{Opts}} \text{benefit}(o,i) \times \text{application\_rate}(o,i).
+$$
+
 **Information flow control** (Section 6.3.6, item 1):
 
 $$
@@ -625,6 +682,7 @@ Exact command lines mirrored from the repository's `REPRODUCING.md`, referenced 
 
 ```
 ./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --backend gateway \
     --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64 \
     --output examples/benchmarks/isa_real_llm_results.json
 ```
@@ -633,8 +691,11 @@ Exact command lines mirrored from the repository's `REPRODUCING.md`, referenced 
 
 ```
 ./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --backend gateway \
     --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64
 ```
+
+(The `--backend gateway` flag is required: the CLI defaults to the deterministic offline mock, so omitting it silently reproduces the mock arm instead of the published real-gateway numbers.)
 
 ## F.3 Section 5.7.1 real-gateway compiler/hot-path harness
 
@@ -655,7 +716,62 @@ Exact command lines mirrored from the repository's `REPRODUCING.md`, referenced 
 
 with test suite `pytest tests/system/test_system_task_demo.py`.
 
-## F.5 Artifact Contents Inventory
+## F.5 Section 5.10–5.11 Extension-Experiment Commands (Offline)
+
+The extension experiments behind Sections 5.10 and 5.11 (Appendices I.1–I.2) are offline and deterministic; each results JSON records its own provenance (seeds, scale, `git_rev`; the provenance revision cited in Appendix I is `0e1671f8`). Seed and scale conventions, mirrored from `REPRODUCING.md`: the trace census analyzes the corpus regenerated by `examples/random_tasks_stress.py` (master seed 2026, per-task corpus seeds 10000–10099); the capability calibration uses pool seed base 2000, enrichment base 5000, cache-workload base 1000, 5 seeds per condition; the selector bench draws `Random(size*1000+seed)` per cell over sizes 20/50/100/200 × seeds 0–4; the EMA stress uses RNG seeds 1000–1004 (threshold 100, stability 0.9, EMA window 10, γ 0.181818, share threshold 0.3); the posture matrix uses task seeds 11–15; the namespacing experiment seeds 1000–1004 (30 cohorts × 100 items, 13,000 lookups); the replay bench draws unseen values with `Random('e7-replay-generalization-seed{seed}')`, experiment seeds 0–4; the fusion-chain bench uses chain-arm seed base 5000 and control base 2000 over lengths 50/200/1000 × 4 levels × 5 seeds; the token-mix sweep uses seeds 1000–1004, 13 mix points × 3 skews × 200 draws (39,000 draws). Command lines:
+
+```
+./venv/bin/python examples/analyze_task_traces.py \
+    --trace-dir examples/random_task_traces --top 10 --output <path>
+
+./venv/bin/python examples/benchmarks/capability_calibration.py
+
+./venv/bin/python examples/benchmarks/selector_dp_bench.py
+
+./venv/bin/python examples/benchmarks/hotpath_ema_stress.py
+
+./venv/bin/python examples/benchmarks/security_posture_matrix.py \
+    --seeds 5 --tasks-per-scenario 40
+
+./venv/bin/python examples/benchmarks/cache_namespace_experiment.py
+
+./venv/bin/python examples/benchmarks/replay_generalization_bench.py
+
+./venv/bin/python examples/benchmarks/fusion_chain_bench.py
+
+./venv/bin/python examples/benchmarks/promptcache_sweep.py
+```
+
+The raw-results file backing each experiment is listed in Appendix I (I.1–I.2) and in `REPRODUCING.md`.
+
+## F.6 Appendix I.3 Live-Gateway Re-Run Commands
+
+Two live runs back Appendix I.3; both target the gateway at `https://127.0.0.1:8443` (model `claude-glm-5.3-flash`, temperature 0), and live model replies are their only non-deterministic input—the aggregates and analysis recompute offline from the recorded raw replies (`REPRODUCING.md` records the scale decisions and the gateway-quota episode; Appendix I.3 the protocol). The cache bench is invoked once per Zipf level—repeat the command below with `--zipf 1.0` / `--zipf 1.5` and a matching `--output`, one raw chunk file per invocation (seeds {0, 1} with `rng = Random(1000 + seed)`); `--backend gateway` is required because the CLI defaults to the offline mock—and the postprocess command folds the three raw chunk files into `gateway_multiseed_results.json`:
+
+```
+./venv/bin/python examples/paper_real_llm_quality_check.py --backend real \
+    --scale tiny --tasks 1 --max-tokens 4096 \
+    --json examples/benchmarks/gateway_quality_probe.json
+./venv/bin/python examples/paper_real_llm_quality_check.py --backend real \
+    --scale tiny --max-tokens 3072 \
+    --json examples/benchmarks/gateway_quality_run_raw.json
+./venv/bin/python examples/benchmarks/e10_gateway_postprocess.py \
+    --quality-probe examples/benchmarks/gateway_quality_probe.json \
+    --quality-run examples/benchmarks/gateway_quality_run_raw.json \
+    --i9-baseline examples/paper_real_llm_quality_results_real.json \
+    --multiseed-run examples/benchmarks/gateway_multiseed_raw_zipf0.5.json \
+                    examples/benchmarks/gateway_multiseed_raw_zipf1.0.json \
+                    examples/benchmarks/gateway_multiseed_raw_zipf1.5.json \
+    --paper-bench examples/benchmarks/isa_real_llm_results.json \
+    --quality-out examples/benchmarks/gateway_quality_results.json \
+    --multiseed-out examples/benchmarks/gateway_multiseed_results.json
+
+./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --backend gateway --tasks 100 --seeds 2 --zipf 0.5 --max-tokens 64 \
+    --output examples/benchmarks/gateway_multiseed_raw_zipf0.5.json
+```
+
+## F.7 Artifact Contents Inventory
 
 Per-file inventory of the artifact (mirrored from `REPRODUCING.md`):
 
@@ -707,17 +823,6 @@ The four tasks:
 - **Full-stack determinism.** A completely fresh stack—new instructions, new cache, new workspace, same seed—reproduces the report byte-for-byte (SHA-256 equality).
 
 
-**Configuration.** Seed 42; 6 files × 400 lines; 12 repeated realizations of the task; hot-path threshold 5. Every phase is deterministic and re-runnable from the repository (Artifact Availability).
-
-
-**What the triage walk-through shows.**
-
-- **Static compilation with structural validation.** NONE compiles to 7 effective instructions / 7 dispatches; AGGRESSIVE to 6 / 6 (14.3%): the dead guard fuses with the following pure step rather than being dropped. The walk-through *asserts the compiled stream's dataflow validity*—every step whose output is consumed downstream must survive compilation, the only eliminable step being the guard—so the shrinkage cannot come from dropping live producers.
-- **Reuse across repeated realizations.** The first realization makes 50 (simulated) model calls; all eleven subsequent realizations make zero (result cache hit rate 91.7% on the classification step); all 12 reports are byte-identical.
-- **Closed-loop hot-path adoption.** The stream crosses the hot-path threshold at the sixth recording (the counter must strictly exceed it and recording follows execution, so adoption lands at realization threshold+2); the runtime *adopts* the optimized form automatically, repeats 7–12 execute the shrunken 6-instruction stream (instruction executions per realization: `[7,7,7,7,7,7,6,6,6,6,6,6]`), and on a fresh workspace the optimized form reproduces the report byte-for-byte—semantics-preserving on the real task, not only on synthetic sequences.
-- **Full-stack determinism.** A completely fresh stack—new instructions, new cache, new workspace, same seed—reproduces the report byte-for-byte (SHA-256 equality).
-
-
 **The four-task characterization.** All four tasks run the identical closed-loop battery (`examples/system_task_workload.py`, `characterize()`, 12 realizations each, hot-path threshold 5, one planted dead guard and one cacheable LLM-type step each, the latter backed by a deterministic rule stand-in counting simulated model calls):
 
 *Structure (compile-time):*
@@ -739,5 +844,363 @@ The four tasks:
 | report-merge | 16 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
 | regression-diff | 240 / 0 | 91.7% | repeat 7 | yes (12/12 + fresh-stack SHA) |
 : Runtime behavior of the four tasks (12 realizations each; classification-type steps are backed by deterministic rule stand-ins).
+
+# Appendix I: Extension-Experiment Protocols and Detailed Tables
+
+Full protocols and detailed tables for the extension experiments whose headlines appear in the main paper's Sections 5.10 and 5.11. Every number below is extracted programmatically from the corresponding committed results file under `examples/benchmarks/` (each file carries a `provenance` block with the git revision `0e1671f8`, UTC timestamps, seeds, and scale; aggregates are computed by the generating script from raw per-instance records, never hand-entered). As elsewhere, N/A results, not-covered axes, and residual failure modes are reported as such rather than dropped.
+
+## I.1 Real-Trace Workload Characterization: Protocol and Complete Tables
+
+`examples/benchmarks/trace_workload_results.json` records the census summarized by the main paper's Section 5.10:
+
+- Driver: `examples/benchmarks/trace_workload_characterization.py`
+- Analyzer: `examples/analyze_task_traces.py`
+
+**Protocol.** The corpus is 100 task traces from the seeded random-task stress battery (`examples/random_tasks_stress.py`; generator master seed 2026, per-task corpus seeds 10000–10099, extracted from the generator source at run time—not hand-copied). The analyzer is pure-stdlib and takes the first `kind=workflow` record of each trace file (message records skipped; malformed JSON rejected loudly). The analysis is a deterministic full census of the committed corpus: the analyzer has no sampling randomness, so multi-seed averaging does not apply (the corpus-generation seeds are recorded; `analysis_seed` is null in the provenance for exactly this reason). The census counts 100 files / 100 workflows / 792 steps / 12 distinct instruction signatures and 692 adjacent step pairs; the corpus is pinned by `corpus_sha256` 7c05d307c64ab418f85811efa18489fa80463ab504fdc1edb3f0c22a4bf323eb, and only the timestamp and git revision vary between runs. Instruction signatures are `(type, params)` pairs; because the traces serialize no instruction params, operation identity is recovered from step names by stripping trailing positional index suffixes (`guard_0_2` → `guard`), with an explicit non-empty `params` field canonicalized with sorted keys when present. The Zipf fit is an OLS regression of log-rank on log-frequency over the 12 signature-class frequencies (fewer than two classes → `s`/`R²` null; a zero-variance distribution → `R²` = 0.0 by convention). Two *distinct* reuse quantities are reported: the corpus-level share of step instances that repeat an already-seen signature, and the mean of per-workflow repeat shares. The shape census resolves dependencies (by output name, then step id) into a DAG and classifies workflows by node structure: *linear* (no fan-out/fan-in node), *fan-out* (a node with $\geq$ 2 consumers), *fan-in* (a node with $\geq$ 2 dependencies), *branch* (both, e.g. a diamond). Dead-end steps are a single-pass structural count (pure steps whose outputs no step consumes)—not the compiler's AGGRESSIVE fixpoint liveness analysis. The fusibility census mirrors `agentflow/core/isa/compiler.py::_are_fusible` on the trace dicts: same type, both members explicitly pure, and no producer–consumer edge inside the pair.
+
+
+| Rank | Signature (type:operation) | Instances |
+| -- | -- | -- |
+| 1 | CONTROL_FLOW:guard | 152 |
+| 2 | STATE_MANAGEMENT:ingest | 100 |
+| 3 | STATE_MANAGEMENT:write_report | 100 |
+| 4 | LLM_INTERACTION:classify | 68 |
+| 5 | CONTROL_FLOW:firsthalf | 61 |
+| 6 | CONTROL_FLOW:reverse_words | 56 |
+| 7 | CONTROL_FLOW:filter_warn | 53 |
+| 8 | CONTROL_FLOW:tail | 43 |
+| 9 | CONTROL_FLOW:filter_info | 43 |
+| 10 | CONTROL_FLOW:dedupe | 42 |
+| 11–12 | two further classes (combined) | 74 |
+: Signature frequency distribution (top 10 of 12 classes; the two remaining classes account for the residual 74 instances, 792 − 718)
+
+
+| Quantity | Value |
+| -- | -- |
+| Trace files / workflows | 100 / 100 |
+| Steps (instances) | 792 |
+| Distinct (type, params) signatures | 12 |
+| Adjacent step pairs | 692 |
+| Zipf fit (log-rank/log-freq OLS) | $s = 0.593$ (0.5927), $R^2 = 0.971$ (0.9714) |
+| Corpus-level repeated instances | 780 / 792 (98.5%) |
+| Per-workflow mean repeat share | 18.3% |
+| Shape census (linear / fan-out / fan-in / branch) | 21 / 79 / 0 / 0 |
+| Average steps per workflow | 7.9 |
+| Dead-end steps (single-pass count, pure, no consumer) | 152 |
+| Workflows with multiple components (disconnected) | 0 |
+| Fusible adjacent pairs | 106 / 692 (15.3%), all CONTROL_FLOW |
+: Census summary
+
+**Disclosures.** The corpus is generator-produced, not production logs; the census characterizes workload structure only. The dead-end count is deliberately the weaker single-pass structural count, so its exact agreement with the 152 planted guards is a cross-validation, not a compiler-behavior claim. The corpus contains no fan-in or branch workflows, so those shape rows report the census honestly at zero rather than by construction. Repetition is dominated by cross-task vocabulary (98.5% corpus-level) while intra-task duplication stays low (18.3% per workflow)—the two definitions answer different questions and both are reported.
+
+## I.2 Mechanism-Extension Experiments: Complete Protocols and Detailed Tables
+
+The six experiments whose headlines the main paper's Section 5.11 sums up, one per shipped opt-in mechanism, plus the two extensions of existing benchmark protocols cited in the same section (chain-enriched workloads, extending the Section 5.3 optimization benchmark; the token-mix sweep, extending the Section 5.7.1/Appendix G priced comparison). Each experiment's results file records the dependency component as shipped in its `coverage` block; N/A results and not-covered axes are listed, not dropped.
+
+### Capability-Score Calibration
+
+Raw results: `examples/benchmarks/capability_calibration_results.json` (script `capability_calibration.py`). **Question:** do the statically extracted capability scores of Section 3.5 track measurable mock-backend behavior? **Pool:** the Section 5.3 microbench generator (`synthetic_formal_sequence`, length 200, `p_dead` 0.25, `p_pure` 0.55, pool seed base 2000 mirroring the compiler experiment), 5 seeds per condition; enrichment draws use an independent seed base 5000 (paired design: the same seed sees identical pools and workloads across intensities), and the cache-workload seed base 1000 mirrors the Section 5.2 cache experiment. **Protocols:** 8 arms, 165 replicas in total—un-enriched base (5), and graded declaration-injection arms P_flow / P_cache / P_resource / P_security / P_audit (25 each), P_mix (20), and a generation anchor G_anchor (15)—over intensities {0.0, 0.25, 0.5, 0.75, 1.0}, four dead/pure mixes, generation anchor lengths {50, 200, 1000}, a cache workload of 2,000 tasks × 20 parameter values × Zipf {0.5, 1.0, 1.5}, and a Zipf-1.0 generation workload; plus 10 inertness probes. **Instruments (all real code paths):** the mock backend (one simulated round trip per executed LLM-typed instruction, 80 simulated ms counted, never slept), the cache arm (honoring declared `optimization.cacheable`), the compiler battery (`compile()` at BASIC/ADVANCED plus isolated fusion-only and DCE-only passes and the resource plan's total cost), and the executor gate battery (`FormalInstruction.execute` against an unprivileged, resource-starved context). Extraction is static and side-effect-free; every pool, enrichment, and workload is seeded. Wall time 2.72 s; git rev 0e1671f8.
+
+**Extraction is no longer constant-zero.** On un-enriched base pools, 7 of 17 metrics and 5 of 8 domain scores are already nonzero (per-seed nonzero counts 7/17 and 5/8 in all five seeds; the stub era was 0/17 by construction), and all 17 metrics attain a nonzero value somewhere across the protocol and probe arms.
+
+
+| Domain | Measured counterpart | Coupling | $r$ | $\rho$ | $n$ |
+| -- | -- | -- | -- | -- | -- |
+| reasoning | fusion-pass instruction-count reduction | cross-path | −0.9647 | −0.9526 | 25 |
+| memory | mock-backend cache hit rate (Zipf 1.0) | cross-path | +0.9482 | +0.9517 | 25 |
+| generation | uniform model-call share (one execution pass) | same quantity via real execution | +0.7902 | +0.9034 | 15 |
+| coordination | parallel dispatch compression (ADVANCED) | cross-path | −0.9767 | −0.9836 | 25 |
+| optimization | executor resource-gate rejection rate | declared-and-enforced | −1.0000 | −1.0000 | 25 |
+| security | executor security-gate rejection rate | declared-and-enforced | +1.0000 | +1.0000 | 25 |
+| specialization | — (N/A: no task-level ground truth in the microbench) | — | — | — | — |
+| robustness | — (N/A: no runtime enforcement axis) | — | — | — | — |
+: Domain-score correlations (Pearson $r$ / Spearman $\rho$; all cross-path coefficients significant at $p < 10^{-12}$, generation at $p = 4.6 \times 10^{-4}$; the declared-and-enforced couplings are exact)
+
+Secondary arms, reported for honesty: memory vs cache hit rate at Zipf 0.5/1.5 gives $r$ = +0.9843 / +0.8925; optimization vs the compiler resource-plan's total cost gives −1.0000 and vs cache hit rate +0.9490; generation under a Zipf-1.0 *workload* arm (rather than the uniform pass) drops to $r$ = +0.176 (workload-position concentration adds variance beyond pool composition—a weaker coupling is expected there).
+
+
+| Metric | Arm | Measured quantity | $r$ | $n$ |
+| -- | -- | -- | -- | -- |
+| causal_understanding | P_flow | fusion-only reduction | −0.9647 | 25 |
+| long_term_memory | P_cache | cache hit rate (Zipf 1.0) | +0.9482 | 25 |
+| creativity | G_anchor | uniform model-call share | +1.0000 | 15 |
+| coherence | P_mix | DCE-only reduction | −0.9900 | 20 |
+| efficiency | P_cache | cache hit rate (Zipf 1.0) | +0.9490 | 25 |
+| resource_usage | P_resource | resource-gate rejection rate | −1.0000 | 25 |
+| collaboration | P_flow | parallel dispatch compression | −0.9767 | 25 |
+| policy_compliance | P_security | security-gate rejection rate | +1.0000 | 25 |
+| logical_consistency | N/A | structural well-formedness has no runtime reader (probe: `malformed_dependencies` moves the score, no measured output changes) | — | — |
+| abstract_reasoning | N/A | declared parameter schemas consulted by no microbench path (probe `parameter_schemas`: zero behavioral delta) | — | — |
+| working_memory | N/A | declared input arity consumed by no runtime path; the extractor-counted `input:` prefix is not matched by the compiler's bare-name dataflow rules (probe `prefixed_input_deps`) | — | — |
+| domain_expertise | N/A | category tags inert; no task-level ground truth (probe `category_tags`) | — | — |
+| adaptability | N/A | deadline/locality hints read by no runtime path (probe `adaptability_hints`) | — | — |
+| communication | N/A | no inter-agent protocol in the microbench (probe `agent_type_recategorization`) | — | — |
+| error_handling | N/A | declared timeouts/retries not enforced by the formal executor (probe `error_contract`: contract broken on every instruction, outcomes unchanged) | — | — |
+| recovery | N/A | recovery metadata extracted, no recovery machinery to measure (probe `recovery_metadata_key`) | — | — |
+| threat_detection | N/A | no measured counterpart (probes `security_verification_flag` + protocol P_audit; see below) | — | — |
+: Per-metric correlations (eight correlated; nine N/A with probe evidence)
+
+The creativity row is instrument agreement—the same quantity (declared LLM composition share) measured through the real mock-backend execution path—and is labeled as such rather than as behavioral prediction. **Inertness probes:** 9 of 10 injected declaration families produce a measured delta of exactly 0.0 in the microbench batteries (`parallelizable_hint`, `security_verification_flag`, `category_tags`, `recovery_metadata_key`, `parameter_schemas`, `malformed_dependencies`, `error_contract`, `adaptability_hints`, `prefixed_input_deps`); the one with a detected effect is `agent_type_recategorization` (maximum delta 0.035 on `basic_reduction` / `advanced_effective_reduction` / `fusion_only_reduction`), i.e., fusion keys on instruction *type* as an adjacency rule—a compiler artifact, not inter-agent coordination semantics, which is why communication stays N/A rather than inheriting that coefficient. **threat_detection reclassified N/A, with measured evidence:** across graded audit intensities the extracted score spans [0.000, 1.000] while every compiler measurement stays invariant per seed—the compiler's audit branch is unreachable-and-redundant (`_has_side_effects` returns True both through the audit branch and the final fallback, and microbench pools declare metadata `side_effects` regardless), and the executor's `_verify_security` does not read `security.verification`; microbench pools also contain no SECURITY-typed instructions. Specialization and robustness are reported N/A with probe evidence rather than fabricated coefficients.
+
+### DP Tree-Pattern Selection Benchmark
+
+Raw results: `examples/benchmarks/selector_dp_results.json` (script `selector_dp_bench.py`). **Question:** does the opt-in MATCH-TREE selector (Appendix D.1) cover random IR trees at cost at or below the default heuristic? **Instances:** 20 = sizes {20, 50, 100, 200} nodes × seeds 0–4, trees grown per-node for exact node counts (fanout $\leq$ 3, depth capped; observed depth mean 8.75, max 11), rng seed = `size × 1000 + seed` per (size, seed) with catalogue and tree drawn from independent streams of the same seed. **Catalogue per instance:** one base single-node instruction per tree op (cost U(0.5, 5.0)); 2 premium variants (1.3–2.0× base cost, carrying an `urgency` parameter that the score-first heuristic values but the cost-minimizing DP does not); 3–6 fused multi-node patterns declaring `params["spanned_child_ops"]`, priced at 0.70–0.95× the base cost of (root + spanned child ops) while covering the spanned children's whole subtrees. **Arms:** `InstructionSelector(selection_strategy="dp")` vs the default heuristic, both through the production `select_for_tree` API. Timing: 5 reps per arm, median reported. Coverage complete 20/20 (pre-bench component check recorded in provenance: the selector's target suite, 37 passed). Both arms produced complete, valid tilings (each node covered exactly once) on all 20 instances.
+
+**Overall:** DP wins 20/20 (0 ties, 0 losses); covering cost DP 85.80 ± 73.69 vs heuristic 292.08 ± 244.95 (gap 206.28 ± 203.43); ratio DP/heuristic mean 0.361, range 0.054–0.685. Selection time DP 0.241 ± 0.163 ms vs heuristic 0.265 ± 0.194 ms; time-ratio mean 0.950, range 0.801–1.086—the DP was *not* slower in this environment, recorded as found (the design allows slower). **Mechanism diagnostics:** the DP used 80 fused sites in total and selected premium variants 0 times; the heuristic used 0 fused sites and 251 premium sites.
+
+
+| Nodes | DP cost (mean ± sd) | Heuristic cost (mean ± sd) | Cost ratio mean (range) | DP wins | DP time (ms) | Heuristic time (ms) | Time ratio |
+| -- | -- | -- | -- | -- | -- | -- | -- |
+| 20 | 33.85 ± 8.49 | 61.53 ± 11.59 | 0.546 (0.484–0.592) | 5/5 | 0.066 ± 0.002 | 0.066 ± 0.004 | 1.011 |
+| 50 | 47.10 ± 31.95 | 150.82 ± 22.40 | 0.305 (0.054–0.555) | 5/5 | 0.141 ± 0.015 | 0.144 ± 0.003 | 0.981 |
+| 100 | 119.22 ± 84.05 | 289.71 ± 69.24 | 0.379 (0.204–0.685) | 5/5 | 0.272 ± 0.017 | 0.286 ± 0.001 | 0.951 |
+| 200 | 143.01 ± 83.11 | 666.24 ± 114.78 | 0.213 (0.080–0.365) | 5/5 | 0.484 ± 0.019 | 0.563 ± 0.003 | 0.859 |
+: By tree size (5 instances per row; cost ratio is DP/heuristic)
+
+
+| Size | Seed | DP cost | Heuristic cost | Ratio (DP/Heur) | Gap (Heur − DP) |
+| -- | -- | -- | -- | -- | -- |
+| 20 | 0 | 41.163 | 70.245 | 0.586 | 29.082 |
+| 20 | 1 | 28.932 | 53.585 | 0.540 | 24.653 |
+| 20 | 2 | 24.850 | 47.014 | 0.529 | 22.164 |
+| 20 | 3 | 29.795 | 61.614 | 0.484 | 31.819 |
+| 20 | 4 | 44.502 | 75.207 | 0.592 | 30.705 |
+| 50 | 0 | 8.280 | 153.381 | 0.054 | 145.101 |
+| 50 | 1 | 21.207 | 113.463 | 0.187 | 92.256 |
+| 50 | 2 | 83.754 | 150.826 | 0.555 | 67.072 |
+| 50 | 3 | 51.958 | 168.336 | 0.309 | 116.378 |
+| 50 | 4 | 70.317 | 168.089 | 0.418 | 97.772 |
+| 100 | 0 | 241.968 | 353.385 | 0.685 | 111.417 |
+| 100 | 1 | 58.532 | 226.463 | 0.258 | 167.931 |
+| 100 | 2 | 45.249 | 222.026 | 0.204 | 176.777 |
+| 100 | 3 | 169.694 | 369.600 | 0.459 | 199.906 |
+| 100 | 4 | 80.655 | 277.086 | 0.291 | 196.431 |
+| 200 | 0 | 50.272 | 631.037 | 0.080 | 580.765 |
+| 200 | 1 | 142.518 | 848.946 | 0.168 | 706.428 |
+| 200 | 2 | 241.602 | 662.779 | 0.365 | 421.177 |
+| 200 | 3 | 208.490 | 656.266 | 0.318 | 447.776 |
+| 200 | 4 | 72.176 | 532.196 | 0.136 | 460.020 |
+: Per-instance detail (covering costs in catalogue units)
+
+**Disclosure.** The invariant under test is structural—DP cost $\leq$ heuristic cost, since the DP minimizes over a covering set that includes the greedy single-node covering; the *absolute* gap depends on this synthetic catalogue's pricing model (a fused site near the root subsumes a large subtree by construction of the discount), so the gap size must not be read as a deployment speedup. No benchmark in Section 5 runs the DP arm; every published number uses the default heuristic.
+
+### EMA Hot-Path Detection Under Trace Diversity
+
+Raw results: `examples/benchmarks/hotpath_ema_results.json` (script `hotpath_ema_stress.py`). **Question:** does the opt-in EMA trigger (`detection_mode="ema"`, Appendix D.4) promote diverse trace variants the exact default misses, without false promotions on one-shot diversity? **Design:** 7 seeded stream scenarios × 5 rng seeds (1000–1004), each stream fed identically to the exact detector, the EMA detector, and a deterministic read-only oracle (a path is hot iff it has $\geq$ 2 recordings and its cumulative share exceeds θ; brute-forced over the stream). Detector configuration: hot-path threshold 100, stability bound 0.9, EMA window 10 (γ = 0.181818), share threshold 0.3, default tracked-path cap 1000 in the detection cells. Adoption is measured end-to-end through `OptimizationManager` (detection → trace re-optimization → first shortened-form service). Cap stress: a Zipf(1.1) mix (~800 recordings) interleaved with 2,200 one-off paths (~3,000 recordings, 2,210 distinct paths), caps swept 2000 → 100; cap rescue: an 80-path warmup + burst stream, caps 1000 → 10. Scale: 175,680 detector `record` calls in total (detection cells 6,800; adoption cells 880; cap cells 75,000; rescue cells 5,600), wall 0.33 s; 12 hard invariants are asserted before the results file is written, and two full reruns are byte-identical apart from timing. Block-granular trace formation (D.5) remains specified, not implemented—the adoption path measured is the shipped whole-sequence re-optimization.
+
+
+| Scenario (stream) | Exact | EMA | Oracle | EMA recall |
+| -- | -- | -- | -- | -- |
+| concentrated (512 recordings, 18 paths) | 1.0 ± 0.0 | 1.0 ± 0.0 | 1.0 ± 0.0 | 1.0 ± 0.0 |
+| diverse_rotated (120; 3 variants × 40, far below threshold 100) | 0.0 ± 0.0 | 3.0 ± 0.0 | 3.0 ± 0.0 | 1.0 ± 0.0 |
+| diverse_zipf (~160; Zipf(1.1) over 10 ranks) | 0.0 ± 0.0 | 1.8 ± 0.45 | 2.2 ± 0.45 | 0.867 ± 0.298 |
+| cyclic_shift (160; 4 shifting variants) | 0.0 ± 0.0 | 2.0 ± 0.0 | 2.0 ± 0.0 | 1.0 ± 0.0 |
+| bursty (88; 80-call burst below threshold) | 0.0 ± 0.0 | 1.0 ± 0.0 | 1.0 ± 0.0 | 1.0 ± 0.0 |
+| warmup_heavy_burst (160; 80 one-shot warmups, default cap) | 0.0 ± 0.0 | 0.0 ± 0.0 | 1.0 ± 0.0 | 0.0 ± 0.0 |
+| pure_diversity (160 one-off trajectories) | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | — |
+: Scenario results (promoted-path counts, mean ± sd over 5 seeds; recall is vs the oracle; false promotions 0.0 ± 0.0 for both detectors in every scenario)
+
+**Adoption latency.** On the concentrated stream the EMA detector promotes at recording 2.0 (mean over 5 seeds) where the exact detector first promotes at recording 107.0; on the bursty stream the EMA detects the burst at recording 13.0 and adopts immediately—12.0 full-form executions before adoption, the served trace shrinking 4 → 1—in 5/5 seeds, while the exact detector stays cold in 0/5. **Warmup disclosure (a measured implementation property, reported as found):** the EMA detector decays each path's counter only on that path's own recordings and normalizes by the sum over LRU-tracked paths, so 80 one-shot warmup paths pin the share denominator at 85.5 and the later burst stays below threshold under caps $\geq$ 15 (detected 0/5 at caps 1000/100/50/20/15, denominators 85.5/85.5/54.5/24.5/19.5); tightening the cap evicts stale paths, shrinks the denominator, and restores detection—cap 12: 5/5 detected at recording 90.0 (denominator 16.5, 69 evictions); cap 10: 5/5 at 87.0 (denominator 14.5, 71 evictions). The exact detector promotes nothing in the rescue stream (0.0 in all cells).
+
+
+| Cap | Evictions | Exact ever-hot → lost | EMA ever-hot → lost |
+| -- | -- | -- | -- |
+| 2000 | 210 | 2.0 → 0.0 | 0.6 → 0.0 |
+| 1000 | 1210 | 2.0 → 2.0 | 0.6 → 0.6 |
+| 500 | 1710 | 2.0 → 2.0 | 0.6 → 0.6 |
+| 200 | 2010 | 2.0 → 2.0 | 0.6 → 0.6 |
+| 100 | 2110 | 2.0 → 2.0 | 0.6 → 0.6 |
+: Tracked-path cap sweep (2,210 distinct paths recorded; evictions and hot-path losses, mean over 5 seeds; all five per-path mappings respect the cap in 5/5 seeds at every cap)
+
+The cap is a real bound with a real cost: hot paths themselves are evictable, and at cap $\leq$ 1000 both detectors lose every path they had promoted (the exact detector's 2.0 promoted hot paths, the EMA's 0.6). Eviction is LRU (least-recently-*recorded*), and an evicted path re-accumulates from zero if it recurs.
+
+### Strict-Security Posture Matrix
+
+Raw results: `examples/benchmarks/security_posture_results.json` (script `security_posture_matrix.py`). **Question:** what does the opt-in strict (fail-closed) flag of `SecurityMonitor`/`AgentCoordinator` change relative to the fail-open default? **Design:** 5 scenario rows (4 main—unregistered resource, unknown data sensitivity, incomplete resource-access policy, normal task—plus 1 supplementary: a type-malformed `allowed_resources` registry), 18 sub-variants in total; 5 seeds (11–15) × 40 tasks per scenario = 1,000 task dicts; every task dict is evaluated in *both* modes (paired 2×2 contingency, fresh `SecurityMonitor` and fresh `AgentCoordinator` per task × mode): 2,000 monitor evaluations and 2,000 end-to-end coordinator runs. Mode flags: `strict=False` (fail-open default) vs `strict=True` (`security_strict` on the coordinator). Every task holds the non-varied security dimensions at known-good values, so exactly one dimension varies per scenario row; the decision function is deterministic, and per-seed allow-rate stdev is 0.0 (seeds vary the task surface—names, request shapes, variant mix—not the verdict). The study is qualitative-and-counting only: no latency, throughput, or memory quantity is measured or claimed, by construction.
+
+
+| Scenario | Mode | Allowed / denied | Deny rate | Reason class |
+| -- | -- | -- | -- | -- |
+| unregistered_resource | fail-open | 0 / 200 | 1.000 | generic_invalid_resource_access |
+| unregistered_resource | fail-closed | 0 / 200 | 1.000 | unregistered_resources_strict |
+| unknown_sensitivity | fail-open | 200 / 0 | 0.000 | (permitted) |
+| unknown_sensitivity | fail-closed | 0 / 200 | 1.000 | unknown_sensitivity_strict |
+| incomplete_policy | fail-open | 200 / 0 | 0.000 | (permitted) |
+| incomplete_policy | fail-closed | 0 / 200 | 1.000 | incomplete_policy_strict |
+| normal_task | fail-open | 200 / 0 | 0.000 | (permitted) |
+| normal_task | fail-closed | 200 / 0 | 0.000 | (permitted) |
+| malformed_registry_supplementary | fail-open | 0 / 200 | 1.000 | generic_invalid_resource_access |
+| malformed_registry_supplementary | fail-closed | 0 / 200 | 1.000 | incomplete_policy_strict |
+: Posture matrix (200 tasks per row; reason class is the recorded `violation_history` category)
+
+**Mode divergence** (per-task paired 2×2): unknown_sensitivity and incomplete_policy each produce 200 task pairs that fail-open permits and fail-closed denies—400 of 1,000 paired tasks in total, the actual fail-open holes; unregistered_resource and the malformed-registry row are denied in both modes (200/200 each), but only fail-closed gives a distinguishable reason class; normal tasks are permitted in both modes (200/200, zero false denials on the well-specified population). **Auditability:** all 800 strict-mode denials in the non-normal scenarios are recorded in `violation_history` with a "(strict mode)" marker (rate 1.000); denials are recorded in *both* modes—what fail-closed adds is the distinguishing reason classes and the marker, not recording itself. **Propagation:** the `AgentCoordinator` gate agrees with the monitor verdict on all 2,000 paired runs (execute-rate equals allow-rate per scenario × mode in all 10 cells). **Not covered:** the always-on authentication/authorization checks are held fixed (all tasks carry tokens; not a matrix axis); `required_level` is LOW everywhere except two normal-task variants (MEDIUM/HIGH), so the sensitivity-vs-requirement mismatch path is exercised only by the shipped unit suite, not scaled here; the supplementary malformed-registry row is grouped by the strict mode under "incomplete policy", while its fail-open outcome is a generic deny (a string registry degenerates to a character set)—unlike the canonical missing-registry hole, which fail-open permits.
+
+### Cache-Key Namespacing Under Semantic Drift
+
+Raw results: `examples/benchmarks/cache_namespace_results.json` (script `cache_namespace_experiment.py`). **Question:** under a deployment-side change of semantic configuration (the Section 5.2 cache-key contract's template version / decoding axes), do strictly namespaced keys invalidate while legacy params-only keys keep serving stale entries? **Design:** 3 drift axes—`template_version` v1 → v2, `decoding` temperature 0.0 → 0.7 (both semantic), and a benign control (decoding-dict key insertion order only)—× 2 arms (`strict_namespaced`: one shared `CacheKeyNamespace` object per cohort, mutated in place at the drift event, exactly a deployment's bookkeeping; `regular_legacy`: the historical params-only keys)—× 5 seeds (1000–1004) × 100 real `CompositeInstruction` items per cohort = 30 cohorts, 3,000 instruction instances, 13,000 cache lookups (cold, warm, two post-drift, plus a rollback lookup for strict cohorts on the semantic axes), all through the production `Instruction._get_cache_key`/`build_cache_key`/`InstructionCache` paths; cache `max_size` 1000, `ttl` 3600. **Measurement protocol:** a lookup is a miss iff the wrapped leaf body actually re-executed; a served result is stale iff its embedded semantic-config snapshot differs canonically from the deployment's current config—no clock arithmetic, no inferred staleness.
+
+
+| Arm | Axis | Post-drift hit rate | Invalidation rate | Stale-serve rate | Fresh-serve rate |
+| -- | -- | -- | -- | -- | -- |
+| strict namespaced | template_version v1 → v2 | 0.0000 | 1.0000 | 0.0000 | 1.0000 |
+| strict namespaced | decoding 0.0 → 0.7 | 0.0000 | 1.0000 | 0.0000 | 1.0000 |
+| strict namespaced | benign key reorder (control) | 1.0000 | 0.0000 | — | — |
+| regular legacy | template_version v1 → v2 | 1.0000 | 0.0000 | 1.0000 | 0.0000 |
+| regular legacy | decoding 0.0 → 0.7 | 1.0000 | 0.0000 | 1.0000 | 0.0000 |
+: Arm × axis results (mean ± sd over 5 seeds; every cell's stdev is 0.0000)
+
+The benign-reorder control also reports a key-change rate of 0.0000 (the normalized decoding hash folds dictionary order away, so reordering neither invalidates nor even re-keys). **Rollback (strict arm):** switching back to the original configuration hits the resident original entries in 100% of lookups on both semantic axes (original-serve rate 1.0000)—namespacing is *isolation, not eviction*: entries from different semantic configurations coexist, and drift is reversible. The legacy arm's post-drift hits are the expected legacy behavior being quantified, not a bug in that arm: every post-drift hit serves an entry produced under the pre-drift configuration. **Not covered:** `model_alias` drift (the third namespace component); shared-store cross-instruction key collisions (covered by the unit suite `tests/core/isa/test_cache_namespacing.py`); TTL/LRU dynamics (the configuration far exceeds the two keys each per-item cache ever holds—drift dynamics are the subject here). Provenance records module digests for `instruction_cache.py` (99718b9af540bba1ab5df8118c5288271545cdde163dd58cfc13c3da8f8114a3) and `instruction.py` (b3657344469bb89937512d3f0bdd37c7d9e00bc5331d2cd8bc79d56ae09f12a5).
+
+### Parameterized Replay on Unseen Values
+
+Raw results: `examples/benchmarks/replay_generalization_results.json` (script `replay_generalization_bench.py`). **Question:** does a learned composite instruction, mined from traces that recorded only a small grid of parameter values, replay exactly like re-running its recorded constituent sequence for parameter values never observed during mining? **Streams:** 3 deterministic multi-operator compositions, rotated by seed (`composition_for_seed(seed) = ('filter3', 'scale4', 'chain5')[seed % 3]`): `filter3` (parameters seed, cutoff; mining grid seed {1, 2, 3} × cutoff {10, 20}), `scale4` (+ factor {2, 3}), and `chain5` (+ shift {1, 2}; 5 steps, 4 external parameters). **Unseen draws:** per experiment seed, 210 unseen parameter combinations (minimum required 200) from ranges disjoint per coordinate from the recorded grid—seed 100–499, factor 4–13, shift 3–15, cutoff 21–98—with four guards enforced per case: per-coordinate disjointness, tuple uniqueness, never a recorded tuple, and the per-seed minimum; the draw rng is `random.Random('e7-replay-generalization-seed{seed}')` with recorded draw order. **Conventions:** each case executes the learned instruction under a rotating calling convention—`wrapped` (`{'ctx': {...}}`, the `run_stream` convention the mining traces were recorded under), `flat` (the bare parameter dict), and `sibling` (`{'ctx': {}, <params>}`, the schema-parameter binding path added by the replay-parameterization work). **Oracle:** per case, the recorded constituent sequence is re-run from scratch via `record_trace` with the unseen values as the initial shared context and the step outputs merged; the replay result must equal that merged dict exactly (no tolerance).
+
+**Result:** 1,050 of 1,050 unseen cases match the oracle exactly (100.0%; 0 mismatches, 0 error cases); per-seed agreement 1.0000 ± 0.0000; per convention 350/350 for each of wrapped, flat, and sibling; per composition filter3 420/420 (seeds 0, 3), scale4 420/420 (seeds 1, 4), chain5 210/210 (seed 2); 179 empty-result edge cases (`kept == []`) all agree. Two independent full runs are byte-identical apart from the timestamp, git revision, and command line.
+
+
+| Seed | Composition | Cases | Match | Empty-kept cases | Conventions (w/f/s, all matching) |
+| -- | -- | -- | -- | -- | -- |
+| 0 | filter3 | 210 | 210 | 36 | 70 / 70 / 70 |
+| 1 | scale4 | 210 | 210 | 31 | 70 / 70 / 70 |
+| 2 | chain5 | 210 | 210 | 38 | 70 / 70 / 70 |
+| 3 | filter3 | 210 | 210 | 41 | 70 / 70 / 70 |
+| 4 | scale4 | 210 | 210 | 33 | 70 / 70 / 70 |
+: Per-seed detail
+
+**Not covered:** dialogue-mined templates with an attached `executor` (the replay arm's sibling feature)—no recorded composite body exists to re-run, so there is nothing to compare; constructor-bound parameters (values baked into instruction state at construction time cannot be rebound—replay re-runs the recorded operator *instances*, so only context-carried values can vary; the streams here read every parameter from the shared context, which is the dataflow contract that makes parameterization possible at all); real-workload and LLM streams (the measured streams are deterministic synthetic arithmetic, and the claim measured is exact per-case equality under that contract, nothing broader).
+
+### Chain-Enriched Optimization Workloads
+
+Raw results: `examples/benchmarks/fusion_chain_results.json` (script `fusion_chain_bench.py`). **Purpose:** the Section 5.3 random-slot pools understate structure-sensitive passes; do chain-enriched workloads—shaped like the fusion/DCE/parallelism assumptions—amplify the BASIC → ADVANCED gain? **Generator:** segment families mixed at fusion_chain 0.35 / parallel_batch 0.30 / dataflow_chain 0.15 / dead_chain 0.08 / effectful_anchor 0.12, with per-family run-length ranges (fusion chains 4–12, parallel batches 4–10, dataflow chains 3–8, dead chains 2–6, effectful anchors 1), declared costs U(0.5, 2.0), declared memory sizes {64, 128} and dataflow buffers {256–2048}; the terminal sink consumes only leaf outputs. **Compiler:** the real `InstructionCompiler.compile` (IR captured around the call, no output patching); levels NONE/BASIC/ADVANCED/AGGRESSIVE (BASIC = DCE + fusion; ADVANCED adds parallel grouping and the resource plan; AGGRESSIVE adds the memory-optimization pass). **Design:** 4 levels × 5 seeds (0–4) × lengths {50, 200, 1000} × 2 arms = 120/120 cells complete; the control arm reuses the Section 5.3 generator `synthetic_formal_sequence` at the same seeds (`p_dead` 0.25, `p_pure` 0.55)—it reproduces the published Section 5.3 numbers at length 1000 (BASIC dispatch 646.0, ADVANCED 344.6, BASIC reduction 0.354), proving the gauge has not drifted.
+
+
+| Length | Level | Effective count | Reduction | Dispatch units | Declared-cost makespan | Parallel width |
+| - | ---- | -- | -- | -- | -- | - |
+| 50 | NONE | 50.0 ± 0.0 | 0.000 | 50.0 ± 0.0 | 61.6 ± 1.1 | 0.0 |
+| 50 | BASIC | 36.8 ± 7.3 | 0.264 ± 0.147 | 36.8 ± 7.3 | 59.8 ± 3.5 | 0.0 |
+| 50 | ADVANCED | 36.8 ± 7.3 | 0.264 ± 0.147 | 5.6 ± 4.3 | 10.1 ± 7.0 | 28.2 |
+| 50 | AGGRESSIVE | 36.8 ± 7.3 | 0.264 ± 0.147 | 5.6 ± 4.3 | 10.1 ± 7.0 | 28.2 |
+| 200 | NONE | 200.0 ± 0.0 | 0.000 | 200.0 ± 0.0 | 247.9 ± 5.5 | 0.0 |
+| 200 | BASIC | 137.6 ± 8.5 | 0.312 ± 0.042 | 137.6 ± 8.5 | 230.7 ± 6.2 | 0.0 |
+| 200 | ADVANCED | 137.6 ± 8.5 | 0.312 ± 0.042 | 25.0 ± 8.5 | 43.6 ± 13.3 | 44.8 |
+| 200 | AGGRESSIVE | 137.6 ± 8.5 | 0.312 ± 0.042 | 25.0 ± 8.5 | 43.6 ± 13.3 | 44.8 |
+| 1000 | NONE | 1000.0 ± 0.0 | 0.000 | 1000.0 ± 0.0 | 1238.3 ± 12.2 | 0.0 |
+| 1000 | BASIC | 705.0 ± 13.5 | 0.295 ± 0.014 | 705.0 ± 13.5 | 1172.7 ± 17.9 | 0.0 |
+| 1000 | ADVANCED | 705.0 ± 13.5 | 0.295 ± 0.014 | 147.0 ± 29.2 | 242.5 ± 42.2 | 69.0 |
+| 1000 | AGGRESSIVE | 705.0 ± 13.5 | 0.295 ± 0.014 | 147.0 ± 29.2 | 242.5 ± 42.2 | 69.0 |
+: Chain-enriched ladder (mean ± sd over 5 seeds)
+
+
+| Length | Level | Effective count | Reduction | Dispatch units | Declared-cost makespan | Parallel width |
+| - | ---- | -- | -- | -- | -- | - |
+| 50 | NONE | 50.0 ± 0.0 | 0.000 | 50.0 ± 0.0 | 50.0 ± 0.0 | 0.0 |
+| 50 | BASIC | 33.6 ± 2.1 | 0.328 ± 0.041 | 33.6 ± 2.1 | 33.6 ± 2.1 | 0.0 |
+| 50 | ADVANCED | 33.6 ± 2.1 | 0.328 ± 0.041 | 19.0 ± 4.1 | 19.0 ± 4.1 | 7.0 |
+| 50 | AGGRESSIVE | 33.6 ± 2.1 | 0.328 ± 0.041 | 19.0 ± 4.1 | 19.0 ± 4.1 | 7.0 |
+| 200 | NONE | 200.0 ± 0.0 | 0.000 | 200.0 ± 0.0 | 200.0 ± 0.0 | 0.0 |
+| 200 | BASIC | 131.6 ± 3.6 | 0.342 ± 0.018 | 131.6 ± 3.6 | 131.6 ± 3.6 | 0.0 |
+| 200 | ADVANCED | 131.6 ± 3.6 | 0.342 ± 0.018 | 74.0 ± 6.3 | 74.0 ± 6.3 | 9.8 |
+| 200 | AGGRESSIVE | 131.6 ± 3.6 | 0.342 ± 0.018 | 74.0 ± 6.3 | 74.0 ± 6.3 | 9.8 |
+| 1000 | NONE | 1000.0 ± 0.0 | 0.000 | 1000.0 ± 0.0 | 1000.0 ± 0.0 | 0.0 |
+| 1000 | BASIC | 646.0 ± 16.4 | 0.354 ± 0.016 | 646.0 ± 16.4 | 646.0 ± 16.4 | 0.0 |
+| 1000 | ADVANCED | 646.0 ± 16.4 | 0.354 ± 0.016 | 344.6 ± 31.6 | 344.6 ± 31.6 | 14.4 |
+| 1000 | AGGRESSIVE | 646.0 ± 16.4 | 0.354 ± 0.016 | 344.6 ± 31.6 | 344.6 ± 31.6 | 14.4 |
+: Random-slots control ladder (same seeds; the published Section 5.3 configuration)
+
+**Findings.** Chain enrichment amplifies the BASIC → ADVANCED dispatch reduction to −558.0 units (705.0 → 147.0, −79.1%) and the declared-cost makespan to −930.1 (1172.7 → 242.5, −79.3%) at length 1000, against −301.4 (646.0 → 344.6, −46.7%) on the random-slots control; the ADVANCED/BASIC dispatch ratio is 0.209 (chain) vs 0.533 (control), and peak parallel width 69.0 vs 14.4. The BASIC-level reduction is *lower* on chain-enriched pools (0.295 ± 0.014 vs 0.354 ± 0.016 control)—enrichment trades single-level shrink for structure the parallel pass can exploit. **AGGRESSIVE is structurally identical to ADVANCED** on all seven structural metrics, per seed, at every length and on both arms (deltas exactly 0.0); its only differentiation is the advisory memory plan, which is itself workload-dependent: buffer-reuse potential 107.8 ± 22.2 sites on chain-enriched length-1000 pools (11.7% of the 922.0 distinct tracked outputs; peak live outputs 814.2) vs 0.0 ± 0.0 on the random-slots control (549.4 tracked outputs, no reuse sites)—the highest optimization level's extra content exists only when chains supply the structure. **Limitations (as recorded in the results file):** the memory-optimization pass only annotates IR metadata—no executor consumes the plan, so memory figures are plan-derived analyses, not measured runtime savings; `declared_cost_makespan` is a metadata cost model (a parallel block contributes the max member cost), not wall-clock time; `peak_live_outputs` uses a conservative tie-break (production counted before release at equal positions).
+
+### Priced-Comparison Token-Mix Sweep
+
+Raw results: `examples/benchmarks/promptcache_sweep_results.json` (script `promptcache_sweep.py`). **Purpose:** Appendix G's two caching strategies ranked differently on the real-gateway run (result cache $\gg$ prompt cache) and the mock paper-scale run (result cache still ahead, margin smaller); this sweep makes the token mix—an output of workload and harness ceilings—the explicit axis. **Design:** the Appendix G overlay ($3/M input, $15/M output, 0.1× cache-read rate, same two simplifications, both favoring the provider baseline) applied to 13 mix points—the measured mock mix plus *modeled* constant completion lengths L ∈ {4, 8, 16, 24, 32, 48, 64, 128, 256, 384, 512, 1024} tokens/call (the observed reply-binds-at-max_tokens behavior of the Section 5.7.1 alias; L64 and L512 correspond to the max_tokens ceilings of the Section 5.7 cache run and the Section 5.7.1 harness)—× 3 Zipf skews {0.5, 1.0, 1.5} × 5 seeds (1000–1004) × 200 draws = 195 cells (39,000 draws) over the 40-task population, on the Section 5.7.1 workload shape (seven-step triage stream, one cacheable LLM-type step). All pricing and workload primitives are imported from `paper_real_llm_compiler_test.py`, not copied; the seed-1000 mock cells reproduce the published mock paper-scale artifact in all three pricing modes (anchor check `all_match = true`). All figures are MODELED-on-measured, mock-only.
+
+**Ordering invariance:** `agentisa_cache ≤ provider_prompt_cache ≤ no_opt` in 195/195 cells, flipped 0 cells; the minimum per-cell gap is $0.016562 (MODELED). The Section 5.7.1 statement that the *ranking* depends on the token mix is therefore about the margin, and the margin is what the mix moves: the provider cache's effectiveness (its saving as a fraction of the result cache's saving) falls by a factor of 16.4 / 16.7 / 17.0 across skews from the input-dominated anchor to the completion-dominated one, crossing 0.5 near output-cost parity and collapsing below a 5% absolute saving well before the harness ceiling.
+
+**Crossover points** (linear interpolation on the 5-seed mean curves): effectiveness crosses 0.5 at 23.3 / 22.9 / 22.5 completion tokens per call at s = 0.5 / 1.0 / 1.5 (output-cost share $\approx$ 44.4% / 44.4% / 44.3%); the provider prompt-cache saving falls below 5% beyond 392.3 / 397.7 / 416.7 completion tokens per call.
+
+
+| Mix point | s = 0.5: result / prompt saving % | ratio | share | s = 1.0: result / prompt saving % | ratio | share | s = 1.5: result / prompt saving % | ratio | share |
+| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
+| L4 | 80.39 / 63.58 | 0.791 | 0.121 | 82.45 / 65.05 | 0.789 | 0.123 | 87.14 / 68.56 | 0.787 | 0.125 |
+| L8 | 80.40 / 56.70 | 0.705 | 0.216 | 82.47 / 57.93 | 0.702 | 0.219 | 87.19 / 60.94 | 0.699 | 0.222 |
+| L16 | 80.40 / 46.62 | 0.580 | 0.356 | 82.51 / 47.52 | 0.576 | 0.359 | 87.26 / 49.85 | 0.571 | 0.364 |
+| L24 | 80.40 / 39.58 | 0.492 | 0.453 | 82.54 / 40.29 | 0.488 | 0.457 | 87.31 / 42.18 | 0.483 | 0.462 |
+| L32 | 80.40 / 34.39 | 0.428 | 0.525 | 82.56 / 34.96 | 0.424 | 0.529 | 87.35 / 36.56 | 0.419 | 0.534 |
+| mock (measured) | 80.42 / 29.06 | 0.361 | 0.598 | 82.32 / 29.95 | 0.364 | 0.596 | 86.83 / 31.94 | 0.368 | 0.593 |
+| L48 | 80.40 / 27.24 | 0.339 | 0.624 | 82.59 / 27.65 | 0.335 | 0.627 | 87.41 / 28.86 | 0.330 | 0.632 |
+| L64 | 80.40 / 22.55 | 0.281 | 0.688 | 82.61 / 22.87 | 0.277 | 0.692 | 87.44 / 23.84 | 0.273 | 0.696 |
+| L128 | 80.40 / 13.36 | 0.166 | 0.815 | 82.65 / 13.52 | 0.164 | 0.818 | 87.51 / 14.06 | 0.161 | 0.821 |
+| L256 | 80.40 / 7.36 | 0.092 | 0.898 | 82.67 / 7.44 | 0.090 | 0.900 | 87.55 / 7.72 | 0.088 | 0.902 |
+| L384 | 80.40 / 5.08 | 0.063 | 0.930 | 82.68 / 5.13 | 0.062 | 0.931 | 87.56 / 5.32 | 0.061 | 0.932 |
+| L512 | 80.40 / 3.88 | 0.048 | 0.946 | 82.68 / 3.92 | 0.047 | 0.947 | 87.57 / 4.06 | 0.046 | 0.948 |
+| L1024 | 80.40 / 1.99 | 0.025 | 0.973 | 82.69 / 2.01 | 0.024 | 0.973 | 87.59 / 2.08 | 0.024 | 0.973 |
+: Per-skew curves (5-seed means; "ratio" is provider-cache effectiveness, its saving ÷ the result cache's saving; "share" is the output-cost share of the no-optimization bill)
+
+The result-cache saving is nearly mix-invariant (within-skew range across the whole 13-point axis: 80.39–80.42 at s = 0.5, 82.32–82.69 at s = 1.0, 86.83–87.59 at s = 1.5) and rises with skew, since it is determined by repeated structure; the provider prompt-cache saving is strongly mix-dependent (63.58% → 1.99% at s = 0.5). **Mix-coordinate alignment with the published real run:** the sweep's L512 point sits at output/input token ratio 3.53–3.66 and output-cost share 94.6–94.8%, against the published real-gateway run's 2.84 and 93.4% (quoted from its artifact, not recomputed: result cache cuts modeled cost 55.96%, provider prompt cache 3.28%, 180.36 prompt tokens and 512 completion tokens per call)—the modeled completion-dominated point is a reasonable analog of the real mix. **Limitations (as recorded in the results file):** mock only, no live gateway tokens in this sweep; the L* completion lengths are modeled constants, not generated text; a single workload shape; the overlay's two simplifications stand (no 1.25× cache-write premium, no 1024-token minimum prefix—both favor the provider baseline); GPTCache and approximate caching remain out of scope, with no head-to-head claimed.
+
+## I.3 Real-Gateway Re-Runs: Quality Harness and Multi-Seed Cache Protocol
+
+Two follow-ups to the Section 5.7/5.7.1 real-gateway experiments, run on the same gateway and model alias (a local alias for a hosted GLM reasoning model) at the scales a per-call quota and a session budget allow. Both results files were recomputed from raw records by `examples/benchmarks/e10_gateway_postprocess.py` with a cross-check against the harness's own summary (both `passed`); raw per-call replies, stop reasons, token usage, and latencies are retained in the committed JSONs.
+
+### Classification-Quality Re-Run at a Raised Token Ceiling
+
+Raw results: `examples/benchmarks/gateway_quality_results.json` (harness `examples/paper_real_llm_quality_check.py`, the Section 5.7.1 quality harness; raw run and probe files committed alongside).
+
+**Protocol.** The Section 5.7.1 reference run bound 7 of 22 classification replies at the 1,500-token ceiling (empty text, the entire budget spent on reasoning), so its agreement numbers were fallback-dominated on those batches. This re-run raises the ceiling under an explicit probe-then-scale rule rather than guesswork: first one probe classification call at `max_tokens` = 4096 (15.25 s, `end_turn`, 719 completion tokens, 8/8 claims parsed—so the alias *can* finish a batch given budget); then worst-case planning from the minimum completion throughput observed in the 1,500-token run (37.6 tokens/s): a full-ceiling reply costs `max_tokens / throughput`, so 3072 tokens (2.05× the 1500 default) plan to 81.6 s—just under the harness's hard-coded 90 s httpx timeout, above which a full-ceiling reply would trip the 3-strike run abort on exactly the batches that bind (the ceiling could not be raised further for this reason); at 81.6 s worst-case, the 40-minute session budget affords 29 calls, so the `tiny` preset (22 distinct batches, worst case 29.9 min) was chosen over `paper` (36 batches, 49.0 min worst case). Run configuration: tiny preset—50 draws over the 40-task population, Zipf 1.0, batch size 8, seed base 1000 (the same seeded draw sequence and batch set as the Section 5.7.1 reference run, enabling a paired comparison), one live call per distinct signature batch, temperature 0. Totals: 1 preflight + 22 live calls = 23 round trips, zero timeouts, zero crashes.
+
+
+| Quantity | Reference run (max_tokens 1500) | Re-run (max_tokens 3072) |
+| -- | -- | -- |
+| Distinct batches / live calls | 22 / 22 | 22 / 22 |
+| Signatures | 176 | 176 |
+| Parsed claims (parse rate) | 120 (68.2%) | 144 (81.8%) |
+| Fallback-filled classifications | 56 | 32 |
+| Replies bound at ceiling | 7 / 22 | 4 / 22 |
+| Model claims vs gold | 50.0% (120 claims) | 51.4% (144 claims) |
+| Final classification vs gold | 43.2% | 45.5% |
+| Rule-fallback baseline vs gold | 32.4% | 32.4% |
+| Final classification vs rule-fallback | 48.9% | 38.6% |
+| Per-call latency (min / median / mean / max) | — | 11.1 s / 29.3 s / 36.0 s / 81.9 s |
+: Recomputed summary, with the 1,500-token reference run for paired contrast
+
+
+| Gold class | Signatures | Reference run matches | Re-run matches |
+| -- | -- | -- | -- |
+| critical | 40 | 17 (42.5%) | 19 (47.5%) |
+| high | 40 | 12 (30.0%) | 12 (30.0%) |
+| medium | 51 | 19 (37.3%) | 23 (45.1%) |
+| low | 45 | 28 (62.2%) | 26 (57.8%) |
+: Per-gold-class agreement (planted rubric classes; 176 synthetic signatures)
+
+**Paired truncation outcome:** of the 7 batches that bound at 1500, 4 now complete (including the highest-rank one) and 3 still bind at 3072 (empty text, the entire budget spent on reasoning); 1 batch that completed at 1500 bound at 3072 in this re-run (rank 11)—the reasoning alias is not bit-reproducible across runs even at temperature 0. **Verdict, reported as the harness issued it:** `all_pass` = False, solely because the `replies_not_bound_at_ceiling` gate fails on 4/22; every measurability precondition holds (one call per distinct batch, raw replies and gold labels recorded for every call, planted classes covered per batch, claims parsed). The harness gates no accuracy threshold—agreement rates are reported measurements. **What this does and does not show:** with the ceiling raised, the model's final classifications agree with the planted gold rubric at 45.5% vs the fallback rule's 32.4%—measurably above the rule, previously unknown from the truncated run—but 4 batches still cannot finish within 3072 tokens, so the model-quality statement carries a disclosed truncation residual rather than a clean all-clear. Gold labels are a planted keyword rubric on synthetic signatures (recorded verbatim in provenance), not human annotation of real logs; agreement-vs-gold is a rubric-following diagnostic, not a deployment-quality claim. Single gateway, single alias, single seed, sequential, no streaming: multi-model, multi-seed, and real-deployment behavior remain untested.
+
+### Multi-Seed Real-Gateway Cache Run at Reduced Scale
+
+Raw results in `examples/benchmarks/gateway_multiseed_results.json`:
+
+- Bench: `examples/benchmarks/isa_real_llm_bench.py`—the Section 5.7 cache experiment's bench, run unmodified via CLI
+- Raw per-Zipf chunk files: committed alongside the results JSON
+
+**Protocol.** The Section 5.7 published run is 200 tasks × 1 seed × 3 Zipf levels; this re-run adds a second real seed at the reduced scale the session budget and gateway quota sanction: `--tasks 100 --seeds 2 --zipf 0.5 1.0 1.5 --max-tokens 64` (mirroring the Section 5.7 protocol's ceiling), seeds {0, 1} with `rng = random.Random(1000 + seed)`, tokens from the gateway's usage field and latency from the wall clock—no simulated values. **Quota episode, recorded as it happened:** the first single-invocation attempt crashed after roughly 125 successful calls with a gateway 429 `AccountQuotaExceeded` (a 5-hour usage quota, reset at 21:19:19 +0800); the bench does not retry 429s and writes no output file on crash. One 16-token probe call and five bench-shaped 64-token calls all returned 200 about ten minutes later, so the re-run was chunked per Zipf level with an outer 90 s × 3 retry wrapper instead of waiting for the reset; all 3 chunks passed on the first try with no recurrence. Totals: 1,103 gateway calls; chunked wall time 3,243.8 s (excluding the crashed attempt and inter-chunk gaps).
+
+
+| Zipf s | Calls (baseline → cached) | Hit rate | Expected hit rate | Wall saved (mean) | p50 cached latency |
+| -- | -- | -- | -- | -- | -- |
+| 0.5 | 100 → 96.5 ± 3.5 | 3.5% ± 3.5% | 3.5% ± 3.5% | 12,655.9 ms | 2,903.45 ms |
+| 1.0 | 100 → 84.5 ± 0.7 | 15.5% ± 0.7% | 15.5% ± 0.7% | 56,495.7 ms | 2,675.25 ms |
+| 1.5 | 100 → 70.5 ± 3.5 | 29.5% ± 3.5% | 29.5% ± 3.5% | 89,201.8 ms | 2,477.3 ms |
+: Per-Zipf aggregates (2 seeds; expected hit rate is the analytic no-backend reference for the same seeded draw)
+
+
+| Zipf s | Seed | Calls (base → cached) | Hit rate = expected | Tokens saved | Wall saved (ms) |
+| -- | -- | -- | -- | -- | -- |
+| 0.5 | 0 | 100 → 99 | 1.00% = 1.00% | 85 | 12,456.2 |
+| 0.5 | 1 | 100 → 94 | 6.00% = 6.00% | 510 | 12,855.6 |
+| 1.0 | 0 | 100 → 85 | 15.00% = 15.00% | 1,275 | 38,894.5 |
+| 1.0 | 1 | 100 → 84 | 16.00% = 16.00% | 1,360 | 74,096.9 |
+| 1.5 | 0 | 100 → 68 | 32.00% = 32.00% | 2,720 | 90,372.1 |
+| 1.5 | 1 | 100 → 73 | 27.00% = 27.00% | 2,295 | 88,031.5 |
+: Raw per-(Zipf, seed) counts (all six cells; hit rate equals the expected reference exactly in every cell)
+
+**What this shows:** the cache protocol's correctness property—measured hit rate equal to the analytic expected hit rate of the seeded draw—holds exactly on the real gateway in all 6 of 6 (Zipf, seed) cells, and call reduction matches hit rate at every skew (3.5% / 15.5% / 29.5%); per-call latency p50 falls mildly with skew (2,903 / 2,675 / 2,477 ms) as fewer uncached calls dominate. **What it does not show, stated plainly:** the reduced scale is *not* 1:1 comparable to the published 200-task run—100-task workloads contain fewer repeated (instruction, params) pairs, so the hit rates (3.5% / 15.5% / 29.5%) sit below the frozen paper values (8.5% / 26.0% / 45.5% at 200 tasks × 1 seed); the side-by-side is context, not a contradiction. Two seeds give a real but small stdev; the synthetic suite's 5-seed protocol would have cost about 2,760 gateway calls (the 1,103 recorded calls over six (Zipf, seed) cells extrapolated to the protocol's fifteen; each round trip ~2 s) and was not affordable in-session. Coverage: complete at reduced scale—single gateway, single model alias, 3 Zipf buckets × 2 seeds × 100 tasks, `max_tokens` 64.
 
 

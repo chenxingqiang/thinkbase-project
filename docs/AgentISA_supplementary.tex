@@ -124,9 +124,14 @@ This document is the supplementary material for \emph{AgentISA: Formal
 Instruction Set Design for LLM Agents}. It contains the appendices
 referenced by the main paper: Appendix A (the Turing-completeness
 construction for Theorem 3.1), Appendix B (the type-safety proof for
-Theorem 3.2), and Appendix C (the semantic-preservation lemmas and
-proofs of Theorems 3.4--3.6, with the scope remarks of C.7). Section and
-theorem numbers follow the main paper.
+Theorem 3.2), Appendix C (the semantic-preservation lemmas and proofs of
+Theorems 3.4--3.6, with the scope remarks of C.7), Appendix D (component
+listings), Appendix E (formal sketches for future directions), Appendix
+F (artifact-regeneration commands), Appendix G (the priced-comparison
+protocol), Appendix H (the four-task characterization in full detail),
+and Appendix I (the extension-experiment protocols and detailed tables
+behind Sections 5.10--5.11). Section and theorem numbers follow the main
+paper.
 \end{abstract}
 
 \appendix
@@ -799,13 +804,15 @@ than through the symbolic-execution checker), and the symbolic-execution
 equivalence checker itself is a specification (Section 4.3.1). Where an
 obligation is discharged only on bounded state spaces (Section 3.3.3),
 the guarantee is correspondingly bounded: rewrites verified on the
-explored subset are sound there. No such rewrite is registered today;
-when one is, its application must be restricted to the explored subset
-(that restriction is a dormant obligation of the future rule set, not
-shipped behavior). What the shipped implementation does provide is
-empirical semantics-preservation at task level: the system-level
-demonstration of Section 5.8 re-executes an optimized stream and checks
-byte-identical output.
+explored subset are sound there. No such rewrite is registered in the
+default configuration; when one is---through the approval-gated
+promotion path of the main paper's Section 3.3.1, or future rule
+authoring---its application must be restricted to the explored subset
+(that restriction remains a dormant obligation, not enforced by the
+shipped gate). What the shipped implementation does provide is empirical
+semantics-preservation at task level: the system-level demonstration of
+Section 5.8 re-executes an optimized stream and checks byte-identical
+output.
 
 \textbf{Observation model.} The theorems' equality is \emph{partial
 equivalence} (C.1: \(\llbracket p \rrbracket = \llbracket q \rrbracket\)
@@ -829,13 +836,13 @@ executed---are likewise not observed; only the net transformation is.
 \textbf{Three status levels.} Each mechanism in this paper falls into
 exactly one of three levels, which we keep separate throughout:
 \emph{(i) specified}---the symbolic-execution equivalence checker, the
-pipeline scheduler's cycle-accurate extension, tree-pattern instruction
-selection (Section 4.1.2); \emph{(ii) implemented with checks}---the
-optimizer passes (fusion, DCE, grouping) with their pass-level arguments
-in C.2/C.5, the runtime monitors, and differential unit tests pinning
-the fusion property this appendix argues (fused-composite execution
-equals constituent-sequence execution; the fusion gate refuses
-producer--consumer pairs;
+pipeline scheduler's cycle-accurate extension, block-granular trace
+formation (Sections 4.1.2 and 4.2.2); \emph{(ii) implemented with
+checks}---the optimizer passes (fusion, DCE, grouping) with their
+pass-level arguments in C.2/C.5, the runtime monitors, and differential
+unit tests pinning the fusion property this appendix argues
+(fused-composite execution equals constituent-sequence execution; the
+fusion gate refuses producer--consumer pairs;
 \texttt{tests/core/isa/test\_fusion\_differential.py}); \emph{(iii)
 empirically validated}---trace-level replay identity on the mock
 (Section 5.4: optimized traces re-executed, final states identical in
@@ -844,18 +851,37 @@ empirically validated}---trace-level replay identity on the mock
 the exact-response-cache parity baseline of Section 5.2). A statement at
 one level is never used to imply a guarantee at a stronger level.
 
-\section{Specified-Only Component
-Listings}\label{specified-only-component-listings}
+\section{Component Listings}\label{component-listings}
 
-This appendix carries the algorithm listings that the main paper
-specifies but does not ship (or ships dormant), moved from its Section 4
-to respect the page limit. Each listing keeps its original framing;
-implementation status statements are unchanged. The shipped selection
-step (the heuristic name-overlap matcher) remains in the source module
+This appendix carries the algorithm listings moved from the main paper
+to respect the page limit; each listing keeps its original framing. Two
+listings formerly specified-only now describe shipped opt-in components,
+updated in place: D.1 (the MATCH-TREE selector:
+\texttt{selection\_strategy="dp"} in
+\texttt{agentflow.core.isa.instruction\_selector}, default heuristic)
+and D.4 (the EMA hot-path detector: \texttt{detection\_mode="ema"} in
+\texttt{agentflow.core.isa.instruction\_optimization}). The remainder
+stay as labeled---specified-only (D.2, D.3, D.5--D.7, D.9) or shipped
+(D.8, D.10, and D.11, the bounded-checker listing relocated from the
+main paper's Section 3.3.3). The default selection step (the heuristic
+name-overlap matcher) remains in the source module
 \texttt{agentflow.core.isa.instruction\_selector}.
 
-\subsection{Specified Tree-Pattern Instruction Selection
-(MATCH-TREE)}\label{specified-tree-pattern-instruction-selection-match-tree}
+\subsection{Tree-Pattern Instruction Selection
+(MATCH-TREE)}\label{tree-pattern-instruction-selection-match-tree}
+
+Implementation status: shipped as the opt-in selector of
+\texttt{agentflow.core.isa.instruction\_selector}
+(\texttt{selection\_strategy="dp"}, engaging only on inputs carrying an
+\texttt{ir\_tree}; the default remains the heuristic matcher).
+\texttt{\_match\_tree} follows the listing's
+recurrence---candidate-pattern cost plus the optimal subtrees of
+unspanned children, memoized top-down---and exposes
+\texttt{(costs,\ selected)} through \texttt{TreeSelectionResult};
+matching is root-op equality (case-insensitive) with each catalogue
+pattern's \texttt{params{[}"spanned\_child\_ops"{]}} spanning whole
+child subtrees, and the covering is read root-first, skipping spanned
+subtrees.
 
 Input: IR tree T, pattern set P; output: optimal pattern selection S.
 
@@ -901,8 +927,8 @@ Input: IR tree T, pattern set P; output: optimal pattern selection S.
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Theorem 4.1} (Selection Optimality, specified algorithm): given
-a set of context-local patterns P and an IR tree T, the MATCH-TREE
+\textbf{Theorem 4.1} (Selection Optimality, shipped opt-in selector):
+given a set of context-local patterns P and an IR tree T, the MATCH-TREE
 algorithm computes the minimal covering cost; the covering itself is
 read off the \texttt{selected} table afterwards, by walking from the
 root and skipping subtrees spanned by the chosen pattern.
@@ -940,8 +966,8 @@ The recurrence requires that a pattern's feasibility at a node not
 depend on the covers chosen for other subtrees; context constraints that
 couple sibling subtrees break this optimal-substructure property, which
 is why the statement restricts to context-local patterns. This theorem
-is a property of the specified algorithm, not of the shipped heuristic
-selector; no optimality claim is made for the implementation.
+is a property of the shipped opt-in selector, not of the default
+heuristic; no optimality claim is made for the default path.
 
 \subsection{Specified Cycle-Accurate Pipeline Scheduler
 (SCHEDULE-PIPELINE)}\label{specified-cycle-accurate-pipeline-scheduler-schedule-pipeline}
@@ -1014,8 +1040,8 @@ assignments.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{Specified Hot-Path Detector
-(DETECT-HOT-PATH)}\label{specified-hot-path-detector-detect-hot-path}
+\subsection{Hot-Path Detector
+(DETECT-HOT-PATH)}\label{hot-path-detector-detect-hot-path}
 
 Input: execution path P, threshold \(\theta\), EMA decay \(\gamma\)
 (\(\gamma\) = 2/(w+1) for window w; \(\gamma\) is unrelated to the
@@ -1052,10 +1078,36 @@ Boolean indicating if P is hot.
 \end{Highlighting}
 \end{Shaded}
 
+Implementation status: shipped as the opt-in
+\texttt{detection\_mode="ema"} of
+\texttt{agentflow.core.isa.instruction\_optimization}, wired through
+\texttt{AgentISAConfig.hot\_path\_detection}/\texttt{ema\_window}/\texttt{ema\_threshold}/\texttt{max\_tracked\_paths}
+(defaults exact / 10 / 0.5 / 1,000). Implementation-fidelity notes: the
+detector remains exact-path-keyed (no similarity merging); a path's EMA
+counter must exceed a single fresh observation before its share is
+evaluated (a cold-start debounce, so the first recorded path cannot
+self-trigger at share 1.0); the share denominator sums the counters of
+LRU-tracked paths, and eviction shrinks it; the stability gate reuses
+the shipped \texttt{\textgreater{}=} predicate rather than the listing's
+strict \texttt{\textgreater{}}; windows below 2 are rejected (\(\gamma\)
+= 1 would be memoryless). Trace formation (D.5) remains specified, not
+shipped.
+
 \subsection{Specified Trace Formation
 (BUILD-TRACE)}\label{specified-trace-formation-build-trace}
 
-Input: hot path H; output: optimized trace T.
+Input: hot path H; output: optimized trace T. Trace validity is
+\emph{defined} by the conjunction of three properties (H the loop header
+of the region, tail the last block of the trace);
+VERIFY-TRACE-PROPERTIES checks them:
+
+\[
+\begin{aligned}
+\text{Valid}(\text{trace}) \iff {}& \text{Entry}(\text{trace}) \text{ dominated by } H \\
+\wedge\;& \text{Exit}(\text{trace}) \text{ post-dominates tail} \\
+\wedge\;& \text{NoSideExit}(\text{trace}) \text{ except tail}
+\end{aligned}
+\]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1156,6 +1208,26 @@ Monitor}\label{specified-performance-monitor}
 \subsection{Shipped Peephole Optimizer (Empty Pattern
 Table)}\label{shipped-peephole-optimizer-empty-pattern-table}
 
+Status: shipped in \texttt{agentflow.core.isa.auto\_promotion} (flag
+\texttt{auto\_approve}, default \texttt{False}; with
+\texttt{min\_support\ =\ 2} and \texttt{min\_success\_rate\ =\ 0.7}).
+The optimizer itself is the \texttt{optimize} loop of
+\texttt{agentflow.core.isa.instruction\_optimization}, whose pattern
+table is populated through \texttt{add\_peephole\_pattern}; the table
+ships empty by design, because mined composites reach it only through
+the audited \texttt{AutoPromotionEngine} gate---candidates must clear
+the support and all-steps-succeeded thresholds, and are then proposed
+for human approval rather than applied, unless \texttt{auto\_approve} is
+enabled. The Section 5.11 replay experiment does \emph{not} run behind
+this gate: its composite is mined and promoted through the learner's own
+threshold-validated path
+(\texttt{InstructionLearner.learn\_from\_traces} \(\rightarrow\)
+\texttt{create\_instruction}, Appendix I.2.6), leaving the optimizer's
+rule set untouched. The approval-gated engine itself ships and is
+exercised by its unit suite
+(\texttt{tests/core/isa/test\_auto\_promotion.py}), not by any Section 5
+experiment.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{class}\NormalTok{ PeepholeOptimizer:}
@@ -1201,6 +1273,15 @@ end function
 
 \subsection{Shipped Coordination Flow and Fusion Pass
 Listings}\label{shipped-coordination-flow-and-fusion-pass-listings}
+
+Status: shipped in \texttt{agentflow.core.isa.coordination} (flag
+\texttt{strict}, default
+\texttt{False})---\texttt{SecurityMonitor(config,\ strict:\ bool\ =\ False)}
+runs the policy checks in the fail-open default posture, and the opt-in
+fail-closed mode is reached through
+\texttt{AgentCoordinator(config,\ security\_strict:\ bool\ =\ False)};
+both default to fail-open, and the paired posture matrix exercising the
+difference is documented in Appendix I.2.4.
 
 The coordination flow implemented by \texttt{AgentCoordinator}
 (authenticate, authorize, select by capability, plan stages with
@@ -1257,11 +1338,45 @@ Section 4.1.3, also in the source module
 \end{Highlighting}
 \end{Shaded}
 
+The illustrative candidate rule set referenced by the main paper's
+Section 3.4.4 (textbook mnemonics, explicitly \emph{not} shipped opcode
+names; specified, not registered---the shipped write path is the audited
+promotion gate of the main paper's Sections 3.3.1 and 4.1.3):
+
+\begin{verbatim}
+Combine Rules {
+  // LOAD/STORE/MOVE are textbook mnemonics, illustrative
+  // only; they are not shipped opcode names
+  LOAD followed by STORE → MOVE
+  Multiple CONTEXT_UPDATE → Single UPDATE
+  Sequential QUERY → Batch QUERY
+}
+\end{verbatim}
+
+\subsection{Shipped Bounded-Checker Listing
+(verify\_instruction)}\label{shipped-bounded-checker-listing-verify_instruction}
+
+Relocated from the main paper's Section 3.3.3 to respect the page limit;
+the shipped module is \texttt{agentflow.core.isa.bounded\_checker}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{def}\NormalTok{ verify\_instruction(instruction, pre\_condition, post\_condition):}
+    \ControlFlowTok{if}\NormalTok{ instruction.side\_effects: }\ControlFlowTok{return}\NormalTok{ skipped(instruction)  }\CommentTok{\# never executed}
+\NormalTok{    state\_space }\OperatorTok{=}\NormalTok{ generate\_state\_space(instruction)  }\CommentTok{\# bounded: exhaustive or seeded, cap 256}
+    \ControlFlowTok{for}\NormalTok{ state }\KeywordTok{in}\NormalTok{ state\_space.states:}
+        \ControlFlowTok{if}\NormalTok{ pre\_condition(state):}
+\NormalTok{            next\_state }\OperatorTok{=}\NormalTok{ execute(instruction, state)}
+\NormalTok{            check(progress, preservation, post\_condition, next\_state)  }\CommentTok{\# structured violation reporting}
+    \ControlFlowTok{return}\NormalTok{ verdict  }\CommentTok{\# checked\_states, exhaustive, violations by kind, passed}
+\end{Highlighting}
+\end{Shaded}
+
 \section{Formal Sketches for Future
 Directions}\label{formal-sketches-for-future-directions}
 
-Sketches referenced by the main paper's Section 6.3; all are future work
-with no current implementation.
+Sketches referenced by the main paper (Sections 3.4 and 6.3); all are
+future work or specified-only, with no current implementation.
 
 \subsection{Stated Sketches}\label{stated-sketches}
 
@@ -1296,6 +1411,28 @@ with typing rules
 \(R(i) = \alpha C_{cpu}(i) + \beta C_{mem}(i) + \gamma C_{io}(i)\) with
 platform-specific coefficients.
 
+\textbf{Instruction scheduling formulation} (Section 3.4.3, the
+specified, not shipped, scheduler's objective): minimize the total stall
+\(\sum_i \text{delay}(i)\) subject to
+\(\text{start}(i_2) \geq \text{end}(i_1)\) for every dependency pair
+\((i_1, i_2) \in \text{Deps}\) and
+\(\sum_{i \in \text{active}(t)} \text{res}(i) \leq \text{Capacity}\) at
+every time \(t\).
+
+\textbf{Performance model} (Section 3.4.5, specified; the benchmarks of
+Section 5 measure latency and token counts directly and do not evaluate
+it):
+
+\[
+\text{Perf}(p) = \sum_{i \in p} (\text{base\_cost}(i) + \text{overhead}(i) - \text{optimization\_gain}(i))
+\]
+
+where optimization gain is
+
+\[
+\text{optimization\_gain}(i) = \sum_{o \in \text{Opts}} \text{benefit}(o,i) \times \text{application\_rate}(o,i).
+\]
+
 \textbf{Information flow control} (Section 6.3.6, item 1):
 
 \[
@@ -1325,6 +1462,7 @@ run}\label{section-5.7-real-gateway-cache-run}
 
 \begin{verbatim}
 ./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --backend gateway \
     --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64 \
     --output examples/benchmarks/isa_real_llm_results.json
 \end{verbatim}
@@ -1337,8 +1475,13 @@ a hosted GLM reasoning model:
 
 \begin{verbatim}
 ./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --backend gateway \
     --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64
 \end{verbatim}
+
+(The \texttt{-\/-backend\ gateway} flag is required: the CLI defaults to
+the deterministic offline mock, so omitting it silently reproduces the
+mock arm instead of the published real-gateway numbers.)
 
 \subsection{Section 5.7.1 real-gateway compiler/hot-path
 harness}\label{section-5.7.1-real-gateway-compilerhot-path-harness}
@@ -1363,6 +1506,96 @@ demonstration}\label{section-5.8-four-task-demonstration}
 
 with test suite
 \texttt{pytest\ tests/system/test\_system\_task\_demo.py}.
+
+\subsection{Section 5.10--5.11 Extension-Experiment Commands
+(Offline)}\label{section-5.105.11-extension-experiment-commands-offline}
+
+The extension experiments behind Sections 5.10 and 5.11 (Appendices
+I.1--I.2) are offline and deterministic; each results JSON records its
+own provenance (seeds, scale, \texttt{git\_rev}; the provenance revision
+cited in Appendix I is \texttt{0e1671f8}). Seed and scale conventions,
+mirrored from \texttt{REPRODUCING.md}: the trace census analyzes the
+corpus regenerated by \texttt{examples/random\_tasks\_stress.py} (master
+seed 2026, per-task corpus seeds 10000--10099); the capability
+calibration uses pool seed base 2000, enrichment base 5000,
+cache-workload base 1000, 5 seeds per condition; the selector bench
+draws \texttt{Random(size*1000+seed)} per cell over sizes 20/50/100/200
+\(\times\) seeds 0--4; the EMA stress uses RNG seeds 1000--1004
+(threshold 100, stability 0.9, EMA window 10, \(\gamma\) 0.181818, share
+threshold 0.3); the posture matrix uses task seeds 11--15; the
+namespacing experiment seeds 1000--1004 (30 cohorts \(\times\) 100
+items, 13,000 lookups); the replay bench draws unseen values with
+\texttt{Random(\textquotesingle{}e7-replay-generalization-seed\{seed\}\textquotesingle{})},
+experiment seeds 0--4; the fusion-chain bench uses chain-arm seed base
+5000 and control base 2000 over lengths 50/200/1000 \(\times\) 4 levels
+\(\times\) 5 seeds; the token-mix sweep uses seeds 1000--1004, 13 mix
+points \(\times\) 3 skews \(\times\) 200 draws (39,000 draws). Command
+lines:
+
+\begin{verbatim}
+./venv/bin/python examples/analyze_task_traces.py \
+    --trace-dir examples/random_task_traces --top 10 --output <path>
+
+./venv/bin/python examples/benchmarks/capability_calibration.py
+
+./venv/bin/python examples/benchmarks/selector_dp_bench.py
+
+./venv/bin/python examples/benchmarks/hotpath_ema_stress.py
+
+./venv/bin/python examples/benchmarks/security_posture_matrix.py \
+    --seeds 5 --tasks-per-scenario 40
+
+./venv/bin/python examples/benchmarks/cache_namespace_experiment.py
+
+./venv/bin/python examples/benchmarks/replay_generalization_bench.py
+
+./venv/bin/python examples/benchmarks/fusion_chain_bench.py
+
+./venv/bin/python examples/benchmarks/promptcache_sweep.py
+\end{verbatim}
+
+The raw-results file backing each experiment is listed in Appendix I
+(I.1--I.2) and in \texttt{REPRODUCING.md}.
+
+\subsection{Appendix I.3 Live-Gateway Re-Run
+Commands}\label{appendix-i.3-live-gateway-re-run-commands}
+
+Two live runs back Appendix I.3; both target the gateway at
+\texttt{https://127.0.0.1:8443} (model \texttt{claude-glm-5.3-flash},
+temperature 0), and live model replies are their only non-deterministic
+input---the aggregates and analysis recompute offline from the recorded
+raw replies (\texttt{REPRODUCING.md} records the scale decisions and the
+gateway-quota episode; Appendix I.3 the protocol). The cache bench is
+invoked once per Zipf level---repeat the command below with
+\texttt{-\/-zipf\ 1.0} / \texttt{-\/-zipf\ 1.5} and a matching
+\texttt{-\/-output}, one raw chunk file per invocation (seeds \{0, 1\}
+with \texttt{rng\ =\ Random(1000\ +\ seed)});
+\texttt{-\/-backend\ gateway} is required because the CLI defaults to
+the offline mock---and the postprocess command folds the three raw chunk
+files into \texttt{gateway\_multiseed\_results.json}:
+
+\begin{verbatim}
+./venv/bin/python examples/paper_real_llm_quality_check.py --backend real \
+    --scale tiny --tasks 1 --max-tokens 4096 \
+    --json examples/benchmarks/gateway_quality_probe.json
+./venv/bin/python examples/paper_real_llm_quality_check.py --backend real \
+    --scale tiny --max-tokens 3072 \
+    --json examples/benchmarks/gateway_quality_run_raw.json
+./venv/bin/python examples/benchmarks/e10_gateway_postprocess.py \
+    --quality-probe examples/benchmarks/gateway_quality_probe.json \
+    --quality-run examples/benchmarks/gateway_quality_run_raw.json \
+    --i9-baseline examples/paper_real_llm_quality_results_real.json \
+    --multiseed-run examples/benchmarks/gateway_multiseed_raw_zipf0.5.json \
+                    examples/benchmarks/gateway_multiseed_raw_zipf1.0.json \
+                    examples/benchmarks/gateway_multiseed_raw_zipf1.5.json \
+    --paper-bench examples/benchmarks/isa_real_llm_results.json \
+    --quality-out examples/benchmarks/gateway_quality_results.json \
+    --multiseed-out examples/benchmarks/gateway_multiseed_results.json
+
+./venv/bin/python examples/benchmarks/isa_real_llm_bench.py \
+    --backend gateway --tasks 100 --seeds 2 --zipf 0.5 --max-tokens 64 \
+    --output examples/benchmarks/gateway_multiseed_raw_zipf0.5.json
+\end{verbatim}
 
 \subsection{Artifact Contents
 Inventory}\label{artifact-contents-inventory}
@@ -1568,45 +1801,6 @@ Availability).
   report byte-for-byte (SHA-256 equality).
 \end{itemize}
 
-\textbf{Configuration.} Seed 42; 6 files \(\times\) 400 lines; 12
-repeated realizations of the task; hot-path threshold 5. Every phase is
-deterministic and re-runnable from the repository (Artifact
-Availability).
-
-\textbf{What the triage walk-through shows.}
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Static compilation with structural validation.} NONE compiles
-  to 7 effective instructions / 7 dispatches; AGGRESSIVE to 6 / 6
-  (14.3\%): the dead guard fuses with the following pure step rather
-  than being dropped. The walk-through \emph{asserts the compiled
-  stream's dataflow validity}---every step whose output is consumed
-  downstream must survive compilation, the only eliminable step being
-  the guard---so the shrinkage cannot come from dropping live producers.
-\item
-  \textbf{Reuse across repeated realizations.} The first realization
-  makes 50 (simulated) model calls; all eleven subsequent realizations
-  make zero (result cache hit rate 91.7\% on the classification step);
-  all 12 reports are byte-identical.
-\item
-  \textbf{Closed-loop hot-path adoption.} The stream crosses the
-  hot-path threshold at the sixth recording (the counter must strictly
-  exceed it and recording follows execution, so adoption lands at
-  realization threshold+2); the runtime \emph{adopts} the optimized form
-  automatically, repeats 7--12 execute the shrunken 6-instruction stream
-  (instruction executions per realization:
-  \texttt{{[}7,7,7,7,7,7,6,6,6,6,6,6{]}}), and on a fresh workspace the
-  optimized form reproduces the report
-  byte-for-byte---semantics-preserving on the real task, not only on
-  synthetic sequences.
-\item
-  \textbf{Full-stack determinism.} A completely fresh stack---new
-  instructions, new cache, new workspace, same seed---reproduces the
-  report byte-for-byte (SHA-256 equality).
-\end{itemize}
-
 \textbf{The four-task characterization.} All four tasks run the
 identical closed-loop battery
 (\texttt{examples/system\_task\_workload.py}, \texttt{characterize()},
@@ -1715,5 +1909,1651 @@ SHA) \\
 regression-diff & 240 / 0 & 91.7\% & repeat 7 & yes (12/12 + fresh-stack
 SHA) \\
 \end{longtable}
+
+\section{Extension-Experiment Protocols and Detailed
+Tables}\label{extension-experiment-protocols-and-detailed-tables}
+
+Full protocols and detailed tables for the extension experiments whose
+headlines appear in the main paper's Sections 5.10 and 5.11. Every
+number below is extracted programmatically from the corresponding
+committed results file under \texttt{examples/benchmarks/} (each file
+carries a \texttt{provenance} block with the git revision
+\texttt{0e1671f8}, UTC timestamps, seeds, and scale; aggregates are
+computed by the generating script from raw per-instance records, never
+hand-entered). As elsewhere, N/A results, not-covered axes, and residual
+failure modes are reported as such rather than dropped.
+
+\subsection{Real-Trace Workload Characterization: Protocol and Complete
+Tables}\label{real-trace-workload-characterization-protocol-and-complete-tables}
+
+\texttt{examples/benchmarks/trace\_workload\_results.json} records the
+census summarized by the main paper's Section 5.10:
+
+\begin{itemize}
+\tightlist
+\item
+  Driver:
+  \texttt{examples/benchmarks/trace\_workload\_characterization.py}
+\item
+  Analyzer: \texttt{examples/analyze\_task\_traces.py}
+\end{itemize}
+
+\textbf{Protocol.} The corpus is 100 task traces from the seeded
+random-task stress battery (\texttt{examples/random\_tasks\_stress.py};
+generator master seed 2026, per-task corpus seeds 10000--10099,
+extracted from the generator source at run time---not hand-copied). The
+analyzer is pure-stdlib and takes the first \texttt{kind=workflow}
+record of each trace file (message records skipped; malformed JSON
+rejected loudly). The analysis is a deterministic full census of the
+committed corpus: the analyzer has no sampling randomness, so multi-seed
+averaging does not apply (the corpus-generation seeds are recorded;
+\texttt{analysis\_seed} is null in the provenance for exactly this
+reason). The census counts 100 files / 100 workflows / 792 steps / 12
+distinct instruction signatures and 692 adjacent step pairs; the corpus
+is pinned by \texttt{corpus\_sha256}
+7c05d307c64ab418f85811efa18489fa80463ab504fdc1edb3f0c22a4bf323eb, and
+only the timestamp and git revision vary between runs. Instruction
+signatures are \texttt{(type,\ params)} pairs; because the traces
+serialize no instruction params, operation identity is recovered from
+step names by stripping trailing positional index suffixes
+(\texttt{guard\_0\_2} \(\rightarrow\) \texttt{guard}), with an explicit
+non-empty \texttt{params} field canonicalized with sorted keys when
+present. The Zipf fit is an OLS regression of log-rank on log-frequency
+over the 12 signature-class frequencies (fewer than two classes
+\(\rightarrow\) \texttt{s}/\texttt{R²} null; a zero-variance
+distribution \(\rightarrow\) \texttt{R²} = 0.0 by convention). Two
+\emph{distinct} reuse quantities are reported: the corpus-level share of
+step instances that repeat an already-seen signature, and the mean of
+per-workflow repeat shares. The shape census resolves dependencies (by
+output name, then step id) into a DAG and classifies workflows by node
+structure: \emph{linear} (no fan-out/fan-in node), \emph{fan-out} (a
+node with \(\geq\) 2 consumers), \emph{fan-in} (a node with \(\geq\) 2
+dependencies), \emph{branch} (both, e.g.~a diamond). Dead-end steps are
+a single-pass structural count (pure steps whose outputs no step
+consumes)---not the compiler's AGGRESSIVE fixpoint liveness analysis.
+The fusibility census mirrors
+\texttt{agentflow/core/isa/compiler.py::\_are\_fusible} on the trace
+dicts: same type, both members explicitly pure, and no
+producer--consumer edge inside the pair.
+
+\begin{longtable}[]{@{}lll@{}}
+\caption{Signature frequency distribution (top 10 of 12 classes; the two
+remaining classes account for the residual 74 instances, 792 −
+718)}\tabularnewline
+\toprule\noalign{}
+Rank & Signature (type:operation) & Instances \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Rank & Signature (type:operation) & Instances \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & CONTROL\_FLOW:guard & 152 \\
+2 & STATE\_MANAGEMENT:ingest & 100 \\
+3 & STATE\_MANAGEMENT:write\_report & 100 \\
+4 & LLM\_INTERACTION:classify & 68 \\
+5 & CONTROL\_FLOW:firsthalf & 61 \\
+6 & CONTROL\_FLOW:reverse\_words & 56 \\
+7 & CONTROL\_FLOW:filter\_warn & 53 \\
+8 & CONTROL\_FLOW:tail & 43 \\
+9 & CONTROL\_FLOW:filter\_info & 43 \\
+10 & CONTROL\_FLOW:dedupe & 42 \\
+11--12 & two further classes (combined) & 74 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\caption{Census summary}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Value
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Trace files / workflows & 100 / 100 \\
+Steps (instances) & 792 \\
+Distinct (type, params) signatures & 12 \\
+Adjacent step pairs & 692 \\
+Zipf fit (log-rank/log-freq OLS) & \(s = 0.593\) (0.5927),
+\(R^2 = 0.971\) (0.9714) \\
+Corpus-level repeated instances & 780 / 792 (98.5\%) \\
+Per-workflow mean repeat share & 18.3\% \\
+Shape census (linear / fan-out / fan-in / branch) & 21 / 79 / 0 / 0 \\
+Average steps per workflow & 7.9 \\
+Dead-end steps (single-pass count, pure, no consumer) & 152 \\
+Workflows with multiple components (disconnected) & 0 \\
+Fusible adjacent pairs & 106 / 692 (15.3\%), all CONTROL\_FLOW \\
+\end{longtable}
+
+\textbf{Disclosures.} The corpus is generator-produced, not production
+logs; the census characterizes workload structure only. The dead-end
+count is deliberately the weaker single-pass structural count, so its
+exact agreement with the 152 planted guards is a cross-validation, not a
+compiler-behavior claim. The corpus contains no fan-in or branch
+workflows, so those shape rows report the census honestly at zero rather
+than by construction. Repetition is dominated by cross-task vocabulary
+(98.5\% corpus-level) while intra-task duplication stays low (18.3\% per
+workflow)---the two definitions answer different questions and both are
+reported.
+
+\subsection{Mechanism-Extension Experiments: Complete Protocols and
+Detailed
+Tables}\label{mechanism-extension-experiments-complete-protocols-and-detailed-tables}
+
+The six experiments whose headlines the main paper's Section 5.11 sums
+up, one per shipped opt-in mechanism, plus the two extensions of
+existing benchmark protocols cited in the same section (chain-enriched
+workloads, extending the Section 5.3 optimization benchmark; the
+token-mix sweep, extending the Section 5.7.1/Appendix G priced
+comparison). Each experiment's results file records the dependency
+component as shipped in its \texttt{coverage} block; N/A results and
+not-covered axes are listed, not dropped.
+
+\subsubsection{Capability-Score
+Calibration}\label{capability-score-calibration}
+
+Raw results:
+\texttt{examples/benchmarks/capability\_calibration\_results.json}
+(script \texttt{capability\_calibration.py}). \textbf{Question:} do the
+statically extracted capability scores of Section 3.5 track measurable
+mock-backend behavior? \textbf{Pool:} the Section 5.3 microbench
+generator (\texttt{synthetic\_formal\_sequence}, length 200,
+\texttt{p\_dead} 0.25, \texttt{p\_pure} 0.55, pool seed base 2000
+mirroring the compiler experiment), 5 seeds per condition; enrichment
+draws use an independent seed base 5000 (paired design: the same seed
+sees identical pools and workloads across intensities), and the
+cache-workload seed base 1000 mirrors the Section 5.2 cache experiment.
+\textbf{Protocols:} 8 arms, 165 replicas in total---un-enriched base
+(5), and graded declaration-injection arms P\_flow / P\_cache /
+P\_resource / P\_security / P\_audit (25 each), P\_mix (20), and a
+generation anchor G\_anchor (15)---over intensities \{0.0, 0.25, 0.5,
+0.75, 1.0\}, four dead/pure mixes, generation anchor lengths \{50, 200,
+1000\}, a cache workload of 2,000 tasks \(\times\) 20 parameter values
+\(\times\) Zipf \{0.5, 1.0, 1.5\}, and a Zipf-1.0 generation workload;
+plus 10 inertness probes. \textbf{Instruments (all real code paths):}
+the mock backend (one simulated round trip per executed LLM-typed
+instruction, 80 simulated ms counted, never slept), the cache arm
+(honoring declared \texttt{optimization.cacheable}), the compiler
+battery (\texttt{compile()} at BASIC/ADVANCED plus isolated fusion-only
+and DCE-only passes and the resource plan's total cost), and the
+executor gate battery (\texttt{FormalInstruction.execute} against an
+unprivileged, resource-starved context). Extraction is static and
+side-effect-free; every pool, enrichment, and workload is seeded. Wall
+time 2.72 s; git rev 0e1671f8.
+
+\textbf{Extraction is no longer constant-zero.} On un-enriched base
+pools, 7 of 17 metrics and 5 of 8 domain scores are already nonzero
+(per-seed nonzero counts 7/17 and 5/8 in all five seeds; the stub era
+was 0/17 by construction), and all 17 metrics attain a nonzero value
+somewhere across the protocol and probe arms.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\caption{Domain-score correlations (Pearson \(r\) / Spearman \(\rho\);
+all cross-path coefficients significant at \(p < 10^{-12}\), generation
+at \(p = 4.6 \times 10^{-4}\); the declared-and-enforced couplings are
+exact)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Domain
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Measured counterpart
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Coupling
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(r\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(\rho\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(n\)
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Domain
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Measured counterpart
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Coupling
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(r\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(\rho\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(n\)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+reasoning & fusion-pass instruction-count reduction & cross-path &
+−0.9647 & −0.9526 & 25 \\
+memory & mock-backend cache hit rate (Zipf 1.0) & cross-path & +0.9482 &
++0.9517 & 25 \\
+generation & uniform model-call share (one execution pass) & same
+quantity via real execution & +0.7902 & +0.9034 & 15 \\
+coordination & parallel dispatch compression (ADVANCED) & cross-path &
+−0.9767 & −0.9836 & 25 \\
+optimization & executor resource-gate rejection rate &
+declared-and-enforced & −1.0000 & −1.0000 & 25 \\
+security & executor security-gate rejection rate & declared-and-enforced
+& +1.0000 & +1.0000 & 25 \\
+specialization & --- (N/A: no task-level ground truth in the microbench)
+& --- & --- & --- & --- \\
+robustness & --- (N/A: no runtime enforcement axis) & --- & --- & --- &
+--- \\
+\end{longtable}
+
+Secondary arms, reported for honesty: memory vs cache hit rate at Zipf
+0.5/1.5 gives \(r\) = +0.9843 / +0.8925; optimization vs the compiler
+resource-plan's total cost gives −1.0000 and vs cache hit rate +0.9490;
+generation under a Zipf-1.0 \emph{workload} arm (rather than the uniform
+pass) drops to \(r\) = +0.176 (workload-position concentration adds
+variance beyond pool composition---a weaker coupling is expected there).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Per-metric correlations (eight correlated; nine N/A with probe
+evidence)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Arm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Measured quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(r\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(n\)
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Arm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Measured quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(r\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\(n\)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+causal\_understanding & P\_flow & fusion-only reduction & −0.9647 &
+25 \\
+long\_term\_memory & P\_cache & cache hit rate (Zipf 1.0) & +0.9482 &
+25 \\
+creativity & G\_anchor & uniform model-call share & +1.0000 & 15 \\
+coherence & P\_mix & DCE-only reduction & −0.9900 & 20 \\
+efficiency & P\_cache & cache hit rate (Zipf 1.0) & +0.9490 & 25 \\
+resource\_usage & P\_resource & resource-gate rejection rate & −1.0000 &
+25 \\
+collaboration & P\_flow & parallel dispatch compression & −0.9767 &
+25 \\
+policy\_compliance & P\_security & security-gate rejection rate &
++1.0000 & 25 \\
+logical\_consistency & N/A & structural well-formedness has no runtime
+reader (probe: \texttt{malformed\_dependencies} moves the score, no
+measured output changes) & --- & --- \\
+abstract\_reasoning & N/A & declared parameter schemas consulted by no
+microbench path (probe \texttt{parameter\_schemas}: zero behavioral
+delta) & --- & --- \\
+working\_memory & N/A & declared input arity consumed by no runtime
+path; the extractor-counted \texttt{input:} prefix is not matched by the
+compiler's bare-name dataflow rules (probe
+\texttt{prefixed\_input\_deps}) & --- & --- \\
+domain\_expertise & N/A & category tags inert; no task-level ground
+truth (probe \texttt{category\_tags}) & --- & --- \\
+adaptability & N/A & deadline/locality hints read by no runtime path
+(probe \texttt{adaptability\_hints}) & --- & --- \\
+communication & N/A & no inter-agent protocol in the microbench (probe
+\texttt{agent\_type\_recategorization}) & --- & --- \\
+error\_handling & N/A & declared timeouts/retries not enforced by the
+formal executor (probe \texttt{error\_contract}: contract broken on
+every instruction, outcomes unchanged) & --- & --- \\
+recovery & N/A & recovery metadata extracted, no recovery machinery to
+measure (probe \texttt{recovery\_metadata\_key}) & --- & --- \\
+threat\_detection & N/A & no measured counterpart (probes
+\texttt{security\_verification\_flag} + protocol P\_audit; see below) &
+--- & --- \\
+\end{longtable}
+
+The creativity row is instrument agreement---the same quantity (declared
+LLM composition share) measured through the real mock-backend execution
+path---and is labeled as such rather than as behavioral prediction.
+\textbf{Inertness probes:} 9 of 10 injected declaration families produce
+a measured delta of exactly 0.0 in the microbench batteries
+(\texttt{parallelizable\_hint}, \texttt{security\_verification\_flag},
+\texttt{category\_tags}, \texttt{recovery\_metadata\_key},
+\texttt{parameter\_schemas}, \texttt{malformed\_dependencies},
+\texttt{error\_contract}, \texttt{adaptability\_hints},
+\texttt{prefixed\_input\_deps}); the one with a detected effect is
+\texttt{agent\_type\_recategorization} (maximum delta 0.035 on
+\texttt{basic\_reduction} / \texttt{advanced\_effective\_reduction} /
+\texttt{fusion\_only\_reduction}), i.e., fusion keys on instruction
+\emph{type} as an adjacency rule---a compiler artifact, not inter-agent
+coordination semantics, which is why communication stays N/A rather than
+inheriting that coefficient. \textbf{threat\_detection reclassified N/A,
+with measured evidence:} across graded audit intensities the extracted
+score spans {[}0.000, 1.000{]} while every compiler measurement stays
+invariant per seed---the compiler's audit branch is
+unreachable-and-redundant (\texttt{\_has\_side\_effects} returns True
+both through the audit branch and the final fallback, and microbench
+pools declare metadata \texttt{side\_effects} regardless), and the
+executor's \texttt{\_verify\_security} does not read
+\texttt{security.verification}; microbench pools also contain no
+SECURITY-typed instructions. Specialization and robustness are reported
+N/A with probe evidence rather than fabricated coefficients.
+
+\subsubsection{DP Tree-Pattern Selection
+Benchmark}\label{dp-tree-pattern-selection-benchmark}
+
+Raw results: \texttt{examples/benchmarks/selector\_dp\_results.json}
+(script \texttt{selector\_dp\_bench.py}). \textbf{Question:} does the
+opt-in MATCH-TREE selector (Appendix D.1) cover random IR trees at cost
+at or below the default heuristic? \textbf{Instances:} 20 = sizes \{20,
+50, 100, 200\} nodes \(\times\) seeds 0--4, trees grown per-node for
+exact node counts (fanout \(\leq\) 3, depth capped; observed depth mean
+8.75, max 11), rng seed = \texttt{size\ ×\ 1000\ +\ seed} per (size,
+seed) with catalogue and tree drawn from independent streams of the same
+seed. \textbf{Catalogue per instance:} one base single-node instruction
+per tree op (cost U(0.5, 5.0)); 2 premium variants (1.3--2.0 \(\times\)
+base cost, carrying an \texttt{urgency} parameter that the score-first
+heuristic values but the cost-minimizing DP does not); 3--6 fused
+multi-node patterns declaring
+\texttt{params{[}"spanned\_child\_ops"{]}}, priced at 0.70--0.95
+\(\times\) the base cost of (root + spanned child ops) while covering
+the spanned children's whole subtrees. \textbf{Arms:}
+\texttt{InstructionSelector(selection\_strategy="dp")} vs the default
+heuristic, both through the production \texttt{select\_for\_tree} API.
+Timing: 5 reps per arm, median reported. Coverage complete 20/20
+(pre-bench component check recorded in provenance: the selector's target
+suite, 37 passed). Both arms produced complete, valid tilings (each node
+covered exactly once) on all 20 instances.
+
+\textbf{Overall:} DP wins 20/20 (0 ties, 0 losses); covering cost DP
+85.80 \(\pm\) 73.69 vs heuristic 292.08 \(\pm\) 244.95 (gap 206.28
+\(\pm\) 203.43); ratio DP/heuristic mean 0.361, range 0.054--0.685.
+Selection time DP 0.241 \(\pm\) 0.163 ms vs heuristic 0.265 \(\pm\)
+0.194 ms; time-ratio mean 0.950, range 0.801--1.086---the DP was
+\emph{not} slower in this environment, recorded as found (the design
+allows slower). \textbf{Mechanism diagnostics:} the DP used 80 fused
+sites in total and selected premium variants 0 times; the heuristic used
+0 fused sites and 251 premium sites.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1250}}@{}}
+\caption{By tree size (5 instances per row; cost ratio is
+DP/heuristic)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Nodes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP cost (mean \(\pm\) sd)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heuristic cost (mean \(\pm\) sd)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost ratio mean (range)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP wins
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP time (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heuristic time (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time ratio
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Nodes
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP cost (mean \(\pm\) sd)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heuristic cost (mean \(\pm\) sd)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cost ratio mean (range)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP wins
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP time (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heuristic time (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Time ratio
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+20 & 33.85 \(\pm\) 8.49 & 61.53 \(\pm\) 11.59 & 0.546 (0.484--0.592) &
+5/5 & 0.066 \(\pm\) 0.002 & 0.066 \(\pm\) 0.004 & 1.011 \\
+50 & 47.10 \(\pm\) 31.95 & 150.82 \(\pm\) 22.40 & 0.305 (0.054--0.555) &
+5/5 & 0.141 \(\pm\) 0.015 & 0.144 \(\pm\) 0.003 & 0.981 \\
+100 & 119.22 \(\pm\) 84.05 & 289.71 \(\pm\) 69.24 & 0.379 (0.204--0.685)
+& 5/5 & 0.272 \(\pm\) 0.017 & 0.286 \(\pm\) 0.001 & 0.951 \\
+200 & 143.01 \(\pm\) 83.11 & 666.24 \(\pm\) 114.78 & 0.213
+(0.080--0.365) & 5/5 & 0.484 \(\pm\) 0.019 & 0.563 \(\pm\) 0.003 &
+0.859 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\caption{Per-instance detail (covering costs in catalogue
+units)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Size
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heuristic cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ratio (DP/Heur)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gap (Heur − DP)
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Size
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DP cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Heuristic cost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ratio (DP/Heur)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Gap (Heur − DP)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+20 & 0 & 41.163 & 70.245 & 0.586 & 29.082 \\
+20 & 1 & 28.932 & 53.585 & 0.540 & 24.653 \\
+20 & 2 & 24.850 & 47.014 & 0.529 & 22.164 \\
+20 & 3 & 29.795 & 61.614 & 0.484 & 31.819 \\
+20 & 4 & 44.502 & 75.207 & 0.592 & 30.705 \\
+50 & 0 & 8.280 & 153.381 & 0.054 & 145.101 \\
+50 & 1 & 21.207 & 113.463 & 0.187 & 92.256 \\
+50 & 2 & 83.754 & 150.826 & 0.555 & 67.072 \\
+50 & 3 & 51.958 & 168.336 & 0.309 & 116.378 \\
+50 & 4 & 70.317 & 168.089 & 0.418 & 97.772 \\
+100 & 0 & 241.968 & 353.385 & 0.685 & 111.417 \\
+100 & 1 & 58.532 & 226.463 & 0.258 & 167.931 \\
+100 & 2 & 45.249 & 222.026 & 0.204 & 176.777 \\
+100 & 3 & 169.694 & 369.600 & 0.459 & 199.906 \\
+100 & 4 & 80.655 & 277.086 & 0.291 & 196.431 \\
+200 & 0 & 50.272 & 631.037 & 0.080 & 580.765 \\
+200 & 1 & 142.518 & 848.946 & 0.168 & 706.428 \\
+200 & 2 & 241.602 & 662.779 & 0.365 & 421.177 \\
+200 & 3 & 208.490 & 656.266 & 0.318 & 447.776 \\
+200 & 4 & 72.176 & 532.196 & 0.136 & 460.020 \\
+\end{longtable}
+
+\textbf{Disclosure.} The invariant under test is structural---DP cost
+\(\leq\) heuristic cost, since the DP minimizes over a covering set that
+includes the greedy single-node covering; the \emph{absolute} gap
+depends on this synthetic catalogue's pricing model (a fused site near
+the root subsumes a large subtree by construction of the discount), so
+the gap size must not be read as a deployment speedup. No benchmark in
+Section 5 runs the DP arm; every published number uses the default
+heuristic.
+
+\subsubsection{EMA Hot-Path Detection Under Trace
+Diversity}\label{ema-hot-path-detection-under-trace-diversity}
+
+Raw results: \texttt{examples/benchmarks/hotpath\_ema\_results.json}
+(script \texttt{hotpath\_ema\_stress.py}). \textbf{Question:} does the
+opt-in EMA trigger (\texttt{detection\_mode="ema"}, Appendix D.4)
+promote diverse trace variants the exact default misses, without false
+promotions on one-shot diversity? \textbf{Design:} 7 seeded stream
+scenarios \(\times\) 5 rng seeds (1000--1004), each stream fed
+identically to the exact detector, the EMA detector, and a deterministic
+read-only oracle (a path is hot iff it has \(\geq\) 2 recordings and its
+cumulative share exceeds \(\theta\); brute-forced over the stream).
+Detector configuration: hot-path threshold 100, stability bound 0.9, EMA
+window 10 (\(\gamma\) = 0.181818), share threshold 0.3, default
+tracked-path cap 1000 in the detection cells. Adoption is measured
+end-to-end through \texttt{OptimizationManager} (detection
+\(\rightarrow\) trace re-optimization \(\rightarrow\) first
+shortened-form service). Cap stress: a Zipf(1.1) mix (\textasciitilde800
+recordings) interleaved with 2,200 one-off paths (\textasciitilde3,000
+recordings, 2,210 distinct paths), caps swept 2000 \(\rightarrow\) 100;
+cap rescue: an 80-path warmup + burst stream, caps 1000 \(\rightarrow\)
+10. Scale: 175,680 detector \texttt{record} calls in total (detection
+cells 6,800; adoption cells 880; cap cells 75,000; rescue cells 5,600),
+wall 0.33 s; 12 hard invariants are asserted before the results file is
+written, and two full reruns are byte-identical apart from timing.
+Block-granular trace formation (D.5) remains specified, not
+implemented---the adoption path measured is the shipped whole-sequence
+re-optimization.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Scenario results (promoted-path counts, mean \(\pm\) sd over 5
+seeds; recall is vs the oracle; false promotions 0.0 \(\pm\) 0.0 for
+both detectors in every scenario)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Scenario (stream)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Exact
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMA
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Oracle
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMA recall
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Scenario (stream)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Exact
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMA
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Oracle
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMA recall
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+concentrated (512 recordings, 18 paths) & 1.0 \(\pm\) 0.0 & 1.0 \(\pm\)
+0.0 & 1.0 \(\pm\) 0.0 & 1.0 \(\pm\) 0.0 \\
+diverse\_rotated (120; 3 variants \(\times\) 40, far below threshold
+100) & 0.0 \(\pm\) 0.0 & 3.0 \(\pm\) 0.0 & 3.0 \(\pm\) 0.0 & 1.0 \(\pm\)
+0.0 \\
+diverse\_zipf (\textasciitilde160; Zipf(1.1) over 10 ranks) & 0.0
+\(\pm\) 0.0 & 1.8 \(\pm\) 0.45 & 2.2 \(\pm\) 0.45 & 0.867 \(\pm\)
+0.298 \\
+cyclic\_shift (160; 4 shifting variants) & 0.0 \(\pm\) 0.0 & 2.0 \(\pm\)
+0.0 & 2.0 \(\pm\) 0.0 & 1.0 \(\pm\) 0.0 \\
+bursty (88; 80-call burst below threshold) & 0.0 \(\pm\) 0.0 & 1.0
+\(\pm\) 0.0 & 1.0 \(\pm\) 0.0 & 1.0 \(\pm\) 0.0 \\
+warmup\_heavy\_burst (160; 80 one-shot warmups, default cap) & 0.0
+\(\pm\) 0.0 & 0.0 \(\pm\) 0.0 & 1.0 \(\pm\) 0.0 & 0.0 \(\pm\) 0.0 \\
+pure\_diversity (160 one-off trajectories) & 0.0 \(\pm\) 0.0 & 0.0
+\(\pm\) 0.0 & 0.0 \(\pm\) 0.0 & --- \\
+\end{longtable}
+
+\textbf{Adoption latency.} On the concentrated stream the EMA detector
+promotes at recording 2.0 (mean over 5 seeds) where the exact detector
+first promotes at recording 107.0; on the bursty stream the EMA detects
+the burst at recording 13.0 and adopts immediately---12.0 full-form
+executions before adoption, the served trace shrinking 4 \(\rightarrow\)
+1---in 5/5 seeds, while the exact detector stays cold in 0/5.
+\textbf{Warmup disclosure (a measured implementation property, reported
+as found):} the EMA detector decays each path's counter only on that
+path's own recordings and normalizes by the sum over LRU-tracked paths,
+so 80 one-shot warmup paths pin the share denominator at 85.5 and the
+later burst stays below threshold under caps \(\geq\) 15 (detected 0/5
+at caps 1000/100/50/20/15, denominators 85.5/85.5/54.5/24.5/19.5);
+tightening the cap evicts stale paths, shrinks the denominator, and
+restores detection---cap 12: 5/5 detected at recording 90.0 (denominator
+16.5, 69 evictions); cap 10: 5/5 at 87.0 (denominator 14.5, 71
+evictions). The exact detector promotes nothing in the rescue stream
+(0.0 in all cells).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\caption{Tracked-path cap sweep (2,210 distinct paths recorded;
+evictions and hot-path losses, mean over 5 seeds; all five per-path
+mappings respect the cap in 5/5 seeds at every cap)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Cap
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evictions
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Exact ever-hot \(\rightarrow\) lost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMA ever-hot \(\rightarrow\) lost
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Cap
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Evictions
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Exact ever-hot \(\rightarrow\) lost
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+EMA ever-hot \(\rightarrow\) lost
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2000 & 210 & 2.0 \(\rightarrow\) 0.0 & 0.6 \(\rightarrow\) 0.0 \\
+1000 & 1210 & 2.0 \(\rightarrow\) 2.0 & 0.6 \(\rightarrow\) 0.6 \\
+500 & 1710 & 2.0 \(\rightarrow\) 2.0 & 0.6 \(\rightarrow\) 0.6 \\
+200 & 2010 & 2.0 \(\rightarrow\) 2.0 & 0.6 \(\rightarrow\) 0.6 \\
+100 & 2110 & 2.0 \(\rightarrow\) 2.0 & 0.6 \(\rightarrow\) 0.6 \\
+\end{longtable}
+
+The cap is a real bound with a real cost: hot paths themselves are
+evictable, and at cap \(\leq\) 1000 both detectors lose every path they
+had promoted (the exact detector's 2.0 promoted hot paths, the EMA's
+0.6). Eviction is LRU (least-recently-\emph{recorded}), and an evicted
+path re-accumulates from zero if it recurs.
+
+\subsubsection{Strict-Security Posture
+Matrix}\label{strict-security-posture-matrix}
+
+Raw results:
+\texttt{examples/benchmarks/security\_posture\_results.json} (script
+\texttt{security\_posture\_matrix.py}). \textbf{Question:} what does the
+opt-in strict (fail-closed) flag of
+\texttt{SecurityMonitor}/\texttt{AgentCoordinator} change relative to
+the fail-open default? \textbf{Design:} 5 scenario rows (4
+main---unregistered resource, unknown data sensitivity, incomplete
+resource-access policy, normal task---plus 1 supplementary: a
+type-malformed \texttt{allowed\_resources} registry), 18 sub-variants in
+total; 5 seeds (11--15) \(\times\) 40 tasks per scenario = 1,000 task
+dicts; every task dict is evaluated in \emph{both} modes (paired 2
+\(\times\) 2 contingency, fresh \texttt{SecurityMonitor} and fresh
+\texttt{AgentCoordinator} per task \(\times\) mode): 2,000 monitor
+evaluations and 2,000 end-to-end coordinator runs. Mode flags:
+\texttt{strict=False} (fail-open default) vs \texttt{strict=True}
+(\texttt{security\_strict} on the coordinator). Every task holds the
+non-varied security dimensions at known-good values, so exactly one
+dimension varies per scenario row; the decision function is
+deterministic, and per-seed allow-rate stdev is 0.0 (seeds vary the task
+surface---names, request shapes, variant mix---not the verdict). The
+study is qualitative-and-counting only: no latency, throughput, or
+memory quantity is measured or claimed, by construction.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\caption{Posture matrix (200 tasks per row; reason class is the recorded
+\protect\texttt{violation\_history} category)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Scenario
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mode
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Allowed / denied
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Deny rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason class
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Scenario
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mode
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Allowed / denied
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Deny rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reason class
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+unregistered\_resource & fail-open & 0 / 200 & 1.000 &
+generic\_invalid\_resource\_access \\
+unregistered\_resource & fail-closed & 0 / 200 & 1.000 &
+unregistered\_resources\_strict \\
+unknown\_sensitivity & fail-open & 200 / 0 & 0.000 & (permitted) \\
+unknown\_sensitivity & fail-closed & 0 / 200 & 1.000 &
+unknown\_sensitivity\_strict \\
+incomplete\_policy & fail-open & 200 / 0 & 0.000 & (permitted) \\
+incomplete\_policy & fail-closed & 0 / 200 & 1.000 &
+incomplete\_policy\_strict \\
+normal\_task & fail-open & 200 / 0 & 0.000 & (permitted) \\
+normal\_task & fail-closed & 200 / 0 & 0.000 & (permitted) \\
+malformed\_registry\_supplementary & fail-open & 0 / 200 & 1.000 &
+generic\_invalid\_resource\_access \\
+malformed\_registry\_supplementary & fail-closed & 0 / 200 & 1.000 &
+incomplete\_policy\_strict \\
+\end{longtable}
+
+\textbf{Mode divergence} (per-task paired 2 \(\times\) 2):
+unknown\_sensitivity and incomplete\_policy each produce 200 task pairs
+that fail-open permits and fail-closed denies---400 of 1,000 paired
+tasks in total, the actual fail-open holes; unregistered\_resource and
+the malformed-registry row are denied in both modes (200/200 each), but
+only fail-closed gives a distinguishable reason class; normal tasks are
+permitted in both modes (200/200, zero false denials on the
+well-specified population). \textbf{Auditability:} all 800 strict-mode
+denials in the non-normal scenarios are recorded in
+\texttt{violation\_history} with a ``(strict mode)'' marker (rate
+1.000); denials are recorded in \emph{both} modes---what fail-closed
+adds is the distinguishing reason classes and the marker, not recording
+itself. \textbf{Propagation:} the \texttt{AgentCoordinator} gate agrees
+with the monitor verdict on all 2,000 paired runs (execute-rate equals
+allow-rate per scenario \(\times\) mode in all 10 cells). \textbf{Not
+covered:} the always-on authentication/authorization checks are held
+fixed (all tasks carry tokens; not a matrix axis);
+\texttt{required\_level} is LOW everywhere except two normal-task
+variants (MEDIUM/HIGH), so the sensitivity-vs-requirement mismatch path
+is exercised only by the shipped unit suite, not scaled here; the
+supplementary malformed-registry row is grouped by the strict mode under
+``incomplete policy'', while its fail-open outcome is a generic deny (a
+string registry degenerates to a character set)---unlike the canonical
+missing-registry hole, which fail-open permits.
+
+\subsubsection{Cache-Key Namespacing Under Semantic
+Drift}\label{cache-key-namespacing-under-semantic-drift}
+
+Raw results: \texttt{examples/benchmarks/cache\_namespace\_results.json}
+(script \texttt{cache\_namespace\_experiment.py}). \textbf{Question:}
+under a deployment-side change of semantic configuration (the Section
+5.2 cache-key contract's template version / decoding axes), do strictly
+namespaced keys invalidate while legacy params-only keys keep serving
+stale entries? \textbf{Design:} 3 drift
+axes---\texttt{template\_version} v1 \(\rightarrow\) v2,
+\texttt{decoding} temperature 0.0 \(\rightarrow\) 0.7 (both semantic),
+and a benign control (decoding-dict key insertion order
+only)---\(\times\) 2 arms (\texttt{strict\_namespaced}: one shared
+\texttt{CacheKeyNamespace} object per cohort, mutated in place at the
+drift event, exactly a deployment's bookkeeping;
+\texttt{regular\_legacy}: the historical params-only keys)---\(\times\)
+5 seeds (1000--1004) \(\times\) 100 real \texttt{CompositeInstruction}
+items per cohort = 30 cohorts, 3,000 instruction instances, 13,000 cache
+lookups (cold, warm, two post-drift, plus a rollback lookup for strict
+cohorts on the semantic axes), all through the production
+\texttt{Instruction.\_get\_cache\_key}/\texttt{build\_cache\_key}/\texttt{InstructionCache}
+paths; cache \texttt{max\_size} 1000, \texttt{ttl} 3600.
+\textbf{Measurement protocol:} a lookup is a miss iff the wrapped leaf
+body actually re-executed; a served result is stale iff its embedded
+semantic-config snapshot differs canonically from the deployment's
+current config---no clock arithmetic, no inferred staleness.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\caption{Arm \(\times\) axis results (mean \(\pm\) sd over 5 seeds;
+every cell's stdev is 0.0000)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Arm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Axis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Post-drift hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Invalidation rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stale-serve rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fresh-serve rate
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Arm
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Axis
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Post-drift hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Invalidation rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Stale-serve rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fresh-serve rate
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+strict namespaced & template\_version v1 \(\rightarrow\) v2 & 0.0000 &
+1.0000 & 0.0000 & 1.0000 \\
+strict namespaced & decoding 0.0 \(\rightarrow\) 0.7 & 0.0000 & 1.0000 &
+0.0000 & 1.0000 \\
+strict namespaced & benign key reorder (control) & 1.0000 & 0.0000 & ---
+& --- \\
+regular legacy & template\_version v1 \(\rightarrow\) v2 & 1.0000 &
+0.0000 & 1.0000 & 0.0000 \\
+regular legacy & decoding 0.0 \(\rightarrow\) 0.7 & 1.0000 & 0.0000 &
+1.0000 & 0.0000 \\
+\end{longtable}
+
+The benign-reorder control also reports a key-change rate of 0.0000 (the
+normalized decoding hash folds dictionary order away, so reordering
+neither invalidates nor even re-keys). \textbf{Rollback (strict arm):}
+switching back to the original configuration hits the resident original
+entries in 100\% of lookups on both semantic axes (original-serve rate
+1.0000)---namespacing is \emph{isolation, not eviction}: entries from
+different semantic configurations coexist, and drift is reversible. The
+legacy arm's post-drift hits are the expected legacy behavior being
+quantified, not a bug in that arm: every post-drift hit serves an entry
+produced under the pre-drift configuration. \textbf{Not covered:}
+\texttt{model\_alias} drift (the third namespace component);
+shared-store cross-instruction key collisions (covered by the unit suite
+\texttt{tests/core/isa/test\_cache\_namespacing.py}); TTL/LRU dynamics
+(the configuration far exceeds the two keys each per-item cache ever
+holds---drift dynamics are the subject here). Provenance records module
+digests for \texttt{instruction\_cache.py}
+(99718b9af540bba1ab5df8118c5288271545cdde163dd58cfc13c3da8f8114a3) and
+\texttt{instruction.py}
+(b3657344469bb89937512d3f0bdd37c7d9e00bc5331d2cd8bc79d56ae09f12a5).
+
+\subsubsection{Parameterized Replay on Unseen
+Values}\label{parameterized-replay-on-unseen-values}
+
+Raw results:
+\texttt{examples/benchmarks/replay\_generalization\_results.json}
+(script \texttt{replay\_generalization\_bench.py}). \textbf{Question:}
+does a learned composite instruction, mined from traces that recorded
+only a small grid of parameter values, replay exactly like re-running
+its recorded constituent sequence for parameter values never observed
+during mining? \textbf{Streams:} 3 deterministic multi-operator
+compositions, rotated by seed
+(\texttt{composition\_for\_seed(seed)\ =\ (\textquotesingle{}filter3\textquotesingle{},\ \textquotesingle{}scale4\textquotesingle{},\ \textquotesingle{}chain5\textquotesingle{}){[}seed\ \%\ 3{]}}):
+\texttt{filter3} (parameters seed, cutoff; mining grid seed \{1, 2, 3\}
+\(\times\) cutoff \{10, 20\}), \texttt{scale4} (+ factor \{2, 3\}), and
+\texttt{chain5} (+ shift \{1, 2\}; 5 steps, 4 external parameters).
+\textbf{Unseen draws:} per experiment seed, 210 unseen parameter
+combinations (minimum required 200) from ranges disjoint per coordinate
+from the recorded grid---seed 100--499, factor 4--13, shift 3--15,
+cutoff 21--98---with four guards enforced per case: per-coordinate
+disjointness, tuple uniqueness, never a recorded tuple, and the per-seed
+minimum; the draw rng is
+\texttt{random.Random(\textquotesingle{}e7-replay-generalization-seed\{seed\}\textquotesingle{})}
+with recorded draw order. \textbf{Conventions:} each case executes the
+learned instruction under a rotating calling
+convention---\texttt{wrapped}
+(\texttt{\{\textquotesingle{}ctx\textquotesingle{}:\ \{...\}\}}, the
+\texttt{run\_stream} convention the mining traces were recorded under),
+\texttt{flat} (the bare parameter dict), and \texttt{sibling}
+(\texttt{\{\textquotesingle{}ctx\textquotesingle{}:\ \{\},\ \textless{}params\textgreater{}\}},
+the schema-parameter binding path added by the replay-parameterization
+work). \textbf{Oracle:} per case, the recorded constituent sequence is
+re-run from scratch via \texttt{record\_trace} with the unseen values as
+the initial shared context and the step outputs merged; the replay
+result must equal that merged dict exactly (no tolerance).
+
+\textbf{Result:} 1,050 of 1,050 unseen cases match the oracle exactly
+(100.0\%; 0 mismatches, 0 error cases); per-seed agreement 1.0000
+\(\pm\) 0.0000; per convention 350/350 for each of wrapped, flat, and
+sibling; per composition filter3 420/420 (seeds 0, 3), scale4 420/420
+(seeds 1, 4), chain5 210/210 (seed 2); 179 empty-result edge cases
+(\texttt{kept\ ==\ {[}{]}}) all agree. Two independent full runs are
+byte-identical apart from the timestamp, git revision, and command line.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\caption{Per-seed detail}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Composition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cases
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Match
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Empty-kept cases
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Conventions (w/f/s, all matching)
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Composition
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cases
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Match
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Empty-kept cases
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Conventions (w/f/s, all matching)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & filter3 & 210 & 210 & 36 & 70 / 70 / 70 \\
+1 & scale4 & 210 & 210 & 31 & 70 / 70 / 70 \\
+2 & chain5 & 210 & 210 & 38 & 70 / 70 / 70 \\
+3 & filter3 & 210 & 210 & 41 & 70 / 70 / 70 \\
+4 & scale4 & 210 & 210 & 33 & 70 / 70 / 70 \\
+\end{longtable}
+
+\textbf{Not covered:} dialogue-mined templates with an attached
+\texttt{executor} (the replay arm's sibling feature)---no recorded
+composite body exists to re-run, so there is nothing to compare;
+constructor-bound parameters (values baked into instruction state at
+construction time cannot be rebound---replay re-runs the recorded
+operator \emph{instances}, so only context-carried values can vary; the
+streams here read every parameter from the shared context, which is the
+dataflow contract that makes parameterization possible at all);
+real-workload and LLM streams (the measured streams are deterministic
+synthetic arithmetic, and the claim measured is exact per-case equality
+under that contract, nothing broader).
+
+\subsubsection{Chain-Enriched Optimization
+Workloads}\label{chain-enriched-optimization-workloads}
+
+Raw results: \texttt{examples/benchmarks/fusion\_chain\_results.json}
+(script \texttt{fusion\_chain\_bench.py}). \textbf{Purpose:} the Section
+5.3 random-slot pools understate structure-sensitive passes; do
+chain-enriched workloads---shaped like the fusion/DCE/parallelism
+assumptions---amplify the BASIC \(\rightarrow\) ADVANCED gain?
+\textbf{Generator:} segment families mixed at fusion\_chain 0.35 /
+parallel\_batch 0.30 / dataflow\_chain 0.15 / dead\_chain 0.08 /
+effectful\_anchor 0.12, with per-family run-length ranges (fusion chains
+4--12, parallel batches 4--10, dataflow chains 3--8, dead chains 2--6,
+effectful anchors 1), declared costs U(0.5, 2.0), declared memory sizes
+\{64, 128\} and dataflow buffers \{256--2048\}; the terminal sink
+consumes only leaf outputs. \textbf{Compiler:} the real
+\texttt{InstructionCompiler.compile} (IR captured around the call, no
+output patching); levels NONE/BASIC/ADVANCED/AGGRESSIVE (BASIC = DCE +
+fusion; ADVANCED adds parallel grouping and the resource plan;
+AGGRESSIVE adds the memory-optimization pass). \textbf{Design:} 4 levels
+\(\times\) 5 seeds (0--4) \(\times\) lengths \{50, 200, 1000\}
+\(\times\) 2 arms = 120/120 cells complete; the control arm reuses the
+Section 5.3 generator \texttt{synthetic\_formal\_sequence} at the same
+seeds (\texttt{p\_dead} 0.25, \texttt{p\_pure} 0.55)---it reproduces the
+published Section 5.3 numbers at length 1000 (BASIC dispatch 646.0,
+ADVANCED 344.6, BASIC reduction 0.354), proving the gauge has not
+drifted.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0714}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0714}}@{}}
+\caption{Chain-enriched ladder (mean \(\pm\) sd over 5
+seeds)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective count
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch units
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Declared-cost makespan
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Parallel width
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective count
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch units
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Declared-cost makespan
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Parallel width
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+50 & NONE & 50.0 \(\pm\) 0.0 & 0.000 & 50.0 \(\pm\) 0.0 & 61.6 \(\pm\)
+1.1 & 0.0 \\
+50 & BASIC & 36.8 \(\pm\) 7.3 & 0.264 \(\pm\) 0.147 & 36.8 \(\pm\) 7.3 &
+59.8 \(\pm\) 3.5 & 0.0 \\
+50 & ADVANCED & 36.8 \(\pm\) 7.3 & 0.264 \(\pm\) 0.147 & 5.6 \(\pm\) 4.3
+& 10.1 \(\pm\) 7.0 & 28.2 \\
+50 & AGGRESSIVE & 36.8 \(\pm\) 7.3 & 0.264 \(\pm\) 0.147 & 5.6 \(\pm\)
+4.3 & 10.1 \(\pm\) 7.0 & 28.2 \\
+200 & NONE & 200.0 \(\pm\) 0.0 & 0.000 & 200.0 \(\pm\) 0.0 & 247.9
+\(\pm\) 5.5 & 0.0 \\
+200 & BASIC & 137.6 \(\pm\) 8.5 & 0.312 \(\pm\) 0.042 & 137.6 \(\pm\)
+8.5 & 230.7 \(\pm\) 6.2 & 0.0 \\
+200 & ADVANCED & 137.6 \(\pm\) 8.5 & 0.312 \(\pm\) 0.042 & 25.0 \(\pm\)
+8.5 & 43.6 \(\pm\) 13.3 & 44.8 \\
+200 & AGGRESSIVE & 137.6 \(\pm\) 8.5 & 0.312 \(\pm\) 0.042 & 25.0
+\(\pm\) 8.5 & 43.6 \(\pm\) 13.3 & 44.8 \\
+1000 & NONE & 1000.0 \(\pm\) 0.0 & 0.000 & 1000.0 \(\pm\) 0.0 & 1238.3
+\(\pm\) 12.2 & 0.0 \\
+1000 & BASIC & 705.0 \(\pm\) 13.5 & 0.295 \(\pm\) 0.014 & 705.0 \(\pm\)
+13.5 & 1172.7 \(\pm\) 17.9 & 0.0 \\
+1000 & ADVANCED & 705.0 \(\pm\) 13.5 & 0.295 \(\pm\) 0.014 & 147.0
+\(\pm\) 29.2 & 242.5 \(\pm\) 42.2 & 69.0 \\
+1000 & AGGRESSIVE & 705.0 \(\pm\) 13.5 & 0.295 \(\pm\) 0.014 & 147.0
+\(\pm\) 29.2 & 242.5 \(\pm\) 42.2 & 69.0 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0714}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.2857}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 12\tabcolsep) * \real{0.0714}}@{}}
+\caption{Random-slots control ladder (same seeds; the published Section
+5.3 configuration)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective count
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch units
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Declared-cost makespan
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Parallel width
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective count
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch units
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Declared-cost makespan
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Parallel width
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+50 & NONE & 50.0 \(\pm\) 0.0 & 0.000 & 50.0 \(\pm\) 0.0 & 50.0 \(\pm\)
+0.0 & 0.0 \\
+50 & BASIC & 33.6 \(\pm\) 2.1 & 0.328 \(\pm\) 0.041 & 33.6 \(\pm\) 2.1 &
+33.6 \(\pm\) 2.1 & 0.0 \\
+50 & ADVANCED & 33.6 \(\pm\) 2.1 & 0.328 \(\pm\) 0.041 & 19.0 \(\pm\)
+4.1 & 19.0 \(\pm\) 4.1 & 7.0 \\
+50 & AGGRESSIVE & 33.6 \(\pm\) 2.1 & 0.328 \(\pm\) 0.041 & 19.0 \(\pm\)
+4.1 & 19.0 \(\pm\) 4.1 & 7.0 \\
+200 & NONE & 200.0 \(\pm\) 0.0 & 0.000 & 200.0 \(\pm\) 0.0 & 200.0
+\(\pm\) 0.0 & 0.0 \\
+200 & BASIC & 131.6 \(\pm\) 3.6 & 0.342 \(\pm\) 0.018 & 131.6 \(\pm\)
+3.6 & 131.6 \(\pm\) 3.6 & 0.0 \\
+200 & ADVANCED & 131.6 \(\pm\) 3.6 & 0.342 \(\pm\) 0.018 & 74.0 \(\pm\)
+6.3 & 74.0 \(\pm\) 6.3 & 9.8 \\
+200 & AGGRESSIVE & 131.6 \(\pm\) 3.6 & 0.342 \(\pm\) 0.018 & 74.0
+\(\pm\) 6.3 & 74.0 \(\pm\) 6.3 & 9.8 \\
+1000 & NONE & 1000.0 \(\pm\) 0.0 & 0.000 & 1000.0 \(\pm\) 0.0 & 1000.0
+\(\pm\) 0.0 & 0.0 \\
+1000 & BASIC & 646.0 \(\pm\) 16.4 & 0.354 \(\pm\) 0.016 & 646.0 \(\pm\)
+16.4 & 646.0 \(\pm\) 16.4 & 0.0 \\
+1000 & ADVANCED & 646.0 \(\pm\) 16.4 & 0.354 \(\pm\) 0.016 & 344.6
+\(\pm\) 31.6 & 344.6 \(\pm\) 31.6 & 14.4 \\
+1000 & AGGRESSIVE & 646.0 \(\pm\) 16.4 & 0.354 \(\pm\) 0.016 & 344.6
+\(\pm\) 31.6 & 344.6 \(\pm\) 31.6 & 14.4 \\
+\end{longtable}
+
+\textbf{Findings.} Chain enrichment amplifies the BASIC \(\rightarrow\)
+ADVANCED dispatch reduction to −558.0 units (705.0 \(\rightarrow\)
+147.0, −79.1\%) and the declared-cost makespan to −930.1 (1172.7
+\(\rightarrow\) 242.5, −79.3\%) at length 1000, against −301.4 (646.0
+\(\rightarrow\) 344.6, −46.7\%) on the random-slots control; the
+ADVANCED/BASIC dispatch ratio is 0.209 (chain) vs 0.533 (control), and
+peak parallel width 69.0 vs 14.4. The BASIC-level reduction is
+\emph{lower} on chain-enriched pools (0.295 \(\pm\) 0.014 vs 0.354
+\(\pm\) 0.016 control)---enrichment trades single-level shrink for
+structure the parallel pass can exploit. \textbf{AGGRESSIVE is
+structurally identical to ADVANCED} on all seven structural metrics, per
+seed, at every length and on both arms (deltas exactly 0.0); its only
+differentiation is the advisory memory plan, which is itself
+workload-dependent: buffer-reuse potential 107.8 \(\pm\) 22.2 sites on
+chain-enriched length-1000 pools (11.7\% of the 922.0 distinct tracked
+outputs; peak live outputs 814.2) vs 0.0 \(\pm\) 0.0 on the random-slots
+control (549.4 tracked outputs, no reuse sites)---the highest
+optimization level's extra content exists only when chains supply the
+structure. \textbf{Limitations (as recorded in the results file):} the
+memory-optimization pass only annotates IR metadata---no executor
+consumes the plan, so memory figures are plan-derived analyses, not
+measured runtime savings; \texttt{declared\_cost\_makespan} is a
+metadata cost model (a parallel block contributes the max member cost),
+not wall-clock time; \texttt{peak\_live\_outputs} uses a conservative
+tie-break (production counted before release at equal positions).
+
+\subsubsection{Priced-Comparison Token-Mix
+Sweep}\label{priced-comparison-token-mix-sweep}
+
+Raw results:
+\texttt{examples/benchmarks/promptcache\_sweep\_results.json} (script
+\texttt{promptcache\_sweep.py}). \textbf{Purpose:} Appendix G's two
+caching strategies ranked differently on the real-gateway run (result
+cache \(\gg\) prompt cache) and the mock paper-scale run (result cache
+still ahead, margin smaller); this sweep makes the token mix---an output
+of workload and harness ceilings---the explicit axis. \textbf{Design:}
+the Appendix G overlay (\$3/M input, \$15/M output, 0.1 \(\times\)
+cache-read rate, same two simplifications, both favoring the provider
+baseline) applied to 13 mix points---the measured mock mix plus
+\emph{modeled} constant completion lengths L \(\in\) \{4, 8, 16, 24, 32,
+48, 64, 128, 256, 384, 512, 1024\} tokens/call (the observed
+reply-binds-at-max\_tokens behavior of the Section 5.7.1 alias; L64 and
+L512 correspond to the max\_tokens ceilings of the Section 5.7 cache run
+and the Section 5.7.1 harness)---\(\times\) 3 Zipf skews \{0.5, 1.0,
+1.5\} \(\times\) 5 seeds (1000--1004) \(\times\) 200 draws = 195 cells
+(39,000 draws) over the 40-task population, on the Section 5.7.1
+workload shape (seven-step triage stream, one cacheable LLM-type step).
+All pricing and workload primitives are imported from
+\texttt{paper\_real\_llm\_compiler\_test.py}, not copied; the seed-1000
+mock cells reproduce the published mock paper-scale artifact in all
+three pricing modes (anchor check \texttt{all\_match\ =\ true}). All
+figures are MODELED-on-measured, mock-only.
+
+\textbf{Ordering invariance:}
+\texttt{agentisa\_cache\ ≤\ provider\_prompt\_cache\ ≤\ no\_opt} in
+195/195 cells, flipped 0 cells; the minimum per-cell gap is \$0.016562
+(MODELED). The Section 5.7.1 statement that the \emph{ranking} depends
+on the token mix is therefore about the margin, and the margin is what
+the mix moves: the provider cache's effectiveness (its saving as a
+fraction of the result cache's saving) falls by a factor of 16.4 / 16.7
+/ 17.0 across skews from the input-dominated anchor to the
+completion-dominated one, crossing 0.5 near output-cost parity and
+collapsing below a 5\% absolute saving well before the harness ceiling.
+
+\textbf{Crossover points} (linear interpolation on the 5-seed mean
+curves): effectiveness crosses 0.5 at 23.3 / 22.9 / 22.5 completion
+tokens per call at s = 0.5 / 1.0 / 1.5 (output-cost share \(\approx\)
+44.4\% / 44.4\% / 44.3\%); the provider prompt-cache saving falls below
+5\% beyond 392.3 / 397.7 / 416.7 completion tokens per call.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 18\tabcolsep) * \real{0.1000}}@{}}
+\caption{Per-skew curves (5-seed means; ``ratio'' is provider-cache
+effectiveness, its saving ÷ the result cache's saving; ``share'' is the
+output-cost share of the no-optimization bill)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mix point
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+s = 0.5: result / prompt saving \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+share
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+s = 1.0: result / prompt saving \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+share
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+s = 1.5: result / prompt saving \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+share
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Mix point
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+s = 0.5: result / prompt saving \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+share
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+s = 1.0: result / prompt saving \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+share
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+s = 1.5: result / prompt saving \%
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+share
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+L4 & 80.39 / 63.58 & 0.791 & 0.121 & 82.45 / 65.05 & 0.789 & 0.123 &
+87.14 / 68.56 & 0.787 & 0.125 \\
+L8 & 80.40 / 56.70 & 0.705 & 0.216 & 82.47 / 57.93 & 0.702 & 0.219 &
+87.19 / 60.94 & 0.699 & 0.222 \\
+L16 & 80.40 / 46.62 & 0.580 & 0.356 & 82.51 / 47.52 & 0.576 & 0.359 &
+87.26 / 49.85 & 0.571 & 0.364 \\
+L24 & 80.40 / 39.58 & 0.492 & 0.453 & 82.54 / 40.29 & 0.488 & 0.457 &
+87.31 / 42.18 & 0.483 & 0.462 \\
+L32 & 80.40 / 34.39 & 0.428 & 0.525 & 82.56 / 34.96 & 0.424 & 0.529 &
+87.35 / 36.56 & 0.419 & 0.534 \\
+mock (measured) & 80.42 / 29.06 & 0.361 & 0.598 & 82.32 / 29.95 & 0.364
+& 0.596 & 86.83 / 31.94 & 0.368 & 0.593 \\
+L48 & 80.40 / 27.24 & 0.339 & 0.624 & 82.59 / 27.65 & 0.335 & 0.627 &
+87.41 / 28.86 & 0.330 & 0.632 \\
+L64 & 80.40 / 22.55 & 0.281 & 0.688 & 82.61 / 22.87 & 0.277 & 0.692 &
+87.44 / 23.84 & 0.273 & 0.696 \\
+L128 & 80.40 / 13.36 & 0.166 & 0.815 & 82.65 / 13.52 & 0.164 & 0.818 &
+87.51 / 14.06 & 0.161 & 0.821 \\
+L256 & 80.40 / 7.36 & 0.092 & 0.898 & 82.67 / 7.44 & 0.090 & 0.900 &
+87.55 / 7.72 & 0.088 & 0.902 \\
+L384 & 80.40 / 5.08 & 0.063 & 0.930 & 82.68 / 5.13 & 0.062 & 0.931 &
+87.56 / 5.32 & 0.061 & 0.932 \\
+L512 & 80.40 / 3.88 & 0.048 & 0.946 & 82.68 / 3.92 & 0.047 & 0.947 &
+87.57 / 4.06 & 0.046 & 0.948 \\
+L1024 & 80.40 / 1.99 & 0.025 & 0.973 & 82.69 / 2.01 & 0.024 & 0.973 &
+87.59 / 2.08 & 0.024 & 0.973 \\
+\end{longtable}
+
+The result-cache saving is nearly mix-invariant (within-skew range
+across the whole 13-point axis: 80.39--80.42 at s = 0.5, 82.32--82.69 at
+s = 1.0, 86.83--87.59 at s = 1.5) and rises with skew, since it is
+determined by repeated structure; the provider prompt-cache saving is
+strongly mix-dependent (63.58\% \(\rightarrow\) 1.99\% at s = 0.5).
+\textbf{Mix-coordinate alignment with the published real run:} the
+sweep's L512 point sits at output/input token ratio 3.53--3.66 and
+output-cost share 94.6--94.8\%, against the published real-gateway run's
+2.84 and 93.4\% (quoted from its artifact, not recomputed: result cache
+cuts modeled cost 55.96\%, provider prompt cache 3.28\%, 180.36 prompt
+tokens and 512 completion tokens per call)---the modeled
+completion-dominated point is a reasonable analog of the real mix.
+\textbf{Limitations (as recorded in the results file):} mock only, no
+live gateway tokens in this sweep; the L* completion lengths are modeled
+constants, not generated text; a single workload shape; the overlay's
+two simplifications stand (no 1.25 \(\times\) cache-write premium, no
+1024-token minimum prefix---both favor the provider baseline); GPTCache
+and approximate caching remain out of scope, with no head-to-head
+claimed.
+
+\subsection{Real-Gateway Re-Runs: Quality Harness and Multi-Seed Cache
+Protocol}\label{real-gateway-re-runs-quality-harness-and-multi-seed-cache-protocol}
+
+Two follow-ups to the Section 5.7/5.7.1 real-gateway experiments, run on
+the same gateway and model alias (a local alias for a hosted GLM
+reasoning model) at the scales a per-call quota and a session budget
+allow. Both results files were recomputed from raw records by
+\texttt{examples/benchmarks/e10\_gateway\_postprocess.py} with a
+cross-check against the harness's own summary (both \texttt{passed});
+raw per-call replies, stop reasons, token usage, and latencies are
+retained in the committed JSONs.
+
+\subsubsection{Classification-Quality Re-Run at a Raised Token
+Ceiling}\label{classification-quality-re-run-at-a-raised-token-ceiling}
+
+Raw results: \texttt{examples/benchmarks/gateway\_quality\_results.json}
+(harness \texttt{examples/paper\_real\_llm\_quality\_check.py}, the
+Section 5.7.1 quality harness; raw run and probe files committed
+alongside).
+
+\textbf{Protocol.} The Section 5.7.1 reference run bound 7 of 22
+classification replies at the 1,500-token ceiling (empty text, the
+entire budget spent on reasoning), so its agreement numbers were
+fallback-dominated on those batches. This re-run raises the ceiling
+under an explicit probe-then-scale rule rather than guesswork: first one
+probe classification call at \texttt{max\_tokens} = 4096 (15.25 s,
+\texttt{end\_turn}, 719 completion tokens, 8/8 claims parsed---so the
+alias \emph{can} finish a batch given budget); then worst-case planning
+from the minimum completion throughput observed in the 1,500-token run
+(37.6 tokens/s): a full-ceiling reply costs
+\texttt{max\_tokens\ /\ throughput}, so 3072 tokens (2.05 \(\times\) the
+1500 default) plan to 81.6 s---just under the harness's hard-coded 90 s
+httpx timeout, above which a full-ceiling reply would trip the 3-strike
+run abort on exactly the batches that bind (the ceiling could not be
+raised further for this reason); at 81.6 s worst-case, the 40-minute
+session budget affords 29 calls, so the \texttt{tiny} preset (22
+distinct batches, worst case 29.9 min) was chosen over \texttt{paper}
+(36 batches, 49.0 min worst case). Run configuration: tiny preset---50
+draws over the 40-task population, Zipf 1.0, batch size 8, seed base
+1000 (the same seeded draw sequence and batch set as the Section 5.7.1
+reference run, enabling a paired comparison), one live call per distinct
+signature batch, temperature 0. Totals: 1 preflight + 22 live calls = 23
+round trips, zero timeouts, zero crashes.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\caption{Recomputed summary, with the 1,500-token reference run for
+paired contrast}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reference run (max\_tokens 1500)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Re-run (max\_tokens 3072)
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Quantity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reference run (max\_tokens 1500)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Re-run (max\_tokens 3072)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Distinct batches / live calls & 22 / 22 & 22 / 22 \\
+Signatures & 176 & 176 \\
+Parsed claims (parse rate) & 120 (68.2\%) & 144 (81.8\%) \\
+Fallback-filled classifications & 56 & 32 \\
+Replies bound at ceiling & 7 / 22 & 4 / 22 \\
+Model claims vs gold & 50.0\% (120 claims) & 51.4\% (144 claims) \\
+Final classification vs gold & 43.2\% & 45.5\% \\
+Rule-fallback baseline vs gold & 32.4\% & 32.4\% \\
+Final classification vs rule-fallback & 48.9\% & 38.6\% \\
+Per-call latency (min / median / mean / max) & --- & 11.1 s / 29.3 s /
+36.0 s / 81.9 s \\
+\end{longtable}
+
+\begin{longtable}[]{@{}llll@{}}
+\caption{Per-gold-class agreement (planted rubric classes; 176 synthetic
+signatures)}\tabularnewline
+\toprule\noalign{}
+Gold class & Signatures & Reference run matches & Re-run matches \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Gold class & Signatures & Reference run matches & Re-run matches \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+critical & 40 & 17 (42.5\%) & 19 (47.5\%) \\
+high & 40 & 12 (30.0\%) & 12 (30.0\%) \\
+medium & 51 & 19 (37.3\%) & 23 (45.1\%) \\
+low & 45 & 28 (62.2\%) & 26 (57.8\%) \\
+\end{longtable}
+
+\textbf{Paired truncation outcome:} of the 7 batches that bound at 1500,
+4 now complete (including the highest-rank one) and 3 still bind at 3072
+(empty text, the entire budget spent on reasoning); 1 batch that
+completed at 1500 bound at 3072 in this re-run (rank 11)---the reasoning
+alias is not bit-reproducible across runs even at temperature 0.
+\textbf{Verdict, reported as the harness issued it:} \texttt{all\_pass}
+= False, solely because the \texttt{replies\_not\_bound\_at\_ceiling}
+gate fails on 4/22; every measurability precondition holds (one call per
+distinct batch, raw replies and gold labels recorded for every call,
+planted classes covered per batch, claims parsed). The harness gates no
+accuracy threshold---agreement rates are reported measurements.
+\textbf{What this does and does not show:} with the ceiling raised, the
+model's final classifications agree with the planted gold rubric at
+45.5\% vs the fallback rule's 32.4\%---measurably above the rule,
+previously unknown from the truncated run---but 4 batches still cannot
+finish within 3072 tokens, so the model-quality statement carries a
+disclosed truncation residual rather than a clean all-clear. Gold labels
+are a planted keyword rubric on synthetic signatures (recorded verbatim
+in provenance), not human annotation of real logs; agreement-vs-gold is
+a rubric-following diagnostic, not a deployment-quality claim. Single
+gateway, single alias, single seed, sequential, no streaming:
+multi-model, multi-seed, and real-deployment behavior remain untested.
+
+\subsubsection{Multi-Seed Real-Gateway Cache Run at Reduced
+Scale}\label{multi-seed-real-gateway-cache-run-at-reduced-scale}
+
+Raw results in
+\texttt{examples/benchmarks/gateway\_multiseed\_results.json}:
+
+\begin{itemize}
+\tightlist
+\item
+  Bench: \texttt{examples/benchmarks/isa\_real\_llm\_bench.py}---the
+  Section 5.7 cache experiment's bench, run unmodified via CLI
+\item
+  Raw per-Zipf chunk files: committed alongside the results JSON
+\end{itemize}
+
+\textbf{Protocol.} The Section 5.7 published run is 200 tasks \(\times\)
+1 seed \(\times\) 3 Zipf levels; this re-run adds a second real seed at
+the reduced scale the session budget and gateway quota sanction:
+\texttt{-\/-tasks\ 100\ -\/-seeds\ 2\ -\/-zipf\ 0.5\ 1.0\ 1.5\ -\/-max-tokens\ 64}
+(mirroring the Section 5.7 protocol's ceiling), seeds \{0, 1\} with
+\texttt{rng\ =\ random.Random(1000\ +\ seed)}, tokens from the gateway's
+usage field and latency from the wall clock---no simulated values.
+\textbf{Quota episode, recorded as it happened:} the first
+single-invocation attempt crashed after roughly 125 successful calls
+with a gateway 429 \texttt{AccountQuotaExceeded} (a 5-hour usage quota,
+reset at 21:19:19 +0800); the bench does not retry 429s and writes no
+output file on crash. One 16-token probe call and five bench-shaped
+64-token calls all returned 200 about ten minutes later, so the re-run
+was chunked per Zipf level with an outer 90 s \(\times\) 3 retry wrapper
+instead of waiting for the reset; all 3 chunks passed on the first try
+with no recurrence. Totals: 1,103 gateway calls; chunked wall time
+3,243.8 s (excluding the crashed attempt and inter-chunk gaps).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\caption{Per-Zipf aggregates (2 seeds; expected hit rate is the analytic
+no-backend reference for the same seeded draw)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (baseline \(\rightarrow\) cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expected hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (mean)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p50 cached latency
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (baseline \(\rightarrow\) cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expected hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (mean)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+p50 cached latency
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.5 & 100 \(\rightarrow\) 96.5 \(\pm\) 3.5 & 3.5\% \(\pm\) 3.5\% & 3.5\%
+\(\pm\) 3.5\% & 12,655.9 ms & 2,903.45 ms \\
+1.0 & 100 \(\rightarrow\) 84.5 \(\pm\) 0.7 & 15.5\% \(\pm\) 0.7\% &
+15.5\% \(\pm\) 0.7\% & 56,495.7 ms & 2,675.25 ms \\
+1.5 & 100 \(\rightarrow\) 70.5 \(\pm\) 3.5 & 29.5\% \(\pm\) 3.5\% &
+29.5\% \(\pm\) 3.5\% & 89,201.8 ms & 2,477.3 ms \\
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 10\tabcolsep) * \real{0.1667}}@{}}
+\caption{Raw per-(Zipf, seed) counts (all six cells; hit rate equals the
+expected reference exactly in every cell)}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (base \(\rightarrow\) cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hit rate = expected
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tokens saved
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (ms)
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (base \(\rightarrow\) cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Hit rate = expected
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tokens saved
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (ms)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.5 & 0 & 100 \(\rightarrow\) 99 & 1.00\% = 1.00\% & 85 & 12,456.2 \\
+0.5 & 1 & 100 \(\rightarrow\) 94 & 6.00\% = 6.00\% & 510 & 12,855.6 \\
+1.0 & 0 & 100 \(\rightarrow\) 85 & 15.00\% = 15.00\% & 1,275 &
+38,894.5 \\
+1.0 & 1 & 100 \(\rightarrow\) 84 & 16.00\% = 16.00\% & 1,360 &
+74,096.9 \\
+1.5 & 0 & 100 \(\rightarrow\) 68 & 32.00\% = 32.00\% & 2,720 &
+90,372.1 \\
+1.5 & 1 & 100 \(\rightarrow\) 73 & 27.00\% = 27.00\% & 2,295 &
+88,031.5 \\
+\end{longtable}
+
+\textbf{What this shows:} the cache protocol's correctness
+property---measured hit rate equal to the analytic expected hit rate of
+the seeded draw---holds exactly on the real gateway in all 6 of 6 (Zipf,
+seed) cells, and call reduction matches hit rate at every skew (3.5\% /
+15.5\% / 29.5\%); per-call latency p50 falls mildly with skew (2,903 /
+2,675 / 2,477 ms) as fewer uncached calls dominate. \textbf{What it does
+not show, stated plainly:} the reduced scale is \emph{not} 1:1
+comparable to the published 200-task run---100-task workloads contain
+fewer repeated (instruction, params) pairs, so the hit rates (3.5\% /
+15.5\% / 29.5\%) sit below the frozen paper values (8.5\% / 26.0\% /
+45.5\% at 200 tasks \(\times\) 1 seed); the side-by-side is context, not
+a contradiction. Two seeds give a real but small stdev; the synthetic
+suite's 5-seed protocol would have cost about 2,760 gateway calls (the
+1,103 recorded calls over six (Zipf, seed) cells extrapolated to the
+protocol's fifteen; each round trip \textasciitilde2 s) and was not
+affordable in-session. Coverage: complete at reduced scale---single
+gateway, single model alias, 3 Zipf buckets \(\times\) 2 seeds
+\(\times\) 100 tasks, \texttt{max\_tokens} 64.
 
 \end{document}
