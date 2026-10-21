@@ -14,13 +14,35 @@ Differences from the synthetic suite (all reported in the output):
 * Latency is measured on the wall clock, not simulated.
 * Token usage is taken from the gateway's ``usage`` field.
 
+Multi-seed orchestration: ``--seeds N`` runs N seeded workloads (rng
+seeds ``1000 + k`` for ``k in range(N)``) per Zipf level and aggregates
+each per-seed measurement to mean/stdev, so single-seed noise cannot be
+mistaken for an effect.  Aggregates and per-seed rows are both reported.
+
+Backends (``--backend``):
+
+* ``mock`` (default) — a deterministic offline stand-in
+  (``DeterministicMockBackend``) with the same accounting surface as the
+  gateway backend.  It runs the existing experiment code path unchanged,
+  so the multi-seed orchestration above is exercisable in CI without the
+  network.  Its numbers are labeled as such in the output: tokens are
+  template-size accounted (chars/4) and per-call latency is a constant
+  simulated charge — api_calls, hit rates and reductions are exact,
+  wall-clock and token fields are not measurements.
+* ``gateway`` — the real ``/v1/messages`` round trips through the local
+  Anthropic-compatible gateway, exactly as before the selector existed
+  (same backend construction, preflight, retries and API-key handling).
+
 Honesty rules: failures are retried a bounded number of times for
 transient errors only; persistent failures abort the run.  Nothing is
-estimated or extrapolated — every number is a measurement.
+estimated or extrapolated — every gateway number is a measurement, and
+every mock number is a deterministic simulation labeled in the output.
 
 Usage:
     python isa_real_llm_bench.py --tasks 60 --seeds 2 \
         --model claude-glm-5.3-flash --output isa_real_llm_results.json
+    python isa_real_llm_bench.py --backend gateway --tasks 200 --seeds 1 \
+        --max-tokens 64 --output isa_real_llm_results.json
 """
 
 from __future__ import annotations
@@ -28,6 +50,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import math
 import os
 import random
 import statistics
@@ -50,10 +73,26 @@ DEFAULT_BASE_URL = "https://127.0.0.1:8443"
 DEFAULT_CA_CERT = "/opt/homebrew/etc/nginx/ssl/witmem-gw.crt"
 DEFAULT_MODEL = "claude-glm-5.3-flash"
 
+# Mock-backend accounting, mirroring paper_real_llm_compiler_test.py so the
+# two harnesses template-account tokens identically (chars/4, min 1) and
+# charge the same constant simulated per-call latency (never slept).
+MOCK_CALL_LATENCY_MS = 80.0
+MOCK_TOKEN_SOURCE = "template-size accounting (chars/4, mock)"
+
+
+def _account_tokens(text: str) -> int:
+    """Deterministic token accounting from text size (chars/4, min 1)."""
+    return max(1, math.ceil(len(text) / 4))
+
 
 @dataclass
 class BackendStats:
-    """Measurements collected from real gateway round trips."""
+    """Measurements collected from backend round trips.
+
+    On the gateway backend these are real measurements; on the mock
+    backend the token/latency fields are deterministic simulations (see
+    ``DeterministicMockBackend``).
+    """
 
     api_calls: int = 0
     wall_ms: float = 0.0
@@ -106,6 +145,7 @@ class RealLLMBackend:
         self.input_tokens = 0
         self.output_tokens = 0
         self.latencies_ms: List[float] = []
+        self.token_source = "gateway usage field (real)"
 
     def stats(self) -> BackendStats:
         return BackendStats(self.api_calls, self.wall_ms, self.input_tokens,
@@ -171,6 +211,62 @@ class RealLLMBackend:
         await self._client.aclose()
 
 
+class DeterministicMockBackend:
+    """Deterministic offline stand-in with the gateway's accounting surface.
+
+    Mirrors ``paper_real_llm_compiler_test.DeterministicMockBackend`` and
+    the synthetic suite's ``MockLLMBackend``: every ``infer`` counts as one
+    API round trip, tokens are accounted from the prompt/reply template
+    sizes (chars/4), and the constant ``MOCK_CALL_LATENCY_MS`` is *charged*
+    to a simulated clock — never slept — so mock runs are fast and
+    byte-reproducible.  The reply is a pure function of the payload; the
+    cache experiment depends only on call counts and the (instruction,
+    params) hit/miss sequence, both of which the mock reproduces exactly.
+    """
+
+    def __init__(self) -> None:
+        self.api_calls = 0
+        self.wall_ms = 0.0
+        self.input_tokens = 0
+        self.output_tokens = 0
+        self.latencies_ms: List[float] = []
+        self.token_source = MOCK_TOKEN_SOURCE
+
+    def stats(self) -> BackendStats:
+        return BackendStats(self.api_calls, self.wall_ms, self.input_tokens,
+                            self.output_tokens, list(self.latencies_ms))
+
+    async def infer(self, payload: str) -> str:
+        reply = f"response::{payload}"
+        self.api_calls += 1
+        self.input_tokens += _account_tokens(payload)
+        self.output_tokens += _account_tokens(reply)
+        self.wall_ms += MOCK_CALL_LATENCY_MS
+        self.latencies_ms.append(MOCK_CALL_LATENCY_MS)
+        return reply
+
+    async def close(self) -> None:
+        pass
+
+
+def build_backend(args: argparse.Namespace) -> Any:
+    """Select the LLM backend from ``args.backend``.
+
+    ``mock`` returns the deterministic offline stand-in (no network, no
+    API key); ``gateway`` preserves the pre-selector behavior exactly: the
+    API key must be present, and a ``RealLLMBackend`` is constructed with
+    the same arguments the script always used.
+    """
+    if args.backend == "mock":
+        return DeterministicMockBackend()
+    if not args.api_key:
+        raise SystemExit("API key required: --api-key or ANTHROPIC_AUTH_TOKEN")
+    return RealLLMBackend(
+        base_url=args.base_url, api_key=args.api_key, ca_cert=args.ca_cert,
+        model=args.model, max_tokens=args.max_tokens,
+    )
+
+
 class RealLLMInstruction(Instruction):
     """LLM-backed instruction routed through the real gateway.
 
@@ -228,13 +324,12 @@ def stats_summary(s: BackendStats) -> Dict[str, Any]:
 
 
 async def run_real_cache_experiment(args: argparse.Namespace) -> Dict[str, Any]:
-    backend = RealLLMBackend(
-        base_url=args.base_url, api_key=args.api_key, ca_cert=args.ca_cert,
-        model=args.model, max_tokens=args.max_tokens,
-    )
+    backend = build_backend(args)
     results: Dict[str, Any] = {
         "experiment": "cache_real_llm",
         "config": {
+            "backend": args.backend,
+            "token_source": getattr(backend, "token_source", ""),
             "gateway_base_url": args.base_url,
             "model": args.model,
             "max_tokens": args.max_tokens,
@@ -251,18 +346,36 @@ async def run_real_cache_experiment(args: argparse.Namespace) -> Dict[str, Any]:
             "scale_note": (
                 "Same workload generator (zipf_workload), instruction pool and "
                 "parameter space as the synthetic suite; n_tasks and seeds are "
-                "reduced because real round trips cost seconds. Latency is "
-                "measured on the wall clock; tokens come from gateway usage."
+                "reduced because real round trips cost seconds. " + (
+                    "Latency is measured on the wall clock; tokens come from "
+                    "gateway usage."
+                    if args.backend == "gateway" else
+                    "Latency and tokens are deterministic simulations on the "
+                    "mock backend (see backend_note)."
+                )
             ),
         },
         "data": [],
     }
+    if args.backend == "mock":
+        results["config"]["backend_note"] = (
+            "Mock backend: the reply is a deterministic pure function of the "
+            "payload; tokens are template-size accounted (chars/4) and the "
+            f"per-call latency is the constant {MOCK_CALL_LATENCY_MS:.0f} ms "
+            "simulated charge (never slept). api_calls, hit rates and call "
+            "reductions are exact; wall_ms is real compute time without "
+            "network and latencies/tokens are simulated, so no wall-clock or "
+            "token comparison to the gateway run is implied."
+        )
     try:
-        # Preflight: one real call to fail fast with a clear error.
+        # Preflight: one call to fail fast with a clear error.
         t0 = time.perf_counter()
         pong = await backend.infer("Reply with exactly: pong")
-        print(f"preflight ok: model={args.model} "
-              f"{1000 * (time.perf_counter() - t0):.0f}ms -> {pong[:40]!r}")
+        if args.backend == "mock":
+            print("preflight ok: mock backend (deterministic, offline)")
+        else:
+            print(f"preflight ok: model={args.model} "
+                  f"{1000 * (time.perf_counter() - t0):.0f}ms -> {pong[:40]!r}")
 
         for zipf_s in args.zipf:
             per_seed: List[Dict[str, Any]] = []
@@ -362,9 +475,14 @@ async def run_real_cache_experiment(args: argparse.Namespace) -> Dict[str, Any]:
         await backend.close()
 
 
-def main() -> None:
+def main(argv: Optional[List[str]] = None) -> None:
     parser = argparse.ArgumentParser(
-        description="AgentISA real-LLM cache benchmark (local gateway)")
+        description="AgentISA real-LLM cache benchmark "
+                    "(deterministic mock or local gateway)")
+    parser.add_argument("--backend", choices=["mock", "gateway"], default="mock",
+                        help="LLM backend: deterministic offline mock "
+                             "(default) or the local Anthropic-compatible "
+                             "gateway (requires an API key)")
     parser.add_argument("--tasks", type=int, default=60)
     parser.add_argument("--seeds", type=int, default=2)
     parser.add_argument("--zipf", nargs="+", type=float, default=[0.5, 1.0, 1.5])
@@ -377,9 +495,9 @@ def main() -> None:
     parser.add_argument("--ca-cert", type=str,
                         default=os.environ.get("NODE_EXTRA_CA_CERTS", DEFAULT_CA_CERT))
     parser.add_argument("--output", type=str, default="isa_real_llm_results.json")
-    args = parser.parse_args()
-    if not args.api_key:
-        raise SystemExit("API key required: --api-key or ANTHROPIC_AUTH_TOKEN")
+    args = parser.parse_args(argv)
+    # The API key is required only by the gateway backend; build_backend
+    # enforces it (same message, same early exit as before the selector).
 
     t0 = time.perf_counter()
     res = asyncio.run(run_real_cache_experiment(args))

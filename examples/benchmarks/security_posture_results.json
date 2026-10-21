@@ -1,0 +1,2634 @@
+{
+  "experiment": "security_posture_matrix",
+  "description": "Functional fail-open vs fail-closed matrix for the AgentISA coordination security layer: scenarios (unregistered resource / unknown data sensitivity / incomplete resource-access policy / normal task, plus a supplementary malformed-registry row) x enforcement modes (strict=False fail-open default vs strict=True fail-closed). Qualitative + counting only: decisions and recorded reasons, no performance quantities.",
+  "config": {
+    "seeds": [
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "n_seeds": 5,
+    "tasks_per_scenario_per_seed": 40,
+    "modes": [
+      "fail_open",
+      "fail_closed"
+    ],
+    "mode_flags": {
+      "fail_open": "strict=False",
+      "fail_closed": "strict=True"
+    },
+    "scenarios_main": [
+      "unregistered_resource",
+      "unknown_sensitivity",
+      "incomplete_policy",
+      "normal_task"
+    ],
+    "scenarios_supplementary": [
+      "malformed_registry_supplementary"
+    ]
+  },
+  "provenance": {
+    "git_rev": "0e1671f8",
+    "git_rev_command": "git rev-parse --short HEAD (read-only)",
+    "timestamp_utc": "2026-10-21T10:12:45+00:00",
+    "seeds": [
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "scale": {
+      "scenarios_main": 4,
+      "scenarios_supplementary": 1,
+      "sub_variants_total": 18,
+      "task_population": 1000,
+      "monitor_evaluations": 2000,
+      "coordinator_runs": 2000,
+      "modes": 2
+    },
+    "command": "examples/benchmarks/security_posture_matrix.py --seeds 5 --tasks-per-scenario 40",
+    "python_version": "3.14.5",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "module_under_test": "agentflow/core/isa/coordination.py",
+    "classes_under_test": [
+      "SecurityMonitor",
+      "AgentCoordinator"
+    ]
+  },
+  "coverage": {
+    "dependency": {
+      "job": "I4-security-failclosed",
+      "status": "shipped",
+      "surface": "SecurityMonitor(config, strict=...) and AgentCoordinator(config, security_strict=...)"
+    },
+    "coverage_status": "full",
+    "covered": [
+      "all four required scenarios x both enforcement modes at the SecurityMonitor.validate_task level (fresh monitor per task x mode)",
+      "the supplementary malformed-registry row in both modes",
+      "end-to-end propagation through AgentCoordinator.coordinate_task for the same task population (fresh coordinator per task x mode)",
+      "violation recording (auditability) for every denial in both modes, and the '(strict mode)' marker on strict denials"
+    ],
+    "not_covered": [
+      "the always-on authentication/authorization checks are held fixed (all tasks carry tokens); they are not a matrix axis",
+      "required_level is LOW everywhere except two normal-task variants (MEDIUM/HIGH); the sensitivity-vs-requirement mismatch path is exercised only by the shipped unit suite, not scaled here",
+      "no live network, LLM or ray involvement: posture counting only, so there are no latency/throughput numbers by construction"
+    ]
+  },
+  "posture_summary": {
+    "hole_scenarios_fail_open_permits_fail_closed_blocks": [
+      "unknown_sensitivity",
+      "incomplete_policy"
+    ],
+    "tasks_fail_open_would_permit_but_fail_closed_blocks": 400,
+    "normal_task_fail_open_denied": 0,
+    "normal_task_fail_closed_denied": 0,
+    "strict_mode_denials_total_non_normal": 800,
+    "strict_mode_denials_with_recorded_violation_non_normal": 800
+  },
+  "matrix": [
+    {
+      "scenario": "unregistered_resource",
+      "scenario_label": "Task requests a resource outside the declared allowed_resources registry",
+      "matrix_role": "main",
+      "expected_posture": "both modes deny; fail-closed adds a distinguishing 'Unregistered resources' reason with the (strict mode) marker",
+      "mode": "fail_open",
+      "strict_flag": false,
+      "n_tasks": 200,
+      "allowed": 0,
+      "denied": 200,
+      "allow_rate": 0.0,
+      "deny_rate": 1.0,
+      "allow_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "mixed_registered_and_unregistered",
+          "n": 43,
+          "allowed": 0,
+          "denied": 43
+        },
+        {
+          "variant": "registry_declared_as_list",
+          "n": 53,
+          "allowed": 0,
+          "denied": 53
+        },
+        {
+          "variant": "single_unregistered",
+          "n": 57,
+          "allowed": 0,
+          "denied": 57
+        },
+        {
+          "variant": "string_form_request",
+          "n": 47,
+          "allowed": 0,
+          "denied": 47
+        }
+      ],
+      "reason_class_counts": {
+        "generic_invalid_resource_access": 200
+      },
+      "distinct_violation_messages": [
+        {
+          "message": "Invalid resource access",
+          "count": 200
+        }
+      ],
+      "denied_with_strict_marker": 0,
+      "denied_with_recorded_violation": 200,
+      "strict_marker_rate_among_denied": 0.0,
+      "violation_recorded_rate_among_denied": 1.0,
+      "observed_note": "both modes deny the whole population; the recorded reason classes differ between modes"
+    },
+    {
+      "scenario": "unregistered_resource",
+      "scenario_label": "Task requests a resource outside the declared allowed_resources registry",
+      "matrix_role": "main",
+      "expected_posture": "both modes deny; fail-closed adds a distinguishing 'Unregistered resources' reason with the (strict mode) marker",
+      "mode": "fail_closed",
+      "strict_flag": true,
+      "n_tasks": 200,
+      "allowed": 0,
+      "denied": 200,
+      "allow_rate": 0.0,
+      "deny_rate": 1.0,
+      "allow_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "mixed_registered_and_unregistered",
+          "n": 43,
+          "allowed": 0,
+          "denied": 43
+        },
+        {
+          "variant": "registry_declared_as_list",
+          "n": 53,
+          "allowed": 0,
+          "denied": 53
+        },
+        {
+          "variant": "single_unregistered",
+          "n": 57,
+          "allowed": 0,
+          "denied": 57
+        },
+        {
+          "variant": "string_form_request",
+          "n": 47,
+          "allowed": 0,
+          "denied": 47
+        }
+      ],
+      "reason_class_counts": {
+        "unregistered_resources_strict": 200
+      },
+      "distinct_violation_messages": [
+        {
+          "message": "Unregistered resources (strict mode): ['shadow_bucket']",
+          "count": 48
+        },
+        {
+          "message": "Unregistered resources (strict mode): ['test_cluster']",
+          "count": 44
+        },
+        {
+          "message": "Unregistered resources (strict mode): ['legacy_tape_archive']",
+          "count": 42
+        },
+        {
+          "message": "Unregistered resources (strict mode): ['unregistered_gpu']",
+          "count": 35
+        },
+        {
+          "message": "Unregistered resources (strict mode): ['rogue_endpoint']",
+          "count": 31
+        }
+      ],
+      "denied_with_strict_marker": 200,
+      "denied_with_recorded_violation": 200,
+      "strict_marker_rate_among_denied": 1.0,
+      "violation_recorded_rate_among_denied": 1.0,
+      "observed_note": "both modes deny the whole population; the recorded reason classes differ between modes"
+    },
+    {
+      "scenario": "unknown_sensitivity",
+      "scenario_label": "Task's data sensitivity cannot be positively determined (undeclared / empty categories / non-numeric / out-of-range low)",
+      "matrix_role": "main",
+      "expected_posture": "fail-open silently treats unknown as 0 and permits; fail-closed denies with an 'Unknown data sensitivity' reason",
+      "mode": "fail_open",
+      "strict_flag": false,
+      "n_tasks": 200,
+      "allowed": 200,
+      "denied": 0,
+      "allow_rate": 1.0,
+      "deny_rate": 0.0,
+      "allow_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "empty_category_list",
+          "n": 45,
+          "allowed": 45,
+          "denied": 0
+        },
+        {
+          "variant": "negative_out_of_range",
+          "n": 51,
+          "allowed": 51,
+          "denied": 0
+        },
+        {
+          "variant": "no_declaration",
+          "n": 49,
+          "allowed": 49,
+          "denied": 0
+        },
+        {
+          "variant": "non_numeric_declaration",
+          "n": 55,
+          "allowed": 55,
+          "denied": 0
+        }
+      ],
+      "reason_class_counts": {
+        "allowed": 200
+      },
+      "distinct_violation_messages": [],
+      "denied_with_strict_marker": 0,
+      "denied_with_recorded_violation": 0,
+      "strict_marker_rate_among_denied": 0.0,
+      "violation_recorded_rate_among_denied": 0.0,
+      "observed_note": "mode flip: fail-open permits the whole population, fail-closed blocks it entirely"
+    },
+    {
+      "scenario": "unknown_sensitivity",
+      "scenario_label": "Task's data sensitivity cannot be positively determined (undeclared / empty categories / non-numeric / out-of-range low)",
+      "matrix_role": "main",
+      "expected_posture": "fail-open silently treats unknown as 0 and permits; fail-closed denies with an 'Unknown data sensitivity' reason",
+      "mode": "fail_closed",
+      "strict_flag": true,
+      "n_tasks": 200,
+      "allowed": 0,
+      "denied": 200,
+      "allow_rate": 0.0,
+      "deny_rate": 1.0,
+      "allow_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "empty_category_list",
+          "n": 45,
+          "allowed": 0,
+          "denied": 45
+        },
+        {
+          "variant": "negative_out_of_range",
+          "n": 51,
+          "allowed": 0,
+          "denied": 51
+        },
+        {
+          "variant": "no_declaration",
+          "n": 49,
+          "allowed": 0,
+          "denied": 49
+        },
+        {
+          "variant": "non_numeric_declaration",
+          "n": 55,
+          "allowed": 0,
+          "denied": 55
+        }
+      ],
+      "reason_class_counts": {
+        "unknown_sensitivity_strict": 200
+      },
+      "distinct_violation_messages": [
+        {
+          "message": "Unknown data sensitivity: no declaration (strict mode)",
+          "count": 94
+        },
+        {
+          "message": "Unknown data sensitivity declaration: 'high' (strict mode)",
+          "count": 55
+        },
+        {
+          "message": "Unknown data sensitivity level: -1 (strict mode)",
+          "count": 51
+        }
+      ],
+      "denied_with_strict_marker": 200,
+      "denied_with_recorded_violation": 200,
+      "strict_marker_rate_among_denied": 1.0,
+      "violation_recorded_rate_among_denied": 1.0,
+      "observed_note": "mode flip: fail-open permits the whole population, fail-closed blocks it entirely"
+    },
+    {
+      "scenario": "incomplete_policy",
+      "scenario_label": "Task requests resources but the coordinator declares no allowed_resources registry at all",
+      "matrix_role": "main",
+      "expected_posture": "fail-open permits (the open default); fail-closed denies with an 'Incomplete resource-access policy' reason",
+      "mode": "fail_open",
+      "strict_flag": false,
+      "n_tasks": 200,
+      "allowed": 200,
+      "denied": 0,
+      "allow_rate": 1.0,
+      "deny_rate": 0.0,
+      "allow_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "multi_resource_request_no_registry",
+          "n": 57,
+          "allowed": 57,
+          "denied": 0
+        },
+        {
+          "variant": "registry_explicitly_none",
+          "n": 60,
+          "allowed": 60,
+          "denied": 0
+        },
+        {
+          "variant": "registry_key_absent",
+          "n": 39,
+          "allowed": 39,
+          "denied": 0
+        },
+        {
+          "variant": "string_resource_no_registry",
+          "n": 44,
+          "allowed": 44,
+          "denied": 0
+        }
+      ],
+      "reason_class_counts": {
+        "allowed": 200
+      },
+      "distinct_violation_messages": [],
+      "denied_with_strict_marker": 0,
+      "denied_with_recorded_violation": 0,
+      "strict_marker_rate_among_denied": 0.0,
+      "violation_recorded_rate_among_denied": 0.0,
+      "observed_note": "mode flip: fail-open permits the whole population, fail-closed blocks it entirely"
+    },
+    {
+      "scenario": "incomplete_policy",
+      "scenario_label": "Task requests resources but the coordinator declares no allowed_resources registry at all",
+      "matrix_role": "main",
+      "expected_posture": "fail-open permits (the open default); fail-closed denies with an 'Incomplete resource-access policy' reason",
+      "mode": "fail_closed",
+      "strict_flag": true,
+      "n_tasks": 200,
+      "allowed": 0,
+      "denied": 200,
+      "allow_rate": 0.0,
+      "deny_rate": 1.0,
+      "allow_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "multi_resource_request_no_registry",
+          "n": 57,
+          "allowed": 0,
+          "denied": 57
+        },
+        {
+          "variant": "registry_explicitly_none",
+          "n": 60,
+          "allowed": 0,
+          "denied": 60
+        },
+        {
+          "variant": "registry_key_absent",
+          "n": 39,
+          "allowed": 0,
+          "denied": 39
+        },
+        {
+          "variant": "string_resource_no_registry",
+          "n": 44,
+          "allowed": 0,
+          "denied": 44
+        }
+      ],
+      "reason_class_counts": {
+        "incomplete_policy_strict": 200
+      },
+      "distinct_violation_messages": [
+        {
+          "message": "Incomplete resource-access policy: no allowed_resources registry declared (strict mode)",
+          "count": 200
+        }
+      ],
+      "denied_with_strict_marker": 200,
+      "denied_with_recorded_violation": 200,
+      "strict_marker_rate_among_denied": 1.0,
+      "violation_recorded_rate_among_denied": 1.0,
+      "observed_note": "mode flip: fail-open permits the whole population, fail-closed blocks it entirely"
+    },
+    {
+      "scenario": "normal_task",
+      "scenario_label": "Fully declared, compliant task (registered resources / declared or inferable sensitivity within requirement)",
+      "matrix_role": "main",
+      "expected_posture": "both modes permit with zero recorded violations (no false positives)",
+      "mode": "fail_open",
+      "strict_flag": false,
+      "n_tasks": 200,
+      "allowed": 200,
+      "denied": 0,
+      "allow_rate": 1.0,
+      "deny_rate": 0.0,
+      "allow_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "benign_categories_inferred_medium",
+          "n": 44,
+          "allowed": 44,
+          "denied": 0
+        },
+        {
+          "variant": "declared_medium_within_requirement",
+          "n": 40,
+          "allowed": 40,
+          "denied": 0
+        },
+        {
+          "variant": "no_resources_zero_sensitivity",
+          "n": 46,
+          "allowed": 46,
+          "denied": 0
+        },
+        {
+          "variant": "registered_resources_only",
+          "n": 28,
+          "allowed": 28,
+          "denied": 0
+        },
+        {
+          "variant": "sensitive_category_within_high_requirement",
+          "n": 42,
+          "allowed": 42,
+          "denied": 0
+        }
+      ],
+      "reason_class_counts": {
+        "allowed": 200
+      },
+      "distinct_violation_messages": [],
+      "denied_with_strict_marker": 0,
+      "denied_with_recorded_violation": 0,
+      "strict_marker_rate_among_denied": 0.0,
+      "violation_recorded_rate_among_denied": 0.0,
+      "observed_note": "both modes permit the whole population (no false positives introduced by fail-closed)"
+    },
+    {
+      "scenario": "normal_task",
+      "scenario_label": "Fully declared, compliant task (registered resources / declared or inferable sensitivity within requirement)",
+      "matrix_role": "main",
+      "expected_posture": "both modes permit with zero recorded violations (no false positives)",
+      "mode": "fail_closed",
+      "strict_flag": true,
+      "n_tasks": 200,
+      "allowed": 200,
+      "denied": 0,
+      "allow_rate": 1.0,
+      "deny_rate": 0.0,
+      "allow_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "benign_categories_inferred_medium",
+          "n": 44,
+          "allowed": 44,
+          "denied": 0
+        },
+        {
+          "variant": "declared_medium_within_requirement",
+          "n": 40,
+          "allowed": 40,
+          "denied": 0
+        },
+        {
+          "variant": "no_resources_zero_sensitivity",
+          "n": 46,
+          "allowed": 46,
+          "denied": 0
+        },
+        {
+          "variant": "registered_resources_only",
+          "n": 28,
+          "allowed": 28,
+          "denied": 0
+        },
+        {
+          "variant": "sensitive_category_within_high_requirement",
+          "n": 42,
+          "allowed": 42,
+          "denied": 0
+        }
+      ],
+      "reason_class_counts": {
+        "allowed": 200
+      },
+      "distinct_violation_messages": [],
+      "denied_with_strict_marker": 0,
+      "denied_with_recorded_violation": 0,
+      "strict_marker_rate_among_denied": 0.0,
+      "violation_recorded_rate_among_denied": 0.0,
+      "observed_note": "both modes permit the whole population (no false positives introduced by fail-closed)"
+    },
+    {
+      "scenario": "malformed_registry_supplementary",
+      "scenario_label": "Supplementary row: allowed_resources declared with a malformed type (a plain string degenerates to a character set)",
+      "matrix_role": "supplementary",
+      "expected_posture": "both modes deny, but for different stated reasons; only fail-closed names the incomplete policy",
+      "mode": "fail_open",
+      "strict_flag": false,
+      "n_tasks": 200,
+      "allowed": 0,
+      "denied": 200,
+      "allow_rate": 0.0,
+      "deny_rate": 1.0,
+      "allow_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "string_registry_degenerates_to_charset",
+          "n": 200,
+          "allowed": 0,
+          "denied": 200
+        }
+      ],
+      "reason_class_counts": {
+        "generic_invalid_resource_access": 200
+      },
+      "distinct_violation_messages": [
+        {
+          "message": "Invalid resource access",
+          "count": 200
+        }
+      ],
+      "denied_with_strict_marker": 0,
+      "denied_with_recorded_violation": 200,
+      "strict_marker_rate_among_denied": 0.0,
+      "violation_recorded_rate_among_denied": 1.0,
+      "observed_note": "both modes deny the whole population; the recorded reason classes differ between modes"
+    },
+    {
+      "scenario": "malformed_registry_supplementary",
+      "scenario_label": "Supplementary row: allowed_resources declared with a malformed type (a plain string degenerates to a character set)",
+      "matrix_role": "supplementary",
+      "expected_posture": "both modes deny, but for different stated reasons; only fail-closed names the incomplete policy",
+      "mode": "fail_closed",
+      "strict_flag": true,
+      "n_tasks": 200,
+      "allowed": 0,
+      "denied": 200,
+      "allow_rate": 0.0,
+      "deny_rate": 1.0,
+      "allow_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "per_variant": [
+        {
+          "variant": "string_registry_degenerates_to_charset",
+          "n": 200,
+          "allowed": 0,
+          "denied": 200
+        }
+      ],
+      "reason_class_counts": {
+        "incomplete_policy_strict": 200
+      },
+      "distinct_violation_messages": [
+        {
+          "message": "Incomplete resource-access policy: allowed_resources must be a set or sequence, got str (strict mode)",
+          "count": 200
+        }
+      ],
+      "denied_with_strict_marker": 200,
+      "denied_with_recorded_violation": 200,
+      "strict_marker_rate_among_denied": 1.0,
+      "violation_recorded_rate_among_denied": 1.0,
+      "observed_note": "both modes deny the whole population; the recorded reason classes differ between modes"
+    }
+  ],
+  "mode_divergence": [
+    {
+      "scenario": "unregistered_resource",
+      "n_task_pairs": 200,
+      "outcome_contingency": {
+        "both_allow": 0,
+        "fail_open_only": 0,
+        "fail_closed_only": 0,
+        "both_deny": 200
+      },
+      "outcome_agreement_rate": 1.0,
+      "fail_open_allow_rate": 0.0,
+      "fail_closed_allow_rate": 0.0,
+      "reason_class_agreement_rate_among_both_denied": 0.0,
+      "observed_note": "both modes deny the whole population; the recorded reason classes differ between modes"
+    },
+    {
+      "scenario": "unknown_sensitivity",
+      "n_task_pairs": 200,
+      "outcome_contingency": {
+        "both_allow": 0,
+        "fail_open_only": 200,
+        "fail_closed_only": 0,
+        "both_deny": 0
+      },
+      "outcome_agreement_rate": 0.0,
+      "fail_open_allow_rate": 1.0,
+      "fail_closed_allow_rate": 0.0,
+      "reason_class_agreement_rate_among_both_denied": 0.0,
+      "observed_note": "mode flip: fail-open permits the whole population, fail-closed blocks it entirely"
+    },
+    {
+      "scenario": "incomplete_policy",
+      "n_task_pairs": 200,
+      "outcome_contingency": {
+        "both_allow": 0,
+        "fail_open_only": 200,
+        "fail_closed_only": 0,
+        "both_deny": 0
+      },
+      "outcome_agreement_rate": 0.0,
+      "fail_open_allow_rate": 1.0,
+      "fail_closed_allow_rate": 0.0,
+      "reason_class_agreement_rate_among_both_denied": 0.0,
+      "observed_note": "mode flip: fail-open permits the whole population, fail-closed blocks it entirely"
+    },
+    {
+      "scenario": "normal_task",
+      "n_task_pairs": 200,
+      "outcome_contingency": {
+        "both_allow": 200,
+        "fail_open_only": 0,
+        "fail_closed_only": 0,
+        "both_deny": 0
+      },
+      "outcome_agreement_rate": 1.0,
+      "fail_open_allow_rate": 1.0,
+      "fail_closed_allow_rate": 1.0,
+      "reason_class_agreement_rate_among_both_denied": 0.0,
+      "observed_note": "both modes permit the whole population (no false positives introduced by fail-closed)"
+    },
+    {
+      "scenario": "malformed_registry_supplementary",
+      "n_task_pairs": 200,
+      "outcome_contingency": {
+        "both_allow": 0,
+        "fail_open_only": 0,
+        "fail_closed_only": 0,
+        "both_deny": 200
+      },
+      "outcome_agreement_rate": 1.0,
+      "fail_open_allow_rate": 0.0,
+      "fail_closed_allow_rate": 0.0,
+      "reason_class_agreement_rate_among_both_denied": 0.0,
+      "observed_note": "both modes deny the whole population; the recorded reason classes differ between modes"
+    }
+  ],
+  "coordinator_propagation": [
+    {
+      "scenario": "unregistered_resource",
+      "mode": "fail_open",
+      "n_runs": 200,
+      "executed": 0,
+      "security_error_raised": 200,
+      "execute_rate": 0.0,
+      "security_error_rate": 1.0,
+      "execute_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 1.0
+    },
+    {
+      "scenario": "unregistered_resource",
+      "mode": "fail_closed",
+      "n_runs": 200,
+      "executed": 0,
+      "security_error_raised": 200,
+      "execute_rate": 0.0,
+      "security_error_rate": 1.0,
+      "execute_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 1.0
+    },
+    {
+      "scenario": "unknown_sensitivity",
+      "mode": "fail_open",
+      "n_runs": 200,
+      "executed": 200,
+      "security_error_raised": 0,
+      "execute_rate": 1.0,
+      "security_error_rate": 0.0,
+      "execute_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 0.0
+    },
+    {
+      "scenario": "unknown_sensitivity",
+      "mode": "fail_closed",
+      "n_runs": 200,
+      "executed": 0,
+      "security_error_raised": 200,
+      "execute_rate": 0.0,
+      "security_error_rate": 1.0,
+      "execute_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 1.0
+    },
+    {
+      "scenario": "incomplete_policy",
+      "mode": "fail_open",
+      "n_runs": 200,
+      "executed": 200,
+      "security_error_raised": 0,
+      "execute_rate": 1.0,
+      "security_error_rate": 0.0,
+      "execute_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 0.0
+    },
+    {
+      "scenario": "incomplete_policy",
+      "mode": "fail_closed",
+      "n_runs": 200,
+      "executed": 0,
+      "security_error_raised": 200,
+      "execute_rate": 0.0,
+      "security_error_rate": 1.0,
+      "execute_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 1.0
+    },
+    {
+      "scenario": "normal_task",
+      "mode": "fail_open",
+      "n_runs": 200,
+      "executed": 200,
+      "security_error_raised": 0,
+      "execute_rate": 1.0,
+      "security_error_rate": 0.0,
+      "execute_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 0.0
+    },
+    {
+      "scenario": "normal_task",
+      "mode": "fail_closed",
+      "n_runs": 200,
+      "executed": 200,
+      "security_error_raised": 0,
+      "execute_rate": 1.0,
+      "security_error_rate": 0.0,
+      "execute_rate_per_seed": {
+        "mean": 1.0,
+        "stdev": 0.0,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 0.0
+    },
+    {
+      "scenario": "malformed_registry_supplementary",
+      "mode": "fail_open",
+      "n_runs": 200,
+      "executed": 0,
+      "security_error_raised": 200,
+      "execute_rate": 0.0,
+      "security_error_rate": 1.0,
+      "execute_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 1.0
+    },
+    {
+      "scenario": "malformed_registry_supplementary",
+      "mode": "fail_closed",
+      "n_runs": 200,
+      "executed": 0,
+      "security_error_raised": 200,
+      "execute_rate": 0.0,
+      "security_error_rate": 1.0,
+      "execute_rate_per_seed": {
+        "mean": 0.0,
+        "stdev": 0.0,
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "violation_recorded_rate_among_security_errors": 1.0
+    }
+  ],
+  "raw_counts": {
+    "monitor": [
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 14,
+        "allowed": 0,
+        "denied": 14
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 11,
+        "allowed": 0,
+        "denied": 11
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 7,
+        "allowed": 0,
+        "denied": 7
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 14,
+        "allowed": 14,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 13,
+        "allowed": 13,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 12,
+        "allowed": 12,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "multi_resource_request_no_registry",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 14,
+        "allowed": 0,
+        "denied": 14
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 12,
+        "allowed": 12,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 14,
+        "allowed": 14,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 13,
+        "allowed": 13,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_explicitly_none",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 13,
+        "allowed": 13,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 5,
+        "allowed": 0,
+        "denied": 5
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 7,
+        "allowed": 0,
+        "denied": 7
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 5,
+        "allowed": 5,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "registry_key_absent",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 5,
+        "allowed": 0,
+        "denied": 5
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 11,
+        "allowed": 0,
+        "denied": 11
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 5,
+        "allowed": 5,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "incomplete_policy",
+        "variant": "string_resource_no_registry",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "malformed_registry_supplementary",
+        "variant": "string_registry_degenerates_to_charset",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 40,
+        "allowed": 0,
+        "denied": 40
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "benign_categories_inferred_medium",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 6,
+        "allowed": 6,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "declared_medium_within_requirement",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 6,
+        "allowed": 6,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 14,
+        "allowed": 14,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 14,
+        "allowed": 14,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "no_resources_zero_sensitivity",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 6,
+        "allowed": 6,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 6,
+        "allowed": 6,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "registered_resources_only",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 12,
+        "allowed": 12,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 4,
+        "allowed": 4,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 12,
+        "allowed": 12,
+        "denied": 0
+      },
+      {
+        "scenario": "normal_task",
+        "variant": "sensitive_category_within_high_requirement",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 7,
+        "allowed": 0,
+        "denied": 7
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "empty_category_list",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 7,
+        "allowed": 7,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 11,
+        "allowed": 0,
+        "denied": 11
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 11,
+        "allowed": 0,
+        "denied": 11
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 12,
+        "allowed": 12,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 8,
+        "allowed": 8,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "negative_out_of_range",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 11,
+        "allowed": 0,
+        "denied": 11
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "no_declaration",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 11,
+        "allowed": 0,
+        "denied": 11
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 10,
+        "allowed": 10,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 9,
+        "allowed": 9,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 12,
+        "allowed": 12,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 11,
+        "allowed": 11,
+        "denied": 0
+      },
+      {
+        "scenario": "unknown_sensitivity",
+        "variant": "non_numeric_declaration",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 13,
+        "allowed": 13,
+        "denied": 0
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 4,
+        "allowed": 0,
+        "denied": 4
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "mixed_registered_and_unregistered",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 4,
+        "allowed": 0,
+        "denied": 4
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "registry_declared_as_list",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 13,
+        "allowed": 0,
+        "denied": 13
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "single_unregistered",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_closed",
+        "seed": 11,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_closed",
+        "seed": 12,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_closed",
+        "seed": 13,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_closed",
+        "seed": 14,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_closed",
+        "seed": 15,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_open",
+        "seed": 11,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_open",
+        "seed": 12,
+        "n": 9,
+        "allowed": 0,
+        "denied": 9
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_open",
+        "seed": 13,
+        "n": 8,
+        "allowed": 0,
+        "denied": 8
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_open",
+        "seed": 14,
+        "n": 10,
+        "allowed": 0,
+        "denied": 10
+      },
+      {
+        "scenario": "unregistered_resource",
+        "variant": "string_form_request",
+        "mode": "fail_open",
+        "seed": 15,
+        "n": 12,
+        "allowed": 0,
+        "denied": 12
+      }
+    ]
+  },
+  "notes": [
+    "Qualitative + counting study only: allow/deny decisions and recorded violation reasons. No latency, throughput, memory or any other performance quantity is measured or claimed.",
+    "The decision function under test is deterministic; a per-seed stdev of 0.0 reflects that determinism. Seeds vary the task surface (resource names, request shapes, sub-variant mix), not the verdict.",
+    "Every task holds the non-varied security dimension at a known-good value (declared data_sensitivity=0 for the resource scenarios; no resources requested for the sensitivity scenarios), so exactly one dimension varies per scenario row.",
+    "The same task dict is evaluated in both modes and paired, so mode_divergence is a true per-task 2x2 contingency, not a comparison of independent samples.",
+    "Denials are recorded in violation_history in BOTH modes (auditability is not new); what fail-closed adds is the distinguishing reason classes and the '(strict mode)' marker.",
+    "The malformed-registry row is supplementary: I4 groups a type-malformed allowed_resources under 'incomplete policy', but its fail-open outcome is a generic deny (a string registry degenerates to a character set), unlike the canonical missing-registry hole which fail-open permits."
+  ]
+}

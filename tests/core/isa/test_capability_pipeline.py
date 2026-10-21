@@ -1,13 +1,13 @@
-"""End-to-end mechanics tests for the capability pipeline (review item L9).
+"""End-to-end mechanics tests for the capability pipeline.
 
-The paper discloses that instruction-level metric extraction is a stub
-(the seventeen ``_measure_*`` functions return 0.0).  These tests pin
-down what *does* hold mechanically, so the disclosure stays accurate:
+These tests pin down the pipeline mechanics of
+``CapabilityProfile.assess_capabilities``:
 
-1. ``assess_capabilities`` runs end-to-end over a real instruction list
-   and produces a well-formed result for all eight domains — with
-   stub metrics, every domain score is 0.0 (this is the documented stub
-   behavior, not a pipeline failure).
+1. ``assess_capabilities`` runs end-to-end over a real instruction
+   list and produces a well-formed result for all eight domains, with
+   metric values extracted from real instruction metadata by the
+   seventeen ``_measure_*`` extractors (their unit-level semantics are
+   pinned by ``tests/core/isa/test_capability_metrics.py``).
 2. Domain aggregation is the confidence-weighted mean and applies the
    domain weight *nowhere* (regression test for the double-weighting
    fix: the weight must enter only in ``get_overall_score``).
@@ -43,21 +43,51 @@ class TestPipelineMechanics:
 
         assert set(results.keys()) == {d.value for d in CapabilityDomain}
         for domain, assessment in results.items():
-            # Every domain produces a non-empty metric list (the stub
-            # metrics are real CapabilityMetric objects with value 0.0).
+            # Every domain produces a non-empty metric list (the
+            # metrics are real CapabilityMetric objects whose values
+            # are extracted from instruction metadata).
             assert assessment["metrics"], f"{domain}: no metrics produced"
             assert assessment["weight"] >= 0.0
-            # Stub extraction: every metric value is 0.0, hence every
-            # domain score is 0.0.  This pins the documented stub status.
-            assert all(m.value == 0.0 for m in assessment["metrics"])
-            assert assessment["score"] == 0.0
+            # Real extraction: metric values are evidence-derived and
+            # stay within the unit interval.
+            assert all(0.0 <= m.value <= 1.0 for m in assessment["metrics"])
 
-    def test_overall_score_is_zero_under_stub_metrics(self):
+        # Spot-check the extraction against the fixture: both steps
+        # are structurally well-formed (logical consistency 1.0) but
+        # declare no dependencies or parameter schemas (causality and
+        # abstraction 0.0).
+        reasoning = {m.name: m.value for m in results["reasoning"]["metrics"]}
+        assert reasoning["logical_consistency"] == 1.0
+        assert reasoning["causal_understanding"] == 0.0
+        # The STATE step drives long-term memory to 1/2.
+        memory = {m.name: m.value for m in results["memory"]["metrics"]}
+        assert memory["long_term_memory"] == 0.5
+        # The LLM step drives creativity and output-declaring
+        # coherence to 1/2.
+        generation = {m.name: m.value for m in results["generation"]["metrics"]}
+        assert generation["creativity"] == 0.5
+        assert generation["coherence"] == 0.5
+
+    def test_overall_score_reflects_real_extraction(self):
         profile = CapabilityProfile({"specializations": ["general"]})
         profile.assess_capabilities(_instructions())
-        # End-to-end assessment with stub metrics cannot clear any
-        # selection threshold — the reason Section 5.6 injects scores.
-        assert profile.get_overall_score() == 0.0
+        # Weighted mean across domains, each domain weight applied
+        # exactly once:
+        #   reasoning     0.2  * 0.9/2.55    (consistency 1.0, rest 0)
+        #   memory        0.15 * 0.425/1.75  (long-term 0.5, working 0)
+        #   generation    0.15 * 0.5         (creativity/coherence 0.5)
+        #   optimization  0.1  * 0.85/1.75   (frugal resources 1.0)
+        #   specialization/coordination/security 0 (nothing declared)
+        #   robustness    0.1  * 0.9/1.75   (error handling 1.0)
+        expected = (
+            0.2 * 0.9 / 2.55
+            + 0.15 * 0.425 / 1.75
+            + 0.15 * 0.5
+            + 0.1 * 0.85 / 1.75
+            + 0.1 * 0.9 / 1.75
+        )
+        assert profile.get_overall_score() == pytest.approx(expected)
+        assert profile.get_overall_score() > 0.0
 
 
 class TestDomainAggregation:

@@ -3,6 +3,7 @@
 from typing import Dict, List, Any, Optional, Tuple, Set, Coroutine, Awaitable, Callable, cast
 from dataclasses import dataclass, field
 import asyncio
+import inspect
 import time
 import json
 import hashlib
@@ -38,6 +39,14 @@ class DialoguePattern:
     dataflow_edges: List[Tuple[str, str]] = field(default_factory=list)
     produced_outputs: Optional[List[str]] = None
     external_inputs: Optional[List[str]] = None
+    # -- Parameter schema (parameterized replay, Section 3.3). ---------
+    # One entry per external input, in mined order: the type observed
+    # for that input across the mined occurrences (permissive ``object``
+    # when it was never observed or observed with several types).  The
+    # saved operator sequence plus this schema is what lets a promoted
+    # instruction execute correctly for parameter values that never
+    # occurred during mining.  Dialogue-mined patterns keep ``None``.
+    parameter_schema: Optional[Dict[str, TypeConstraint]] = None
 
 @dataclass
 class InstructionTemplate:
@@ -51,9 +60,19 @@ class InstructionTemplate:
     parallel_config: Optional[Dict[str, Any]] = None
     # Constituent instruction sequence for composite replay.  ``None``
     # (or empty) means the template was mined without recorded bodies;
-    # instructions created from such a template refuse to execute.
+    # instructions created from such a template refuse to execute
+    # unless the template carries an executable declaration.
     components: Optional[List[Instruction]] = None
     dataflow_edges: List[Tuple[str, str]] = field(default_factory=list)
+    # -- Executable declaration (Section 3.3.2). ------------------------
+    # Optional developer-attached body for a template mined without a
+    # recorded instruction sequence (dialogue-mined templates).  It
+    # receives the caller's input parameters under the standard
+    # ``Instruction.execute`` contract and returns the result (or an
+    # awaitable resolving to it); sync and async callables are both
+    # accepted.  Promotion is developer-controlled, so the declaration
+    # is an explicit opt-in -- nothing is inferred from the dialogues.
+    executor: Optional[Callable[[Dict[str, Any]], Any]] = None
 
 @dataclass
 class LearningConfig:
@@ -76,6 +95,11 @@ class _TraceEntry:
     # the keys of its observed dict result, or its declared ``outputs``
     # when no result was recorded.
     output_keys: List[str]
+    # Snapshot of the shared context this step consumed (the state it
+    # read, before its own outputs merged back).  ``None`` for traces
+    # that were not recorded by :func:`record_trace`.  The replay
+    # parameter schema is derived from these observations.
+    inputs: Optional[Dict[str, Any]] = None
 
 async def record_trace(
     stream: List[Instruction],
@@ -87,19 +111,24 @@ async def record_trace(
     receives ``{"ctx": <shared state>}`` and its dict outputs are merged
     into the shared state for later steps.  The caller's
     ``initial_ctx`` is copied, never mutated.  Each recorded entry is a
-    dict ``{"instruction": ..., "success": True, "outputs": {...}}`` as
-    consumed by :meth:`PatternRecognizer.extract_instruction_patterns`;
-    a step that raises propagates its exception and is not recorded.
+    dict ``{"instruction": ..., "success": True, "outputs": {...},
+    "inputs": {...}}`` as consumed by
+    :meth:`PatternRecognizer.extract_instruction_patterns`; ``inputs``
+    is the snapshot of the shared context the step consumed, which is
+    what lets mining derive a parameter schema (observed external-input
+    types) alongside the operator sequence.  A step that raises
+    propagates its exception and is not recorded.
     """
     ctx: Dict[str, Any] = dict(initial_ctx or {})
     trace: List[Dict[str, Any]] = []
     for instr in stream:
-        result = await instr.execute({"ctx": ctx})
         entry: Dict[str, Any] = {
             "instruction": instr,
             "success": True,
             "outputs": {},
+            "inputs": dict(ctx),
         }
+        result = await instr.execute({"ctx": ctx})
         if isinstance(result, dict):
             entry["outputs"] = dict(result)
             ctx.update(result)
@@ -369,9 +398,10 @@ class PatternRecognizer:
     def _normalize_trace(self, trace: List[Any]) -> List[_TraceEntry]:
         """Normalize a raw trace into per-step records.
 
-        Dict records carry the observed success flag and the observed
-        output keys; bare instructions default to success with their
-        declared ``outputs``.
+        Dict records carry the observed success flag, the observed
+        output keys, and (when recorded by :func:`record_trace`) the
+        input snapshot the step consumed; bare instructions default to
+        success with their declared ``outputs`` and no input snapshot.
         """
         entries: List[_TraceEntry] = []
         for record in trace or []:
@@ -387,6 +417,8 @@ class PatternRecognizer:
                     output_keys = list(outputs.keys())
                 else:
                     output_keys = list(getattr(instruction, "outputs", []) or [])
+                inputs = record.get("inputs")
+                input_snapshot = dict(inputs) if isinstance(inputs, dict) else None
             else:
                 instruction = record
                 if not isinstance(instruction, Instruction):
@@ -395,7 +427,10 @@ class PatternRecognizer:
                     )
                 success = True
                 output_keys = list(getattr(instruction, "outputs", []) or [])
-            entries.append(_TraceEntry(instruction, success, output_keys))
+                input_snapshot = None
+            entries.append(
+                _TraceEntry(instruction, success, output_keys, input_snapshot)
+            )
         return entries
 
     @staticmethod
@@ -433,11 +468,13 @@ class PatternRecognizer:
         The constituent sequence is taken from the *first* occurrence
         (deterministic).  The pattern records the dataflow edges
         between its members (producer id -> consumer id), the output
-        names it was observed to produce (first-seen order), and its
-        external inputs: dependencies satisfied by neither an earlier
-        member's outputs nor an earlier member's id.  The pattern id is
-        a content hash of the instruction-id sequence, so promotion is
-        reproducible across recognizer instances and runs.
+        names it was observed to produce (first-seen order), its
+        external inputs (dependencies satisfied by neither an earlier
+        member's outputs nor an earlier member's id), and the parameter
+        schema derived from the input values its occurrences consumed.
+        The pattern id is a content hash of the instruction-id
+        sequence, so promotion is reproducible across recognizer
+        instances and runs.
         """
         _, _, window = occurrences[0]
         components = [entry.instruction for entry in window]
@@ -481,7 +518,46 @@ class PatternRecognizer:
             dataflow_edges=dataflow_edges,
             produced_outputs=produced_outputs,
             external_inputs=external_inputs,
+            parameter_schema=self._derive_parameter_schema(
+                external_inputs, occurrences
+            ),
         )
+
+    @staticmethod
+    def _derive_parameter_schema(
+        external_inputs: List[str],
+        occurrences: List[Tuple[int, int, List[_TraceEntry]]],
+    ) -> Dict[str, TypeConstraint]:
+        """Parameter schema for the subsequence's external inputs.
+
+        For each external input, the types observed for it across the
+        mined occurrences pin down its constraint: a single observed
+        type becomes the constraint's ``base_type``; anything unobserved
+        (bare-Instruction traces, identity dependencies) or observed
+        with several types stays permissive (``object``).  External
+        inputs are by definition absent from the members' outputs, so
+        every observable one is present in the ctx snapshot the first
+        member of each occurrence consumed.
+        """
+        observed: Dict[str, Set[type]] = {}
+        for _, _, window in occurrences:
+            if not window:
+                continue
+            snapshot = window[0].inputs
+            if not snapshot:
+                continue
+            for name in external_inputs:
+                if name in snapshot:
+                    observed.setdefault(name, set()).add(
+                        type(snapshot[name])
+                    )
+
+        schema: Dict[str, TypeConstraint] = {}
+        for name in external_inputs:
+            types = observed.get(name)
+            base = next(iter(types)) if types and len(types) == 1 else object
+            schema[name] = TypeConstraint(base_type=base)
+        return schema
 
 class InstructionLearner:
     """Instruction learning and optimization system."""
@@ -541,6 +617,18 @@ class InstructionLearner:
 
         return templates
 
+    def template_for_pattern(self, pattern: DialoguePattern) -> Optional[InstructionTemplate]:
+        """Convert one mined pattern into a promotion template.
+
+        Public seam for the promotion pipeline
+        (``agentflow.core.isa.auto_promotion``): mining produces
+        ``DialoguePattern`` objects, and this builds the template the
+        learner can construct an executable instruction from.  Pure
+        converter -- unlike :meth:`learn_from_traces` it registers
+        nothing.
+        """
+        return self._pattern_to_template(pattern)
+
     def _pattern_to_template(self, pattern: DialoguePattern) -> Optional[InstructionTemplate]:
         """Convert dialogue pattern to instruction template."""
         try:
@@ -587,11 +675,27 @@ class InstructionLearner:
         return InstructionType.LLM_INTERACTION
 
     def _extract_parameters(self, pattern: DialoguePattern) -> Dict[str, Any]:
-        """Extract parameters from pattern."""
-        params = {}
-        # Trace mining derives no type information for the external
-        # inputs; they are captured as preconditions instead.
-        return params
+        """Extract the parameter schema from the pattern.
+
+        Trace-mined patterns carry (or imply) a parameter schema over
+        their external inputs: the saved operator sequence together
+        with this schema is what lets a promoted instruction replay
+        correctly for parameter values never observed during mining.
+        Observed types tighten the constraints; unobserved or
+        mixed-type inputs stay permissive.  Dialogue-mined patterns
+        keep ``{}`` -- dialogue mining recovers structure, not
+        semantics, so their parameters remain unknown (their
+        executable behavior, if any, comes from an explicit executor
+        declaration).
+        """
+        if pattern.instruction_sequence is None:
+            return {}
+        if pattern.parameter_schema is not None:
+            return dict(pattern.parameter_schema)
+        return {
+            name: TypeConstraint(base_type=object)
+            for name in (pattern.external_inputs or [])
+        }
 
     def _generate_preconditions(self, pattern: DialoguePattern) -> List[str]:
         """Generate preconditions from pattern.
@@ -668,83 +772,172 @@ class InstructionLearner:
                     )
 
             async def execute(self, input_params: Dict[str, Any]) -> Any:
-                """Execute by composite replay of the mined subsequence.
+                """Execute the learned instruction.
 
                 When the template carries its constituent instruction
-                sequence, replay is plain sequential composition: the
-                components run in mined order against one shared
-                context built from the inputs (run_stream convention),
-                each component's dict outputs merge into that context,
-                and the keys the template's ``produces_X``
-                postconditions declare are returned.  Nothing smarter
-                happens -- no generalization beyond the recorded
-                subsequence.  A template mined without bodies refuses
-                to execute rather than silently no-opping.
+                sequence, execution is *parameterized* composite replay:
+                the saved operator sequence re-runs in mined order
+                against one shared context built from the inputs
+                (run_stream convention), with the caller's values for
+                the saved parameter schema bound in -- so replay
+                reproduces the recorded subsequence's behavior not just
+                for the recorded parameter values but for *unseen* ones
+                too.  Bound values are type-checked against the schema
+                before any constituent runs.
+
+                When the template instead carries an executable
+                declaration (``executor``), the declaration runs under
+                the standard execute contract, with declared
+                ``produces_X`` postconditions enforced on its dict
+                results.  A template with neither a recorded body nor a
+                declaration refuses to execute rather than silently
+                no-opping.
                 """
                 start_time = time.time()
                 try:
                     if not self.validate_types(input_params):
                         raise TypeError("Invalid parameter types")
 
-                    # Shared replay context: the wrapped ``{"ctx": ...}``
-                    # convention when the caller uses it, the flat
-                    # parameter dict otherwise.  Copied, never mutated
-                    # in place for the caller.
-                    if isinstance(input_params.get("ctx"), dict):
-                        replay_ctx = dict(input_params["ctx"])
-                    else:
-                        replay_ctx = dict(input_params)
-
                     # Preconditions speak about the data the sequence
-                    # consumes: the replay context, plus any sibling
+                    # consumes: the shared state, plus any sibling
                     # parameters the caller passed alongside it.
+                    if isinstance(input_params.get("ctx"), dict):
+                        state_source = input_params["ctx"]
+                    else:
+                        state_source = input_params
                     condition_state = {
                         **{k: v for k, v in input_params.items() if k != "ctx"},
-                        **replay_ctx,
+                        **state_source,
                     }
                     if not self.verify_conditions(condition_state):
                         raise ValueError("Preconditions not met")
 
-                    if not self.components:
+                    if self.components:
+                        # Shared replay context: the wrapped
+                        # ``{"ctx": ...}`` convention when the caller
+                        # uses it, the flat parameter dict otherwise.
+                        # Copied, never mutated in place for the caller.
+                        if isinstance(input_params.get("ctx"), dict):
+                            replay_ctx = dict(input_params["ctx"])
+                            # Parameter binding: schema-named
+                            # parameters the caller passed alongside ctx
+                            # bind into the replay context when ctx does
+                            # not already carry them (ctx wins on
+                            # conflict, mirroring the condition-state
+                            # merge above).  This is the path by which
+                            # unseen parameter values reach the
+                            # constituents.
+                            for name in self.params:
+                                if name in input_params and name not in replay_ctx:
+                                    replay_ctx[name] = input_params[name]
+                        else:
+                            replay_ctx = dict(input_params)
+                        # Unseen parameter values are validated against
+                        # the saved schema before any constituent runs.
+                        self._validate_bound_parameters(replay_ctx)
+
+                        produced: Dict[str, Any] = {}
+                        for component in self.components:
+                            result = await component.execute({"ctx": replay_ctx})
+                            if isinstance(result, dict):
+                                replay_ctx.update(result)
+                                produced.update(result)
+
+                        declared = [
+                            post.removeprefix("produces_")
+                            for post in self.template.postconditions
+                        ]
+                        if declared:
+                            missing = [
+                                key for key in declared if key not in replay_ctx
+                            ]
+                            if missing:
+                                raise RuntimeError(
+                                    f"Learned instruction '{self.name}' failed "
+                                    f"to produce declared output(s) {missing} "
+                                    f"after replaying {len(self.components)} "
+                                    "constituent instructions"
+                                )
+                            result_out = {key: replay_ctx[key] for key in declared}
+                        else:
+                            result_out = dict(produced)
+                    elif self.template.executor is not None:
+                        # Executable declaration: run it under the
+                        # standard execute contract (sync or async) and
+                        # enforce declared postconditions on dict
+                        # results, without reshaping them.
+                        outcome = self.template.executor(input_params)
+                        if inspect.isawaitable(outcome):
+                            outcome = await outcome
+                        declared = [
+                            post.removeprefix("produces_")
+                            for post in self.template.postconditions
+                        ]
+                        if declared and isinstance(outcome, dict):
+                            missing = [key for key in declared if key not in outcome]
+                            if missing:
+                                raise RuntimeError(
+                                    f"Learned instruction '{self.name}' failed "
+                                    f"to produce declared output(s) {missing} "
+                                    "from its executable declaration"
+                                )
+                        result_out = outcome
+                    else:
                         raise NotImplementedError(
                             f"Learned instruction '{self.name}' has no "
                             "constituent instruction sequence to replay: "
                             "its template was mined without execution "
-                            "bodies. Re-mine the pattern from instruction "
-                            "traces (InstructionLearner.learn_from_traces) "
-                            "to attach a replayable body."
+                            "bodies. Attach an executable declaration "
+                            "(InstructionTemplate.executor) or re-mine "
+                            "the pattern from instruction traces "
+                            "(InstructionLearner.learn_from_traces) "
+                            "to give it a body."
                         )
-
-                    produced: Dict[str, Any] = {}
-                    for component in self.components:
-                        result = await component.execute({"ctx": replay_ctx})
-                        if isinstance(result, dict):
-                            replay_ctx.update(result)
-                            produced.update(result)
-
-                    declared = [
-                        post.removeprefix("produces_")
-                        for post in self.template.postconditions
-                    ]
-                    if declared:
-                        missing = [
-                            key for key in declared if key not in replay_ctx
-                        ]
-                        if missing:
-                            raise RuntimeError(
-                                f"Learned instruction '{self.name}' failed "
-                                f"to produce declared output(s) {missing} "
-                                f"after replaying {len(self.components)} "
-                                "constituent instructions"
-                            )
-                        result_out = {key: replay_ctx[key] for key in declared}
-                    else:
-                        result_out = dict(produced)
 
                     self._update_metrics(start_time, True)
                     return result_out
                 except Exception:
                     self._update_metrics(start_time, False)
                     raise
+
+            def _validate_bound_parameters(
+                self, values: Dict[str, Any]
+            ) -> None:
+                """Validate bound parameter values against the schema.
+
+                Non-:class:`TypeConstraint` schema entries (dialogue
+                templates may carry bare types) are skipped rather than
+                misread, mirroring how :meth:`validate_types` treats
+                unknown shapes conservatively.  Raises ``TypeError``
+                naming the offending parameter.
+                """
+                for name, constraint in self.params.items():
+                    if name not in values or not isinstance(
+                        constraint, TypeConstraint
+                    ):
+                        continue
+                    value = values[name]
+                    if value is None:
+                        if not constraint.nullable:
+                            raise TypeError(
+                                f"Parameter '{name}' must not be None"
+                            )
+                        continue
+                    if not isinstance(value, constraint.base_type):
+                        raise TypeError(
+                            f"Invalid parameter type for '{name}': expected "
+                            f"{constraint.base_type.__name__}, got "
+                            f"{type(value).__name__}"
+                        )
+                    if constraint.dependent_on and not constraint.dependent_on(value):
+                        raise TypeError(
+                            f"Invalid parameter type for '{name}': "
+                            "dependent constraint failed"
+                        )
+                    if constraint.validation and not constraint.validation(value):
+                        raise TypeError(
+                            f"Invalid parameter type for '{name}': "
+                            "validation failed"
+                        )
 
         return LearnedInstruction(template)

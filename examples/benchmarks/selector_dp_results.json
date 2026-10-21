@@ -1,0 +1,3264 @@
+{
+  "benchmark": "selector_dp_bench",
+  "description": "Heuristic vs DP instruction selector on random IR trees: MATCH-TREE DP (supplementary Appendix D.1) vs the shipped greedy heuristic tree cover. Sizes 20/50/100/200 nodes x 5 seeds; metrics are covering cost and wall-clock selection time.",
+  "provenance": {
+    "git_rev": "0e1671f8",
+    "timestamp_utc": "2026-10-21T10:27:48+00:00",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "sizes": [
+      20,
+      50,
+      100,
+      200
+    ],
+    "rng_seed_formula": "random.Random(size * 1000 + seed) per (size, seed); catalogue and tree use independent streams from the same seed",
+    "timing": {
+      "reps": 5,
+      "reported_statistic": "median of reps, per arm",
+      "clock": "time.perf_counter"
+    },
+    "python_version": "3.14.5",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "component": {
+      "job": "I2-dp-selector",
+      "status": "shipped",
+      "pre_bench_component_check": "tests/core/isa/test_instruction_selector_dp.py 37 passed (pre-bench check, this session)",
+      "dp_arm": "InstructionSelector(selection_strategy='dp')",
+      "heuristic_arm": "InstructionSelector(selection_strategy='heuristic')",
+      "module": "agentflow/core/isa/instruction_selector.py"
+    }
+  },
+  "coverage": {
+    "status": "complete",
+    "instances_planned": 20,
+    "instances_completed": 20,
+    "failed_instances": [],
+    "note": "All planned instances completed."
+  },
+  "instances": [
+    {
+      "size": 20,
+      "seed": 0,
+      "rng_seed": 20000,
+      "tree": {
+        "node_count": 20,
+        "depth": 6,
+        "internal_nodes": 10,
+        "leaf_nodes": 10,
+        "max_fanout": 3,
+        "payload_nodes": 2
+      },
+      "catalogue": {
+        "n_instructions": 11,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 5,
+        "base_costs": {
+          "a": 2.467,
+          "b": 1.799,
+          "c": 4.365,
+          "d": 4.108
+        },
+        "premium": [
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 2.651,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 8.011,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_1",
+            "name": "a",
+            "root_op": "a",
+            "cost": 9.373,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "c"
+            ]
+          },
+          {
+            "key": "a_fused_4",
+            "name": "a",
+            "root_op": "a",
+            "cost": 9.824,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "c"
+            ]
+          },
+          {
+            "key": "b_fused_2",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.844,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "c_fused_3",
+            "name": "c",
+            "root_op": "c",
+            "cost": 8.38,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 9.367,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 41.163,
+        "covering_size": 11,
+        "fused_sites_used": 1,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.100125,
+          0.074542,
+          0.067542,
+          0.0655,
+          0.065958
+        ],
+        "time_ms_median": 0.067542,
+        "time_ms_min": 0.0655,
+        "time_ms_max": 0.100125
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 70.245,
+        "covering_size": 20,
+        "fused_sites_used": 0,
+        "premium_sites_used": 2,
+        "time_ms_reps": [
+          0.079334,
+          0.066334,
+          0.064208,
+          0.062292,
+          0.061833
+        ],
+        "time_ms_median": 0.064208,
+        "time_ms_min": 0.061833,
+        "time_ms_max": 0.079334
+      },
+      "cost_gap_heuristic_minus_dp": 29.082,
+      "cost_ratio_dp_over_heuristic": 0.585992,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 1.051925
+    },
+    {
+      "size": 20,
+      "seed": 1,
+      "rng_seed": 20001,
+      "tree": {
+        "node_count": 20,
+        "depth": 6,
+        "internal_nodes": 10,
+        "leaf_nodes": 10,
+        "max_fanout": 3,
+        "payload_nodes": 4
+      },
+      "catalogue": {
+        "n_instructions": 11,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 5,
+        "base_costs": {
+          "a": 1.943,
+          "b": 2.467,
+          "c": 2.742,
+          "d": 3.038
+        },
+        "premium": [
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 4.106,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.646,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_2",
+            "name": "b",
+            "root_op": "b",
+            "cost": 3.895,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_3",
+            "name": "c",
+            "root_op": "c",
+            "cost": 5.2,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "a"
+            ]
+          },
+          {
+            "key": "c_fused_4",
+            "name": "c",
+            "root_op": "c",
+            "cost": 3.928,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 8.092,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "c"
+            ]
+          },
+          {
+            "key": "d_fused_1",
+            "name": "d",
+            "root_op": "d",
+            "cost": 7.429,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 28.932,
+        "covering_size": 8,
+        "fused_sites_used": 3,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.076209,
+          0.070042,
+          0.068875,
+          0.068041,
+          0.06725
+        ],
+        "time_ms_median": 0.068875,
+        "time_ms_min": 0.06725,
+        "time_ms_max": 0.076209
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 53.585,
+        "covering_size": 20,
+        "fused_sites_used": 0,
+        "premium_sites_used": 1,
+        "time_ms_reps": [
+          0.069875,
+          0.074834,
+          0.065625,
+          0.06375,
+          0.063416
+        ],
+        "time_ms_median": 0.065625,
+        "time_ms_min": 0.063416,
+        "time_ms_max": 0.074834
+      },
+      "cost_gap_heuristic_minus_dp": 24.653,
+      "cost_ratio_dp_over_heuristic": 0.539927,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 1.049524
+    },
+    {
+      "size": 20,
+      "seed": 2,
+      "rng_seed": 20002,
+      "tree": {
+        "node_count": 20,
+        "depth": 7,
+        "internal_nodes": 12,
+        "leaf_nodes": 8,
+        "max_fanout": 3,
+        "payload_nodes": 7
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 1.904,
+          "b": 4.858,
+          "c": 2.596,
+          "d": 1.754
+        },
+        "premium": [
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.201,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 4.64,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_2",
+            "name": "a",
+            "root_op": "a",
+            "cost": 6.153,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_3",
+            "name": "c",
+            "root_op": "c",
+            "cost": 6.201,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.452,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_1",
+            "name": "d",
+            "root_op": "d",
+            "cost": 2.479,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 24.85,
+        "covering_size": 9,
+        "fused_sites_used": 2,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.071625,
+          0.063541,
+          0.062375,
+          0.062208,
+          0.06175
+        ],
+        "time_ms_median": 0.062375,
+        "time_ms_min": 0.06175,
+        "time_ms_max": 0.071625
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 47.014,
+        "covering_size": 20,
+        "fused_sites_used": 0,
+        "premium_sites_used": 3,
+        "time_ms_reps": [
+          0.065208,
+          0.062958,
+          0.062792,
+          0.059708,
+          0.059708
+        ],
+        "time_ms_median": 0.062792,
+        "time_ms_min": 0.059708,
+        "time_ms_max": 0.065208
+      },
+      "cost_gap_heuristic_minus_dp": 22.164,
+      "cost_ratio_dp_over_heuristic": 0.528566,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.993359
+    },
+    {
+      "size": 20,
+      "seed": 3,
+      "rng_seed": 20003,
+      "tree": {
+        "node_count": 20,
+        "depth": 5,
+        "internal_nodes": 8,
+        "leaf_nodes": 12,
+        "max_fanout": 3,
+        "payload_nodes": 9
+      },
+      "catalogue": {
+        "n_instructions": 11,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 5,
+        "base_costs": {
+          "a": 3.879,
+          "b": 0.986,
+          "c": 0.768,
+          "d": 1.511
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 5.857,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 1.752,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_2",
+            "name": "a",
+            "root_op": "a",
+            "cost": 3.999,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "a_fused_4",
+            "name": "a",
+            "root_op": "a",
+            "cost": 4.441,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "c"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.078,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_1",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.033,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_3",
+            "name": "d",
+            "root_op": "d",
+            "cost": 6.528,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "a"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 29.795,
+        "covering_size": 10,
+        "fused_sites_used": 1,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.071834,
+          0.06875,
+          0.066042,
+          0.065167,
+          0.064875
+        ],
+        "time_ms_median": 0.066042,
+        "time_ms_min": 0.064875,
+        "time_ms_max": 0.071834
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 61.614,
+        "covering_size": 20,
+        "fused_sites_used": 0,
+        "premium_sites_used": 8,
+        "time_ms_reps": [
+          0.073416,
+          0.226708,
+          0.070791,
+          0.076292,
+          0.067583
+        ],
+        "time_ms_median": 0.073416,
+        "time_ms_min": 0.067583,
+        "time_ms_max": 0.226708
+      },
+      "cost_gap_heuristic_minus_dp": 31.819,
+      "cost_ratio_dp_over_heuristic": 0.483575,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.899559
+    },
+    {
+      "size": 20,
+      "seed": 4,
+      "rng_seed": 20004,
+      "tree": {
+        "node_count": 20,
+        "depth": 6,
+        "internal_nodes": 11,
+        "leaf_nodes": 9,
+        "max_fanout": 3,
+        "payload_nodes": 10
+      },
+      "catalogue": {
+        "n_instructions": 11,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 5,
+        "base_costs": {
+          "a": 4.468,
+          "b": 0.619,
+          "c": 1.38,
+          "d": 4.033
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 7.557,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 0.979,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_0",
+            "name": "a",
+            "root_op": "a",
+            "cost": 5.165,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "c"
+            ]
+          },
+          {
+            "key": "a_fused_2",
+            "name": "a",
+            "root_op": "a",
+            "cost": 8.093,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_1",
+            "name": "b",
+            "root_op": "b",
+            "cost": 3.928,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "c_fused_3",
+            "name": "c",
+            "root_op": "c",
+            "cost": 4.87,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_4",
+            "name": "d",
+            "root_op": "d",
+            "cost": 7.988,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 44.502,
+        "covering_size": 12,
+        "fused_sites_used": 3,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.075417,
+          0.0725,
+          0.066875,
+          0.066,
+          0.065083
+        ],
+        "time_ms_median": 0.066875,
+        "time_ms_min": 0.065083,
+        "time_ms_max": 0.075417
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 75.207,
+        "covering_size": 20,
+        "fused_sites_used": 0,
+        "premium_sites_used": 4,
+        "time_ms_reps": [
+          0.066291,
+          0.064166,
+          0.063,
+          0.062666,
+          0.062667
+        ],
+        "time_ms_median": 0.063,
+        "time_ms_min": 0.062666,
+        "time_ms_max": 0.066291
+      },
+      "cost_gap_heuristic_minus_dp": 30.705,
+      "cost_ratio_dp_over_heuristic": 0.591727,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 1.061508
+    },
+    {
+      "size": 50,
+      "seed": 0,
+      "rng_seed": 50000,
+      "tree": {
+        "node_count": 50,
+        "depth": 7,
+        "internal_nodes": 28,
+        "leaf_nodes": 22,
+        "max_fanout": 3,
+        "payload_nodes": 15
+      },
+      "catalogue": {
+        "n_instructions": 12,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 6,
+        "base_costs": {
+          "a": 2.567,
+          "b": 1.326,
+          "c": 4.786,
+          "d": 3.048
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 4.105,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 9.352,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_0",
+            "name": "a",
+            "root_op": "a",
+            "cost": 8.772,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "c"
+            ]
+          },
+          {
+            "key": "a_fused_2",
+            "name": "a",
+            "root_op": "a",
+            "cost": 9.061,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "d"
+            ]
+          },
+          {
+            "key": "a_fused_3",
+            "name": "a",
+            "root_op": "a",
+            "cost": 6.63,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "d"
+            ]
+          },
+          {
+            "key": "b_fused_4",
+            "name": "b",
+            "root_op": "b",
+            "cost": 3.835,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_1",
+            "name": "c",
+            "root_op": "c",
+            "cost": 5.621,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_5",
+            "name": "d",
+            "root_op": "d",
+            "cost": 8.28,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 8.28,
+        "covering_size": 1,
+        "fused_sites_used": 1,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.146958,
+          0.143083,
+          0.141875,
+          0.13875,
+          0.13975
+        ],
+        "time_ms_median": 0.141875,
+        "time_ms_min": 0.13875,
+        "time_ms_max": 0.146958
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 153.381,
+        "covering_size": 50,
+        "fused_sites_used": 0,
+        "premium_sites_used": 6,
+        "time_ms_reps": [
+          0.148833,
+          0.145958,
+          0.14475,
+          0.142958,
+          0.145875
+        ],
+        "time_ms_median": 0.145875,
+        "time_ms_min": 0.142958,
+        "time_ms_max": 0.148833
+      },
+      "cost_gap_heuristic_minus_dp": 145.101,
+      "cost_ratio_dp_over_heuristic": 0.053983,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.972579
+    },
+    {
+      "size": 50,
+      "seed": 1,
+      "rng_seed": 50001,
+      "tree": {
+        "node_count": 50,
+        "depth": 9,
+        "internal_nodes": 27,
+        "leaf_nodes": 23,
+        "max_fanout": 3,
+        "payload_nodes": 10
+      },
+      "catalogue": {
+        "n_instructions": 9,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 3,
+        "base_costs": {
+          "a": 2.488,
+          "b": 3.826,
+          "c": 1.109,
+          "d": 1.372
+        },
+        "premium": [
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.676,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 1.939,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_1",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.371,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_2",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.01,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 5.315,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "a"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 21.207,
+        "covering_size": 7,
+        "fused_sites_used": 2,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.128042,
+          0.1205,
+          0.123958,
+          0.118542,
+          0.11925
+        ],
+        "time_ms_median": 0.1205,
+        "time_ms_min": 0.118542,
+        "time_ms_max": 0.128042
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 113.463,
+        "covering_size": 50,
+        "fused_sites_used": 0,
+        "premium_sites_used": 5,
+        "time_ms_reps": [
+          0.152291,
+          0.147917,
+          0.146417,
+          0.144417,
+          0.14375
+        ],
+        "time_ms_median": 0.146417,
+        "time_ms_min": 0.14375,
+        "time_ms_max": 0.152291
+      },
+      "cost_gap_heuristic_minus_dp": 92.256,
+      "cost_ratio_dp_over_heuristic": 0.186907,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.822992
+    },
+    {
+      "size": 50,
+      "seed": 2,
+      "rng_seed": 50002,
+      "tree": {
+        "node_count": 50,
+        "depth": 8,
+        "internal_nodes": 27,
+        "leaf_nodes": 23,
+        "max_fanout": 3,
+        "payload_nodes": 20
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 4.967,
+          "b": 1.291,
+          "c": 3.189,
+          "d": 1.736
+        },
+        "premium": [
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 4.308,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 2.405,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_3",
+            "name": "a",
+            "root_op": "a",
+            "cost": 5.722,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "c_fused_2",
+            "name": "c",
+            "root_op": "c",
+            "cost": 5.148,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 6.145,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_1",
+            "name": "d",
+            "root_op": "d",
+            "cost": 6.195,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "d"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 83.754,
+        "covering_size": 26,
+        "fused_sites_used": 5,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.138959,
+          0.132167,
+          0.130958,
+          0.133,
+          0.136667
+        ],
+        "time_ms_median": 0.133,
+        "time_ms_min": 0.130958,
+        "time_ms_max": 0.138959
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 150.826,
+        "covering_size": 50,
+        "fused_sites_used": 0,
+        "premium_sites_used": 9,
+        "time_ms_reps": [
+          0.146459,
+          0.143208,
+          0.1405,
+          0.139125,
+          0.139416
+        ],
+        "time_ms_median": 0.1405,
+        "time_ms_min": 0.139125,
+        "time_ms_max": 0.146459
+      },
+      "cost_gap_heuristic_minus_dp": 67.072,
+      "cost_ratio_dp_over_heuristic": 0.555302,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.946619
+    },
+    {
+      "size": 50,
+      "seed": 3,
+      "rng_seed": 50003,
+      "tree": {
+        "node_count": 50,
+        "depth": 8,
+        "internal_nodes": 28,
+        "leaf_nodes": 22,
+        "max_fanout": 3,
+        "payload_nodes": 11
+      },
+      "catalogue": {
+        "n_instructions": 12,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 6,
+        "base_costs": {
+          "a": 3.931,
+          "b": 2.838,
+          "c": 2.396,
+          "d": 4.083
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 7.674,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.07,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_0",
+            "name": "b",
+            "root_op": "b",
+            "cost": 6.955,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_1",
+            "name": "b",
+            "root_op": "b",
+            "cost": 6.065,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "b_fused_5",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.131,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "c"
+            ]
+          },
+          {
+            "key": "c_fused_2",
+            "name": "c",
+            "root_op": "c",
+            "cost": 5.208,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "c_fused_4",
+            "name": "c",
+            "root_op": "c",
+            "cost": 4.667,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_3",
+            "name": "d",
+            "root_op": "d",
+            "cost": 8.051,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 51.958,
+        "covering_size": 13,
+        "fused_sites_used": 4,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.157459,
+          0.154792,
+          0.154875,
+          0.15425,
+          0.153333
+        ],
+        "time_ms_median": 0.154792,
+        "time_ms_min": 0.153333,
+        "time_ms_max": 0.157459
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 168.336,
+        "covering_size": 50,
+        "fused_sites_used": 0,
+        "premium_sites_used": 2,
+        "time_ms_reps": [
+          0.14725,
+          0.144834,
+          0.142542,
+          0.142417,
+          0.141416
+        ],
+        "time_ms_median": 0.142542,
+        "time_ms_min": 0.141416,
+        "time_ms_max": 0.14725
+      },
+      "cost_gap_heuristic_minus_dp": 116.378,
+      "cost_ratio_dp_over_heuristic": 0.308656,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 1.08594
+    },
+    {
+      "size": 50,
+      "seed": 4,
+      "rng_seed": 50004,
+      "tree": {
+        "node_count": 50,
+        "depth": 9,
+        "internal_nodes": 26,
+        "leaf_nodes": 24,
+        "max_fanout": 3,
+        "payload_nodes": 17
+      },
+      "catalogue": {
+        "n_instructions": 12,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 6,
+        "base_costs": {
+          "a": 4.087,
+          "b": 2.931,
+          "c": 3.378,
+          "d": 1.311
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 7.314,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 4.892,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_1",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.895,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_4",
+            "name": "b",
+            "root_op": "b",
+            "cost": 4.135,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_5",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.73,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 7.22,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_2",
+            "name": "d",
+            "root_op": "d",
+            "cost": 7.861,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_3",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.995,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "d"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 70.317,
+        "covering_size": 21,
+        "fused_sites_used": 3,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.16125,
+          0.159334,
+          0.156417,
+          0.155875,
+          0.15525
+        ],
+        "time_ms_median": 0.156417,
+        "time_ms_min": 0.15525,
+        "time_ms_max": 0.16125
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 168.089,
+        "covering_size": 50,
+        "fused_sites_used": 0,
+        "premium_sites_used": 9,
+        "time_ms_reps": [
+          0.1505,
+          0.147125,
+          0.144084,
+          0.143333,
+          0.1455
+        ],
+        "time_ms_median": 0.1455,
+        "time_ms_min": 0.143333,
+        "time_ms_max": 0.1505
+      },
+      "cost_gap_heuristic_minus_dp": 97.772,
+      "cost_ratio_dp_over_heuristic": 0.418332,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 1.075031
+    },
+    {
+      "size": 100,
+      "seed": 0,
+      "rng_seed": 100000,
+      "tree": {
+        "node_count": 100,
+        "depth": 10,
+        "internal_nodes": 51,
+        "leaf_nodes": 49,
+        "max_fanout": 3,
+        "payload_nodes": 21
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 0.92,
+          "b": 4.044,
+          "c": 3.61,
+          "d": 4.629
+        },
+        "premium": [
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 6.36,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 7.278,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_2",
+            "name": "a",
+            "root_op": "a",
+            "cost": 4.725,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "c"
+            ]
+          },
+          {
+            "key": "b_fused_1",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.705,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_3",
+            "name": "c",
+            "root_op": "c",
+            "cost": 7.614,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 7.634,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 241.968,
+        "covering_size": 69,
+        "fused_sites_used": 6,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.288917,
+          0.288833,
+          0.284292,
+          0.281,
+          0.281667
+        ],
+        "time_ms_median": 0.284292,
+        "time_ms_min": 0.281,
+        "time_ms_max": 0.288917
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 353.385,
+        "covering_size": 100,
+        "fused_sites_used": 0,
+        "premium_sites_used": 9,
+        "time_ms_reps": [
+          0.288416,
+          0.287167,
+          0.288208,
+          0.281917,
+          0.281917
+        ],
+        "time_ms_median": 0.287167,
+        "time_ms_min": 0.281917,
+        "time_ms_max": 0.288416
+      },
+      "cost_gap_heuristic_minus_dp": 111.417,
+      "cost_ratio_dp_over_heuristic": 0.684715,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.989988
+    },
+    {
+      "size": 100,
+      "seed": 1,
+      "rng_seed": 100001,
+      "tree": {
+        "node_count": 100,
+        "depth": 9,
+        "internal_nodes": 52,
+        "leaf_nodes": 48,
+        "max_fanout": 3,
+        "payload_nodes": 30
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 1.703,
+          "b": 2.636,
+          "c": 1.361,
+          "d": 2.581
+        },
+        "premium": [
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 2.585,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.398,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_1",
+            "name": "a",
+            "root_op": "a",
+            "cost": 5.664,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_2",
+            "name": "b",
+            "root_op": "b",
+            "cost": 3.542,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "b_fused_3",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.714,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.044,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 58.532,
+        "covering_size": 27,
+        "fused_sites_used": 3,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.264958,
+          0.258209,
+          0.267875,
+          0.259875,
+          0.270375
+        ],
+        "time_ms_median": 0.264958,
+        "time_ms_min": 0.258209,
+        "time_ms_max": 0.270375
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 226.463,
+        "covering_size": 100,
+        "fused_sites_used": 0,
+        "premium_sites_used": 15,
+        "time_ms_reps": [
+          0.296083,
+          0.288125,
+          0.286542,
+          0.284542,
+          0.284
+        ],
+        "time_ms_median": 0.286542,
+        "time_ms_min": 0.284,
+        "time_ms_max": 0.296083
+      },
+      "cost_gap_heuristic_minus_dp": 167.931,
+      "cost_ratio_dp_over_heuristic": 0.258462,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.924674
+    },
+    {
+      "size": 100,
+      "seed": 2,
+      "rng_seed": 100002,
+      "tree": {
+        "node_count": 100,
+        "depth": 10,
+        "internal_nodes": 54,
+        "leaf_nodes": 46,
+        "max_fanout": 3,
+        "payload_nodes": 25
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 4.244,
+          "b": 1.896,
+          "c": 0.867,
+          "d": 1.486
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 7.687,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 1.282,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_0",
+            "name": "a",
+            "root_op": "a",
+            "cost": 5.073,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "a_fused_1",
+            "name": "a",
+            "root_op": "a",
+            "cost": 3.763,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "c_fused_2",
+            "name": "c",
+            "root_op": "c",
+            "cost": 1.872,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_3",
+            "name": "d",
+            "root_op": "d",
+            "cost": 2.53,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 45.249,
+        "covering_size": 18,
+        "fused_sites_used": 6,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.261625,
+          0.250334,
+          0.258416,
+          0.253375,
+          0.251166
+        ],
+        "time_ms_median": 0.253375,
+        "time_ms_min": 0.250334,
+        "time_ms_max": 0.261625
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 222.026,
+        "covering_size": 100,
+        "fused_sites_used": 0,
+        "premium_sites_used": 14,
+        "time_ms_reps": [
+          0.289417,
+          0.28575,
+          0.28725,
+          0.283,
+          0.280166
+        ],
+        "time_ms_median": 0.28575,
+        "time_ms_min": 0.280166,
+        "time_ms_max": 0.289417
+      },
+      "cost_gap_heuristic_minus_dp": 176.777,
+      "cost_ratio_dp_over_heuristic": 0.2038,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.886702
+    },
+    {
+      "size": 100,
+      "seed": 3,
+      "rng_seed": 100003,
+      "tree": {
+        "node_count": 100,
+        "depth": 10,
+        "internal_nodes": 52,
+        "leaf_nodes": 48,
+        "max_fanout": 3,
+        "payload_nodes": 23
+      },
+      "catalogue": {
+        "n_instructions": 9,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 3,
+        "base_costs": {
+          "a": 2.167,
+          "b": 3.258,
+          "c": 4.458,
+          "d": 4.366
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 2.863,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 6.2,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_1",
+            "name": "a",
+            "root_op": "a",
+            "cost": 4.82,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "a_fused_2",
+            "name": "a",
+            "root_op": "a",
+            "cost": 8.268,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "c"
+            ]
+          },
+          {
+            "key": "b_fused_0",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.156,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 169.694,
+        "covering_size": 40,
+        "fused_sites_used": 11,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.262583,
+          0.255458,
+          0.463,
+          0.261833,
+          0.259541
+        ],
+        "time_ms_median": 0.261833,
+        "time_ms_min": 0.255458,
+        "time_ms_max": 0.463
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 369.6,
+        "covering_size": 100,
+        "fused_sites_used": 0,
+        "premium_sites_used": 10,
+        "time_ms_reps": [
+          0.291417,
+          0.296042,
+          0.286875,
+          0.285458,
+          0.285708
+        ],
+        "time_ms_median": 0.286875,
+        "time_ms_min": 0.285458,
+        "time_ms_max": 0.296042
+      },
+      "cost_gap_heuristic_minus_dp": 199.906,
+      "cost_ratio_dp_over_heuristic": 0.459129,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.912708
+    },
+    {
+      "size": 100,
+      "seed": 4,
+      "rng_seed": 100004,
+      "tree": {
+        "node_count": 100,
+        "depth": 10,
+        "internal_nodes": 53,
+        "leaf_nodes": 47,
+        "max_fanout": 3,
+        "payload_nodes": 26
+      },
+      "catalogue": {
+        "n_instructions": 12,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 6,
+        "base_costs": {
+          "a": 4.74,
+          "b": 0.65,
+          "c": 3.83,
+          "d": 1.84
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 7.92,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 1.126,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_4",
+            "name": "a",
+            "root_op": "a",
+            "cost": 6.748,
+            "params": {
+              "spanned_child_ops": [
+                "b",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "b",
+              "d"
+            ]
+          },
+          {
+            "key": "a_fused_5",
+            "name": "a",
+            "root_op": "a",
+            "cost": 5.326,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_1",
+            "name": "c",
+            "root_op": "c",
+            "cost": 10.893,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 3.474,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_2",
+            "name": "d",
+            "root_op": "d",
+            "cost": 5.702,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_3",
+            "name": "d",
+            "root_op": "d",
+            "cost": 3.62,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 80.655,
+        "covering_size": 22,
+        "fused_sites_used": 3,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.309875,
+          0.294625,
+          0.294083,
+          0.29675,
+          0.295625
+        ],
+        "time_ms_median": 0.295625,
+        "time_ms_min": 0.294083,
+        "time_ms_max": 0.309875
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 277.086,
+        "covering_size": 100,
+        "fused_sites_used": 0,
+        "premium_sites_used": 16,
+        "time_ms_reps": [
+          0.292208,
+          0.288833,
+          0.283209,
+          0.284375,
+          0.283041
+        ],
+        "time_ms_median": 0.284375,
+        "time_ms_min": 0.283041,
+        "time_ms_max": 0.292208
+      },
+      "cost_gap_heuristic_minus_dp": 196.431,
+      "cost_ratio_dp_over_heuristic": 0.291083,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 1.03956
+    },
+    {
+      "size": 200,
+      "seed": 0,
+      "rng_seed": 200000,
+      "tree": {
+        "node_count": 200,
+        "depth": 11,
+        "internal_nodes": 108,
+        "leaf_nodes": 92,
+        "max_fanout": 3,
+        "payload_nodes": 67
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 1.231,
+          "b": 2.042,
+          "c": 4.611,
+          "d": 3.038
+        },
+        "premium": [
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 6.928,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 5.831,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_0",
+            "name": "b",
+            "root_op": "b",
+            "cost": 6.112,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "b_fused_1",
+            "name": "b",
+            "root_op": "b",
+            "cost": 4.665,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          },
+          {
+            "key": "b_fused_3",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.276,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_2",
+            "name": "d",
+            "root_op": "d",
+            "cost": 6.476,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 50.272,
+        "covering_size": 13,
+        "fused_sites_used": 5,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.502083,
+          0.487375,
+          0.483,
+          0.484541,
+          0.483917
+        ],
+        "time_ms_median": 0.484541,
+        "time_ms_min": 0.483,
+        "time_ms_max": 0.502083
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 631.037,
+        "covering_size": 200,
+        "fused_sites_used": 0,
+        "premium_sites_used": 35,
+        "time_ms_reps": [
+          0.558,
+          0.564667,
+          0.558,
+          0.571333,
+          0.562667
+        ],
+        "time_ms_median": 0.562667,
+        "time_ms_min": 0.558,
+        "time_ms_max": 0.571333
+      },
+      "cost_gap_heuristic_minus_dp": 580.765,
+      "cost_ratio_dp_over_heuristic": 0.079666,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.861151
+    },
+    {
+      "size": 200,
+      "seed": 1,
+      "rng_seed": 200001,
+      "tree": {
+        "node_count": 200,
+        "depth": 11,
+        "internal_nodes": 118,
+        "leaf_nodes": 82,
+        "max_fanout": 3,
+        "payload_nodes": 51
+      },
+      "catalogue": {
+        "n_instructions": 9,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 3,
+        "base_costs": {
+          "a": 4.217,
+          "b": 3.312,
+          "c": 2.983,
+          "d": 4.527
+        },
+        "premium": [
+          {
+            "key": "a_premium",
+            "name": "a",
+            "root_op": "a",
+            "cost": 7.023,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 8.896,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_0",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.625,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_1",
+            "name": "d",
+            "root_op": "d",
+            "cost": 5.394,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          },
+          {
+            "key": "d_fused_2",
+            "name": "d",
+            "root_op": "d",
+            "cost": 9.19,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 142.518,
+        "covering_size": 35,
+        "fused_sites_used": 6,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.459125,
+          0.454833,
+          0.452167,
+          0.4565,
+          0.453958
+        ],
+        "time_ms_median": 0.454833,
+        "time_ms_min": 0.452167,
+        "time_ms_max": 0.459125
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 848.946,
+        "covering_size": 200,
+        "fused_sites_used": 0,
+        "premium_sites_used": 26,
+        "time_ms_reps": [
+          0.570167,
+          0.574375,
+          0.567667,
+          0.560875,
+          0.56225
+        ],
+        "time_ms_median": 0.567667,
+        "time_ms_min": 0.560875,
+        "time_ms_max": 0.574375
+      },
+      "cost_gap_heuristic_minus_dp": 706.428,
+      "cost_ratio_dp_over_heuristic": 0.167876,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.801232
+    },
+    {
+      "size": 200,
+      "seed": 2,
+      "rng_seed": 200002,
+      "tree": {
+        "node_count": 200,
+        "depth": 11,
+        "internal_nodes": 103,
+        "leaf_nodes": 97,
+        "max_fanout": 3,
+        "payload_nodes": 61
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 0.57,
+          "b": 2.89,
+          "c": 4.596,
+          "d": 4.109
+        },
+        "premium": [
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.415,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 8.018,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_0",
+            "name": "b",
+            "root_op": "b",
+            "cost": 4.79,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "b_fused_3",
+            "name": "b",
+            "root_op": "b",
+            "cost": 2.432,
+            "params": {
+              "spanned_child_ops": [
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_1",
+            "name": "d",
+            "root_op": "d",
+            "cost": 8.527,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "a"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "a"
+            ]
+          },
+          {
+            "key": "d_fused_2",
+            "name": "d",
+            "root_op": "d",
+            "cost": 8.89,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "b"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 241.602,
+        "covering_size": 79,
+        "fused_sites_used": 5,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.505875,
+          0.5005,
+          0.5035,
+          0.509459,
+          0.505209
+        ],
+        "time_ms_median": 0.505209,
+        "time_ms_min": 0.5005,
+        "time_ms_max": 0.509459
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 662.779,
+        "covering_size": 200,
+        "fused_sites_used": 0,
+        "premium_sites_used": 27,
+        "time_ms_reps": [
+          0.563792,
+          0.567625,
+          0.558541,
+          0.553791,
+          0.552625
+        ],
+        "time_ms_median": 0.558541,
+        "time_ms_min": 0.552625,
+        "time_ms_max": 0.567625
+      },
+      "cost_gap_heuristic_minus_dp": 421.177,
+      "cost_ratio_dp_over_heuristic": 0.364529,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.904516
+    },
+    {
+      "size": 200,
+      "seed": 3,
+      "rng_seed": 200003,
+      "tree": {
+        "node_count": 200,
+        "depth": 11,
+        "internal_nodes": 103,
+        "leaf_nodes": 97,
+        "max_fanout": 3,
+        "payload_nodes": 64
+      },
+      "catalogue": {
+        "n_instructions": 9,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 3,
+        "base_costs": {
+          "a": 3.281,
+          "b": 3.157,
+          "c": 3.478,
+          "d": 1.458
+        },
+        "premium": [
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 6.277,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "c_premium",
+            "name": "c",
+            "root_op": "c",
+            "cost": 5.676,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "b_fused_2",
+            "name": "b",
+            "root_op": "b",
+            "cost": 5.832,
+            "params": {
+              "spanned_child_ops": [
+                "a",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "a",
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_1",
+            "name": "c",
+            "root_op": "c",
+            "cost": 7.861,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "d"
+            ]
+          },
+          {
+            "key": "d_fused_0",
+            "name": "d",
+            "root_op": "d",
+            "cost": 2.175,
+            "params": {
+              "spanned_child_ops": [
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "d"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 208.49,
+        "covering_size": 65,
+        "fused_sites_used": 5,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.489916,
+          0.4775,
+          0.479208,
+          0.479,
+          0.483125
+        ],
+        "time_ms_median": 0.479208,
+        "time_ms_min": 0.4775,
+        "time_ms_max": 0.489916
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 656.266,
+        "covering_size": 200,
+        "fused_sites_used": 0,
+        "premium_sites_used": 33,
+        "time_ms_reps": [
+          0.581208,
+          0.570708,
+          0.565125,
+          0.562917,
+          0.561416
+        ],
+        "time_ms_median": 0.565125,
+        "time_ms_min": 0.561416,
+        "time_ms_max": 0.581208
+      },
+      "cost_gap_heuristic_minus_dp": 447.776,
+      "cost_ratio_dp_over_heuristic": 0.317691,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.847968
+    },
+    {
+      "size": 200,
+      "seed": 4,
+      "rng_seed": 200004,
+      "tree": {
+        "node_count": 200,
+        "depth": 11,
+        "internal_nodes": 109,
+        "leaf_nodes": 91,
+        "max_fanout": 3,
+        "payload_nodes": 54
+      },
+      "catalogue": {
+        "n_instructions": 10,
+        "n_single": 4,
+        "n_premium": 2,
+        "n_fused": 4,
+        "base_costs": {
+          "a": 1.883,
+          "b": 3.831,
+          "c": 0.735,
+          "d": 3.378
+        },
+        "premium": [
+          {
+            "key": "b_premium",
+            "name": "b",
+            "root_op": "b",
+            "cost": 7.146,
+            "params": {
+              "urgency": "high"
+            }
+          },
+          {
+            "key": "d_premium",
+            "name": "d",
+            "root_op": "d",
+            "cost": 4.624,
+            "params": {
+              "urgency": "high"
+            }
+          }
+        ],
+        "fused": [
+          {
+            "key": "a_fused_1",
+            "name": "a",
+            "root_op": "a",
+            "cost": 4.486,
+            "params": {
+              "spanned_child_ops": [
+                "c",
+                "d"
+              ]
+            },
+            "spanned_child_ops": [
+              "c",
+              "d"
+            ]
+          },
+          {
+            "key": "c_fused_0",
+            "name": "c",
+            "root_op": "c",
+            "cost": 3.891,
+            "params": {
+              "spanned_child_ops": [
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "b"
+            ]
+          },
+          {
+            "key": "c_fused_2",
+            "name": "c",
+            "root_op": "c",
+            "cost": 5.857,
+            "params": {
+              "spanned_child_ops": [
+                "d",
+                "b"
+              ]
+            },
+            "spanned_child_ops": [
+              "d",
+              "b"
+            ]
+          },
+          {
+            "key": "d_fused_3",
+            "name": "d",
+            "root_op": "d",
+            "cost": 3.822,
+            "params": {
+              "spanned_child_ops": [
+                "c"
+              ]
+            },
+            "spanned_child_ops": [
+              "c"
+            ]
+          }
+        ]
+      },
+      "dp": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 72.176,
+        "covering_size": 28,
+        "fused_sites_used": 5,
+        "premium_sites_used": 0,
+        "time_ms_reps": [
+          0.500291,
+          0.49175,
+          0.493917,
+          0.494167,
+          0.508583
+        ],
+        "time_ms_median": 0.494167,
+        "time_ms_min": 0.49175,
+        "time_ms_max": 0.508583
+      },
+      "heuristic": {
+        "complete": true,
+        "tiling_valid": true,
+        "cost": 532.196,
+        "covering_size": 200,
+        "fused_sites_used": 0,
+        "premium_sites_used": 17,
+        "time_ms_reps": [
+          0.56925,
+          0.573125,
+          0.562459,
+          0.559708,
+          0.560083
+        ],
+        "time_ms_median": 0.562459,
+        "time_ms_min": 0.559708,
+        "time_ms_max": 0.573125
+      },
+      "cost_gap_heuristic_minus_dp": 460.02,
+      "cost_ratio_dp_over_heuristic": 0.135619,
+      "dp_cost_le_heuristic": true,
+      "time_ratio_dp_over_heuristic_median": 0.878583
+    }
+  ],
+  "by_size": {
+    "20": {
+      "n_instances": 5,
+      "dp_cost_mean": 33.8484,
+      "dp_cost_stdev": 8.493745,
+      "heuristic_cost_mean": 61.533,
+      "heuristic_cost_stdev": 11.585075,
+      "cost_gap_mean": 27.6846,
+      "cost_gap_stdev": 4.118144,
+      "cost_ratio_dp_over_heuristic_mean": 0.545957,
+      "cost_ratio_dp_over_heuristic_min": 0.483575,
+      "cost_ratio_dp_over_heuristic_max": 0.591727,
+      "dp_wins": 5,
+      "cost_ties": 0,
+      "dp_cost_losses": 0,
+      "dp_cost_le_heuristic_all": true,
+      "dp_time_ms_mean": 0.066342,
+      "dp_time_ms_stdev": 0.002448,
+      "heuristic_time_ms_mean": 0.065808,
+      "heuristic_time_ms_stdev": 0.0044,
+      "time_ratio_dp_over_heuristic_mean": 1.011175,
+      "time_ratio_dp_over_heuristic_min": 0.899559,
+      "time_ratio_dp_over_heuristic_max": 1.061508,
+      "dp_fused_sites_total": 10,
+      "dp_premium_sites_total": 0,
+      "heuristic_fused_sites_total": 0,
+      "heuristic_premium_sites_total": 18,
+      "tree_depth_mean": 6,
+      "tree_depth_max": 7
+    },
+    "50": {
+      "n_instances": 5,
+      "dp_cost_mean": 47.1032,
+      "dp_cost_stdev": 31.951466,
+      "heuristic_cost_mean": 150.819,
+      "heuristic_cost_stdev": 22.400518,
+      "cost_gap_mean": 103.7158,
+      "cost_gap_stdev": 29.079589,
+      "cost_ratio_dp_over_heuristic_mean": 0.304636,
+      "cost_ratio_dp_over_heuristic_min": 0.053983,
+      "cost_ratio_dp_over_heuristic_max": 0.555302,
+      "dp_wins": 5,
+      "cost_ties": 0,
+      "dp_cost_losses": 0,
+      "dp_cost_le_heuristic_all": true,
+      "dp_time_ms_mean": 0.141317,
+      "dp_time_ms_stdev": 0.015103,
+      "heuristic_time_ms_mean": 0.144167,
+      "heuristic_time_ms_stdev": 0.002542,
+      "time_ratio_dp_over_heuristic_mean": 0.980632,
+      "time_ratio_dp_over_heuristic_min": 0.822992,
+      "time_ratio_dp_over_heuristic_max": 1.08594,
+      "dp_fused_sites_total": 15,
+      "dp_premium_sites_total": 0,
+      "heuristic_fused_sites_total": 0,
+      "heuristic_premium_sites_total": 31,
+      "tree_depth_mean": 8.2,
+      "tree_depth_max": 9
+    },
+    "100": {
+      "n_instances": 5,
+      "dp_cost_mean": 119.2196,
+      "dp_cost_stdev": 84.048643,
+      "heuristic_cost_mean": 289.712,
+      "heuristic_cost_stdev": 69.241588,
+      "cost_gap_mean": 170.4924,
+      "cost_gap_stdev": 35.615764,
+      "cost_ratio_dp_over_heuristic_mean": 0.379438,
+      "cost_ratio_dp_over_heuristic_min": 0.2038,
+      "cost_ratio_dp_over_heuristic_max": 0.684715,
+      "dp_wins": 5,
+      "cost_ties": 0,
+      "dp_cost_losses": 0,
+      "dp_cost_le_heuristic_all": true,
+      "dp_time_ms_mean": 0.272017,
+      "dp_time_ms_stdev": 0.017386,
+      "heuristic_time_ms_mean": 0.286142,
+      "heuristic_time_ms_stdev": 0.001121,
+      "time_ratio_dp_over_heuristic_mean": 0.950726,
+      "time_ratio_dp_over_heuristic_min": 0.886702,
+      "time_ratio_dp_over_heuristic_max": 1.03956,
+      "dp_fused_sites_total": 29,
+      "dp_premium_sites_total": 0,
+      "heuristic_fused_sites_total": 0,
+      "heuristic_premium_sites_total": 64,
+      "tree_depth_mean": 9.8,
+      "tree_depth_max": 10
+    },
+    "200": {
+      "n_instances": 5,
+      "dp_cost_mean": 143.0116,
+      "dp_cost_stdev": 83.105426,
+      "heuristic_cost_mean": 666.2448,
+      "heuristic_cost_stdev": 114.782388,
+      "cost_gap_mean": 523.2332,
+      "cost_gap_stdev": 119.34761,
+      "cost_ratio_dp_over_heuristic_mean": 0.213076,
+      "cost_ratio_dp_over_heuristic_min": 0.079666,
+      "cost_ratio_dp_over_heuristic_max": 0.364529,
+      "dp_wins": 5,
+      "cost_ties": 0,
+      "dp_cost_losses": 0,
+      "dp_cost_le_heuristic_all": true,
+      "dp_time_ms_mean": 0.483592,
+      "dp_time_ms_stdev": 0.018883,
+      "heuristic_time_ms_mean": 0.563292,
+      "heuristic_time_ms_stdev": 0.003397,
+      "time_ratio_dp_over_heuristic_mean": 0.85869,
+      "time_ratio_dp_over_heuristic_min": 0.801232,
+      "time_ratio_dp_over_heuristic_max": 0.904516,
+      "dp_fused_sites_total": 26,
+      "dp_premium_sites_total": 0,
+      "heuristic_fused_sites_total": 0,
+      "heuristic_premium_sites_total": 138,
+      "tree_depth_mean": 11,
+      "tree_depth_max": 11
+    }
+  },
+  "overall": {
+    "n_instances": 20,
+    "dp_cost_mean": 85.7957,
+    "dp_cost_stdev": 73.694656,
+    "heuristic_cost_mean": 292.0772,
+    "heuristic_cost_stdev": 244.946722,
+    "cost_gap_mean": 206.2815,
+    "cost_gap_stdev": 203.428345,
+    "cost_ratio_dp_over_heuristic_mean": 0.360777,
+    "cost_ratio_dp_over_heuristic_min": 0.053983,
+    "cost_ratio_dp_over_heuristic_max": 0.684715,
+    "dp_wins": 20,
+    "cost_ties": 0,
+    "dp_cost_losses": 0,
+    "dp_cost_le_heuristic_all": true,
+    "dp_time_ms_mean": 0.240817,
+    "dp_time_ms_stdev": 0.163006,
+    "heuristic_time_ms_mean": 0.264852,
+    "heuristic_time_ms_stdev": 0.194486,
+    "time_ratio_dp_over_heuristic_mean": 0.950306,
+    "time_ratio_dp_over_heuristic_min": 0.801232,
+    "time_ratio_dp_over_heuristic_max": 1.08594,
+    "dp_fused_sites_total": 80,
+    "dp_premium_sites_total": 0,
+    "heuristic_fused_sites_total": 0,
+    "heuristic_premium_sites_total": 251,
+    "tree_depth_mean": 8.75,
+    "tree_depth_max": 11
+  },
+  "notes": [
+    "Costs are catalogue instruction costs summed over the covering (MATCH-TREE total cost); lower is better.",
+    "The invariant under test is DP cost <= heuristic cost (structural: the DP minimises over a covering set that includes the greedy single-node covering); the ABSOLUTE gap depends on this synthetic catalogue's pricing model.",
+    "Catalogue pricing: fused patterns cost 0.70-0.95x the base cost of (root op + spanned child ops) while covering the spanned children's whole subtrees, so one fused site near the root can subsume a large subtree -- the cost gap grows with tree size by construction of the model, not by magic.",
+    "Premium variants (1.3-2.0x base cost, carrying the urgency param) are only ever chosen by the score-first heuristic; the cost-minimising DP never selects them.",
+    "Timing is wall-clock selection time (median of reps); DP being slower is allowed and reported honestly.",
+    "The heuristic arm is the shipped greedy tree cover (single-node patterns only, no cross-node horizon); the DP arm is MATCH-TREE (Appendix D.1).",
+    "Aggregates are computed by this script from the raw per-instance records via the statistics module; nothing is hand-filled."
+  ]
+}

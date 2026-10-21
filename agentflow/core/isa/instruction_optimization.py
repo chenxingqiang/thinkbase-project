@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Any, Set, Optional, Tuple
 from dataclasses import dataclass
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import networkx as nx
 from .instruction import Instruction, InstructionType
 
@@ -308,16 +308,75 @@ class StaticOptimizer:
         return merged
 
 class DynamicOptimizer:
-    """Dynamic instruction optimization."""
-    
-    def __init__(self):
+    """Dynamic instruction optimization.
+
+    Hot-path detection has two modes:
+
+    * ``"exact"`` (default): the shipped counter/threshold rule — a
+      monotone count per exact ``path_id``; a path turns hot once its
+      count exceeds ``hot_path_threshold`` and its last-recorded
+      success rate clears ``stability_threshold``.  Trajectory
+      diversity never accumulates: each distinct sequence counts
+      separately.
+    * ``"ema"``: the windowed detector specified in the paper
+      (supplementary D.4) — an exponential moving average per path
+      with decay ``gamma = 2/(ema_window+1)``; a path turns hot once
+      its *recent execution share* ``counter[h] / sum(counter)``
+      exceeds ``ema_threshold`` and stability clears
+      ``stability_threshold``.  A path must repeat (its EMA counter
+      rise above a single fresh observation) before it can be hot.
+
+    Tracked-path state (counts, EMA counters, stats, hot paths) is
+    bounded by ``max_tracked_paths`` (default 1000): the least
+    recently recorded path is evicted LRU-style when the cap is
+    exceeded.
+    """
+
+    DETECTION_MODES = ("exact", "ema")
+
+    def __init__(self,
+                 hot_path_threshold: int = 100,
+                 stability_threshold: float = 0.9,
+                 detection_mode: str = "exact",
+                 ema_window: int = 10,
+                 ema_threshold: float = 0.5,
+                 max_tracked_paths: int = 1000):
+        if detection_mode not in self.DETECTION_MODES:
+            raise ValueError(
+                f"detection_mode must be one of {self.DETECTION_MODES}, "
+                f"got {detection_mode!r}"
+            )
+        if ema_window < 2:
+            # gamma = 2/(window+1) == 1 for window 1: no memory, so a
+            # window of one can never accumulate anything.
+            raise ValueError(f"ema_window must be >= 2, got {ema_window}")
+        if not 0.0 < ema_threshold <= 1.0:
+            raise ValueError(
+                f"ema_threshold must be in (0, 1], got {ema_threshold}"
+            )
+        if max_tracked_paths < 1:
+            raise ValueError(
+                f"max_tracked_paths must be >= 1, got {max_tracked_paths}"
+            )
+
         self.hot_paths: Dict[str, List[Instruction]] = {}
         self.execution_counts: Dict[str, int] = defaultdict(int)
         self.performance_stats: Dict[str, OptimizationMetrics] = {}
-        
+
+        # Windowed detector state (detection_mode="ema").
+        self.ema_counters: Dict[str, float] = defaultdict(float)
+        self.ema_decay = 2.0 / (ema_window + 1)
+
+        # LRU recency over tracked paths; bounds all per-path state.
+        self._path_recency: OrderedDict[str, None] = OrderedDict()
+
         # Thresholds
-        self.hot_path_threshold = 100
-        self.stability_threshold = 0.9
+        self.hot_path_threshold = hot_path_threshold
+        self.stability_threshold = stability_threshold
+        self.detection_mode = detection_mode
+        self.ema_window = ema_window
+        self.ema_threshold = ema_threshold
+        self.max_tracked_paths = max_tracked_paths
         self.recompilation_threshold = 0.7
 
         # Trace optimization: reuse the static pass machinery, bounded
@@ -328,13 +387,57 @@ class DynamicOptimizer:
     def record_execution(self, path_id: str, instructions: List[Instruction], 
                         metrics: OptimizationMetrics):
         """Record execution of instruction sequence."""
+        self._touch_tracked_path(path_id)
         self.execution_counts[path_id] += 1
         self.performance_stats[path_id] = metrics
         
         # Check if path is hot
-        if (self.execution_counts[path_id] > self.hot_path_threshold and
-            self._is_path_stable(path_id)):
+        if self.detection_mode == "ema":
+            self._update_ema_counter(path_id)
+            if self._is_path_hot_ema(path_id):
+                self.hot_paths[path_id] = instructions
+        elif (self.execution_counts[path_id] > self.hot_path_threshold and
+              self._is_path_stable(path_id)):
             self.hot_paths[path_id] = instructions
+
+    def _touch_tracked_path(self, path_id: str) -> None:
+        """Mark ``path_id`` most recently recorded and enforce the LRU cap."""
+        if path_id in self._path_recency:
+            self._path_recency.move_to_end(path_id)
+        else:
+            self._path_recency[path_id] = None
+        while len(self._path_recency) > self.max_tracked_paths:
+            evicted, _ = self._path_recency.popitem(last=False)
+            self.execution_counts.pop(evicted, None)
+            self.ema_counters.pop(evicted, None)
+            self.performance_stats.pop(evicted, None)
+            self.hot_paths.pop(evicted, None)
+
+    def _update_ema_counter(self, path_id: str) -> None:
+        """Fold one observation into the path's EMA counter (decay gamma)."""
+        previous = self.ema_counters.get(path_id, 0.0)
+        self.ema_counters[path_id] = previous * (1.0 - self.ema_decay) + 1.0
+
+    def _recent_execution_share(self, path_id: str) -> float:
+        """Recent execution share of ``path_id`` among tracked paths."""
+        total = sum(self.ema_counters.values())
+        if total <= 0.0:
+            return 0.0
+        return self.ema_counters.get(path_id, 0.0) / total
+
+    def _is_path_hot_ema(self, path_id: str) -> bool:
+        """Windowed hot-path predicate (supplementary D.4).
+
+        Hot iff the path has repeated (EMA counter above a single
+        fresh observation), its recent execution share exceeds
+        ``ema_threshold``, and its recent stability clears the
+        stability threshold.
+        """
+        if self.ema_counters.get(path_id, 0.0) <= 1.0:
+            return False
+        if not self._is_path_stable(path_id):
+            return False
+        return self._recent_execution_share(path_id) > self.ema_threshold
 
     def optimize_hot_path(self, path_id: str) -> Optional[List[Instruction]]:
         """Optimize a hot execution path."""
@@ -391,9 +494,22 @@ class DynamicOptimizer:
 class OptimizationManager:
     """Manages both static and dynamic optimization."""
     
-    def __init__(self):
+    def __init__(self,
+                 hot_path_threshold: int = 100,
+                 stability_threshold: float = 0.9,
+                 detection_mode: str = "exact",
+                 ema_window: int = 10,
+                 ema_threshold: float = 0.5,
+                 max_tracked_paths: int = 1000):
         self.static_optimizer = StaticOptimizer()
-        self.dynamic_optimizer = DynamicOptimizer()
+        self.dynamic_optimizer = DynamicOptimizer(
+            hot_path_threshold=hot_path_threshold,
+            stability_threshold=stability_threshold,
+            detection_mode=detection_mode,
+            ema_window=ema_window,
+            ema_threshold=ema_threshold,
+            max_tracked_paths=max_tracked_paths,
+        )
         self.pipeline_scheduler = PipelineScheduler()
 
     def optimize_instructions(self, instructions: List[Instruction]) -> List[Instruction]:

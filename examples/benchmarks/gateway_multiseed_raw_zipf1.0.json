@@ -1,0 +1,121 @@
+{
+  "experiment": "cache_real_llm",
+  "config": {
+    "backend": "gateway",
+    "token_source": "gateway usage field (real)",
+    "gateway_base_url": "https://127.0.0.1:8443",
+    "model": "claude-glm-5.3-flash",
+    "max_tokens": 64,
+    "seeds": 2,
+    "n_tasks": 100,
+    "n_instructions": 50,
+    "n_param_values": 20,
+    "zipf_s": [
+      1.0
+    ],
+    "synthetic_reference": {
+      "n_tasks": 2000,
+      "seeds": 5,
+      "n_instructions": 50,
+      "n_param_values": 20,
+      "reduction_mean": [
+        0.5948,
+        0.679,
+        0.796
+      ]
+    },
+    "scale_note": "Same workload generator (zipf_workload), instruction pool and parameter space as the synthetic suite; n_tasks and seeds are reduced because real round trips cost seconds. Latency is measured on the wall clock; tokens come from gateway usage."
+  },
+  "data": [
+    {
+      "zipf_s": 1.0,
+      "per_seed": [
+        {
+          "seed": 0,
+          "expected_hit_rate": 0.15,
+          "baseline": {
+            "api_calls": 100,
+            "wall_ms": 332091.4,
+            "input_tokens": 2100,
+            "output_tokens": 6400,
+            "latency_ms_p50": 3185.3,
+            "latency_ms_p95": 4773.7
+          },
+          "cached": {
+            "api_calls": 85,
+            "wall_ms": 293196.9,
+            "input_tokens": 1785,
+            "output_tokens": 5440,
+            "latency_ms_p50": 2991.8,
+            "latency_ms_p95": 6495.6
+          },
+          "hit_rate": 0.15,
+          "call_reduction": 0.15,
+          "wall_saved_ms": 38894.5,
+          "tokens_saved": 1275
+        },
+        {
+          "seed": 1,
+          "expected_hit_rate": 0.16,
+          "baseline": {
+            "api_calls": 100,
+            "wall_ms": 299654.4,
+            "input_tokens": 2100,
+            "output_tokens": 6400,
+            "latency_ms_p50": 2971.0,
+            "latency_ms_p95": 4447.5
+          },
+          "cached": {
+            "api_calls": 84,
+            "wall_ms": 225557.6,
+            "input_tokens": 1764,
+            "output_tokens": 5376,
+            "latency_ms_p50": 2358.7,
+            "latency_ms_p95": 4101.7
+          },
+          "hit_rate": 0.16,
+          "call_reduction": 0.16,
+          "wall_saved_ms": 74096.9,
+          "tokens_saved": 1360
+        }
+      ],
+      "api_calls_no_cache": {
+        "mean": 100,
+        "stdev": 0.0
+      },
+      "api_calls_cached": {
+        "mean": 84.5,
+        "stdev": 0.7071
+      },
+      "reduction_ratio": {
+        "mean": 0.155,
+        "stdev": 0.0071
+      },
+      "hit_rate": {
+        "mean": 0.155,
+        "stdev": 0.0071
+      },
+      "expected_hit_rate": {
+        "mean": 0.155,
+        "stdev": 0.0071
+      },
+      "wall_ms_no_cache": {
+        "mean": 315872.9,
+        "stdev": 22936.4227
+      },
+      "wall_ms_cached": {
+        "mean": 259377.25,
+        "stdev": 47828.2077
+      },
+      "wall_saved_ms": {
+        "mean": 56495.7,
+        "stdev": 24891.8558
+      },
+      "latency_ms_p50_cached": {
+        "mean": 2675.25,
+        "stdev": 447.6693
+      }
+    }
+  ],
+  "wall_time_s": 1154.9
+}

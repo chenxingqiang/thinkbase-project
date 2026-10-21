@@ -32,12 +32,12 @@ class CoordinationPolicy:
 class AgentCoordinator:
     """Manages multi-agent coordination."""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], security_strict: bool = False):
         self.config = config
         self.agents: Dict[str, CapabilityProfile] = {}
         self.policies: Dict[str, CoordinationPolicy] = {}
         self.task_history = []
-        self.security_monitor = SecurityMonitor(config)
+        self.security_monitor = SecurityMonitor(config, strict=security_strict)
         
     def register_agent(self, 
                       agent_id: str,
@@ -354,10 +354,21 @@ class AgentCoordinator:
         })
 
 class SecurityMonitor:
-    """Monitors and enforces security policies."""
+    """Monitors and enforces security policies.
+
+    Two enforcement postures (Section 6.2 of the AgentISA paper):
+
+    * fail-open (default, ``strict=False``): resource access is open
+      unless an ``allowed_resources`` policy restricts it, and an
+      undeterminable data sensitivity is treated as 0;
+    * fail-closed (``strict=True``): unregistered resources, unknown
+      data sensitivity levels and incomplete resource-access policies
+      are denied and recorded in ``violation_history``.
+    """
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, Any], strict: bool = False):
         self.config = config
+        self.strict = bool(strict)
         self.security_policies = self._initialize_policies()
         self.violation_history = []
         
@@ -416,15 +427,77 @@ class SecurityMonitor:
     
     def _check_resource_access(self, task: Dict[str, Any]):
         """Check resource access permissions."""
-        if not self._validate_resource_access(task):
+        if self.strict:
+            self._check_resource_access_strict(task)
+        elif not self._validate_resource_access(task):
             raise SecurityViolation("Invalid resource access")
+    
+    def _check_resource_access_strict(self, task: Dict[str, Any]):
+        """Check resource access in strict (fail-closed) mode.
+        
+        Denies any request for a resource that is not registered in an
+        explicit ``allowed_resources`` policy — including the case where
+        no such policy is declared at all (incomplete policy).  Tasks
+        that request no resources need no registry decision.
+        """
+        requested = self._requested_resources(task)
+        if not requested:
+            return
+        
+        allowed = self.config.get("allowed_resources")
+        if allowed is None:
+            raise SecurityViolation(
+                "Incomplete resource-access policy: no allowed_resources "
+                "registry declared (strict mode)"
+            )
+        if not isinstance(allowed, (set, frozenset, list, tuple)):
+            raise SecurityViolation(
+                "Incomplete resource-access policy: allowed_resources must "
+                f"be a set or sequence, got {type(allowed).__name__} (strict mode)"
+            )
+        
+        allowed = set(allowed)
+        unregistered = [
+            resource for resource in requested if resource not in allowed
+        ]
+        if unregistered:
+            raise SecurityViolation(
+                f"Unregistered resources (strict mode): {unregistered}"
+            )
     
     def _check_data_sensitivity(self,
                               task: Dict[str, Any],
                               required_level: SecurityLevel):
         """Check data sensitivity requirements."""
+        if self.strict:
+            self._check_sensitivity_is_known(task)
         if self._get_data_sensitivity(task) > required_level.value:
             raise SecurityViolation("Data sensitivity mismatch")
+    
+    def _check_sensitivity_is_known(self, task: Dict[str, Any]):
+        """Check that the task's data sensitivity is positively known.
+        
+        Strict (fail-closed) guard: a task whose sensitivity cannot be
+        determined — no usable ``data_sensitivity`` declaration and no
+        ``data_categories`` — is rejected instead of being silently
+        treated as sensitivity 0.
+        """
+        declared = task.get("data_sensitivity")
+        if declared is not None:
+            if isinstance(declared, bool) or not isinstance(declared, (int, float)):
+                raise SecurityViolation(
+                    f"Unknown data sensitivity declaration: {declared!r} (strict mode)"
+                )
+            level = int(declared)
+            if not (SecurityLevel.LOW.value <= level <= SecurityLevel.CRITICAL.value):
+                raise SecurityViolation(
+                    f"Unknown data sensitivity level: {level} (strict mode)"
+                )
+            return
+        if self._resolve_data_sensitivity(task) is None:
+            raise SecurityViolation(
+                "Unknown data sensitivity: no declaration (strict mode)"
+            )
     
     def _validate_resource_access(self, task: Dict[str, Any]) -> bool:
         """Validate resource access permissions.
@@ -438,10 +511,17 @@ class SecurityMonitor:
         if allowed is None:
             return True
         allowed = set(allowed)
+        return all(
+            resource in allowed for resource in self._requested_resources(task)
+        )
+
+    @staticmethod
+    def _requested_resources(task: Dict[str, Any]) -> List[Any]:
+        """Normalize the task's resource request into a list."""
         requested = task.get("resources", [])
         if isinstance(requested, str):
             requested = [requested]
-        return all(resource in allowed for resource in requested)
+        return list(requested)
 
     def _get_data_sensitivity(self, task: Dict[str, Any]) -> int:
         """Get data sensitivity level.
@@ -449,7 +529,17 @@ class SecurityMonitor:
         The task may declare sensitivity directly (``data_sensitivity``
         as an int 0-3) or reference classified categories via
         ``data_categories`` (e.g. ``["financial", "medical"]`` count as
-        highly sensitive).  0 means no special sensitivity.
+        highly sensitive).  0 means no special sensitivity; an unknown
+        sensitivity is treated as 0 (fail-open default).
+        """
+        sensitivity = self._resolve_data_sensitivity(task)
+        return 0 if sensitivity is None else sensitivity
+
+    def _resolve_data_sensitivity(self, task: Dict[str, Any]) -> Optional[int]:
+        """Resolve the task's declared sensitivity to a numeric level.
+
+        Returns the declared or category-inferred level, or ``None``
+        when the task carries no sensitivity information at all.
         """
         declared = task.get("data_sensitivity")
         if isinstance(declared, (int, float)):
@@ -463,7 +553,7 @@ class SecurityMonitor:
             return SecurityLevel.HIGH.value
         if categories:
             return SecurityLevel.MEDIUM.value
-        return 0
+        return None
 
 class SecurityError(Exception):
     """Security-related error."""

@@ -1,0 +1,525 @@
+{
+ "experiment": "gateway_multiseed_cache_rerun",
+ "harness": "examples/benchmarks/isa_real_llm_bench.py (I8) run unmodified via its CLI with --backend gateway (one invocation per zipf bucket after the 429 episode; identical scale and flags per chunk)",
+ "backend": "gateway",
+ "config": {
+  "backend": "gateway",
+  "token_source": "gateway usage field (real)",
+  "gateway_base_url": "https://127.0.0.1:8443",
+  "model": "claude-glm-5.3-flash",
+  "max_tokens": 64,
+  "seeds": 2,
+  "n_tasks": 100,
+  "n_instructions": 50,
+  "n_param_values": 20,
+  "zipf_s": [
+   0.5,
+   1.0,
+   1.5
+  ],
+  "synthetic_reference": {
+   "n_tasks": 2000,
+   "seeds": 5,
+   "n_instructions": 50,
+   "n_param_values": 20,
+   "reduction_mean": [
+    0.5948,
+    0.679,
+    0.796
+   ]
+  },
+  "scale_note": "Same workload generator (zipf_workload), instruction pool and parameter space as the synthetic suite; n_tasks and seeds are reduced because real round trips cost seconds. Latency is measured on the wall clock; tokens come from gateway usage."
+ },
+ "provenance": {
+  "git_rev": "0e1671f8",
+  "postprocess_utc": "2026-10-21T11:57:42+00:00",
+  "raw_run_files": [
+   {
+    "file": "examples/benchmarks/gateway_multiseed_raw_zipf0.5.json",
+    "mtime_utc": "2026-10-21T11:21:57+00:00"
+   },
+   {
+    "file": "examples/benchmarks/gateway_multiseed_raw_zipf1.0.json",
+    "mtime_utc": "2026-10-21T11:41:18+00:00"
+   },
+   {
+    "file": "examples/benchmarks/gateway_multiseed_raw_zipf1.5.json",
+    "mtime_utc": "2026-10-21T11:56:50+00:00"
+   }
+  ],
+  "chunking": {
+   "n_invocations": 3,
+   "note": "after the first single-invocation attempt died on a gateway 429 (no retry, no output file), the rerun was chunked per zipf with an outer retry wrapper; each chunk is a full unmodified bench CLI invocation at the sanctioned scale",
+   "quota_episode": {
+    "what": "first attempt (single invocation, --tasks 100 --seeds 2 --zipf 0.5 1.0 1.5) crashed after ~125 successful calls (zipf=0.5 seed=0 baseline complete, cached arm at 25/100) with a gateway 429; the bench does not retry 429s and writes no output file on crash",
+    "gateway_error": "429 {\"error\":{\"code\":\"AccountQuotaExceeded\",\"message\":\"You have exceeded the 5-hour usage quota. It will reset at 2026-10-21 21:19:19 +0800 CST.\"}}",
+    "post_episode_diagnostics": "one 16-token probe call and five bench-like 64-token calls all returned 200 (~10 min after the crash), so the rerun was chunked per zipf with an outer retry wrapper instead of waiting for the quota reset"
+   }
+  },
+  "seeds": [
+   0,
+   1
+  ],
+  "seed_convention": "rng = random.Random(1000 + seed), seed in range(--seeds)",
+  "scale": {
+   "tasks_per_seed_per_zipf": 100,
+   "zipf_s": [
+    0.5,
+    1.0,
+    1.5
+   ],
+   "seeds": 2,
+   "max_tokens": 64,
+   "total_gateway_calls": 1103
+  },
+  "wall_time_s": 3243.8,
+  "wall_time_note": "sum of the per-chunk harness wall times (excludes the crashed first attempt and inter-chunk gaps)",
+  "aggregates_computed_by": "e10_gateway_postprocess.py recomputed from raw per_seed records and asserted equal to the harness aggregates (cross_check: passed)"
+ },
+ "aggregate_recomputed": [
+  {
+   "zipf_s": 0.5,
+   "n_seeds": 2,
+   "api_calls_no_cache": {
+    "mean": 100,
+    "stdev": 0.0
+   },
+   "api_calls_cached": {
+    "mean": 96.5,
+    "stdev": 3.5355
+   },
+   "reduction_ratio": {
+    "mean": 0.035,
+    "stdev": 0.0354
+   },
+   "hit_rate": {
+    "mean": 0.035,
+    "stdev": 0.0354
+   },
+   "expected_hit_rate": {
+    "mean": 0.035,
+    "stdev": 0.0354
+   },
+   "wall_ms_no_cache": {
+    "mean": 296090.0,
+    "stdev": 7690.6348
+   },
+   "wall_ms_cached": {
+    "mean": 283434.15,
+    "stdev": 7972.9825
+   },
+   "wall_saved_ms": {
+    "mean": 12655.9,
+    "stdev": 282.4184
+   },
+   "latency_ms_p50_cached": {
+    "mean": 2903.45,
+    "stdev": 20.4354
+   }
+  },
+  {
+   "zipf_s": 1.0,
+   "n_seeds": 2,
+   "api_calls_no_cache": {
+    "mean": 100,
+    "stdev": 0.0
+   },
+   "api_calls_cached": {
+    "mean": 84.5,
+    "stdev": 0.7071
+   },
+   "reduction_ratio": {
+    "mean": 0.155,
+    "stdev": 0.0071
+   },
+   "hit_rate": {
+    "mean": 0.155,
+    "stdev": 0.0071
+   },
+   "expected_hit_rate": {
+    "mean": 0.155,
+    "stdev": 0.0071
+   },
+   "wall_ms_no_cache": {
+    "mean": 315872.9,
+    "stdev": 22936.4227
+   },
+   "wall_ms_cached": {
+    "mean": 259377.25,
+    "stdev": 47828.2077
+   },
+   "wall_saved_ms": {
+    "mean": 56495.7,
+    "stdev": 24891.8558
+   },
+   "latency_ms_p50_cached": {
+    "mean": 2675.25,
+    "stdev": 447.6693
+   }
+  },
+  {
+   "zipf_s": 1.5,
+   "n_seeds": 2,
+   "api_calls_no_cache": {
+    "mean": 100,
+    "stdev": 0.0
+   },
+   "api_calls_cached": {
+    "mean": 70.5,
+    "stdev": 3.5355
+   },
+   "reduction_ratio": {
+    "mean": 0.295,
+    "stdev": 0.0354
+   },
+   "hit_rate": {
+    "mean": 0.295,
+    "stdev": 0.0354
+   },
+   "expected_hit_rate": {
+    "mean": 0.295,
+    "stdev": 0.0354
+   },
+   "wall_ms_no_cache": {
+    "mean": 275918.85,
+    "stdev": 1750.0186
+   },
+   "wall_ms_cached": {
+    "mean": 186717.1,
+    "stdev": 95.0352
+   },
+   "wall_saved_ms": {
+    "mean": 89201.8,
+    "stdev": 1655.0541
+   },
+   "latency_ms_p50_cached": {
+    "mean": 2477.3,
+    "stdev": 256.3969
+   }
+  }
+ ],
+ "cross_check": "passed (recomputed aggregates == harness aggregates)",
+ "vs_frozen_paper_run": {
+  "file": "examples/benchmarks/isa_real_llm_results.json",
+  "paper_scale": {
+   "tasks": 200,
+   "seeds": 1,
+   "zipf_s": [
+    0.5,
+    1.0,
+    1.5
+   ],
+   "max_tokens": 64,
+   "total_gateway_calls": 1040
+  },
+  "per_zipf": [
+   {
+    "zipf_s": 0.5,
+    "rerun_hit_rate_mean": 0.035,
+    "paper_hit_rate": 0.085,
+    "rerun_reduction_mean": 0.035,
+    "paper_reduction": 0.085,
+    "rerun_seeds": 2,
+    "paper_seeds": 1
+   },
+   {
+    "zipf_s": 1.0,
+    "rerun_hit_rate_mean": 0.155,
+    "paper_hit_rate": 0.26,
+    "rerun_reduction_mean": 0.155,
+    "paper_reduction": 0.26,
+    "rerun_seeds": 2,
+    "paper_seeds": 1
+   },
+   {
+    "zipf_s": 1.5,
+    "rerun_hit_rate_mean": 0.295,
+    "paper_hit_rate": 0.455,
+    "rerun_reduction_mean": 0.295,
+    "paper_reduction": 0.455,
+    "rerun_seeds": 2,
+    "paper_seeds": 1
+   }
+  ]
+ },
+ "data": [
+  {
+   "zipf_s": 0.5,
+   "per_seed": [
+    {
+     "seed": 0,
+     "expected_hit_rate": 0.01,
+     "baseline": {
+      "api_calls": 100,
+      "wall_ms": 301528.1,
+      "input_tokens": 2100,
+      "output_tokens": 6400,
+      "latency_ms_p50": 2943.7,
+      "latency_ms_p95": 4522.6
+     },
+     "cached": {
+      "api_calls": 99,
+      "wall_ms": 289071.9,
+      "input_tokens": 2079,
+      "output_tokens": 6336,
+      "latency_ms_p50": 2889.0,
+      "latency_ms_p95": 4429.6
+     },
+     "hit_rate": 0.01,
+     "call_reduction": 0.01,
+     "wall_saved_ms": 12456.2,
+     "tokens_saved": 85
+    },
+    {
+     "seed": 1,
+     "expected_hit_rate": 0.06,
+     "baseline": {
+      "api_calls": 100,
+      "wall_ms": 290651.9,
+      "input_tokens": 2100,
+      "output_tokens": 6400,
+      "latency_ms_p50": 2863.6,
+      "latency_ms_p95": 4070.2
+     },
+     "cached": {
+      "api_calls": 94,
+      "wall_ms": 277796.4,
+      "input_tokens": 1974,
+      "output_tokens": 6016,
+      "latency_ms_p50": 2917.9,
+      "latency_ms_p95": 4559.9
+     },
+     "hit_rate": 0.06,
+     "call_reduction": 0.06,
+     "wall_saved_ms": 12855.6,
+     "tokens_saved": 510
+    }
+   ],
+   "api_calls_no_cache": {
+    "mean": 100,
+    "stdev": 0.0
+   },
+   "api_calls_cached": {
+    "mean": 96.5,
+    "stdev": 3.5355
+   },
+   "reduction_ratio": {
+    "mean": 0.035,
+    "stdev": 0.0354
+   },
+   "hit_rate": {
+    "mean": 0.035,
+    "stdev": 0.0354
+   },
+   "expected_hit_rate": {
+    "mean": 0.035,
+    "stdev": 0.0354
+   },
+   "wall_ms_no_cache": {
+    "mean": 296090.0,
+    "stdev": 7690.6348
+   },
+   "wall_ms_cached": {
+    "mean": 283434.15,
+    "stdev": 7972.9825
+   },
+   "wall_saved_ms": {
+    "mean": 12655.9,
+    "stdev": 282.4184
+   },
+   "latency_ms_p50_cached": {
+    "mean": 2903.45,
+    "stdev": 20.4354
+   }
+  },
+  {
+   "zipf_s": 1.0,
+   "per_seed": [
+    {
+     "seed": 0,
+     "expected_hit_rate": 0.15,
+     "baseline": {
+      "api_calls": 100,
+      "wall_ms": 332091.4,
+      "input_tokens": 2100,
+      "output_tokens": 6400,
+      "latency_ms_p50": 3185.3,
+      "latency_ms_p95": 4773.7
+     },
+     "cached": {
+      "api_calls": 85,
+      "wall_ms": 293196.9,
+      "input_tokens": 1785,
+      "output_tokens": 5440,
+      "latency_ms_p50": 2991.8,
+      "latency_ms_p95": 6495.6
+     },
+     "hit_rate": 0.15,
+     "call_reduction": 0.15,
+     "wall_saved_ms": 38894.5,
+     "tokens_saved": 1275
+    },
+    {
+     "seed": 1,
+     "expected_hit_rate": 0.16,
+     "baseline": {
+      "api_calls": 100,
+      "wall_ms": 299654.4,
+      "input_tokens": 2100,
+      "output_tokens": 6400,
+      "latency_ms_p50": 2971.0,
+      "latency_ms_p95": 4447.5
+     },
+     "cached": {
+      "api_calls": 84,
+      "wall_ms": 225557.6,
+      "input_tokens": 1764,
+      "output_tokens": 5376,
+      "latency_ms_p50": 2358.7,
+      "latency_ms_p95": 4101.7
+     },
+     "hit_rate": 0.16,
+     "call_reduction": 0.16,
+     "wall_saved_ms": 74096.9,
+     "tokens_saved": 1360
+    }
+   ],
+   "api_calls_no_cache": {
+    "mean": 100,
+    "stdev": 0.0
+   },
+   "api_calls_cached": {
+    "mean": 84.5,
+    "stdev": 0.7071
+   },
+   "reduction_ratio": {
+    "mean": 0.155,
+    "stdev": 0.0071
+   },
+   "hit_rate": {
+    "mean": 0.155,
+    "stdev": 0.0071
+   },
+   "expected_hit_rate": {
+    "mean": 0.155,
+    "stdev": 0.0071
+   },
+   "wall_ms_no_cache": {
+    "mean": 315872.9,
+    "stdev": 22936.4227
+   },
+   "wall_ms_cached": {
+    "mean": 259377.25,
+    "stdev": 47828.2077
+   },
+   "wall_saved_ms": {
+    "mean": 56495.7,
+    "stdev": 24891.8558
+   },
+   "latency_ms_p50_cached": {
+    "mean": 2675.25,
+    "stdev": 447.6693
+   }
+  },
+  {
+   "zipf_s": 1.5,
+   "per_seed": [
+    {
+     "seed": 0,
+     "expected_hit_rate": 0.32,
+     "baseline": {
+      "api_calls": 100,
+      "wall_ms": 277156.3,
+      "input_tokens": 2100,
+      "output_tokens": 6400,
+      "latency_ms_p50": 2611.1,
+      "latency_ms_p95": 3952.8
+     },
+     "cached": {
+      "api_calls": 68,
+      "wall_ms": 186784.3,
+      "input_tokens": 1428,
+      "output_tokens": 4352,
+      "latency_ms_p50": 2658.6,
+      "latency_ms_p95": 4139.8
+     },
+     "hit_rate": 0.32,
+     "call_reduction": 0.32,
+     "wall_saved_ms": 90372.1,
+     "tokens_saved": 2720
+    },
+    {
+     "seed": 1,
+     "expected_hit_rate": 0.27,
+     "baseline": {
+      "api_calls": 100,
+      "wall_ms": 274681.4,
+      "input_tokens": 2100,
+      "output_tokens": 6400,
+      "latency_ms_p50": 2443.3,
+      "latency_ms_p95": 4214.8
+     },
+     "cached": {
+      "api_calls": 73,
+      "wall_ms": 186649.9,
+      "input_tokens": 1533,
+      "output_tokens": 4672,
+      "latency_ms_p50": 2296.0,
+      "latency_ms_p95": 3570.6
+     },
+     "hit_rate": 0.27,
+     "call_reduction": 0.27,
+     "wall_saved_ms": 88031.5,
+     "tokens_saved": 2295
+    }
+   ],
+   "api_calls_no_cache": {
+    "mean": 100,
+    "stdev": 0.0
+   },
+   "api_calls_cached": {
+    "mean": 70.5,
+    "stdev": 3.5355
+   },
+   "reduction_ratio": {
+    "mean": 0.295,
+    "stdev": 0.0354
+   },
+   "hit_rate": {
+    "mean": 0.295,
+    "stdev": 0.0354
+   },
+   "expected_hit_rate": {
+    "mean": 0.295,
+    "stdev": 0.0354
+   },
+   "wall_ms_no_cache": {
+    "mean": 275918.85,
+    "stdev": 1750.0186
+   },
+   "wall_ms_cached": {
+    "mean": 186717.1,
+    "stdev": 95.0352
+   },
+   "wall_saved_ms": {
+    "mean": 89201.8,
+    "stdev": 1655.0541
+   },
+   "latency_ms_p50_cached": {
+    "mean": 2477.3,
+    "stdev": 256.3969
+   }
+  }
+ ],
+ "notes": [
+  "E10 multi-seed rerun of the I8-orchestrated real-gateway cache experiment at the reduced scale sanctioned by the task instruction: --tasks 100 --seeds 2 (paper protocol: --tasks 200 --seeds 1).",
+  "Honest scale annotation: with 100 tasks per (zipf, seed) the workload contains fewer repeated (instruction, params) pairs than the paper's 200-task runs, so hit rates and call reductions are NOT comparable 1:1 to the frozen paper numbers; the per-zipf side-by-side is provided for context only.",
+  "Two seeds per zipf bucket give a real (if small) stdev; single-number cells would have stdev 0.0 by convention. The 5-seed protocol of the synthetic suite was not affordable on the real gateway within this session (each round trip costs ~2 s; 5 seeds x 3 zipf x ~192 calls would exceed the session budget).",
+  "Per-call latency p50, wall times and token counts come from the gateway's own usage/latency measurements; no simulated values in this run."
+ ],
+ "coverage": {
+  "status": "complete_at_reduced_scale",
+  "scope": "single gateway (https://127.0.0.1:8443), single model alias, 3 zipf buckets x 2 seeds x 100 tasks, max_tokens=64 mirroring the paper's Section 5.7 protocol",
+  "i8_dependency": "shipped (bench run unmodified via CLI)"
+ }
+}

@@ -6,9 +6,9 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import asyncio
 import time
-import json
-import hashlib
 from collections import OrderedDict
+
+from .instruction_cache import CacheKeyNamespace, build_cache_key
 
 # Type definitions
 T = TypeVar('T')
@@ -117,7 +117,8 @@ class Instruction(ABC):
                  cache_config: Optional[Dict[str, Any]] = None,
                  parallel_config: Optional[Dict[str, Any]] = None,
                  side_effects: bool = True,
-                 outputs: Optional[List[str]] = None):
+                 outputs: Optional[List[str]] = None,
+                 cache_namespace: Optional[CacheKeyNamespace] = None):
         self.id = id
         self.name = name
         self.type = type
@@ -143,6 +144,14 @@ class Instruction(ABC):
             max_size=cache_config.get("max_size", 1000) if cache_config else 1000,
             ttl=cache_config.get("ttl", 3600) if cache_config else 3600
         )
+        # Opt-in strict cache-key namespace (AgentISA Section 5.2
+        # cache-key contract): when attached, cache keys are extended
+        # from (instruction, params) to (instruction, params,
+        # model_alias, template_version, decoding_hash), so drifting
+        # any semantic configuration misses instead of serving a
+        # stale entry.  The default None keeps the legacy key
+        # unchanged.
+        self.cache_namespace = cache_namespace
         self.metrics = InstructionMetrics()
 
     def add_precondition(self, condition: Callable[..., bool]):
@@ -195,10 +204,15 @@ class Instruction(ABC):
             return False
 
     def _get_cache_key(self, input_params: Dict[str, Any]) -> str:
-        """Generate cache key from input parameters."""
-        # Sort dictionary to ensure consistent serialization
-        serialized = json.dumps(input_params, sort_keys=True)
-        return hashlib.sha256(serialized.encode()).hexdigest()
+        """Generate cache key from input parameters.
+
+        Without a ``cache_namespace`` (the default) this is the legacy
+        params-only key, byte-identical to the historical format.  With
+        a strict namespace attached the key folds in the instruction
+        identity and the namespace components (see
+        ``instruction_cache.build_cache_key``).
+        """
+        return build_cache_key(self.id, input_params, self.cache_namespace)
 
     async def _execute_parallel(self, tasks: List[Callable]) -> List[Any]:
         """Execute tasks in parallel with configured limits."""
@@ -251,7 +265,8 @@ class CompositeInstruction(Instruction):
                  components: List[Instruction],
                  composition_type: str = "sequential",
                  cache_config: Optional[Dict[str, Any]] = None,
-                 parallel_config: Optional[Dict[str, Any]] = None):
+                 parallel_config: Optional[Dict[str, Any]] = None,
+                 cache_namespace: Optional[CacheKeyNamespace] = None):
         super().__init__(
             id=id,
             name=name,
@@ -259,7 +274,8 @@ class CompositeInstruction(Instruction):
             params={},
             description=f"Composite instruction with {composition_type} composition",
             cache_config=cache_config,
-            parallel_config=parallel_config
+            parallel_config=parallel_config,
+            cache_namespace=cache_namespace
         )
         self.components = components
         self.composition_type = composition_type

@@ -1,0 +1,4551 @@
+{
+  "experiment": "fusion_chain_level_differentiation",
+  "purpose": "Respond to the 'optimization gains are small' criticism by quantifying optimization-level differentiation under chain-enriched workloads (4 levels x 5 seeds), against a random-slot control arm that reproduces the published microbench compiler numbers.",
+  "provenance": {
+    "git_rev": "0e1671f8",
+    "timestamp": "2026-10-21T10:34:04.661025+00:00",
+    "timezone": "UTC",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "seed_base": {
+      "chain_enriched": 5000,
+      "random_slots_control": 2000
+    },
+    "scale": {
+      "lengths": [
+        50,
+        200,
+        1000
+      ],
+      "seeds_per_length": 5,
+      "levels": [
+        "NONE",
+        "BASIC",
+        "ADVANCED",
+        "AGGRESSIVE"
+      ],
+      "arms": 2
+    },
+    "python": "3.14.5",
+    "determinism": "workloads and compiles are fully seeded; only the timestamp and git rev vary between runs of this script",
+    "compiler": "agentflow/core/isa/compiler.py",
+    "chain_generator": "examples/benchmarks/fusion_chain_bench.py::generate_chain_workload",
+    "control_generator": "examples/benchmarks/isa_microbench.py::synthetic_formal_sequence"
+  },
+  "config": {
+    "chain_mix": {
+      "fusion_chain": 0.35,
+      "parallel_batch": 0.3,
+      "dataflow_chain": 0.15,
+      "dead_chain": 0.08,
+      "effectful_anchor": 0.12
+    },
+    "segment_run_ranges": {
+      "fusion_chain": [
+        4,
+        12
+      ],
+      "parallel_batch": [
+        4,
+        10
+      ],
+      "dataflow_chain": [
+        3,
+        8
+      ],
+      "dead_chain": [
+        2,
+        6
+      ],
+      "effectful_anchor": [
+        1,
+        1
+      ]
+    },
+    "cost_range": [
+      0.5,
+      2.0
+    ],
+    "memory_sizes": [
+      64,
+      128
+    ],
+    "dataflow_memory_sizes": [
+      256,
+      512,
+      1024,
+      2048
+    ],
+    "control_config": {
+      "p_dead": 0.25,
+      "p_pure": 0.55
+    }
+  },
+  "metric_definitions": {
+    "effective_instruction_count": "instruction count after compilation, unwrapping parallel_block wrappers (reused from isa_microbench)",
+    "instruction_count_reduction": "1 - effective_instruction_count / original_count",
+    "dispatch_count": "number of top-level dispatch units in the compiled program; a parallel_block wrapper is one dispatch",
+    "declared_cost_makespan": "sum of declared costs over dispatch units; a parallel_block contributes max(member costs) since members run concurrently; metadata['cost'] default 1.0",
+    "fused_instruction_count": "surviving top-level instructions named 'fused_*'",
+    "peak_live_outputs": "from the AGGRESSIVE memory plan lifecycle: max simultaneously-live outputs (conservative tie-break)",
+    "buffer_reuse_potential": "distinct_tracked_outputs - peak_live_outputs: buffers a disjoint-reuse allocator could recycle, from the AGGRESSIVE memory plan",
+    "structural_metrics_identical_per_seed": "all STRUCTURAL_METRIC_KEYS match per seed between the two levels",
+    "aggressive_memory_plan_differentiates": "AGGRESSIVE emits a memory plan on every seed, ADVANCED on none, and the mean buffer_reuse_potential is > 0"
+  },
+  "coverage": {
+    "status": "complete",
+    "cells_planned": 120,
+    "cells_run": 120,
+    "compiler_passes_present": {
+      "instruction_fusion": true,
+      "dead_code_elimination": true,
+      "parallel_execution": true,
+      "resource_optimization": true,
+      "memory_optimization": true
+    },
+    "passes_applied_by_level": {
+      "NONE": [],
+      "BASIC": [
+        "dead_code_elimination",
+        "instruction_fusion"
+      ],
+      "ADVANCED": [
+        "dead_code_elimination",
+        "instruction_fusion",
+        "parallel_execution",
+        "resource_optimization"
+      ],
+      "AGGRESSIVE": [
+        "dead_code_elimination",
+        "instruction_fusion",
+        "memory_optimization",
+        "parallel_execution",
+        "resource_optimization"
+      ]
+    },
+    "limitations": [
+      "AGGRESSIVE's memory_optimization pass only annotates the IR metadata; no executor consumes the plan, so memory metrics are plan-derived analyses, not measured runtime savings.",
+      "declared_cost_makespan is a metadata cost model (a parallel_block contributes the max member cost), not wall-clock time.",
+      "peak_live_outputs uses a conservative tie-break: at equal positions production is counted before release."
+    ]
+  },
+  "workload_census": {
+    "chain_enriched": [
+      {
+        "length": 50,
+        "per_seed": [
+          {
+            "fusion_chain_instructions": 10,
+            "parallel_batch_instructions": 38,
+            "dataflow_chain_instructions": 0,
+            "dead_chain_instructions": 0,
+            "effectful_anchor_instructions": 2,
+            "total": 50,
+            "declared_outputs": 48,
+            "leaf_outputs": 48
+          },
+          {
+            "fusion_chain_instructions": 10,
+            "parallel_batch_instructions": 39,
+            "dataflow_chain_instructions": 0,
+            "dead_chain_instructions": 0,
+            "effectful_anchor_instructions": 1,
+            "total": 50,
+            "declared_outputs": 49,
+            "leaf_outputs": 49
+          },
+          {
+            "fusion_chain_instructions": 30,
+            "parallel_batch_instructions": 17,
+            "dataflow_chain_instructions": 0,
+            "dead_chain_instructions": 2,
+            "effectful_anchor_instructions": 1,
+            "total": 50,
+            "declared_outputs": 47,
+            "leaf_outputs": 47
+          },
+          {
+            "fusion_chain_instructions": 32,
+            "parallel_batch_instructions": 8,
+            "dataflow_chain_instructions": 0,
+            "dead_chain_instructions": 5,
+            "effectful_anchor_instructions": 5,
+            "total": 50,
+            "declared_outputs": 40,
+            "leaf_outputs": 40
+          },
+          {
+            "fusion_chain_instructions": 31,
+            "parallel_batch_instructions": 9,
+            "dataflow_chain_instructions": 7,
+            "dead_chain_instructions": 0,
+            "effectful_anchor_instructions": 3,
+            "total": 50,
+            "declared_outputs": 47,
+            "leaf_outputs": 41
+          }
+        ],
+        "mean": {
+          "dataflow_chain_instructions": 1.4,
+          "dead_chain_instructions": 1.4,
+          "declared_outputs": 46.2,
+          "effectful_anchor_instructions": 2.4,
+          "fusion_chain_instructions": 22.6,
+          "leaf_outputs": 45,
+          "parallel_batch_instructions": 22.2,
+          "total": 50
+        }
+      },
+      {
+        "length": 200,
+        "per_seed": [
+          {
+            "fusion_chain_instructions": 85,
+            "parallel_batch_instructions": 72,
+            "dataflow_chain_instructions": 26,
+            "dead_chain_instructions": 13,
+            "effectful_anchor_instructions": 4,
+            "total": 200,
+            "declared_outputs": 183,
+            "leaf_outputs": 162
+          },
+          {
+            "fusion_chain_instructions": 63,
+            "parallel_batch_instructions": 90,
+            "dataflow_chain_instructions": 26,
+            "dead_chain_instructions": 17,
+            "effectful_anchor_instructions": 4,
+            "total": 200,
+            "declared_outputs": 179,
+            "leaf_outputs": 158
+          },
+          {
+            "fusion_chain_instructions": 107,
+            "parallel_batch_instructions": 63,
+            "dataflow_chain_instructions": 11,
+            "dead_chain_instructions": 14,
+            "effectful_anchor_instructions": 5,
+            "total": 200,
+            "declared_outputs": 181,
+            "leaf_outputs": 172
+          },
+          {
+            "fusion_chain_instructions": 94,
+            "parallel_batch_instructions": 72,
+            "dataflow_chain_instructions": 5,
+            "dead_chain_instructions": 22,
+            "effectful_anchor_instructions": 7,
+            "total": 200,
+            "declared_outputs": 171,
+            "leaf_outputs": 167
+          },
+          {
+            "fusion_chain_instructions": 96,
+            "parallel_batch_instructions": 55,
+            "dataflow_chain_instructions": 23,
+            "dead_chain_instructions": 17,
+            "effectful_anchor_instructions": 9,
+            "total": 200,
+            "declared_outputs": 174,
+            "leaf_outputs": 156
+          }
+        ],
+        "mean": {
+          "dataflow_chain_instructions": 18.2,
+          "dead_chain_instructions": 16.6,
+          "declared_outputs": 177.6,
+          "effectful_anchor_instructions": 5.8,
+          "fusion_chain_instructions": 89,
+          "leaf_outputs": 163,
+          "parallel_batch_instructions": 70.4,
+          "total": 200
+        }
+      },
+      {
+        "length": 1000,
+        "per_seed": [
+          {
+            "fusion_chain_instructions": 460,
+            "parallel_batch_instructions": 303,
+            "dataflow_chain_instructions": 163,
+            "dead_chain_instructions": 49,
+            "effectful_anchor_instructions": 25,
+            "total": 1000,
+            "declared_outputs": 926,
+            "leaf_outputs": 790
+          },
+          {
+            "fusion_chain_instructions": 473,
+            "parallel_batch_instructions": 307,
+            "dataflow_chain_instructions": 132,
+            "dead_chain_instructions": 70,
+            "effectful_anchor_instructions": 18,
+            "total": 1000,
+            "declared_outputs": 912,
+            "leaf_outputs": 806
+          },
+          {
+            "fusion_chain_instructions": 480,
+            "parallel_batch_instructions": 357,
+            "dataflow_chain_instructions": 91,
+            "dead_chain_instructions": 56,
+            "effectful_anchor_instructions": 16,
+            "total": 1000,
+            "declared_outputs": 928,
+            "leaf_outputs": 852
+          },
+          {
+            "fusion_chain_instructions": 486,
+            "parallel_batch_instructions": 322,
+            "dataflow_chain_instructions": 123,
+            "dead_chain_instructions": 45,
+            "effectful_anchor_instructions": 24,
+            "total": 1000,
+            "declared_outputs": 931,
+            "leaf_outputs": 829
+          },
+          {
+            "fusion_chain_instructions": 425,
+            "parallel_batch_instructions": 342,
+            "dataflow_chain_instructions": 146,
+            "dead_chain_instructions": 64,
+            "effectful_anchor_instructions": 23,
+            "total": 1000,
+            "declared_outputs": 913,
+            "leaf_outputs": 794
+          }
+        ],
+        "mean": {
+          "dataflow_chain_instructions": 131,
+          "dead_chain_instructions": 56.8,
+          "declared_outputs": 922,
+          "effectful_anchor_instructions": 21.2,
+          "fusion_chain_instructions": 464.8,
+          "leaf_outputs": 814.2,
+          "parallel_batch_instructions": 326.2,
+          "total": 1000
+        }
+      }
+    ],
+    "random_slots_control": [
+      {
+        "length": 50,
+        "per_seed": [
+          {
+            "dead_instructions": 13,
+            "pure_instructions": 27,
+            "effectful_instructions": 9,
+            "total": 50
+          },
+          {
+            "dead_instructions": 9,
+            "pure_instructions": 34,
+            "effectful_instructions": 6,
+            "total": 50
+          },
+          {
+            "dead_instructions": 11,
+            "pure_instructions": 24,
+            "effectful_instructions": 14,
+            "total": 50
+          },
+          {
+            "dead_instructions": 11,
+            "pure_instructions": 29,
+            "effectful_instructions": 9,
+            "total": 50
+          },
+          {
+            "dead_instructions": 11,
+            "pure_instructions": 28,
+            "effectful_instructions": 10,
+            "total": 50
+          }
+        ],
+        "mean": {
+          "dead_instructions": 11,
+          "effectful_instructions": 9.6,
+          "pure_instructions": 28.4,
+          "total": 50
+        }
+      },
+      {
+        "length": 200,
+        "per_seed": [
+          {
+            "dead_instructions": 55,
+            "pure_instructions": 106,
+            "effectful_instructions": 38,
+            "total": 200
+          },
+          {
+            "dead_instructions": 44,
+            "pure_instructions": 110,
+            "effectful_instructions": 45,
+            "total": 200
+          },
+          {
+            "dead_instructions": 51,
+            "pure_instructions": 105,
+            "effectful_instructions": 43,
+            "total": 200
+          },
+          {
+            "dead_instructions": 52,
+            "pure_instructions": 107,
+            "effectful_instructions": 40,
+            "total": 200
+          },
+          {
+            "dead_instructions": 43,
+            "pure_instructions": 110,
+            "effectful_instructions": 46,
+            "total": 200
+          }
+        ],
+        "mean": {
+          "dead_instructions": 49,
+          "effectful_instructions": 42.4,
+          "pure_instructions": 107.6,
+          "total": 200
+        }
+      },
+      {
+        "length": 1000,
+        "per_seed": [
+          {
+            "dead_instructions": 270,
+            "pure_instructions": 558,
+            "effectful_instructions": 171,
+            "total": 1000
+          },
+          {
+            "dead_instructions": 220,
+            "pure_instructions": 566,
+            "effectful_instructions": 213,
+            "total": 1000
+          },
+          {
+            "dead_instructions": 247,
+            "pure_instructions": 531,
+            "effectful_instructions": 221,
+            "total": 1000
+          },
+          {
+            "dead_instructions": 268,
+            "pure_instructions": 551,
+            "effectful_instructions": 180,
+            "total": 1000
+          },
+          {
+            "dead_instructions": 255,
+            "pure_instructions": 541,
+            "effectful_instructions": 203,
+            "total": 1000
+          }
+        ],
+        "mean": {
+          "dead_instructions": 252,
+          "effectful_instructions": 197.6,
+          "pure_instructions": 549.4,
+          "total": 1000
+        }
+      }
+    ]
+  },
+  "data": {
+    "chain_enriched": [
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "NONE",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 61.09122505934951,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 43,
+        "instruction_count_reduction": 0.14,
+        "dispatch_count": 43,
+        "declared_cost_makespan": 61.091225059349505,
+        "fused_instruction_count": 7,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 43,
+        "instruction_count_reduction": 0.14,
+        "dispatch_count": 4,
+        "declared_cost_makespan": 7.425025352580931,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 2,
+        "max_parallel_width": 31,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 43,
+        "instruction_count_reduction": 0.14,
+        "dispatch_count": 4,
+        "declared_cost_makespan": 7.425025352580931,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 2,
+        "max_parallel_width": 31,
+        "memory_plan_present": true,
+        "peak_live_outputs": 48,
+        "distinct_tracked_outputs": 48,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 5184.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "NONE",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 61.43253233143274,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 46,
+        "instruction_count_reduction": 0.07999999999999996,
+        "dispatch_count": 46,
+        "declared_cost_makespan": 61.43253233143274,
+        "fused_instruction_count": 4,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 46,
+        "instruction_count_reduction": 0.07999999999999996,
+        "dispatch_count": 2,
+        "declared_cost_makespan": 4.0498996241506084,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 1,
+        "max_parallel_width": 45,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 46,
+        "instruction_count_reduction": 0.07999999999999996,
+        "dispatch_count": 2,
+        "declared_cost_makespan": 4.0498996241506084,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 1,
+        "max_parallel_width": 45,
+        "memory_plan_present": true,
+        "peak_live_outputs": 49,
+        "distinct_tracked_outputs": 49,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 4800.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "NONE",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 61.12191059552714,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 32,
+        "declared_cost_makespan": 58.01720314312121,
+        "fused_instruction_count": 16,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 2,
+        "declared_cost_makespan": 4.114901374882551,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 1,
+        "max_parallel_width": 31,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 2,
+        "declared_cost_makespan": 4.114901374882551,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 1,
+        "max_parallel_width": 31,
+        "memory_plan_present": true,
+        "peak_live_outputs": 47,
+        "distinct_tracked_outputs": 47,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 4800.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "NONE",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 61.023800545469726,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 29,
+        "instruction_count_reduction": 0.42000000000000004,
+        "dispatch_count": 29,
+        "declared_cost_makespan": 54.6798393740942,
+        "fused_instruction_count": 16,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 29,
+        "instruction_count_reduction": 0.42000000000000004,
+        "dispatch_count": 8,
+        "declared_cost_makespan": 15.418456015971474,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 3,
+        "max_parallel_width": 18,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 29,
+        "instruction_count_reduction": 0.42000000000000004,
+        "dispatch_count": 8,
+        "declared_cost_makespan": 15.418456015971474,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 3,
+        "max_parallel_width": 18,
+        "memory_plan_present": true,
+        "peak_live_outputs": 40,
+        "distinct_tracked_outputs": 40,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 4224.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "NONE",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 63.550136616372036,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 34,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 34,
+        "declared_cost_makespan": 63.550136616372036,
+        "fused_instruction_count": 16,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 34,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 12,
+        "declared_cost_makespan": 19.569157194121306,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 3,
+        "max_parallel_width": 16,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 34,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 12,
+        "declared_cost_makespan": 19.569157194121306,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 3,
+        "max_parallel_width": 16,
+        "memory_plan_present": true,
+        "peak_live_outputs": 41,
+        "distinct_tracked_outputs": 47,
+        "buffer_reuse_potential": 6,
+        "total_declared_memory_bytes": 12160.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "NONE",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 249.756942558334,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 145,
+        "instruction_count_reduction": 0.275,
+        "dispatch_count": 145,
+        "declared_cost_makespan": 235.49388971011118,
+        "fused_instruction_count": 44,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 145,
+        "instruction_count_reduction": 0.275,
+        "dispatch_count": 29,
+        "declared_cost_makespan": 48.42245660053487,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 6,
+        "max_parallel_width": 45,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 145,
+        "instruction_count_reduction": 0.275,
+        "dispatch_count": 29,
+        "declared_cost_makespan": 48.42245660053487,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 6,
+        "max_parallel_width": 45,
+        "memory_plan_present": true,
+        "peak_live_outputs": 162,
+        "distinct_tracked_outputs": 183,
+        "buffer_reuse_potential": 21,
+        "total_declared_memory_bytes": 44224.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "NONE",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 240.75507116238936,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 148,
+        "instruction_count_reduction": 0.26,
+        "dispatch_count": 148,
+        "declared_cost_makespan": 223.7055276287721,
+        "fused_instruction_count": 37,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 148,
+        "instruction_count_reduction": 0.26,
+        "dispatch_count": 27,
+        "declared_cost_makespan": 47.144677048457844,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 50,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 148,
+        "instruction_count_reduction": 0.26,
+        "dispatch_count": 27,
+        "declared_cost_makespan": 47.144677048457844,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 50,
+        "memory_plan_present": true,
+        "peak_live_outputs": 158,
+        "distinct_tracked_outputs": 179,
+        "buffer_reuse_potential": 21,
+        "total_declared_memory_bytes": 43712.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "NONE",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 247.21357013319852,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 129,
+        "instruction_count_reduction": 0.355,
+        "dispatch_count": 129,
+        "declared_cost_makespan": 230.02635718497788,
+        "fused_instruction_count": 57,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 129,
+        "instruction_count_reduction": 0.355,
+        "dispatch_count": 17,
+        "declared_cost_makespan": 30.442842306388435,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 50,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 129,
+        "instruction_count_reduction": 0.355,
+        "dispatch_count": 17,
+        "declared_cost_makespan": 30.442842306388435,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 50,
+        "memory_plan_present": true,
+        "peak_live_outputs": 172,
+        "distinct_tracked_outputs": 181,
+        "buffer_reuse_potential": 9,
+        "total_declared_memory_bytes": 24832.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "NONE",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 245.86841309835276,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 131,
+        "instruction_count_reduction": 0.345,
+        "dispatch_count": 131,
+        "declared_cost_makespan": 225.74972139134155,
+        "fused_instruction_count": 50,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 131,
+        "instruction_count_reduction": 0.345,
+        "dispatch_count": 16,
+        "declared_cost_makespan": 30.515654834990777,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 6,
+        "max_parallel_width": 52,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 131,
+        "instruction_count_reduction": 0.345,
+        "dispatch_count": 16,
+        "declared_cost_makespan": 30.515654834990777,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 6,
+        "max_parallel_width": 52,
+        "memory_plan_present": true,
+        "peak_live_outputs": 167,
+        "distinct_tracked_outputs": 171,
+        "buffer_reuse_potential": 4,
+        "total_declared_memory_bytes": 24256.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "NONE",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 255.8109130362282,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 135,
+        "instruction_count_reduction": 0.32499999999999996,
+        "dispatch_count": 135,
+        "declared_cost_makespan": 238.2983538237113,
+        "fused_instruction_count": 50,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 135,
+        "instruction_count_reduction": 0.32499999999999996,
+        "dispatch_count": 36,
+        "declared_cost_makespan": 61.58163833784245,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 9,
+        "max_parallel_width": 27,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 135,
+        "instruction_count_reduction": 0.32499999999999996,
+        "dispatch_count": 36,
+        "declared_cost_makespan": 61.58163833784245,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 9,
+        "max_parallel_width": 27,
+        "memory_plan_present": true,
+        "peak_live_outputs": 156,
+        "distinct_tracked_outputs": 174,
+        "buffer_reuse_potential": 18,
+        "total_declared_memory_bytes": 39680.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1221.9155714168976,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 717,
+        "instruction_count_reduction": 0.28300000000000003,
+        "dispatch_count": 717,
+        "declared_cost_makespan": 1161.296208139839,
+        "fused_instruction_count": 235,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 717,
+        "instruction_count_reduction": 0.28300000000000003,
+        "dispatch_count": 183,
+        "declared_cost_makespan": 288.9496323747012,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 36,
+        "max_parallel_width": 86,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 717,
+        "instruction_count_reduction": 0.28300000000000003,
+        "dispatch_count": 183,
+        "declared_cost_makespan": 288.9496323747012,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 36,
+        "max_parallel_width": 86,
+        "memory_plan_present": true,
+        "peak_live_outputs": 790,
+        "distinct_tracked_outputs": 926,
+        "buffer_reuse_potential": 136,
+        "total_declared_memory_bytes": 227712.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1239.098592200983,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 688,
+        "instruction_count_reduction": 0.31200000000000006,
+        "dispatch_count": 688,
+        "declared_cost_makespan": 1156.9541497745063,
+        "fused_instruction_count": 245,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 688,
+        "instruction_count_reduction": 0.31200000000000006,
+        "dispatch_count": 140,
+        "declared_cost_makespan": 239.44446429321874,
+        "fused_instruction_count": 2,
+        "parallel_block_wrappers": 33,
+        "max_parallel_width": 54,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 688,
+        "instruction_count_reduction": 0.31200000000000006,
+        "dispatch_count": 140,
+        "declared_cost_makespan": 239.44446429321874,
+        "fused_instruction_count": 2,
+        "parallel_block_wrappers": 33,
+        "max_parallel_width": 54,
+        "memory_plan_present": true,
+        "peak_live_outputs": 806,
+        "distinct_tracked_outputs": 912,
+        "buffer_reuse_potential": 106,
+        "total_declared_memory_bytes": 221632.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1230.8502160923997,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 695,
+        "instruction_count_reduction": 0.30500000000000005,
+        "dispatch_count": 695,
+        "declared_cost_makespan": 1165.3033216963952,
+        "fused_instruction_count": 254,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 695,
+        "instruction_count_reduction": 0.30500000000000005,
+        "dispatch_count": 104,
+        "declared_cost_makespan": 174.77916901985878,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 23,
+        "max_parallel_width": 99,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 695,
+        "instruction_count_reduction": 0.30500000000000005,
+        "dispatch_count": 104,
+        "declared_cost_makespan": 174.77916901985878,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 23,
+        "max_parallel_width": 99,
+        "memory_plan_present": true,
+        "peak_live_outputs": 852,
+        "distinct_tracked_outputs": 928,
+        "buffer_reuse_potential": 76,
+        "total_declared_memory_bytes": 173376.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1247.5077746605787,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 706,
+        "instruction_count_reduction": 0.29400000000000004,
+        "dispatch_count": 706,
+        "declared_cost_makespan": 1201.3361277222145,
+        "fused_instruction_count": 256,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 706,
+        "instruction_count_reduction": 0.29400000000000004,
+        "dispatch_count": 146,
+        "declared_cost_makespan": 248.34192104523055,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 37,
+        "max_parallel_width": 53,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 706,
+        "instruction_count_reduction": 0.29400000000000004,
+        "dispatch_count": 146,
+        "declared_cost_makespan": 248.34192104523055,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 37,
+        "max_parallel_width": 53,
+        "memory_plan_present": true,
+        "peak_live_outputs": 829,
+        "distinct_tracked_outputs": 931,
+        "buffer_reuse_potential": 102,
+        "total_declared_memory_bytes": 205248.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1251.942190902109,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 719,
+        "instruction_count_reduction": 0.281,
+        "dispatch_count": 719,
+        "declared_cost_makespan": 1178.3728077502108,
+        "fused_instruction_count": 221,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 719,
+        "instruction_count_reduction": 0.281,
+        "dispatch_count": 162,
+        "declared_cost_makespan": 261.1632175758281,
+        "fused_instruction_count": 4,
+        "parallel_block_wrappers": 33,
+        "max_parallel_width": 53,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "chain_enriched",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 719,
+        "instruction_count_reduction": 0.281,
+        "dispatch_count": 162,
+        "declared_cost_makespan": 261.1632175758281,
+        "fused_instruction_count": 4,
+        "parallel_block_wrappers": 33,
+        "max_parallel_width": 53,
+        "memory_plan_present": true,
+        "peak_live_outputs": 794,
+        "distinct_tracked_outputs": 913,
+        "buffer_reuse_potential": 119,
+        "total_declared_memory_bytes": 217088.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      }
+    ],
+    "random_slots_control": [
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "NONE",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 50.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 32,
+        "declared_cost_makespan": 32.0,
+        "fused_instruction_count": 10,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 20,
+        "declared_cost_makespan": 20.0,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 6,
+        "max_parallel_width": 7,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 0,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 20,
+        "declared_cost_makespan": 20.0,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 6,
+        "max_parallel_width": 7,
+        "memory_plan_present": true,
+        "peak_live_outputs": 27,
+        "distinct_tracked_outputs": 27,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "NONE",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 50.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 32,
+        "declared_cost_makespan": 32.0,
+        "fused_instruction_count": 10,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 14,
+        "declared_cost_makespan": 14.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 4,
+        "max_parallel_width": 9,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 1,
+        "original_count": 50,
+        "effective_instruction_count": 32,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 14,
+        "declared_cost_makespan": 14.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 4,
+        "max_parallel_width": 9,
+        "memory_plan_present": true,
+        "peak_live_outputs": 34,
+        "distinct_tracked_outputs": 34,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "NONE",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 50.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 37,
+        "instruction_count_reduction": 0.26,
+        "dispatch_count": 37,
+        "declared_cost_makespan": 37.0,
+        "fused_instruction_count": 8,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 37,
+        "instruction_count_reduction": 0.26,
+        "dispatch_count": 25,
+        "declared_cost_makespan": 25.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 6,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 2,
+        "original_count": 50,
+        "effective_instruction_count": 37,
+        "instruction_count_reduction": 0.26,
+        "dispatch_count": 25,
+        "declared_cost_makespan": 25.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 6,
+        "memory_plan_present": true,
+        "peak_live_outputs": 24,
+        "distinct_tracked_outputs": 24,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "NONE",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 50.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 34,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 34,
+        "declared_cost_makespan": 34.0,
+        "fused_instruction_count": 9,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 34,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 17,
+        "declared_cost_makespan": 17.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 7,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 3,
+        "original_count": 50,
+        "effective_instruction_count": 34,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 17,
+        "declared_cost_makespan": 17.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 5,
+        "max_parallel_width": 7,
+        "memory_plan_present": true,
+        "peak_live_outputs": 29,
+        "distinct_tracked_outputs": 29,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "NONE",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 50,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 50,
+        "declared_cost_makespan": 50.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "BASIC",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 33,
+        "instruction_count_reduction": 0.33999999999999997,
+        "dispatch_count": 33,
+        "declared_cost_makespan": 33.0,
+        "fused_instruction_count": 12,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "ADVANCED",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 33,
+        "instruction_count_reduction": 0.33999999999999997,
+        "dispatch_count": 19,
+        "declared_cost_makespan": 19.0,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 4,
+        "max_parallel_width": 6,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "seed": 4,
+        "original_count": 50,
+        "effective_instruction_count": 33,
+        "instruction_count_reduction": 0.33999999999999997,
+        "dispatch_count": 19,
+        "declared_cost_makespan": 19.0,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 4,
+        "max_parallel_width": 6,
+        "memory_plan_present": true,
+        "peak_live_outputs": 28,
+        "distinct_tracked_outputs": 28,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "NONE",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 200.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 129,
+        "instruction_count_reduction": 0.355,
+        "dispatch_count": 129,
+        "declared_cost_makespan": 129.0,
+        "fused_instruction_count": 39,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 129,
+        "instruction_count_reduction": 0.355,
+        "dispatch_count": 68,
+        "declared_cost_makespan": 68.0,
+        "fused_instruction_count": 2,
+        "parallel_block_wrappers": 21,
+        "max_parallel_width": 9,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 0,
+        "original_count": 200,
+        "effective_instruction_count": 129,
+        "instruction_count_reduction": 0.355,
+        "dispatch_count": 68,
+        "declared_cost_makespan": 68.0,
+        "fused_instruction_count": 2,
+        "parallel_block_wrappers": 21,
+        "max_parallel_width": 9,
+        "memory_plan_present": true,
+        "peak_live_outputs": 106,
+        "distinct_tracked_outputs": 106,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "NONE",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 200.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 136,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 136,
+        "declared_cost_makespan": 136.0,
+        "fused_instruction_count": 35,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 136,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 79,
+        "declared_cost_makespan": 79.0,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 22,
+        "max_parallel_width": 11,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 1,
+        "original_count": 200,
+        "effective_instruction_count": 136,
+        "instruction_count_reduction": 0.31999999999999995,
+        "dispatch_count": 79,
+        "declared_cost_makespan": 79.0,
+        "fused_instruction_count": 1,
+        "parallel_block_wrappers": 22,
+        "max_parallel_width": 11,
+        "memory_plan_present": true,
+        "peak_live_outputs": 110,
+        "distinct_tracked_outputs": 110,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "NONE",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 200.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 130,
+        "instruction_count_reduction": 0.35,
+        "dispatch_count": 130,
+        "declared_cost_makespan": 130.0,
+        "fused_instruction_count": 40,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 130,
+        "instruction_count_reduction": 0.35,
+        "dispatch_count": 75,
+        "declared_cost_makespan": 75.0,
+        "fused_instruction_count": 2,
+        "parallel_block_wrappers": 17,
+        "max_parallel_width": 9,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 2,
+        "original_count": 200,
+        "effective_instruction_count": 130,
+        "instruction_count_reduction": 0.35,
+        "dispatch_count": 75,
+        "declared_cost_makespan": 75.0,
+        "fused_instruction_count": 2,
+        "parallel_block_wrappers": 17,
+        "max_parallel_width": 9,
+        "memory_plan_present": true,
+        "peak_live_outputs": 105,
+        "distinct_tracked_outputs": 105,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "NONE",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 200.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 128,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 128,
+        "declared_cost_makespan": 128.0,
+        "fused_instruction_count": 40,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 128,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 67,
+        "declared_cost_makespan": 67.0,
+        "fused_instruction_count": 3,
+        "parallel_block_wrappers": 17,
+        "max_parallel_width": 11,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 3,
+        "original_count": 200,
+        "effective_instruction_count": 128,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 67,
+        "declared_cost_makespan": 67.0,
+        "fused_instruction_count": 3,
+        "parallel_block_wrappers": 17,
+        "max_parallel_width": 11,
+        "memory_plan_present": true,
+        "peak_live_outputs": 107,
+        "distinct_tracked_outputs": 107,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "NONE",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 200,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 200,
+        "declared_cost_makespan": 200.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "BASIC",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 135,
+        "instruction_count_reduction": 0.32499999999999996,
+        "dispatch_count": 135,
+        "declared_cost_makespan": 135.0,
+        "fused_instruction_count": 39,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "ADVANCED",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 135,
+        "instruction_count_reduction": 0.32499999999999996,
+        "dispatch_count": 81,
+        "declared_cost_makespan": 81.0,
+        "fused_instruction_count": 6,
+        "parallel_block_wrappers": 22,
+        "max_parallel_width": 9,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "seed": 4,
+        "original_count": 200,
+        "effective_instruction_count": 135,
+        "instruction_count_reduction": 0.32499999999999996,
+        "dispatch_count": 81,
+        "declared_cost_makespan": 81.0,
+        "fused_instruction_count": 6,
+        "parallel_block_wrappers": 22,
+        "max_parallel_width": 9,
+        "memory_plan_present": true,
+        "peak_live_outputs": 110,
+        "distinct_tracked_outputs": 110,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1000.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 624,
+        "instruction_count_reduction": 0.376,
+        "dispatch_count": 624,
+        "declared_cost_makespan": 624.0,
+        "fused_instruction_count": 221,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 624,
+        "instruction_count_reduction": 0.376,
+        "dispatch_count": 308,
+        "declared_cost_makespan": 308.0,
+        "fused_instruction_count": 17,
+        "parallel_block_wrappers": 95,
+        "max_parallel_width": 13,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 0,
+        "original_count": 1000,
+        "effective_instruction_count": 624,
+        "instruction_count_reduction": 0.376,
+        "dispatch_count": 308,
+        "declared_cost_makespan": 308.0,
+        "fused_instruction_count": 17,
+        "parallel_block_wrappers": 95,
+        "max_parallel_width": 13,
+        "memory_plan_present": true,
+        "peak_live_outputs": 558,
+        "distinct_tracked_outputs": 558,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1000.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 668,
+        "instruction_count_reduction": 0.33199999999999996,
+        "dispatch_count": 668,
+        "declared_cost_makespan": 668.0,
+        "fused_instruction_count": 204,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 668,
+        "instruction_count_reduction": 0.33199999999999996,
+        "dispatch_count": 366,
+        "declared_cost_makespan": 366.0,
+        "fused_instruction_count": 15,
+        "parallel_block_wrappers": 101,
+        "max_parallel_width": 13,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 1,
+        "original_count": 1000,
+        "effective_instruction_count": 668,
+        "instruction_count_reduction": 0.33199999999999996,
+        "dispatch_count": 366,
+        "declared_cost_makespan": 366.0,
+        "fused_instruction_count": 15,
+        "parallel_block_wrappers": 101,
+        "max_parallel_width": 13,
+        "memory_plan_present": true,
+        "peak_live_outputs": 566,
+        "distinct_tracked_outputs": 566,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1000.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 654,
+        "instruction_count_reduction": 0.346,
+        "dispatch_count": 654,
+        "declared_cost_makespan": 654.0,
+        "fused_instruction_count": 198,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 654,
+        "instruction_count_reduction": 0.346,
+        "dispatch_count": 381,
+        "declared_cost_makespan": 381.0,
+        "fused_instruction_count": 19,
+        "parallel_block_wrappers": 92,
+        "max_parallel_width": 12,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 2,
+        "original_count": 1000,
+        "effective_instruction_count": 654,
+        "instruction_count_reduction": 0.346,
+        "dispatch_count": 381,
+        "declared_cost_makespan": 381.0,
+        "fused_instruction_count": 19,
+        "parallel_block_wrappers": 92,
+        "max_parallel_width": 12,
+        "memory_plan_present": true,
+        "peak_live_outputs": 531,
+        "distinct_tracked_outputs": 531,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1000.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 640,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 640,
+        "declared_cost_makespan": 640.0,
+        "fused_instruction_count": 203,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 640,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 316,
+        "declared_cost_makespan": 316.0,
+        "fused_instruction_count": 14,
+        "parallel_block_wrappers": 86,
+        "max_parallel_width": 23,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 3,
+        "original_count": 1000,
+        "effective_instruction_count": 640,
+        "instruction_count_reduction": 0.36,
+        "dispatch_count": 316,
+        "declared_cost_makespan": 316.0,
+        "fused_instruction_count": 14,
+        "parallel_block_wrappers": 86,
+        "max_parallel_width": 23,
+        "memory_plan_present": true,
+        "peak_live_outputs": 551,
+        "distinct_tracked_outputs": 551,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "NONE",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 1000,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 1000,
+        "declared_cost_makespan": 1000.0,
+        "fused_instruction_count": 0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "BASIC",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 644,
+        "instruction_count_reduction": 0.356,
+        "dispatch_count": 644,
+        "declared_cost_makespan": 644.0,
+        "fused_instruction_count": 193,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "ADVANCED",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 644,
+        "instruction_count_reduction": 0.356,
+        "dispatch_count": 352,
+        "declared_cost_makespan": 352.0,
+        "fused_instruction_count": 22,
+        "parallel_block_wrappers": 101,
+        "max_parallel_width": 11,
+        "memory_plan_present": false,
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_optimizations": null
+      },
+      {
+        "arm": "random_slots_control",
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "seed": 4,
+        "original_count": 1000,
+        "effective_instruction_count": 644,
+        "instruction_count_reduction": 0.356,
+        "dispatch_count": 352,
+        "declared_cost_makespan": 352.0,
+        "fused_instruction_count": 22,
+        "parallel_block_wrappers": 101,
+        "max_parallel_width": 11,
+        "memory_plan_present": true,
+        "peak_live_outputs": 541,
+        "distinct_tracked_outputs": 541,
+        "buffer_reuse_potential": 0,
+        "total_declared_memory_bytes": 0.0,
+        "memory_plan_optimizations": [
+          "reuse_disjoint_buffers",
+          "stream_small_intermediates"
+        ]
+      }
+    ]
+  },
+  "aggregates": {
+    "chain_enriched": [
+      {
+        "length": 50,
+        "level": "NONE",
+        "effective_instruction_count": {
+          "mean": 50,
+          "stdev": 0.0
+        },
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "dispatch_count": {
+          "mean": 50,
+          "stdev": 0.0
+        },
+        "declared_cost_makespan": {
+          "mean": 61.64392102963023,
+          "stdev": 1.0771327899353378
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 50,
+        "level": "BASIC",
+        "effective_instruction_count": {
+          "mean": 36.8,
+          "stdev": 7.328028384224504
+        },
+        "instruction_count_reduction": {
+          "mean": 0.264,
+          "stdev": 0.1465605676844901
+        },
+        "dispatch_count": {
+          "mean": 36.8,
+          "stdev": 7.328028384224504
+        },
+        "declared_cost_makespan": {
+          "mean": 59.75418730487394,
+          "stdev": 3.4561490152089456
+        },
+        "fused_instruction_count": {
+          "mean": 11.8,
+          "stdev": 5.848076606885378
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 50,
+        "level": "ADVANCED",
+        "effective_instruction_count": {
+          "mean": 36.8,
+          "stdev": 7.328028384224504
+        },
+        "instruction_count_reduction": {
+          "mean": 0.264,
+          "stdev": 0.1465605676844901
+        },
+        "dispatch_count": {
+          "mean": 5.6,
+          "stdev": 4.33589667773576
+        },
+        "declared_cost_makespan": {
+          "mean": 10.115487912341374,
+          "stdev": 7.027274052899699
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 2,
+          "stdev": 1.0
+        },
+        "max_parallel_width": {
+          "mean": 28.2,
+          "stdev": 11.734564329364767
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "effective_instruction_count": {
+          "mean": 36.8,
+          "stdev": 7.328028384224504
+        },
+        "instruction_count_reduction": {
+          "mean": 0.264,
+          "stdev": 0.1465605676844901
+        },
+        "dispatch_count": {
+          "mean": 5.6,
+          "stdev": 4.33589667773576
+        },
+        "declared_cost_makespan": {
+          "mean": 10.115487912341374,
+          "stdev": 7.027274052899699
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 2,
+          "stdev": 1.0
+        },
+        "max_parallel_width": {
+          "mean": 28.2,
+          "stdev": 11.734564329364767
+        },
+        "peak_live_outputs": {
+          "mean": 45,
+          "stdev": 4.183300132670378
+        },
+        "distinct_tracked_outputs": {
+          "mean": 46.2,
+          "stdev": 3.5637059362410923
+        },
+        "buffer_reuse_potential": {
+          "mean": 1.2,
+          "stdev": 2.6832815729997477
+        },
+        "total_declared_memory_bytes": {
+          "mean": 6233.6,
+          "stdev": 3330.645102679059
+        },
+        "memory_plan_present": {
+          "seeds_with_plan": 5,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": {
+          "union": [
+            "reuse_disjoint_buffers",
+            "stream_small_intermediates"
+          ]
+        }
+      },
+      {
+        "length": 200,
+        "level": "NONE",
+        "effective_instruction_count": {
+          "mean": 200,
+          "stdev": 0.0
+        },
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "dispatch_count": {
+          "mean": 200,
+          "stdev": 0.0
+        },
+        "declared_cost_makespan": {
+          "mean": 247.88098199770056,
+          "stdev": 5.515376499051577
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 200,
+        "level": "BASIC",
+        "effective_instruction_count": {
+          "mean": 137.6,
+          "stdev": 8.473488065725943
+        },
+        "instruction_count_reduction": {
+          "mean": 0.312,
+          "stdev": 0.0423674403286297
+        },
+        "dispatch_count": {
+          "mean": 137.6,
+          "stdev": 8.473488065725943
+        },
+        "declared_cost_makespan": {
+          "mean": 230.6547699477828,
+          "stdev": 6.21666766226776
+        },
+        "fused_instruction_count": {
+          "mean": 47.6,
+          "stdev": 7.503332592921628
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 200,
+        "level": "ADVANCED",
+        "effective_instruction_count": {
+          "mean": 137.6,
+          "stdev": 8.473488065725943
+        },
+        "instruction_count_reduction": {
+          "mean": 0.312,
+          "stdev": 0.0423674403286297
+        },
+        "dispatch_count": {
+          "mean": 25,
+          "stdev": 8.455767262643882
+        },
+        "declared_cost_makespan": {
+          "mean": 43.621453825642874,
+          "stdev": 13.261492431032792
+        },
+        "fused_instruction_count": {
+          "mean": 0.2,
+          "stdev": 0.4472135954999579
+        },
+        "parallel_block_wrappers": {
+          "mean": 6.2,
+          "stdev": 1.6431676725154984
+        },
+        "max_parallel_width": {
+          "mean": 44.8,
+          "stdev": 10.2810505299799
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "effective_instruction_count": {
+          "mean": 137.6,
+          "stdev": 8.473488065725943
+        },
+        "instruction_count_reduction": {
+          "mean": 0.312,
+          "stdev": 0.0423674403286297
+        },
+        "dispatch_count": {
+          "mean": 25,
+          "stdev": 8.455767262643882
+        },
+        "declared_cost_makespan": {
+          "mean": 43.621453825642874,
+          "stdev": 13.261492431032792
+        },
+        "fused_instruction_count": {
+          "mean": 0.2,
+          "stdev": 0.4472135954999579
+        },
+        "parallel_block_wrappers": {
+          "mean": 6.2,
+          "stdev": 1.6431676725154984
+        },
+        "max_parallel_width": {
+          "mean": 44.8,
+          "stdev": 10.2810505299799
+        },
+        "peak_live_outputs": {
+          "mean": 163,
+          "stdev": 6.557438524302
+        },
+        "distinct_tracked_outputs": {
+          "mean": 177.6,
+          "stdev": 4.979959839195493
+        },
+        "buffer_reuse_potential": {
+          "mean": 14.6,
+          "stdev": 7.700649323271382
+        },
+        "total_declared_memory_bytes": {
+          "mean": 35340.8,
+          "stdev": 10014.047093957568
+        },
+        "memory_plan_present": {
+          "seeds_with_plan": 5,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": {
+          "union": [
+            "reuse_disjoint_buffers",
+            "stream_small_intermediates"
+          ]
+        }
+      },
+      {
+        "length": 1000,
+        "level": "NONE",
+        "effective_instruction_count": {
+          "mean": 1000,
+          "stdev": 0.0
+        },
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "dispatch_count": {
+          "mean": 1000,
+          "stdev": 0.0
+        },
+        "declared_cost_makespan": {
+          "mean": 1238.2628690545935,
+          "stdev": 12.201148747579445
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 1000,
+        "level": "BASIC",
+        "effective_instruction_count": {
+          "mean": 705,
+          "stdev": 13.509256086106296
+        },
+        "instruction_count_reduction": {
+          "mean": 0.29500000000000004,
+          "stdev": 0.013509256086106309
+        },
+        "dispatch_count": {
+          "mean": 705,
+          "stdev": 13.509256086106296
+        },
+        "declared_cost_makespan": {
+          "mean": 1172.6525230166333,
+          "stdev": 17.92265609790202
+        },
+        "fused_instruction_count": {
+          "mean": 242.2,
+          "stdev": 14.481022063376605
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 1000,
+        "level": "ADVANCED",
+        "effective_instruction_count": {
+          "mean": 705,
+          "stdev": 13.509256086106296
+        },
+        "instruction_count_reduction": {
+          "mean": 0.29500000000000004,
+          "stdev": 0.013509256086106309
+        },
+        "dispatch_count": {
+          "mean": 147,
+          "stdev": 29.24038303442689
+        },
+        "declared_cost_makespan": {
+          "mean": 242.53568086176747,
+          "stdev": 42.23580519240483
+        },
+        "fused_instruction_count": {
+          "mean": 1.8,
+          "stdev": 1.3038404810405297
+        },
+        "parallel_block_wrappers": {
+          "mean": 32.4,
+          "stdev": 5.549774770204643
+        },
+        "max_parallel_width": {
+          "mean": 69,
+          "stdev": 21.94310825749169
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "effective_instruction_count": {
+          "mean": 705,
+          "stdev": 13.509256086106296
+        },
+        "instruction_count_reduction": {
+          "mean": 0.29500000000000004,
+          "stdev": 0.013509256086106309
+        },
+        "dispatch_count": {
+          "mean": 147,
+          "stdev": 29.24038303442689
+        },
+        "declared_cost_makespan": {
+          "mean": 242.53568086176747,
+          "stdev": 42.23580519240483
+        },
+        "fused_instruction_count": {
+          "mean": 1.8,
+          "stdev": 1.3038404810405297
+        },
+        "parallel_block_wrappers": {
+          "mean": 32.4,
+          "stdev": 5.549774770204643
+        },
+        "max_parallel_width": {
+          "mean": 69,
+          "stdev": 21.94310825749169
+        },
+        "peak_live_outputs": {
+          "mean": 814.2,
+          "stdev": 26.023066690918654
+        },
+        "distinct_tracked_outputs": {
+          "mean": 922,
+          "stdev": 8.860022573334675
+        },
+        "buffer_reuse_potential": {
+          "mean": 107.8,
+          "stdev": 22.185580902919806
+        },
+        "total_declared_memory_bytes": {
+          "mean": 209011.2,
+          "stdev": 21553.818483043786
+        },
+        "memory_plan_present": {
+          "seeds_with_plan": 5,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": {
+          "union": [
+            "reuse_disjoint_buffers",
+            "stream_small_intermediates"
+          ]
+        }
+      }
+    ],
+    "random_slots_control": [
+      {
+        "length": 50,
+        "level": "NONE",
+        "effective_instruction_count": {
+          "mean": 50,
+          "stdev": 0.0
+        },
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "dispatch_count": {
+          "mean": 50,
+          "stdev": 0.0
+        },
+        "declared_cost_makespan": {
+          "mean": 50.0,
+          "stdev": 0.0
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 50,
+        "level": "BASIC",
+        "effective_instruction_count": {
+          "mean": 33.6,
+          "stdev": 2.073644135332772
+        },
+        "instruction_count_reduction": {
+          "mean": 0.32799999999999996,
+          "stdev": 0.04147288270665543
+        },
+        "dispatch_count": {
+          "mean": 33.6,
+          "stdev": 2.073644135332772
+        },
+        "declared_cost_makespan": {
+          "mean": 33.6,
+          "stdev": 2.073644135332772
+        },
+        "fused_instruction_count": {
+          "mean": 9.8,
+          "stdev": 1.4832396974191326
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 50,
+        "level": "ADVANCED",
+        "effective_instruction_count": {
+          "mean": 33.6,
+          "stdev": 2.073644135332772
+        },
+        "instruction_count_reduction": {
+          "mean": 0.32799999999999996,
+          "stdev": 0.04147288270665543
+        },
+        "dispatch_count": {
+          "mean": 19,
+          "stdev": 4.06201920231798
+        },
+        "declared_cost_makespan": {
+          "mean": 19.0,
+          "stdev": 4.06201920231798
+        },
+        "fused_instruction_count": {
+          "mean": 0.4,
+          "stdev": 0.5477225575051661
+        },
+        "parallel_block_wrappers": {
+          "mean": 4.8,
+          "stdev": 0.8366600265340756
+        },
+        "max_parallel_width": {
+          "mean": 7,
+          "stdev": 1.224744871391589
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 50,
+        "level": "AGGRESSIVE",
+        "effective_instruction_count": {
+          "mean": 33.6,
+          "stdev": 2.073644135332772
+        },
+        "instruction_count_reduction": {
+          "mean": 0.32799999999999996,
+          "stdev": 0.04147288270665543
+        },
+        "dispatch_count": {
+          "mean": 19,
+          "stdev": 4.06201920231798
+        },
+        "declared_cost_makespan": {
+          "mean": 19.0,
+          "stdev": 4.06201920231798
+        },
+        "fused_instruction_count": {
+          "mean": 0.4,
+          "stdev": 0.5477225575051661
+        },
+        "parallel_block_wrappers": {
+          "mean": 4.8,
+          "stdev": 0.8366600265340756
+        },
+        "max_parallel_width": {
+          "mean": 7,
+          "stdev": 1.224744871391589
+        },
+        "peak_live_outputs": {
+          "mean": 28.4,
+          "stdev": 3.646916505762094
+        },
+        "distinct_tracked_outputs": {
+          "mean": 28.4,
+          "stdev": 3.646916505762094
+        },
+        "buffer_reuse_potential": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "total_declared_memory_bytes": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "memory_plan_present": {
+          "seeds_with_plan": 5,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": {
+          "union": [
+            "reuse_disjoint_buffers",
+            "stream_small_intermediates"
+          ]
+        }
+      },
+      {
+        "length": 200,
+        "level": "NONE",
+        "effective_instruction_count": {
+          "mean": 200,
+          "stdev": 0.0
+        },
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "dispatch_count": {
+          "mean": 200,
+          "stdev": 0.0
+        },
+        "declared_cost_makespan": {
+          "mean": 200.0,
+          "stdev": 0.0
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 200,
+        "level": "BASIC",
+        "effective_instruction_count": {
+          "mean": 131.6,
+          "stdev": 3.646916505762094
+        },
+        "instruction_count_reduction": {
+          "mean": 0.34199999999999997,
+          "stdev": 0.018234582528810484
+        },
+        "dispatch_count": {
+          "mean": 131.6,
+          "stdev": 3.646916505762094
+        },
+        "declared_cost_makespan": {
+          "mean": 131.6,
+          "stdev": 3.646916505762094
+        },
+        "fused_instruction_count": {
+          "mean": 38.6,
+          "stdev": 2.073644135332772
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 200,
+        "level": "ADVANCED",
+        "effective_instruction_count": {
+          "mean": 131.6,
+          "stdev": 3.646916505762094
+        },
+        "instruction_count_reduction": {
+          "mean": 0.34199999999999997,
+          "stdev": 0.018234582528810484
+        },
+        "dispatch_count": {
+          "mean": 74,
+          "stdev": 6.324555320336759
+        },
+        "declared_cost_makespan": {
+          "mean": 74.0,
+          "stdev": 6.324555320336759
+        },
+        "fused_instruction_count": {
+          "mean": 2.8,
+          "stdev": 1.9235384061671346
+        },
+        "parallel_block_wrappers": {
+          "mean": 19.8,
+          "stdev": 2.588435821108957
+        },
+        "max_parallel_width": {
+          "mean": 9.8,
+          "stdev": 1.0954451150103321
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 200,
+        "level": "AGGRESSIVE",
+        "effective_instruction_count": {
+          "mean": 131.6,
+          "stdev": 3.646916505762094
+        },
+        "instruction_count_reduction": {
+          "mean": 0.34199999999999997,
+          "stdev": 0.018234582528810484
+        },
+        "dispatch_count": {
+          "mean": 74,
+          "stdev": 6.324555320336759
+        },
+        "declared_cost_makespan": {
+          "mean": 74.0,
+          "stdev": 6.324555320336759
+        },
+        "fused_instruction_count": {
+          "mean": 2.8,
+          "stdev": 1.9235384061671346
+        },
+        "parallel_block_wrappers": {
+          "mean": 19.8,
+          "stdev": 2.588435821108957
+        },
+        "max_parallel_width": {
+          "mean": 9.8,
+          "stdev": 1.0954451150103321
+        },
+        "peak_live_outputs": {
+          "mean": 107.6,
+          "stdev": 2.3021728866442674
+        },
+        "distinct_tracked_outputs": {
+          "mean": 107.6,
+          "stdev": 2.3021728866442674
+        },
+        "buffer_reuse_potential": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "total_declared_memory_bytes": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "memory_plan_present": {
+          "seeds_with_plan": 5,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": {
+          "union": [
+            "reuse_disjoint_buffers",
+            "stream_small_intermediates"
+          ]
+        }
+      },
+      {
+        "length": 1000,
+        "level": "NONE",
+        "effective_instruction_count": {
+          "mean": 1000,
+          "stdev": 0.0
+        },
+        "instruction_count_reduction": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "dispatch_count": {
+          "mean": 1000,
+          "stdev": 0.0
+        },
+        "declared_cost_makespan": {
+          "mean": 1000.0,
+          "stdev": 0.0
+        },
+        "fused_instruction_count": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 1000,
+        "level": "BASIC",
+        "effective_instruction_count": {
+          "mean": 646,
+          "stdev": 16.3707055437449
+        },
+        "instruction_count_reduction": {
+          "mean": 0.354,
+          "stdev": 0.016370705543744913
+        },
+        "dispatch_count": {
+          "mean": 646,
+          "stdev": 16.3707055437449
+        },
+        "declared_cost_makespan": {
+          "mean": 646.0,
+          "stdev": 16.3707055437449
+        },
+        "fused_instruction_count": {
+          "mean": 203.8,
+          "stdev": 10.56882207249228
+        },
+        "parallel_block_wrappers": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "max_parallel_width": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 1000,
+        "level": "ADVANCED",
+        "effective_instruction_count": {
+          "mean": 646,
+          "stdev": 16.3707055437449
+        },
+        "instruction_count_reduction": {
+          "mean": 0.354,
+          "stdev": 0.016370705543744913
+        },
+        "dispatch_count": {
+          "mean": 344.6,
+          "stdev": 31.60379724020517
+        },
+        "declared_cost_makespan": {
+          "mean": 344.6,
+          "stdev": 31.60379724020517
+        },
+        "fused_instruction_count": {
+          "mean": 17.4,
+          "stdev": 3.2093613071762426
+        },
+        "parallel_block_wrappers": {
+          "mean": 95,
+          "stdev": 6.363961030678928
+        },
+        "max_parallel_width": {
+          "mean": 14.4,
+          "stdev": 4.878524367060187
+        },
+        "peak_live_outputs": null,
+        "distinct_tracked_outputs": null,
+        "buffer_reuse_potential": null,
+        "total_declared_memory_bytes": null,
+        "memory_plan_present": {
+          "seeds_with_plan": 0,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": null
+      },
+      {
+        "length": 1000,
+        "level": "AGGRESSIVE",
+        "effective_instruction_count": {
+          "mean": 646,
+          "stdev": 16.3707055437449
+        },
+        "instruction_count_reduction": {
+          "mean": 0.354,
+          "stdev": 0.016370705543744913
+        },
+        "dispatch_count": {
+          "mean": 344.6,
+          "stdev": 31.60379724020517
+        },
+        "declared_cost_makespan": {
+          "mean": 344.6,
+          "stdev": 31.60379724020517
+        },
+        "fused_instruction_count": {
+          "mean": 17.4,
+          "stdev": 3.2093613071762426
+        },
+        "parallel_block_wrappers": {
+          "mean": 95,
+          "stdev": 6.363961030678928
+        },
+        "max_parallel_width": {
+          "mean": 14.4,
+          "stdev": 4.878524367060187
+        },
+        "peak_live_outputs": {
+          "mean": 549.4,
+          "stdev": 13.794926603646719
+        },
+        "distinct_tracked_outputs": {
+          "mean": 549.4,
+          "stdev": 13.794926603646719
+        },
+        "buffer_reuse_potential": {
+          "mean": 0,
+          "stdev": 0.0
+        },
+        "total_declared_memory_bytes": {
+          "mean": 0.0,
+          "stdev": 0.0
+        },
+        "memory_plan_present": {
+          "seeds_with_plan": 5,
+          "seeds_total": 5
+        },
+        "memory_plan_optimizations": {
+          "union": [
+            "reuse_disjoint_buffers",
+            "stream_small_intermediates"
+          ]
+        }
+      }
+    ]
+  },
+  "differentiation": {
+    "chain_enriched": [
+      {
+        "length": 50,
+        "pairs": [
+          {
+            "pair": [
+              "NONE",
+              "BASIC"
+            ],
+            "deltas": {
+              "effective_instruction_count": -13.200000000000003,
+              "instruction_count_reduction": 0.264,
+              "dispatch_count": -13.200000000000003,
+              "declared_cost_makespan": -1.8897337247562902,
+              "fused_instruction_count": 11.8,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "BASIC",
+              "ADVANCED"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": -31.199999999999996,
+              "declared_cost_makespan": -49.638699392532565,
+              "fused_instruction_count": -11.8,
+              "parallel_block_wrappers": 2,
+              "max_parallel_width": 28.2
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "ADVANCED",
+              "AGGRESSIVE"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": 0.0,
+              "declared_cost_makespan": 0.0,
+              "fused_instruction_count": 0,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0.0
+            },
+            "structural_metrics_identical_per_seed": true,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 5,
+              "upper_mean_buffer_reuse_potential": 1.2
+            }
+          }
+        ]
+      },
+      {
+        "length": 200,
+        "pairs": [
+          {
+            "pair": [
+              "NONE",
+              "BASIC"
+            ],
+            "deltas": {
+              "effective_instruction_count": -62.400000000000006,
+              "instruction_count_reduction": 0.312,
+              "dispatch_count": -62.400000000000006,
+              "declared_cost_makespan": -17.226212049917763,
+              "fused_instruction_count": 47.6,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "BASIC",
+              "ADVANCED"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": -112.6,
+              "declared_cost_makespan": -187.03331612213992,
+              "fused_instruction_count": -47.4,
+              "parallel_block_wrappers": 6.2,
+              "max_parallel_width": 44.8
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "ADVANCED",
+              "AGGRESSIVE"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": 0,
+              "declared_cost_makespan": 0.0,
+              "fused_instruction_count": 0.0,
+              "parallel_block_wrappers": 0.0,
+              "max_parallel_width": 0.0
+            },
+            "structural_metrics_identical_per_seed": true,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 5,
+              "upper_mean_buffer_reuse_potential": 14.6
+            }
+          }
+        ]
+      },
+      {
+        "length": 1000,
+        "pairs": [
+          {
+            "pair": [
+              "NONE",
+              "BASIC"
+            ],
+            "deltas": {
+              "effective_instruction_count": -295,
+              "instruction_count_reduction": 0.29500000000000004,
+              "dispatch_count": -295,
+              "declared_cost_makespan": -65.6103460379602,
+              "fused_instruction_count": 242.2,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "BASIC",
+              "ADVANCED"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": -558,
+              "declared_cost_makespan": -930.1168421548658,
+              "fused_instruction_count": -240.39999999999998,
+              "parallel_block_wrappers": 32.4,
+              "max_parallel_width": 69
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "ADVANCED",
+              "AGGRESSIVE"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": 0,
+              "declared_cost_makespan": 0.0,
+              "fused_instruction_count": 0.0,
+              "parallel_block_wrappers": 0.0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": true,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 5,
+              "upper_mean_buffer_reuse_potential": 107.8
+            }
+          }
+        ]
+      }
+    ],
+    "random_slots_control": [
+      {
+        "length": 50,
+        "pairs": [
+          {
+            "pair": [
+              "NONE",
+              "BASIC"
+            ],
+            "deltas": {
+              "effective_instruction_count": -16.4,
+              "instruction_count_reduction": 0.32799999999999996,
+              "dispatch_count": -16.4,
+              "declared_cost_makespan": -16.4,
+              "fused_instruction_count": 9.8,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "BASIC",
+              "ADVANCED"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": -14.600000000000001,
+              "declared_cost_makespan": -14.600000000000001,
+              "fused_instruction_count": -9.4,
+              "parallel_block_wrappers": 4.8,
+              "max_parallel_width": 7
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "ADVANCED",
+              "AGGRESSIVE"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": 0,
+              "declared_cost_makespan": 0.0,
+              "fused_instruction_count": 0.0,
+              "parallel_block_wrappers": 0.0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": true,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 5,
+              "upper_mean_buffer_reuse_potential": 0
+            }
+          }
+        ]
+      },
+      {
+        "length": 200,
+        "pairs": [
+          {
+            "pair": [
+              "NONE",
+              "BASIC"
+            ],
+            "deltas": {
+              "effective_instruction_count": -68.4,
+              "instruction_count_reduction": 0.34199999999999997,
+              "dispatch_count": -68.4,
+              "declared_cost_makespan": -68.4,
+              "fused_instruction_count": 38.6,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "BASIC",
+              "ADVANCED"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": -57.599999999999994,
+              "declared_cost_makespan": -57.599999999999994,
+              "fused_instruction_count": -35.800000000000004,
+              "parallel_block_wrappers": 19.8,
+              "max_parallel_width": 9.8
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "ADVANCED",
+              "AGGRESSIVE"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0.0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": 0,
+              "declared_cost_makespan": 0.0,
+              "fused_instruction_count": 0.0,
+              "parallel_block_wrappers": 0.0,
+              "max_parallel_width": 0.0
+            },
+            "structural_metrics_identical_per_seed": true,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 5,
+              "upper_mean_buffer_reuse_potential": 0
+            }
+          }
+        ]
+      },
+      {
+        "length": 1000,
+        "pairs": [
+          {
+            "pair": [
+              "NONE",
+              "BASIC"
+            ],
+            "deltas": {
+              "effective_instruction_count": -354,
+              "instruction_count_reduction": 0.354,
+              "dispatch_count": -354,
+              "declared_cost_makespan": -354.0,
+              "fused_instruction_count": 203.8,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "BASIC",
+              "ADVANCED"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": -301.4,
+              "declared_cost_makespan": -301.4,
+              "fused_instruction_count": -186.4,
+              "parallel_block_wrappers": 95,
+              "max_parallel_width": 14.4
+            },
+            "structural_metrics_identical_per_seed": false,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 0,
+              "upper_mean_buffer_reuse_potential": null
+            }
+          },
+          {
+            "pair": [
+              "ADVANCED",
+              "AGGRESSIVE"
+            ],
+            "deltas": {
+              "effective_instruction_count": 0,
+              "instruction_count_reduction": 0.0,
+              "dispatch_count": 0.0,
+              "declared_cost_makespan": 0.0,
+              "fused_instruction_count": 0.0,
+              "parallel_block_wrappers": 0,
+              "max_parallel_width": 0.0
+            },
+            "structural_metrics_identical_per_seed": true,
+            "memory_plan_differentiation": {
+              "lower_seeds_with_plan": 0,
+              "upper_seeds_with_plan": 5,
+              "upper_mean_buffer_reuse_potential": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "verdicts": {
+    "chain_enriched": {
+      "aggressive_structurally_identical_to_advanced": true,
+      "aggressive_memory_plan_differentiates": true,
+      "max_length": 1000,
+      "ladder_at_max_length": {
+        "NONE": {
+          "effective_instruction_count": 1000,
+          "instruction_count_reduction": 0.0,
+          "dispatch_count": 1000,
+          "declared_cost_makespan": 1238.2628690545935
+        },
+        "BASIC": {
+          "effective_instruction_count": 705,
+          "instruction_count_reduction": 0.29500000000000004,
+          "dispatch_count": 705,
+          "declared_cost_makespan": 1172.6525230166333
+        },
+        "ADVANCED": {
+          "effective_instruction_count": 705,
+          "instruction_count_reduction": 0.29500000000000004,
+          "dispatch_count": 147,
+          "declared_cost_makespan": 242.53568086176747
+        },
+        "AGGRESSIVE": {
+          "effective_instruction_count": 705,
+          "instruction_count_reduction": 0.29500000000000004,
+          "dispatch_count": 147,
+          "declared_cost_makespan": 242.53568086176747
+        }
+      },
+      "aggressive_vs_advanced_at_max_length": {
+        "effective_instruction_count": 0,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 0,
+        "declared_cost_makespan": 0.0,
+        "fused_instruction_count": 0.0,
+        "parallel_block_wrappers": 0.0,
+        "max_parallel_width": 0,
+        "aggressive_mean_buffer_reuse_potential": 107.8
+      }
+    },
+    "random_slots_control": {
+      "aggressive_structurally_identical_to_advanced": true,
+      "aggressive_memory_plan_differentiates": false,
+      "max_length": 1000,
+      "ladder_at_max_length": {
+        "NONE": {
+          "effective_instruction_count": 1000,
+          "instruction_count_reduction": 0.0,
+          "dispatch_count": 1000,
+          "declared_cost_makespan": 1000.0
+        },
+        "BASIC": {
+          "effective_instruction_count": 646,
+          "instruction_count_reduction": 0.354,
+          "dispatch_count": 646,
+          "declared_cost_makespan": 646.0
+        },
+        "ADVANCED": {
+          "effective_instruction_count": 646,
+          "instruction_count_reduction": 0.354,
+          "dispatch_count": 344.6,
+          "declared_cost_makespan": 344.6
+        },
+        "AGGRESSIVE": {
+          "effective_instruction_count": 646,
+          "instruction_count_reduction": 0.354,
+          "dispatch_count": 344.6,
+          "declared_cost_makespan": 344.6
+        }
+      },
+      "aggressive_vs_advanced_at_max_length": {
+        "effective_instruction_count": 0,
+        "instruction_count_reduction": 0.0,
+        "dispatch_count": 0.0,
+        "declared_cost_makespan": 0.0,
+        "fused_instruction_count": 0.0,
+        "parallel_block_wrappers": 0,
+        "max_parallel_width": 0.0,
+        "aggressive_mean_buffer_reuse_potential": 0
+      }
+    }
+  },
+  "wall_time_s": {
+    "chain_enriched": 0.2136692909989506,
+    "random_slots_control": 0.14633187488652766
+  }
+}

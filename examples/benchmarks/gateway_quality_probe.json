@@ -1,0 +1,325 @@
+{
+ "experiment": "classify_step_quality_check",
+ "harness": "examples/paper_real_llm_quality_check.py",
+ "backend": "real",
+ "backend_config": {
+  "base_url": "https://127.0.0.1:8443",
+  "model": "claude-glm-5.3-flash",
+  "max_tokens": 4096,
+  "temperature": 0.0,
+  "timeout_s": 90.0,
+  "retries": "3 bounded (transient only), sequential httpx"
+ },
+ "config": {
+  "tasks": 1,
+  "zipf_s": 1.0,
+  "task_population": 40,
+  "seed_base": 1000,
+  "batch_size": 8,
+  "max_tokens": 4096,
+  "call_protocol": "one live call per distinct signature batch; repeats would be result-cache hits (the Section 5.7.1 protocol)"
+ },
+ "provenance": {
+  "gold_labels": "planted at batch generation from an explicit keyword rubric (gold_rubric below): synthetic ground truth on synthetic signatures, not human annotation of real logs",
+  "gold_rubric": [
+   [
+    "heartbeat lost",
+    "critical"
+   ],
+   [
+    "data loss",
+    "critical"
+   ],
+   [
+    "replica lag",
+    "critical"
+   ],
+   [
+    "upstream 5xx",
+    "high"
+   ],
+   [
+    "timeout waiting for lock",
+    "high"
+   ],
+   [
+    "queue depth critical",
+    "high"
+   ],
+   [
+    "token refresh failed",
+    "medium"
+   ],
+   [
+    "connection reset",
+    "medium"
+   ],
+   [
+    "schema mismatch",
+    "medium"
+   ],
+   [
+    "cache miss storm",
+    "medium"
+   ],
+   [
+    "latency above threshold",
+    "low"
+   ],
+   [
+    "request completed",
+    "low"
+   ],
+   [
+    "debug trace volume",
+    "low"
+   ]
+  ],
+  "rule_fallback": "the classify step's deterministic fallback (paper_real_llm_compiler_test.fallback_severity, imported -- identical function), used by the pipeline whenever a reply line does not parse",
+  "prompt": "the pipeline's CLASSIFY_PROMPT verbatim (imported from paper_real_llm_compiler_test): identical prompt to the Section 5.7.1 classify step; prompt_sha256 recorded per call",
+  "parser": "same per-index regex as parse_classification (mirror pinned by tests); each signature's claim_source records whether its severity came from the model reply ('model') or the fallback rule ('rule_fallback')",
+  "model_reply": "raw reply text recorded verbatim per call with sha256; stop_reason from the gateway (end_turn vs max_tokens)",
+  "tokens": "gateway usage field (real)",
+  "latency": "measured per call (real) / accounted constant 80 ms (mock)",
+  "draw_sequence": "seeded truncated-Zipf draws (same weight formula as the microbenchmark suite) over the fixed task population; batches are per-rank deterministic and sorted"
+ },
+ "summary": {
+  "draws": 1,
+  "distinct_batches": 1,
+  "model_calls": 1,
+  "signatures_total": 8,
+  "parsed_claims": 8,
+  "fallback_filled": 0,
+  "parse_rate": 1.0,
+  "replies_bound_at_ceiling": 0,
+  "final_agreement_vs_gold": 0.25,
+  "claims_agreement_vs_gold": 0.25,
+  "final_agreement_vs_rule_fallback": 0.375,
+  "rule_fallback_agreement_vs_gold": 0.625,
+  "per_gold_class": {
+   "low": {
+    "signatures": 1,
+    "final_matches_gold": 0,
+    "agreement_rate": 0.0
+   },
+   "medium": {
+    "signatures": 2,
+    "final_matches_gold": 0,
+    "agreement_rate": 0.0
+   },
+   "high": {
+    "signatures": 3,
+    "final_matches_gold": 1,
+    "agreement_rate": 0.3333
+   },
+   "critical": {
+    "signatures": 2,
+    "final_matches_gold": 1,
+    "agreement_rate": 0.5
+   }
+  },
+  "confusion_vs_gold": {
+   "low": {
+    "medium": 1
+   },
+   "medium": {
+    "high": 2
+   },
+   "critical": {
+    "critical": 1,
+    "medium": 1
+   },
+   "high": {
+    "critical": 1,
+    "high": 1,
+    "medium": 1
+   }
+  },
+  "input_tokens": 142,
+  "completion_tokens": 719,
+  "accounted_wall_ms": 15254.3,
+  "token_source": "gateway usage field (real)",
+  "measured_wall_ms": 15255.0
+ },
+ "verdict": {
+  "at_least_one_batch": true,
+  "one_call_per_distinct_batch": true,
+  "raw_reply_recorded_for_every_call": true,
+  "gold_labels_for_every_signature": true,
+  "planted_gold_classes_covered_per_batch": true,
+  "replies_not_bound_at_ceiling": true,
+  "model_claims_parsed": true
+ },
+ "all_pass": true,
+ "data": [
+  {
+   "batch_id": "2133720b21cd7be9",
+   "task_rank": 15,
+   "signature_count": 8,
+   "signatures": [
+    "api|latency above threshold",
+    "auth|connection reset by peer",
+    "auth|db data loss detected",
+    "auth|queue depth critical",
+    "auth|upstream 5xx",
+    "db|connection reset by peer",
+    "db|timeout waiting for lock",
+    "worker|worker heartbeat lost"
+   ],
+   "gold": {
+    "api|latency above threshold": "low",
+    "auth|connection reset by peer": "medium",
+    "auth|db data loss detected": "critical",
+    "auth|queue depth critical": "high",
+    "auth|upstream 5xx": "high",
+    "db|connection reset by peer": "medium",
+    "db|timeout waiting for lock": "high",
+    "worker|worker heartbeat lost": "critical"
+   },
+   "rule_fallback": {
+    "api|latency above threshold": "low",
+    "auth|connection reset by peer": "high",
+    "auth|db data loss detected": "high",
+    "auth|queue depth critical": "critical",
+    "auth|upstream 5xx": "high",
+    "db|connection reset by peer": "medium",
+    "db|timeout waiting for lock": "high",
+    "worker|worker heartbeat lost": "critical"
+   },
+   "model_final": {
+    "api|latency above threshold": "medium",
+    "auth|connection reset by peer": "high",
+    "auth|db data loss detected": "critical",
+    "auth|queue depth critical": "critical",
+    "auth|upstream 5xx": "high",
+    "db|connection reset by peer": "high",
+    "db|timeout waiting for lock": "medium",
+    "worker|worker heartbeat lost": "medium"
+   },
+   "per_signature": [
+    {
+     "index": 0,
+     "signature": "api|latency above threshold",
+     "gold": "low",
+     "rule_fallback": "low",
+     "model_claim": "medium",
+     "final": "medium",
+     "claim_source": "model",
+     "final_matches_gold": false,
+     "claim_matches_gold": false
+    },
+    {
+     "index": 1,
+     "signature": "auth|connection reset by peer",
+     "gold": "medium",
+     "rule_fallback": "high",
+     "model_claim": "high",
+     "final": "high",
+     "claim_source": "model",
+     "final_matches_gold": false,
+     "claim_matches_gold": false
+    },
+    {
+     "index": 2,
+     "signature": "auth|db data loss detected",
+     "gold": "critical",
+     "rule_fallback": "high",
+     "model_claim": "critical",
+     "final": "critical",
+     "claim_source": "model",
+     "final_matches_gold": true,
+     "claim_matches_gold": true
+    },
+    {
+     "index": 3,
+     "signature": "auth|queue depth critical",
+     "gold": "high",
+     "rule_fallback": "critical",
+     "model_claim": "critical",
+     "final": "critical",
+     "claim_source": "model",
+     "final_matches_gold": false,
+     "claim_matches_gold": false
+    },
+    {
+     "index": 4,
+     "signature": "auth|upstream 5xx",
+     "gold": "high",
+     "rule_fallback": "high",
+     "model_claim": "high",
+     "final": "high",
+     "claim_source": "model",
+     "final_matches_gold": true,
+     "claim_matches_gold": true
+    },
+    {
+     "index": 5,
+     "signature": "db|connection reset by peer",
+     "gold": "medium",
+     "rule_fallback": "medium",
+     "model_claim": "high",
+     "final": "high",
+     "claim_source": "model",
+     "final_matches_gold": false,
+     "claim_matches_gold": false
+    },
+    {
+     "index": 6,
+     "signature": "db|timeout waiting for lock",
+     "gold": "high",
+     "rule_fallback": "high",
+     "model_claim": "medium",
+     "final": "medium",
+     "claim_source": "model",
+     "final_matches_gold": false,
+     "claim_matches_gold": false
+    },
+    {
+     "index": 7,
+     "signature": "worker|worker heartbeat lost",
+     "gold": "critical",
+     "rule_fallback": "critical",
+     "model_claim": "medium",
+     "final": "medium",
+     "claim_source": "model",
+     "final_matches_gold": false,
+     "claim_matches_gold": false
+    }
+   ],
+   "parsed_claims": 8,
+   "fallback_filled": 0,
+   "parse_rate": 1.0,
+   "final_agreement_vs_gold": 0.25,
+   "claims_agreement_vs_gold": 0.25,
+   "final_agreement_vs_rule_fallback": 0.375,
+   "raw_reply": "0: medium\n1: high\n2: critical\n3: critical\n4: high\n5: high\n6: medium\n7: medium",
+   "raw_reply_sha256": "0b988261adf28455947ce0a30377d19b65c44a26ab7c3800bf4b73d97a9705ac",
+   "stop_reason": "end_turn",
+   "reply_bound_at_ceiling": false,
+   "prompt_chars": 524,
+   "prompt_sha256": "324d8d4de7c1df866830a4a6cf1f7c9b5066b67488aeb35eac56e0f6647f0842",
+   "input_tokens": 142,
+   "completion_tokens": 719,
+   "latency_ms": 15254.3
+  }
+ ],
+ "notes": [
+  "all_pass gates only the measurability preconditions (one call per distinct batch, raw replies and gold labels recorded, no reply bound at the token ceiling, at least one model claim parsed); agreement rates are reported measurements -- no accuracy threshold is claimed or gated.",
+  "Gold labels are a planted keyword rubric on synthetic signatures (recorded verbatim in provenance), not human annotation of real logs; agreement-vs-gold is a rubric-following diagnostic, not a deployment-quality claim.",
+  "If replies report stop_reason=max_tokens, those replies' classifications are fallback-derived -- exactly the Section 5.7.1 failure mode; raise --max-tokens and rerun before reading the agreement rates as model quality.",
+  "The reply parser accepts the classify step's documented '<index>: <severity>' line format (same regex as the pipeline's fallback-filling parse); replies that do not follow it are counted as unparsed, with each missing classification attributed to the fallback rule.",
+  "Single gateway, one model alias, one seed, sequential, no streaming; multi-model, multi-seed and real-deployment behavior remain untested."
+ ],
+ "preflight": {
+  "ok": true,
+  "latency_ms": 2096.4,
+  "reply": "pong",
+  "stop_reason": "end_turn",
+  "completion_tokens": 40
+ },
+ "gateway_round_trips": {
+  "preflight": 1,
+  "live_calls": 1,
+  "total": 2
+ }
+}

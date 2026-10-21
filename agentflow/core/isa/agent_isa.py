@@ -21,6 +21,15 @@ class AgentISAConfig:
     min_success_rate: float = 0.7
     hot_path_threshold: int = 100
     stability_threshold: float = 0.9
+    # Hot-path detection mode: "exact" (shipped counter/threshold rule,
+    # default) or "ema" (windowed detector, supplementary D.4).
+    hot_path_detection: str = "exact"
+    # EMA detector: decay gamma = 2/(ema_window+1); a path is hot when
+    # its recent execution share exceeds ema_threshold.
+    ema_window: int = 10
+    ema_threshold: float = 0.5
+    # LRU cap on tracked paths (counts, EMA counters, stats, hot paths).
+    max_tracked_paths: int = 1000
 
 class AgentISA:
     """Main interface for AgentISA framework."""
@@ -33,7 +42,14 @@ class AgentISA:
         self.transformer = AgenticTransformer()
         self.model_adapter = ModelAdapter(self.config.model_type)
         self.instruction_learner = InstructionLearner(self.transformer)
-        self.optimization_manager = OptimizationManager()
+        self.optimization_manager = OptimizationManager(
+            hot_path_threshold=self.config.hot_path_threshold,
+            stability_threshold=self.config.stability_threshold,
+            detection_mode=self.config.hot_path_detection,
+            ema_window=self.config.ema_window,
+            ema_threshold=self.config.ema_threshold,
+            max_tracked_paths=self.config.max_tracked_paths,
+        )
         
         # Instruction registry
         self.instructions: Dict[str, Instruction] = {}
