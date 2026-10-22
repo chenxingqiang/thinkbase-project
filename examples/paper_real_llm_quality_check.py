@@ -78,12 +78,17 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import httpx
 import hashlib
 import json
+import os
 import random
 import re
 import sys
 import time
+
+_RETRIES = max(1, int(os.environ.get("GATEWAY_RETRY_ATTEMPTS", "3")))
+_TIMEOUT = float(os.environ.get("GATEWAY_CALL_TIMEOUT", "90"))
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -345,7 +350,7 @@ class RealGatewayBackend:
     """
 
     def __init__(self, *, base_url: str, api_key: str, ca_cert: Optional[str],
-                 model: str, max_tokens: int, timeout: float = 90.0,
+                 model: str, max_tokens: int, timeout: float = _TIMEOUT,
                  temperature: float = 0.0,
                  max_payload_chars: int = 4000) -> None:
         # Imported lazily so mock-only runs never touch httpx at all.
@@ -361,6 +366,7 @@ class RealGatewayBackend:
             verify=ca_cert or True,
             trust_env=False,  # bypass any system proxy for the local gateway
             timeout=timeout,
+            limits=httpx.Limits(max_keepalive_connections=0),  # rotate connections across retries
         )
         self.api_calls = 0
         self.input_tokens = 0
@@ -383,7 +389,7 @@ class RealGatewayBackend:
             "content-type": "application/json",
         }
         last_error: Optional[Exception] = None
-        for attempt in range(3):
+        for attempt in range(_RETRIES):
             start = time.perf_counter()
             try:
                 resp = await self._client.post(
@@ -396,11 +402,11 @@ class RealGatewayBackend:
             elapsed_ms = (time.perf_counter() - start) * 1000.0
             if resp.status_code >= 500:
                 last_error = RuntimeError(f"gateway {resp.status_code}")
-                if attempt < 2:  # transient: retry with backoff
+                if attempt < _RETRIES - 1:  # transient: retry with backoff
                     await asyncio.sleep(1.0 * (attempt + 1))
                     continue
                 raise RuntimeError(
-                    f"gateway unreachable after 3 attempts: {last_error}"
+                    f"gateway unreachable after {_RETRIES} attempts: {last_error!r}"
                 )
             if resp.status_code != 200:
                 raise RuntimeError(
@@ -428,7 +434,7 @@ class RealGatewayBackend:
                                input_tokens=in_tok,
                                completion_tokens=out_tok,
                                latency_ms=elapsed_ms)
-        raise RuntimeError(f"gateway unreachable after 3 attempts: {last_error}")
+        raise RuntimeError(f"gateway unreachable after {_RETRIES} attempts: {last_error!r}")
 
     async def close(self) -> None:
         await self._client.aclose()

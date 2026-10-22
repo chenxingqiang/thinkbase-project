@@ -56,6 +56,9 @@ import random
 import statistics
 import sys
 import time
+
+_RETRIES = max(1, int(os.environ.get("GATEWAY_RETRY_ATTEMPTS", "3")))
+_TIMEOUT = float(os.environ.get("GATEWAY_CALL_TIMEOUT", "90"))
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -124,7 +127,7 @@ class RealLLMBackend:
     """
 
     def __init__(self, base_url: str, api_key: str, ca_cert: Optional[str],
-                 model: str, max_tokens: int, timeout: float = 90.0,
+                 model: str, max_tokens: int, timeout: float = _TIMEOUT,
                  transport: Optional[httpx.AsyncBaseTransport] = None,
                  temperature: Optional[float] = None,
                  max_payload_chars: int = 2000):
@@ -138,6 +141,7 @@ class RealLLMBackend:
             verify=ca_cert or True,
             trust_env=False,  # bypass any system proxy for the local gateway
             timeout=timeout,
+            limits=httpx.Limits(max_keepalive_connections=0),  # rotate connections across retries (gateway LB can pin sick upstreams per connection)
             transport=transport,  # injectable for tests (MockTransport)
         )
         self.api_calls = 0
@@ -167,7 +171,7 @@ class RealLLMBackend:
             "content-type": "application/json",
         }
         last_error: Optional[Exception] = None
-        for attempt in range(3):
+        for attempt in range(_RETRIES):
             start = time.perf_counter()
             try:
                 resp = await self._client.post(
@@ -180,11 +184,11 @@ class RealLLMBackend:
             elapsed_ms = (time.perf_counter() - start) * 1000.0
             if resp.status_code >= 500:
                 last_error = RuntimeError(f"gateway {resp.status_code}")
-                if attempt < 2:  # transient: retry with backoff
+                if attempt < _RETRIES - 1:  # transient: retry with backoff
                     await asyncio.sleep(1.0 * (attempt + 1))
                     continue
                 raise RuntimeError(
-                    f"gateway unreachable after 3 attempts: {last_error}"
+                    f"gateway unreachable after {_RETRIES} attempts: {last_error!r}"
                 )
             if resp.status_code != 200:
                 raise RuntimeError(
@@ -205,7 +209,7 @@ class RealLLMBackend:
                 if block.get("type") == "text"
             ]
             return "".join(texts) or f"[stop={data.get('stop_reason')}]"
-        raise RuntimeError(f"gateway unreachable after 3 attempts: {last_error}")
+        raise RuntimeError(f"gateway unreachable after {_RETRIES} attempts: {last_error!r}")
 
     async def close(self) -> None:
         await self._client.aclose()
@@ -502,7 +506,8 @@ def main(argv: Optional[List[str]] = None) -> None:
     t0 = time.perf_counter()
     res = asyncio.run(run_real_cache_experiment(args))
     res["wall_time_s"] = round(time.perf_counter() - t0, 1)
-    out_path = Path(__file__).parent / args.output
+    out_arg = Path(args.output)
+    out_path = out_arg if (out_arg.is_absolute() or out_arg.parent != Path(".")) else Path(__file__).parent / out_arg
     out_path.write_text(json.dumps(res, indent=2))
     print(f"\nResults written to {out_path}")
     print(json.dumps({k: v for k, v in res.items() if k != "data"}, indent=2)[:800])
