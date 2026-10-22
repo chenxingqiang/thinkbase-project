@@ -95,14 +95,16 @@ mock LLM backend: result caching reduces simulated API calls by
 compilation cuts the effective instruction count by 34.2\% (35.4\% at
 length 1,000), decomposed by a same-seed ablation into fusion (21.6\%)
 and dead-code elimination (24.5\%) with an 11.9-point overlap; dynamic
-hot-path optimization shrinks repeatedly executed traces by 65.8\%. Two
-real-gateway experiments extend validation---the cache reproduces
-computed hit/miss statistics with measured time and token savings, and
-the compiled, hot-path-adopted stream issues zero new gateway calls with
-byte-identical artifacts (cache-mediated)---and a four-task system-level
-characterization (12.5--25.0\% per-task compile shrink) calibrates the
-synthetic headline; a 100-trace census (792 steps, 12 instruction
-signatures) confirms Zipf-like reuse outside the hand-built benchmarks
+hot-path optimization shrinks repeatedly executed traces by 65.8\%.
+Real-gateway experiments extend validation across three production
+models---the cache reproduces computed hit/miss statistics exactly on
+both models tested with measured time and token savings, and the
+compiled, hot-path-adopted stream issues zero new gateway calls with
+byte-identical artifacts, live-model classifications included in one
+rerun (cache-mediated)---and a four-task system-level characterization
+(12.5--25.0\% per-task compile shrink) calibrates the synthetic
+headline; a 100-trace census (792 steps, 12 instruction signatures)
+confirms Zipf-like reuse outside the hand-built benchmarks
 (\(s = 0.593\), \(R^2\) = 0.971; 98.5\% of instances recur corpus-wide,
 per-workflow duplication averaging 18.3\%); 43 multi-agent tests provide
 functional validation. We position these results as controlled-setting
@@ -111,20 +113,9 @@ benchmark-firing static passes, and threshold-triggered trace
 re-optimization ship; capability metric extraction, parameterized
 replay, opt-in tree-pattern selection, EMA hot-path detection, strict
 security, and cache namespacing now also ship, each exercised by a
-controlled mechanism experiment on the real code path (Section 5.11):
-capability scores track mock-backend behavior (four domains at Pearson r
-= 0.79--0.98, two domains N/A with probe evidence), the DP tree-pattern
-selector covers 20/20 random IR trees at cost at or below the heuristic
-(mean ratio 0.361; synthetic-pricing-dependent), the EMA detector
-promotes 3/3 rotated trace variants the exact default misses, with zero
-false promotions on one-shot diversity, strict mode denies 400
-policy-gap tasks per 1,000 paired evaluations that fail-open admits,
-with zero false denials on the 200 well-specified tasks, namespaced
-cache keys invalidate 100\% under template/decoding drift while legacy
-keys serve stale entries, and 1,050/1,050 unseen-parameter replays match
-the oracle exactly. Cycle-accurate pipeline scheduling, block-granular
-trace formation, and symbolic-equivalence checking remain specified---no
-claim rests on them.
+controlled mechanism experiment on the real code path (Section 5.11).
+Cycle-accurate pipeline scheduling, block-granular trace formation, and
+symbolic-equivalence checking remain specified---no claim rests on them.
 \end{abstract}
 \ccsdesc[500]{Software and its engineering~\textgreater{}Compilers}
 \ccsdesc[500]{Theory of computation~\textgreater{}Program reasoning}
@@ -750,15 +741,14 @@ Pattern recognition proceeds in three stages:
   identity derives from the mined instruction-id sequence), and replay
   is plain sequential composition---nothing smarter---so a learned
   instruction reproduces its recorded subsequence's outputs on the
-  recorded inputs; on unseen parameter values it does so via the binding
-  above, which re-runs the recorded operator \emph{instances}, so a
-  parameter baked into an operator's constructed state rather than read
-  from the shared context cannot be rebound, and the schema is
-  observational---single-observation types tighten, mixed or unseen ones
-  fall back to \texttt{object}. The mining-to-optimization path now
-  exists: an approved proposal registers the fused instruction and
-  installs a name-level peephole rule into the optimizer's rule set,
-  gated by default on a developer's approval.
+  recorded inputs; on unseen parameter values the binding above re-runs
+  the recorded operator \emph{instances}, so parameters baked into an
+  operator's constructed state cannot be rebound, and the schema is
+  observational---mixed or unseen types fall back to \texttt{object}.
+  The mining-to-optimization path now exists: an approved proposal
+  registers the fused instruction and installs a name-level peephole
+  rule into the optimizer's rule set, gated by default on a developer's
+  approval.
 \item
   \textbf{Pattern validation.} Each candidate is checked for
   significance---support above \(\sigma_{min}\) and, for
@@ -1879,8 +1869,8 @@ rates and call counts) it does:
 
 \begin{table}[t]
 \caption{Real-gateway cache behavior against the computed expectation
-(200 sequential requests, single seed, three Zipf levels, single model;
-paired cells read no cache -\textgreater{} cached).}
+(200 sequential requests, one seed, three Zipf levels, one model; paired
+cells read no cache -\textgreater{} cached).}
 \small\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0359}}
@@ -1931,28 +1921,29 @@ observed hit rates match the computed expectation exactly at every skew
 level, so Section 5.2's synthetic results measure the cache, not a mock
 artifact. Second, avoided calls convert into measured time and
 tokens---14.1\%, 26.6\%, and 45.8\% of the no-cache arm's wall clock at
-s = 0.5, 1.0, 1.5---tracking but not identical to the call reduction,
-since arms ran sequentially and per-call latency drifted slightly (the
-exact quantity is the call reduction; wall and token figures are
-measurements, not derivations). Third, the \emph{absolute} hit rates
-here (8.5--45.5\%) are lower than Section 5.2's (59.5--79.6\%) purely
-because repetition accumulates with task count: at N = 200 these are the
-exact computed values for this workload family, and at N = 2,000 the
-same computation yields the Section 5.2 numbers.
+s = 0.5, 1.0, 1.5---tracking but not identical to the call reduction
+(the exact quantity is the call reduction; wall and token figures are
+measurements). Third, the absolute hit rates (8.5--45.5\%) trail Section
+5.2's (59.5--79.6\%) purely because repetition accumulates with task
+count: at N = 2,000 the same computation yields the Section 5.2 numbers.
+
+\textbf{Multi-model rerun.} The identical protocol re-run on a second
+production model (\texttt{claude-doubao-seed-2.0-code}, replies
+completing below the ceiling) reproduces the expectation exactly in all
+three cells---8.5\%, 26.0\%, 45.5\%; calls 200 \(\rightarrow\)
+183/148/109; p50 3.6--4.0 s (table: supplementary I.3)---the exactness
+property is model-independent by construction.
 
 \textbf{Two-seed rerun.} A reduced-scale rerun (100 tasks \(\times\) 2
-seeds per Zipf level, 1,103 gateway calls) reproduced the computed
-expectation exactly in all six (Zipf, seed) cells---hit rates 3.5\%
-\(\pm\) 3.5\%, 15.5\% \(\pm\) 0.7\%, 29.5\% \(\pm\) 3.5\%---the lower
-absolute rates versus N = 200 reflecting the halved number of repeated
-pairs at N = 100, not a mechanism difference.
+seeds per Zipf level) reproduced the computed expectation exactly in all
+six (Zipf, seed) cells (hit rates, quota record: supplementary I.3).
 
 \textbf{Scope of the claim.} This experiment validates the caching
-mechanism end-to-end---one gateway, one model, one seed, N = 200,
-sequential requests, no streaming---recording per-arm aggregate hit
-rates and call counts; per-position identity follows from the
-deterministic cache decisions above but is not separately logged, and
-nothing here is a throughput, availability, or dollar-cost claim.
+mechanism end-to-end---one gateway, two production models (one seed per
+model), N = 200, sequential requests, no streaming---recording per-arm
+aggregate hit rates and call counts; per-position identity follows from
+the deterministic cache decisions above but is not separately logged,
+and nothing here is a throughput, availability, or dollar-cost claim.
 Sections 5.3--5.5 are structural, never dispatching to the backend;
 Section 5.7.1 extends the real-gateway validation to them via a
 cache-mediated protocol.
@@ -1963,30 +1954,28 @@ Optimization}\label{real-gateway-validation-of-compilation-and-hot-path-optimiza
 \textbf{Research question.} Do static compilation and closed-loop
 hot-path adoption preserve the observable semantics of an instruction
 stream when the stream's LLM step is served by a real model---and what
-do the mechanisms measurably save on a live gateway?
+do they measurably save on a live gateway?
 
 \textbf{Setup, arms, scale.} A dedicated harness
 (\texttt{examples/paper\_real\_llm\_compiler\_test.py}; tests in
 \texttt{tests/system/test\_real\_llm\_compiler\_test.py}) reuses Section
-5.7's gateway configuration (same base URL, internal-CA TLS, alias
-\texttt{claude-glm-5.3-flash}, sequential httpx, 90 s timeout, three
-bounded retries) but raises \texttt{max\_tokens} to 512 (Section 5.7
-used 64) so completions dominate the priced comparison; it runs
-identically online or offline against a deterministic same-protocol mock
-(call counting, template-accounted tokens, constant 80 ms simulated
-latency). The task is Section 5.8's service-log triage shape: a
-seven-instruction stream with one cacheable LLM-type step
-(\texttt{classify\_signature}, one model call per distinct
-incident-signature batch) and the same planted dead guard
-(\texttt{check\_format}), over 50 realizations \(\times\) 1 seed
-\(\times\) Zipf s = 1.0 from a fixed universe of 40 task instances---22
-distinct signature batches, so the entire run is 23 gateway round trips
-(one preflight plus 22 live calls, all by arm (a)) in 4.4 minutes, a
-bounded validation run, not the 200 \(\times\) 3-skew sweep of Section
-5.7. Arm (a) is the unoptimized authored stream, run first, cold,
-performing every live round trip; arm (b) drives the \emph{same} stream
-through the production machinery---\texttt{optimize\_hot\_path} adoption
-plus static \texttt{InstructionCompiler} at NONE vs AGGRESSIVE with the
+5.7's gateway configuration (alias \texttt{claude-glm-5.3-flash},
+sequential httpx, bounded retries) but raises \texttt{max\_tokens} to
+512 (Section 5.7 used 64) so completions dominate the priced comparison;
+it runs identically online or offline against a deterministic
+same-protocol mock (call counting, template-accounted tokens). The task
+is Section 5.8's service-log triage shape: a seven-instruction stream
+with one cacheable LLM-type step (\texttt{classify\_signature}, one
+model call per distinct incident-signature batch) and the same planted
+dead guard (\texttt{check\_format}), over 50 realizations \(\times\) 1
+seed \(\times\) Zipf s = 1.0 from a fixed universe of 40 task
+instances---22 distinct signature batches, so the entire run is 23
+gateway round trips in 4.4 minutes---bounded validation, not the 200
+\(\times\) 3-skew sweep of Section 5.7. Arm (a) is the unoptimized
+authored stream, run first, cold, performing every live round trip; arm
+(b) drives the \emph{same} stream through the production
+machinery---\texttt{optimize\_hot\_path} adoption plus static
+\texttt{InstructionCompiler} at NONE vs AGGRESSIVE with the
 dataflow-preservation assertion---then executes the same draws against
 arm (a)'s warmed cache. The classify step's cache key is the sha256 of
 exactly the input dictionary its prompt is built from, so arm (b)
@@ -2016,35 +2005,39 @@ from the cache's call savings. Static compilation of the same stream:
 NONE 7 \(\rightarrow\) AGGRESSIVE 6 effective instructions, dataflow
 preserved.
 
+\textbf{Identity rerun with live-model values.} Re-running the harness
+on \texttt{claude-doubao-seed-2.0-code} at \texttt{max\_tokens} = 1,500
+changes the evidential class: all 104 live calls across the three Zipf
+cells completed below the ceiling (max completion 142 tokens, 0 bound)
+and replied in the requested reply format, so the artifacts' severity
+values are the live model's own classifications, not the fallback. Every
+mechanism check re-passed---expected call counts, arm (b) zero new
+calls, byte-identical artifacts, hot-path adoption, the 7
+\(\rightarrow\) 6 shrink---and a third model
+(\texttt{claude-minimax-m3}, reasoning-style) passes every check while
+binding at the ceiling in 97\% of calls at \texttt{max\_tokens} = 512
+and 65\% at 1,500: ceiling-binding is a model-family property, not a
+harness artifact (census: supplementary I.3).
+
 \textbf{A priced comparison (summary; protocol and table in Appendix G
-of the supplementary material).} Costs are MODELED---computed from a
-pricing overlay on measured tokens, not observed: the overlay prices the
-run's token counts under no optimization, AgentISA result caching (first
-occurrences only---the measured behavior of both arms), and a modeled
-provider prompt cache (every realization queries; repeat prompts bill
-input tokens as prompt-cache reads at 0.1x, mirroring Anthropic's
-published read discount; completions always bill at full price). Two
-simplifications---omitting Anthropic's 1.25x cache-write premium and
-1024-token minimum cacheable prefix---both favor the provider-cache
-baseline, so the comparison is conservative for us; list prices are
-parameterized stand-ins (\$3/M input, \$15/M output) because the
-gateway's actual pricing is unknown; no dollar-savings claim is made. On
-this run's token mix the result cache cuts modeled cost by 56.0\%---it
-removes whole calls, completions included---while the modeled provider
-prompt cache cuts only 3.3\%, the reasoning model's completions
-dominating; on the deterministic mock at paper scale (200 tasks
-\(\times\) 1 seed \(\times\) 3 Zipf levels) the result cache cuts
-modeled cost by 80.1\%, 81.6\%, and 85.1\% at s = 0.5, 1.0, 1.5, against
-28.9--31.4\% for the provider prompt cache---there short completions do
-not dominate, so the input-side discount matters more; the ranking of
-the two caching strategies is a function of the input/output token mix,
-not a constant. GPTCache, an external cache layer, is explicitly out of
-scope; no head-to-head against it is claimed.
+of the supplementary material).} Costs are MODELED on measured tokens,
+not observed: the overlay prices this run under no optimization,
+AgentISA result caching (first occurrences only), and a modeled provider
+prompt cache (repeat prompts bill as 0.1x cache reads, mirroring
+Anthropic's published discount; completions at full price); two
+simplifications favor the provider-cache baseline, and list prices are
+parameterized stand-ins---no dollar-savings claim is made. On this run's
+token mix the result cache cuts modeled cost by 56.0\% while the prompt
+cache cuts only 3.3\% (the reasoning model's completions dominate); on
+the mock at paper scale the corresponding figures are 80.1\%, 81.6\%,
+and 85.1\% against 28.9--31.4\%---the ranking of the two caching
+strategies is a function of the input/output token mix, not a constant.
+GPTCache is explicitly out of scope; no head-to-head is claimed.
 
 \textbf{What this does and does not show.} The byte-identity property is
-cache-mediated by design: the cached values entered the artifacts once,
-through arm (a)---values that on this alias are fallback-derived, as
-explained below---and arm (b) is proven to compute the same keys and
+cache-mediated by design: the values entered the artifacts once through
+arm (a)---fallback-derived on this alias, live-model classifications in
+the doubao rerun---and arm (b) is proven to compute the same keys and
 consume the same values; this validates the stream transformation, not
 model determinism, which is not guaranteed at temperature 0 and is not
 claimed. On this alias the reasoning model's replies bind at
@@ -2064,14 +2057,20 @@ identity validating the stream transformation, not model determinism):
 \textbf{established} by Sections 5.7 and 5.7.1. (3) \emph{Real-model
 task quality}: \textbf{measured only by a follow-up rubric
 diagnostic}---a 3,072-token rerun of the same 22 signature batches
-parsed 144 of 176 claims (81.8\%), with final classifications matching
-the planted keyword-rubric gold on 45.5\% of signatures (model claims
+parsed 144 of 176 claims, with final classifications matching the
+planted keyword-rubric gold on 45.5\% of signatures (model claims
 51.4\%) against 32.4\% for the deterministic fallback rule, so the live
 model measurably outperforms the fallback rule on this rubric; 4 of 22
 batches still bind at the ceiling, and the gold is a synthetic rubric,
 not human annotation---a rubric-following diagnostic at one gateway and
 reduced scale, not a deployment-quality claim (coverage limits restated
-with Section 5.9).
+with Section 5.9). A second quality run on a completing model
+(\texttt{claude-deepseek-v4-flash}, 36 distinct signature batches at the
+paper preset, \texttt{max\_tokens} 1,500) parses 288/288 claims with 0
+ceiling bindings: final classifications match gold on 52.1\% of
+signatures against 31.9\% for the fallback rule (per-class agreement
+67.6/39.0/47.8/54.4\% on low/medium/high/critical)---model-over-rule
+holds on both families (protocol: supplementary I.3).
 
 \subsection{Controlled Four-Task System-Level
 Characterization}\label{controlled-four-task-system-level-characterization}
@@ -2079,29 +2078,28 @@ Characterization}\label{controlled-four-task-system-level-characterization}
 The experiments above measure individual mechanisms on synthetic
 sequences; this section is a \emph{controlled four-task system-level
 characterization}---a functional demonstration under a fixed closed-loop
-protocol, not a generalization experiment; the identical 91.7\% hit-rate
-figure below is a property of that protocol, not four independent cache
-observations. The seed-controlled characterization
+protocol, not a generalization experiment; the identical 91.7\% figure
+below is a property of that protocol, not four independent observations.
+The seed-controlled characterization
 (\texttt{examples/system\_task\_workload.py},
 \texttt{tests/system/test\_system\_task\_workload.py}) is built from
 \textbf{four tasks with genuinely different dependency shapes}---linear
 service-log triage, fan-out csv-etl-anomaly, wide-fan-in report-merge,
 two-branch regression-diff---each realized end-to-end against
 sandbox-resident files (12 realizations each, hot-path threshold 5, one
-planted dead guard and one cacheable LLM-type step per task, the latter
-backed by a deterministic rule stand-in counting simulated model calls),
-making the mechanisms' composition---and Section 3.4.4's closed-loop
-optimization claims---checkable. Per-task instruction streams, the
-single-task walk-through, and both result tables are in Appendix H of
-the supplementary material; the headline: every task's guard survives
-compilation (never dropped outright, the reduction being fusion), the
-first realization pays all model calls and every subsequent one hits the
-cache (91.7\%, 11 of 12 realizations by construction), hot-path adoption
-lands at repeat 7 executing the shrunken six-instruction stream, and all
-reports come out byte-identical (12/12 plus fresh-stack SHA-256
-equality); the compile shrink is the only shape-dependent quantity
-(12.5--25.0\%)---the composition behavior is not an artifact of one
-stream's structure.
+planted dead guard and one cacheable LLM-type step per task, backed by a
+deterministic rule stand-in), making the mechanisms' composition and
+Section 3.4.4's closed-loop optimization claims checkable. Per-task
+instruction streams, the single-task walk-through, and both result
+tables are in Appendix H of the supplementary material; the headline:
+every task's guard survives compilation (never dropped outright, the
+reduction being fusion), the first realization pays all model calls and
+every subsequent one hits the cache (91.7\%, 11 of 12 realizations by
+construction), hot-path adoption lands at repeat 7 executing the
+shrunken six-instruction stream, and all reports come out byte-identical
+(12/12 plus fresh-stack SHA-256 equality); the compile shrink is the
+only shape-dependent quantity (12.5--25.0\%)---the composition behavior
+is not an artifact of one stream's structure.
 
 \textbf{The triage task's instruction stream} (seven instructions over
 sandbox-resident files---side-effectful first and last, the planted dead
@@ -2152,12 +2150,13 @@ We enumerate the limitations of the evaluation explicitly:
   cache's hit/miss reproduction with measured time/token savings
   (Section 5.7) and the compiled, hot-path-adopted stream's zero new
   gateway calls and byte-identical artifacts (Section 5.7.1). Still not
-  covered: multi-model behavior, multi-seed behavior beyond the two-seed
-  reduced-scale rerun (Section 5.7), real deployment, caching under
-  model nondeterminism \emph{across prompt variations}, streaming
-  responses, provider rate limits, and live-model task quality beyond
-  the Section 5.7.1 rubric diagnostic (the four-task classification
-  steps remain deterministic rule-based stand-ins).
+  covered: multi-seed behavior beyond the two-seed reduced-scale rerun
+  (Section 5.7), real deployment, caching under model nondeterminism
+  \emph{across prompt variations}, streaming responses, provider rate
+  limits, and live-model task quality beyond the Section 5.7.1 rubric
+  diagnostics, now run on both a reasoning model and two completing
+  models (the four-task classification steps remain deterministic
+  rule-based stand-ins).
 \item
   \textbf{Synthetic workloads.} Zipf-distributed synthetic tasks are a
   reasonable model of skewed agent workloads, but a model; Sections 5.8
@@ -2167,15 +2166,14 @@ We enumerate the limitations of the evaluation explicitly:
   uniformly novel tasks would see near-zero benefit. Section 5.8's
   four-shape characterization calibrates the 65.8\% synthetic headline
   downward with its 12.5--25.0\% per-task compile shrink and shows
-  uniform reuse and closed-loop adoption under the fixed protocol (12
-  seeded realizations, threshold 5)---but the four tasks remain
-  seed-controlled, hand-constructed streams, not a production workload
-  study.
+  uniform reuse and closed-loop adoption under the fixed protocol---but
+  the four tasks remain seed-controlled, hand-constructed streams, not a
+  production workload study.
 \item
   \textbf{No production end-to-end evaluation.} We have not deployed
-  AgentISA in a production setting; consequently this paper contains no
+  AgentISA in a production setting; the paper therefore contains no
   latency-under-load, throughput, availability, or dollar-cost
-  measurements, and we make no such claims.
+  measurements, and makes no such claims.
 \item
   \textbf{No real cost data (token usage measured; pricing MODELED on
   measured tokens).} All latency figures in Sections 5.2--5.5 are
@@ -2183,15 +2181,14 @@ We enumerate the limitations of the evaluation explicitly:
   wall-clock time and gateway-reported tokens at reduced scale, and
   Section 5.7.1 prices its own measured tokens under three modes---no
   optimization, AgentISA result caching, and a modeled provider prompt
-  cache with a parameterized cache-read discount (default 0.1, after
-  Anthropic's published prompt-caching economics). The costs are
-  MODELED-on-measured: tokens are measurements, prices are configurable
-  list-price stand-ins (the gateway's actual pricing is unknown), and no
-  dollar-savings claim is made. Section 5.2's baseline is an
-  \emph{exact-match} response cache (parity reported); head-to-head
-  against \emph{approximate} (semantic/embedding) caching (GPTCache's
-  approximate mode---explicitly out of scope) and a priced deployment
-  study under real pricing remain future work.
+  cache with a parameterized cache-read discount (default 0.1). The
+  costs are MODELED-on-measured: tokens are measurements, prices are
+  configurable list-price stand-ins (the gateway's actual pricing is
+  unknown), and no dollar-savings claim is made. Section 5.2's baseline
+  is an \emph{exact-match} response cache (parity reported);
+  head-to-head against \emph{approximate} (semantic/embedding) caching
+  (GPTCache's approximate mode---explicitly out of scope) and a priced
+  deployment study under real pricing remain future work.
 \item
   \textbf{Program-size metrics, not wall-clock time.}
   Effective-instruction and dispatch-count reduction are structural
@@ -2201,9 +2198,9 @@ We enumerate the limitations of the evaluation explicitly:
 \item
   \textbf{Descriptive statistics only.} Synthetic configurations use
   five seeds (Section 5.1.3); the real-gateway and system-level runs are
-  single-seed by design (Section 5.7's two-seed rerun excepted). No
+  single-seed by design (Section 5.7's two-seed rerun excepted); no
   hypothesis tests, confidence intervals, or significance claims are
-  made; standard deviations indicate stability across seeds, nothing
+  made---standard deviations indicate stability across seeds, nothing
   more.
 \item
   \textbf{Functional, not performance, validation of coordination.} The
@@ -2211,10 +2208,10 @@ We enumerate the limitations of the evaluation explicitly:
   conditions, not throughput or scalability.
 \end{enumerate}
 
-Despite these limitations, the evaluation achieves its purpose: it
-demonstrates, under fully disclosed and reproducible conditions, that
-each optimization mechanism is implemented, active, and produces the
-claimed structural effects on workloads designed to expose them.
+Despite these limitations, the evaluation demonstrates, under fully
+disclosed and reproducible conditions, that each optimization mechanism
+is implemented, active, and produces the claimed structural effects on
+workloads designed to expose them.
 
 \subsection{Real-Trace Workload
 Characterization}\label{real-trace-workload-characterization}
@@ -2323,12 +2320,11 @@ violation history. The 43 functional tests validate the implemented
 checks under configured policies, not the default posture; nothing in
 this paper constitutes a security certification. Beyond what is
 implemented, hardening considerations---not claims about the current
-system: (i) \textbf{data privacy}---end-to-end data-flow tracking and
-privacy-preserving computation remain future work (Section 6.3.6); (ii)
-\textbf{system security}---secure multi-agent communication channels and
-audit-log integrity are not yet addressed; (iii)
-\textbf{compliance}---regulated deployments require externally audited
-controls; the system provides enforcement hooks, not certification.
+system: data privacy (end-to-end data-flow tracking, privacy-preserving
+computation; Section 6.3.6), secure multi-agent communication channels,
+audit-log integrity, and externally audited compliance controls all
+remain future work; the system provides enforcement hooks, not
+certification.
 
 \subsection{Future Research
 Directions}\label{future-research-directions}

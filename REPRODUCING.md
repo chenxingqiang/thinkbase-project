@@ -225,3 +225,36 @@ python examples/benchmarks/isa_real_llm_bench.py --backend gateway \
   sanctioned scale.
 - Total: 1,103 gateway calls, wall 3,243.8 s; aggregates recomputed from
   the per-seed cells in the postprocess step.
+
+Multi-model production-gateway reruns (Section 5.7/5.7.1 citations and
+supplementary I.3): same harnesses, additional model aliases. Gateway
+env: `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` + gateway CA via
+`NODE_EXTRA_CA_CERTS` (all resolved by the harnesses' defaults).
+
+```bash
+# multi-model cache exactness (doubao-seed-2.0-code, 200 x 1 seed x 3 skews)
+python examples/benchmarks/isa_real_llm_bench.py --backend gateway     --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64     --model claude-doubao-seed-2.0-code     --output examples/benchmarks/isa_real_llm_results_doubao_seed_2_0_code.json
+
+# identity rerun with live-model values (doubao-seed-2.0-code @1500)
+python examples/paper_real_llm_compiler_test.py --backend real --scale paper     --model claude-doubao-seed-2.0-code --max-tokens 1500     --json examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json
+
+# model-family ceiling census (minimax-m3 @512 and @1500)
+python examples/paper_real_llm_compiler_test.py --backend real --scale paper     --model claude-minimax-m3 --max-tokens 512     --json examples/benchmarks/paper_real_llm_compiler_results_minimax.json
+python examples/paper_real_llm_compiler_test.py --backend real --scale paper     --model claude-minimax-m3 --max-tokens 1500     --json examples/benchmarks/paper_real_llm_compiler_results_minimax_1500.json
+
+# quality on a completing model (deepseek-v4-flash @1500)
+python examples/paper_real_llm_quality_check.py --backend real --scale paper     --model claude-deepseek-v4-flash     --json examples/benchmarks/gateway_quality_deepseek.json
+```
+
+- Pool-serial discipline: run at most one job per model alias at a time;
+  concurrent load on a single alias was observed to starve parallel
+  callers on this gateway (hangs with empty-message read timeouts).
+- Retry envelope used for these sessions (defaults remain 3/90):
+  `GATEWAY_RETRY_ATTEMPTS=8 GATEWAY_CALL_TIMEOUT=150`; the clients
+  rotate connections across retries
+  (`httpx.Limits(max_keepalive_connections=0)`).
+- Recorded, not pursued: `claude-deepseek-v4-flash` deterministically
+  hangs on the compiler-test classify payloads (19+ attempts, both
+  budgets, connection-rotated retries) while completing the quality
+  harness's batched prompts at the same ceiling; no paper number rests
+  on that alias for the identity run.

@@ -438,7 +438,7 @@ chk(sum(r['denied'] for (s_, m), r in mrows.items() if m == 'fail_closed' and s_
 scale = sec['provenance']['scale']
 chk(scale['task_population'] == 1000 and scale['monitor_evaluations'] == 2000 and scale['coordinator_runs'] == 2000,
     f"security scale json {scale} vs paper 1,000 tasks / 2,000 evaluations / 2,000 runs")
-for s_ in ['400 of 1,000 paired tasks', '400 policy-gap tasks per 1,000 paired evaluations',
+for s_ in ['400 of 1,000 paired tasks', 'fail-closed denies 400 policy-gap tasks fail-open admits',
            '800 strict-mode denials', 'all 2,000 paired runs', 'zero false denials', '0/200 normal-task false denials']:
     chk(s_ in md, f'paper missing security citation {s_}')
 
@@ -769,6 +769,70 @@ for vp in gm['vs_frozen_paper_run']['per_zipf']:
 for s_ in ['1,103 gateway calls', '3,243.8 s', 'AccountQuotaExceeded', '21:19:19 +0800',
            '(8.5% / 26.0% / 45.5% at 200 tasks × 1 seed)', 'all 6 of 6', '2,903 / 2,675 / 2,477 ms']:
     chk(s_ in md, f'paper missing gateway-multiseed citation {s_}')
+
+
+# ── Multi-model production-gateway reruns (doubao cache / doubao identity / minimax census / deepseek quality) ──
+ddb = json.load(open('examples/benchmarks/isa_real_llm_results_doubao_seed_2_0_code.json'))
+for z in ddb['data']:
+    c = z['per_seed'][0]
+    chk(c['hit_rate'] == c['expected_hit_rate'],
+        f'doubao-bench measured hit rate != analytic expectation in cell s={z["zipf_s"]}')
+    chk(c['baseline']['api_calls'] == 200, f'doubao-bench baseline calls != 200 in cell s={z["zipf_s"]}')
+hit05 = ddb['data'][0]['per_seed'][0]; hit10 = ddb['data'][1]['per_seed'][0]; hit15 = ddb['data'][2]['per_seed'][0]
+chk(f'\u2014{hit05["hit_rate"]:.1%}, {hit10["hit_rate"]:.1%}, {hit15["hit_rate"]:.1%}; '
+    f'calls 200\u2192{hit05["cached"]["api_calls"]}/{hit10["cached"]["api_calls"]}/{hit15["cached"]["api_calls"]}; p50' in md,
+    'paper multi-model rerun citation (hit rates / calls) altered')
+p50s = sorted(z['per_seed'][0]['baseline']['latency_ms_p50'] for z in ddb['data'])
+chk(f'{p50s[0]/1000:.1f}\u2013{p50s[-1]/1000:.1f} s' in md, 'paper multi-model p50 citation altered')
+for s_ in ['two production models (one seed per model)', 'Real-gateway experiments extend validation across three production models']:
+    chk(s_ in md, f'paper missing multi-model scope/abstract citation: {s_}')
+
+idd = json.load(open('examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json'))
+mt = idd['backend_config']['max_tokens']
+live_calls = sum(1 for cell in idd['data'] for r in cell['arm_a_unoptimized']['per_realization'] if r['calls'] > 0)
+bound = sum(1 for cell in idd['data'] for r in cell['arm_a_unoptimized']['per_realization'] if r['calls'] > 0 and r['completion_tokens'] >= mt)
+mtok = max(r['completion_tokens'] for cell in idd['data'] for r in cell['arm_a_unoptimized']['per_realization'] if r['calls'] > 0)
+chk(live_calls == 104 and bound == 0 and mtok == 142, 'doubao-identity raw records recompute mismatch (104 live / 0 bound / max 142)')
+chk(idd['verdict']['byte_identical_all_realizations'] and idd['verdict']['arm_b_zero_new_calls_when_shared']
+    and idd['verdict']['hot_path_adopted'] and idd['verdict']['static_compile_dataflow_preserved'],
+    'doubao-identity verdict flags not all true')
+chk(all(cell['byte_identity']['all_realizations_identical'] and cell['byte_identity']['arm_b_new_model_calls'] == 0
+        for cell in idd['data']), 'doubao-identity per-cell byte identity/arm-b-calls mismatch')
+chk(f'all {live_calls} live calls across the three Zipf cells completed below the ceiling (max completion {mtok} tokens, {bound} bound)' in md,
+    'paper doubao identity citation altered')
+
+def _census(fn, cap):
+    d = json.load(open(fn))
+    t = sum(1 for cell in d['data'] for r in cell['arm_a_unoptimized']['per_realization'] if r['calls'] > 0)
+    c = sum(1 for cell in d['data'] for r in cell['arm_a_unoptimized']['per_realization'] if r['calls'] > 0 and r['completion_tokens'] >= cap)
+    return c, t
+c512, t512 = _census('examples/benchmarks/paper_real_llm_compiler_results_minimax.json', 512)
+c1500, t1500 = _census('examples/benchmarks/paper_real_llm_compiler_results_minimax_1500.json', 1500)
+chk((c512, t512) == (101, 104) and (c1500, t1500) == (68, 104), 'minimax census raw records recompute mismatch')
+chk(f'{round(100*c512/t512)}% of calls at `max_tokens` = 512 and {round(100*c1500/t1500)}% at 1,500' in md,
+    'paper minimax census citation altered')
+chk(f'binding at the ceiling in {c512}/{t512} calls ({100*c512/t512:.0f}%)' in md
+    and f'{c1500}/{t1500} ({100*c1500/t1500:.0f}%)' in md, 'supp minimax census citation altered')
+
+dsq = json.load(open('examples/benchmarks/gateway_quality_deepseek.json'))
+qs = dsq['summary']
+chk(qs['parsed_claims'] == 288 and qs['parsed_claims'] == qs['signatures_total'] and qs['fallback_filled'] == 0
+    and qs['replies_bound_at_ceiling'] == 0, 'deepseek-quality raw summary mismatch (288/288, 0 fills, 0 bound)')
+chk(abs(qs['final_agreement_vs_gold'] - 0.5208) < 1e-9 and abs(qs['rule_fallback_agreement_vs_gold'] - 0.3194) < 1e-4,
+    'deepseek-quality agreement numbers recompute mismatch')
+chk(f'parses {qs["parsed_claims"]}/{qs["signatures_total"]} claims with {qs["replies_bound_at_ceiling"]} ceiling bindings: '
+    f'final classifications match gold on {qs["final_agreement_vs_gold"]:.1%} of signatures against '
+    f'{qs["rule_fallback_agreement_vs_gold"]:.1%} for the fallback rule' in md, 'paper deepseek quality citation altered')
+pc = qs['per_gold_class']
+chk(f'per-class agreement {100*pc["low"]["agreement_rate"]:.1f}/{100*pc["medium"]["agreement_rate"]:.1f}/{100*pc["high"]["agreement_rate"]:.1f}/{100*pc["critical"]["agreement_rate"]:.1f}%' in md,
+    'paper deepseek per-class citation altered')
+chk(dsq['gateway_round_trips']['live_calls'] == 36 and f'{dsq["gateway_round_trips"]["live_calls"]} distinct signature batches' in md,
+    'paper deepseek batch count citation altered')
+margin = qs['final_agreement_vs_gold'] - qs['rule_fallback_agreement_vs_gold']
+chk(f'+{100*margin:.1f} points' in md, 'supp deepseek model-over-rule margin citation altered')
+chk(f'{100*qs["claims_agreement_vs_gold"]:.1%} | {100*qs["final_agreement_vs_gold"]:.1%} | {100*qs["rule_fallback_agreement_vs_gold"]:.1%}' in md
+    or (f'| {100*qs["claims_agreement_vs_gold"]:.1%} |' in md and f'| {100*qs["rule_fallback_agreement_vs_gold"]:.1%} |' in md),
+    'supp deepseek quality table row altered')
 
 if fails:
     print('REGRESSION FAILURES:')

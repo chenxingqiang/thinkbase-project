@@ -1139,7 +1139,7 @@ The result-cache saving is nearly mix-invariant (within-skew range across the wh
 
 ## I.3 Real-Gateway Re-Runs: Quality Harness and Multi-Seed Cache Protocol
 
-Two follow-ups to the Section 5.7/5.7.1 real-gateway experiments, run on the same gateway and model alias (a local alias for a hosted GLM reasoning model) at the scales a per-call quota and a session budget allow. Both results files were recomputed from raw records by `examples/benchmarks/e10_gateway_postprocess.py` with a cross-check against the harness's own summary (both `passed`); raw per-call replies, stop reasons, token usage, and latencies are retained in the committed JSONs.
+Four follow-ups to the Section 5.7/5.7.1 real-gateway experiments, run on the same gateway at the scales a per-call quota and a session budget allow. The first two use the original alias (a local alias for a hosted GLM reasoning model); the remaining three extend the same protocols to additional production model families (`claude-doubao-seed-2.0-code`, `claude-minimax-m3`, `claude-deepseek-v4-flash`) under a per-model-pool serialization discipline (concurrent load on one upstream alias was observed to starve parallel callers; runs on distinct aliases are independent). Both results files were recomputed from raw records by `examples/benchmarks/e10_gateway_postprocess.py` with a cross-check against the harness's own summary (both `passed`); raw per-call replies, stop reasons, token usage, and latencies are retained in the committed JSONs.
 
 ### Classification-Quality Re-Run at a Raised Token Ceiling
 
@@ -1204,3 +1204,45 @@ Raw results in `examples/benchmarks/gateway_multiseed_results.json`:
 **What this shows:** the cache protocol's correctness property—measured hit rate equal to the analytic expected hit rate of the seeded draw—holds exactly on the real gateway in all 6 of 6 (Zipf, seed) cells, and call reduction matches hit rate at every skew (3.5% / 15.5% / 29.5%); per-call latency p50 falls mildly with skew (2,903 / 2,675 / 2,477 ms) as fewer uncached calls dominate. **What it does not show, stated plainly:** the reduced scale is *not* 1:1 comparable to the published 200-task run—100-task workloads contain fewer repeated (instruction, params) pairs, so the hit rates (3.5% / 15.5% / 29.5%) sit below the frozen paper values (8.5% / 26.0% / 45.5% at 200 tasks × 1 seed); the side-by-side is context, not a contradiction. Two seeds give a real but small stdev; the synthetic suite's 5-seed protocol would have cost about 2,760 gateway calls (the 1,103 recorded calls over six (Zipf, seed) cells extrapolated to the protocol's fifteen; each round trip ~2 s) and was not affordable in-session. Coverage: complete at reduced scale—single gateway, single model alias, 3 Zipf buckets × 2 seeds × 100 tasks, `max_tokens` 64.
 
 
+### Multi-Model Cache-Exactness Re-Run (`claude-doubao-seed-2.0-code`)
+
+Raw results: `examples/benchmarks/isa_real_llm_results_doubao_seed_2_0_code.json` (harness `examples/benchmarks/isa_real_llm_bench.py`, `--backend gateway`).
+
+**Protocol.** Byte-identical protocol to Section 5.7: same workload generator (`zipf_workload`), instruction pool, parameter space, seed (0), N = 200 per Zipf level, `max_tokens` = 64, sequential httpx against the same gateway; the only differences are the model alias and the harness's hardened retry envelope used for this session (eight bounded retries at a 150 s per-call timeout, connection rotation across retries—`httpx.Limits(max_keepalive_connections=0)`—added after the gateway's load balancer was observed pinning retries to a sick upstream connection; defaults in the committed harness remain 3 attempts / 90 s). One preflight plus 6 × 200 = 1,200 measured round trips.
+
+| Zipf s | Expected hit rate | Observed hit rate | Calls | Cached-arm p50 (ms) | Wall clock (ms) | Tokens |
+| -- | -- | -- | -- | -- | -- | -- |
+| 0.5 | 8.5% | 8.5% | 200 -> 183 | 3998 | 868339 -> 808579 | 23811 -> 21769 |
+| 1.0 | 26.0% | 26.0% | 200 -> 148 | 3732 | 807988 -> 593098 | 23735 -> 17526 |
+| 1.5 | 45.5% | 45.5% | 200 -> 109 | 3743 | 729446 -> 422906 | 23606 -> 12868 |
+
+Observed hit rates match the computed expectation exactly in 3/3 cells, as on the reasoning alias (Section 5.7). Per-call latency is higher on this model family (p50 3.6–4.0 s across cells versus 2.1 s on the reasoning alias), so wall-clock savings per avoided call are larger while the hit/miss statistics are unchanged—consistent with the exactness property (hit/miss decisions are a pure function of the (instruction, params) sequence and cannot depend on the backend).
+
+### Identity Re-Run with Live-Model Values, and a Model-Family Ceiling Census
+
+Raw results: `examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json` and `examples/benchmarks/paper_real_llm_compiler_results_minimax.json` / `..._minimax_1500.json` (harness `examples/paper_real_llm_compiler_test.py`, `--backend real --scale paper`).
+
+**Live-values run (`claude-doubao-seed-2.0-code`, `max_tokens` 1,500).** Same harness, preset, seed, and cache protocol as Section 5.7.1, across all three Zipf cells. All 104 live calls (one per distinct signature batch, all by arm (a)) completed below the ceiling (max completion 142 tokens, zero bound) and replied in the requested `'<index>: <severity>'` format—verified once out-of-band by replaying a batch's prompt and running the committed `parse_classification` on the reply (6/6 signatures resolved)—so the severity values entering arm (a)'s artifacts are the live model's own classifications, not the deterministic fallback. All mechanism checks re-passed on this model: `calls_match_expected`, arm (b) zero new gateway calls against the shared warmed cache, byte-identical artifacts across all realizations (verdict `byte_identical_all_realizations`), hot-path adoption, and the static 7→6 effective-instruction shrink.
+
+**Ceiling census (`claude-minimax-m3`).** The same harness passes every mechanism check on a reasoning-style third model at two budgets, with replies binding at the ceiling in 101/104 calls (97%) at `max_tokens` 512 and 68/104 (65%) at 1,500. Combined with the reasoning alias (bound in every call at 64 and 512) and doubao-seed-2.0-code (zero bindings at 1,500), this locates ceiling-binding in the model family's verbosity under this prompt, not in the harness: the same protocol yields fallback-derived values on verbose reasoners and live-model values on terse completers.
+
+**Gateway quirk, recorded not pursued.** `claude-deepseek-v4-flash` deterministically hangs on this harness's classify payloads (empty-message `ReadTimeout` across 19+ attempts spanning connection-rotated retries at both 512 and 1,500) while completing the quality harness's batched prompts over the same template at 1,500 with zero bindings (next subsection)—an upstream/alias-specific behavior, recorded as a deployment note; no run in this paper rests on it.
+
+### Quality on a Completing Model (`claude-deepseek-v4-flash`)
+
+Raw results: `examples/benchmarks/gateway_quality_deepseek.json` (harness `examples/paper_real_llm_quality_check.py`, `--backend real --scale paper`).
+
+**Protocol.** Identical harness, preset (200 draws over the 40-task population, Zipf 1.0, batch size 8, seed base 1000), gold rubric, and one-live-call-per-distinct-batch rule as the Section 5.7.1 quality diagnostic, with `max_tokens` = 1,500 and temperature 0; 36 distinct signature batches, one preflight, zero timeouts, zero crashes.
+
+| Quantity | Reasoning alias (Section 5.7.1, `max_tokens` 3072) | Completing model (`claude-deepseek-v4-flash`, `max_tokens` 1500) |
+| -- | -- | -- |
+| Distinct batches / live calls | 22 / 22 | 36 / 36 |
+| Signatures | 176 | 288 |
+| Parsed claims (parse rate) | 144 (81.8%) | 288 (10000.0%) |
+| Fallback-filled classifications | 32 | 0 |
+| Replies bound at ceiling | 4 / 22 | 0 |
+| Model claims vs gold | 51.4% | 5208.0% |
+| Final classification vs gold | 45.5% | 5208.0% |
+| Rule-fallback baseline vs gold | 32.4% | 3194.0% |
+
+Per-class agreement on the completing model: low 67.6% (74 signatures), medium 39.0% (77), high 47.8% (69), critical 54.4% (68). On this model every signature's final classification is the live model's own (zero fallback fills), and the model-over-rule margin is +20.1 points (versus +13.1 on the reasoning alias). The gold remains a planted keyword rubric over synthetic signatures, recorded verbatim in the results file; both runs are rubric-following diagnostics at one gateway, not deployment-quality claims.
