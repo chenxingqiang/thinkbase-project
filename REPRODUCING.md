@@ -274,8 +274,18 @@ python examples/paper_real_llm_quality_check.py --backend real --scale paper    
   figures_manifest.json against the same sources. Build order: make_figures
   then build_paper (the build copies docs/figures/ into the LaTeX tree and
   promotes `wide_`-prefixed assets to full-width floats).
-- Full-scale multi-seed cache run (Section 5.7 / I.3):
-  `python examples/benchmarks/isa_real_llm_bench.py --backend gateway     --tasks 200 --seeds 3 --zipf 0.5 1.0 1.5 --max-tokens 64     --model claude-glm-5.3-flash     --output examples/benchmarks/isa_real_llm_results_glm_multiseed.json`
-- Third-family reduced-scale cache run (I.3): same command with
-  `--tasks 100 --seeds 1 --model claude-minimax-m3 --output
-  examples/benchmarks/isa_real_llm_results_minimax_m3.json`.
+- Quota-blocked extensions, recorded so they are not mistaken for
+  evidence: attempts to upgrade the committed two-seed reduced-scale
+  run to three seeds (full-scale 200-task and reduced-scale 100-task
+  variants, glm 5.3 flash) and to add third-family cache-exactness runs
+  (`claude-minimax-m3`, `claude-kimi-k2.7-code`) were all rejected by
+  the gateway's quota layers (HTTP 429 `AccountQuotaExceeded`; the glm
+  pool's window quota exhausted mid-run at full scale, then reported a
+  monthly pool exhausted until 2026-11-12 on the reduced-scale retry;
+  minimax and kimi pools are monthly, resetting 2026-11-05 and
+  2026-11-12). The bench writes no output file on failure, so none of
+  these attempts produced a results JSON, and no paper number depends
+  on them. The committed multi-seed cache evidence remains the two-seed
+  reduced-scale run (`gateway_multiseed_results.json`) and the
+  multi-model cache-exactness pair (glm 5.3 flash + doubao
+  seed-2.0-code, 200 tasks x 1 seed x 3 skews each).
