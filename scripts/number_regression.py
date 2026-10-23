@@ -838,5 +838,82 @@ if fails:
     print('REGRESSION FAILURES:')
     for f in fails: print(' -', f)
     sys.exit(1)
+# ---- I.3 prompt-cache billing probe (gateway_promptcache_probe.json) ----
+probe = jload('gateway_promptcache_probe.json')
+for alias, calls in probe['probe'].items():
+    chk(len(calls) == 2 and all(c['input_tokens'] > 0 for c in calls),
+        f'prompt-cache probe {alias}: missing input_tokens')
+    chk(all(c['cache_creation_input_tokens'] == 0 and c['cache_read_input_tokens'] == 0 for c in calls),
+        f'prompt-cache probe {alias}: cache fields unexpectedly nonzero')
+it_d = probe['probe']['claude-doubao-seed-2.0-code'][0]['input_tokens']
+it_s = probe['probe']['claude-deepseek-v4-flash'][0]['input_tokens']
+chk(f'plain `input_tokens` ({it_d} and {it_s}, respectively)' in md,
+    'supp I.3 prompt-cache probe citation altered')
+chk('cache_creation_input_tokens = cache_read_input_tokens = 0' in md,
+    'supp I.3 prompt-cache zero-fields citation altered')
+
+
+# ---- Figures: manifest re-verification (docs/figures/figures_manifest.json) ----
+figm = json.loads((ROOT / 'docs/figures/figures_manifest.json').read_text())
+fe = figm['figures']
+for name in ['wide_1_architecture.pdf', '2_compile_pipeline.pdf', '3_cache_exactness.pdf',
+             '4_token_mix_sweep.pdf', '5_quality_per_class.pdf', '6_ceiling_census.pdf']:
+    chk(name in fe and (ROOT / 'docs/figures' / name).exists(),
+        f'figure missing from manifest or disk: {name}')
+# F3: every plotted bar equals its bench JSON cell exactly
+for src, cells in fe['3_cache_exactness.pdf']['cells'].items():
+    d3 = json.loads((ROOT / 'examples/benchmarks' / src).read_text())
+    by = {z['zipf_s']: z['per_seed'][0] for z in d3['data']}
+    for c in cells:
+        m3 = by[c['zipf_s']]
+        chk(m3['hit_rate'] == c['hit_rate'] == c['expected'] == m3['expected_hit_rate'],
+            f'figure-3 cell mismatch {src} s={c["zipf_s"]}')
+chk(fe['3_cache_exactness.pdf']['all_cells_exact'] is True, 'figure-3 exactness flag off')
+# F4: sweep series match the sweep JSON, ordering invariant holds on the plotted values
+sw4 = json.loads((ROOT / 'examples/benchmarks/promptcache_sweep_results.json').read_text())
+chk(fe['4_token_mix_sweep.pdf']['cells'] == 195, 'figure-4 cell count != 195')
+for ps in sw4['analysis']['per_skew']:
+    ser = fe['4_token_mix_sweep.pdf']['series'][str(ps['zipf_s'])]
+    xs = [pt['x_completion_tokens_per_call'] for pt in ps['curve']]
+    pa = [pt['savings_provider_prompt_cache_pct'] for pt in ps['curve']]
+    sa = [pt['savings_agentisa_cache_pct'] for pt in ps['curve']]
+    chk(ser['x'] == xs and ser['provider'] == pa and ser['agentisa'] == sa,
+        f'figure-4 series mismatch at s={ps["zipf_s"]}')
+    chk(all(a >= p for a, p in zip(ser['agentisa'], ser['provider'])),
+        f'figure-4 ordering violation at s={ps["zipf_s"]}')
+# F4 caption pins (supp): endpoint savings at s=0.5
+c05 = sw4['analysis']['per_skew'][0]['curve']
+chk(f'{c05[0]["savings_provider_prompt_cache_pct"]:.1f}% at L4' in md
+    and f'{c05[-1]["savings_provider_prompt_cache_pct"]:.1f}% at L1024' in md,
+    'figure-4 caption endpoint citation altered')
+# F5: per-class agreement values match both quality JSONs and the recomputed fallback
+q5 = fe['5_quality_per_class.pdf']
+for src, key, top in [('gateway_quality_results.json', 'glm_per_class', 'summary_recomputed'),
+                      ('gateway_quality_deepseek.json', 'deepseek_per_class', 'summary')]:
+    qq = json.loads((ROOT / 'examples/benchmarks' / src).read_text())[top]
+    for cls, v in q5[key].items():
+        chk(abs(v - qq['per_gold_class'][cls]['agreement_rate']) < 1e-9,
+            f'figure-5 {top} {cls} mismatch')
+dsk5 = json.loads((ROOT / 'examples/benchmarks/gateway_quality_deepseek.json').read_text())
+chk(abs(q5['fallback_overall'] - dsk5['summary']['rule_fallback_agreement_vs_gold']) < 5e-5,
+    'figure-5 fallback overall mismatch')
+# F6: census tuples match the identity runs' raw records (recomputed here)
+def _fig6_census(fn, cap):
+    d = json.loads((ROOT / fn).read_text())
+    t = sum(1 for cell in d['data'] for r in cell['arm_a_unoptimized']['per_realization'] if r['calls'] > 0)
+    c = sum(1 for cell in d['data'] for r in cell['arm_a_unoptimized']['per_realization']
+            if r['calls'] > 0 and r['completion_tokens'] >= cap)
+    return c, t
+chk(tuple(fe['6_ceiling_census.pdf']['minimax_512']) == _fig6_census('examples/benchmarks/paper_real_llm_compiler_results_minimax.json', 512)
+    and tuple(fe['6_ceiling_census.pdf']['minimax_1500']) == _fig6_census('examples/benchmarks/paper_real_llm_compiler_results_minimax_1500.json', 1500)
+    and tuple(fe['6_ceiling_census.pdf']['doubao_1500']) == _fig6_census('examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json', 1500),
+    'figure-6 census tuples mismatch raw records')
+chk(tuple(fe['6_ceiling_census.pdf']['glm_512']) == (22, 22), 'figure-6 glm census != (22,22)')
+# F6 caption pins (supp)
+for s_ in ['binds in 22/22 calls at the compiler budget (512)',
+           '101/104 at 512 and 68/104 at 1,500',
+           'completes below the ceiling in all 104 calls at 1,500']:
+    chk(s_ in md, f'paper missing figure-6 caption citation: {s_}')
+
 print('ALL NUMBERS REGRESSION-CLEAN: every cited benchmark number matches its committed results JSON '
       '(microbench + real-gateway + Appendix-I extension experiments; aggregates recomputed from raw records)')

@@ -47,6 +47,21 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -55,6 +70,14 @@
 \usepackage{fvextra}
 \RecustomVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize,breaklines,breakanywhere}
 \emergencystretch=3em
+% Float tuning: the paper concentrates figures/tables in Sections 3 and 5;
+% permissive fractions stop LaTeX from breaking pages early around them.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.86}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{5}
 % Math macros used by the paper that standard LaTeX lacks:
 \DeclareMathOperator*{\argmin}{arg\,min}
 \newcommand{\llbracket}{[\![}
@@ -462,6 +485,17 @@ and optimization (Section 3.4), and the capability-assessment layer
 
 \subsection{Core Architecture}\label{core-architecture}
 
+\begin{figure*}
+\centering
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored streams pass a security gate and a coordinator that routes LLM-type steps through a result cache (first occurrence only) against the production gateway; a hot-path detector and the static optimizer re-optimize and re-adopt the stream (threshold-triggered). Sections 5.7-5.7.1 measure each property on the real code path.}]{figures/wide_1_architecture.pdf}
+\caption{\textbf{AgentISA runtime architecture.} Authored streams pass a
+security gate and a coordinator that routes LLM-type steps through a
+result cache (first occurrence only) against the production gateway; a
+hot-path detector and the static optimizer re-optimize and re-adopt the
+stream (threshold-triggered). Sections 5.7-5.7.1 measure each property
+on the real code path.}
+\end{figure*}
+
 \subsubsection{Instruction Set
 Specification}\label{instruction-set-specification}
 
@@ -724,18 +758,17 @@ Pattern recognition proceeds in three stages:
   groups dialogues deterministically by \emph{action signature}---the
   sorted set of system-turn contents---and promotes each sufficiently
   supported bucket into a pattern. An earlier prototype (TF-IDF
-  embeddings, density-based clustering, k-means) was abandoned for
-  production use: non-deterministic across library versions and
-  degenerate on the short traces agents actually provide (a k-means view
-  over instruction-trace features remains in \texttt{pattern\_mining},
-  with fixed \texttt{random\_state}). Promotions split by source:
-  trace-mined promotions execute by \textbf{composite replay}---the
-  learned instruction's \texttt{execute} body re-runs the recorded
-  constituent sequence, with its dataflow edges, in mined order against
-  a shared context, merging outputs and returning the keys its
+  embeddings, density-based clustering, k-means) was abandoned:
+  non-deterministic across library versions and degenerate on the short
+  traces agents provide (a k-means view over instruction-trace features
+  remains in \texttt{pattern\_mining}, fixed \texttt{random\_state}).
+  Promotions split by source: trace-mined promotions execute by
+  \textbf{composite replay}---the \texttt{execute} body re-runs the
+  recorded constituent sequence, with its dataflow edges, in mined order
+  against a shared context, merging outputs and returning the keys its
   \texttt{produces\_X} postconditions declare---while dialogue-mined
-  templates run an attached \texttt{executor} declaration if one exists
-  (dict results are checked against the declared \texttt{produces\_X}
+  templates run an attached \texttt{executor} if one exists (dict
+  results checked against the declared \texttt{produces\_X}
   postconditions) and otherwise raise \texttt{NotImplementedError}
   rather than silently no-opping. Promotion is deterministic (pattern
   identity derives from the mined instruction-id sequence), and replay
@@ -1505,35 +1538,6 @@ SHA-256, byte-identical to the published hit statistics.
 \emph{Automatic} drift detection remains absent, and no number in this
 paper runs under the strict key.
 
-\begin{table}[t]
-\caption{Simulated API calls with and without the result cache (2,000
-tasks per seed, 5 seeds, mean \(\pm\) sample standard deviation;
-reduction equals hit rate by construction; the third, naive
-response-cache arm is reported in the text below).}
-\small\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2537}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2388}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2090}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2985}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Zipf exponent \(s\)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Calls (no cache)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Calls (cached)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Reduction = hit rate
-\end{minipage} \\
-\midrule\noalign{}
-0.5 & 2,000 & 810.4 \(\pm\) 5.7 & 59.5\% \(\pm\) 0.3\% \\
-1.0 & 2,000 & 642.0 \(\pm\) 3.8 & 67.9\% \(\pm\) 0.2\% \\
-1.5 & 2,000 & 408.0 \(\pm\) 9.4 & 79.6\% \(\pm\) 0.5\% \\
-\bottomrule\noalign{}
-\end{tabular}
-\end{table}
-
 \textbf{Naive response-cache baseline.} A third arm runs an app-level
 \emph{response} cache keyed on the exact request payload string---what
 an exact-match cache in front of the backend (GPTCache's exact mode, or
@@ -1581,44 +1585,8 @@ count}---independent dispatch operations the runtime issues, where
 parallel grouping can fold several independent instructions into one
 dispatch \emph{without changing the effective instruction count}.
 
-\begin{table}[t]
-\caption{Effective-instruction-count reduction by optimization level and
-sequence length (5 seeds, mean \(\pm\) sample standard deviation;
-planted dead 0.25 / pure 0.55 workload).}
-\small\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2143}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1571}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4286}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2000}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Sequence length
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Level
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Effective-instruction reduction
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Dispatch count
-\end{minipage} \\
-\midrule\noalign{}
-50 & NONE & 0\% \(\pm\) 0.0 & 50.0 \(\pm\) 0.0 \\
-50 & BASIC & 32.8\% \(\pm\) 4.1\% & 33.6 \(\pm\) 2.1 \\
-50 & ADVANCED & 32.8\% \(\pm\) 4.1\% & 19.0 \(\pm\) 4.1 \\
-50 & AGGRESSIVE & 32.8\% \(\pm\) 4.1\% & 19.0 \(\pm\) 4.1 \\
-200 & NONE & 0\% \(\pm\) 0.0 & 200.0 \(\pm\) 0.0 \\
-200 & BASIC & 34.2\% \(\pm\) 1.8\% & 131.6 \(\pm\) 3.6 \\
-200 & ADVANCED & 34.2\% \(\pm\) 1.8\% & 74.0 \(\pm\) 6.3 \\
-200 & AGGRESSIVE & 34.2\% \(\pm\) 1.8\% & 74.0 \(\pm\) 6.3 \\
-1,000 & NONE & 0\% \(\pm\) 0.0 & 1,000.0 \(\pm\) 0.0 \\
-1,000 & BASIC & 35.4\% \(\pm\) 1.6\% & 646.0 \(\pm\) 16.4 \\
-1,000 & ADVANCED & 35.4\% \(\pm\) 1.6\% & 344.6 \(\pm\) 31.6 \\
-1,000 & AGGRESSIVE & 35.4\% \(\pm\) 1.6\% & 344.6 \(\pm\) 31.6 \\
-\bottomrule\noalign{}
-\end{tabular}
-\end{table}
-
-\textbf{Interpretation.} Three observations:
+\textbf{Interpretation} (full table: supplementary I.3). Three
+observations:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -1735,40 +1703,22 @@ fusion and DCE toggled individually and jointly, so per-configuration
 differences are same-input paired differences---an exact decomposition
 of the headline, not a replication:
 
-\begin{table}[t]
-\caption{Paired per-pass decomposition on the Section 5.3 sequences
-(length 200, 5 seeds, identical seed base 2,000); the fusion + DCE row
-reproduces the Section 5.3 headline exactly because the inputs are
-identical.}
-\small\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}ll@{}}
-\toprule\noalign{}
-Configuration & Instruction-count reduction \\
-\midrule\noalign{}
-NONE & 0.0\% \(\pm\) 0.0\% \\
-fusion only & 21.6\% \(\pm\) 1.2\% \\
-DCE only & 24.5\% \(\pm\) 2.6\% \\
-fusion + DCE & 34.2\% \(\pm\) 1.8\% \\
-\bottomrule\noalign{}
-\end{tabular}
-\end{table}
+The paired per-pass decomposition (table: supplementary I.3) gives
+fusion+DCE = 34.2\% \(\pm\) 1.8\%---the headline itself, confirming that
+these two passes account for the entire static gain at length 200. The
+\textbf{paired interaction}, computed per seed as (fusion+DCE − NONE) −
+(fusion − NONE) − (DCE − NONE)---34.2 − 21.6 − 24.5 = −11.9 points---is
+−11.9\% \(\pm\) 2.0\% (per-seed −14.5/−9.5/−13.0/−12.0/−10.5 points):
+the passes overlap---dead slots break fusion chains and fused pairs
+absorb neighbors DCE would otherwise have removed individually---so the
+sum of the single-pass gains (46.1 points) overstates the joint effect
+by 11.9 points.
 
-The fusion+DCE row is 34.2\% \(\pm\) 1.8\%---the headline itself,
-confirming that these two passes account for the entire static gain at
-length 200. The \textbf{paired interaction}, computed per seed as
-(fusion+DCE − NONE) − (fusion − NONE) − (DCE − NONE)---34.2 − 21.6 −
-24.5 = −11.9 points---is −11.9\% \(\pm\) 2.0\% (per-seed
-−14.5/−9.5/−13.0/−12.0/−10.5 points): the passes overlap---dead slots
-break fusion chains and fused pairs absorb neighbors DCE would otherwise
-have removed individually---so the sum of the single-pass gains (46.1
-points) overstates the joint effect by 11.9 points.
-
-The secondary ablation is the earlier \textbf{independent-draw
-replication} (seed base 4,000, same distribution): fusion alone 21.9\%
-\(\pm\) 3.5\%, DCE alone 24.1\% \(\pm\) 3.3\%, fusion+DCE and all passes
-35.0\% \(\pm\) 3.7\%---the paired structure reproduces on fresh
-sequences (single-pass shares agree within one standard deviation), so
-the decomposition is not an artifact of one draw. ``All passes'' equals
+The secondary ablation is an \textbf{independent-draw replication} (seed
+base 4,000, same distribution): fusion alone 21.9\% \(\pm\) 3.5\%, DCE
+alone 24.1\% \(\pm\) 3.3\%, fusion+DCE and all passes 35.0\% \(\pm\)
+3.7\%---the paired structure reproduces on fresh sequences, so the
+decomposition is not an artifact of one draw. ``All passes'' equals
 fusion+DCE here, consistent with Section 5.3's level stability: no
 additional pass contributes measurable reduction, and we report that
 absence rather than dress the higher levels in unearned credit. Because
@@ -1867,48 +1817,15 @@ any backend}; if the mechanism is correct the real run must reproduce
 that sequence exactly---and at the recorded granularity (per-arm hit
 rates and call counts) it does:
 
-\begin{table}[t]
-\caption{Real-gateway cache behavior against the computed expectation
-(200 sequential requests, one seed, three Zipf levels, one model; paired
-cells read no cache -\textgreater{} cached).}
-\small\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0359}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2395}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1018}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1617}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0838}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2156}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0898}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0719}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Zipf s
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Expected hit rate (computed, no backend)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Observed hit rate
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Calls
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Call reduction
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Wall clock (ms)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Wall saved (ms)
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Tokens saved
-\end{minipage} \\
-\midrule\noalign{}
-0.5 & 8.5\% & 8.5\% & 200 -\textgreater{} 183 & 8.5\% & 472,276
--\textgreater{} 405,754 & 66,522 & 1,445 \\
-1.0 & 26.0\% & 26.0\% & 200 -\textgreater{} 148 & 26.0\% & 455,946
--\textgreater{} 334,597 & 121,349 & 4,420 \\
-1.5 & 45.5\% & 45.5\% & 200 -\textgreater{} 109 & 45.5\% & 450,330
--\textgreater{} 244,316 & 206,014 & 7,735 \\
-\bottomrule\noalign{}
-\end{tabular}
-\end{table}
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Real-gateway cache exactness across model families. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every cell of every family; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
+\caption{\textbf{Real-gateway cache exactness across model families.}
+Bars are measured hit rates under the identical protocol (200 sequential
+requests, one seed, three skews per model); the white tick is the
+backend-free computed expectation---matched exactly in every cell of
+every family; call, wall-clock, and token figures: supplementary I.3.}
+\end{figure}
 
 Per-call latency was stable across arms (p50 2.13--2.21 s, p95
 3.06--3.54 s). Token savings are gateway-reported \texttt{usage}
@@ -2079,9 +1996,8 @@ The experiments above measure individual mechanisms on synthetic
 sequences; this section is a \emph{controlled four-task system-level
 characterization}---a functional demonstration under a fixed closed-loop
 protocol, not a generalization experiment; the identical 91.7\% figure
-below is a property of that protocol, not four independent observations.
-The seed-controlled characterization
-(\texttt{examples/system\_task\_workload.py},
+below is a property of that protocol. The seed-controlled
+characterization (\texttt{examples/system\_task\_workload.py},
 \texttt{tests/system/test\_system\_task\_workload.py}) is built from
 \textbf{four tasks with genuinely different dependency shapes}---linear
 service-log triage, fan-out csv-etl-anomaly, wide-fan-in report-merge,
@@ -2090,16 +2006,16 @@ sandbox-resident files (12 realizations each, hot-path threshold 5, one
 planted dead guard and one cacheable LLM-type step per task, backed by a
 deterministic rule stand-in), making the mechanisms' composition and
 Section 3.4.4's closed-loop optimization claims checkable. Per-task
-instruction streams, the single-task walk-through, and both result
-tables are in Appendix H of the supplementary material; the headline:
-every task's guard survives compilation (never dropped outright, the
-reduction being fusion), the first realization pays all model calls and
-every subsequent one hits the cache (91.7\%, 11 of 12 realizations by
-construction), hot-path adoption lands at repeat 7 executing the
-shrunken six-instruction stream, and all reports come out byte-identical
-(12/12 plus fresh-stack SHA-256 equality); the compile shrink is the
-only shape-dependent quantity (12.5--25.0\%)---the composition behavior
-is not an artifact of one stream's structure.
+streams, the walk-through, and both result tables are in Appendix H of
+the supplementary material; the headline: every task's guard survives
+compilation (never dropped outright, the reduction being fusion), the
+first realization pays all model calls and every subsequent one hits the
+cache (91.7\%, 11 of 12 realizations by construction), hot-path adoption
+lands at repeat 7 executing the shrunken six-instruction stream, and all
+reports come out byte-identical (12/12 plus fresh-stack SHA-256
+equality); the compile shrink is the only shape-dependent quantity
+(12.5--25.0\%)---the composition behavior is not an artifact of one
+stream's structure.
 
 \textbf{The triage task's instruction stream} (seven instructions over
 sandbox-resident files---side-effectful first and last, the planted dead
@@ -2297,34 +2213,32 @@ Considerations}\label{security-and-privacy-considerations}
 
 AgentISA's implemented security layer is the \texttt{SecurityMonitor} of
 Section 5.6, consulted by the coordinator before every assignment, with
-violations timestamped. One shipped default deserves an explicit
-call-out: \textbf{resource access is open by default} and restrictable
-by configuration---a fail-open stance shifting the security burden onto
-the policy writer. The hardened inversion now ships as an opt-in strict
-mode (\texttt{SecurityMonitor(...,\ strict=True)}, propagated by
+violations timestamped. One shipped default deserves a call-out:
+\textbf{resource access is open by default} and restrictable by
+configuration---a fail-open stance shifting the burden onto the policy
+writer. The hardened inversion ships as an opt-in strict mode
+(\texttt{SecurityMonitor(...,\ strict=True)}, propagated by
 \texttt{AgentCoordinator(...,\ security\_strict=True)}; default
-\texttt{False}, the fail-open checks unchanged): strict denies
-unregistered resources, incomplete or malformed resource-access
-policies, and unknown data sensitivity, recording each in the existing
-timestamped violation history with a \texttt{(strict\ mode)} marker
-(unit suite \texttt{tests/core/isa/test\_security\_failclosed.py}). A
-paired posture matrix (1,000 evaluation tasks per mode, five seeds,
-every task judged by a fresh \texttt{SecurityMonitor} and re-run through
-a fresh \texttt{AgentCoordinator}; Section 5.11) quantifies the stance
-difference on the real code paths: the fail-open default admits all 400
-unknown-sensitivity and incomplete-policy tasks that strict mode denies;
-both modes deny the 200 unregistered-resource tasks, strict mode adding
-a distinguishable reason class; strict mode adds zero false denials on
-the 200 well-specified tasks; and every strict denial is recorded in the
-violation history. The 43 functional tests validate the implemented
-checks under configured policies, not the default posture; nothing in
-this paper constitutes a security certification. Beyond what is
-implemented, hardening considerations---not claims about the current
-system: data privacy (end-to-end data-flow tracking, privacy-preserving
-computation; Section 6.3.6), secure multi-agent communication channels,
-audit-log integrity, and externally audited compliance controls all
-remain future work; the system provides enforcement hooks, not
-certification.
+\texttt{False}, fail-open checks unchanged): strict denies unregistered
+resources, malformed resource-access policies, and unknown data
+sensitivity, recording each in the timestamped violation history with a
+\texttt{(strict\ mode)} marker
+(\texttt{tests/core/isa/test\_security\_failclosed.py}). A paired
+posture matrix (1,000 tasks per mode, five seeds, fresh
+\texttt{SecurityMonitor} and \texttt{AgentCoordinator} per task; Section
+5.11) quantifies the difference on the real code paths: fail-open admits
+all 400 unknown-sensitivity and incomplete-policy tasks that strict
+denies; both deny the 200 unregistered-resource tasks, strict adding a
+distinguishable reason class; strict adds zero false denials on the 200
+well-specified tasks; every strict denial is recorded. The 43 functional
+tests validate the implemented checks under configured policies, not the
+default posture; nothing in this paper constitutes a security
+certification. Beyond what is implemented, hardening
+considerations---not claims about the current system: data privacy
+(end-to-end data-flow tracking, privacy-preserving computation; Section
+6.3.6), secure multi-agent communication channels, audit-log integrity,
+and externally audited compliance controls all remain future work; the
+system provides enforcement hooks, not certification.
 
 \subsection{Future Research
 Directions}\label{future-research-directions}

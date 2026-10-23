@@ -88,6 +88,21 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -1722,6 +1737,19 @@ both columns remain MODELED-on-measured in both cases. GPTCache, an
 external cache layer, is explicitly out of scope; no head-to-head
 against it is claimed.
 
+\textbf{Why the provider-cache column stays MODELED.} A direct probe
+(2026-10-22; artifact \texttt{gateway\_promptcache\_probe.json}) sent an
+identical \textasciitilde800-token system+user prefix twice per alias
+with \texttt{cache\_control:\ \{type:\ ephemeral\}} blocks on
+\texttt{claude-doubao-seed-2.0-code} and
+\texttt{claude-deepseek-v4-flash}: every response reports plain
+\texttt{input\_tokens} (842 and 891, respectively) with
+\texttt{cache\_creation\_input\_tokens\ =\ cache\_read\_input\_tokens\ =\ 0}
+on both calls---the gateway does not surface provider prompt-cache
+billing fields, so the read-discount behavior cannot be measured through
+it; the MODELED overlay is a necessity of the environment, not a choice.
+The result-cache column's calls and tokens remain gateway-measured.
+
 \section{Four-Task Characterization --- Full
 Detail}\label{four-task-characterization-full-detail}
 
@@ -2914,6 +2942,125 @@ real-workload and LLM streams (the measured streams are deterministic
 synthetic arithmetic, and the claim measured is exact per-case equality
 under that contract, nothing broader).
 
+\textbf{Optimization-level sweep (moved verbatim from the main text's
+Section 5.3; the main text retains the prose interpretation).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2143}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1571}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.4286}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2000}}@{}}
+\caption{Effective-instruction-count reduction by optimization level and
+sequence length (5 seeds, mean \(\pm\) sample standard deviation;
+planted dead 0.25 / pure 0.55 workload).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sequence length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective-instruction reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch count
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sequence length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Level
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Effective-instruction reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dispatch count
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+50 & NONE & 0\% \(\pm\) 0.0 & 50.0 \(\pm\) 0.0 \\
+50 & BASIC & 32.8\% \(\pm\) 4.1\% & 33.6 \(\pm\) 2.1 \\
+50 & ADVANCED & 32.8\% \(\pm\) 4.1\% & 19.0 \(\pm\) 4.1 \\
+50 & AGGRESSIVE & 32.8\% \(\pm\) 4.1\% & 19.0 \(\pm\) 4.1 \\
+200 & NONE & 0\% \(\pm\) 0.0 & 200.0 \(\pm\) 0.0 \\
+200 & BASIC & 34.2\% \(\pm\) 1.8\% & 131.6 \(\pm\) 3.6 \\
+200 & ADVANCED & 34.2\% \(\pm\) 1.8\% & 74.0 \(\pm\) 6.3 \\
+200 & AGGRESSIVE & 34.2\% \(\pm\) 1.8\% & 74.0 \(\pm\) 6.3 \\
+1,000 & NONE & 0\% \(\pm\) 0.0 & 1,000.0 \(\pm\) 0.0 \\
+1,000 & BASIC & 35.4\% \(\pm\) 1.6\% & 646.0 \(\pm\) 16.4 \\
+1,000 & ADVANCED & 35.4\% \(\pm\) 1.6\% & 344.6 \(\pm\) 31.6 \\
+1,000 & AGGRESSIVE & 35.4\% \(\pm\) 1.6\% & 344.6 \(\pm\) 31.6 \\
+\end{longtable}
+
+\textbf{Simulated cache sweep (moved verbatim from the main text's
+Section 5.2; the main text retains the prose headline and the naive-arm
+comparison).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2537}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2388}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2090}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2985}}@{}}
+\caption{Simulated API calls with and without the result cache (2,000
+tasks per seed, 5 seeds, mean \(\pm\) sample standard deviation;
+reduction equals hit rate by construction; the third, naive
+response-cache arm is reported in the text below).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf exponent \(s\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (no cache)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction = hit rate
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf exponent \(s\)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (no cache)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls (cached)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Reduction = hit rate
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.5 & 2,000 & 810.4 \(\pm\) 5.7 & 59.5\% \(\pm\) 0.3\% \\
+1.0 & 2,000 & 642.0 \(\pm\) 3.8 & 67.9\% \(\pm\) 0.2\% \\
+1.5 & 2,000 & 408.0 \(\pm\) 9.4 & 79.6\% \(\pm\) 0.5\% \\
+\end{longtable}
+
+\textbf{Paired per-pass decomposition (moved verbatim from the main
+text's Section 5.5; the main text retains the prose analysis).}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Paired per-pass decomposition on the Section 5.3 sequences
+(length 200, 5 seeds, identical seed base 2,000); the fusion + DCE row
+reproduces the Section 5.3 headline exactly because the inputs are
+identical.}\tabularnewline
+\toprule\noalign{}
+Configuration & Instruction-count reduction \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Configuration & Instruction-count reduction \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+NONE & 0.0\% \(\pm\) 0.0\% \\
+fusion only & 21.6\% \(\pm\) 1.2\% \\
+DCE only & 24.5\% \(\pm\) 2.6\% \\
+fusion + DCE & 34.2\% \(\pm\) 1.8\% \\
+\end{longtable}
+
 \subsubsection{Chain-Enriched Optimization
 Workloads}\label{chain-enriched-optimization-workloads}
 
@@ -3114,6 +3261,16 @@ measured runtime savings; \texttt{declared\_cost\_makespan} is a
 metadata cost model (a parallel block contributes the max member cost),
 not wall-clock time; \texttt{peak\_live\_outputs} uses a conservative
 tie-break (production counted before release at equal positions).
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Token-mix sweep of the priced comparison (MODELED overlay, 195 cells). The provider prompt cache's modeled saving collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the result cache holds 80-88\% across the axis: the ranking is a function of the token mix, not a constant (this section).}]{figures/4_token_mix_sweep.pdf}
+\caption{\textbf{Token-mix sweep of the priced comparison (MODELED
+overlay, 195 cells).} The provider prompt cache's modeled saving
+collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s =
+0.5) while the result cache holds 80-88\% across the axis: the ranking
+is a function of the token mix, not a constant (this section).}
+\end{figure}
 
 \subsubsection{Priced-Comparison Token-Mix
 Sweep}\label{priced-comparison-token-mix-sweep}
@@ -3565,6 +3722,72 @@ gateway, single model alias, 3 Zipf buckets \(\times\) 2 seeds
 \subsubsection{\texorpdfstring{Multi-Model Cache-Exactness Re-Run
 (\texttt{claude-doubao-seed-2.0-code})}{Multi-Model Cache-Exactness Re-Run (claude-doubao-seed-2.0-code)}}\label{multi-model-cache-exactness-re-run-claude-doubao-seed-2.0-code}
 
+The frozen primary-alias run this section extends (moved verbatim from
+the main text when Figure 3 took over the visual): the GLM 5.3 flash
+cells under the identical protocol.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0359}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2395}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1018}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.1617}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0838}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.2156}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0898}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 14\tabcolsep) * \real{0.0719}}@{}}
+\caption{Real-gateway cache behavior against the computed expectation
+(200 sequential requests, one seed, three Zipf levels, one model; paired
+cells read no cache -\textgreater{} cached).}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expected hit rate (computed, no backend)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Observed hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Call reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall clock (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tokens saved
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Zipf s
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Expected hit rate (computed, no backend)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Observed hit rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Calls
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Call reduction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall clock (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Wall saved (ms)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tokens saved
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0.5 & 8.5\% & 8.5\% & 200 -\textgreater{} 183 & 8.5\% & 472,276
+-\textgreater{} 405,754 & 66,522 & 1,445 \\
+1.0 & 26.0\% & 26.0\% & 200 -\textgreater{} 148 & 26.0\% & 455,946
+-\textgreater{} 334,597 & 121,349 & 4,420 \\
+1.5 & 45.5\% & 45.5\% & 200 -\textgreater{} 109 & 45.5\% & 450,330
+-\textgreater{} 244,316 & 206,014 & 7,735 \\
+\end{longtable}
+
 Raw results:
 \texttt{examples/benchmarks/isa\_real\_llm\_results\_doubao\_seed\_2\_0\_code.json}
 (harness \texttt{examples/benchmarks/isa\_real\_llm\_bench.py},
@@ -3628,6 +3851,28 @@ while the hit/miss statistics are unchanged---consistent with the
 exactness property (hit/miss decisions are a pure function of the
 (instruction, params) sequence and cannot depend on the backend).
 
+\begin{figure}
+\centering
+\includegraphics[width=0.62\linewidth,height=\textheight,keepaspectratio,alt={The compiler/hot-path pipeline on the Section 5.7.1 triage task. The authored seven-step stream compiles to six steps (dataflow-preserving dead-step elimination); the LLM-type step is served from the result cache after its first occurrence, and the hot path is adopted under the recording threshold.}]{figures/2_compile_pipeline.pdf}
+\caption{\textbf{The compiler/hot-path pipeline on the Section 5.7.1
+triage task.} The authored seven-step stream compiles to six steps
+(dataflow-preserving dead-step elimination); the LLM-type step is served
+from the result cache after its first occurrence, and the hot path is
+adopted under the recording threshold.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Ceiling-binding census across model families and budgets. Replies that bind at max\_tokens (reasoning traces cut before a parseable classification) per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, while Doubao Seed 2.0 completes below the ceiling in all 104 calls at 1,500.}]{figures/6_ceiling_census.pdf}
+\caption{\textbf{Ceiling-binding census across model families and
+budgets.} Replies that bind at \protect\texttt{max\_tokens} (reasoning
+traces cut before a parseable classification) per alias and budget, from
+the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at
+the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at
+1,500, while Doubao Seed 2.0 completes below the ceiling in all 104
+calls at 1,500.}
+\end{figure}
+
 \subsubsection{Identity Re-Run with Live-Model Values, and a
 Model-Family Ceiling
 Census}\label{identity-re-run-with-live-model-values-and-a-model-family-ceiling-census}
@@ -3676,6 +3921,18 @@ while completing the quality harness's batched prompts over the same
 template at 1,500 with zero bindings (next subsection)---an
 upstream/alias-specific behavior, recorded as a deployment note; no run
 in this paper rests on it.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Per-class agreement with the planted rubric gold. Final classifications of both live models against the gold class (GLM 5.3 flash at the raised 3,072-token ceiling, 176 signatures; DeepSeek v4 flash at 1,500 tokens, 288/288 signatures parsed, zero fallback fills), with the deterministic fallback rule recomputed per class from the DeepSeek run's raw records; dotted lines mark each run's overall agreement.}]{figures/5_quality_per_class.pdf}
+\caption{\textbf{Per-class agreement with the planted rubric gold.}
+Final classifications of both live models against the gold class (GLM
+5.3 flash at the raised 3,072-token ceiling, 176 signatures; DeepSeek v4
+flash at 1,500 tokens, 288/288 signatures parsed, zero fallback fills),
+with the deterministic fallback rule recomputed per class from the
+DeepSeek run's raw records; dotted lines mark each run's overall
+agreement.}
+\end{figure}
 
 \subsubsection{\texorpdfstring{Quality on a Completing Model
 (\texttt{claude-deepseek-v4-flash})}{Quality on a Completing Model (claude-deepseek-v4-flash)}}\label{quality-on-a-completing-model-claude-deepseek-v4-flash}

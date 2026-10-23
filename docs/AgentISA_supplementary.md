@@ -799,6 +799,8 @@ Full protocol of the priced comparison summarized by the main paper's Section 5.
 
 On this run's token mix the result cache cuts modeled cost by 56.0%—it removes whole calls, completions included—while the modeled provider prompt cache cuts only 3.3%, because the reasoning model's completion tokens dominate and a discount on input reads cannot touch them; the ranking of the two caching strategies is a function of the input/output token mix, not a constant. On the deterministic mock at paper scale (200 tasks × 1 seed × 3 Zipf levels, template-accounted tokens, same modes and prices) the result cache cuts modeled cost by 80.1%, 81.6%, and 85.1% at s = 0.5, 1.0, 1.5, while the modeled provider prompt cache cuts 28.9–31.4%—there the short completions do not dominate, so the input-side discount matters more; both columns remain MODELED-on-measured in both cases. GPTCache, an external cache layer, is explicitly out of scope; no head-to-head against it is claimed.
 
+**Why the provider-cache column stays MODELED.** A direct probe (2026-10-22; artifact `gateway_promptcache_probe.json`) sent an identical ~800-token system+user prefix twice per alias with `cache_control: {type: ephemeral}` blocks on `claude-doubao-seed-2.0-code` and `claude-deepseek-v4-flash`: every response reports plain `input_tokens` (842 and 891, respectively) with `cache_creation_input_tokens = cache_read_input_tokens = 0` on both calls—the gateway does not surface provider prompt-cache billing fields, so the read-discount behavior cannot be measured through it; the MODELED overlay is a necessity of the environment, not a choice. The result-cache column's calls and tokens remain gateway-measured.
+
 
 # Appendix H: Four-Task Characterization — Full Detail
 
@@ -1069,6 +1071,43 @@ Raw results: `examples/benchmarks/replay_generalization_results.json` (script `r
 
 **Not covered:** dialogue-mined templates with an attached `executor` (the replay arm's sibling feature)—no recorded composite body exists to re-run, so there is nothing to compare; constructor-bound parameters (values baked into instruction state at construction time cannot be rebound—replay re-runs the recorded operator *instances*, so only context-carried values can vary; the streams here read every parameter from the shared context, which is the dataflow contract that makes parameterization possible at all); real-workload and LLM streams (the measured streams are deterministic synthetic arithmetic, and the claim measured is exact per-case equality under that contract, nothing broader).
 
+**Optimization-level sweep (moved verbatim from the main text's Section 5.3; the main text retains the prose interpretation).**
+
+| Sequence length | Level       | Effective-instruction reduction | Dispatch count |
+| --------------- | ----------- | ------------------------------ | -------------- |
+| 50              | NONE        | 0% ± 0.0                           | 50.0 ± 0.0     |
+| 50              | BASIC       | 32.8% ± 4.1%                   | 33.6 ± 2.1     |
+| 50              | ADVANCED    | 32.8% ± 4.1%                   | 19.0 ± 4.1     |
+| 50              | AGGRESSIVE  | 32.8% ± 4.1%                   | 19.0 ± 4.1     |
+| 200             | NONE        | 0% ± 0.0                           | 200.0 ± 0.0    |
+| 200             | BASIC       | 34.2% ± 1.8%                   | 131.6 ± 3.6    |
+| 200             | ADVANCED    | 34.2% ± 1.8%                   | 74.0 ± 6.3     |
+| 200             | AGGRESSIVE  | 34.2% ± 1.8%                   | 74.0 ± 6.3     |
+| 1,000           | NONE        | 0% ± 0.0                           | 1,000.0 ± 0.0  |
+| 1,000           | BASIC       | 35.4% ± 1.6%                   | 646.0 ± 16.4   |
+| 1,000           | ADVANCED    | 35.4% ± 1.6%                   | 344.6 ± 31.6   |
+| 1,000           | AGGRESSIVE  | 35.4% ± 1.6%                   | 344.6 ± 31.6   |
+: Effective-instruction-count reduction by optimization level and sequence length (5 seeds, mean ± sample standard deviation; planted dead 0.25 / pure 0.55 workload).
+
+**Simulated cache sweep (moved verbatim from the main text's Section 5.2; the main text retains the prose headline and the naive-arm comparison).**
+
+| Zipf exponent $s$ | Calls (no cache) | Calls (cached) | Reduction = hit rate |
+| ----------------- | ---------------- | -------------- | -------------------- |
+| 0.5               | 2,000            | 810.4 ± 5.7    | 59.5% ± 0.3%         |
+| 1.0               | 2,000            | 642.0 ± 3.8    | 67.9% ± 0.2%         |
+| 1.5               | 2,000            | 408.0 ± 9.4    | 79.6% ± 0.5%         |
+: Simulated API calls with and without the result cache (2,000 tasks per seed, 5 seeds, mean ± sample standard deviation; reduction equals hit rate by construction; the third, naive response-cache arm is reported in the text below).
+
+**Paired per-pass decomposition (moved verbatim from the main text's Section 5.5; the main text retains the prose analysis).**
+
+| Configuration | Instruction-count reduction |
+| ------------- | --------------------------- |
+| NONE          | 0.0% ± 0.0%                 |
+| fusion only   | 21.6% ± 1.2%                |
+| DCE only      | 24.5% ± 2.6%                |
+| fusion + DCE  | 34.2% ± 1.8%                |
+: Paired per-pass decomposition on the Section 5.3 sequences (length 200, 5 seeds, identical seed base 2,000); the fusion + DCE row reproduces the Section 5.3 headline exactly because the inputs are identical.
+
 ### Chain-Enriched Optimization Workloads
 
 Raw results: `examples/benchmarks/fusion_chain_results.json` (script `fusion_chain_bench.py`). **Purpose:** the Section 5.3 random-slot pools understate structure-sensitive passes; do chain-enriched workloads—shaped like the fusion/DCE/parallelism assumptions—amplify the BASIC → ADVANCED gain? **Generator:** segment families mixed at fusion_chain 0.35 / parallel_batch 0.30 / dataflow_chain 0.15 / dead_chain 0.08 / effectful_anchor 0.12, with per-family run-length ranges (fusion chains 4–12, parallel batches 4–10, dataflow chains 3–8, dead chains 2–6, effectful anchors 1), declared costs U(0.5, 2.0), declared memory sizes {64, 128} and dataflow buffers {256–2048}; the terminal sink consumes only leaf outputs. **Compiler:** the real `InstructionCompiler.compile` (IR captured around the call, no output patching); levels NONE/BASIC/ADVANCED/AGGRESSIVE (BASIC = DCE + fusion; ADVANCED adds parallel grouping and the resource plan; AGGRESSIVE adds the memory-optimization pass). **Design:** 4 levels × 5 seeds (0–4) × lengths {50, 200, 1000} × 2 arms = 120/120 cells complete; the control arm reuses the Section 5.3 generator `synthetic_formal_sequence` at the same seeds (`p_dead` 0.25, `p_pure` 0.55)—it reproduces the published Section 5.3 numbers at length 1000 (BASIC dispatch 646.0, ADVANCED 344.6, BASIC reduction 0.354), proving the gauge has not drifted.
@@ -1108,6 +1147,10 @@ Raw results: `examples/benchmarks/fusion_chain_results.json` (script `fusion_cha
 : Random-slots control ladder (same seeds; the published Section 5.3 configuration)
 
 **Findings.** Chain enrichment amplifies the BASIC → ADVANCED dispatch reduction to −558.0 units (705.0 → 147.0, −79.1%) and the declared-cost makespan to −930.1 (1172.7 → 242.5, −79.3%) at length 1000, against −301.4 (646.0 → 344.6, −46.7%) on the random-slots control; the ADVANCED/BASIC dispatch ratio is 0.209 (chain) vs 0.533 (control), and peak parallel width 69.0 vs 14.4. The BASIC-level reduction is *lower* on chain-enriched pools (0.295 ± 0.014 vs 0.354 ± 0.016 control)—enrichment trades single-level shrink for structure the parallel pass can exploit. **AGGRESSIVE is structurally identical to ADVANCED** on all seven structural metrics, per seed, at every length and on both arms (deltas exactly 0.0); its only differentiation is the advisory memory plan, which is itself workload-dependent: buffer-reuse potential 107.8 ± 22.2 sites on chain-enriched length-1000 pools (11.7% of the 922.0 distinct tracked outputs; peak live outputs 814.2) vs 0.0 ± 0.0 on the random-slots control (549.4 tracked outputs, no reuse sites)—the highest optimization level's extra content exists only when chains supply the structure. **Limitations (as recorded in the results file):** the memory-optimization pass only annotates IR metadata—no executor consumes the plan, so memory figures are plan-derived analyses, not measured runtime savings; `declared_cost_makespan` is a metadata cost model (a parallel block contributes the max member cost), not wall-clock time; `peak_live_outputs` uses a conservative tie-break (production counted before release at equal positions).
+
+
+
+![**Token-mix sweep of the priced comparison (MODELED overlay, 195 cells).** The provider prompt cache's modeled saving collapses as completions lengthen (63.6% at L4 to 2.0% at L1024, s = 0.5) while the result cache holds 80-88% across the axis: the ranking is a function of the token mix, not a constant (this section).](figures/4_token_mix_sweep.pdf){width=100%}
 
 ### Priced-Comparison Token-Mix Sweep
 
@@ -1206,6 +1249,15 @@ Raw results in `examples/benchmarks/gateway_multiseed_results.json`:
 
 ### Multi-Model Cache-Exactness Re-Run (`claude-doubao-seed-2.0-code`)
 
+The frozen primary-alias run this section extends (moved verbatim from the main text when Figure 3 took over the visual): the GLM 5.3 flash cells under the identical protocol.
+
+| Zipf s | Expected hit rate (computed, no backend) | Observed hit rate | Calls | Call reduction | Wall clock (ms) | Wall saved (ms) | Tokens saved |
+| ------ | ---------------------------------------- | ----------------- | --------------------------- | -------------- | ------------------------------------ | --------------- | ------------ |
+| 0.5    | 8.5%                                     | 8.5%              | 200 -> 183                  | 8.5%           | 472,276 -> 405,754                   | 66,522          | 1,445        |
+| 1.0    | 26.0%                                    | 26.0%             | 200 -> 148                  | 26.0%          | 455,946 -> 334,597                   | 121,349         | 4,420        |
+| 1.5    | 45.5%                                    | 45.5%             | 200 -> 109                  | 45.5%          | 450,330 -> 244,316                   | 206,014         | 7,735        |
+: Real-gateway cache behavior against the computed expectation (200 sequential requests, one seed, three Zipf levels, one model; paired cells read no cache -> cached).
+
 Raw results: `examples/benchmarks/isa_real_llm_results_doubao_seed_2_0_code.json` (harness `examples/benchmarks/isa_real_llm_bench.py`, `--backend gateway`).
 
 **Protocol.** Byte-identical protocol to Section 5.7: same workload generator (`zipf_workload`), instruction pool, parameter space, seed (0), N = 200 per Zipf level, `max_tokens` = 64, sequential httpx against the same gateway; the only differences are the model alias and the harness's hardened retry envelope used for this session (eight bounded retries at a 150 s per-call timeout, connection rotation across retries—`httpx.Limits(max_keepalive_connections=0)`—added after the gateway's load balancer was observed pinning retries to a sick upstream connection; defaults in the committed harness remain 3 attempts / 90 s). One preflight plus 6 × 200 = 1,200 measured round trips.
@@ -1218,6 +1270,10 @@ Raw results: `examples/benchmarks/isa_real_llm_results_doubao_seed_2_0_code.json
 
 Observed hit rates match the computed expectation exactly in 3/3 cells, as on the reasoning alias (Section 5.7). Per-call latency is higher on this model family (p50 3.6–4.0 s across cells versus 2.1 s on the reasoning alias), so wall-clock savings per avoided call are larger while the hit/miss statistics are unchanged—consistent with the exactness property (hit/miss decisions are a pure function of the (instruction, params) sequence and cannot depend on the backend).
 
+![**The compiler/hot-path pipeline on the Section 5.7.1 triage task.** The authored seven-step stream compiles to six steps (dataflow-preserving dead-step elimination); the LLM-type step is served from the result cache after its first occurrence, and the hot path is adopted under the recording threshold.](figures/2_compile_pipeline.pdf){width=62%}
+
+![**Ceiling-binding census across model families and budgets.** Replies that bind at `max_tokens` (reasoning traces cut before a parseable classification) per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, while Doubao Seed 2.0 completes below the ceiling in all 104 calls at 1,500.](figures/6_ceiling_census.pdf){width=70%}
+
 ### Identity Re-Run with Live-Model Values, and a Model-Family Ceiling Census
 
 Raw results: `examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json` and `examples/benchmarks/paper_real_llm_compiler_results_minimax.json` / `..._minimax_1500.json` (harness `examples/paper_real_llm_compiler_test.py`, `--backend real --scale paper`).
@@ -1227,6 +1283,8 @@ Raw results: `examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.js
 **Ceiling census (`claude-minimax-m3`).** The same harness passes every mechanism check on a reasoning-style third model at two budgets, with replies binding at the ceiling in 101/104 calls (97%) at `max_tokens` 512 and 68/104 (65%) at 1,500. Combined with the reasoning alias (bound in every call at 64 and 512) and doubao-seed-2.0-code (zero bindings at 1,500), this locates ceiling-binding in the model family's verbosity under this prompt, not in the harness: the same protocol yields fallback-derived values on verbose reasoners and live-model values on terse completers.
 
 **Gateway quirk, recorded not pursued.** `claude-deepseek-v4-flash` deterministically hangs on this harness's classify payloads (empty-message `ReadTimeout` across 19+ attempts spanning connection-rotated retries at both 512 and 1,500) while completing the quality harness's batched prompts over the same template at 1,500 with zero bindings (next subsection)—an upstream/alias-specific behavior, recorded as a deployment note; no run in this paper rests on it.
+
+![**Per-class agreement with the planted rubric gold.** Final classifications of both live models against the gold class (GLM 5.3 flash at the raised 3,072-token ceiling, 176 signatures; DeepSeek v4 flash at 1,500 tokens, 288/288 signatures parsed, zero fallback fills), with the deterministic fallback rule recomputed per class from the DeepSeek run's raw records; dotted lines mark each run's overall agreement.](figures/5_quality_per_class.pdf){width=70%}
 
 ### Quality on a Completing Model (`claude-deepseek-v4-flash`)
 

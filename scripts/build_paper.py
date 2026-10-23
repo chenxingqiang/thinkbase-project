@@ -49,6 +49,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 BUILD = ROOT / "docs" / ".paper_build"
+FIGURES = DOCS / "figures"
 TEX_OUT = DOCS / "AgentISA.tex"
 PDF_OUT = DOCS / "AgentISA.pdf"
 SUPP_TEX_OUT = DOCS / "AgentISA_supplementary.tex"
@@ -243,6 +244,14 @@ HEADER_MAIN_TEX = r"""\setmonofont{DejaVuSansMono.ttf}[Scale=0.78]
 \usepackage{fvextra}
 \RecustomVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize,breaklines,breakanywhere}
 \emergencystretch=3em
+% Float tuning: the paper concentrates figures/tables in Sections 3 and 5;
+% permissive fractions stop LaTeX from breaking pages early around them.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.86}
+\setcounter{topnumber}{3}
+\setcounter{totalnumber}{5}
 % Math macros used by the paper that standard LaTeX lacks:
 \DeclareMathOperator*{\argmin}{arg\,min}
 \newcommand{\llbracket}{[\![}
@@ -319,6 +328,28 @@ def convert_longtables(tex: str) -> tuple[str, int]:
     return LONGTABLE_RE.sub(repl, tex), count
 
 
+def promote_wide_figures(tex: str) -> tuple[str, int]:
+    """figure -> figure* for assets named figures/wide_* (two-column class).
+
+    Pandoc emits every image as a single-column ``figure``; assets whose
+    filename carries the ``wide_`` prefix are promoted to full-width
+    ``figure*`` floats so diagrams can span both columns."""
+    count = 0
+
+    def repl(m: re.Match) -> str:
+        nonlocal count
+        block = m.group(0)
+        if "figures/wide_" in block:
+            count += 1
+            block = block.replace(r"\begin{figure}", r"\begin{figure*}")
+            block = block.replace(r"\end{figure}", r"\end{figure*}")
+        return block
+
+    tex = re.sub(r"\\begin\{figure\}\n.*?\n\\end\{figure\}", repl, tex,
+                 flags=re.S)
+    return tex, count
+
+
 def strip_class_clashes(tex: str) -> str:
     """Remove pandoc-template package loads that clash with acmart:
     unicode-math fights acmart's math setup under xelatex, and lmodern
@@ -365,6 +396,9 @@ def build_target(name: str, src: Path, tex_out: Path, pdf_out: Path,
     if build_dir.exists():
         shutil.rmtree(build_dir)
     build_dir.mkdir(parents=True)
+    if FIGURES.is_dir() and any(FIGURES.glob("*.pdf")):
+        shutil.copytree(FIGURES, build_dir / "figures",
+                        ignore=shutil.ignore_patterns("*.png"))
 
     yaml, body_md, keywords, ccs = build_body_md(
         src.read_text(encoding="utf-8"), title=title,
@@ -405,6 +439,8 @@ def build_target(name: str, src: Path, tex_out: Path, pdf_out: Path,
         out_tex = strip_class_clashes(out_tex)
         out_tex, n_tables = convert_longtables(out_tex)
         print(f"  converted {n_tables} longtables to table floats")
+        out_tex, n_wide = promote_wide_figures(out_tex)
+        print(f"  promoted {n_wide} wide figures to figure* floats")
         out_tex = reorder_front(out_tex, keywords, ccs)
     out_tex_path.write_text(out_tex, encoding="utf-8")
 

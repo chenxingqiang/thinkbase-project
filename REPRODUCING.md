@@ -258,3 +258,24 @@ python examples/paper_real_llm_quality_check.py --backend real --scale paper    
   budgets, connection-rotated retries) while completing the quality
   harness's batched prompts at the same ceiling; no paper number rests
   on that alias for the identity run.
+- Prompt-cache billing probe (`gateway_promptcache_probe.json`,
+  supplementary I.3): re-send an identical ~800-token system+user
+  prefix twice per alias with `cache_control: {type: ephemeral}` blocks
+  and inspect the usage fields. The gateway reports plain
+  `input_tokens` with `cache_creation_input_tokens =
+  cache_read_input_tokens = 0` on both aliases tested — it does not
+  surface provider prompt-cache billing, which is why the
+  Appendix-G/I.3 provider-cache column stays MODELED while the
+  result-cache column's calls and tokens stay gateway-measured.
+- Figures: `python scripts/make_figures.py` regenerates all six figures
+  (docs/figures/) from the committed results JSONs — every plotted value is
+  asserted against its artifact inside the script, and
+  scripts/number_regression.py independently re-verifies the emitted
+  figures_manifest.json against the same sources. Build order: make_figures
+  then build_paper (the build copies docs/figures/ into the LaTeX tree and
+  promotes `wide_`-prefixed assets to full-width floats).
+- Full-scale multi-seed cache run (Section 5.7 / I.3):
+  `python examples/benchmarks/isa_real_llm_bench.py --backend gateway     --tasks 200 --seeds 3 --zipf 0.5 1.0 1.5 --max-tokens 64     --model claude-glm-5.3-flash     --output examples/benchmarks/isa_real_llm_results_glm_multiseed.json`
+- Third-family reduced-scale cache run (I.3): same command with
+  `--tasks 100 --seeds 1 --model claude-minimax-m3 --output
+  examples/benchmarks/isa_real_llm_results_minimax_m3.json`.
