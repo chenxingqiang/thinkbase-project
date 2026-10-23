@@ -1071,6 +1071,17 @@ Raw results: `examples/benchmarks/replay_generalization_results.json` (script `r
 
 **Not covered:** dialogue-mined templates with an attached `executor` (the replay arm's sibling feature)—no recorded composite body exists to re-run, so there is nothing to compare; constructor-bound parameters (values baked into instruction state at construction time cannot be rebound—replay re-runs the recorded operator *instances*, so only context-carried values can vary; the streams here read every parameter from the shared context, which is the dataflow contract that makes parameterization possible at all); real-workload and LLM streams (the measured streams are deterministic synthetic arithmetic, and the claim measured is exact per-case equality under that contract, nothing broader).
 
+**Hot-path trace shrinkage (moved verbatim from the main text's Section 5.4; the main text retains the prose interpretation).**
+
+| Seed | Original length | Optimized length | Shrink ratio | Replay state identical |
+| ---- | --------------- | ---------------- | ------------ | ---------------------- |
+| 0    | 100             | 30               | 70.0%        | yes                    |
+| 1    | 100             | 41               | 59.0%        | yes                    |
+| 2    | 100             | 30               | 70.0%        | yes                    |
+| 3    | 100             | 36               | 64.0%        | yes                    |
+| 4    | 100             | 34               | 66.0%        | yes                    |
+: Hot-path trace shrinkage per seed (length-100 traces, detection threshold 50 recordings). The replay column records the executed-state identity check: the optimized trace, re-executed against an independent state, reproduces the original trace's final state exactly in every seed.
+
 **Optimization-level sweep (moved verbatim from the main text's Section 5.3; the main text retains the prose interpretation).**
 
 | Sequence length | Level       | Effective-instruction reduction | Dispatch count |
@@ -1150,8 +1161,6 @@ Raw results: `examples/benchmarks/fusion_chain_results.json` (script `fusion_cha
 
 
 
-![**Token-mix sweep of the priced comparison (MODELED overlay, 195 cells).** The provider prompt cache's modeled saving collapses as completions lengthen (63.6% at L4 to 2.0% at L1024, s = 0.5) while the result cache holds 80-88% across the axis: the ranking is a function of the token mix, not a constant (this section).](figures/4_token_mix_sweep.pdf){width=100%}
-
 ### Priced-Comparison Token-Mix Sweep
 
 Raw results: `examples/benchmarks/promptcache_sweep_results.json` (script `promptcache_sweep.py`). **Purpose:** Appendix G's two caching strategies ranked differently on the real-gateway run (result cache $\gg$ prompt cache) and the mock paper-scale run (result cache still ahead, margin smaller); this sweep makes the token mix—an output of workload and harness ceilings—the explicit axis. **Design:** the Appendix G overlay ($3/M input, $15/M output, 0.1× cache-read rate, same two simplifications, both favoring the provider baseline) applied to 13 mix points—the measured mock mix plus *modeled* constant completion lengths L ∈ {4, 8, 16, 24, 32, 48, 64, 128, 256, 384, 512, 1024} tokens/call (the observed reply-binds-at-max_tokens behavior of the Section 5.7.1 alias; L64 and L512 correspond to the max_tokens ceilings of the Section 5.7 cache run and the Section 5.7.1 harness)—× 3 Zipf skews {0.5, 1.0, 1.5} × 5 seeds (1000–1004) × 200 draws = 195 cells (39,000 draws) over the 40-task population, on the Section 5.7.1 workload shape (seven-step triage stream, one cacheable LLM-type step). All pricing and workload primitives are imported from `paper_real_llm_compiler_test.py`, not copied; the seed-1000 mock cells reproduce the published mock paper-scale artifact in all three pricing modes (anchor check `all_match = true`). All figures are MODELED-on-measured, mock-only.
@@ -1216,6 +1225,8 @@ Raw results: `examples/benchmarks/gateway_quality_results.json` (harness `exampl
 
 **Paired truncation outcome:** of the 7 batches that bound at 1500, 4 now complete (including the highest-rank one) and 3 still bind at 3072 (empty text, the entire budget spent on reasoning); 1 batch that completed at 1500 bound at 3072 in this re-run (rank 11)—the reasoning alias is not bit-reproducible across runs even at temperature 0. **Verdict, reported as the harness issued it:** `all_pass` = False, solely because the `replies_not_bound_at_ceiling` gate fails on 4/22; every measurability precondition holds (one call per distinct batch, raw replies and gold labels recorded for every call, planted classes covered per batch, claims parsed). The harness gates no accuracy threshold—agreement rates are reported measurements. **What this does and does not show:** with the ceiling raised, the model's final classifications agree with the planted gold rubric at 45.5% vs the fallback rule's 32.4%—measurably above the rule, previously unknown from the truncated run—but 4 batches still cannot finish within 3072 tokens, so the model-quality statement carries a disclosed truncation residual rather than a clean all-clear. Gold labels are a planted keyword rubric on synthetic signatures (recorded verbatim in provenance), not human annotation of real logs; agreement-vs-gold is a rubric-following diagnostic, not a deployment-quality claim. Single gateway, single alias, single seed, sequential, no streaming: multi-model, multi-seed, and real-deployment behavior remain untested.
 
+**Trace-workload shape census (moved verbatim from the main text's Section 5.10).** Shape census: 79 fan-out, 21 linear, 0 fan-in, 0 branch (7.9 steps/workflow); 152 dead-end steps exactly equal the planted guards; 106 of 692 adjacent pairs (15.3%) pass the compiler's fusibility gate, all CONTROL_FLOW. Disclosure: the corpus is generator-produced, not production logs; the census characterizes workload structure only.
+
 ### Multi-Seed Real-Gateway Cache Run at Reduced Scale
 
 Raw results in `examples/benchmarks/gateway_multiseed_results.json`:
@@ -1270,10 +1281,6 @@ Raw results: `examples/benchmarks/isa_real_llm_results_doubao_seed_2_0_code.json
 
 Observed hit rates match the computed expectation exactly in 3/3 cells, as on the reasoning alias (Section 5.7). Per-call latency is higher on this model family (p50 3.6–4.0 s across cells versus 2.1 s on the reasoning alias), so wall-clock savings per avoided call are larger while the hit/miss statistics are unchanged—consistent with the exactness property (hit/miss decisions are a pure function of the (instruction, params) sequence and cannot depend on the backend).
 
-![**The compiler/hot-path pipeline on the Section 5.7.1 triage task.** The authored seven-step stream compiles to six steps (dataflow-preserving dead-step elimination); the LLM-type step is served from the result cache after its first occurrence, and the hot path is adopted under the recording threshold.](figures/2_compile_pipeline.pdf){width=62%}
-
-![**Ceiling-binding census across model families and budgets.** Replies that bind at `max_tokens` (reasoning traces cut before a parseable classification) per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, while Doubao Seed 2.0 completes below the ceiling in all 104 calls at 1,500.](figures/6_ceiling_census.pdf){width=70%}
-
 ### Identity Re-Run with Live-Model Values, and a Model-Family Ceiling Census
 
 Raw results: `examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json` and `examples/benchmarks/paper_real_llm_compiler_results_minimax.json` / `..._minimax_1500.json` (harness `examples/paper_real_llm_compiler_test.py`, `--backend real --scale paper`).
@@ -1283,8 +1290,6 @@ Raw results: `examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.js
 **Ceiling census (`claude-minimax-m3`).** The same harness passes every mechanism check on a reasoning-style third model at two budgets, with replies binding at the ceiling in 101/104 calls (97%) at `max_tokens` 512 and 68/104 (65%) at 1,500. Combined with the reasoning alias (bound in every call at 64 and 512) and doubao-seed-2.0-code (zero bindings at 1,500), this locates ceiling-binding in the model family's verbosity under this prompt, not in the harness: the same protocol yields fallback-derived values on verbose reasoners and live-model values on terse completers.
 
 **Gateway quirk, recorded not pursued.** `claude-deepseek-v4-flash` deterministically hangs on this harness's classify payloads (empty-message `ReadTimeout` across 19+ attempts spanning connection-rotated retries at both 512 and 1,500) while completing the quality harness's batched prompts over the same template at 1,500 with zero bindings (next subsection)—an upstream/alias-specific behavior, recorded as a deployment note; no run in this paper rests on it.
-
-![**Per-class agreement with the planted rubric gold.** Final classifications of both live models against the gold class (GLM 5.3 flash at the raised 3,072-token ceiling, 176 signatures; DeepSeek v4 flash at 1,500 tokens, 288/288 signatures parsed, zero fallback fills), with the deterministic fallback rule recomputed per class from the DeepSeek run's raw records; dotted lines mark each run's overall agreement.](figures/5_quality_per_class.pdf){width=70%}
 
 ### Quality on a Completing Model (`claude-deepseek-v4-flash`)
 

@@ -88,21 +88,6 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
-\usepackage{graphicx}
-\makeatletter
-\newsavebox\pandoc@box
-\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
-  \sbox\pandoc@box{#1}%
-  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
-  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
-  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
-  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
-  \else\usebox{\pandoc@box}%
-  \fi%
-}
-% Set default figure placement to htbp
-\def\fps@figure{htbp}
-\makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -2942,6 +2927,57 @@ real-workload and LLM streams (the measured streams are deterministic
 synthetic arithmetic, and the claim measured is exact per-case equality
 under that contract, nothing broader).
 
+\textbf{Hot-path trace shrinkage (moved verbatim from the main text's
+Section 5.4; the main text retains the prose interpretation).}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.0580}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2174}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2319}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.1739}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.3188}}@{}}
+\caption{Hot-path trace shrinkage per seed (length-100 traces, detection
+threshold 50 recordings). The replay column records the executed-state
+identity check: the optimized trace, re-executed against an independent
+state, reproduces the original trace's final state exactly in every
+seed.}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Original length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Optimized length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shrink ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Replay state identical
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Seed
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Original length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Optimized length
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Shrink ratio
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Replay state identical
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+0 & 100 & 30 & 70.0\% & yes \\
+1 & 100 & 41 & 59.0\% & yes \\
+2 & 100 & 30 & 70.0\% & yes \\
+3 & 100 & 36 & 64.0\% & yes \\
+4 & 100 & 34 & 66.0\% & yes \\
+\end{longtable}
+
 \textbf{Optimization-level sweep (moved verbatim from the main text's
 Section 5.3; the main text retains the prose interpretation).}
 
@@ -3262,16 +3298,6 @@ metadata cost model (a parallel block contributes the max member cost),
 not wall-clock time; \texttt{peak\_live\_outputs} uses a conservative
 tie-break (production counted before release at equal positions).
 
-\begin{figure}
-\centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Token-mix sweep of the priced comparison (MODELED overlay, 195 cells). The provider prompt cache's modeled saving collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the result cache holds 80-88\% across the axis: the ranking is a function of the token mix, not a constant (this section).}]{figures/4_token_mix_sweep.pdf}
-\caption{\textbf{Token-mix sweep of the priced comparison (MODELED
-overlay, 195 cells).} The provider prompt cache's modeled saving
-collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s =
-0.5) while the result cache holds 80-88\% across the axis: the ranking
-is a function of the token mix, not a constant (this section).}
-\end{figure}
-
 \subsubsection{Priced-Comparison Token-Mix
 Sweep}\label{priced-comparison-token-mix-sweep}
 
@@ -3560,6 +3586,14 @@ in provenance), not human annotation of real logs; agreement-vs-gold is
 a rubric-following diagnostic, not a deployment-quality claim. Single
 gateway, single alias, single seed, sequential, no streaming:
 multi-model, multi-seed, and real-deployment behavior remain untested.
+
+\textbf{Trace-workload shape census (moved verbatim from the main text's
+Section 5.10).} Shape census: 79 fan-out, 21 linear, 0 fan-in, 0 branch
+(7.9 steps/workflow); 152 dead-end steps exactly equal the planted
+guards; 106 of 692 adjacent pairs (15.3\%) pass the compiler's
+fusibility gate, all CONTROL\_FLOW. Disclosure: the corpus is
+generator-produced, not production logs; the census characterizes
+workload structure only.
 
 \subsubsection{Multi-Seed Real-Gateway Cache Run at Reduced
 Scale}\label{multi-seed-real-gateway-cache-run-at-reduced-scale}
@@ -3851,28 +3885,6 @@ while the hit/miss statistics are unchanged---consistent with the
 exactness property (hit/miss decisions are a pure function of the
 (instruction, params) sequence and cannot depend on the backend).
 
-\begin{figure}
-\centering
-\includegraphics[width=0.62\linewidth,height=\textheight,keepaspectratio,alt={The compiler/hot-path pipeline on the Section 5.7.1 triage task. The authored seven-step stream compiles to six steps (dataflow-preserving dead-step elimination); the LLM-type step is served from the result cache after its first occurrence, and the hot path is adopted under the recording threshold.}]{figures/2_compile_pipeline.pdf}
-\caption{\textbf{The compiler/hot-path pipeline on the Section 5.7.1
-triage task.} The authored seven-step stream compiles to six steps
-(dataflow-preserving dead-step elimination); the LLM-type step is served
-from the result cache after its first occurrence, and the hot path is
-adopted under the recording threshold.}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Ceiling-binding census across model families and budgets. Replies that bind at max\_tokens (reasoning traces cut before a parseable classification) per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, while Doubao Seed 2.0 completes below the ceiling in all 104 calls at 1,500.}]{figures/6_ceiling_census.pdf}
-\caption{\textbf{Ceiling-binding census across model families and
-budgets.} Replies that bind at \protect\texttt{max\_tokens} (reasoning
-traces cut before a parseable classification) per alias and budget, from
-the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at
-the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at
-1,500, while Doubao Seed 2.0 completes below the ceiling in all 104
-calls at 1,500.}
-\end{figure}
-
 \subsubsection{Identity Re-Run with Live-Model Values, and a
 Model-Family Ceiling
 Census}\label{identity-re-run-with-live-model-values-and-a-model-family-ceiling-census}
@@ -3921,18 +3933,6 @@ while completing the quality harness's batched prompts over the same
 template at 1,500 with zero bindings (next subsection)---an
 upstream/alias-specific behavior, recorded as a deployment note; no run
 in this paper rests on it.
-
-\begin{figure}
-\centering
-\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Per-class agreement with the planted rubric gold. Final classifications of both live models against the gold class (GLM 5.3 flash at the raised 3,072-token ceiling, 176 signatures; DeepSeek v4 flash at 1,500 tokens, 288/288 signatures parsed, zero fallback fills), with the deterministic fallback rule recomputed per class from the DeepSeek run's raw records; dotted lines mark each run's overall agreement.}]{figures/5_quality_per_class.pdf}
-\caption{\textbf{Per-class agreement with the planted rubric gold.}
-Final classifications of both live models against the gold class (GLM
-5.3 flash at the raised 3,072-token ceiling, 176 signatures; DeepSeek v4
-flash at 1,500 tokens, 288/288 signatures parsed, zero fallback fills),
-with the deterministic fallback rule recomputed per class from the
-DeepSeek run's raw records; dotted lines mark each run's overall
-agreement.}
-\end{figure}
 
 \subsubsection{\texorpdfstring{Quality on a Completing Model
 (\texttt{claude-deepseek-v4-flash})}{Quality on a Completing Model (claude-deepseek-v4-flash)}}\label{quality-on-a-completing-model-claude-deepseek-v4-flash}

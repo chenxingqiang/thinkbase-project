@@ -87,7 +87,7 @@ def arrow(ax, p0, p1, *, style="-|>", lw=0.8, color="#33475b", ls="-",
 
 # ── F1: architecture (conceptual, no data) ─────────────────────────────────
 def fig1() -> None:
-    fig, ax = plt.subplots(figsize=(7.0, 1.9))
+    fig, ax = plt.subplots(figsize=(7.0, 1.62))
     ax.set_xlim(0, 14.6)
     ax.set_ylim(0, 5.2)
     ax.axis("off")
@@ -121,7 +121,7 @@ def fig1() -> None:
 
 # ── F2: compile pipeline on the triage example (conceptual) ────────────────
 def fig2() -> None:
-    fig, ax = plt.subplots(figsize=(3.35, 2.05))
+    fig, ax = plt.subplots(figsize=(3.35, 1.45))
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 6.4)
     ax.axis("off")
@@ -174,7 +174,7 @@ def fig3() -> None:
     skews = [0.5, 1.0, 1.5]
     colors = ["#33475b", "#4f8a5b", "#8a5a00"]
     measured: dict = {}
-    fig, ax = plt.subplots(figsize=(3.35, 1.95))
+    fig, ax = plt.subplots(figsize=(3.35, 1.75))
     for fi, (label, fn) in enumerate(fams):
         d = jload(fn)
         cells = {z["zipf_s"]: z["per_seed"][0] for z in d["data"]}
@@ -218,7 +218,7 @@ def fig4() -> None:
     chk(d["provenance"]["scale"]["cells"] == 195
         and d["coverage"]["sweep_cells_completed"] == 195,
         "sweep coverage != 195 cells")
-    fig, ax = plt.subplots(figsize=(3.35, 1.95))
+    fig, ax = plt.subplots(figsize=(3.35, 1.62))
     series = {}
     for pi, ps in enumerate(d["analysis"]["per_skew"]):
         s = ps["zipf_s"]
@@ -287,7 +287,7 @@ def fig5() -> None:
     chk(round(glm["final_agreement_vs_gold"], 4) == 0.4545
         and round(glm["rule_fallback_agreement_vs_gold"], 4) == 0.3239,
         "glm overall agreement drifted")
-    fig, ax = plt.subplots(figsize=(3.35, 2.05))
+    fig, ax = plt.subplots(figsize=(3.35, 1.65))
     xs = range(len(classes))
     w = 0.26
     for off, (vals, lbl, fc) in enumerate([
@@ -354,7 +354,7 @@ def fig6() -> None:
         f"minimax census {mm512}/{mm1500} != (101,104)/(68,104)")
     rows = [("GLM 5.3\n@512", *glm512), ("Doubao 2.0\n@1500", *db512),
             ("Minimax m3\n@512", *mm512), ("Minimax m3\n@1500", *mm1500)]
-    fig, ax = plt.subplots(figsize=(3.35, 1.95))
+    fig, ax = plt.subplots(figsize=(3.35, 1.5))
     xs = range(len(rows))
     vals = [b / t * 100 for _, b, t in rows]
     ax.bar(xs, vals, width=0.55,
