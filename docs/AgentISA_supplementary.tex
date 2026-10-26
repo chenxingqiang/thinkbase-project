@@ -368,7 +368,7 @@ The two judgment forms:
   well-typed predicates over the state type, and the Definition 3.5
   obligation \(\forall s \models pre(i): \delta_i(s) \models post(i)\)
   is discharged per instruction, offline, by the bounded verification of
-  Section 3.3.3. Instructions are \textbf{not values and never stuck}:
+  Section 3.3.2. Instructions are \textbf{not values and never stuck}:
   totality on precondition-satisfying states is a standing
   assumption---for each instruction \(i\) with its transition function
   \(\delta_i\), \(\delta_i(s)\) is defined whenever
@@ -519,7 +519,7 @@ step:
   \textbf{Instruction transitions:} the instruction's \(\mathit{ok}\)
   judgment (B.1(ii)) certifies that \(\delta_i\) establishes \(post(i)\)
   from any \(pre(i)\)-satisfying state (discharged offline by the
-  bounded verification of Section 3.3.3), so the reduct re-types at the
+  bounded verification of Section 3.3.2), so the reduct re-types at the
   postcondition.
 \item
   \textbf{Composition operators:} each operator's step is typed by its
@@ -548,7 +548,7 @@ Two caveats state the theorem's boundaries honestly. First, B.4's appeal
 to totality of transition functions on precondition-satisfying states is
 an assumption about instruction \emph{implementations}, not something
 the type system alone discharges. The per-instruction mechanism intended
-to discharge it is the bounded verification of Section 3.3.3, which is
+to discharge it is the bounded verification of Section 3.3.2, which is
 now shipped code: the checker mechanically discharges the obligation for
 pure instructions on the state spaces it can enumerate---exhaustively
 for small enumerable domains, by deterministic bounded sampling
@@ -815,7 +815,7 @@ peephole rules (the peephole obligation is dormant, and the
 fusion/DCE/grouping passes are argued directly in C.2 and C.5 rather
 than through the symbolic-execution checker), and the symbolic-execution
 equivalence checker itself is a specification (Section 4.3.1). Where an
-obligation is discharged only on bounded state spaces (Section 3.3.3),
+obligation is discharged only on bounded state spaces (Section 3.3.2),
 the guarantee is correspondingly bounded: rewrites verified on the
 explored subset are sound there. No such rewrite is registered in the
 default configuration; when one is---through the approval-gated
@@ -876,7 +876,7 @@ and D.4 (the EMA hot-path detector: \texttt{detection\_mode="ema"} in
 \texttt{agentflow.core.isa.instruction\_optimization}). The remainder
 stay as labeled---specified-only (D.2, D.3, D.5--D.7, D.9) or shipped
 (D.8, D.10, and D.11, the bounded-checker listing relocated from the
-main paper's Section 3.3.3). The default selection step (the heuristic
+main paper's Section 3.3.2). The default selection step (the heuristic
 name-overlap matcher) remains in the source module
 \texttt{agentflow.core.isa.instruction\_selector}.
 
@@ -1369,7 +1369,7 @@ Combine Rules {
 \subsection{Shipped Bounded-Checker Listing
 (verify\_instruction)}\label{shipped-bounded-checker-listing-verify_instruction}
 
-Relocated from the main paper's Section 3.3.3 to respect the page limit;
+Relocated from the main paper's Section 3.3.2 to respect the page limit;
 the shipped module is \texttt{agentflow.core.isa.bounded\_checker}.
 
 \begin{Shaded}
@@ -4235,18 +4235,29 @@ Section 6.3.1 (Appendix E.1) \\
 3.5 \\
 \(\phi_{A \rightarrow B}\) & Cross-model instruction mapping
 \(I_A \rightarrow I_B\) & Section 6.3.2 \\
+\((I, T, \Sigma, \Delta, \Phi)\) & The AgentISA core tuple: instruction
+set, type system, state space, transition-function set,
+verification-function set & Definition 3.1 (Section 3.1) \\
+\(pre(i)\), \(post(i)\) & Pre-/post-condition predicates of instruction
+\(i\) & Section 3.1.1 (Definition 3.5's obligation) \\
+\(\Pi\), \(\Sigma\), \(\mu\) & Type constructors: dependent function,
+dependent pair, recursive types & Section 3.1.2 \\
+\(s\) & Zipf skew parameter & Section 5.2 \\
 \(\epsilon_i\), \(\delta_i\) & Per-mechanism differential-privacy
 parameters & Section 6.3.6 \\
 \end{longtable}
 }
 
-\textbf{Symbol reuse.} \(\delta_i\) is deliberately
-overloaded---per-instruction transition function (Appendix B.1) and
-per-mechanism DP parameter (Section 6.3.6), a reuse the main paper
-itself flags (Section 2.1); \(\delta\) further denotes the state-machine
-transition function (Section 3.2.2) and the pipeline data-transfer
-function (Definition 3.7). \(\tau\) doubles as the selection-pattern
-tree of Definition 3.8, and \(\phi\) as the context-interpretation
-function of Theorem 3.3.
+\textbf{Symbol reuse.} \(\Sigma\) is overloaded beyond the core
+tuple---state space (Definition 3.1) and the dependent-pair type
+constructor (Section 3.1.2); \(s\) denotes both the Zipf skew (Section
+5.2) and arbitrary states in the semantics (Appendix B). \(\delta_i\) is
+deliberately overloaded---per-instruction transition function (Appendix
+B.1) and per-mechanism DP parameter (Section 6.3.6), a reuse the main
+paper itself flags (Section 2.1); \(\delta\) further denotes the
+state-machine transition function (Section 3.2.2) and the pipeline
+data-transfer function (Definition 3.7). \(\tau\) doubles as the
+selection-pattern tree of Definition 3.8, and \(\phi\) as the
+context-interpretation function of Theorem 3.3.
 
 \end{document}

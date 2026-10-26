@@ -115,39 +115,36 @@
 
 \begin{document}
 \begin{abstract}
-Large Language Models are increasingly deployed as autonomous agents,
-yet ad hoc prompt engineering and per-provider function calling leave
-behavior difficult to specify, analyze, and optimize. We present
-AgentISA, an instruction set architecture making agent behavior a
-first-class compilable artifact: (1) a formal instruction set with
-compositional semantics, a type system, and pre/post-conditions,
-bracketed at runtime by pre-dispatch validation; a shipped bounded
-offline verifier for pure instructions is unit-tested but not exercised
-by the Section 5 benchmarks; (2) Agentic Calling, lifting
-provider-specific function calling into reusable, cacheable
-instructions; (3) instruction learning mining recurring trace patterns
-into developer-gated composite replays; (4) a compiler and runtime
-applying classical optimization---fusion, dead-code elimination,
-pipeline scheduling, dynamic hot-path specialization---to agent
+Large Language Models increasingly run as autonomous agents, yet ad hoc
+prompt engineering and per-provider function calling leave behavior hard
+to specify, analyze, and optimize. We present AgentISA, an instruction
+set architecture making agent behavior a first-class compilable
+artifact: (1) a formal instruction set with compositional semantics, a
+type system, and pre/post-conditions, bracketed at runtime by
+pre-dispatch validation; a shipped bounded verifier for pure
+instructions is unit-tested but not exercised by the benchmarks; (2)
+Agentic Calling, lifting provider function calling into reusable,
+cacheable instructions; (3) instruction learning mining recurring trace
+patterns into developer-gated composite replays; (4) a compiler and
+runtime applying classical optimizations---fusion, dead-code
+elimination, pipeline scheduling, hot-path specialization---to
 instruction streams.
 
 A reproducible mock-backend microbenchmark drives the real
-implementation: result caching reduces simulated API calls by
-59.5--79.6\% on synthetic Zipf workloads (2,000 tasks, 5 seeds); static
-compilation removes 34.2\% of effective instructions (35.4\% at length
-1,000) on sequences carrying planted optimization targets at disclosed
-rates (Section 5.1.2); dynamic hot-path optimization shrinks repeatedly
-executed traces by 65.8\%. A plain exact-response cache matches this
-call reduction to the digit; the instruction-level cache's distinct
+implementation: result caching cuts simulated API calls by 59.5--79.6\%
+on synthetic Zipf workloads (2,000 tasks, 5 seeds); static compilation
+removes 34.2\% of effective instructions (35.4\% at length 1,000) on
+planted optimization targets at disclosed rates (Section 5.1.2); dynamic
+hot-path optimization shrinks repeated traces by 65.8\%. A plain
+exact-response cache matches this reduction to the digit; its distinct
 value is reducing the program before any request is issued. Live-gateway
 conformance checks across four model aliases confirm the implementation
 matches its backend-free specification---cache statistics equal the
-computed expectation on the two caching-protocol aliases, and the
-compiled, hot-path-adopted stream issues zero new gateway calls with
-byte-identical artifacts (live-model classifications in one
-cache-mediated rerun); these runs test the implementation, not model
-variation. A four-task characterization bounds the same passes at
-12.5--25.0\% per-task compile shrink; a 100-trace vocabulary census
+computed expectation on the two caching-protocol aliases; the compiled,
+hot-path-adopted stream issues zero new gateway calls with
+byte-identical artifacts (live-model-checked in one rerun); they test
+the implementation, not model variation. A four-task characterization
+bounds them at 12.5--25.0\% per-task compile shrink; a 100-trace census
 characterizes generator-produced traces (Section 5.10; it does not
 establish realism); 43 multi-agent tests provide functional validation.
 These are controlled-setting results, not production end-to-end
@@ -1807,9 +1804,9 @@ s = 0.5, 1.0, 1.5---tracking but not identical to the call reduction
 wall-clock ratio is sampling-noise-dominated (the 17 avoided calls
 average 1.7 \(\times\) the arm mean); the token ratio is the steadier
 read. Third, the absolute hit rates (8.5--45.5\%) trail Section 5.2's
-(59.5--79.6\%) consistently with repetition accumulating with task
-count: the backend-free computation at N = 2,000 reproduces the Section
-5.2 figures (the gateway run stays at N = 200).
+(59.5--79.6\%): repetition accumulates with task count---the
+backend-free computation at N = 2,000 reproduces the Section 5.2 figures
+(the gateway run stays at N = 200).
 
 \textbf{Multi-model rerun.} The identical protocol re-run on a second
 production model (\texttt{claude-doubao-seed-2.0-code}, replies
@@ -2096,10 +2093,10 @@ We enumerate the limitations of the evaluation explicitly:
   time/token savings (Section 5.7) and the compiled stream's zero new
   gateway calls and byte-identical artifacts (Section 5.7.1). Still not
   covered: multi-seed behavior beyond the two-seed rerun (Section 5.7),
-  real deployment, caching under model nondeterminism \emph{across
-  prompt variations}, streaming, provider rate limits, and live-model
-  quality beyond the Section 5.7.1 rubric diagnostics (the four-task
-  classification steps remain rule-based stand-ins).
+  real deployment, caching under model nondeterminism, streaming,
+  provider rate limits, and live-model quality beyond the Section 5.7.1
+  rubric diagnostics (the four-task classification steps remain
+  rule-based stand-ins).
 \item
   \textbf{Synthetic workloads.} Zipf-distributed synthetic tasks
   reasonably model skewed agent workloads---but are a model; Section 5.8
@@ -2159,6 +2156,13 @@ We enumerate the limitations of the evaluation explicitly:
   \textbf{Functional, not performance, validation of coordination.} The
   43 multi-agent tests verify behavioral correctness under deterministic
   conditions, not throughput or scalability.
+\item
+  \textbf{No prompt-variant robustness evaluation.} Each experiment
+  measures one authored instruction stream per configuration (Sections
+  5.2--5.5, 5.8). Outcomes under prompt paraphrase---semantically
+  equivalent requests yielding different (instruction, params) keys and
+  responses---are unmeasured; the exact-match key design forfeits reuse
+  there by construction, but the sensitivity is not quantified.
 \end{enumerate}
 
 Despite these limitations, each optimization mechanism is implemented,
@@ -2269,17 +2273,16 @@ quantifies the difference on the real code paths: fail-open admits all
 both deny the 200 unregistered-resource tasks, strict adding a
 distinguishable reason class; both also deny the 200 malformed-registry
 tasks (a malformed registry fails in either posture---the fifth cohort);
-strict adds zero false denials on the 200 well-specified tasks; 1,000
-tasks per mode in five cohorts of 200, and every strict denial is
-recorded (matrix: supplementary I.2). The 43 functional tests validate
-the implemented checks under configured policies, not the default
-posture; nothing in this paper constitutes a security certification.
-Beyond what is implemented, hardening considerations---not claims about
-the current system: data privacy (end-to-end data-flow tracking,
-privacy-preserving computation; Section 6.3.6), secure multi-agent
-communication channels, audit-log integrity, and externally audited
-compliance controls all remain future work; the system provides
-enforcement hooks, not certification.
+strict adds zero false denials on the 200 well-specified tasks, and
+every strict denial is recorded (matrix: supplementary I.2). The 43
+functional tests validate the implemented checks under configured
+policies, not the default posture; nothing in this paper constitutes a
+security certification. Beyond what is implemented, hardening
+considerations---not claims about the current system: data privacy
+(end-to-end data-flow tracking, privacy-preserving computation; Section
+6.3.6), secure multi-agent communication channels, audit-log integrity,
+and externally audited compliance controls all remain future work; the
+system provides enforcement hooks, not certification.
 
 \subsection{Future Research
 Directions}\label{future-research-directions}
@@ -2399,8 +2402,7 @@ Extensions}\label{security-and-privacy-extensions}
 
 None of the frameworks above is implemented today; Sections 6.3.3 and
 6.3.4 are stated precisely enough to be falsifiable, while the remaining
-sketches are programmatic---guidance from controlled-setting-validated
-infrastructure toward a deployable, formally verified agent platform.
+sketches are programmatic.
 
 \section{Conclusion}\label{conclusion}
 
