@@ -584,7 +584,7 @@ chk(fc['config']['chain_mix'] == {'fusion_chain': 0.35, 'parallel_batch': 0.3, '
 for s_ in ['−558.0 units', '705.0 → 147.0, −79.1%', '−930.1', '1172.7 → 242.5, −79.3%', '−301.4',
            '0.209 (chain) vs 0.533 (control)', '69.0 vs 14.4', '107.8 ± 22.2', '11.7% of the 922.0',
            '814.2', '549.4 tracked outputs', '120/120 cells complete', 'deltas exactly 0.0',
-           '79.1% (random-slots control 46.7%)']:
+           '79.1% (random-slots control 46.7%—paralleling']:
     chk(s_ in md, f'paper missing fusion citation {s_}')
 
 # ---- 5.11 / I.2 priced-comparison token-mix sweep (promptcache_sweep_results.json)
@@ -784,7 +784,7 @@ chk(f'\u2014{hit05["hit_rate"]:.1%}, {hit10["hit_rate"]:.1%}, {hit15["hit_rate"]
     'paper multi-model rerun citation (hit rates / calls) altered')
 p50s = sorted(z['per_seed'][0]['baseline']['latency_ms_p50'] for z in ddb['data'])
 chk(f'{p50s[0]/1000:.1f}\u2013{p50s[-1]/1000:.1f} s' in md, 'paper multi-model p50 citation altered')
-for s_ in ['two production models (one seed per model)', 'Real-gateway experiments extend validation across three production models']:
+for s_ in ['two model aliases (one seed per alias', 'Live-gateway conformance checks across four model aliases']:
     chk(s_ in md, f'paper missing multi-model scope/abstract citation: {s_}')
 
 idd = json.load(open('examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json'))

@@ -183,6 +183,8 @@ Each rewrite rule implemented by the optimizer (Section 3.4.4) preserves denotat
 
 *Proof.* Each case reduces to the construction of the rewritten instruction and the definition of liveness. The inner inductions—on the pair of bodies for (i), on suffix programs for (ii)—are routine and left to the reader. ∎
 
+**Distributivity necessity arguments (moved verbatim from the main text's Section 3.4).** *Both premises are necessary, and neither follows from the other or from purity.* Purity not implying idempotence is the less obvious of the two failures: a pure `update(+1)` applied twice increments twice (purity bars *external* side effects, not writes to declared cells). Taking $i_1$ as such an update and $i_2 = i_3 = \epsilon$ (the identity, empty footprint, so (b) holds vacuously), the two sides execute $i_1$ once and twice—from $x = 0$ they yield $x = 1$ and $x = 2$; only premise (a) rules this out. Conversely, without (b), a write of $i_2$ into a cell $i_1$ reads changes $i_1$'s second execution even when $i_1$ is idempotent.
+
 ## C.3 Lemma (Compositionality)
 
 Let $T$ be a program transform with $\llbracket T(p) \rrbracket = \llbracket p \rrbracket$ for all $p$. Then for any context $C[\cdot]$ built from the composition operators, $\llbracket C[T(p)] \rrbracket = \llbracket C[p] \rrbracket$.
@@ -770,6 +772,16 @@ Two live runs back Appendix I.3; both target the gateway at `https://127.0.0.1:8
     --backend gateway --tasks 100 --seeds 2 --zipf 0.5 --max-tokens 64 \
     --output examples/benchmarks/gateway_multiseed_raw_zipf0.5.json
 ```
+
+## F.8 Artifact Notes: Superseded Implementations
+
+All numbers in the main text's Section 5 were produced after the soundness fixes below; no superseded implementation contributes to any reported figure.
+
+**Folding pass (Section 5.3).** An earlier implementation folded more aggressively—44.4% at length 200—but could place side-effectful instructions into shared groups when types were compatible, violating the disjointness condition; it was replaced by the current strictly disjoint design, and all reported figures use the current pass.
+
+**Domain-score weighting (Section 3.5).** An earlier form folded the domain weight $w_k$ into $s_k$ as well—double-counting it once at aggregation and again at the top level; Section 5.6's injected-score tests were unaffected (they bypass aggregation).
+
+**Pattern-recognizer prototype (Section 3.3.1).** An earlier prototype (TF-IDF embeddings, density-based clustering, k-means) was abandoned—non-deterministic across library versions, degenerate on short traces (a k-means view remains in `pattern_mining`, fixed `random_state`).
 
 ## F.7 Artifact Contents Inventory
 
