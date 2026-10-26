@@ -4,7 +4,7 @@ plus a priced analytical cost baseline from measured tokens.
 
 This harness addresses two gaps the paper is explicit about: only result
 caching had ever been executed against a live model (Section 5.7), and
-no cost baseline of any kind existed (Section 5.9, items 1 and 4).
+no cost baseline of any kind existed (Section 5.9, items 1 and 6).
 
 W1 -- semantics preservation of compilation + hot-path, measured.
     The SAME task stream (a seven-step service-log triage with ONE

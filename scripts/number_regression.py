@@ -393,8 +393,24 @@ dcfg = hp['provenance']['detector_config']
 chk(dcfg == {'hot_path_threshold': 100, 'stability_threshold': 0.9, 'ema_window': 10,
              'ema_gamma': 0.181818, 'ema_threshold': 0.3},
     f'hotpath detector config json {dcfg} vs paper threshold 100 / stability 0.9 / window 10 (γ 0.181818) / share 0.3')
+# The paper cites Zipf recall per seed (the 5 seeds are bimodal—one seed at 1/3,
+# four at 1.0—so the ± sd form was dropped from the main text); recompute each
+# seed's recall from the raw per-seed records to keep the citation pinned to the JSON.
+zipf_per_seed = scn['diverse_zipf']['per_seed']
+zipf_recalls = []
+for seed_ in sorted(zipf_per_seed, key=int):
+    v_ = zipf_per_seed[seed_]
+    oracle_ = {e['path'] for e in v_['oracle_events']}
+    ema_ = {e['path'] for e in v_['ema_events']}
+    zipf_recalls.append(len(ema_ & oracle_) / len(oracle_) if oracle_ else 0.0)
+chk(abs(statistics.fmean(zipf_recalls) - scn['diverse_zipf']['ema_recall_vs_oracle']['mean']) < 1e-9
+    and abs(statistics.stdev(zipf_recalls) - scn['diverse_zipf']['ema_recall_vs_oracle']['stdev']) < 1e-9,
+    'zipf per-seed recalls disagree with the stored ema_recall_vs_oracle aggregate')
+zipf_prose = ('3/3 rotated variants promoted (exact: 0/3; Zipf recall per seed: ['
+              + ', '.join(f'{r_:.3f}' for r_ in zipf_recalls)
+              + f'] (mean {statistics.fmean(zipf_recalls):.3f}))')
 for s_ in ['175,680 detector', '0.33 s', '12 hard invariants', 'γ = 0.181818',
-           '3/3 rotated variants promoted (exact: 0/3; Zipf recall 0.867 ± 0.298)',
+           zipf_prose,
            'zero false promotions', '85.5/85.5/54.5/24.5/19.5', '16.5, 69 evictions', '14.5, 71 evictions']:
     chk(s_ in md, f'paper missing hotpath citation {s_}')
 
@@ -584,7 +600,7 @@ chk(fc['config']['chain_mix'] == {'fusion_chain': 0.35, 'parallel_batch': 0.3, '
 for s_ in ['−558.0 units', '705.0 → 147.0, −79.1%', '−930.1', '1172.7 → 242.5, −79.3%', '−301.4',
            '0.209 (chain) vs 0.533 (control)', '69.0 vs 14.4', '107.8 ± 22.2', '11.7% of the 922.0',
            '814.2', '549.4 tracked outputs', '120/120 cells complete', 'deltas exactly 0.0',
-           '79.1% (random-slots control 46.7%—paralleling']:
+           "79.1% (random-slots control 46.7%—paralleling Section 5.3's 43.8% random-sequence dispatch reduction (131.6→74.0 at length 200; the control's 46.7% is measured on its own length-200 slots)"]:
     chk(s_ in md, f'paper missing fusion citation {s_}')
 
 # ---- 5.11 / I.2 priced-comparison token-mix sweep (promptcache_sweep_results.json)

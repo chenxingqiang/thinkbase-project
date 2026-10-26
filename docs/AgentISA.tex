@@ -36,6 +36,17 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \newsavebox\pandoc@box
@@ -54,6 +65,24 @@
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+% --- acmart top-matter metadata --------------------------------------------
+% acmart ships demo defaults (\acmConference[Conference'17]{ACM
+% Conference}{July 2017}{Washington, DC, USA}, dummy ISBN/DOI) that leak
+% into the first-page copyright block, every running header, and the "ACM
+% Reference Format" citation whenever \acmConference is left unset.  Supply
+% complete metadata instead.  The values below are provisional for the
+% double-anonymous review build (like AUTHOR above): replace them with the
+% real venue, copyright mode, and the ACM-assigned ISBN/DOI for the
+% camera-ready version.  \acmBooktitle ("Proceedings of AgentISA 2026
+% (AgentISA'26)") derives automatically from \acmConference.
+\acmConference[AgentISA'26]{AgentISA 2026}{October 2026}{Virtual Event}
+\acmYear{2026}
+\setcopyright{acmlicensed}
+% ISBN and DOI are publisher-assigned; leaving them empty suppresses the
+% dummy "ACM ISBN 978-x-xxxx-xxxx-x/YYYY/MM" and placeholder-DOI lines
+% from the first-page copyright block and the reference citation.
+\acmISBN{}
+\acmDOI{}
 \setmonofont{DejaVuSansMono.ttf}[Scale=0.78]
 \usepackage[htt]{hyphenat}
 \usepackage{fvextra}
@@ -87,49 +116,43 @@
 \begin{document}
 \begin{abstract}
 Large Language Models are increasingly deployed as autonomous agents,
-yet ad-hoc prompt engineering and per-provider function calling leave
+yet ad hoc prompt engineering and per-provider function calling leave
 behavior difficult to specify, analyze, and optimize. We present
 AgentISA, an instruction set architecture making agent behavior a
-first-class compilable artifact: (1) a formal instruction
-set---compositional semantics, a type system,
-pre/post-conditions---checked offline by a shipped bounded verifier for
-pure instructions---unit-tested but not exercised by the Section 5
-benchmarks---bracketed by runtime pre-dispatch validation; (2) Agentic
-Calling, lifting provider-specific function calling into reusable,
-cacheable instructions; (3) instruction learning that mines recurring
-trace patterns and proposes them, behind a developer-approval gate by
-default, as composite-replay instructions; (4) a compiler and runtime
+first-class compilable artifact: (1) a formal instruction set with
+compositional semantics, a type system, and pre/post-conditions,
+bracketed at runtime by pre-dispatch validation; a shipped bounded
+offline verifier for pure instructions is unit-tested but not exercised
+by the Section 5 benchmarks; (2) Agentic Calling, lifting
+provider-specific function calling into reusable, cacheable
+instructions; (3) instruction learning mining recurring trace patterns
+into developer-gated composite replays; (4) a compiler and runtime
 applying classical optimization---fusion, dead-code elimination,
 pipeline scheduling, dynamic hot-path specialization---to agent
 instruction streams.
 
-A reproducible microbenchmark drives the real implementation against a
-mock LLM backend: result caching reduces simulated API calls by
+A reproducible mock-backend microbenchmark drives the real
+implementation: result caching reduces simulated API calls by
 59.5--79.6\% on synthetic Zipf workloads (2,000 tasks, 5 seeds); static
 compilation removes 34.2\% of effective instructions (35.4\% at length
 1,000) on sequences carrying planted optimization targets at disclosed
-rates (Section 5.1.2), decomposed by a same-seed ablation into fusion
-(21.6\%) and dead-code elimination (24.5\%) with an 11.9-point overlap;
-dynamic hot-path optimization shrinks repeatedly executed traces by
-65.8\% on the same planted-target family. A plain exact-response cache
-matches the instruction-level cache's call reduction to the digit on
-these workloads---the latter's distinct value is reducing the program
-before any request is issued. Live-gateway conformance checks across
-four model aliases confirm the implementation matches its backend-free
-specification---measured cache statistics equal the computed expectation
-exactly on both aliases tested, and the compiled, hot-path-adopted
-stream issues zero new gateway calls with byte-identical artifacts,
-live-model classifications included in one rerun (cache-mediated); since
-the exactness property holds by construction, these runs test the
-implementation, not model variation. A four-task characterization on
-hand-built realistic streams bounds the same passes at 12.5--25.0\%
-per-task compile shrink; a 100-trace census confirms Zipf-like reuse
-outside the hand-built benchmarks (Section 5.10); 43 multi-agent tests
-provide functional validation. We position these results as
-controlled-setting evidence, not production end-to-end measurements.
-Result caching, the benchmark-exercised static passes,
-threshold-triggered trace re-optimization, and six opt-in mechanisms
-ship, each exercised on the real code path; the specified-only
+rates (Section 5.1.2); dynamic hot-path optimization shrinks repeatedly
+executed traces by 65.8\%. A plain exact-response cache matches this
+call reduction to the digit; the instruction-level cache's distinct
+value is reducing the program before any request is issued. Live-gateway
+conformance checks across four model aliases confirm the implementation
+matches its backend-free specification---cache statistics equal the
+computed expectation on the two caching-protocol aliases, and the
+compiled, hot-path-adopted stream issues zero new gateway calls with
+byte-identical artifacts (live-model classifications in one
+cache-mediated rerun); these runs test the implementation, not model
+variation. A four-task characterization bounds the same passes at
+12.5--25.0\% per-task compile shrink; a 100-trace vocabulary census
+characterizes generator-produced traces (Section 5.10; it does not
+establish realism); 43 multi-agent tests provide functional validation.
+These are controlled-setting results, not production end-to-end
+measurements. Result caching, the benchmark-exercised static passes,
+trace re-optimization, and six opt-in mechanisms ship; specified-only
 components carry no claim (Section 5.11).
 \end{abstract}
 \ccsdesc[500]{Software and its engineering~\textgreater{}Compilers}
@@ -184,7 +207,7 @@ Five structural challenges motivate AgentISA:
   function-calling protocols treat each call as an isolated event {[}13,
   14, 18{]}: the provider has no notion of a \emph{program} being
   executed, repeated identical work incurs repeated cost, and caching,
-  where present, is a bolt-on afterthought rather than a property of the
+  where present, is an afterthought rather than a property of the
   execution model.
 \item
   \textbf{Experience that does not accumulate as compiler-visible
@@ -267,10 +290,10 @@ contributions are:
   repeatedly executed traces by 65.8\% \(\pm\) 4.6\%; real-gateway
   experiments (Sections 5.7--5.7.1) validate the cache and compiled
   pipeline on a live gateway, a four-task characterization (Section 5.8)
-  composes the mechanisms on realistic streams, a 100-trace census
-  (Section 5.10) tests Zipf-like reuse and fusibility outside the
-  hand-built benchmarks, and six mechanism experiments (Section 5.11)
-  exercise the shipped opt-in components.
+  composes the mechanisms on realistic streams, a 100-trace vocabulary
+  census (Section 5.10) documents the cross-task reuse structure of
+  generator-produced traces, and six mechanism experiments (Section
+  5.11) exercise the shipped opt-in components.
 \item
   \textbf{Multi-agent coordination infrastructure} with
   capability-threshold agent selection (exercised with injected scores;
@@ -328,7 +351,9 @@ caching and fusion are designed to remove. Structural similarity alone
 does not make a re-invocation waste: if an input's dependencies have
 changed or the call probes external state, re-execution has semantic
 meaning; the cache-validity conditions, not structural identity, license
-reuse.
+reuse. Under the result cache, the measured quantity is
+\(C_{cached}(n) = \sum_{i \in miss}(\tau_i + \omega_i)\) and Section 5.2
+reports \(|miss|/n\) as the call-reduction rate.
 
 \subsection{Reasoning and Agent
 Paradigms}\label{reasoning-and-agent-paradigms}
@@ -530,10 +555,10 @@ by pre-dispatch context validation (Section 3.2.3).
 is Turing complete.
 
 \emph{Proof sketch}: a translation from WHILE programs---known Turing
-equivalent---to instruction sequences, by simulation: state management
-instructions encode an unbounded store, control-flow instructions encode
-composition, branching, and iteration. The full construction is in
-Appendix A.
+equivalent {[}44{]}---to instruction sequences, by simulation: state
+management instructions encode an unbounded store, control-flow
+instructions encode composition, branching, and iteration. The full
+construction is in Appendix A.
 
 \subsubsection{Type System and
 Semantics}\label{type-system-and-semantics}
@@ -548,7 +573,7 @@ T ::= \text{Base} \mid \Pi(x:T_1).T_2 \mid \Sigma(x:T_1).T_2 \mid \mu X.T
 where Base types include \{Bool, Int, String, Float\},
 \(\Pi\)/\(\Sigma\) represent dependent function/pair types, and \(\mu\)
 recursive types. The semantic rules follow standard operational
-semantics (a context rule and \(\beta\)-reduction).
+semantics {[}43{]} (a context rule and \(\beta\)-reduction).
 
 The pure core carries a standard type-safety argument---progress and
 preservation, in the style of Pierce {[}36{]}---discharging the
@@ -771,16 +796,15 @@ Pattern recognition proceeds in three stages:
   postconditions) and otherwise raise \texttt{NotImplementedError}
   rather than silently no-opping. Promotion is deterministic (pattern
   identity derives from the mined instruction-id sequence), and replay
-  is plain sequential composition---nothing smarter---so a learned
-  instruction reproduces its recorded subsequence's outputs on the
-  recorded inputs; on unseen parameter values the binding above re-runs
-  the recorded operator \emph{instances}, so parameters baked into an
-  operator's constructed state cannot be rebound, and the schema is
-  observational---mixed or unseen types fall back to \texttt{object}.
-  The mining-to-optimization path now exists: an approved proposal
-  registers the fused instruction and installs a name-level peephole
-  rule into the optimizer's rule set, gated by default on a developer's
-  approval.
+  is plain sequential composition, so a learned instruction reproduces
+  its recorded subsequence's outputs on the recorded inputs; on unseen
+  parameter values the binding above re-runs the recorded operator
+  \emph{instances}, so parameters baked into an operator's constructed
+  state cannot be rebound, and the schema is observational---mixed or
+  unseen types fall back to \texttt{object}. The mining-to-optimization
+  path now exists: an approved proposal registers the fused instruction
+  and installs a name-level peephole rule into the optimizer's rule set,
+  gated by default on a developer's approval.
 \item
   \textbf{Pattern validation.} Each candidate is checked for
   significance---support above \(\sigma_{min}\) and, for
@@ -861,8 +885,8 @@ Optimization}\label{instruction-organization-and-optimization}
 
 \subsubsection{Instruction Composition}\label{instruction-composition}
 
-The AgentISA supports hierarchical instruction composition through a
-formal composition algebra:
+AgentISA supports hierarchical instruction composition through a formal
+composition algebra:
 
 \textbf{Definition 3.6} (Instruction Composition): Given instructions
 \(i_1, i_2 \in I\), we define four composition operators---Sequential
@@ -900,12 +924,9 @@ idempotence of \(i_1\) must be assumed separately:
 
 \textbf{Remark} (implementation consequence): distributivity also fails
 for side-effectful instructions, for the same double-execution reason.
-Because the law is doubly conditional, the shipped compiler does not
-rely on it at all: parallel grouping is gated on purity plus disjoint
-dependencies and disjoint outputs, \texttt{side\_effects=True}
-instructions are excluded from all such rewrites, and no
-distributivity-based simplification is applied. The law is stated for
-the algebra's completeness, not as a license for rewrites.
+Accordingly, parallel grouping is gated on purity plus disjoint
+dependencies and disjoint outputs, and \texttt{side\_effects=True}
+instructions are excluded from all such rewrites.
 
 \subsubsection{Instruction Pipeline
 Design}\label{instruction-pipeline-design}
@@ -928,6 +949,9 @@ sequence \(s\) and any schedule \(S\) satisfying conditions S1-S4 of
 Appendix C.5---each instruction dispatched exactly once, dependencies
 respected, dispatch groups pairwise non-interfering, commit in program
 order---pipeline execution preserves program semantics.
+
+The shipped dispatch implements the unit-slot case of S1--S4; the
+multi-period schedule remains conditional on the stated premise.
 
 \emph{Proof}: By induction over the dispatch groups of \(S\) in commit
 order, under the invariant that the architectural state after committing
@@ -1354,7 +1378,7 @@ specified, not shipped, component):
 
 We evaluate AgentISA with a reproducible microbenchmark suite
 (\texttt{examples/benchmarks/isa\_microbench.py}) and a multi-agent
-functional test suite, under the scope fixed in Section 4.3.
+functional test suite, under the scope stated at the end of Section 1.3.
 
 \subsection{Methodology}\label{methodology}
 
@@ -1520,6 +1544,21 @@ hits 95.0\% versus the response key's 7.3\%; under template churn the
 default key false-hits 48.3\% of calls, which the strict namespace key
 (90.4\% hit, zero false hits) prevents (supplementary I.4).
 Semantic/embedding caching remains out of scope (Section 5.9).
+
+\begin{table}[t]
+\small\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llll@{}}
+\toprule\noalign{}
+Zipf s & No-cache calls & Cached calls & Reduction \\
+\midrule\noalign{}
+0.5 & 2,000 \(\pm\) 0 & 810.4 \(\pm\) 5.7 & 59.5\% \(\pm\) 0.3\% \\
+1.0 & 2,000 \(\pm\) 0 & 642 \(\pm\) 3.8 & 67.9\% \(\pm\) 0.2\% \\
+1.5 & 2,000 \(\pm\) 0 & 408 \(\pm\) 9.4 & 79.6\% \(\pm\) 0.5\% \\
+\bottomrule\noalign{}
+\end{tabular}
+\end{table}
+
+(data: \texttt{isa\_microbench\_results.json}, cache experiment)
 
 \textbf{Interpretation.} The reduction increases across the three tested
 skews, 59.5\% at \(s = 0.5\) to 79.6\% at \(s = 1.5\): the savings'
@@ -1744,12 +1783,12 @@ rates and call counts) it does:
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Real-gateway cache exactness across model families. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every cell of every family; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
-\caption{\textbf{Real-gateway cache exactness across model families.}
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Live-gateway cache conformance across model aliases. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every (alias, skew) cell; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
+\caption{\textbf{Live-gateway cache conformance across model aliases.}
 Bars are measured hit rates under the identical protocol (200 sequential
 requests, one seed, three skews per model); the white tick is the
-backend-free computed expectation---matched exactly in every cell of
-every family; call, wall-clock, and token figures: supplementary I.3.}
+backend-free computed expectation---matched exactly in every (alias,
+skew) cell; call, wall-clock, and token figures: supplementary I.3.}
 \end{figure}
 
 Per-call latency was stable across arms (p50 2.13--2.21 s, p95
@@ -1764,11 +1803,13 @@ level, so Section 5.2's synthetic results measure the cache, not a mock
 artifact. Second, avoided calls convert into measured time and
 tokens---14.1\%, 26.6\%, and 45.8\% of the no-cache arm's wall clock at
 s = 0.5, 1.0, 1.5---tracking but not identical to the call reduction
-(wall and token figures are measurements). Third, the absolute hit rates
-(8.5--45.5\%) trail Section 5.2's (59.5--79.6\%) consistently with
-repetition accumulating with task count: the backend-free computation at
-N = 2,000 reproduces the Section 5.2 figures (the gateway run stays at N
-= 200).
+(wall and token figures are measurements). At N = 200, one seed, the
+wall-clock ratio is sampling-noise-dominated (the 17 avoided calls
+average 1.7 \(\times\) the arm mean); the token ratio is the steadier
+read. Third, the absolute hit rates (8.5--45.5\%) trail Section 5.2's
+(59.5--79.6\%) consistently with repetition accumulating with task
+count: the backend-free computation at N = 2,000 reproduces the Section
+5.2 figures (the gateway run stays at N = 200).
 
 \textbf{Multi-model rerun.} The identical protocol re-run on a second
 production model (\texttt{claude-doubao-seed-2.0-code}, replies
@@ -1828,6 +1869,37 @@ issuing \emph{zero} new gateway calls proves it computed identical
 keys---hence identical prompts and consumed values---and its artifacts
 must come out byte-for-byte equal.
 
+\begin{table*}[t]
+\small\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}
+  >{\raggedright\arraybackslash}p{(\textwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\textwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\textwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\textwidth - 8\tabcolsep) * \real{0.2000}}
+  >{\raggedright\arraybackslash}p{(\textwidth - 8\tabcolsep) * \real{0.2000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Run
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Alias
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+max\_tokens
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Skews
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Requests issued
+\end{minipage} \\
+\midrule\noalign{}
+Cache conformance (§5.7) & claude-glm-5.3-flash & 64 & 0.5/1.0/1.5 & 600
+(200/skew; hits client-side) \\
+Identity check (§5.7.1) & claude-glm-5.3-flash & 512 & 1.0 & 23 (1
+preflight + 22 live) \\
+\bottomrule\noalign{}
+\end{tabular}
+\end{table*}
+
+The +1 preflight is the token-ceiling probe.
+
 \textbf{Results.} All checks pass. Arm (a) made exactly the 22
 first-occurrence calls the backend-free computation predicts and served
 the other 28 realizations from the result cache (hit rate 56.0\%),
@@ -1841,16 +1913,15 @@ hot path was adopted at realization 7 (threshold 5; adoption lands two
 realizations past it because the counter must strictly exceed it and
 recording follows execution, as in Section 5.8): realizations 1--6
 executed the full seven-instruction stream, realizations 7--50 the
-shrunken six-instruction form with \texttt{check\_format} absorbed into
-its successor by fusion---306 instruction executions against 350 in arm
-(a), a 12.6\% executed-instruction reduction attributable to the adopted
-trace (per-stream shrink 14.3\%, 7 \(\rightarrow\) 6; realized saving
-diluted by the six full-form realizations before adoption; the static
-compiler alone reproduces the 7 \(\rightarrow\) 6 shrink at AGGRESSIVE,
-so the two mechanisms' contributions are not separated), reported
-separately from the cache's call savings. Static compilation of the same
-stream: NONE 7 \(\rightarrow\) AGGRESSIVE 6 effective instructions,
-dataflow preserved.
+shrunken six-instruction form with \texttt{check\_format} absorbed by
+fusion---306 instruction executions against 350 in arm (a), a 12.6\%
+executed-instruction reduction attributable to the adopted trace
+(per-stream shrink 14.3\%, 7 \(\rightarrow\) 6; the static compiler
+alone reproduces the 7 \(\rightarrow\) 6 shrink at AGGRESSIVE, so the
+two mechanisms' contributions are not separated), reported separately
+from the cache's call savings. Static compilation of the same stream:
+NONE 7 \(\rightarrow\) AGGRESSIVE 6 effective instructions, dataflow
+preserved.
 
 \textbf{Identity rerun with live-model values.} Re-running the harness
 on \texttt{claude-doubao-seed-2.0-code} at \texttt{max\_tokens} = 1,500
@@ -1863,13 +1934,13 @@ calls, byte-identical artifacts, hot-path adoption, the 7
 \(\rightarrow\) 6 shrink---and a third model
 (\texttt{claude-minimax-m3}, reasoning-style) passes every check while
 binding at the ceiling in 97\% of calls at \texttt{max\_tokens} = 512
-and 65\% at 1,500: ceiling-binding is a model-family property, not a
+and 65\% at 1,500: ceiling-binding is a model-alias property, not a
 harness artifact (census: supplementary I.3).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Ceiling-binding census across model families and budgets. Calls binding at max\_tokens per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, Doubao Seed 2.0 in all 104 calls below the ceiling at 1,500.}]{figures/6_ceiling_census.pdf}
-\caption{\textbf{Ceiling-binding census across model families and
+\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Ceiling-binding census across model aliases and budgets. Calls binding at max\_tokens per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, Doubao Seed 2.0 in all 104 calls below the ceiling at 1,500.}]{figures/6_ceiling_census.pdf}
+\caption{\textbf{Ceiling-binding census across model aliases and
 budgets.} Calls binding at \protect\texttt{max\_tokens} per alias and
 budget, from the identity runs' raw records: GLM 5.3 flash binds in
 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512
@@ -2022,14 +2093,13 @@ We enumerate the limitations of the evaluation explicitly:
   Section 5.4's replay verification (final-state identity, 5/5 seeds)
   and Section 5.2's naive-cache baseline. The real-gateway experiments
   extend coverage to the cache's hit/miss reproduction with measured
-  time/token savings (Section 5.7) and the compiled, hot-path-adopted
-  stream's zero new gateway calls and byte-identical artifacts (Section
-  5.7.1). Still not covered: multi-seed behavior beyond the two-seed
-  reduced-scale rerun (Section 5.7), real deployment, caching under
-  model nondeterminism \emph{across prompt variations}, streaming
-  responses, provider rate limits, and live-model quality beyond the
-  Section 5.7.1 rubric diagnostics (the four-task classification steps
-  remain rule-based stand-ins).
+  time/token savings (Section 5.7) and the compiled stream's zero new
+  gateway calls and byte-identical artifacts (Section 5.7.1). Still not
+  covered: multi-seed behavior beyond the two-seed rerun (Section 5.7),
+  real deployment, caching under model nondeterminism \emph{across
+  prompt variations}, streaming, provider rate limits, and live-model
+  quality beyond the Section 5.7.1 rubric diagnostics (the four-task
+  classification steps remain rule-based stand-ins).
 \item
   \textbf{Synthetic workloads.} Zipf-distributed synthetic tasks
   reasonably model skewed agent workloads---but are a model; Section 5.8
@@ -2043,24 +2113,35 @@ We enumerate the limitations of the evaluation explicitly:
   shrink and shows uniform reuse and closed-loop adoption---but the four
   tasks remain hand-constructed, not a production workload study.
 \item
+  \textbf{Generated corpora do not establish realism.} The census corpus
+  is itself a generator artifact---its 12-signature vocabulary,
+  log-linear decay, and 98.5\% recurrence characterize the generator,
+  not any production workload. The non-planted-family control
+  (supplementary I.4) swaps planted linear sequences for the same
+  generator's traces (19.2\% vs.~34.2\%)---a generated-versus-planted
+  comparison, not generated-versus-real.
+\item
+  \textbf{Capability correlations are small-sample consistency checks.}
+  The domain-score correlations (Section 5.11) are computed on n = 25
+  declaration-injection pools (generation n = 15), with scores and
+  metrics derived from the same injected declarations---consistency
+  checks, not calibration. The \(\pm\) 1.000 entries are step-function
+  artifacts of declared-and-enforced gates, and no independent,
+  live-model capability measure enters any correlation.
+\item
   \textbf{No production end-to-end evaluation.} We have not deployed
   AgentISA in a production setting; the paper therefore contains no
   latency-under-load, throughput, availability, or dollar-cost
   measurements, and makes no such claims.
 \item
-  \textbf{No real cost data (token usage measured; pricing MODELED on
-  measured tokens).} Sections 5.2--5.5 latencies are simulated (avoided
-  calls \(\times\) 80 ms); Section 5.7 measures real wall-clock time and
-  gateway-reported tokens at reduced scale; Section 5.7.1 prices its
-  measured tokens under three modes---no optimization, AgentISA result
-  caching, and a modeled provider prompt cache with a parameterized
-  cache-read discount (default 0.1). The costs are MODELED-on-measured:
-  tokens are measurements, prices are configurable list-price stand-ins
-  (the gateway's actual pricing is unknown), and no dollar-savings claim
-  is made. Section 5.2's baseline is an \emph{exact-match} response
-  cache; head-to-head against approximate (semantic/embedding)
-  caching---explicitly out of scope---and a priced deployment study
-  under real pricing remain future work.
+  \textbf{No real cost data (tokens measured; pricing MODELED).}
+  Sections 5.2--5.5 latencies are simulated (avoided calls \(\times\) 80
+  ms); Section 5.7 measures wall-clock time and gateway-reported tokens;
+  Section 5.7.1 prices measured tokens under three modes---no
+  optimization, result caching, and a modeled provider prompt cache
+  (cache-read discount 0.1). Prices are configurable list-price
+  stand-ins; no dollar-savings claim is made. Approximate
+  (semantic/embedding) caching remains out of scope and future work.
 \item
   \textbf{Program-size metrics, not wall-clock time.}
   Effective-instruction and dispatch-count reduction are structural
@@ -2109,28 +2190,30 @@ Appendix I). \textbf{Capability calibration:} extracted domain scores
 correlate with mock-backend behavior on declaration-injection pools
 (Pearson r; n = 25 pools, generation n = 15): memory +0.948 (cache hit
 rate), coordination −0.977 (dispatch compression---the negative sign is
-the designed coupling: higher declared coordination, more compression),
-reasoning −0.965 (fusion reduction), generation +0.790; optimization
-−1.000 and security +1.000 are step-function artifacts of
-declared-and-enforced gates---consistency checks, not calibration; 2/8
-domains, 9/17 metrics N/A (probe-evidenced; per-metric table with n, p,
-and Spearman ρ: supplementary I.2). \textbf{DP tree-pattern selection:}
-covering cost \(\leq\) heuristic on 20/20 random IR trees (ratio 0.361;
-time 0.950); gap size is synthetic-pricing-dependent. \textbf{EMA
-hot-path detection:} 3/3 rotated variants promoted (exact: 0/3; Zipf
-recall 0.867 \(\pm\) 0.298), zero false promotions on one-shot
-diversity. \textbf{Strict security:} of 1,000 paired tasks, fail-closed
-denies 400 policy-gap tasks fail-open admits; 0/200 normal-task false
-denials. \textbf{Cache namespacing:} 100\% invalidation under
-template/decoding drift (legacy keys 100\% stale); modeled cost under
-the result cache is no higher than under the modeled provider prompt
-cache in 195/195 token-mix cells. \textbf{Parameterized replay:} all
-1,050 unseen-parameter replays match the oracle exactly. Chain-enriched
-workloads amplify BASIC\(\rightarrow\)ADVANCED dispatch reduction to
-79.1\% (random-slots control 46.7\%---paralleling Section 5.3's
-random-sequence dispatch reduction; protocol and per-seed tables:
-supplementary I.2), AGGRESSIVE differing only in the advisory memory
-plan.
+the designed coupling: more declared dataflow edges, more fusion
+barriers, less compression), reasoning −0.965 (fusion reduction),
+generation +0.790; optimization −1.000 and security +1.000 are
+step-function artifacts of declared-and-enforced gates---consistency
+checks, not calibration; 2/8 domains, 9/17 metrics N/A (probe-evidenced;
+per-metric table with n, p, and Spearman ρ: supplementary I.2).
+\textbf{DP tree-pattern selection:} covering cost \(\leq\) heuristic on
+20/20 random IR trees (ratio 0.361; time 0.950); gap size is
+synthetic-pricing-dependent. \textbf{EMA hot-path detection:} 3/3
+rotated variants promoted (exact: 0/3; Zipf recall per seed: {[}0.333,
+1.000, 1.000, 1.000, 1.000{]} (mean 0.867)), zero false promotions on
+one-shot diversity. \textbf{Strict security:} of 1,000 paired tasks,
+fail-closed denies 400 policy-gap tasks fail-open admits; 0/200
+normal-task false denials. \textbf{Cache namespacing:} 100\%
+invalidation under template/decoding drift (legacy keys 100\% stale);
+modeled cost under the result cache is no higher than under the modeled
+provider prompt cache in 195/195 token-mix cells. \textbf{Parameterized
+replay:} all 1,050 unseen-parameter replays match the oracle exactly.
+Chain-enriched workloads amplify BASIC\(\rightarrow\)ADVANCED dispatch
+reduction to 79.1\% (random-slots control 46.7\%---paralleling Section
+5.3's 43.8\% random-sequence dispatch reduction (131.6 \(\rightarrow\)
+74.0 at length 200; the control's 46.7\% is measured on its own
+length-200 slots); protocol and per-seed tables: supplementary I.2),
+AGGRESSIVE differing only in the advisory memory plan.
 
 \section{Discussion}\label{discussion}
 
@@ -2356,37 +2439,30 @@ controlled conditions: 59.5--79.6\% simulated-call reduction from
 caching, 34.2\% instruction-count reduction from static compilation,
 65.8\% trace shrinkage from hot-path optimization (Sections 5.2--5.5),
 real-gateway validations of the cache and the compiled pipeline
-(Sections 5.7--5.7.1; integration and cache-mediated-identity layers
-only), a four-task system-level characterization (Section 5.8), a
-100-trace workload census (Section 5.10), six controlled mechanism
-experiments (Section 5.11), and 43 functional tests for the multi-agent
-layer. These are microbenchmark and controlled-setting results, not
-production end-to-end measurements; the threats to validity of Section
-5.9 stand.
+(Sections 5.7--5.7.1), a four-task characterization (Section 5.8), a
+100-trace workload census (Section 5.10), six mechanism experiments
+(Section 5.11), and 43 functional tests for the multi-agent layer. These
+are microbenchmark and controlled-setting results, not production
+end-to-end measurements; the threats to validity of Section 5.9 stand.
 
 \textbf{Implementation status of the contributions.} For auditability,
-the five contributions above split by status: \emph{implemented and
-exercised by the benchmarks}---the instruction set and contracts,
-Agentic Calling, result caching, fusion/DCE/grouping, hot-path detection
-and adoption (exact default), the coordination layer with injected-score
-capability selection, and the security monitor (fail-open default; 43
-tests); \emph{implemented with known limits, exercised by the Section
-5.11 mechanism experiments but not the Section 5.2--5.5 benchmark
-arms}---the opt-in DP tree-pattern selector (default heuristic), the EMA
-hot-path detector (LRU-bounded tracked-path state; default exact), the
-strict cache namespace (default params-only key), the strict security
-mode, parameter-binding composite replay (mined via the learner's
-threshold-validated path, not the approval gate; constructor-baked
-parameters not rebindable), and capability metric extraction (static,
-declared-metadata only; coordinator wiring still injected);
+the five contributions split by status: \emph{implemented and exercised
+by the benchmarks} (instruction set and contracts, Agentic Calling,
+result caching, fusion/DCE/grouping, hot-path detection and adoption,
+the coordination layer with injected-score capability selection, the
+security monitor); \emph{implemented with known limits, exercised by the
+mechanism experiments but not the benchmark arms} (DP tree-pattern
+selector, EMA hot-path detector, strict cache namespace, strict security
+mode, parameter-binding composite replay, capability metric extraction);
 \emph{implemented with known limits, still unexercised by any Section 5
-experiment}---the bounded checker (pure instructions, bounded state
-spaces only) and runtime context validation (deletion blind spot
-disclosed); \emph{specified, not implemented}---cycle-accurate pipeline
-scheduling, block-granular trace formation, adaptive
-performance-triggered recompilation, and symbolic-equivalence checking.
-Theorems 3.4--3.6 are conditional arguments for the implemented passes;
-the specified components carry no verification claim.
+experiment} (the bounded checker; runtime context validation); and
+\emph{specified, not implemented} (cycle-accurate pipeline scheduling,
+block-granular trace formation, adaptive recompilation,
+symbolic-equivalence checking). The per-mechanism status table and the
+full limitations of each entry are in supplementary F.9; Theorems 3.4
+and 3.6 are conditional arguments for the implemented rewrites, Theorem
+3.5 covers the shipped unit-slot dispatch, and the specified components
+carry no verification claim.
 
 AgentISA's longer-term significance is architectural: an
 instruction-level contract for agent behavior makes agent systems
@@ -2410,25 +2486,24 @@ artifacts are in the repository accompanying this submission (anonymized
 for review), and every number in Section 5 is generated from the exact
 repository state whose build produces this PDF (\texttt{REPRODUCING.md}
 records the submission-time \texttt{git\ rev-parse\ HEAD}, the
-dependency lock file, and the Python/system versions). A fresh clone
-reproduces the full-suite count with
-\texttt{python\ -m\ pytest\ tests/\ -q} (1,337 passed, 14 skipped at run
-time), the Section 5.6 functional-test counts, and, via the Appendix F
-command lines, every results table from scratch---real-gateway runs
-included, with a mock-backend fallback for environments without gateway
-credentials. \texttt{REPRODUCING.md} also maps each paper claim to the
-implementing module, the test that exercises it, and the raw-results
-file that backs its numbers, flagging specified-only components; the
-artifact is inventoried per file in Appendix F.7.
+dependency lock, and the Python/system versions). A fresh clone
+reproduces the full suite (\texttt{python\ -m\ pytest\ tests/\ -q}:
+1,337 passed, 14 skipped at run time), the Section 5.6 functional-test
+counts, and, via the Appendix F command lines, every results table from
+scratch---real-gateway runs included, with a mock-backend fallback for
+environments without credentials. \texttt{REPRODUCING.md} also maps each
+claim to the implementing module, the exercising test, and the
+raw-results file, flagging specified-only components; the artifact is
+inventoried in Appendix F.7.
 
 \begin{thebibliography}{99}
-\bibitem{ref1} Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, Dario Amodei. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.
-\bibitem{ref2} Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, Noah Fiedel. 2023. PaLM: Scaling Language Modeling with Pathways. JMLR 24(240):1–113. arXiv:2204.02311.
+\bibitem{ref1} Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, et al. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.
+\bibitem{ref2} Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, et al. 2023. PaLM: Scaling Language Modeling with Pathways. JMLR 24(240):1–113. arXiv:2204.02311.
 \bibitem{ref3} OpenAI. 2023. GPT-4 Technical Report. arXiv:2303.08774.
-\bibitem{ref4} Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, Guillaume Lample. 2023. LLaMA: Open and Efficient Foundation Language Models. arXiv:2302.13971.
-\bibitem{ref5} Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, Quoc V. Le. 2022. Finetuned Language Models Are Zero-Shot Learners. ICLR 2022. arXiv:2109.01652.
-\bibitem{ref6} Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, Ryan Lowe. 2022. Training language models to follow instructions with human feedback. NeurIPS 35. arXiv:2203.02155.
-\bibitem{ref7} Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc V. Le, Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. NeurIPS 35, pp. 24824–24837. arXiv:2201.11903.
+\bibitem{ref4} Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, et al. 2023. LLaMA: Open and Efficient Foundation Language Models. arXiv:2302.13971.
+\bibitem{ref5} Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, et al. 2022. Finetuned Language Models Are Zero-Shot Learners. ICLR 2022. arXiv:2109.01652.
+\bibitem{ref6} Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, et al. 2022. Training language models to follow instructions with human feedback. NeurIPS 35. arXiv:2203.02155.
+\bibitem{ref7} Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, et al. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. NeurIPS 35, pp. 24824–24837. arXiv:2201.11903.
 \bibitem{ref8} Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, Yusuke Iwasawa. 2022. Large Language Models are Zero-Shot Reasoners. NeurIPS 35. arXiv:2205.11916.
 \bibitem{ref9} Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao. 2023. ReAct: Synergizing Reasoning and Acting in Language Models. ICLR 2023. arXiv:2210.03629.
 \bibitem{ref10} Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao. 2023. Reflexion: Language Agents with Verbal Reinforcement Learning. NeurIPS 36. arXiv:2303.11366.
@@ -2436,21 +2511,21 @@ artifact is inventoried per file in Appendix F.7.
 \bibitem{ref12} Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, Anima Anandkumar. 2023. Voyager: An Open-Ended Embodied Agent with Large Language Models. arXiv:2305.16291.
 \bibitem{ref13} Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, Thomas Scialom. 2023. Toolformer: Language Models Can Teach Themselves to Use Tools. NeurIPS 36. arXiv:2302.04761.
 \bibitem{ref14} Shishir G. Patil, Tianjun Zhang, Xin Wang, Joseph E. Gonzalez. 2023. Gorilla: Large Language Model Connected with Massive APIs. arXiv:2305.15334.
-\bibitem{ref15} Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, Sihan Zhao, Lauren Hong, Runchu Tian, Ruobing Xie, Jie Zhou, Mark Gerstein, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs. ICLR 2024. arXiv:2307.16789.
+\bibitem{ref15} Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, et al. 2024. ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs. ICLR 2024. arXiv:2307.16789.
 \bibitem{ref16} Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, Yueting Zhuang. 2023. HuggingGPT: Solving AI Tasks with ChatGPT and its Friends in Hugging Face. NeurIPS 36. arXiv:2303.17580.
 \bibitem{ref17} Shishir G. Patil, Huanzhi Mao, Fanjia Yan, Charlie Cheng-Jie Ji, Vishnu Suresh, Ion Stoica, Joseph E. Gonzalez. 2025. The Berkeley Function Calling Leaderboard (BFCL): From Tool Use to Agentic Evaluation of Large Language Models. ICML 2025. arXiv:2408.12946.
 \bibitem{ref18} Anthropic. 2024. Introducing the Model Context Protocol. Anthropic announcement, November 25, 2024.
-\bibitem{ref19} Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu, Li Jiang, Xiaoyun Zhang, Shaokun Zhang, Jiale Liu, Ahmed Hassan Awadallah, Ryen W. White, Doug Burger, Chi Wang. 2023. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation. arXiv:2308.08155. (Final version COLM 2024.)
-\bibitem{ref20} Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven Ka Shing Yau, Zijuan Lin, Liyang Zhou, Chenyu Ran, Lingfeng Xiao, Chenglin Wu, Jürgen Schmidhuber. 2024. MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework. ICLR 2024. arXiv:2308.00352.
-\bibitem{ref21} Weize Chen, Yusheng Su, Jingwei Zuo, Cheng Yang, Chenfei Yuan, Chi-Min Chan, Heyang Yu, Yaxi Lu, Yi-Hsin Hung, Chen Qian, Yujia Qin, Xin Cong, Ruobing Xie, Zhiyuan Liu, Maosong Sun, Jie Zhou. 2024. AgentVerse: Facilitating Multi-Agent Collaboration and Exploring Emergent Behaviors. ICLR 2024 (Poster). arXiv:2308.10848.
-\bibitem{ref22} Chen Qian, Wei Liu, Hongzhang Liu, Nuo Chen, Yufan Dang, Jiahao Li, Cheng Yang, Weize Chen, Yusheng Su, Xin Cong, Juyuan Xu, Dahai Li, Zhiyuan Liu, Maosong Sun. 2024. ChatDev: Communicative Agents for Software Development. ACL 2024, pp. 15174–15186. arXiv:2307.07924.
+\bibitem{ref19} Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Beibin Li, Erkang Zhu, et al. 2023. AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation. arXiv:2308.08155. (Final version COLM 2024.)
+\bibitem{ref20} Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, Jinlin Wang, et al. 2024. MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework. ICLR 2024. arXiv:2308.00352.
+\bibitem{ref21} Weize Chen, Yusheng Su, Jingwei Zuo, Cheng Yang, Chenfei Yuan, Chi-Min Chan, et al. 2024. AgentVerse: Facilitating Multi-Agent Collaboration and Exploring Emergent Behaviors. ICLR 2024 (Poster). arXiv:2308.10848.
+\bibitem{ref22} Chen Qian, Wei Liu, Hongzhang Liu, Nuo Chen, Yufan Dang, Jiahao Li, et al. 2024. ChatDev: Communicative Agents for Software Development. ACL 2024, pp. 15174–15186. arXiv:2307.07924.
 \bibitem{ref23} Guohao Li, Hasan Abed Al Kader Hammoud, Hani Itani, Dmitrii Khizbullin, Bernard Ghanem. 2023. CAMEL: Communicative Agents for "Mind" Exploration of Large Language Model Society. NeurIPS 36. arXiv:2303.17760.
 \bibitem{ref24} Significant Gravitas. 2023. AutoGPT. GitHub repository. https://github.com/Significant-Gravitas/AutoGPT
-\bibitem{ref25} Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, Zhiyuan Zhang, Keshav Santhanam, Sri Vardhamanan, Saiful Haq, Ashutosh Sharma, Thomas T. Joshi, Hanna Moazam, Heather Miller, Matei Zaharia, Christopher Potts. 2023. DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines. arXiv:2310.03714.
+\bibitem{ref25} Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, Zhiyuan Zhang, Keshav Santhanam, Sri Vardhamanan, et al. 2023. DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines. arXiv:2310.03714.
 \bibitem{ref26} Harrison Chase. 2022. LangChain. GitHub repository. https://github.com/langchain-ai/langchain
 \bibitem{ref27} Jerry Liu. 2022. LlamaIndex. GitHub repository. https://github.com/run-llama/llama\_index
 \bibitem{ref28} Lingjiao Chen, Matei Zaharia, James Zou. 2023. FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance. arXiv:2305.05176.
-\bibitem{ref29} Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, Yu Gu, Hangliang Ding, Kaiwen Men, Kejuan Yang, Shudan Zhang, Xiang Deng, Aohan Zeng, Zhengxiao Du, Chenhui Zhang, Sheng Shen, Tianjun Zhang, Yu Su, Huan Sun, Minlie Huang, Yuxiao Dong, Jie Tang. 2024. AgentBench: Evaluating LLMs as Agents. ICLR 2024. arXiv:2308.03688.
+\bibitem{ref29} Xiao Liu, Hao Yu, Hanchen Zhang, Yifan Xu, Xuanyu Lei, Hanyu Lai, et al. 2024. AgentBench: Evaluating LLMs as Agents. ICLR 2024. arXiv:2308.03688.
 \bibitem{ref30} Grégoire Mialon, Clémentine Fourrier, Craig Swift, Thomas Wolf, Yann LeCun, Thomas Scialom. 2023. GAIA: a benchmark for General AI Assistants. arXiv:2311.12983. (Final version ICLR 2024.)
 \bibitem{ref31} Karthik Valmeekam, Matthew Marquez, Alberto Olmo, Sarath Sreedharan, Subbarao Kambhampati. 2023. PlanBench: An Extensible Benchmark for Evaluating Large Language Models on Planning and Reasoning about Change. NeurIPS 2023 Datasets and Benchmarks Track. arXiv:2206.10498.
 \bibitem{ref32} Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, Karthik Narasimhan. 2024. SWE-bench: Can Language Models Resolve Real-world GitHub Issues? ICLR 2024. arXiv:2310.06770.
@@ -2459,16 +2534,16 @@ artifact is inventoried per file in Appendix F.7.
 \bibitem{ref35} David A. Patterson, Andrew Waterman. 2017. The RISC-V Reader: An Open Architecture Atlas. Strawberry Canyon.
 \bibitem{ref36} Benjamin C. Pierce. 2002. Types and Programming Languages. MIT Press.
 \bibitem{ref37} Xavier Leroy. 2009. Formal verification of a realistic compiler. Communications of the ACM 52(7):107–115.
-\bibitem{ref38} Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao Zhang, Ion Stoica. 2023. Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023. arXiv:2309.06180.
+\bibitem{ref38} Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, et al. 2023. Efficient Memory Management for Large Language Model Serving with PagedAttention. SOSP 2023. arXiv:2309.06180.
 \bibitem{ref39} Gyeong-In Yu, Joo Seong Jeong, Geon-Woo Kim, Soojeong Kim, Byung-Gon Chun. 2022. Orca: A Distributed Serving System for Transformer-Based Generative Models. OSDI 2022, pp. 521–538.
 \bibitem{ref40} Tri Dao, Daniel Y. Fu, Stefano Ermon, Atri Rudra, Christopher Ré. 2022. FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness. NeurIPS 35. arXiv:2205.14135.
-\bibitem{ref41} Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, Yongwei Wu, Weimin Zheng, Xinran Xu. 2025. Mooncake: Trading More Storage for Less Computation—A KVCache-centric Architecture for Serving LLM Chatbot. FAST 2025, pp. 155–170.
-\bibitem{ref42} Siddharth Samsi, Dan Zhao, Joseph McDonald, Baolin Li, Adam Michaleas, Michael Jones, William Bergeron, Jeremy Kepner, Devesh Tiwari, Vijay Gadepally. 2023. From Words to Watts: Benchmarking the Energy Costs of Large Language Model Inference. arXiv:2310.03003.
-\bibitem{ref43} Hanne Riis Nielson, Flemming Nielson. 1992. Semantics with Applications: A Formal Introduction. Wiley. (Springer 2007 retitled edition: Semantics with Applications: An Appetizer.)
-\bibitem{ref44} Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. Chapter 3 (the Church–Turing thesis and equivalence of computational models).
-\bibitem{ref45} Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. PLDI 2000, pp. 1–12. <https://doi.org/10.1145/349299.349303>
-\bibitem{ref46} Zilliz and community contributors. 2023. GPTCache: An Open-Source Library for Specifying and Implementing Semantics-Aware Caches for LLM Applications. https://github.com/zilliztech/GPTCache.
-\bibitem{ref47} Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Sun, Jeff Huang, Cody Hao Yu, Shiyi Cao, Christos Kozyrakis, Ion Stoica, Joseph E. Gonzalez, Clark Barrett, and Ying Sheng. 2024. SGLang: Efficient Execution of Structured Language Model Programs. NeurIPS 37. arXiv:2312.07104.
+\bibitem{ref41} Ruoyu Qin, Zheming Li, Weiran He, Jialei Cui, Feng Ren, Mingxing Zhang, et al. 2025. Mooncake: Trading More Storage for Less Computation—A KVCache-centric Architecture for Serving LLM Chatbot. FAST 2025, pp. 155–170.
+\bibitem{ref42} Siddharth Samsi, Dan Zhao, Joseph McDonald, Baolin Li, Adam Michaleas, Michael Jones, et al. 2023. From Words to Watts: Benchmarking the Energy Costs of Large Language Model Inference. arXiv:2310.03003.
+\bibitem{ref43} Hanne Riis Nielson, Flemming Nielson. 1992. Semantics with Applications: A Formal Introduction. Wiley. (2007 retitled edition: An Appetizer, Springer.)
+\bibitem{ref44} Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. (Church–Turing thesis, Chapter 3.)
+\bibitem{ref45} Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. PLDI 2000. https://doi.org/10.1145/349299.349303
+\bibitem{ref46} Zilliz and community contributors. 2023. GPTCache: Semantics-Aware Caches for LLM Applications. https://github.com/zilliztech/GPTCache.
+\bibitem{ref47} Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Sun, et al. 2024. SGLang: Efficient Execution of Structured Language Model Programs. NeurIPS 37. arXiv:2312.07104.
 \end{thebibliography}
 
 \end{document}

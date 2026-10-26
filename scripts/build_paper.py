@@ -26,10 +26,11 @@ Preprocessing (shared) makes the markdown losslessly compilable:
 
 Two-column post-processing (main target only):
 * pandoc emits pipe tables as longtable, which cannot live in a
-  two-column layout.  Each longtable is converted to a proper float:
-  column specs without \\columnwidth become single-column ``table``,
-  specs with fractional \\columnwidth widths become full-width
-  ``table*`` (with \\columnwidth promoted to \\textwidth);
+  two-column layout.  Each longtable -- with or without a caption --
+  is converted to a proper float: plain column specs become
+  single-column ``table``, specs with fractional widths (\\columnwidth
+  in older pandoc, \\linewidth in 3.x) become full-width ``table*``
+  (with the width macro promoted to \\textwidth);
 * pandoc's default template places \\maketitle before the abstract;
   acmart requires abstract + \\keywords before \\maketitle.
 
@@ -239,7 +240,25 @@ def build_body_md(text: str, *, title: str, extract_acmart_meta: bool):
     return yaml, body_md, keywords, ccs
 
 
-HEADER_MAIN_TEX = r"""\setmonofont{DejaVuSansMono.ttf}[Scale=0.78]
+HEADER_MAIN_TEX = r"""% --- acmart top-matter metadata --------------------------------------------
+% acmart ships demo defaults (\acmConference[Conference'17]{ACM
+% Conference}{July 2017}{Washington, DC, USA}, dummy ISBN/DOI) that leak
+% into the first-page copyright block, every running header, and the "ACM
+% Reference Format" citation whenever \acmConference is left unset.  Supply
+% complete metadata instead.  The values below are provisional for the
+% double-anonymous review build (like AUTHOR above): replace them with the
+% real venue, copyright mode, and the ACM-assigned ISBN/DOI for the
+% camera-ready version.  \acmBooktitle ("Proceedings of AgentISA 2026
+% (AgentISA'26)") derives automatically from \acmConference.
+\acmConference[AgentISA'26]{AgentISA 2026}{October 2026}{Virtual Event}
+\acmYear{2026}
+\setcopyright{acmlicensed}
+% ISBN and DOI are publisher-assigned; leaving them empty suppresses the
+% dummy "ACM ISBN 978-x-xxxx-xxxx-x/YYYY/MM" and placeholder-DOI lines
+% from the first-page copyright block and the reference citation.
+\acmISBN{}
+\acmDOI{}
+\setmonofont{DejaVuSansMono.ttf}[Scale=0.78]
 \usepackage[htt]{hyphenat}
 \usepackage{fvextra}
 \RecustomVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\scriptsize,breaklines,breakanywhere}
@@ -277,12 +296,11 @@ def ccsdesc_lines(ccs: list[str]) -> str:
 
 LONGTABLE_RE = re.compile(
     r"\\begin\{longtable\}\[\]\{@{}(.*?)@\{\}\}\s*\n"
-    r"\\caption\{(.*?)\}(?:\\label\{(.*?)\})?\\tabularnewline\s*\n"
+    r"(?:\\caption\{(.*?)\}(?:\\label\{(.*?)\})?\\tabularnewline\s*\n)?"
     r"\\toprule\\noalign\{\}\s*\n"
     r"(.*?)\s*\n"
     r"\\midrule\\noalign\{\}\s*\n"
-    r"\\endfirsthead\s*\n"
-    r".*?\\endhead\s*\n"
+    r"(?:\\endfirsthead\s*\n.*?\\endhead\s*\n|\\endhead\s*\n)"
     r"\\bottomrule\\noalign\{\}\s*\n"
     r"\\endlastfoot\s*\n"
     r"(.*?)\s*\n"
@@ -294,27 +312,41 @@ LONGTABLE_RE = re.compile(
 def convert_longtables(tex: str) -> tuple[str, int]:
     """longtable -> table (narrow) / table* (wide) for the two-column class.
 
-    Wide = the column spec carries fractional \\columnwidth widths (pandoc
-    emits plain alignment letters when every cell fits a narrow column).
-    Wide tables are promoted to \\textwidth so the same fractions span the
-    full page.
+    Two pandoc shapes must match: a captioned table carries
+    \\caption/\\label/\\endfirsthead; a caption-less one is wrapped in a
+    ``{\\def\\LTcaptype{none} ...}`` group with neither caption nor
+    \\endfirsthead, and becomes a caption-less float.  Wide = the column
+    spec carries fractional widths (\\columnwidth in older pandoc,
+    \\linewidth in 3.x; plain alignment letters mean every cell fits a
+    narrow column).  Wide tables are promoted to \\textwidth so the same
+    fractions span the full page.
     """
     count = 0
+
+    # Unwrap the no-caption group so both shapes match LONGTABLE_RE.
+    tex = re.sub(
+        r"\{\\def\\LTcaptype\{none\}[^\n]*\n(.*?)\\end\{longtable\}\s*\n\}",
+        r"\1\\end{longtable}",
+        tex, flags=re.S)
 
     def repl(m: re.Match) -> str:
         nonlocal count
         count += 1
         spec, caption, label, header, body = (
             m.group(1), m.group(2), m.group(3), m.group(4), m.group(5))
-        wide = "\\columnwidth" in spec
+        wide = ("\\columnwidth" in spec) or ("\\linewidth" in spec)
         env = "table*" if wide else "table"
         if wide:
             spec = spec.replace("\\columnwidth", "\\textwidth")
-        cap_label = rf"\caption{{{caption}}}" + (rf"\label{{{label}}}" if label else "")
+            spec = spec.replace("\\linewidth", "\\textwidth")
+        start = rf"\begin{{{env}}}[t]"
+        if caption:
+            start += "\n" + rf"\caption{{{caption}}}"
+            if label:
+                start += rf"\label{{{label}}}"
         return (
-            rf"\begin{{{env}}}[t]"
-            + "\n" + cap_label + "\n"
-            + r"\small\setlength{\tabcolsep}{3pt}" + "\n"
+            start
+            + "\n" + r"\small\setlength{\tabcolsep}{3pt}" + "\n"
             + rf"\begin{{tabular}}{{@{{}}{spec}@{{}}}}" + "\n"
             + r"\toprule\noalign{}" + "\n"
             + header + "\n"

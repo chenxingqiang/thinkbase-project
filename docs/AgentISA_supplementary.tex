@@ -1610,31 +1610,6 @@ files into \texttt{gateway\_multiseed\_results.json}:
     --output examples/benchmarks/gateway_multiseed_raw_zipf0.5.json
 \end{verbatim}
 
-\subsection{Artifact Notes: Superseded
-Implementations}\label{artifact-notes-superseded-implementations}
-
-All numbers in the main text's Section 5 were produced after the
-soundness fixes below; no superseded implementation contributes to any
-reported figure.
-
-\textbf{Folding pass (Section 5.3).} An earlier implementation folded
-more aggressively---44.4\% at length 200---but could place
-side-effectful instructions into shared groups when types were
-compatible, violating the disjointness condition; it was replaced by the
-current strictly disjoint design, and all reported figures use the
-current pass.
-
-\textbf{Domain-score weighting (Section 3.5).} An earlier form folded
-the domain weight \(w_k\) into \(s_k\) as well---double-counting it once
-at aggregation and again at the top level; Section 5.6's injected-score
-tests were unaffected (they bypass aggregation).
-
-\textbf{Pattern-recognizer prototype (Section 3.3.1).} An earlier
-prototype (TF-IDF embeddings, density-based clustering, k-means) was
-abandoned---non-deterministic across library versions, degenerate on
-short traces (a k-means view remains in \texttt{pattern\_mining}, fixed
-\texttt{random\_state}).
-
 \subsection{Artifact Contents
 Inventory}\label{artifact-contents-inventory}
 
@@ -1675,6 +1650,86 @@ Per-file inventory of the artifact (mirrored from
   (\texttt{tests/core/isa/test\_coordination.py},
   \texttt{tests/core/instructions/test\_agent\_coordination.py}).
 \end{itemize}
+
+\subsection{Artifact Notes: Superseded
+Implementations}\label{artifact-notes-superseded-implementations}
+
+All numbers in the main text's Section 5 were produced after the
+soundness fixes below; no superseded implementation contributes to any
+reported figure.
+
+\textbf{Folding pass (Section 5.3).} An earlier implementation folded
+more aggressively---44.4\% at length 200---but could place
+side-effectful instructions into shared groups when types were
+compatible, violating the disjointness condition; it was replaced by the
+current strictly disjoint design, and all reported figures use the
+current pass.
+
+\textbf{Domain-score weighting (Section 3.5).} An earlier form folded
+the domain weight \(w_k\) into \(s_k\) as well---double-counting it once
+at aggregation and again at the top level; Section 5.6's injected-score
+tests were unaffected (they bypass aggregation).
+
+\textbf{Pattern-recognizer prototype (Section 3.3.1).} An earlier
+prototype (TF-IDF embeddings, density-based clustering, k-means) was
+abandoned---non-deterministic across library versions, degenerate on
+short traces (a k-means view remains in \texttt{pattern\_mining}, fixed
+\texttt{random\_state}).
+
+\subsection{Mechanism Status Table}\label{mechanism-status-table}
+
+The paragraph below is reproduced verbatim from the main text's Section
+7, where it now appears in summary form:
+
+\textbf{Implementation status of the contributions.} A per-mechanism
+status table is in supplementary F.9. For auditability, the five
+contributions above split by status: \emph{implemented and exercised by
+the benchmarks}---the instruction set and contracts, Agentic Calling,
+result caching, fusion/DCE/grouping, hot-path detection and adoption
+(exact default), the coordination layer with injected-score capability
+selection, and the security monitor (fail-open default; 43 tests);
+\emph{implemented with known limits, exercised by the Section 5.11
+mechanism experiments but not the Section 5.2--5.5 benchmark arms}---the
+opt-in DP tree-pattern selector (default heuristic), the EMA hot-path
+detector (LRU-bounded tracked-path state; default exact), the strict
+cache namespace (default params-only key), the strict security mode,
+parameter-binding composite replay (mined via the learner's
+threshold-validated path, not the approval gate; constructor-baked
+parameters not rebindable), and capability metric extraction (static,
+declared-metadata only; coordinator wiring still injected);
+\emph{implemented with known limits, still unexercised by any Section 5
+experiment}---the bounded checker (pure instructions, bounded state
+spaces only) and runtime context validation (deletion blind spot
+disclosed); \emph{specified, not implemented}---cycle-accurate pipeline
+scheduling, block-granular trace formation, adaptive
+performance-triggered recompilation, and symbolic-equivalence checking.
+Theorems 3.4 and 3.6 are conditional arguments for the implemented
+rewrites; Theorem 3.5 covers the shipped unit-slot dispatch, and the
+specified components carry no verification claim.
+
+Per-mechanism companion to the status statement of the main paper's
+Section 7: each mechanism, its implementation status, and the experiment
+that exercises it. The opt-in rows are exercised by the Section 5.11
+mechanism experiments, not by the Section 5.2--5.5 benchmark arms.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Mechanism & Status & Exercised by \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+result caching & implemented & §5.2 + 5.7 \\
+static fusion + DCE & implemented & §5.3 + 5.7.1 \\
+hot-path specialization & implemented & §5.4 \\
+coordination layer & implemented, injected scores & §5.6 \\
+security monitor & implemented, fail-open default & §5.6 \\
+DP tree-pattern selector & implemented, opt-in & §5.11 \\
+EMA hot-path detector & implemented, opt-in & §5.11 \\
+strict cache namespace & implemented, opt-in & §5.11 \\
+\end{longtable}
+}
 
 \section{Priced-Comparison Protocol and
 Table}\label{priced-comparison-protocol-and-table}
@@ -4129,5 +4184,69 @@ the fusion share of the 34.2\% headline is a property of the planted
 linear family, not of this corpus. The corpus is itself
 generator-produced (Section 5.10's disclosure applies): this experiment
 varies the workload family, it does not remove planting altogether.
+
+\subsection{Notation}\label{notation}
+
+Notation used across the main paper and this supplement, with the
+location of each symbol's definition. Section, definition, and theorem
+numbers follow the main paper; appendix references are to this
+supplement.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Symbol
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Defined at
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\(\tau_i\) & Per-call latency & Section 2.1 \\
+\(\omega_i\) & Per-call context-reconstruction overhead & Section 2.1 \\
+\(\delta_i\) & Per-instruction state-transition function & Appendix
+B.1 \\
+\(C(n)\) & Overhead of executing \(n\) function calls & Definition
+2.1 \\
+\(C_{cached}(n)\) & Measured overhead under the result cache &
+Definition 2.1 \\
+\(\llbracket P \rrbracket\) & Denotation of program \(P\) & Appendix
+C.1 \\
+\(\parallel\) & Parallel composition (disjoint state footprints) &
+Definition 3.6 (Section 3.4.1) \\
+\(\circ\) & Sequential composition & Definition 3.6 (Section 3.4.1) \\
+\(\otimes\) & Capability-type composition & Section 6.3.1 (Appendix
+E.1) \\
+\(\text{cap}\) & Capability type (Basic / Composite / Emergent) &
+Section 6.3.1 (Appendix E.1) \\
+\(L\) & Security-level assignment on states and outputs & Section 6.3.6
+(Appendix E.1) \\
+\(s_k\) & Capability score of domain \(k\) & Definition 3.9 (Section
+3.5) \\
+\(w_k\) & Capability-domain weight & Definition 3.9 (Section 3.5) \\
+\(v_m\), \(\text{conf}_m\) & Metric value / metric confidence & Section
+3.5 \\
+\(\phi_{A \rightarrow B}\) & Cross-model instruction mapping
+\(I_A \rightarrow I_B\) & Section 6.3.2 \\
+\(\epsilon_i\), \(\delta_i\) & Per-mechanism differential-privacy
+parameters & Section 6.3.6 \\
+\end{longtable}
+}
+
+\textbf{Symbol reuse.} \(\delta_i\) is deliberately
+overloaded---per-instruction transition function (Appendix B.1) and
+per-mechanism DP parameter (Section 6.3.6), a reuse the main paper
+itself flags (Section 2.1); \(\delta\) further denotes the state-machine
+transition function (Section 3.2.2) and the pipeline data-transfer
+function (Definition 3.7). \(\tau\) doubles as the selection-pattern
+tree of Definition 3.8, and \(\phi\) as the context-interpretation
+function of Theorem 3.3.
 
 \end{document}
