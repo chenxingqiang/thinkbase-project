@@ -1511,11 +1511,14 @@ plain dict with no AgentISA machinery. Across the three skews it issues
 exactly the same call counts as the table's cached arm: \textbf{parity
 with the \texttt{InstructionCache} to the digit}, because the
 (instruction, params) key is already canonical on this workload. Parity
-is the finding: at the level of call reduction the instruction-level
-cache adds nothing over exact-response caching; what it adds is the
-compile-time transformations of Sections 5.3 and 5.5---reducing the
-program before any request is issued, which a response cache cannot
-express because it sees request strings, not instruction semantics.
+is the finding: on call reduction the instruction-level cache adds
+nothing over exact-response caching---its value is reducing the program
+before any request is issued (Sections 5.3 and 5.5), which a response
+cache cannot express. Parity is also a property of this workload, not
+the mechanism: under random param-insertion order the instruction key
+hits 95.0\% versus the response key's 7.3\%; under template churn the
+default key false-hits 48.3\% of calls, which the strict namespace key
+(90.4\% hit, zero false hits) prevents (supplementary I.4).
 Semantic/embedding caching remains out of scope (Section 5.9).
 
 \textbf{Interpretation.} The reduction increases across the three tested
@@ -1542,12 +1545,11 @@ instruction sequences, and what do the different optimization levels
 contribute?
 
 We compile random sequences at four optimization levels and measure two
-quantities, kept explicit (they are easy to conflate): \textbf{effective
-instruction count}---instructions remaining after fusion and dead-code
-elimination, a program-size measure---and \textbf{dispatch
-count}---independent dispatch operations the runtime issues, where
-parallel grouping can fold several independent instructions into one
-dispatch \emph{without changing the effective instruction count}.
+quantities, kept explicit: \textbf{effective instruction
+count}---instructions remaining after fusion and DCE, a program-size
+measure---and \textbf{dispatch count}---dispatches the runtime issues;
+parallel grouping folds several independent instructions into one
+dispatch without changing the effective count.
 
 \textbf{Interpretation} (full table: supplementary I.3). Three
 observations:
@@ -1567,16 +1569,20 @@ observations:
   effective-instruction reduction unchanged---adjacent side-effect-free
   instructions with disjoint dependencies and outputs grouped into
   shared dispatches. The 74.0 figure is a scheduling reduction, not a
-  further program-size reduction. (An earlier implementation folded more
-  aggressively---44.4 at length 200---but could place side-effectful
-  instructions into shared groups whose non-interference was never
-  established; the sounder grouping here folds less, and Appendix C.5's
-  dispatch-folding corollary now matches the implementation exactly.)
+  further program-size reduction (an earlier pass folded more but on
+  unproven non-interference---history in supplementary F.8).
 \item
   \textbf{Gains are stable across sequence lengths}: 32.8\%, 34.2\%,
   35.4\% at lengths 50, 200, 1,000 respectively, tightest variance at
   length 1,000 (\(\pm\) 1.6\%); length does not materially change the
   opportunity structure.
+\item
+  \textbf{A non-planted-family control bounds the headline.} Over
+  Section 5.10's corpus (100 workflows, 792 steps) the same compiler
+  reduces 19.2\%, all dead-guard elimination: pure transforms there form
+  dataflow chains, each of the 106 fusions absorbs a dead guard, no live
+  pair passes the disjointness gate---the fusion share of 34.2\% belongs
+  to the planted linear family (supplementary I.4).
 \end{enumerate}
 
 Effective-instruction reduction is again a \emph{program-size} metric:
@@ -1593,10 +1599,9 @@ specialize repeatedly executed traces?
 We record an instruction trace of length 100 for up to 200 iterations
 per seed with hot-path detection active (Section 5.1.2). Once a path is
 flagged hot, the runtime forms an optimized trace; \textbf{this
-experiment measures that trace's length and re-executes it}---the replay
-verification below checks that it reproduces the original trace's final
-state exactly (task-level artifact preservation is established
-separately, on realistic streams, by Section 5.8).
+experiment measures that trace's length and re-executes it}, the replay
+check verifying exact reproduction of the original trace's final state
+(task-level artifact preservation on realistic streams: Section 5.8).
 
 Across seeds, hot-path optimization shrinks the trace by \textbf{65.8\%
 \(\pm\) 4.6\%}; the seed-to-seed spread (59.0\%--70.0\%) reflects which
@@ -2085,19 +2090,17 @@ Census}\label{generated-trace-vocabulary-census}
 This census characterizes the generator's own vocabulary; it does
 \textbf{not} discharge the synthetic-workload threat of Section 5.9 (a
 generated corpus cannot validate a hand-built benchmark's realism). We
-analyze 100 task traces from a seeded random-task stress
-battery---randomly shaped instruction streams executed through the
-production engine, not hand-picked---totaling 792 steps and 12
-instruction signatures (protocol and tables: Appendix I of the
-supplementary material). The empirical rank-frequency decay is flatter
-than classical Zipf yet strongly log-linear (descriptive log-log slope
-0.593; a 12-signature vocabulary is too small to support a tail-exponent
-claim, so none is made---supplementary I.3). 98.5\% of instances recur
-corpus-wide (780/792)---a figure that reflects the 12-signature
-vocabulary as much as the generator, per-workflow repetition averaging
-18.3\% being the more informative quantity---so reuse is cross-task
-vocabulary, not intra-task duplication (shape census, fusibility counts,
-and the generator-produced disclosure: supplementary I.3).
+analyze 100 seeded random-task stress traces---randomly shaped streams
+through the production engine, not hand-picked---792 steps, 12
+signatures (protocol and tables: supplementary Appendix I). The
+empirical rank-frequency decay is flatter than classical Zipf yet
+strongly log-linear (descriptive log-log slope 0.593; a 12-signature
+vocabulary is too small to support a tail-exponent claim, so none is
+made---supplementary I.3). 98.5\% of instances recur corpus-wide
+(780/792)---reflecting the 12-signature vocabulary as much as the
+generator; per-workflow repetition, 18.3\%, is more informative---so
+reuse is cross-task vocabulary, not intra-task duplication (shape
+census, fusibility counts: supplementary I.3).
 
 \subsection{Mechanism Extensions}\label{mechanism-extensions}
 
@@ -2266,12 +2269,11 @@ Extensions}\label{capability-assessment-extensions}
 The instruction-level capability assessment subsystem
 (\texttt{CapabilityProfile}, Section 3.5) now ships at the static layer;
 its wiring gap remains disclosed there. Two extensions remain future
-work: (i) \textbf{benchmark-calibrated metrics}---correlating the scores
-with \emph{end-to-end} benchmark performance {[}17{]} {[}29{]} and
-grounding the weights \(w_k\) in such measurements; and (ii)
-\textbf{cross-model comparison matrices}, a pairwise framework
-\(\Delta(M_1, M_2)\) over capability dimensions for systematic model
-selection.
+work: (i) \textbf{benchmark-calibrated metrics}---correlating scores
+with \emph{end-to-end} performance {[}17{]} {[}29{]} and grounding the
+weights \(w_k\) therein; and (ii) \textbf{cross-model comparison
+matrices}, a pairwise framework \(\Delta(M_1, M_2)\) over capability
+dimensions for model selection.
 
 \subsubsection{Emergent Behavior
 Analysis}\label{emergent-behavior-analysis}
@@ -2283,11 +2285,10 @@ Analysis}\label{emergent-behavior-analysis}
   formal metric for when multi-agent composition exceeds the sum of its
   members' capabilities.
 \item
-  \textbf{Learning transfer mechanisms}: knowledge transfer across
-  agents composes the mining-extraction-validation pipeline of Section
-  3.3 rather than introducing new machinery---patterns mined from a
-  source agent's traces would be adapted and re-validated before
-  promotion.
+  \textbf{Learning transfer}: knowledge transfer across agents composes
+  Section 3.3's mining-extraction-validation pipeline rather than new
+  machinery---patterns mined from a source agent's traces would be
+  adapted and re-validated before promotion.
 \end{enumerate}
 
 \subsubsection{Security and Privacy
@@ -2304,14 +2305,13 @@ Extensions}\label{security-and-privacy-extensions}
   Appendix E.1).
 \item
   \textbf{Privacy-preserving computation}: a direction, not a delivered
-  mechanism---if agent computations over sensitive data were routed
-  through per-step differentially private mechanisms, the overall loss
-  would follow a composition theorem over the per-mechanism
+  mechanism---if computations over sensitive data were routed through
+  per-step differentially private mechanisms, overall loss would follow
+  a composition theorem over the per-mechanism
   \((\epsilon_i, \delta_i)\) parameters. We deliberately state no bound:
-  which composition theorem applies, and which concrete mechanisms the
-  runtime would expose, are open design choices; the instruction
-  contract is the natural place to carry such annotations once the
-  mechanisms exist.
+  which theorem applies and which mechanisms the runtime would expose
+  are open design choices; the instruction contract is the natural place
+  to carry such annotations once the mechanisms exist.
 \end{enumerate}
 
 None of the frameworks above is implemented today; Sections 6.3.3 and
@@ -2392,35 +2392,34 @@ AgentISA's longer-term significance is architectural: an
 instruction-level contract for agent behavior makes agent systems
 amenable to the discipline that transformed hardware and compiler
 engineering---precise specification, portability across backends, and
-semantics-preserving optimization. Establishing the corresponding gains
-on production workloads and mechanically verified implementations of the
-conditional arguments are the immediate next steps.
+semantics-preserving optimization. Establishing these gains on
+production workloads and mechanically verifying the conditional
+arguments are the immediate next steps.
 
 \section*{Artifact Availability}\label{artifact-availability}
 \addcontentsline{toc}{section}{Artifact Availability}
 
-Full proofs of Theorems 3.1--3.2 and 3.4--3.6, the component listings,
-the future-direction sketches, the artifact-regeneration command lines,
-the priced-comparison protocol, the four-task characterization detail,
-and the extension-experiment protocols and detailed tables behind
-Sections 5.10--5.11 (supplementary Appendices A--I, built from this
-repository as \texttt{docs/AgentISA\_supplementary.pdf}) are in the
-supplementary material; the commands are mirrored in the repository's
-top-level \texttt{REPRODUCING.md}. All artifacts are in the repository
-accompanying this submission (anonymized for review), and every number
-in Section 5 is generated from the exact repository state whose build
-produces this PDF (\texttt{REPRODUCING.md} records the submission-time
-\texttt{git\ rev-parse\ HEAD}, the dependency lock file, and the
-Python/system versions). A fresh clone reproduces the full-suite count
-with \texttt{python\ -m\ pytest\ tests/\ -q} (1,333 passed, 14 skipped
-at run time), the Section 5.6 functional-test counts, and, via the
-Appendix F command lines, every results table from
-scratch---real-gateway runs included, with a mock-backend fallback for
-environments without gateway credentials. \texttt{REPRODUCING.md} also
-maps each paper claim to the implementing module, the test that
-exercises it, and the raw-results file that backs its numbers, flagging
-specified-only components; the artifact is inventoried per file in
-Appendix F.7.
+Full proofs of Theorems 3.1--3.2 and 3.4--3.6, component listings,
+future-direction sketches, artifact-regeneration commands, the
+priced-comparison protocol, the four-task characterization detail, and
+the extension-experiment protocols and tables behind Sections 5.10--5.11
+(supplementary Appendices A--I, built from this repository as
+\texttt{docs/AgentISA\_supplementary.pdf}) are in the supplementary
+material; the commands are mirrored in \texttt{REPRODUCING.md}. All
+artifacts are in the repository accompanying this submission (anonymized
+for review), and every number in Section 5 is generated from the exact
+repository state whose build produces this PDF (\texttt{REPRODUCING.md}
+records the submission-time \texttt{git\ rev-parse\ HEAD}, the
+dependency lock file, and the Python/system versions). A fresh clone
+reproduces the full-suite count with
+\texttt{python\ -m\ pytest\ tests/\ -q} (1,337 passed, 14 skipped at run
+time), the Section 5.6 functional-test counts, and, via the Appendix F
+command lines, every results table from scratch---real-gateway runs
+included, with a mock-backend fallback for environments without gateway
+credentials. \texttt{REPRODUCING.md} also maps each paper claim to the
+implementing module, the test that exercises it, and the raw-results
+file that backs its numbers, flagging specified-only components; the
+artifact is inventoried per file in Appendix F.7.
 
 \begin{thebibliography}{99}
 \bibitem{ref1} Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, Dario Amodei. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.
@@ -2468,8 +2467,8 @@ Appendix F.7.
 \bibitem{ref43} Hanne Riis Nielson, Flemming Nielson. 1992. Semantics with Applications: A Formal Introduction. Wiley. (Springer 2007 retitled edition: Semantics with Applications: An Appetizer.)
 \bibitem{ref44} Michael Sipser. 2012. Introduction to the Theory of Computation, 3rd edition. Cengage Learning. Chapter 3 (the Church–Turing thesis and equivalence of computational models).
 \bibitem{ref45} Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. PLDI 2000, pp. 1–12. <https://doi.org/10.1145/349299.349303>
-\bibitem{ref46} Zilliz and community contributors. 2023. GPTCache: An Open-Source Library for Specifying and Implementing Semantics-Aware Caches for LLM Applications. Open-source release and technical report. https://github.com/zilliztech/GPTCache.
-\bibitem{ref47} Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Sun, Jeff Huang, Cody Hao Yu, Shiyi Cao, Christos Kozyrakis, Ion Stoica, Joseph E. Gonzalez, Clark Barrett, Ying Sheng. 2024. SGLang: Efficient Execution of Structured Language Model Programs. NeurIPS 37. arXiv:2312.07104.
+\bibitem{ref46} Zilliz and community contributors. 2023. GPTCache: An Open-Source Library for Specifying and Implementing Semantics-Aware Caches for LLM Applications. https://github.com/zilliztech/GPTCache.
+\bibitem{ref47} Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Sun, Jeff Huang, Cody Hao Yu, Shiyi Cao, Christos Kozyrakis, Ion Stoica, Joseph E. Gonzalez, Clark Barrett, and Ying Sheng. 2024. SGLang: Efficient Execution of Structured Language Model Programs. NeurIPS 37. arXiv:2312.07104.
 \end{thebibliography}
 
 \end{document}

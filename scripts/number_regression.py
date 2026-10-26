@@ -204,7 +204,7 @@ chk(tw['provenance']['corpus_sha256'] == '7c05d307c64ab418f85811efa18489fa80463a
 chk(tw['provenance']['seeds']['master_seed'] == 2026
     and tw['provenance']['seeds']['per_task_seed_range'] == [10000, 10099],
     'trace generator seeds json mismatch (paper: master seed 2026, corpus seeds 10000-10099)')
-for s_ in ['98.5% of instances recur corpus-wide', 'averaging 18.3%', '152 dead-end steps exactly equal the planted guards',
+for s_ in ['98.5% of instances recur corpus-wide', 'per-workflow repetition, 18.3%, is more informative', '152 dead-end steps exactly equal the planted guards',
            '106 of 692 adjacent pairs (15.3%)', '79 fan-out, 21 linear, 0 fan-in, 0 branch (7.9 steps/workflow)',
            'master seed 2026', '10000–10099']:
     chk(s_ in md, f'paper missing trace citation: {s_[:45]}')

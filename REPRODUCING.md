@@ -27,7 +27,7 @@ python -m pytest tests/core/isa/test_coordination.py \
 python -m pytest tests/system/ -q
 
 python -m pytest tests/ -q
-# 1333 passed, 14 skipped, 13 subtests passed (full suite)
+# 1337 passed, 14 skipped, 13 subtests passed (full suite)
 ```
 
 Note: the coordination tests initialize a local Ray session; on machines
@@ -67,6 +67,8 @@ marked below; every results JSON records its own provenance (seeds, scale,
 | I.2 token-mix priced sweep | `python examples/benchmarks/promptcache_sweep.py` (seeds 1000–1004; 13 mix points × 3 skews × 200 draws, 39,000 draws) | `examples/benchmarks/promptcache_sweep_results.json` |
 | I.3 gateway quality re-run (live) | `python examples/paper_real_llm_quality_check.py --backend real --scale tiny --max-tokens 3072` against the gateway at `https://127.0.0.1:8443` (model `claude-glm-5.3-flash`) — see reproduction notes below | `examples/benchmarks/gateway_quality_results.json` |
 | I.3 multi-seed cache run (live) | `python examples/benchmarks/isa_real_llm_bench.py --backend gateway --tasks 100 --seeds 2 --zipf 0.5 --max-tokens 64` (one invocation per zipf — repeat for 1.0 / 1.5 — with `--output` per raw chunk; `Random(1000+seed)`), then `python examples/benchmarks/e10_gateway_postprocess.py …` to fold the raw runs into the deliverable JSON — see reproduction notes below | `examples/benchmarks/gateway_multiseed_results.json` |
+| I.4 cache-key differentiation | `python examples/benchmarks/cache_key_differentiation.py` (W1 seed base 4000, W2 base 5000; universe 100 × 6-key params, 2000 draws × 5 seeds, Zipf s=1.0; production `build_cache_key` under test) | `examples/benchmarks/cache_key_differentiation_results.json` |
+| I.4 trace-corpus compile control | `python examples/benchmarks/trace_compile_control.py` (deterministic full census of the 100 committed traces; no seeds) | `examples/benchmarks/trace_compile_control_results.json` |
 
 Offline re-verification of every cited number (main text + supplementary,
 aggregates recomputed from raw records):
