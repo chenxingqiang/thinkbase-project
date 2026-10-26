@@ -1,0 +1,160 @@
+{
+  "experiment": "cache_key_differentiation",
+  "schema": "cache_key_differentiation/v1",
+  "description": "Workloads separating the instruction-level cache key from an exact-response key (W1: multi-key params under random insertion order) and the default params-only key from the strict namespace key (W2: alternating template version). Production build_cache_key under test; hit/miss accounting only, no LLM backend.",
+  "provenance": {
+    "git_rev": "c55dc1dbf2d8a395c1a37b91085e31941430e50a",
+    "utc_timestamp": "2026-10-26T06:53:33.381829+00:00",
+    "n_tasks": 2000,
+    "seeds": 5,
+    "seed_bases": {
+      "w1": 4000,
+      "w2": 5000
+    },
+    "zipf_s": 1.0,
+    "param_keys": 6,
+    "param_values": 20,
+    "task_universe": 100
+  },
+  "w1_param_reordering": {
+    "per_seed": [
+      {
+        "scenario": "w1_param_reordering",
+        "n_tasks": 2000,
+        "instruction_key_hits": 1900,
+        "response_key_hits": 147,
+        "instruction_key_hit_rate": 0.95,
+        "response_key_hit_rate": 0.0735,
+        "call_gap_percentage_points": 87.65
+      },
+      {
+        "scenario": "w1_param_reordering",
+        "n_tasks": 2000,
+        "instruction_key_hits": 1900,
+        "response_key_hits": 137,
+        "instruction_key_hit_rate": 0.95,
+        "response_key_hit_rate": 0.0685,
+        "call_gap_percentage_points": 88.15
+      },
+      {
+        "scenario": "w1_param_reordering",
+        "n_tasks": 2000,
+        "instruction_key_hits": 1900,
+        "response_key_hits": 135,
+        "instruction_key_hit_rate": 0.95,
+        "response_key_hit_rate": 0.0675,
+        "call_gap_percentage_points": 88.25
+      },
+      {
+        "scenario": "w1_param_reordering",
+        "n_tasks": 2000,
+        "instruction_key_hits": 1901,
+        "response_key_hits": 162,
+        "instruction_key_hit_rate": 0.9505,
+        "response_key_hit_rate": 0.081,
+        "call_gap_percentage_points": 86.95
+      },
+      {
+        "scenario": "w1_param_reordering",
+        "n_tasks": 2000,
+        "instruction_key_hits": 1900,
+        "response_key_hits": 148,
+        "instruction_key_hit_rate": 0.95,
+        "response_key_hit_rate": 0.074,
+        "call_gap_percentage_points": 87.6
+      }
+    ],
+    "aggregate": {
+      "instruction_key_hit_rate": {
+        "mean": 0.9501,
+        "stdev": 0.0002
+      },
+      "response_key_hit_rate": {
+        "mean": 0.0729,
+        "stdev": 0.0054
+      },
+      "call_gap_percentage_points": {
+        "mean": 87.72,
+        "stdev": 0.5191
+      }
+    }
+  },
+  "w2_template_churn": {
+    "per_seed": [
+      {
+        "scenario": "w2_template_churn",
+        "n_tasks": 2000,
+        "churn_period": 2,
+        "default_key_hits": 1901,
+        "default_key_hit_rate": 0.9505,
+        "default_key_false_hits": 951,
+        "default_key_false_hit_rate": 0.4755,
+        "strict_key_hits": 1804,
+        "strict_key_hit_rate": 0.902,
+        "strict_key_false_hits": 0
+      },
+      {
+        "scenario": "w2_template_churn",
+        "n_tasks": 2000,
+        "churn_period": 2,
+        "default_key_hits": 1901,
+        "default_key_hit_rate": 0.9505,
+        "default_key_false_hits": 972,
+        "default_key_false_hit_rate": 0.486,
+        "strict_key_hits": 1810,
+        "strict_key_hit_rate": 0.905,
+        "strict_key_false_hits": 0
+      },
+      {
+        "scenario": "w2_template_churn",
+        "n_tasks": 2000,
+        "churn_period": 2,
+        "default_key_hits": 1901,
+        "default_key_hit_rate": 0.9505,
+        "default_key_false_hits": 990,
+        "default_key_false_hit_rate": 0.495,
+        "strict_key_hits": 1808,
+        "strict_key_hit_rate": 0.904,
+        "strict_key_false_hits": 0
+      },
+      {
+        "scenario": "w2_template_churn",
+        "n_tasks": 2000,
+        "churn_period": 2,
+        "default_key_hits": 1900,
+        "default_key_hit_rate": 0.95,
+        "default_key_false_hits": 974,
+        "default_key_false_hit_rate": 0.487,
+        "strict_key_hits": 1806,
+        "strict_key_hit_rate": 0.903,
+        "strict_key_false_hits": 0
+      },
+      {
+        "scenario": "w2_template_churn",
+        "n_tasks": 2000,
+        "churn_period": 2,
+        "default_key_hits": 1900,
+        "default_key_hit_rate": 0.95,
+        "default_key_false_hits": 942,
+        "default_key_false_hit_rate": 0.471,
+        "strict_key_hits": 1809,
+        "strict_key_hit_rate": 0.9045,
+        "strict_key_false_hits": 0
+      }
+    ],
+    "aggregate": {
+      "default_key_hit_rate": {
+        "mean": 0.9503,
+        "stdev": 0.0003
+      },
+      "default_key_false_hit_rate": {
+        "mean": 0.4829,
+        "stdev": 0.0096
+      },
+      "strict_key_hit_rate": {
+        "mean": 0.9037,
+        "stdev": 0.0012
+      }
+    }
+  }
+}
