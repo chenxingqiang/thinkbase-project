@@ -52,12 +52,21 @@ def test_cache_key_differentiation(tmp_path):
         tmp_path / "keys.json")
     w1 = report["w1_param_reordering"]["aggregate"]
     w2 = report["w2_template_churn"]["aggregate"]
-    # W1: the instruction-level key dominates the order-sensitive
-    # response key under param reordering (parity breaks).
+    # W1's claim is an equivalence, not an advantage: the instruction
+    # key and an order-canonicalizing response key are information
+    # equivalent, so their hit counts must agree exactly, per seed.
+    for row in report["w1_param_reordering"]["per_seed"]:
+        assert (row["instruction_key_hits"]
+                == row["canonical_response_key_hits"])
+        assert row["canonical_gap_percentage_points"] == 0.0
+    assert w1["canonical_gap_percentage_points"]["mean"] == 0.0
+    assert w1["canonical_gap_percentage_points"]["stdev"] == 0.0
+    # Only the arm that skips canonicalization loses hits, and the
+    # loss is large enough that the gap cannot be read as a mechanism
+    # advantage without the canonicalizing control above.
     assert w1["instruction_key_hit_rate"]["mean"] > 0.90
     assert w1["response_key_hit_rate"]["mean"] < 0.15
-    assert (w1["instruction_key_hit_rate"]["mean"]
-            - w1["response_key_hit_rate"]["mean"]) > 0.75
+    assert w1["call_gap_percentage_points"]["mean"] > 75.0
     # W2: the default params-only key false-hits under template churn;
     # the strict namespace key never does.
     assert w2["default_key_false_hit_rate"]["mean"] > 0.40

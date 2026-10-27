@@ -1,20 +1,25 @@
-"""When does the instruction-level cache key stop being at parity?
+"""Is the instruction-level cache key's parity a workload or a key property?
 
 Review-motivated experiment for the Section 5.2 parity finding: on the
-Zipf benchmark the instruction-level (instruction, params) key and a
-naive exact-response key on the request string issue *identical* call
-counts, because the benchmark's params are single-key dicts and the
-naive arm canonicalizes by sorting.  Parity is thus a property of that
-workload, not of the mechanism.  This experiment constructs the two
-families of workload that separate the keys, using the production
+Zipf benchmark the instruction-level (instruction, params) key and an
+exact-response key on the request string issue *identical* call counts.
+This experiment locates the boundary, using the production
 ``build_cache_key`` (no mock of the key function):
 
-W1 -- parameter reordering.  Every task carries the same semantic
-params under a random insertion order (multi-key dicts, keys inserted
-in a random permutation per call).  The instruction-level key
-canonicalizes (``sort_keys=True``) and hits; an exact-response key on
-the serialized request (insertion-order-sensitive) misses on every
-reorder.  This measures the gap the Section 5.2 workload cannot show.
+W1 -- parameter reordering, with both response-cache variants.  Every
+task carries the same semantic params under a random insertion order
+(multi-key dicts, keys inserted in a random permutation per call).
+Three keys are accounted in one pass over one task stream: the
+instruction-level key (canonical by construction), an *order-sensitive*
+response key on the serialized request, and an *order-canonicalizing*
+response key (``sort_keys=True``) -- the variant Section 5.2's own naive
+arm already uses.  The order-sensitive arm loses every reorder; the
+canonicalizing arm ties the instruction key exactly.  The conclusion is
+therefore a statement about key *functions*, not about the workload:
+the default instruction key is information-equivalent to a canonicalized
+request payload, so parity is structural and reordering separates only
+the uncanonicalized variant.  W1 is reported as that equivalence
+measurement, not as evidence of an instruction-level advantage.
 
 W2 -- template-version churn.  The same instruction and params are
 rendered under an alternating template version (v1/v2, semantics
@@ -59,7 +64,7 @@ DEFAULT_OUTPUT = (
     REPO_ROOT / "examples" / "benchmarks"
     / "cache_key_differentiation_results.json"
 )
-SCHEMA = "cache_key_differentiation/v1"
+SCHEMA = "cache_key_differentiation/v2"
 
 N_KEYS = 6  # params dicts carry six keys (order has room to vary)
 ZIPF_S = 1.0  # same skew family as Section 5.2 so totals are comparable
@@ -108,11 +113,20 @@ def reorder(rng: random.Random, params: Dict[str, int]) -> Dict[str, int]:
 
 
 def w1_reordering(rng: random.Random, n_tasks: int) -> Dict[str, Any]:
-    """Instruction key vs order-sensitive response key under reorders."""
+    """Instruction key vs both response-key variants under reorders.
+
+    One pass over one task stream feeds three key functions, so the
+    three hit rates are paired by construction.  The canonicalizing
+    response key is the control that decides whether the instruction
+    key carries information a request-string key cannot: a zero gap
+    against it means the two key functions are equivalent and the
+    order-sensitive arm's loss is a canonicalization artifact.
+    """
     tasks = draw_tasks(rng, n_tasks)
-    instr_key_hits = resp_key_hits = 0
+    instr_key_hits = resp_key_hits = canon_resp_key_hits = 0
     seen_instr: Dict[str, str] = {}
     seen_resp: Dict[str, str] = {}
+    seen_canon: Dict[str, str] = {}
     for params in tasks:
         presented = reorder(rng, params)
         # Instruction-level key: production default (params-only, canonical).
@@ -121,22 +135,35 @@ def w1_reordering(rng: random.Random, n_tasks: int) -> Dict[str, Any]:
             instr_key_hits += 1
         else:
             seen_instr[ik] = "v"
-        # Exact-response key: the serialized request as an HTTP cache
-        # would see it (insertion order preserved, no canonicalization).
+        # Response key, order-sensitive: the serialized request as a cache
+        # that does not canonicalize would see it.
         rk = json.dumps({"instruction": "instr_w1", "params": presented})
         if rk in seen_resp:
             resp_key_hits += 1
         else:
             seen_resp[rk] = "v"
+        # Response key, order-canonicalizing: the same payload under
+        # sort_keys -- what Section 5.2's naive arm already does.
+        ck = json.dumps({"instruction": "instr_w1", "params": presented},
+                        sort_keys=True)
+        if ck in seen_canon:
+            canon_resp_key_hits += 1
+        else:
+            seen_canon[ck] = "v"
     return {
         "scenario": "w1_param_reordering",
         "n_tasks": n_tasks,
         "instruction_key_hits": instr_key_hits,
         "response_key_hits": resp_key_hits,
+        "canonical_response_key_hits": canon_resp_key_hits,
         "instruction_key_hit_rate": round(instr_key_hits / n_tasks, 4),
         "response_key_hit_rate": round(resp_key_hits / n_tasks, 4),
+        "canonical_response_key_hit_rate": round(
+            canon_resp_key_hits / n_tasks, 4),
         "call_gap_percentage_points": round(
             (instr_key_hits - resp_key_hits) / n_tasks * 100, 2),
+        "canonical_gap_percentage_points": round(
+            (instr_key_hits - canon_resp_key_hits) / n_tasks * 100, 2),
     }
 
 
@@ -206,12 +233,14 @@ def run(n_tasks: int, seeds: int) -> Dict[str, Any]:
         "experiment": "cache_key_differentiation",
         "schema": SCHEMA,
         "description": (
-            "Workloads separating the instruction-level cache key from an "
-            "exact-response key (W1: multi-key params under random "
-            "insertion order) and the default params-only key from the "
-            "strict namespace key (W2: alternating template version). "
-            "Production build_cache_key under test; hit/miss accounting "
-            "only, no LLM backend."
+            "W1 measures whether the instruction-level cache key carries "
+            "information an exact-response key cannot: one task stream "
+            "(multi-key params under random insertion order) is keyed "
+            "three ways -- instruction key, order-sensitive response key, "
+            "and order-canonicalizing response key. W2 separates the "
+            "default params-only key from the strict namespace key under "
+            "alternating template versions. Production build_cache_key "
+            "under test; hit/miss accounting only, no LLM backend."
         ),
         "provenance": {
             "git_rev": git_rev(),
@@ -228,7 +257,9 @@ def run(n_tasks: int, seeds: int) -> Dict[str, Any]:
             "per_seed": w1,
             "aggregate": agg(w1, ["instruction_key_hit_rate",
                                   "response_key_hit_rate",
-                                  "call_gap_percentage_points"]),
+                                  "canonical_response_key_hit_rate",
+                                  "call_gap_percentage_points",
+                                  "canonical_gap_percentage_points"]),
         },
         "w2_template_churn": {
             "per_seed": w2,
@@ -252,8 +283,11 @@ def main(argv: List[str] | None = None) -> int:
     a1 = report["w1_param_reordering"]["aggregate"]
     a2 = report["w2_template_churn"]["aggregate"]
     print(f"W1 reorder: instr-key hit {a1['instruction_key_hit_rate']['mean']:.1%} vs "
-          f"response-key {a1['response_key_hit_rate']['mean']:.1%} "
-          f"(gap {a1['call_gap_percentage_points']['mean']:.1f} pp)")
+          f"order-sensitive response-key {a1['response_key_hit_rate']['mean']:.1%} "
+          f"(gap {a1['call_gap_percentage_points']['mean']:.1f} pp) vs "
+          f"canonicalizing response-key "
+          f"{a1['canonical_response_key_hit_rate']['mean']:.1%} "
+          f"(gap {a1['canonical_gap_percentage_points']['mean']:.2f} pp)")
     print(f"W2 churn:   default hit {a2['default_key_hit_rate']['mean']:.1%} "
           f"(false {a2['default_key_false_hit_rate']['mean']:.1%}) vs "
           f"strict hit {a2['strict_key_hit_rate']['mean']:.1%}")

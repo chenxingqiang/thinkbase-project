@@ -1,10 +1,10 @@
 {
   "experiment": "cache_key_differentiation",
-  "schema": "cache_key_differentiation/v1",
-  "description": "Workloads separating the instruction-level cache key from an exact-response key (W1: multi-key params under random insertion order) and the default params-only key from the strict namespace key (W2: alternating template version). Production build_cache_key under test; hit/miss accounting only, no LLM backend.",
+  "schema": "cache_key_differentiation/v2",
+  "description": "W1 measures whether the instruction-level cache key carries information an exact-response key cannot: one task stream (multi-key params under random insertion order) is keyed three ways -- instruction key, order-sensitive response key, and order-canonicalizing response key. W2 separates the default params-only key from the strict namespace key under alternating template versions. Production build_cache_key under test; hit/miss accounting only, no LLM backend.",
   "provenance": {
-    "git_rev": "c55dc1dbf2d8a395c1a37b91085e31941430e50a",
-    "utc_timestamp": "2026-10-26T06:53:33.381829+00:00",
+    "git_rev": "b6af966d6f527b5e4637b82232c1e710c38ff757",
+    "utc_timestamp": "2026-10-26T10:03:29.694621+00:00",
     "n_tasks": 2000,
     "seeds": 5,
     "seed_bases": {
@@ -23,45 +23,60 @@
         "n_tasks": 2000,
         "instruction_key_hits": 1900,
         "response_key_hits": 147,
+        "canonical_response_key_hits": 1900,
         "instruction_key_hit_rate": 0.95,
         "response_key_hit_rate": 0.0735,
-        "call_gap_percentage_points": 87.65
+        "canonical_response_key_hit_rate": 0.95,
+        "call_gap_percentage_points": 87.65,
+        "canonical_gap_percentage_points": 0.0
       },
       {
         "scenario": "w1_param_reordering",
         "n_tasks": 2000,
         "instruction_key_hits": 1900,
         "response_key_hits": 137,
+        "canonical_response_key_hits": 1900,
         "instruction_key_hit_rate": 0.95,
         "response_key_hit_rate": 0.0685,
-        "call_gap_percentage_points": 88.15
+        "canonical_response_key_hit_rate": 0.95,
+        "call_gap_percentage_points": 88.15,
+        "canonical_gap_percentage_points": 0.0
       },
       {
         "scenario": "w1_param_reordering",
         "n_tasks": 2000,
         "instruction_key_hits": 1900,
         "response_key_hits": 135,
+        "canonical_response_key_hits": 1900,
         "instruction_key_hit_rate": 0.95,
         "response_key_hit_rate": 0.0675,
-        "call_gap_percentage_points": 88.25
+        "canonical_response_key_hit_rate": 0.95,
+        "call_gap_percentage_points": 88.25,
+        "canonical_gap_percentage_points": 0.0
       },
       {
         "scenario": "w1_param_reordering",
         "n_tasks": 2000,
         "instruction_key_hits": 1901,
         "response_key_hits": 162,
+        "canonical_response_key_hits": 1901,
         "instruction_key_hit_rate": 0.9505,
         "response_key_hit_rate": 0.081,
-        "call_gap_percentage_points": 86.95
+        "canonical_response_key_hit_rate": 0.9505,
+        "call_gap_percentage_points": 86.95,
+        "canonical_gap_percentage_points": 0.0
       },
       {
         "scenario": "w1_param_reordering",
         "n_tasks": 2000,
         "instruction_key_hits": 1900,
         "response_key_hits": 148,
+        "canonical_response_key_hits": 1900,
         "instruction_key_hit_rate": 0.95,
         "response_key_hit_rate": 0.074,
-        "call_gap_percentage_points": 87.6
+        "canonical_response_key_hit_rate": 0.95,
+        "call_gap_percentage_points": 87.6,
+        "canonical_gap_percentage_points": 0.0
       }
     ],
     "aggregate": {
@@ -73,9 +88,17 @@
         "mean": 0.0729,
         "stdev": 0.0054
       },
+      "canonical_response_key_hit_rate": {
+        "mean": 0.9501,
+        "stdev": 0.0002
+      },
       "call_gap_percentage_points": {
         "mean": 87.72,
         "stdev": 0.5191
+      },
+      "canonical_gap_percentage_points": {
+        "mean": 0.0,
+        "stdev": 0.0
       }
     }
   },

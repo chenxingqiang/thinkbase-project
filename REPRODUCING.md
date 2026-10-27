@@ -52,7 +52,7 @@ model-cost map through `httpx` at import time and fails collection otherwise
 
 All commands are offline and deterministic except the two live-gateway runs
 marked below; every results JSON records its own provenance (seeds, scale,
-`git_rev`). Commit `0e1671f8` is the provenance revision cited in Appendix I.
+`git_rev`). The recorded revisions are `0e1671f8` for ten of the Appendix-I files, `c55dc1db` for the trace-corpus compile control, and `b6af966d` for the cache-key control's canonical-arm re-run (Appendix I.4.1); later doc-only commits do not change experiment provenance.
 
 | Experiment | Command | Raw results |
 | --- | --- | --- |

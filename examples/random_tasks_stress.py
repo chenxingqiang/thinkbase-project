@@ -268,6 +268,17 @@ def compile_check(stream: List[Instruction],
     ``guards`` is the set of instruction ids the task author knows to
     be dead code (no outputs consumed downstream); when omitted, the
     ``guard_`` prefix convention is used.
+
+    The verdict is deliberately two-sided.  ``dataflow_preserved``
+    checks the *soundness* direction -- nothing outside ``guards`` was
+    removed -- which on its own is circular: it can only ever confirm
+    that the pass removed a subset of what the generator planted, and
+    is silent about dead code the pass failed to find.  ``missed_dce``
+    supplies the *completeness* direction from the stream's own
+    dataflow, independently of the naming convention: a side-effect-free
+    instruction none of whose declared outputs is consumed by any other
+    instruction is dead by construction, so its survival is a missed
+    elimination whether or not it was planted as a guard.
     """
     compiler = InstructionCompiler({})
 
@@ -286,6 +297,14 @@ def compile_check(stream: List[Instruction],
     out: Dict[str, Any] = {}
     if guards is None:
         guards = {i.id for i in stream if i.id.startswith("guard_")}
+    consumed = {d for i in stream for d in i.dependencies}
+    # Convention-independent dead set: side-effect-free and no declared
+    # output is consumed anywhere in the stream.
+    dead_by_dataflow = {
+        i.id for i in stream
+        if not i.side_effects
+        and not any(o in consumed for o in i.outputs)
+    }
     for level in ("NONE", "AGGRESSIVE"):
         compiled = compiler.compile(
             spec_view, CompilationContext({"optimization_level": level}))
@@ -293,7 +312,6 @@ def compile_check(stream: List[Instruction],
         covered_producers = {n for n in all_names
                              if any(n in c for c in cov)}
         eliminated = all_names - covered_producers
-        consumed = {d for i in stream for d in i.dependencies}
         producer_of = {}
         for i in stream:
             for o in i.outputs:
@@ -309,9 +327,11 @@ def compile_check(stream: List[Instruction],
             "dataflow_preserved": (
                 not missing and eliminated <= guards
             ),
+            "missed_dce": sorted(dead_by_dataflow - eliminated),
         }
     out["n"] = len(stream)
     out["guards"] = sorted(guards)
+    out["dead_by_dataflow"] = sorted(dead_by_dataflow)
     out["pass"] = (
         out["NONE"]["effective"] == len(stream)
         and out["NONE"]["dataflow_preserved"]
