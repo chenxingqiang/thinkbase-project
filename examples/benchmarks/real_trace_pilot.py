@@ -303,13 +303,25 @@ def fusible_pairs_compiler_gate(steps: Sequence[Mapping[str, Any]]) -> int:
     return n
 
 
+def is_pure(tool: str) -> bool:
+    return bool(TOOL_CLASSES.get(tool, EFFECTFUL_DEFAULT)[1])
+
+
 def cache_measure(actions: Sequence[tuple]) -> Dict[str, Any]:
     """Hit counts under the canonical (params-only, sorted) key and the raw
     insertion-order key, over one trajectory's ordered calls."""
     seen_params: set = set()
     seen_scoped: set = set()
     hits_params = hits_scoped = 0
+    cacheable = effectful_repeats = 0
+    seen_effectful: set = set()
     for tool, args in actions:
+        if not is_pure(tool):
+            if build_cache_key(tool, dict(args)) in seen_effectful:
+                effectful_repeats += 1
+            seen_effectful.add(build_cache_key(tool, dict(args)))
+            continue
+        cacheable += 1
         # params-only: the legacy default key (build_cache_key with no namespace)
         params_key = build_cache_key(tool, dict(args))
         # instruction-scoped: the shipped per-instance scoping, tool in the key
@@ -325,26 +337,35 @@ def cache_measure(actions: Sequence[tuple]) -> Dict[str, Any]:
     n = len(actions)
     return {
         "calls": n,
+        "cacheable_calls": cacheable,
+        "effectful_repeats": effectful_repeats,
         "params_only_hits": hits_params,
-        "params_only_hit_rate": round(hits_params / n, 4) if n else 0.0,
+        "params_only_hit_rate": round(hits_params / cacheable, 4) if cacheable else 0.0,
         "instruction_scoped_hits": hits_scoped,
-        "instruction_scoped_hit_rate": round(hits_scoped / n, 4) if n else 0.0,
+        "instruction_scoped_hit_rate": (
+            round(hits_scoped / cacheable, 4) if cacheable else 0.0),
     }
 
 
 def _scope_once(records: Sequence[Mapping[str, Any]], fn) -> Dict[str, Any]:
     runs: Dict[str, set] = {}
     per_source: Dict[str, Dict[str, int]] = {}
-    calls = task_hits = run_hits = 0
+    calls = task_hits = run_hits = effectful_repeats = 0
     for rec in records:
         source = str(rec.get("source") or "unknown")
         seen_run = runs.setdefault(source, set())
         seen_task: set = set()
+        seen_effectful: set = set()
         for turn in fn(rec):
             for tool, args in turn:
                 key = hashlib.sha256(
                     f"{tool}|{_args_text(dict(args))}".encode("utf-8")
                 ).hexdigest()
+                if not is_pure(tool):
+                    if key in seen_effectful:
+                        effectful_repeats += 1
+                    seen_effectful.add(key)
+                    continue
                 calls += 1
                 stat = per_source.setdefault(
                     source, {"calls": 0, "within_task_hits": 0, "within_run_hits": 0})
@@ -359,6 +380,8 @@ def _scope_once(records: Sequence[Mapping[str, Any]], fn) -> Dict[str, Any]:
                 seen_task.add(key)
     return {
         "calls": calls,
+        "cacheable_calls": calls,
+        "effectful_repeats": effectful_repeats,
         "runs": len(runs),
         "within_task_hits": task_hits,
         "within_task_hit_rate": round(task_hits / calls, 4) if calls else 0.0,

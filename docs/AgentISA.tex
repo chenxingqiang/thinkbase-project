@@ -1696,7 +1696,7 @@ Validation}\label{multi-agent-coordination-functional-validation}
 The multi-agent layer---\texttt{AgentCoordinator},
 \texttt{SecurityMonitor}, and the collaborative instruction set---is
 validated functionally by 43 tests, all passing---the
-coordination-and-security subset of the repository's full suite (1,343
+coordination-and-security subset of the repository's full suite (1,345
 passing, 14 skipped at run time), which also covers the ISA core,
 compiler, and optimizer units of Sections 5.2--5.5. This is
 \textbf{qualitative functional validation}: the tests verify the
@@ -2064,7 +2064,7 @@ We enumerate the limitations of the evaluation explicitly:
   shrink and shows uniform reuse and closed-loop adoption---but the four
   tasks remain hand-constructed, not a production workload study.
   Section 5.12 adds recorded model trajectories: static reduction there
-  is 0.0\% and cache reuse is 35.5\% across tasks but 1.5\% within one,
+  is 0.0\% and cache reuse is 41.7\% across tasks but 1.7\% within one,
   so each headline is a bound of its construction, not a workload
   constant.
 \item
@@ -2190,12 +2190,15 @@ final-turn outputs are required so liveness cannot delete the answer.
 Static reduction is \textbf{0.0\%} at BASIC and AGGRESSIVE---real traces
 chain their observations, so no step is provably dead and no pure pair
 provably independent, confirming Section 5.3's 34.2\% as a property of
-the planted family. Reuse transfers conditionally: \textbf{1.54\%} of
-calls hit within a task, \textbf{35.47\%} across the distinct tasks of
-one run (retail 40.9--43.9\%, airline 13.8--18.4\%), and 79.24\% under
-the benchmark's trial replay, which repeats identical tasks rather than
-exhibiting workload repetition. Section 5.2's benefit therefore survives
-on real workloads only where a cache is shared across tasks.
+the planted family. Reuse transfers conditionally: \textbf{1.73\%} of
+cacheable calls hit within a task, \textbf{41.70\%} across the distinct
+tasks of one run (retail 49.0--50.2\%, airline 16.3--22.1\%), and 83.4\%
+under the benchmark's trial replay, which repeats identical tasks rather
+than exhibiting workload repetition. Section 5.2's benefit therefore
+survives on real workloads only where a cache is shared across tasks. A
+second, bash-only coding-agent family (supplementary I.6) also earns
+0.0\% statically and contains no cacheable instruction at all, though
+45.5\% of its commands repeat verbatim: repetition is not cacheability.
 
 \section{Discussion}\label{discussion}
 
@@ -2468,7 +2471,7 @@ repository state whose build produces this PDF (\texttt{REPRODUCING.md}
 records the submission-time \texttt{git\ rev-parse\ HEAD}, the
 dependency lock, and the Python/system versions). A fresh clone
 reproduces the full suite (\texttt{python\ -m\ pytest\ tests/\ -q}:
-1,343 passed, 14 skipped at run time), the Section 5.6 functional-test
+1,345 passed, 14 skipped at run time), the Section 5.6 functional-test
 counts, and, via the Appendix F command lines, every results table from
 scratch---real-gateway runs included, with a mock-backend fallback for
 environments without credentials. \texttt{REPRODUCING.md} also maps each

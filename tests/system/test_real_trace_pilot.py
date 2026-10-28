@@ -97,9 +97,9 @@ def test_terminal_artifact_is_protected_from_dce(pilot) -> None:
 
 def test_cache_measure_counts_repeats(pilot) -> None:
     cm = pilot.cache_measure([
-        ("bash", {"cmd": "pytest"}),
-        ("bash", {"cmd": "pytest"}),
-        ("bash", {"cmd": "git diff"}),
+        ("get_order_details", {"order_id": "A1"}),
+        ("get_order_details", {"order_id": "A1"}),
+        ("get_user_details", {"user_id": "U7"}),
     ])
     assert cm["calls"] == 3
     assert cm["instruction_scoped_hits"] == 1
@@ -107,3 +107,39 @@ def test_cache_measure_counts_repeats(pilot) -> None:
     # the params-only legacy key is not tool-scoped: only equal here because
     # the three calls carry distinct parameters
     assert cm["params_only_hits"] == 1
+
+
+PREPARE_SWE = REPO_ROOT / "examples" / "real_traces" / "prepare_swe_agent.py"
+
+
+def test_swe_action_parser_reads_the_last_fenced_block() -> None:
+    """SWE-agent emits its action as the last fenced block; prose above it is
+    not an action, and a shell command keeps only its first line."""
+    spec = importlib.util.spec_from_file_location("prepare_swe_agent", PREPARE_SWE)
+    mod = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(mod)
+    text = (
+        "I will inspect the file.\n\n```\nstr_replace_editor view /repo/app.py\n```\n"
+    )
+    assert mod.parse_action(text) == [
+        "str_replace_editor", {"command": "view", "path": "/repo/app.py"}]
+    shell = "Let me run the tests.\n\n```bash\ncd /repo && pytest -q\nmore output\n```\n"
+    assert mod.parse_action(shell) == ["bash", {"cmd": "cd /repo && pytest -q"}]
+    assert mod.parse_action("only reasoning, no action") is None
+
+
+def test_cache_is_restricted_to_side_effect_free_calls(pilot) -> None:
+    """A result cache may serve only pure instructions: repeated effectful
+    commands are repetition, not cacheable reuse."""
+    cm = pilot.cache_measure([
+        ("bash", {"cmd": "pytest"}),          # effectful, repeated
+        ("bash", {"cmd": "pytest"}),
+        ("get_order_details", {"order_id": "A1"}),   # pure, repeated
+        ("get_order_details", {"order_id": "A1"}),
+    ])
+    assert cm["calls"] == 4
+    assert cm["cacheable_calls"] == 2
+    assert cm["effectful_repeats"] == 1
+    assert cm["instruction_scoped_hits"] == 1
+    assert cm["instruction_scoped_hit_rate"] == pytest.approx(0.5)

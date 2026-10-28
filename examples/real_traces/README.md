@@ -64,3 +64,29 @@ upstream tree; the upstream digests above let a reader verify the provenance.
 | **total** | **1,960** | **14,285** |
 
 Tasks whose trajectory contained no tool call are omitted (28 of them).
+
+## Second family: bash-only coding agents
+
+`SWE-agent-trajectories` on Hugging Face (`nebius/SWE-agent-trajectories`,
+revision `68195a14`, CC-BY-4.0): recorded SWE-agent runs on SWE-bench
+instances. `swe_agent_sample.jsonl` takes the first 300 trajectories of shard
+`train-00000-of-00012` in file order (8,150 actions; swe-agent-llama-70b/8b/405b
+backbones).
+
+These trajectories carry no structured tool calls: SWE-agent emits its action
+as the last fenced block of an assistant message. `prepare_swe_agent.py` parses
+it mechanically—a block starting with `str_replace_editor` becomes an editor
+call, anything else a shell command with its first line kept. This shard is
+bash-only: all 8,150 actions are shell commands, so the family has no read-only
+instruction, which is exactly why it is reported separately in I.6.
+
+```bash
+# China mirror works where huggingface.co resolves to a poisoned address
+curl -L -o swe0.parquet \
+  https://hf-mirror.com/datasets/nebius/SWE-agent-trajectories/resolve/main/data/train-00000-of-00012.parquet
+./venv/bin/python examples/real_traces/prepare_swe_agent.py --parquet swe0.parquet --limit 300
+```
+
+| source | trajectories | tool calls | cacheable calls |
+|---|---|---|---|
+| swe-agent-llama-70b/8b/405b | 300 | 8,150 | 0 |

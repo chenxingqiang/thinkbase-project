@@ -1378,6 +1378,25 @@ Raw results: `examples/benchmarks/trace_compile_control_results.json` (runner `e
 
 The decomposition: 792 − 640 = 152 = the dead-step count exactly; all 106 fusions that fire absorb a dead guard (the corpus's pure transforms form dataflow chains, so no live pair passes the disjointness condition—correctly, since fusing a dataflow chain would change semantics). The 19.2% is therefore entirely dead-guard elimination, and the fusion share of the 34.2% headline is a property of the planted linear family, not of this corpus. The corpus is itself generator-produced (Section 5.10's disclosure applies): this experiment varies the workload family, it does not remove planting altogether.
 
+## I.6 Second Real Family: Bash-Only Coding-Agent Trajectories
+
+Section 5.12 measures tool-use traces in which read-only lookups dominate the stream. Coding agents have the opposite shape, so the same harness was run on a second recorded family.
+
+**Data.** `nebius/SWE-agent-trajectories` (CC-BY-4.0, revision `68195a14`), shard `train-00000-of-00012`, the first 300 trajectories in file order—recorded SWE-agent runs on SWE-bench instances (swe-agent-llama-70b/8b/405b backbones), 8,150 actions in total, compacted by the same rule (keep ordered `[tool, args]`, drop prose and observations).
+
+**Parsing, disclosed.** These trajectories carry no structured tool calls: SWE-agent emits its action as the last fenced block of an assistant message and the next message is the observation. A block starting with `str_replace_editor` is an editor call (subcommand and path); anything else is a shell command whose first line is kept as `cmd`. This shard's backbones are bash-only: all 8,150 actions parse as shell commands and none as an editor call, so the family contains no read-only instruction at all.
+
+| | τ-bench (Section 5.12) | SWE-agent (I.6) |
+| -- | -- | -- |
+| trajectories / distinct tasks | 1,960 / 330 | 300 / 300 |
+| tool calls | 14,285 | 8,150 |
+| cacheable (side-effect-free) calls | 1,789 (79% of the first-trial stream) | 0 (0%) |
+| verbatim repeats | 4 | 3,711 (45.5%) |
+| static reduction (BASIC, AGGRESSIVE) | 0.0%, 0.0% | 0.0%, 0.0% |
+| cache hits within task / within run | 1.73% / 41.70% | — (nothing cacheable) |
+
+**Finding: repetition is not cacheability.** A bash-only coding agent repeats 45.5% of its commands verbatim, yet every one of them is effectful, so the result cache has nothing it may serve—the cache's surface exists only where the stream is dominated by side-effect-free reads, as in the tool-use family. The static 0.0% also holds in both families, though for different structural reasons: sequential observation chaining in tool use (no provably dead step, no provably independent pair), and an effectful-only instruction mix in the bash agent.
+
 ## I.5 Notation
 
 Notation used across the main paper and this supplement, with the location of each symbol's definition. Section, definition, and theorem numbers follow the main paper; appendix references are to this supplement.
