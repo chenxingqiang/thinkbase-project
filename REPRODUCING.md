@@ -27,7 +27,7 @@ python -m pytest tests/core/isa/test_coordination.py \
 python -m pytest tests/system/ -q
 
 python -m pytest tests/ -q
-# 1337 passed, 14 skipped, 13 subtests passed (full suite)
+# 1343 passed, 14 skipped, 13 subtests passed (full suite)
 ```
 
 Note: the coordination tests initialize a local Ray session; on machines
