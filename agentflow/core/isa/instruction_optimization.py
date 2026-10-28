@@ -142,6 +142,24 @@ class StaticOptimizer:
         pattern_key = "_".join(pattern)
         self.peephole_patterns[pattern_key] = (pattern, replacement)
 
+    def remove_peephole_pattern(self, pattern: List[str],
+                                replacement: Optional[List[str]] = None) -> bool:
+        """Withdraw a peephole pattern; the inverse of ``add_peephole_pattern``.
+
+        Returns whether a rule was removed. When ``replacement`` is given the
+        rule is only withdrawn if it still points at that replacement, so a
+        retire cannot silently delete a rule that was re-installed with
+        different semantics.
+        """
+        pattern_key = "_".join(pattern)
+        current = self.peephole_patterns.get(pattern_key)
+        if current is None:
+            return False
+        if replacement is not None and list(current[1]) != list(replacement):
+            return False
+        del self.peephole_patterns[pattern_key]
+        return True
+
     def optimize(self, instructions: List[Instruction]) -> List[Instruction]:
         """Apply static optimizations."""
         # Apply peephole optimization

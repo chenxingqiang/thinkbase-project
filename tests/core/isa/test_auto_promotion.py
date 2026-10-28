@@ -486,3 +486,58 @@ async def test_remining_same_traces_is_idempotent():
     assert g_second == g_first
     assert len(gated.proposals) == 1
     assert [p.status for p in g_second] == [PromotionStatus.PENDING]
+
+
+# -- deprecation: the delete half of the repertoire lifecycle ---------
+
+
+@pytest.mark.asyncio
+async def test_deprecate_retires_an_applied_promotion():
+    """Deprecating withdraws both the executable and its rewrite rule."""
+    engine = make_engine()
+    (proposal,) = engine.mine_and_propose(
+        await record_streams([build_abc_stream(), build_abc_stream()])
+    )
+    engine.approve(proposal.proposal_id)
+    assert engine.active_promotions() == [proposal]
+
+    retired = engine.deprecate(proposal.proposal_id, reason="superseded")
+
+    assert retired.status is PromotionStatus.DEPRECATED
+    assert retired.deprecation_reason == "superseded"
+    assert engine.promoted_instructions == {}
+    assert engine.optimizer.peephole_patterns == {}
+    assert engine.active_promotions() == []
+    # Idempotent: retiring twice changes nothing.
+    assert engine.deprecate(proposal.proposal_id) is proposal
+
+
+@pytest.mark.asyncio
+async def test_deprecate_refuses_proposals_that_were_never_applied():
+    """Only an installation can be withdrawn; the record stays honest."""
+    engine = make_engine()
+    (proposal,) = engine.mine_and_propose(
+        await record_streams([build_abc_stream(), build_abc_stream()])
+    )
+    with pytest.raises(ValueError, match="only an applied promotion"):
+        engine.deprecate(proposal.proposal_id)
+    engine.reject(proposal.proposal_id)
+    with pytest.raises(ValueError, match="only an applied promotion"):
+        engine.deprecate(proposal.proposal_id)
+
+
+@pytest.mark.asyncio
+async def test_deprecate_stale_retires_only_idle_promotions():
+    """Staleness counts observations since last use; absent names are idle."""
+    engine = make_engine()
+    (proposal,) = engine.mine_and_propose(
+        await record_streams([build_abc_stream(), build_abc_stream()])
+    )
+    engine.approve(proposal.proposal_id)
+
+    assert engine.deprecate_stale({proposal.fused_name: 1}, max_idle=5) == []
+    assert engine.active_promotions() == [proposal]
+
+    retired = engine.deprecate_stale({proposal.fused_name: 9}, max_idle=5)
+    assert [p.proposal_id for p in retired] == [proposal.proposal_id]
+    assert engine.active_promotions() == []

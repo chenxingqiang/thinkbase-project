@@ -62,9 +62,10 @@ def _proposal_id(pattern_id: str) -> str:
 
 class PromotionStatus(str, Enum):
     """Lifecycle states of a promotion proposal."""
-    PENDING = "pending"    # waiting at the approval gate
-    APPLIED = "applied"   # approved and promoted
-    REJECTED = "rejected"  # declined at the gate
+    PENDING = "pending"      # waiting at the approval gate
+    APPLIED = "applied"     # approved and promoted
+    REJECTED = "rejected"    # declined at the gate
+    DEPRECATED = "deprecated"  # promoted, then retired from service
 
 
 @dataclass
@@ -111,6 +112,7 @@ class PromotionProposal:
     support: int
     success_rate: float
     status: PromotionStatus = PromotionStatus.PENDING
+    deprecation_reason: str = ""
 
 
 class AutoPromotionEngine:
@@ -249,6 +251,62 @@ class AutoPromotionEngine:
             )
         proposal.status = PromotionStatus.REJECTED
         return proposal
+
+    def deprecate(self, proposal_id: str, reason: str = "") -> PromotionProposal:
+        """Retire an applied promotion from service.
+
+        The delete half of the repertoire's lifecycle: the proposal keeps
+        its identity and history, but stops being active -- the executable
+        fused instruction and its rewrite rule are withdrawn, so later
+        traffic can no longer be served by it. Idempotent; refusing a
+        proposal that was never applied keeps the record honest, because
+        a ``pending`` or ``rejected`` proposal has no installation to
+        withdraw.
+        """
+        proposal = self._require_proposal(proposal_id)
+        if proposal.status is PromotionStatus.DEPRECATED:
+            return proposal
+        if proposal.status is not PromotionStatus.APPLIED:
+            raise ValueError(
+                f"Proposal {proposal_id!r} is {proposal.status.value}; only "
+                "an applied promotion can be deprecated"
+            )
+        proposal.status = PromotionStatus.DEPRECATED
+        proposal.deprecation_reason = reason
+        self.promoted_instructions.pop(proposal.fused_name, None)
+        if self.optimizer is not None:
+            self.optimizer.remove_peephole_pattern(
+                list(proposal.instruction_names), [proposal.fused_name]
+            )
+        return proposal
+
+    def deprecate_stale(
+        self, usage: Mapping[str, int], max_idle: int
+    ) -> List[PromotionProposal]:
+        """Deprecate applied promotions unused for more than ``max_idle``
+        observations.
+
+        ``usage`` maps ``fused_name`` to the number of observations since
+        the promotion was last used; absent names count as fully idle.
+        Returns the proposals retired, in creation order.
+        """
+        retired: List[PromotionProposal] = []
+        for proposal in self.proposals.values():
+            if proposal.status is not PromotionStatus.APPLIED:
+                continue
+            if usage.get(proposal.fused_name, max_idle + 1) > max_idle:
+                retired.append(self.deprecate(
+                    proposal.proposal_id,
+                    reason=f"unused for more than {max_idle} observations",
+                ))
+        return retired
+
+    def active_promotions(self) -> List[PromotionProposal]:
+        """Promotions currently in service, in creation order."""
+        return [
+            proposal for proposal in self.proposals.values()
+            if proposal.status is PromotionStatus.APPLIED
+        ]
 
     def _require_proposal(self, proposal_id: str) -> PromotionProposal:
         if proposal_id not in self.proposals:

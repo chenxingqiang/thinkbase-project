@@ -1696,7 +1696,7 @@ Validation}\label{multi-agent-coordination-functional-validation}
 The multi-agent layer---\texttt{AgentCoordinator},
 \texttt{SecurityMonitor}, and the collaborative instruction set---is
 validated functionally by 43 tests, all passing---the
-coordination-and-security subset of the repository's full suite (1,345
+coordination-and-security subset of the repository's full suite (1,353
 passing, 14 skipped at run time), which also covers the ISA core,
 compiler, and optimizer units of Sections 5.2--5.5. This is
 \textbf{qualitative functional validation}: the tests verify the
@@ -2183,22 +2183,31 @@ Traces?}\label{do-the-reductions-survive-real-traces}
 Every number above comes from workloads we constructed. We therefore ran
 the shipped compiler and result cache on 1,960 tool-call trajectories
 recorded from real model runs (\(\tau\)-bench; GPT-4o and Claude 3.5
-Sonnet; retail and airline; 14,285 calls), converted under a
-conservative mapping: same-turn calls are independent, later turns
-consume the preceding step's result, unknown tools are effectful, and
-final-turn outputs are required so liveness cannot delete the answer.
-Static reduction is \textbf{0.0\%} at BASIC and AGGRESSIVE---real traces
-chain their observations, so no step is provably dead and no pure pair
-provably independent, confirming Section 5.3's 34.2\% as a property of
-the planted family. Reuse transfers conditionally: \textbf{1.73\%} of
-cacheable calls hit within a task, \textbf{41.70\%} across the distinct
-tasks of one run (retail 49.0--50.2\%, airline 16.3--22.1\%), and 83.4\%
-under the benchmark's trial replay, which repeats identical tasks rather
-than exhibiting workload repetition. Section 5.2's benefit therefore
-survives on real workloads only where a cache is shared across tasks. A
-second, bash-only coding-agent family (supplementary I.6) also earns
-0.0\% statically and contains no cacheable instruction at all, though
-45.5\% of its commands repeat verbatim: repetition is not cacheability.
+Sonnet; retail and airline; 14,285 calls), converted under the
+conservative mapping in supplementary I.6: same-turn calls are
+independent, later turns consume the preceding step's result, unknown
+tools are effectful, and final-turn outputs are required so liveness
+cannot delete the answer. Static reduction is \textbf{0.0\%} at BASIC
+and AGGRESSIVE---real traces chain their observations, so no step is
+provably dead and no pure pair provably independent, confirming Section
+5.3's 34.2\% as a property of the planted family. Reuse transfers
+conditionally: \textbf{1.73\%} of cacheable calls hit within a task,
+\textbf{41.70\%} across the distinct tasks of one run (retail
+49.0--50.2\%, airline 16.3--22.1\%), and 83.4\% under the benchmark's
+trial replay, which repeats identical tasks rather than exhibiting
+workload repetition. Section 5.2's benefit therefore survives on real
+workloads only where a cache is shared across tasks. A second, bash-only
+coding-agent family (supplementary I.6) also earns 0.0\% statically and
+contains no cacheable instruction at all, though 47.2\% of its commands
+repeat verbatim: repetition is not cacheability. Do instructions
+themselves sediment, so that reuse pays as experience accumulates?
+Running both streams through a support-gated repertoire--promote at two
+occurrences, credit a hit only to a template promoted before the task,
+retire on staleness--answers it: 12--14 active templates serve
+\textbf{95.9\%} of the 2,340 tool-use steps (76--88\% in the first
+quarter, 97--100\% after), and 291 command templates serve 43\%
+\(\rightarrow\) 67\% on the coding traces, while retirement and
+re-mining fire throughout (protocol and CRUD counts: supplementary I.7).
 
 \section{Discussion}\label{discussion}
 
@@ -2471,7 +2480,7 @@ repository state whose build produces this PDF (\texttt{REPRODUCING.md}
 records the submission-time \texttt{git\ rev-parse\ HEAD}, the
 dependency lock, and the Python/system versions). A fresh clone
 reproduces the full suite (\texttt{python\ -m\ pytest\ tests/\ -q}:
-1,345 passed, 14 skipped at run time), the Section 5.6 functional-test
+1,353 passed, 14 skipped at run time), the Section 5.6 functional-test
 counts, and, via the Appendix F command lines, every results table from
 scratch---real-gateway runs included, with a mock-backend fallback for
 environments without credentials. \texttt{REPRODUCING.md} also maps each

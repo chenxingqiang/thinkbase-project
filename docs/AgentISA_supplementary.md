@@ -1382,20 +1382,57 @@ The decomposition: 792 − 640 = 152 = the dead-step count exactly; all 106 fusi
 
 Section 5.12 measures tool-use traces in which read-only lookups dominate the stream. Coding agents have the opposite shape, so the same harness was run on a second recorded family.
 
-**Data.** `nebius/SWE-agent-trajectories` (CC-BY-4.0, revision `68195a14`), shard `train-00000-of-00012`, the first 300 trajectories in file order—recorded SWE-agent runs on SWE-bench instances (swe-agent-llama-70b/8b/405b backbones), 8,150 actions in total, compacted by the same rule (keep ordered `[tool, args]`, drop prose and observations).
+**Data.** `nebius/SWE-agent-trajectories` (CC-BY-4.0, revision `68195a14`), shard `train-00000-of-00012`, the first attempt of each of the first 300 distinct instances—recorded SWE-agent runs on SWE-bench instances (swe-agent-llama-70b/8b/405b backbones), 8,502 actions in total, compacted by the same rule (keep ordered `[tool, args]`, drop prose and observations).
 
-**Parsing, disclosed.** These trajectories carry no structured tool calls: SWE-agent emits its action as the last fenced block of an assistant message and the next message is the observation. A block starting with `str_replace_editor` is an editor call (subcommand and path); anything else is a shell command whose first line is kept as `cmd`. This shard's backbones are bash-only: all 8,150 actions parse as shell commands and none as an editor call, so the family contains no read-only instruction at all.
+**Mapping.** The pilot's own conversion rules apply to both families and are the ones Section 5.12 cites: calls in the same turn are independent; each later turn consumes the immediately preceding step's result; unknown tools are effectful; and final-turn outputs are required, so liveness analysis cannot delete the answer.
+
+**Parsing, disclosed.** These trajectories carry no structured tool calls: SWE-agent emits its action as the last fenced block of an assistant message and the next message is the observation. A block starting with `str_replace_editor` is an editor call (subcommand and path); anything else is a shell command whose first line is kept as `cmd`. This shard's backbones are bash-only: all 8,502 actions parse as shell commands and none as an editor call, so the family contains no read-only instruction at all.
 
 | | τ-bench (Section 5.12) | SWE-agent (I.6) |
 | -- | -- | -- |
 | trajectories / distinct tasks | 1,960 / 330 | 300 / 300 |
-| tool calls | 14,285 | 8,150 |
+| tool calls | 14,285 | 8,502 |
 | cacheable (side-effect-free) calls | 1,789 (79% of the first-trial stream) | 0 (0%) |
-| verbatim repeats | 4 | 3,711 (45.5%) |
+| verbatim repeats | 4 | 4,009 (47.2%) |
 | static reduction (BASIC, AGGRESSIVE) | 0.0%, 0.0% | 0.0%, 0.0% |
 | cache hits within task / within run | 1.73% / 41.70% | — (nothing cacheable) |
 
-**Finding: repetition is not cacheability.** A bash-only coding agent repeats 45.5% of its commands verbatim, yet every one of them is effectful, so the result cache has nothing it may serve—the cache's surface exists only where the stream is dominated by side-effect-free reads, as in the tool-use family. The static 0.0% also holds in both families, though for different structural reasons: sequential observation chaining in tool use (no provably dead step, no provably independent pair), and an effectful-only instruction mix in the bash agent.
+**Finding: repetition is not cacheability.** A bash-only coding agent repeats 47.2% of its commands verbatim, yet every one of them is effectful, so the result cache has nothing it may serve—the cache's surface exists only where the stream is dominated by side-effect-free reads, as in the tool-use family. The static 0.0% also holds in both families, though for different structural reasons: sequential observation chaining in tool use (no provably dead step, no provably independent pair), and an effectful-only instruction mix in the bash agent.
+
+## I.7 Instruction Precipitation: Protocol, Curves, and Lifecycle
+
+The value claim for instructionization is not that one trajectory can be compiled, but that instructions *sediment*: a repertoire built from earlier tasks serves later ones, so per-task work falls as experience accumulates. That claim runs through the implemented pipeline—trace mining, templates with parameter schemas, parameterized replay, an approval gate—but had never been measured on real traces. This appendix gives the protocol and the complete tables behind the paragraph in Section 5.12.
+
+**Streams.** Precipitation is a property of a *coherent* workload, so streams are never formed by concatenating domains: retirement would fire on the domain switch and read as instability. The tool-use family therefore contributes its four source streams separately (gpt-4o-retail 115 tasks, sonnet-35-new-retail 115, gpt-4o-airline 50, sonnet-35-new-airline 50; first trial per task) plus a round-robin mixed stream over all of them. The coding family contributes its 300 tasks (first attempt per instance, I.6), split by backbone and also run mixed.
+
+**Template identity.** A call instantiates a template: `(tool, parameter keys)` in *schema* mode for named-parameter tools, and `(tool, leading command tokens)` in *command* mode for shell calls whose payload is a command line.
+
+**Four rules, each mirroring shipped machinery.** (i) *Promotion gate*: a template enters the repertoire after two occurrences, the default `AutoPromotionConfig.min_support`; until then it is a candidate, not a hit. (ii) *Credit rule*: a step counts as served only by a template promoted in an **earlier** task, so no task scores off instructions it just created. (iii) *Retirement*: a template idle for more than `max_idle` tasks is retired at a task boundary, the `deprecate_stale` policy; a retired template must be re-mined (two fresh occurrences) to return. (iv) *Serving* means parameterized replay of a known instruction—the path `test_replay_parameterization` covers—not composition into a larger instruction.
+
+**Tool-use family (max_idle = 40, min_support = 2).**
+
+| stream | tasks | steps | served | coverage | quarters | created | active | retired | re-mined |
+| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
+| gpt-4o-retail | 115 | 794 | 762 | 95.97% | 88/99/100/99% | 15 | 13 | 3 | 1 |
+| sonnet-35-new-retail | 115 | 872 | 834 | 95.64% | 88/99/99/98% | 16 | 14 | 8 | 6 |
+| gpt-4o-airline | 50 | 347 | 320 | 92.22% | 76/98/99/99% | 13 | 13 | 0 | 0 |
+| sonnet-35-new-airline | 50 | 327 | 299 | 91.44% | 76/100/98/97% | 14 | 13 | 1 | 0 |
+| mixed (round-robin) | 330 | 2,340 | 2,245 | 95.94% | 91/98/96/99% | 26 | 12 | 57 | 43 |
+
+**Coding family (max_idle = 100, min_support = 2).**
+
+| stream | tasks | steps | served | coverage | quarters | created | active | retired | re-mined |
+| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
+| llama-70b | 283 | 7,726 | 4,449 | 57.58% | 43/54/63/67% | 666 | 291 | 409 | 34 |
+| llama-8b | 15 | 752 | 547 | 72.74% | 51/89/53/50% | 52 | 52 | 0 | 0 |
+| llama-405b | 2 | 24 | 4 | 16.67% | 9/0/23/0% | 5 | 5 | 0 | 0 |
+| mixed (round-robin) | 300 | 8,502 | 5,052 | 59.42% | 55/52/60/67% | 709 | 291 | 457 | 39 |
+
+**Two shapes of precipitation.** With a small tool vocabulary the repertoire saturates almost immediately: twelve to fourteen templates serve 92–96% of the tool-use stream, and coverage is already 76–88% in the first quarter because the first few tasks introduce nearly every instruction the domain has. With a large, instance-specific command vocabulary the repertoire is deep and keeps growing: hundreds of templates serve 43%→67%, and coverage rises monotonically on the dominant backbone. Reuse is also skewed—one instruction (`get_order_details`, shape `order_id`) serves 540 steps of the tool-use stream, while `bash` with the shapes `edit 1:1`, `python reproduce.py`, and `ls -F` serve 582, 393, and 192 steps of the coding stream. That skew is why a small active set can carry most of the traffic, and why retirement fires often while re-mining stays rare.
+
+**Boundary: compound instructions are not claimed.** Three-step windows recur in 75.0% of the tool-use stream's windows and 32.8–36.0% of the coding stream's, and it is tempting to read that as the compound-instruction opportunity. We do not: instantiating a compound from the window's first call requires binding later steps to *observation values*, which inputs-only corpora do not carry, so these figures are recurrence upper bounds and are never added to coverage. Establishing them would need a corpus of recorded observations, and would be the next experiment, not a result of this one.
+
+**What the measurement does and does not mean.** Served steps are identity-level reuse: the system recognizes an instruction it already holds and instantiates it with new parameters instead of treating the call as new work. This is consistent with the 0.0% static reduction of Section 5.12 rather than in tension with it—the repertoire's payoff is replay-shaped, not composition-shaped—and it is the machine-checkable core of the "instructions as an accumulating asset" claim: create on support, read by replay, update through the approval gate, retire on staleness.
 
 ## I.5 Notation
 

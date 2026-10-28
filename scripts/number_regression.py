@@ -850,10 +850,6 @@ chk(f'{100*qs["claims_agreement_vs_gold"]:.1%} | {100*qs["final_agreement_vs_gol
     or (f'| {100*qs["claims_agreement_vs_gold"]:.1%} |' in md and f'| {100*qs["rule_fallback_agreement_vs_gold"]:.1%} |' in md),
     'supp deepseek quality table row altered')
 
-if fails:
-    print('REGRESSION FAILURES:')
-    for f in fails: print(' -', f)
-    sys.exit(1)
 # ---- I.3 prompt-cache billing probe (gateway_promptcache_probe.json) ----
 probe = jload('gateway_promptcache_probe.json')
 for alias, calls in probe['probe'].items():
@@ -928,8 +924,81 @@ chk(tuple(fe['6_ceiling_census.pdf']['glm_512']) == (22, 22), 'figure-6 glm cens
 # F6 caption pins (supp)
 for s_ in ['binds in 22/22 calls at the compiler budget (512)',
            '101/104 at 512 and 68/104 at 1,500',
-           'completes below the ceiling in all 104 calls at 1,500']:
+           'Doubao Seed 2.0 in all 104 calls below the ceiling at 1,500']:
     chk(s_ in md, f'paper missing figure-6 caption citation: {s_}')
 
+# ---- 5.12 / I.6 real-trace pilots (real_trace_pilot_*.json) ----------
+def _pilot(name):
+    d = jload(name)
+    return d, d['aggregate'], d['cache_scopes']['first_trial']
+
+tau, tau_ag, tau_ft = _pilot('real_trace_pilot_tau_bench_results.json')
+chk(tau['provenance']['streams'] == 1960 and tau_ag['total_steps'] == 14285,
+    f"pilot tau scale json streams={tau['provenance']['streams']} steps={tau_ag['total_steps']} "
+    "vs paper 1,960 / 14,285")
+chk(tau_ag['effective_reduction_vs_none'] == {'BASIC': 0.0, 'AGGRESSIVE': 0.0},
+    f"pilot tau static reduction json {tau_ag['effective_reduction_vs_none']} vs paper 0.0% / 0.0%")
+chk(tau_ft['calls'] == 1789, f"pilot tau cacheable calls json {tau_ft['calls']} vs paper 1,789")
+for src, lo, hi in [('gpt-4o-retail', 0.4895, 0.5021), ('gpt-4o-airline', 0.1628, 0.2205)]:
+    rate = tau_ft['per_source'][src]['within_run_hit_rate']
+    chk(round(rate, 4) in (lo, hi), f"pilot tau {src} within-run json {rate} vs paper range")
+chk(round(tau_ft['within_task_hit_rate'], 4) == 0.0173,
+    f"pilot tau within-task json {tau_ft['within_task_hit_rate']} vs paper 1.73%")
+chk(round(tau_ft['within_run_hit_rate'], 4) == 0.4170,
+    f"pilot tau within-run json {tau_ft['within_run_hit_rate']} vs paper 41.70%")
+chk(round(tau['cache_scopes']['all_trials']['within_run_hit_rate'], 3) == 0.834,
+    "pilot tau trial-replay cache rate json != paper 83.4%")
+for s_ in ['1,960 tool-call trajectories', '14,285 calls', '1.73%', '41.70%', '49.0–50.2%',
+           '16.3–22.1%', '83.4%', 'Static reduction is **0.0%** at BASIC and AGGRESSIVE']:
+    chk(s_ in md, f'paper missing pilot citation {s_}')
+
+swe, swe_ag, swe_ft = _pilot('real_trace_pilot_swe_agent_results.json')
+chk(swe['provenance']['streams'] == 300 and swe_ag['total_steps'] == 8502,
+    f"pilot swe scale json streams={swe['provenance']['streams']} steps={swe_ag['total_steps']} "
+    "vs paper 300 / 8,502")
+chk(swe_ft['calls'] == 0, f"pilot swe cacheable calls json {swe_ft['calls']} vs paper 0")
+chk(swe_ft['effectful_repeats'] == 4009,
+    f"pilot swe effectful repeats json {swe_ft['effectful_repeats']} vs paper 4,009")
+for s_ in ['47.2% of its commands repeat verbatim', 'repetition is not cacheability',
+           '| 300 / 300 |', '8,502', '| 4,009 (47.2%) |']:
+    chk(s_ in md, f'paper missing coding-family citation {s_}')
+
+# ---- 5.12 / I.7 instruction precipitation (instruction_precipitation_*.json) ----
+def _prec(name):
+    d = jload(name)
+    return d, d['interleaved']
+
+tau_p, tau_i = _prec('instruction_precipitation_results.json')
+chk(tau_i['tasks'] == 330 and tau_i['steps'] == 2340 and tau_i['served'] == 2245
+    and round(tau_i['coverage'], 4) == 0.9594,
+    f"precip tau json tasks={tau_i['tasks']} steps={tau_i['steps']} served={tau_i['served']} "
+    f"coverage={tau_i['coverage']:.4f} vs paper 330 / 2,340 / 2,245 / 95.94%")
+seg = tau_i['segments']
+chk(round(seg[0]['coverage'], 2) == 0.91 and round(seg[-1]['coverage'], 2) == 0.99,
+    f"precip tau quarters json {[round(x['coverage'], 2) for x in seg]} vs paper 91..99")
+chk(12 <= tau_i['repertoire']['templates_active'] <= 14,
+    f"precip tau active templates json {tau_i['repertoire']['templates_active']} vs paper 12-14")
+for src in tau_p['per_source'].values():
+    first = round(src['segments'][0]['coverage'], 2)
+    chk(0.76 <= first <= 0.88, f"precip tau first-quarter coverage json {first} vs paper 76-88%")
+    chk(src['coverage'] >= 0.91, f"precip tau stream coverage json {src['coverage']} vs paper >= 91%")
+
+swe_p, swe_i = _prec('instruction_precipitation_swe_agent_results.json')
+chk(swe_i['tasks'] == 300 and swe_i['steps'] == 8502,
+    f"precip swe scale json {swe_i['tasks']}/{swe_i['steps']} vs paper 300 / 8,502")
+chk(swe_i['repertoire']['templates_active'] == 291,
+    f"precip swe active templates json {swe_i['repertoire']['templates_active']} vs paper 291")
+rm = swe_p['per_source']['swe-agent-swe-agent-llama-70b']
+chk(round(rm['segments'][0]['coverage'], 2) == 0.43 and round(rm['segments'][-1]['coverage'], 2) == 0.67,
+    f"precip swe 70b curve json {[round(x['coverage'], 2) for x in rm['segments']]} vs paper 43..67%")
+for s_ in ['12–14 active templates serve **95.9%**', '291 command templates serve 43%→67%',
+           '2,340 tool-use steps', '| 300 | 8,502 | 5,052 | 59.42% |', '| mixed (round-robin) | 330 | 2,340 | 2,245 | 95.94% |',
+           '75.0% of the tool-use stream']:
+    chk(s_ in md, f'paper missing precipitation citation {s_}')
+
+if fails:
+    print('REGRESSION FAILURES:')
+    for f in fails: print(' -', f)
+    sys.exit(1)
 print('ALL NUMBERS REGRESSION-CLEAN: every cited benchmark number matches its committed results JSON '
       '(microbench + real-gateway + Appendix-I extension experiments; aggregates recomputed from raw records)')

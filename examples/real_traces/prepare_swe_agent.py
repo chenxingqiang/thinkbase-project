@@ -22,6 +22,11 @@ Compaction keeps ``[tool, args]`` per turn and drops prose and observations --
 the pilot measures structure and cache keys, and a key is built from a call's
 inputs.
 
+Each instance appears many times in a shard (up to ~98 attempts), so the
+compactor keeps the **first attempt of each distinct instance** and stamps that
+attempt's index into ``trial``: sampling rows blindly would hand the corpus 300
+replays of 22 tasks rather than 300 tasks, which inflates every reuse metric.
+
 Deterministic: rows are taken in file order, so the same shard and limit always
 produce the same corpus. One call per turn: SWE-agent acts sequentially.
 
@@ -73,18 +78,27 @@ def compact(parquet: Path, limit: int) -> Iterable[Dict[str, Any]]:
     import pyarrow.parquet as pq  # imported here so the module stays testable without it
 
     table = pq.read_table(parquet, columns=["instance_id", "model_name", "trajectory"])
-    rows = table.to_pylist()
-    for row in rows[:limit]:
+    attempts: Dict[str, int] = {}
+    emitted = 0
+    for row in table.to_pylist():
+        instance = str(row.get("instance_id"))
+        attempt = attempts.get(instance, 0)
+        attempts[instance] = attempt + 1
+        if attempt:  # keep the first attempt of each instance only
+            continue
         turns = turns_of(row)
         if not turns:
             continue
         yield {
             "source": "swe-agent-" + str(row.get("model_name", "unknown")),
-            "task_id": row.get("instance_id"),
-            "trial": 0,
+            "task_id": instance,
+            "trial": attempt,
             "reward": None,
             "turns": turns,
         }
+        emitted += 1
+        if emitted >= limit:
+            return
 
 
 def main() -> int:
