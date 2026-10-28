@@ -58,7 +58,8 @@ def test_same_turn_calls_are_parallel_later_turns_chain(pilot) -> None:
     steps = pilot.to_steps(pilot.actions_tau_bench(record))
     assert steps[0]["dependencies"] == []
     assert steps[1]["dependencies"] == []          # same turn -> independent
-    assert steps[2]["dependencies"] == ["record:U1"]  # explicit reference wins
+    # later turn consumes the previous step's declared output exactly once
+    assert steps[2]["dependencies"] == ["record#U1"]
 
 
 def test_unknown_tools_are_effectful(pilot) -> None:
@@ -78,7 +79,7 @@ def test_dependency_tokens_share_the_output_namespace(pilot) -> None:
     outputs = {o for st in steps for o in st["outputs"]}
     for st in steps:
         for dep in st["dependencies"]:
-            assert dep in outputs or dep.startswith("record:")
+            assert dep in outputs
 
 
 def test_terminal_artifact_is_protected_from_dce(pilot) -> None:
@@ -101,5 +102,8 @@ def test_cache_measure_counts_repeats(pilot) -> None:
         ("bash", {"cmd": "git diff"}),
     ])
     assert cm["calls"] == 3
-    assert cm["canonical_hits"] == 1
-    assert cm["canonical_hit_rate"] == pytest.approx(1 / 3, abs=1e-4)
+    assert cm["instruction_scoped_hits"] == 1
+    assert cm["instruction_scoped_hit_rate"] == pytest.approx(1 / 3, abs=1e-4)
+    # the params-only legacy key is not tool-scoped: only equal here because
+    # the three calls carry distinct parameters
+    assert cm["params_only_hits"] == 1

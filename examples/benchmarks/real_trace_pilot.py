@@ -104,6 +104,36 @@ TOOL_CLASSES: Dict[str, tuple] = {
     "get_product": (InstructionType.STATE, True, True, "record"),
     "retrieve": (InstructionType.STATE, True, True, "record"),
     "embed": (InstructionType.LLM, True, True, "vector"),
+    # --- tau-bench domain tools (real model runs, examples/real_traces) ---
+    # Read-only lookups: declared pure, they return a record and change nothing.
+    "find_user_id_by_name_zip": (InstructionType.STATE, True, True, "record"),
+    "find_user_id_by_email": (InstructionType.STATE, True, True, "record"),
+    "get_user_details": (InstructionType.STATE, True, True, "record"),
+    "get_order_details": (InstructionType.STATE, True, True, "record"),
+    "get_product_details": (InstructionType.STATE, True, True, "record"),
+    "get_reservation_details": (InstructionType.STATE, True, True, "record"),
+    "list_all_product_types": (InstructionType.STATE, True, True, "record"),
+    "list_all_airports": (InstructionType.STATE, True, True, "record"),
+    "search_direct_flight": (InstructionType.STATE, True, True, "record"),
+    "search_onestop_flight": (InstructionType.STATE, True, True, "record"),
+    "calculate": (InstructionType.STATE, True, True, "record"),
+    "think": (InstructionType.LLM, True, True, "llm"),
+    # State-changing tools stay effectful and unremovable: every request here
+    # mutates the mock database or ends the episode.
+    "return_delivered_order_items": (InstructionType.STATE, False, False, None),
+    "exchange_delivered_order_items": (InstructionType.STATE, False, False, None),
+    "modify_pending_order_items": (InstructionType.STATE, False, False, None),
+    "modify_pending_order_address": (InstructionType.STATE, False, False, None),
+    "modify_pending_order_payment": (InstructionType.STATE, False, False, None),
+    "modify_user_address": (InstructionType.STATE, False, False, None),
+    "cancel_pending_order": (InstructionType.STATE, False, False, None),
+    "cancel_reservation": (InstructionType.STATE, False, False, None),
+    "book_reservation": (InstructionType.STATE, False, False, None),
+    "update_reservation_flights": (InstructionType.STATE, False, False, None),
+    "update_reservation_baggages": (InstructionType.STATE, False, False, None),
+    "update_reservation_passengers": (InstructionType.STATE, False, False, None),
+    "send_certificate": (InstructionType.STATE, False, False, None),
+    "transfer_to_human_agents": (InstructionType.STATE, False, False, None),
     # LLM calls
     "llm": (InstructionType.LLM, True, True, "llm"),
     "chat": (InstructionType.LLM, True, True, "llm"),
@@ -156,7 +186,17 @@ def actions_tau_bench(record: Mapping[str, Any]) -> List[List[tuple]]:
     return turns
 
 
-ADAPTERS = {"swe-agent": actions_swe_agent, "tau-bench": actions_tau_bench}
+def actions_tau_bench_compact(record: Mapping[str, Any]) -> List[List[tuple]]:
+    """The committed pilot corpus: turns already grouped, [tool, args] pairs."""
+    return [[(str(name), dict(args or {})) for name, args in turn]
+            for turn in record.get("turns") or []]
+
+
+ADAPTERS = {
+    "swe-agent": actions_swe_agent,
+    "tau-bench": actions_tau_bench,
+    "tau-bench-compact": actions_tau_bench_compact,
+}
 
 
 # --------------------------------------------------------------------------
@@ -172,46 +212,40 @@ def _args_text(args: Mapping[str, Any]) -> str:
 def to_steps(turns: Sequence[Sequence[tuple]]) -> List[Dict[str, Any]]:
     """Map ordered turns of (tool, args) calls to steps.
 
-    Dependency discipline (conservative, and the reason the numbers can be
-    read at all). The compiler's fusion gate compares a step's *dependencies*
-    against the *outputs* of its predecessor, so the two must share one
-    namespace: dependencies are the output tokens this step consumes, never
-    internal ids.
+    Dependency discipline. The compiler's fusion gate compares a step's
+    *dependencies* with its predecessor's *outputs*, so both are output tokens.
+    The rule is deliberately the strictest one that a trajectory's inputs can
+    support:
 
-      * same turn  -> calls are issued in parallel by construction: no edge;
-      * later turn -> an edge to the live handle (the most recent output
-        token) unless the arguments name a different earlier output, in which
-        case the edge points there. Doubt resolves to "dependent": a step is
-        never declared independent merely because its arguments do not spell
-        out the handle.
+      * same turn  -- calls were issued together, parallel by construction: no
+        edge, they may fuse if both are pure;
+      * later turn -- the step depends on the outputs of the immediately
+        preceding step (it observed that result before acting; agents chain
+        observations even when they do not echo an id into the next argument).
+
+    Consequences, and they are the point of the discipline: every step's output
+    is consumed by its successor, so no step is *provably* dead, and adjacent
+    pure steps are chained, so they cannot fuse. A real trace therefore earns
+    no static reduction from the compiler's gates -- unlike the planted family,
+    where dead guards and independent transforms are inserted on purpose. Any
+    figure above zero here would have to come from a declared, checkable
+    independence, which trajectory inputs alone never give.
     """
     steps: List[Dict[str, Any]] = []
-    handle: Optional[str] = None
     for t, turn in enumerate(turns):
+        prev_outputs: List[str] = list(steps[-1]["outputs"]) if steps else []
         for s_idx, (tool, args) in enumerate(turn):
             itype, pure, declares, tag = TOOL_CLASSES.get(tool, EFFECTFUL_DEFAULT)
             outputs: List[str] = []
             if pure and declares and tag is not None:
                 target = None
-                for key in ("path", "file", "filepath", "filename", "id", "query"):
+                for key in ("path", "file", "filepath", "filename", "id", "order_id",
+                            "user_id", "reservation_id", "product_id"):
                     if key in args:
                         target = str(args[key])
                         break
-                outputs = [f"{tag}:{target}" if target else f"{tag}:{t}.{s_idx}"]
-            text = _args_text(args)
-            deps: List[str] = []
-            # explicit reference to an earlier output wins
-            for prev in steps:
-                for out in prev["outputs"]:
-                    bare = out.split(":", 1)[1] if ":" in out else out
-                    if bare and bare in text:
-                        deps.append(out)
-                        break
-            if not deps:
-                # same-turn siblings are parallel; later turns chain to the handle
-                same_turn = s_idx > 0
-                if not same_turn and handle is not None:
-                    deps.append(handle)
+                outputs = [f"{tag}#{target}" if target else f"{tag}#{t}.{s_idx}"]
+            deps: List[str] = [] if s_idx > 0 else prev_outputs
             steps.append({
                 "id": f"s{t}.{s_idx}",
                 "name": tool,
@@ -220,8 +254,6 @@ def to_steps(turns: Sequence[Sequence[tuple]]) -> List[Dict[str, Any]]:
                 "outputs": outputs,
                 "side_effects": not pure,
             })
-            if outputs and pure:
-                handle = outputs[0]
     return steps
 
 
@@ -274,27 +306,95 @@ def fusible_pairs_compiler_gate(steps: Sequence[Mapping[str, Any]]) -> int:
 def cache_measure(actions: Sequence[tuple]) -> Dict[str, Any]:
     """Hit counts under the canonical (params-only, sorted) key and the raw
     insertion-order key, over one trajectory's ordered calls."""
-    seen_canon: set = set()
-    seen_raw: set = set()
-    hits_canon = hits_raw = 0
+    seen_params: set = set()
+    seen_scoped: set = set()
+    hits_params = hits_scoped = 0
     for tool, args in actions:
-        canon = build_cache_key(tool, dict(args))
-        raw = hashlib.sha256(
-            f"{tool}|{_args_text_unsorted(args)}".encode("utf-8")
+        # params-only: the legacy default key (build_cache_key with no namespace)
+        params_key = build_cache_key(tool, dict(args))
+        # instruction-scoped: the shipped per-instance scoping, tool in the key
+        scoped_key = hashlib.sha256(
+            f"{tool}|{_args_text(dict(args))}".encode("utf-8")
         ).hexdigest()
-        if canon in seen_canon:
-            hits_canon += 1
-        seen_canon.add(canon)
-        if raw in seen_raw:
-            hits_raw += 1
-        seen_raw.add(raw)
+        if params_key in seen_params:
+            hits_params += 1
+        seen_params.add(params_key)
+        if scoped_key in seen_scoped:
+            hits_scoped += 1
+        seen_scoped.add(scoped_key)
     n = len(actions)
     return {
         "calls": n,
-        "canonical_hits": hits_canon,
-        "canonical_hit_rate": round(hits_canon / n, 4) if n else 0.0,
-        "raw_order_hits": hits_raw,
-        "raw_order_hit_rate": round(hits_raw / n, 4) if n else 0.0,
+        "params_only_hits": hits_params,
+        "params_only_hit_rate": round(hits_params / n, 4) if n else 0.0,
+        "instruction_scoped_hits": hits_scoped,
+        "instruction_scoped_hit_rate": round(hits_scoped / n, 4) if n else 0.0,
+    }
+
+
+def _scope_once(records: Sequence[Mapping[str, Any]], fn) -> Dict[str, Any]:
+    runs: Dict[str, set] = {}
+    per_source: Dict[str, Dict[str, int]] = {}
+    calls = task_hits = run_hits = 0
+    for rec in records:
+        source = str(rec.get("source") or "unknown")
+        seen_run = runs.setdefault(source, set())
+        seen_task: set = set()
+        for turn in fn(rec):
+            for tool, args in turn:
+                key = hashlib.sha256(
+                    f"{tool}|{_args_text(dict(args))}".encode("utf-8")
+                ).hexdigest()
+                calls += 1
+                stat = per_source.setdefault(
+                    source, {"calls": 0, "within_task_hits": 0, "within_run_hits": 0})
+                stat["calls"] += 1
+                if key in seen_run:
+                    run_hits += 1
+                    stat["within_run_hits"] += 1
+                if key in seen_task:
+                    task_hits += 1
+                    stat["within_task_hits"] += 1
+                seen_run.add(key)
+                seen_task.add(key)
+    return {
+        "calls": calls,
+        "runs": len(runs),
+        "within_task_hits": task_hits,
+        "within_task_hit_rate": round(task_hits / calls, 4) if calls else 0.0,
+        "within_run_hits": run_hits,
+        "within_run_hit_rate": round(run_hits / calls, 4) if calls else 0.0,
+        "per_source": {
+            name: {
+                **stat,
+                "within_task_hit_rate": (
+                    round(stat["within_task_hits"] / stat["calls"], 4)
+                    if stat["calls"] else 0.0),
+                "within_run_hit_rate": (
+                    round(stat["within_run_hits"] / stat["calls"], 4)
+                    if stat["calls"] else 0.0),
+            }
+            for name, stat in sorted(per_source.items())
+        },
+    }
+
+
+def cache_scopes(records: Sequence[Mapping[str, Any]], fn) -> Dict[str, Any]:
+    """Hit rates under two cache scopes, and two trial conventions.
+
+    Scopes. ``within_task`` is a cache scoped to one task attempt (how much
+    does this trajectory repeat itself); ``within_run`` is a cache shared by
+    the tasks of one model run, the common production shape.
+
+    Trials. tau-bench records several trials of the same task. Replaying an
+    identical task is not workload repetition, so the headline figure uses one
+    trial per task (``first_trial``); ``all_trials`` is kept as the sensitivity
+    bound that shows what re-running the same tasks would add.
+    """
+    first = [r for r in records if r.get("trial") in (None, 0)]
+    return {
+        "first_trial": _scope_once(first, fn),
+        "all_trials": _scope_once(records, fn),
     }
 
 
@@ -352,8 +452,8 @@ def run(records: Sequence[Mapping[str, Any]], adapter: str,
         total_steps += len(steps)
         total_dead += row["dead_steps"]
         total_fusible += row["fusible_pairs_compiler_gate"]
-        hits_c += cm["canonical_hits"]
-        hits_r += cm["raw_order_hits"]
+        hits_c += cm["instruction_scoped_hits"]
+        hits_r += cm["params_only_hits"]
         calls += cm["calls"]
 
     return {
@@ -390,13 +490,27 @@ def run(records: Sequence[Mapping[str, Any]], adapter: str,
             },
             "cache": {
                 "calls": calls,
-                "canonical_hits": hits_c,
-                "canonical_hit_rate": round(hits_c / calls, 4) if calls else 0.0,
-                "raw_order_hits": hits_r,
-                "raw_order_hit_rate": round(hits_r / calls, 4) if calls else 0.0,
+                "instruction_scoped_hits": hits_c,
+                "instruction_scoped_hit_rate": (
+                    round(hits_c / calls, 4) if calls else 0.0),
+                "params_only_hits": hits_r,
+                "params_only_hit_rate": (
+                    round(hits_r / calls, 4) if calls else 0.0),
             },
         },
-        "per_stream": per_stream,
+        "cache_scopes": cache_scopes(records, fn),
+        "tool_classification": {
+            name: {"pure": bool(v[1]), "declares_output": bool(v[2])}
+            for name, v in sorted(TOOL_CLASSES.items())
+        },
+        # Per-stream rows are an audit aid, not evidence: on a large corpus they
+        # dominate the file, and the script regenerates them in about a second.
+        "per_stream": per_stream if len(per_stream) <= 200 else [],
+        "per_stream_omitted": len(per_stream) > 200,
+        "per_stream_note": (
+            "omitted for corpora above 200 streams; rerun this script to "
+            "reproduce the per-stream audit rows"
+        ) if len(per_stream) > 200 else None,
     }
 
 
@@ -459,8 +573,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             reports.append(rep)
             agg = rep["aggregate"]
             assert agg["total_dead_steps"] == 0, "self-test expects no dead steps"
-            assert agg["cache"]["canonical_hits"] > 0, "repeated calls must hit"
-            assert agg["cache"]["canonical_hits"] >= agg["cache"]["raw_order_hits"]
+            assert agg["cache"]["instruction_scoped_hits"] > 0, "repeated calls must hit"
             assert agg["effective"]["NONE"] == agg["total_steps"]
             # The terminal-answer protection must hold: a pure final LLM/answer
             # step may not be deleted as dead.
@@ -471,7 +584,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                   f"steps={agg['total_steps']} dead={agg['total_dead_steps']} "
                   f"fusible={agg['total_fusible_pairs_compiler_gate']} "
                   f"eff.reduction={agg['effective_reduction_vs_none']} "
-                  f"cache={agg['cache']['canonical_hit_rate']:.1%}")
+                  f"cache={agg['cache']['instruction_scoped_hit_rate']:.1%}")
         out.write_text(json.dumps(reports, indent=2), encoding="utf-8")
         print(f"-> {out}")
         return 0
@@ -479,8 +592,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not args.corpus or not args.adapter:
         parser.error("--corpus and --adapter are required unless --self-test")
     records = load_records(args.corpus, args.adapter)
-    report = run(records, args.adapter,
-                 str(args.corpus.relative_to(REPO_ROOT)), False)
+    corpus = args.corpus.resolve()
+    label = (str(corpus.relative_to(REPO_ROOT))
+             if corpus.is_relative_to(REPO_ROOT) else str(corpus))
+    report = run(records, args.adapter, label, False)
     out = args.output or (REPO_ROOT / "examples" / "benchmarks" /
                           "real_trace_pilot_results.json")
     if out.name.endswith("_results.json") and report["provenance"]["streams"] < 20:
@@ -491,9 +606,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(f"streams: {report['provenance']['streams']} steps: {agg['total_steps']}")
     print(f"effective reduction: {agg['effective_reduction_vs_none']}")
     print(f"dispatch  reduction: {agg['dispatch_reduction_vs_none']}")
-    print(f"cache: {agg['cache']['canonical_hits']}/{agg['cache']['calls']} "
-          f"({agg['cache']['canonical_hit_rate']:.1%}) canonical, "
-          f"{agg['cache']['raw_order_hit_rate']:.1%} raw-order")
+    print(f"cache: within-task {agg['cache']['instruction_scoped_hit_rate']:.2%} "
+          f"scoped / {agg['cache']['params_only_hit_rate']:.2%} params-only; "
+          f"within-run {report['cache_scopes']['first_trial']['within_run_hit_rate']:.2%} "
+          f"(all-trials {report['cache_scopes']['all_trials']['within_run_hit_rate']:.2%})")
     print(f"-> {out}")
     return 0
 
