@@ -90,3 +90,27 @@ curl -L -o swe0.parquet \
 | source | trajectories | tool calls | cacheable calls |
 |---|---|---|---|
 | swe-agent-llama-70b/8b/405b | 300 | 8,150 | 0 |
+
+## Third family: task flows with explicitly finite action spaces
+
+`AgentGym/AgentTraj-L` (Apache-2.0) ships rollouts in ten environments. Three
+are compacted into `agentgym_sample.jsonl` because their action spaces are
+explicit vocabularies rather than free-form tool arguments:
+
+| environment | action space | records | actions |
+|---|---|---|---|
+| `alfworld` (household) | 13 verbs | 2,420 | 32,247 |
+| `babyai` (grid) | 8 verbs | 810 | 4,642 |
+| `sqlgym` (analytics) | 1 verb | 3,000 | 3,000 |
+
+```bash
+./venv/bin/python examples/real_traces/prepare_agentgym.py \
+    --input /path/to/AgentTraj-L --output examples/real_traces/agentgym_sample.jsonl
+./venv/bin/python examples/benchmarks/instruction_precipitation.py \
+    --corpus examples/real_traces/agentgym_sample.jsonl --param-mode shape --max-idle 100 \
+    --output examples/benchmarks/instruction_precipitation_agentgym_results.json
+```
+
+Disclosed limitation: these files are per-step samples (an episode prefix and
+its next action), so they measure action-level precipitation across tasks, not
+the composition of a whole episode into one instruction.

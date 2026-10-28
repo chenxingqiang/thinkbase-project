@@ -1434,6 +1434,26 @@ The value claim for instructionization is not that one trajectory can be compile
 
 **What the measurement does and does not mean.** Served steps are identity-level reuse: the system recognizes an instruction it already holds and instantiates it with new parameters instead of treating the call as new work. This is consistent with the 0.0% static reduction of Section 5.12 rather than in tension with it—the repertoire's payoff is replay-shaped, not composition-shaped—and it is the machine-checkable core of the "instructions as an accumulating asset" claim: create on support, read by replay, update through the approval gate, retire on staleness.
 
+## I.8 Cross-Family Instruction Flow: Finite Action Spaces, Two Regimes
+
+The precipitation experiment of I.7 runs on tool use and shell coding. Those are two points; a claim about instruction memory should not rest on two points, and the embodied framing makes the gap obvious: a household robot's actions are a closed vocabulary (go to, open, take, put, heat, ...), so instruction memory there should behave like a database agent's, not like a coding agent's. This appendix adds three task families whose action spaces are *explicitly finite* and measures them with the same harness, same rules, same metric.
+
+**Data.** `AgentGym/AgentTraj-L` (Apache-2.0), three environments: `alfworld` (household manipulation, 2,420 episode prefixes, 32,247 actions, 13 verbs), `babyai` (grid navigation, 810 records, 4,642 actions, 8 verbs), `sqlgym` (analytics, 3,000 records, 3,000 single-statement tasks, 1 verb). Actions are extracted from the last `Action:` marker of each assistant turn; entity numbers are stripped (`alarmclock 1` → `alarmclock`) so that a template is the operation plus its normalised arguments. Disclosed limitation: AgentGym ships per-step samples (an episode prefix and its next action), so these streams measure action-level precipitation across tasks, not the composition of a whole episode into one instruction; every action here is effectful, so the result cache has no surface in these families (as in I.6).
+
+**Results (min_support = 2, max_idle = 100).**
+
+| family | action space | active templates | tasks | steps | served | quarters |
+| -- | -- | -- | -- | -- | -- | -- |
+| household manipulation (alfworld) | 13 verbs | 103 | 2,420 | 32,247 | 84.94% | 85.8/86.7/84.8/82.9% |
+| grid navigation (babyai) | 8 verbs | 54 | 810 | 4,642 | 92.72% | 89.0/93.4/93.8/94.8% |
+| SQL analytics (sqlgym) | 1 verb | 16 | 3,000 | 3,000 | 45.17% | 46.4/45.9/41.9/46.5% |
+| tool use (I.7, retail) | 22 tools | 13 | 115 | 794 | 95.97% | 88.1/99.1/100/99.4% |
+| shell coding (I.7) | open | 291 | 300 | 8,502 | 59.42% | 43/54/63/67% |
+
+**Two regimes, and why the second one matters.** Where the *arguments* come from a closed vocabulary, coverage saturates immediately and stays high: household manipulation and grid navigation serve 85–93% of later steps from the first quarter on, because "go to cabinet", "open drawer", "move forward" are the whole repertoire and recombine endlessly. Where the arguments are open—SQL table sets, shell command lines—coverage either flattens at 45% (SQL: every query names a different table combination, so the verb is shared but the parameter is not) or climbs slowly as the long tail accumulates (coding: 43%→67%). The two regimes are visible in the skew as well: `go to cabinet` serves 4,422 steps and `open cabinet` 3,434, while the most-used SQL template serves 38.
+
+**The law this supports.** A finite action space is necessary but not sufficient for instruction memory to pay. What governs the payoff is *parameter reuse*: the same operation applied to arguments drawn from a small, recurring vocabulary. Software agents satisfy this for lookups and entity operations and fail it for free-form code; embodied agents satisfy it for furniture, receptacles, and objects; analytical agents satisfy the verb and fail the schema. This refines the embodied intuition rather than contradicting it—a robot's advantage is not that its verbs are few, but that its *objects* are few and recur.
+
 ## I.5 Notation
 
 Notation used across the main paper and this supplement, with the location of each symbol's definition. Section, definition, and theorem numbers follow the main paper; appendix references are to this supplement.

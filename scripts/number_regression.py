@@ -1000,5 +1000,37 @@ if fails:
     print('REGRESSION FAILURES:')
     for f in fails: print(' -', f)
     sys.exit(1)
+# ---- 5.12 / I.8 cross-family instruction flow (agentgym) ----------------
+ag_p, ag_i = _prec('instruction_precipitation_agentgym_results.json')
+FAMILIES = [('agentgym-alfworld', 2420, 32247, 0.8494, 0.858),
+            ('agentgym-babyai', 810, 4642, 0.9272, 0.890),
+            ('agentgym-sqlgym', 3000, 3000, 0.4517, 0.464)]
+for name, tasks, steps, coverage, first_q in FAMILIES:
+    st = ag_p['per_source'][name]
+    chk(st['tasks'] == tasks and st['steps'] == steps,
+        f"precip {name} scale json {st['tasks']}/{st['steps']} vs paper {tasks}/{steps}")
+    chk(round(st['coverage'], 4) == coverage,
+        f"precip {name} coverage json {st['coverage']:.4f} vs paper {coverage:.4f}")
+    chk(round(st['segments'][0]['coverage'], 2) == first_q,
+        f"precip {name} first-quarter json {st['segments'][0]['coverage']:.3f} vs paper {first_q:.3f}")
+chk(ag_p['per_source']['agentgym-alfworld']['repertoire']['templates_active'] == 103,
+    "precip alfworld active templates json != paper 103")
+chk(ag_p['per_source']['agentgym-babyai']['repertoire']['templates_active'] == 54,
+    "precip babyai active templates json != paper 54")
+chk(ag_p['per_source']['agentgym-sqlgym']['repertoire']['templates_active'] == 16,
+    "precip sqlgym active templates json != paper 16")
+top_alf = ag_p['per_source']['agentgym-alfworld']['top_templates']
+chk(top_alf[0]['tool'] == 'go to' and top_alf[0]['uses'] == 4422,
+    f"precip alfworld top template json {top_alf[0]} vs paper go to/4,422")
+top_sql = ag_p['per_source']['agentgym-sqlgym']['top_templates']
+chk(top_sql[0]['uses'] == 38, f"precip sqlgym top template uses json {top_sql[0]['uses']} vs paper 38")
+for s_ in ['household manipulation (13 verbs, 2,420 episodes)', 'flatten at 45% (SQL)',
+           'climb 43%→67% (shell)', 'a finite action space is necessary but not sufficient',
+           'parameter reuse governs the payoff', '| household manipulation (alfworld) | 13 verbs | 103 | 2,420 | 32,247 | 84.94% |',
+           '| grid navigation (babyai) | 8 verbs | 54 | 810 | 4,642 | 92.72% |',
+           '| SQL analytics (sqlgym) | 1 verb | 16 | 3,000 | 3,000 | 45.17% |',
+           '`go to cabinet` serves 4,422 steps']:
+    chk(s_ in md, f'paper missing cross-family citation {s_}')
+
 print('ALL NUMBERS REGRESSION-CLEAN: every cited benchmark number matches its committed results JSON '
       '(microbench + real-gateway + Appendix-I extension experiments; aggregates recomputed from raw records)')

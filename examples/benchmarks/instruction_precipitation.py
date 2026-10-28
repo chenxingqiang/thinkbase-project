@@ -95,6 +95,10 @@ def template_of(tool: str, args: Dict[str, Any], param_mode: str) -> TemplateId:
     if param_mode == "command":
         head = tuple(str(args.get("cmd", "")).split()[:2])
         return (tool, head)
+    if param_mode == "shape":
+        # embodied/game flows: the operation is the verb, its parameters are the
+        # normalised entities it acts on (object/receptacle/table names)
+        return (tool, tuple(str(part) for part in args.get("shape", [])))
     return (tool, tuple(sorted(str(key) for key in args)))
 
 
@@ -337,7 +341,8 @@ def summarise(report: Dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--corpus", type=Path, required=True)
-    parser.add_argument("--param-mode", choices=["schema", "command"], default="schema")
+    parser.add_argument("--param-mode", choices=["schema", "command", "shape"],
+                        default="schema")
     parser.add_argument("--min-support", type=int, default=2)
     parser.add_argument("--max-idle", type=int, default=40)
     parser.add_argument("--compound-k", type=int, default=3)
