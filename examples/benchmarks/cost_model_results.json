@@ -1,0 +1,485 @@
+{
+ "schema": "cost_model/v1",
+ "result_kind": "MODELED",
+ "not_observed": true,
+ "statement": "MODELED, not observed: every avoided count below is measured in a committed results file, but every second, token and dollar figure is a model (measured per-call unit price x that count) under the stated price assumption. No saving was instrumented end to end; no production trace is involved.",
+ "price_assumption": {
+  "input_dollars_per_mtok": 3.0,
+  "output_dollars_per_mtok": 15.0,
+  "provenance": "docs/AgentISA_supplementary.md, Appendix G (priced-comparison protocol)",
+  "status": "assumed stand-in list prices, not a provider quote or invoice",
+  "why": "the gateway's actual pricing is unknown, so dollars are a model end to end",
+  "regime": {
+   "model": "claude-glm-5.3-flash",
+   "max_tokens": 64,
+   "censored": true,
+   "note": "tokens are measured at this budget; output is a floor, and a 512-token regime would cost ~8x more per call"
+  }
+ },
+ "units": {
+  "unit_price_dollars_per_avoided_unit": 0.001023,
+  "seconds": "mean / p50 / p95 of measured per-call wall clock",
+  "tokens": "gateway-reported input/output tokens per call"
+ },
+ "unit_prices": {
+  "source": "examples/benchmarks/isa_real_llm_results.json",
+  "measured": [
+   "t_mean_s",
+   "t_p50_s",
+   "t_p95_s",
+   "input_tokens_per_call",
+   "output_tokens_per_call"
+  ],
+  "t_mean_s": 2.297587,
+  "t_p50_s": 2.172433,
+  "t_p95_s": 3.2974,
+  "input_tokens_per_call": 21.0,
+  "output_tokens_per_call": 64.0,
+  "arms": [
+   {
+    "zipf_s": 0.5,
+    "baseline_calls": 200,
+    "wall_ms": 472275.9,
+    "t_mean_s": 2.361379,
+    "t_p50_s": 2.2087,
+    "t_p95_s": 3.5425,
+    "input_tokens_per_call": 21.0,
+    "output_tokens_per_call": 64.0
+   },
+   {
+    "zipf_s": 1.0,
+    "baseline_calls": 200,
+    "wall_ms": 455946.2,
+    "t_mean_s": 2.279731,
+    "t_p50_s": 2.1821,
+    "t_p95_s": 3.1596,
+    "input_tokens_per_call": 21.0,
+    "output_tokens_per_call": 64.0
+   },
+   {
+    "zipf_s": 1.5,
+    "baseline_calls": 200,
+    "wall_ms": 450330.3,
+    "t_mean_s": 2.251651,
+    "t_p50_s": 2.1265,
+    "t_p95_s": 3.1901,
+    "input_tokens_per_call": 21.0,
+    "output_tokens_per_call": 64.0
+   }
+  ]
+ },
+ "mechanisms": [
+  {
+   "id": "F1",
+   "name": "result cache, cross-task hits",
+   "mechanism": "cache",
+   "unit_kind": "call",
+   "effect_units": 746.0,
+   "effect_units_are": "measured cache hits; each replaces one real model call",
+   "effect_source": {
+    "file": "examples/benchmarks/real_trace_pilot_tau_bench_results.json",
+    "json_path": "cache_scopes.first_trial.within_run_hits",
+    "denominator_json_path": "cache_scopes.first_trial.calls",
+    "denominator": 1789.0,
+    "rate": 0.416993,
+    "scope": "cacheable first-trial calls, shared across the tasks of one run"
+   },
+   "assumption_conditioned": false,
+   "conversion_assumption": "none: the avoided unit is a measured model call, so seconds and tokens convert at the measured per-call unit price",
+   "point": {
+    "avoided_units": 746.0,
+    "seconds": {
+     "mean": 1714.000151,
+     "p50": 1620.635267,
+     "p95": 2459.8604
+    },
+    "input_tokens": 15666.0,
+    "output_tokens": 47744.0,
+    "dollars": 0.763158,
+    "unit_cost_dollars": 0.001023,
+    "avoided_calls": 746.0,
+    "avoided_calls_basis": "measured model calls (cache hits)"
+   },
+   "sensitivity": {
+    "declared": {
+     "price_multiplier_range": [
+      0.5,
+      1.5
+     ],
+     "token_multiplier_range": [
+      0.7,
+      1.3
+     ],
+     "note": "declared input bounds, not a confidence interval"
+    },
+    "dollars": {
+     "low": 0.267105,
+     "high": 1.488158,
+     "corners": [
+      {
+       "price_multiplier": 0.5,
+       "token_multiplier": 0.7,
+       "dollars": 0.267105
+      },
+      {
+       "price_multiplier": 0.5,
+       "token_multiplier": 1.3,
+       "dollars": 0.496053
+      },
+      {
+       "price_multiplier": 1.5,
+       "token_multiplier": 0.7,
+       "dollars": 0.801316
+      },
+      {
+       "price_multiplier": 1.5,
+       "token_multiplier": 1.3,
+       "dollars": 1.488158
+      }
+     ]
+    },
+    "input_tokens": {
+     "low": 10966.2,
+     "high": 20365.8
+    },
+    "output_tokens": {
+     "low": 33420.8,
+     "high": 62067.2
+    },
+    "seconds": {
+     "low": 1620.635267,
+     "high": 2459.8604,
+     "invariant_to_price": true,
+     "invariant_to_token_count": true,
+     "note": "width comes from the measured latency axis (p50..p95)"
+    }
+   }
+  },
+  {
+   "id": "F2",
+   "name": "template precipitation, served steps",
+   "mechanism": "template",
+   "unit_kind": "step",
+   "effect_units": 2245.0,
+   "effect_units_are": "measured template-served dispatches (a step count, not a call count)",
+   "effect_source": {
+    "file": "examples/benchmarks/instruction_precipitation_results.json",
+    "json_path": "interleaved.served",
+    "denominator_json_path": "interleaved.steps",
+    "denominator": 2340.0,
+    "rate": 0.959402,
+    "scope": "first-trial tau-bench tasks, template promoted by an earlier task"
+   },
+   "assumption_conditioned": true,
+   "conversion_assumption": "planner bypass: a template match substitutes for the planner turn that would have emitted the dispatch; that turn is never instrumented, so the seconds/tokens/dollars below are a conditional bound, not a saving",
+   "point": {
+    "avoided_units": 2245.0,
+    "seconds": {
+     "mean": 5158.083563,
+     "p50": 4877.112833,
+     "p95": 7402.663
+    },
+    "input_tokens": 47145.0,
+    "output_tokens": 143680.0,
+    "dollars": 2.296635,
+    "unit_cost_dollars": 0.001023,
+    "avoided_calls": 2245.0,
+    "avoided_calls_basis": "conditional on planner bypass: steps counted, not measured calls"
+   },
+   "sensitivity": {
+    "declared": {
+     "price_multiplier_range": [
+      0.5,
+      1.5
+     ],
+     "token_multiplier_range": [
+      0.7,
+      1.3
+     ],
+     "note": "declared input bounds, not a confidence interval"
+    },
+    "dollars": {
+     "low": 0.803822,
+     "high": 4.478438,
+     "corners": [
+      {
+       "price_multiplier": 0.5,
+       "token_multiplier": 0.7,
+       "dollars": 0.803822
+      },
+      {
+       "price_multiplier": 0.5,
+       "token_multiplier": 1.3,
+       "dollars": 1.492813
+      },
+      {
+       "price_multiplier": 1.5,
+       "token_multiplier": 0.7,
+       "dollars": 2.411467
+      },
+      {
+       "price_multiplier": 1.5,
+       "token_multiplier": 1.3,
+       "dollars": 4.478438
+      }
+     ]
+    },
+    "input_tokens": {
+     "low": 33001.5,
+     "high": 61288.5
+    },
+    "output_tokens": {
+     "low": 100576.0,
+     "high": 186784.0
+    },
+    "seconds": {
+     "low": 4877.112833,
+     "high": 7402.663,
+     "invariant_to_price": true,
+     "invariant_to_token_count": true,
+     "note": "width comes from the measured latency axis (p50..p95)"
+    }
+   }
+  },
+  {
+   "id": "F3",
+   "name": "compound absorption, dispatches",
+   "mechanism": "compound",
+   "unit_kind": "dispatch",
+   "effect_units": 285.0,
+   "effect_units_are": "measured dispatches absorbed by greedy longest-match substitution",
+   "effect_source": {
+    "file": "examples/benchmarks/compound_binding_results.json",
+    "json_path": "reduction_if_substituted.steps_removed",
+    "denominator_json_path": "reduction_if_substituted.steps",
+    "denominator": 2275.0,
+    "rate": 0.125275,
+    "scope": "observed-observation corpus; binder bound, not an end-to-end cost measurement"
+   },
+   "assumption_conditioned": true,
+   "conversion_assumption": "planner bypass (as F2), plus within-family generalization: the compounds were learned and verified on the same corpus",
+   "point": {
+    "avoided_units": 285.0,
+    "seconds": {
+     "mean": 654.81239,
+     "p50": 619.1435,
+     "p95": 939.759
+    },
+    "input_tokens": 5985.0,
+    "output_tokens": 18240.0,
+    "dollars": 0.291555,
+    "unit_cost_dollars": 0.001023,
+    "avoided_calls": 285.0,
+    "avoided_calls_basis": "conditional on planner bypass: dispatchs counted, not measured calls"
+   },
+   "sensitivity": {
+    "declared": {
+     "price_multiplier_range": [
+      0.5,
+      1.5
+     ],
+     "token_multiplier_range": [
+      0.7,
+      1.3
+     ],
+     "note": "declared input bounds, not a confidence interval"
+    },
+    "dollars": {
+     "low": 0.102044,
+     "high": 0.568532,
+     "corners": [
+      {
+       "price_multiplier": 0.5,
+       "token_multiplier": 0.7,
+       "dollars": 0.102044
+      },
+      {
+       "price_multiplier": 0.5,
+       "token_multiplier": 1.3,
+       "dollars": 0.189511
+      },
+      {
+       "price_multiplier": 1.5,
+       "token_multiplier": 0.7,
+       "dollars": 0.306133
+      },
+      {
+       "price_multiplier": 1.5,
+       "token_multiplier": 1.3,
+       "dollars": 0.568532
+      }
+     ]
+    },
+    "input_tokens": {
+     "low": 4189.5,
+     "high": 7780.5
+    },
+    "output_tokens": {
+     "low": 12768.0,
+     "high": 23712.0
+    },
+    "seconds": {
+     "low": 619.1435,
+     "high": 939.759,
+     "invariant_to_price": true,
+     "invariant_to_token_count": true,
+     "note": "width comes from the measured latency axis (p50..p95)"
+    }
+   }
+  }
+ ],
+ "aggregate": {
+  "sum_allowed": false,
+  "why": "the three rows are three readings of the same tau-bench recordings (14,285 calls / 2,340 steps / 2,275 calls) and F2/F3 count the same steps at different granularity; summing double counts",
+  "rule": "report the largest single mechanism, never a sum or a total",
+  "max_mechanism": "F2",
+  "max_mechanism_name": "template precipitation, served steps",
+  "point": {
+   "avoided_units": 2245.0,
+   "seconds": {
+    "mean": 5158.083563,
+    "p50": 4877.112833,
+    "p95": 7402.663
+   },
+   "input_tokens": 47145.0,
+   "output_tokens": 143680.0,
+   "dollars": 2.296635,
+   "unit_cost_dollars": 0.001023,
+   "avoided_calls": 2245.0,
+   "avoided_calls_basis": "conditional on planner bypass: steps counted, not measured calls"
+  },
+  "sensitivity": {
+   "declared": {
+    "price_multiplier_range": [
+     0.5,
+     1.5
+    ],
+    "token_multiplier_range": [
+     0.7,
+     1.3
+    ],
+    "note": "declared input bounds, not a confidence interval"
+   },
+   "dollars": {
+    "low": 0.803822,
+    "high": 4.478438,
+    "corners": [
+     {
+      "price_multiplier": 0.5,
+      "token_multiplier": 0.7,
+      "dollars": 0.803822
+     },
+     {
+      "price_multiplier": 0.5,
+      "token_multiplier": 1.3,
+      "dollars": 1.492813
+     },
+     {
+      "price_multiplier": 1.5,
+      "token_multiplier": 0.7,
+      "dollars": 2.411467
+     },
+     {
+      "price_multiplier": 1.5,
+      "token_multiplier": 1.3,
+      "dollars": 4.478438
+     }
+    ]
+   },
+   "input_tokens": {
+    "low": 33001.5,
+    "high": 61288.5
+   },
+   "output_tokens": {
+    "low": 100576.0,
+    "high": 186784.0
+   },
+   "seconds": {
+    "low": 4877.112833,
+    "high": 7402.663,
+    "invariant_to_price": true,
+    "invariant_to_token_count": true,
+    "note": "width comes from the measured latency axis (p50..p95)"
+   }
+  }
+ },
+ "denominator_guard": {
+  "mechanism": "F1",
+  "accepted_denominator": 1789.0,
+  "accepted_avoided_calls": 746.0,
+  "rejected_denominator": 14285,
+  "rejected_avoided_calls": 5956.741196,
+  "why": "14,285 is every call in the corpus; only the 1,789 cacheable first-trial calls can produce a hit, so the corpus-wide denominator inflates F1 by ~8x"
+ },
+ "checks": [
+  {
+   "name": "f1_rate_matches_committed_rate",
+   "value": 0.416993,
+   "expected": 0.41699,
+   "tolerance": 0.0001,
+   "ok": true
+  },
+  {
+   "name": "f2_rate_matches_committed_rate",
+   "value": 0.959402,
+   "expected": 0.9594,
+   "tolerance": 0.0001,
+   "ok": true
+  },
+  {
+   "name": "f3_rate_matches_committed_rate",
+   "value": 0.125275,
+   "expected": 0.12527,
+   "tolerance": 0.0001,
+   "ok": true
+  },
+  {
+   "name": "output_tokens_censored_at_budget",
+   "value": 64.0,
+   "expected": 64.0,
+   "tolerance": 0.0,
+   "note": "every call bound at max_tokens, so this is a floor on true output length",
+   "ok": true
+  },
+  {
+   "name": "unit_price_arithmetic",
+   "value": 0.001023,
+   "expected": 0.001023,
+   "tolerance": 0.0,
+   "ok": true
+  },
+  {
+   "name": "f1_not_inflated_by_corpus_denominator",
+   "value": 746.0,
+   "expected": 746.0,
+   "tolerance": 0.0,
+   "note": "rejects 0.41699 x 14,285 = 5,956.8 avoided calls",
+   "ok": true
+  }
+ ],
+ "limits": [
+  "prices are assumed stand-ins; money is modeled, never measured",
+  "F2/F3 require the unmeasured planner-bypass assumption; without it their seconds, tokens and dollars are zero",
+  "output tokens are censored at max_tokens, so dollars are a floor at the 64-token budget",
+  "no total is emitted because the corpora overlap; max single mechanism only",
+  "sequential, single-gateway, mock-environment recordings: no throughput, concurrency or availability claim"
+ ],
+ "provenance": {
+  "script": "examples/benchmarks/cost_model.py",
+  "deterministic": true,
+  "inputs": {
+   "examples/benchmarks/isa_real_llm_results.json": {
+    "sha256": "608ed2eb9e6a6f1f162cc853e9cede46d9d1ec952f0e1319fe75deaea3ddd866"
+   },
+   "examples/benchmarks/real_trace_pilot_tau_bench_results.json": {
+    "sha256": "23495e5ec7723a72ad317a35ebaa632f330bd82937ab748d63c2b901dca30a58"
+   },
+   "examples/benchmarks/instruction_precipitation_results.json": {
+    "sha256": "78e41f081415b748e741ec068d5ee7587a1c880a861c9a043bbafd074c99afcc"
+   },
+   "examples/benchmarks/compound_binding_results.json": {
+    "sha256": "6ff470c8db0f6cf041f295a421d345dcf8ed6115661a1f70049517a3dcc4dc2c"
+   }
+  }
+ }
+}

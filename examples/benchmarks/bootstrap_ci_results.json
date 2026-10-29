@@ -1,0 +1,86 @@
+{
+  "schema": "bootstrap_ci/v1",
+  "source": {
+    "path": "examples/benchmarks/isa_microbench_results.json",
+    "sha256": "646ca450f76ffd6563547ea8022a2ed6826966414d03ee38f91aa7e212ef0241",
+    "experiments": [
+      "cache",
+      "compiler",
+      "dynamic",
+      "ablation",
+      "paired_ablation"
+    ]
+  },
+  "method": {
+    "name": "percentile_bootstrap",
+    "resamples": 10000,
+    "confidence": 0.95,
+    "interval": [
+      0.025,
+      0.975
+    ],
+    "quantile": "linear interpolation between order statistics",
+    "rng": "random.Random, per-metric seed sha256(base_seed:metric)[:8]",
+    "base_seed": 20240601,
+    "point_estimate": "arithmetic mean of the observed values"
+  },
+  "metrics": {
+    "dynamic.optimized_at_iteration": {
+      "mean": 50.0,
+      "ci_low": 50.0,
+      "ci_high": 50.0,
+      "n": 5,
+      "method": "percentile_bootstrap"
+    },
+    "dynamic.optimized_len": {
+      "mean": 34.2,
+      "ci_low": 30.8,
+      "ci_high": 37.8,
+      "n": 5,
+      "method": "percentile_bootstrap"
+    },
+    "dynamic.original_len": {
+      "mean": 100.0,
+      "ci_low": 100.0,
+      "ci_high": 100.0,
+      "n": 5,
+      "method": "percentile_bootstrap"
+    },
+    "dynamic.shrink_ratio": {
+      "mean": 0.658,
+      "ci_low": 0.622,
+      "ci_high": 0.692,
+      "n": 5,
+      "method": "percentile_bootstrap"
+    }
+  },
+  "paired_differences": {
+    "paired_ablation.paired_interaction": {
+      "definition": "(fusion+dce) - fusion_only - dce_only, per seed",
+      "mean": -0.119,
+      "ci_low": -0.134,
+      "ci_high": -0.104,
+      "n": 5,
+      "method": "percentile_bootstrap",
+      "source": "committed per_seed series (paired by seed base)"
+    }
+  },
+  "not_computable": [
+    {
+      "experiment": "cache",
+      "reason": "stores mean/stdev aggregates only; no per-seed raw values are committed, so no CI can be computed"
+    },
+    {
+      "experiment": "compiler",
+      "reason": "stores mean/stdev aggregates only; no per-seed raw values are committed, so no CI can be computed"
+    },
+    {
+      "experiment": "ablation",
+      "reason": "stores mean/stdev aggregates only; no per-seed raw values are committed, so no CI can be computed"
+    },
+    {
+      "experiment": "paired_ablation",
+      "reason": "4 arm row(s) store mean/stdev aggregates only; a two-arm paired difference from those arms is not computable, so only the committed per_seed series is reported"
+    }
+  ]
+}

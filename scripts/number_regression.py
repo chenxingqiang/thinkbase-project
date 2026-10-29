@@ -1086,6 +1086,121 @@ chk('| all | 450 | 102 (22.7%) | 78 (17.3%) |' in md,
 chk('285/2,275 steps, 178 applications' in md and '231 (84.3%) are external parameters' in md,
     'supplement missing compound wiring detail')
 
+# ---------------------------------------------------------------------------
+# Appendix I.10 (external cache baselines + priced effects), I.11 (cross-model
+# compound transfer) and the bootstrap intervals. Every number is re-derived
+# from a committed results file; the anchor (746/1,789) is also recomputed from
+# the corpus so the baselines cannot drift from the paper's own cache figure.
+# ---------------------------------------------------------------------------
+SUPP = (ROOT / 'docs/AgentISA_supplementary.md').read_text(encoding='utf-8')
+MD = (ROOT / 'docs/AgentISA.md').read_text(encoding='utf-8')
+_bl = jload('real_trace_external_baselines_results.json')
+_anc = _bl['anchor']
+chk(_anc['reproduced_hits'] == 746 and _anc['reproduced_cacheable_calls'] == 1789,
+    f"I.10 anchor must reproduce 746/1789 (paper's cache), got {_anc['reproduced_hits']}/{_anc['reproduced_cacheable_calls']}")
+chk(abs(_anc['reproduced_within_run'] - 0.417) < 5e-4 and abs(_anc['reproduced_within_task'] - 0.0173) < 5e-5,
+    'I.10 anchor rates must match the paper: 41.70% within run, 1.73% within task')
+chk(_anc['matches_published'] is True, 'I.10 anchor must report a match; a mismatch voids the comparison')
+
+_lru = _bl['lru']['sound']['run']
+for _cap, _exp in ((8, 0.2554), (16, 0.3382), (32, 0.3482), (64, 0.3689),
+                   (128, 0.3862), (256, 0.4159), (512, 0.417)):
+    _got = _lru[str(_cap)]['hit_rate']
+    chk(abs(_got - _exp) < 5e-5,
+        f'I.10 LRU capacity {_cap} must be {_exp:.2%}, got {_got:.2%}')
+_ws = _bl['lru']['sound']['task']['0']['hit_rate']
+chk(abs(_ws - 0.0173) < 5e-5, f'I.10 within-task LRU must be 1.73%, got {_ws:.2%}')
+
+_hs = _bl['hot_set']['sound']['global']
+for _n, _exp in ((16, 0.0277), (64, 0.0520), (256, 0.1363)):
+    chk(abs(_hs[str(_n)]['hit_rate'] - _exp) < 5e-5,
+        f'I.10 static hot set N={_n} must be {_exp:.2%}, got {_hs[str(_n)]["hit_rate"]:.2%}')
+chk(_hs['256']['calls'] == 866,
+    f'I.10 hot-set test half must be 866 calls, got {_hs["256"]["calls"]}')
+chk(abs(_hs['256']['test_unseen_rate'] - 0.8522) < 5e-5,
+    f'I.10 unseen-key share must be 85.22%, got {_hs["256"]["test_unseen_rate"]:.4%}')
+chk(abs(_lru['256']['hit_rate'] - _hs['256']['hit_rate']) > 0.2,
+    'I.10 must show the 256-entry LRU far above the static hot set')
+
+_st = _bl['same_turn']
+chk(_st['turns_with_multiple_calls'] == 0 and _st['turns'] == 2275,
+    f'I.10 same-turn must be a structural zero over 2,275 turns, got {_st["turns_with_multiple_calls"]}/{_st["turns"]}')
+
+_g = _bl['global_scope_decomposition']
+chk(_g['hits'] == 1126 and _g['hits_same_task_other_backbone'] == 371,
+    f'I.10 global hits must decompose as 1,126 with 371 trial-replay hits, got {_g["hits"]}/{_g["hits_same_task_other_backbone"]}')
+_indep = _g['hits_other_task_same_run'] + _g['hits_other_task_other_run']
+chk(_indep == 741, f'I.10 independent-task reuse must be 354+387=741, got {_indep}')
+chk(abs(_indep / _g['calls'] - 0.414) < 5e-4,
+    f'I.10 independent-task reuse must be 41.4%, got {_indep / _g["calls"]:.2%}')
+chk(abs(_g['hit_rate'] - 0.6294) < 5e-5,
+    f'I.10 global rate must be 62.94% before decomposition, got {_g["hit_rate"]:.2%}')
+
+_cm = jload('cost_model_results.json')
+chk(_cm['result_kind'] == 'MODELED' and _cm['not_observed'] is True,
+    'I.10 cost figures must be labelled MODELED and not_observed')
+chk(_cm['aggregate']['sum_allowed'] is False,
+    'I.10 must refuse to sum mechanisms (F2/F3 count the same stream)')
+_f1 = _cm['mechanisms'][0]['point']
+chk(_f1['avoided_calls'] == 746, f'I.10 F1 must rest on 746 measured calls, got {_f1["avoided_calls"]}')
+chk(abs(_f1['seconds']['mean'] - 1714.0) < 1.0,
+    f'I.10 F1 avoided wall clock must be 1,714 s, got {_f1["seconds"]["mean"]}')
+chk(_f1['input_tokens'] == 15666 and _f1['output_tokens'] == 47744,
+    f'I.10 F1 tokens must be 15,666/47,744, got {_f1["input_tokens"]}/{_f1["output_tokens"]}')
+chk(abs(_f1['dollars'] - 0.763158) < 1e-5, f'I.10 F1 dollars must be 0.763, got {_f1["dollars"]}')
+_up = _cm['unit_prices']
+chk(abs(_up['t_mean_s'] - 2.2976) < 5e-4 and _up['input_tokens_per_call'] == 21 and _up['output_tokens_per_call'] == 64,
+    f'I.10 unit prices must be 2.30 s and 21/64 tokens, got {_up["t_mean_s"]}/{_up["input_tokens_per_call"]}/{_up["output_tokens_per_call"]}')
+for _line in ('28.6 minutes', '2.30 s', '21 input and 64 output tokens', 'modeled not observed', '62.94%', '41.4%', '85.22%', '13.63%'):
+    chk(_line in SUPP, f'supplementary I.10 must state "{_line}"')
+
+_ct = jload('compound_transfer_results.json')
+_cells = _ct['cross_model']['cells']
+_expect_cells = {'retail': (49, 36, 33), 'retail_reverse': (23, 17, 17),
+                 'airline': (32, 18, 18), 'airline_reverse': (8, 5, 5)}
+for _name, (_el, _ex, _tr) in _expect_cells.items():
+    _c = _cells[_name]
+    chk((_c['eligible'], _c['exposed'], _c['transferred']) == (_el, _ex, _tr),
+        f'I.11 {_name} must be {_el}/{_ex}/{_tr}, got {(_c["eligible"], _c["exposed"], _c["transferred"])}')
+_po = _cells['retail']['wiring']['parameter_only']
+_ow = _cells['retail']['wiring']['observation_wired']
+chk(_po['transfer_rate'] == 1.0 and _po['occurrences']['exact_share'] == 1.0,
+    f'I.11 parameter-only must transfer at 100% with exact replay, got {_po["transfer_rate"]}/{_po["occurrences"]["exact_share"]}')
+chk(_ow['transfer_rate'] == 0.0,
+    f'I.11 observation-wired must transfer at 0%, got {_ow["transfer_rate"]}')
+_cov = _cells['retail'].get('step_coverage_wiring', {})
+if _cov:
+    chk(abs(_cov['parameter_only']['share'] - 0.2443) < 5e-4,
+        f'I.11 parameter-only step coverage must be 24.4%, got {_cov["parameter_only"]["share"]:.2%}')
+    chk(_cov['observation_wired']['share'] == 0.0, 'I.11 observation-wired step coverage must be 0.0%')
+_ctrl = _ct['controls']['per_direction']['retail']['conditions']['within_source']
+chk((_ctrl['exposed'], _ctrl['transferred']) == (28, 27),
+    f'I.11 within-source control must be 27/28, got {_ctrl["transferred"]}/{_ctrl["exposed"]}')
+_cd = _ct.get('cross_domain', {})
+if _cd:
+    chk(_cd['shared_atomic_templates'] == 4 and _cd['eligible_expressible_in_tester'] == 1
+        and _cd['eligible_exposed_in_tester'] == 0,
+        'I.11 cross-domain must be 4 shared tools / 1 expressible / 0 exposed')
+for _line in ('91.7% [78.2, 97.1]', '96.4% [82.3, 99.4]', '24.4%', 'path drift'):
+    chk(_line in SUPP, f'supplementary I.11 must state "{_line}"')
+
+_bc = jload('bootstrap_ci_results.json')
+_m = _bc['metrics']
+chk(abs(_m['dynamic.shrink_ratio']['ci_low'] - 0.622) < 5e-4
+    and abs(_m['dynamic.shrink_ratio']['ci_high'] - 0.692) < 5e-4,
+    f'§5.4 CI must be 62.2–69.2%, got {_m["dynamic.shrink_ratio"]["ci_low"]:.3f}–{_m["dynamic.shrink_ratio"]["ci_high"]:.3f}')
+_pi = _bc['paired_differences']['paired_ablation.paired_interaction']
+chk(abs(_pi['mean'] + 0.119) < 5e-4 and _pi['ci_high'] < 0,
+    f'§5.5 interaction CI must be −11.9% [−13.4, −10.4] excluding zero, got {_pi["mean"]} [{_pi["ci_low"]}, {_pi["ci_high"]}]')
+for _line in ('62.2–69.2%', '−13.4 to −10.4'):
+    chk(_line in MD, f'main paper must state "{_line}"')
+
+# ---------------------------------------------------------------------------
+# suite-count invariant (must stay last among checks)
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# suite-count invariant (computed last; the failure branch follows it)
+# ---------------------------------------------------------------------------
 # ---- suite count: the paper's "N passing" must equal collected - skipped ------
 _m = re.search(r'([\d,]+) passing, (\d+) skipped at run time', md)
 if _m:

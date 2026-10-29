@@ -115,42 +115,33 @@
 
 \begin{document}
 \begin{abstract}
-Large Language Models increasingly run as autonomous agents, yet ad hoc
-prompt engineering and per-provider function calling leave behavior hard
-to specify, analyze, and optimize. We present AgentISA, an instruction
-set architecture making agent behavior a first-class compilable
-artifact: (1) a formal instruction set with compositional semantics, a
-type system, and pre/post-conditions, bracketed at runtime by
-pre-dispatch validation; a shipped bounded verifier for pure
-instructions is unit-tested but not exercised by the benchmarks; (2)
-Agentic Calling, lifting provider function calling into reusable,
-cacheable instructions; (3) instruction learning mining recurring trace
-patterns into developer-gated composite replays; (4) a compiler and
-runtime applying classical optimizations---fusion, dead-code
-elimination, pipeline scheduling, hot-path specialization---to
-instruction streams.
-
-A reproducible mock-backend microbenchmark drives the real
-implementation: result caching cuts simulated API calls by 59.5--79.6\%
-on synthetic Zipf workloads (2,000 tasks, 5 seeds); static compilation
-removes 34.2\% of effective instructions (35.4\% at length 1,000) on
-planted optimization targets at disclosed rates (Section 5.1.2); dynamic
-hot-path optimization shrinks repeated traces by 65.8\%. A plain
-exact-response cache matches this reduction to the digit; its distinct
-value is reducing the program before any request is issued. Live-gateway
-conformance checks across four model aliases confirm the implementation
-matches its backend-free specification---cache statistics equal the
-computed expectation on the two caching-protocol aliases; the compiled,
-hot-path-adopted stream issues zero new gateway calls with
-byte-identical artifacts (live-model-checked in one rerun); they test
-the implementation, not model variation. A four-task characterization
-bounds them at 12.5--25.0\% per-task compile shrink; a 100-trace census
-characterizes generator-produced traces (Section 5.10; it does not
-establish realism); 43 multi-agent tests provide functional validation.
-These are controlled-setting results, not production end-to-end
-measurements. Result caching, the benchmark-exercised static passes,
-trace re-optimization, and six opt-in mechanisms ship; specified-only
-components carry no claim (Section 5.11).
+Agent systems are usually evaluated on constructed workloads, so the
+load-bearing question is what survives when the workload is recorded.
+Replaying 1,960 recorded tool-call trajectories (\(\tau\)-bench; GPT-4o
+and Claude 3.5 Sonnet; retail and airline; 14,285 calls) through the
+shipped compiler and result cache, static reduction is 0.0\% at BASIC
+and AGGRESSIVE: recorded traces chain their observations, so no step is
+provably dead and no pure pair provably independent. Reuse is
+conditional on the sharing boundary---1.73\% of cacheable calls hit
+within a task, 41.70\% across the distinct tasks of one run (62.9\% only
+when a second model replays the same tasks, of which 41.4\% survives as
+independent-task reuse)---so caching pays only where instruction memory
+is shared across tasks. That memory does sediment: 12--14 mined
+templates serve 95.9\% of 2,340 tool-use steps (all trials; the
+first-trial corpus used elsewhere in this paragraph is 2,275 calls), and
+replay-verified compound specifications absorb 12.53\% of dispatches,
+far below the 75.0\% that recurrence alone implies, while specifications
+learned on one model reproduce 91.7\% of the compounds another model
+exposes. AgentISA supplies the layer that makes this measurable: a
+formal instruction set with compositional semantics, a type system, and
+pre/post-conditions; Agentic Calling; developer-gated trace learning;
+and a compiler with fusion, dead-code elimination, and hot-path
+specialization. The 34.2\% static reduction is a planted-family
+mechanism demonstration and does not transfer. All measurements are
+offline---recorded-trajectory replay and a mock-backend microbenchmark.
+Live-gateway conformance checks across four model aliases confirm that
+the implementation matches its specification; no production end-to-end
+result is claimed.
 \end{abstract}
 \ccsdesc[500]{Software and its engineering~\textgreater{}Compilers}
 \ccsdesc[500]{Theory of computation~\textgreater{}Program reasoning}
@@ -241,67 +232,58 @@ contributions are:
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{A formal instruction set} for LLM agents with compositional
-  semantics, a type system, and pre/post-conditions on every instruction
-  (Section 3.1). Two deliberately modest sanity results serve as design
-  rationale: Turing completeness (Theorem 3.1---a sanity check that the
-  instruction set does not constrain expressiveness; it equally entails
-  undecidability of static properties in general, which is why the
-  Section 3.3.2 checker is bounded) and type safety for the pure core
-  (Theorem 3.2), fixing the well-formedness obligation the offline
-  bounded checker discharges for pure instructions (Section 3.3.2) and
-  the runtime brackets with pre-dispatch validation.
+  \textbf{A formal instruction set with compositional semantics and
+  contracts} (Section 3.1; type system in 3.1.2; bounded checker in
+  3.3.2). Instructions carry pre/post-conditions and compose under
+  sequential, parallel, conditional, and iterative operators (Definition
+  3.6). The strongest evidence is analytic, not empirical: Theorem 3.2
+  gives progress and preservation for the pure core, conditional on the
+  per-instruction validity obligation, while the shipped checker
+  discharges that obligation only on a bounded state set and only for
+  pure instructions---unit-tested but not exercised by any benchmark. No
+  performance claim attaches.
 \item
-  \textbf{Agentic Calling}, a mechanism lifting provider-specific
-  function calling into reusable, cacheable, semantically specified
-  agent instructions, with a model-adapter layer for cross-provider
-  portability (Section 3.2).
+  \textbf{Agentic Calling: function calls lifted into reusable,
+  cacheable instructions} (Section 3.2; adapters in 3.2.3; measured in
+  5.2 and 5.12). Signatures are preserved verbatim on the dispatch path,
+  so semantics are unchanged when the cache is bypassed. The strongest
+  evidence is the reuse that survives recording: 41.70\% of cacheable
+  calls hit across a run's distinct tasks versus 1.73\% within one
+  (1,960 trajectories, 14,285 calls). Caveat: on the synthetic workload
+  a plain exact-response cache matches the call reduction to the digit,
+  so the measured advantage is program reduction before dispatch, not a
+  higher hit rate.
 \item
-  \textbf{Trace-based instruction learning}, which mines recurring
-  instruction patterns from interaction traces and promotes validated
-  recurring patterns into candidate instructions whose \texttt{execute}
-  bodies replay the mined constituent subsequence by sequential
-  composition over a shared context (Section 3.3; replay reproduces the
-  recorded subsequence's outputs on the recorded inputs and, via shipped
-  schema-checked binding, on unseen parameter values---constructor-baked
-  parameters excepted, as the section states; the generalization is
-  quantified: 1,050/1,050 unseen-parameter replays match the oracle
-  exactly, Section 5.11).
+  \textbf{Developer-gated trace-based instruction learning} (Section
+  3.3; gate in 3.3.1; experiments in 5.11 and 5.12). Mining groups by
+  action signature and promotes through an approval gate into composite
+  replays; with schema-checked binding, 1,050/1,050 unseen-parameter
+  replays match the oracle exactly on deterministic synthetic streams.
+  Workload evidence: replay-verified compounds absorb 12.53\% of
+  dispatches (285/2,275) where three-step recurrence alone would suggest
+  75.0\%, 12--14 mined templates serve 95.9\% of 2,340 tool-use steps,
+  and cross-model transfer reproduces 33 of the 36 exposed compounds.
 \item
-  \textbf{A compiler and runtime} implementing fusion, dead-code
-  elimination, parallel-grouped scheduling, and dynamic hot-path
-  specialization for agent instruction streams (Sections 3.4 and 4),
-  together with an opt-in tree-pattern instruction selector (shipped,
-  Section 4.1.1; benchmarked in Section 5.11: covering cost at or below
-  the default heuristic's on 20/20 random IR trees, mean ratio 0.361,
-  the gap synthetic-pricing-dependent) and cycle-accurate pipeline
-  scheduling (specified, Section 4.1.2), with semantic-preservation
-  arguments for the implemented rewrites (Theorems 3.4--3.6, proofs in
-  Appendix C).
+  \textbf{A compiler and runtime for instruction streams} (Sections 3.4
+  and 4; results in 5.2--5.5, 5.8, 5.12). Fusion, dead-code elimination,
+  parallel-grouped dispatch, and hot-path specialization are implemented
+  and exercised; tree-pattern selection is opt-in and cycle-accurate
+  scheduling is specified only. The evidence is both positive and
+  negative: 65.8\% \(\pm\) 4.6\% hot-path trace shrink with 5/5
+  final-state identity, 12.5--25.0\% per-task trace shrink on four
+  controlled task shapes---and 0.0\% static reduction on 1,960 recorded
+  trajectories against 34.2\% on planted targets, which bounds the
+  headline to its construction.
 \item
-  \textbf{An empirical evaluation} of the implemented system, with full
-  methodology disclosure. On synthetic Zipf workloads (5 random seeds
-  each), caching reduces simulated API calls by 59.5--79.6\% depending
-  on skew, static compilation reduces the effective instruction count by
-  34.2\% \(\pm\) 1.8\% (length 200), and dynamic optimization shrinks
-  repeatedly executed traces by 65.8\% \(\pm\) 4.6\%; real-gateway
-  experiments (Sections 5.7--5.7.1) validate the cache and compiled
-  pipeline on a live gateway, a four-task characterization (Section 5.8)
-  composes the mechanisms on realistic streams, a 100-trace vocabulary
-  census (Section 5.10) documents the cross-task reuse structure of
-  generator-produced traces, and six mechanism experiments (Section
-  5.11) exercise the shipped opt-in components.
-\item
-  \textbf{Multi-agent coordination infrastructure} with
-  capability-threshold agent selection (exercised with injected scores;
-  the static metric extractor ships unwired, Section 3.5), execution
-  planning, fallback strategies, and a security monitor enforcing
+  \textbf{Coordination and security infrastructure} (Section 3.5;
+  validation in 5.6 and 5.11). Capability-threshold agent selection,
+  execution planning with fallback, and a security monitor enforcing
   authentication, authorization, resource-access, and data-sensitivity
-  policies (Sections 3.5 and 5.6), validated by 43 passing functional
-  tests; an opt-in fail-closed security mode now also ships, and its
-  paired posture matrix (1,000 evaluation tasks per mode) shows it
-  denying the 400 policy-gap tasks the fail-open default admits with
-  zero false denials on well-specified tasks (Section 5.11).
+  policies, plus an opt-in fail-closed mode. The evidence is functional:
+  43 passing tests, and a paired posture matrix in which strict mode
+  denies the 400 policy-gap tasks fail-open admits, with 0/200 false
+  denials on well-specified tasks---not a throughput or live-deployment
+  measurement.
 \end{enumerate}
 
 Our empirical claims are scoped accordingly: Sections 5.2--5.5 exercise
@@ -1643,10 +1625,11 @@ check verifying exact reproduction of the original trace's final state
 (task-level artifact preservation on realistic streams: Section 5.8).
 
 Across seeds, hot-path optimization shrinks the trace by \textbf{65.8\%
-\(\pm\) 4.6\%}; the seed-to-seed spread (59.0\%--70.0\%) reflects which
-sub-sequences each trace makes hot. As with the static experiments, this
-is trace-length reduction on synthetic traces---workload-controlled
-evidence that the loop functions, not a wall-clock speedup claim.
+\(\pm\) 4.6\%} (bootstrap 95\% CI 62.2--69.2\% over the five seeds); the
+seed-to-seed spread (59.0\%--70.0\%) reflects which sub-sequences each
+trace makes hot. As with the static experiments, this is trace-length
+reduction on synthetic traces---workload-controlled evidence that the
+loop functions, not a wall-clock speedup claim.
 
 \textbf{Replay verification.} Each seed's optimized trace \emph{is}
 re-executed---every instruction reads its declared dependencies from a
@@ -1676,11 +1659,12 @@ fusion+DCE = 34.2\% \(\pm\) 1.8\%---the headline itself, confirming that
 these two passes account for the entire static gain at length 200. The
 \textbf{paired interaction}, computed per seed as (fusion+DCE − NONE) −
 (fusion − NONE) − (DCE − NONE)---34.2 − 21.6 − 24.5 = −11.9 points---is
-−11.9\% \(\pm\) 2.0\% (per-seed −14.5/−9.5/−13.0/−12.0/−10.5 points):
-the passes overlap---dead slots break fusion chains and fused pairs
-absorb neighbors DCE would otherwise have removed individually---so the
-sum of the single-pass gains (46.1 points) overstates the joint effect
-by 11.9 points.
+−11.9\% \(\pm\) 2.0\% (per-seed −14.5/−9.5/−13.0/−12.0/−10.5 points;
+bootstrap 95\% CI −13.4 to −10.4, excluding zero): the passes
+overlap---dead slots break fusion chains and fused pairs absorb
+neighbors DCE would otherwise have removed individually---so the sum of
+the single-pass gains (46.1 points) overstates the joint effect by 11.9
+points.
 
 The secondary ablation is an \textbf{independent-draw replication} (seed
 base 4,000, same distribution): fusion alone 21.9\% \(\pm\) 3.5\%, DCE
@@ -1696,7 +1680,7 @@ Validation}\label{multi-agent-coordination-functional-validation}
 The multi-agent layer---\texttt{AgentCoordinator},
 \texttt{SecurityMonitor}, and the collaborative instruction set---is
 validated functionally by 43 tests, all passing---the
-coordination-and-security subset of the repository's full suite (1,366
+coordination-and-security subset of the repository's full suite (1,420
 passing, 14 skipped at run time), which also covers the ISA core,
 compiler, and optimizer units of Sections 5.2--5.5. This is
 \textbf{qualitative functional validation}: the tests verify the
@@ -2200,7 +2184,17 @@ level is where reduction reappears once observations are kept: 78 of 450
 recurring compounds (17.3\%) yield a spec that reproduces held-out
 occurrences exactly, absorbing \textbf{12.53\%} of dispatches---against
 0.0\% statically, and far below the 75.0\% recurrence alone suggested
-(supplementary I.9).
+(supplementary I.9). Two external checks bound these numbers
+(I.10--I.11). A static hot set trained on a run's first half reaches
+only 13.6\% even with 256 rows, a capacity-limited LRU needs 256 entries
+to approach 41.6\%, and sharing one cache across all four runs lifts the
+exact-key rate to 62.9\%---of which 371 hits are the same task replayed
+under a second model, leaving 41.4\% as independent-task reuse. Learned
+compounds also cross models: specifications from GPT-4o's retail
+trajectories reproduce 33 of the 36 Claude-exposed compounds (91.7\%),
+observation-wired ones failing. Priced at the gateway's measured 2.30 s
+and 21/64 tokens, the 746 measured hits are 28.6 minutes of avoided
+round trips---modeled, not observed.
 
 \begin{figure}
 \centering
@@ -2231,10 +2225,12 @@ Challenges}\label{system-limitations-and-challenges}
   needed), and maintaining consistency of pre/post-conditions and typing
   rules across extensions remains an open engineering challenge.
 \item
-  \textbf{Evaluation scope}: the quantitative evidence is primarily
+  \textbf{Evaluation scope}: the quantitative evidence is
   microbenchmark-based (Sections 5.2--5.5), supplemented by real-gateway
-  spot checks (Sections 5.7--5.7.1) and the four-task characterization
-  (Section 5.8); production end-to-end evaluation remains required
+  spot checks (Sections 5.7--5.7.1), a four-task characterization
+  (Section 5.8), and recorded-trajectory replay on four public families
+  (Section 5.12; Appendices I.6--I.11); production end-to-end
+  evaluation---including task success under an ISA---remains required
   before any deployment claim (Section 5.9).
 \item
   \textbf{Performance bottlenecks}: cache memory consumption under large
@@ -2405,46 +2401,30 @@ sketches are programmatic.
 
 \section{Conclusion}\label{conclusion}
 
-This paper presented AgentISA, an instruction set architecture that
-treats LLM agent behavior as a first-class compilable artifact. Our
-contributions are:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  A formal instruction set with compositional semantics, a type system,
-  and pre/post-conditions, with sanity results as design rationale
-  (Theorems 3.1--3.3) and semantic-preservation arguments for the
-  optimization and scheduling transformations (Theorems 3.4--3.6).
-\item
-  Agentic Calling, which lifts provider-specific function calling into
-  reusable, provider-independent, cacheable agent instructions.
-\item
-  Trace-based instruction learning---frequency mining with deterministic
-  action-signature grouping, developer-controlled promotion, and
-  composite replay, with shipped schema-checked parameter binding
-  (unseen-parameter replays exact on 1,050/1,050 cases;
-  constructor-baked parameters excepted; Section 5.11).
-\item
-  A compiler and runtime applying classical optimizations---fusion,
-  dead-code elimination, scheduling, and dynamic hot-path
-  specialization---to agent instruction streams.
-\item
-  A multi-agent coordination layer with capability-threshold selection
-  and a security monitor, now with an opt-in fail-closed mode.
-\end{enumerate}
-
-The evaluation shows the optimizations are real and measurable under
-controlled conditions: 59.5--79.6\% simulated-call reduction from
-caching, 34.2\% instruction-count reduction from static compilation,
-65.8\% trace shrinkage from hot-path optimization (Sections 5.2--5.5),
-real-gateway validations of the cache and the compiled pipeline
-(Sections 5.7--5.7.1), a four-task characterization (Section 5.8), a
-100-trace workload census (Section 5.10), six mechanism experiments
-(Section 5.11), and 43 functional tests for the multi-agent layer. These
-are microbenchmark and controlled-setting results, not production
-end-to-end measurements; the threats to validity of Section 5.9 stand.
+AgentISA treats agent behavior as a compilable artifact: an instruction
+set with compositional semantics, a type system and pre/post-conditions,
+an Agentic Calling layer, developer-gated trace learning, and a compiler
+and runtime applying fusion, dead-code elimination, scheduling, and
+hot-path specialization. The evaluation is deliberately two-sided. On
+1,960 recorded trajectories (14,285 calls), static reduction is 0.0\% at
+BASIC and AGGRESSIVE---recorded traces chain their observations---so the
+34.2\% figure reported for planted targets measures a mechanism, not a
+workload. Reuse reappears where sharing exists: 41.70\% of cacheable
+calls hit across the distinct tasks of a run against 1.73\% within a
+task, an exact-key cache over all four runs reaches 62.9\% but only
+41.4\% of that is independent-task reuse, mined templates serve 95.9\%
+of 2,340 tool-use steps, replay-verified compounds absorb 12.53\% of
+dispatches, and specifications learned on one model reproduce 91.7\% of
+the compounds another model exposes. Synthetic Zipf workloads reduce
+simulated calls by 59.5--79.6\%, and hot-path optimization shrinks
+repeated traces by 65.8\%. Every number comes from a mock backend or
+recorded replay; live-gateway checks establish that the implementation
+matches its specification, not that models behave differently, and
+production behavior remains unmeasured. The next steps are therefore the
+ones this scope implies: production workloads, task success under an
+ISA, mechanical verification of the conditional preservation arguments,
+and measured comparison against serving-layer and semantic caches we
+have not run here.
 
 \textbf{Implementation status of the contributions.} For auditability,
 the five contributions split by status: \emph{implemented and exercised

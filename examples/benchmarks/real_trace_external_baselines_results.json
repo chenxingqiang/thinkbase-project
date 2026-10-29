@@ -1,0 +1,1812 @@
+{
+ "experiment": "real_trace_external_baselines",
+ "schema": "real_trace_external_baselines/v1",
+ "self_test": false,
+ "description": "Offline external baselines for the real-trace transfer result (Section 5.12): exact-key LRU at capacities 8..4096 under task, run and global scopes; a static top-N hot set trained on the first half and measured on the second; same-turn duplicate rate; and the exact-key cross-task hit rate. naive = cache everything (unsound on effectful tools, count reported); sound = side-effect-free only, the like-for-like comparison with the published 41.70%.",
+ "provenance": {
+  "corpus": "examples/real_traces/tau_bench_historical.jsonl",
+  "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+  "records": 1960,
+  "first_trial_records": 325,
+  "sources": {
+   "gpt-4o-retail": 115,
+   "gpt-4o-airline": 45,
+   "sonnet-35-new-retail": 115,
+   "sonnet-35-new-airline": 50
+  },
+  "sources_all_trials": {
+   "gpt-4o-retail": 460,
+   "gpt-4o-airline": 182,
+   "sonnet-35-new-retail": 919,
+   "sonnet-35-new-airline": 399
+  },
+  "trials": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "key": "sha256(\"tool|\" + json.dumps(args, sort_keys=True, default=str))",
+  "effect_classification": "imported from real_trace_pilot.TOOL_CLASSES",
+  "scopes": {
+   "task": "cache flushed at every task attempt",
+   "run": "cache shared across the tasks of one source run",
+   "global": "one cache across every run in the corpus"
+  },
+  "capacities": [
+   0,
+   8,
+   16,
+   32,
+   64,
+   128,
+   256,
+   512,
+   1024,
+   2048,
+   4096
+  ],
+  "capacity_zero_means": "unbounded (reference, matches the published setup)"
+ },
+ "anchor": {
+  "published_within_run": 0.417,
+  "published_within_task": 0.0173,
+  "reproduced_within_run": 0.417,
+  "reproduced_within_task": 0.0173,
+  "reproduced_hits": 746,
+  "reproduced_cacheable_calls": 1789,
+  "reproduced_calls": 2275,
+  "matches_published": true,
+  "note": "same key, same purity filter, same first-trial records; a mismatch voids every comparison below"
+ },
+ "same_turn": {
+  "turns": 2275,
+  "calls": 2275,
+  "turns_with_multiple_calls": 0,
+  "multi_call_turn_rate": 0.0,
+  "batch_size_histogram": {
+   "1": 2275
+  },
+  "same_turn_duplicate_calls": 0,
+  "same_turn_duplicate_rate": 0.0,
+  "turns_containing_a_duplicate": 0,
+  "identifiable": false,
+  "note": "same-turn repetition is measured, not assumed; when every batch has one call the rate is structurally 0 and the question is unanswerable from this corpus"
+ },
+ "vocabulary": {
+  "naive": {
+   "mode": "naive",
+   "per_source": {
+    "gpt-4o-retail": {
+     "calls": 794,
+     "distinct_keys": 469,
+     "keys_for_50pct": 124,
+     "keys_for_80pct": 311,
+     "keys_for_90pct": 390
+    },
+    "gpt-4o-airline": {
+     "calls": 282,
+     "distinct_keys": 243,
+     "keys_for_50pct": 102,
+     "keys_for_80pct": 187,
+     "keys_for_90pct": 215
+    },
+    "sonnet-35-new-retail": {
+     "calls": 872,
+     "distinct_keys": 489,
+     "keys_for_50pct": 129,
+     "keys_for_80pct": 315,
+     "keys_for_90pct": 402
+    },
+    "sonnet-35-new-airline": {
+     "calls": 327,
+     "distinct_keys": 267,
+     "keys_for_50pct": 104,
+     "keys_for_80pct": 202,
+     "keys_for_90pct": 235
+    }
+   },
+   "calls": 2275,
+   "distinct_keys": 979,
+   "calls_per_distinct_key": 2.324
+  },
+  "sound": {
+   "mode": "sound",
+   "per_source": {
+    "gpt-4o-retail": {
+     "calls": 619,
+     "distinct_keys": 316,
+     "keys_for_50pct": 82,
+     "keys_for_80pct": 193,
+     "keys_for_90pct": 255
+    },
+    "gpt-4o-airline": {
+     "calls": 215,
+     "distinct_keys": 180,
+     "keys_for_50pct": 73,
+     "keys_for_80pct": 137,
+     "keys_for_90pct": 159
+    },
+    "sonnet-35-new-retail": {
+     "calls": 701,
+     "distinct_keys": 349,
+     "keys_for_50pct": 90,
+     "keys_for_80pct": 209,
+     "keys_for_90pct": 279
+    },
+    "sonnet-35-new-airline": {
+     "calls": 254,
+     "distinct_keys": 198,
+     "keys_for_50pct": 71,
+     "keys_for_80pct": 148,
+     "keys_for_90pct": 173
+    }
+   },
+   "calls": 1789,
+   "distinct_keys": 663,
+   "calls_per_distinct_key": 2.698
+  }
+ },
+ "lru": {
+  "naive": {
+   "task": {
+    "0": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 0,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "8": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 29,
+     "hits_cacheable": 25,
+     "hits_cross_task": 0,
+     "hits_same_task": 29,
+     "hits_unsound_effectful": 4,
+     "insertions": 2246,
+     "evictions": 279,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0127,
+     "capacity": 8,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "16": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 10,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 16,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "32": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 32,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "64": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 64,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "128": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 128,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "256": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 256,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "512": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 512,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "1024": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 1024,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "2048": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 2048,
+     "scope": "task",
+     "mode": "naive"
+    },
+    "4096": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 35,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 35,
+     "hits_unsound_effectful": 4,
+     "insertions": 2240,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.0154,
+     "capacity": 4096,
+     "scope": "task",
+     "mode": "naive"
+    }
+   },
+   "run": {
+    "0": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 807,
+     "hits_cacheable": 746,
+     "hits_cross_task": 781,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1468,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3547,
+     "capacity": 0,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "8": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 372,
+     "hits_cacheable": 338,
+     "hits_cross_task": 348,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 34,
+     "insertions": 1903,
+     "evictions": 1871,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.1635,
+     "capacity": 8,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "16": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 654,
+     "hits_cacheable": 595,
+     "hits_cross_task": 626,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1621,
+     "evictions": 1557,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.2875,
+     "capacity": 16,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "32": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 675,
+     "hits_cacheable": 616,
+     "hits_cross_task": 647,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1600,
+     "evictions": 1472,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.2967,
+     "capacity": 32,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "64": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 701,
+     "hits_cacheable": 642,
+     "hits_cross_task": 673,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1574,
+     "evictions": 1318,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3081,
+     "capacity": 64,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "128": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 737,
+     "hits_cacheable": 678,
+     "hits_cross_task": 709,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1538,
+     "evictions": 1026,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.324,
+     "capacity": 128,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "256": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 794,
+     "hits_cacheable": 733,
+     "hits_cross_task": 768,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1481,
+     "evictions": 470,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.349,
+     "capacity": 256,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "512": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 807,
+     "hits_cacheable": 746,
+     "hits_cross_task": 781,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1468,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3547,
+     "capacity": 512,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "1024": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 807,
+     "hits_cacheable": 746,
+     "hits_cross_task": 781,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1468,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3547,
+     "capacity": 1024,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "2048": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 807,
+     "hits_cacheable": 746,
+     "hits_cross_task": 781,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1468,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3547,
+     "capacity": 2048,
+     "scope": "run",
+     "mode": "naive"
+    },
+    "4096": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 807,
+     "hits_cacheable": 746,
+     "hits_cross_task": 781,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1468,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3547,
+     "capacity": 4096,
+     "scope": "run",
+     "mode": "naive"
+    }
+   },
+   "global": {
+    "0": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1296,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1279,
+     "hits_same_task": 17,
+     "hits_unsound_effectful": 170,
+     "insertions": 979,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.5697,
+     "capacity": 0,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "8": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 372,
+     "hits_cacheable": 338,
+     "hits_cross_task": 348,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 34,
+     "insertions": 1903,
+     "evictions": 1895,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.1635,
+     "capacity": 8,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "16": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 654,
+     "hits_cacheable": 595,
+     "hits_cross_task": 626,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1621,
+     "evictions": 1605,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.2875,
+     "capacity": 16,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "32": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 675,
+     "hits_cacheable": 616,
+     "hits_cross_task": 647,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1600,
+     "evictions": 1568,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.2967,
+     "capacity": 32,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "64": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 701,
+     "hits_cacheable": 642,
+     "hits_cross_task": 673,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1574,
+     "evictions": 1510,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3081,
+     "capacity": 64,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "128": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 737,
+     "hits_cacheable": 678,
+     "hits_cross_task": 709,
+     "hits_same_task": 28,
+     "hits_unsound_effectful": 59,
+     "insertions": 1538,
+     "evictions": 1410,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.324,
+     "capacity": 128,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "256": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 794,
+     "hits_cacheable": 733,
+     "hits_cross_task": 768,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1481,
+     "evictions": 1225,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.349,
+     "capacity": 256,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "512": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 821,
+     "hits_cacheable": 760,
+     "hits_cross_task": 795,
+     "hits_same_task": 26,
+     "hits_unsound_effectful": 61,
+     "insertions": 1454,
+     "evictions": 942,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.3609,
+     "capacity": 512,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "1024": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1296,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1279,
+     "hits_same_task": 17,
+     "hits_unsound_effectful": 170,
+     "insertions": 979,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.5697,
+     "capacity": 1024,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "2048": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1296,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1279,
+     "hits_same_task": 17,
+     "hits_unsound_effectful": 170,
+     "insertions": 979,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.5697,
+     "capacity": 2048,
+     "scope": "global",
+     "mode": "naive"
+    },
+    "4096": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1296,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1279,
+     "hits_same_task": 17,
+     "hits_unsound_effectful": 170,
+     "insertions": 979,
+     "evictions": 0,
+     "skipped_by_mode": 0,
+     "hit_rate": 0.5697,
+     "capacity": 4096,
+     "scope": "global",
+     "mode": "naive"
+    }
+   }
+  },
+  "sound": {
+   "task": {
+    "0": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 0,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "8": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 27,
+     "hits_cacheable": 27,
+     "hits_cross_task": 0,
+     "hits_same_task": 27,
+     "hits_unsound_effectful": 0,
+     "insertions": 1762,
+     "evictions": 96,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0151,
+     "capacity": 8,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "16": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 2,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 16,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "32": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 32,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "64": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 64,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "128": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 128,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "256": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 256,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "512": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 512,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "1024": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 1024,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "2048": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 2048,
+     "scope": "task",
+     "mode": "sound"
+    },
+    "4096": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 31,
+     "hits_cacheable": 31,
+     "hits_cross_task": 0,
+     "hits_same_task": 31,
+     "hits_unsound_effectful": 0,
+     "insertions": 1758,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.0173,
+     "capacity": 4096,
+     "scope": "task",
+     "mode": "sound"
+    }
+   },
+   "run": {
+    "0": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 746,
+     "hits_cacheable": 746,
+     "hits_cross_task": 724,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1043,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.417,
+     "capacity": 0,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "8": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 457,
+     "hits_cacheable": 457,
+     "hits_cross_task": 436,
+     "hits_same_task": 21,
+     "hits_unsound_effectful": 0,
+     "insertions": 1332,
+     "evictions": 1300,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.2554,
+     "capacity": 8,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "16": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 605,
+     "hits_cacheable": 605,
+     "hits_cross_task": 581,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1184,
+     "evictions": 1120,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3382,
+     "capacity": 16,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "32": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 623,
+     "hits_cacheable": 623,
+     "hits_cross_task": 599,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1166,
+     "evictions": 1038,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3482,
+     "capacity": 32,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "64": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 660,
+     "hits_cacheable": 660,
+     "hits_cross_task": 636,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1129,
+     "evictions": 873,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3689,
+     "capacity": 64,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "128": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 691,
+     "hits_cacheable": 691,
+     "hits_cross_task": 667,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1098,
+     "evictions": 586,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3862,
+     "capacity": 128,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "256": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 744,
+     "hits_cacheable": 744,
+     "hits_cross_task": 722,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1045,
+     "evictions": 155,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.4159,
+     "capacity": 256,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "512": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 746,
+     "hits_cacheable": 746,
+     "hits_cross_task": 724,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1043,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.417,
+     "capacity": 512,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "1024": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 746,
+     "hits_cacheable": 746,
+     "hits_cross_task": 724,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1043,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.417,
+     "capacity": 1024,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "2048": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 746,
+     "hits_cacheable": 746,
+     "hits_cross_task": 724,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1043,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.417,
+     "capacity": 2048,
+     "scope": "run",
+     "mode": "sound"
+    },
+    "4096": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 746,
+     "hits_cacheable": 746,
+     "hits_cross_task": 724,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1043,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.417,
+     "capacity": 4096,
+     "scope": "run",
+     "mode": "sound"
+    }
+   },
+   "global": {
+    "0": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1126,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1112,
+     "hits_same_task": 14,
+     "hits_unsound_effectful": 0,
+     "insertions": 663,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.6294,
+     "capacity": 0,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "8": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 457,
+     "hits_cacheable": 457,
+     "hits_cross_task": 436,
+     "hits_same_task": 21,
+     "hits_unsound_effectful": 0,
+     "insertions": 1332,
+     "evictions": 1324,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.2554,
+     "capacity": 8,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "16": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 605,
+     "hits_cacheable": 605,
+     "hits_cross_task": 581,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1184,
+     "evictions": 1168,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3382,
+     "capacity": 16,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "32": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 623,
+     "hits_cacheable": 623,
+     "hits_cross_task": 599,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1166,
+     "evictions": 1134,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3482,
+     "capacity": 32,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "64": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 660,
+     "hits_cacheable": 660,
+     "hits_cross_task": 636,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1129,
+     "evictions": 1065,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3689,
+     "capacity": 64,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "128": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 691,
+     "hits_cacheable": 691,
+     "hits_cross_task": 667,
+     "hits_same_task": 24,
+     "hits_unsound_effectful": 0,
+     "insertions": 1098,
+     "evictions": 970,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.3862,
+     "capacity": 128,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "256": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 746,
+     "hits_cacheable": 746,
+     "hits_cross_task": 724,
+     "hits_same_task": 22,
+     "hits_unsound_effectful": 0,
+     "insertions": 1043,
+     "evictions": 787,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.417,
+     "capacity": 256,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "512": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 906,
+     "hits_cacheable": 906,
+     "hits_cross_task": 890,
+     "hits_same_task": 16,
+     "hits_unsound_effectful": 0,
+     "insertions": 883,
+     "evictions": 371,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.5064,
+     "capacity": 512,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "1024": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1126,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1112,
+     "hits_same_task": 14,
+     "hits_unsound_effectful": 0,
+     "insertions": 663,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.6294,
+     "capacity": 1024,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "2048": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1126,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1112,
+     "hits_same_task": 14,
+     "hits_unsound_effectful": 0,
+     "insertions": 663,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.6294,
+     "capacity": 2048,
+     "scope": "global",
+     "mode": "sound"
+    },
+    "4096": {
+     "calls": 2275,
+     "cacheable_calls": 1789,
+     "effectful_calls": 486,
+     "hits": 1126,
+     "hits_cacheable": 1126,
+     "hits_cross_task": 1112,
+     "hits_same_task": 14,
+     "hits_unsound_effectful": 0,
+     "insertions": 663,
+     "evictions": 0,
+     "skipped_by_mode": 486,
+     "hit_rate": 0.6294,
+     "capacity": 4096,
+     "scope": "global",
+     "mode": "sound"
+    }
+   }
+  }
+ },
+ "hot_set": {
+  "naive": {
+   "mode": "naive",
+   "split": "per source, first floor(n/2) tasks (first trial) train, remainder test",
+   "global": {
+    "16": {
+     "n": 16,
+     "calls": 1106,
+     "hits": 24,
+     "hit_rate": 0.0217,
+     "test_keys_unseen_in_train": 978,
+     "test_unseen_rate": 0.8843,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 131,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 394,
+       "hits": 14,
+       "hit_rate": 0.0355
+      },
+      "sonnet-35-new-airline": {
+       "calls": 130,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 451,
+       "hits": 10,
+       "hit_rate": 0.0222
+      }
+     }
+    },
+    "64": {
+     "n": 64,
+     "calls": 1106,
+     "hits": 45,
+     "hit_rate": 0.0407,
+     "test_keys_unseen_in_train": 978,
+     "test_unseen_rate": 0.8843,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 131,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 394,
+       "hits": 24,
+       "hit_rate": 0.0609
+      },
+      "sonnet-35-new-airline": {
+       "calls": 130,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 451,
+       "hits": 21,
+       "hit_rate": 0.0466
+      }
+     }
+    },
+    "256": {
+     "n": 256,
+     "calls": 1106,
+     "hits": 118,
+     "hit_rate": 0.1067,
+     "test_keys_unseen_in_train": 978,
+     "test_unseen_rate": 0.8843,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 131,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 394,
+       "hits": 56,
+       "hit_rate": 0.1421
+      },
+      "sonnet-35-new-airline": {
+       "calls": 130,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 451,
+       "hits": 62,
+       "hit_rate": 0.1375
+      }
+     }
+    }
+   },
+   "per_source": {
+    "16": {
+     "n": 16,
+     "calls": 1106,
+     "hits": 25,
+     "hit_rate": 0.0226,
+     "test_keys_unseen_in_train": 978,
+     "test_unseen_rate": 0.8843,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 131,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 394,
+       "hits": 14,
+       "hit_rate": 0.0355
+      },
+      "sonnet-35-new-airline": {
+       "calls": 130,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 451,
+       "hits": 11,
+       "hit_rate": 0.0244
+      }
+     }
+    },
+    "64": {
+     "n": 64,
+     "calls": 1106,
+     "hits": 49,
+     "hit_rate": 0.0443,
+     "test_keys_unseen_in_train": 978,
+     "test_unseen_rate": 0.8843,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 131,
+       "hits": 2,
+       "hit_rate": 0.0153
+      },
+      "gpt-4o-retail": {
+       "calls": 394,
+       "hits": 24,
+       "hit_rate": 0.0609
+      },
+      "sonnet-35-new-airline": {
+       "calls": 130,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 451,
+       "hits": 23,
+       "hit_rate": 0.051
+      }
+     }
+    },
+    "256": {
+     "n": 256,
+     "calls": 1106,
+     "hits": 128,
+     "hit_rate": 0.1157,
+     "test_keys_unseen_in_train": 978,
+     "test_unseen_rate": 0.8843,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 131,
+       "hits": 4,
+       "hit_rate": 0.0305
+      },
+      "gpt-4o-retail": {
+       "calls": 394,
+       "hits": 56,
+       "hit_rate": 0.1421
+      },
+      "sonnet-35-new-airline": {
+       "calls": 130,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 451,
+       "hits": 68,
+       "hit_rate": 0.1508
+      }
+     }
+    }
+   },
+   "train_distinct_keys": 551,
+   "train_top_key_share": 0.0128,
+   "train_top_key_count": 15
+  },
+  "sound": {
+   "mode": "sound",
+   "split": "per source, first floor(n/2) tasks (first trial) train, remainder test",
+   "global": {
+    "16": {
+     "n": 16,
+     "calls": 866,
+     "hits": 24,
+     "hit_rate": 0.0277,
+     "test_keys_unseen_in_train": 738,
+     "test_unseen_rate": 0.8522,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 102,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 306,
+       "hits": 14,
+       "hit_rate": 0.0458
+      },
+      "sonnet-35-new-airline": {
+       "calls": 101,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 357,
+       "hits": 10,
+       "hit_rate": 0.028
+      }
+     }
+    },
+    "64": {
+     "n": 64,
+     "calls": 866,
+     "hits": 45,
+     "hit_rate": 0.052,
+     "test_keys_unseen_in_train": 738,
+     "test_unseen_rate": 0.8522,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 102,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 306,
+       "hits": 24,
+       "hit_rate": 0.0784
+      },
+      "sonnet-35-new-airline": {
+       "calls": 101,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 357,
+       "hits": 21,
+       "hit_rate": 0.0588
+      }
+     }
+    },
+    "256": {
+     "n": 256,
+     "calls": 866,
+     "hits": 118,
+     "hit_rate": 0.1363,
+     "test_keys_unseen_in_train": 738,
+     "test_unseen_rate": 0.8522,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 102,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 306,
+       "hits": 56,
+       "hit_rate": 0.183
+      },
+      "sonnet-35-new-airline": {
+       "calls": 101,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 357,
+       "hits": 62,
+       "hit_rate": 0.1737
+      }
+     }
+    }
+   },
+   "per_source": {
+    "16": {
+     "n": 16,
+     "calls": 866,
+     "hits": 25,
+     "hit_rate": 0.0289,
+     "test_keys_unseen_in_train": 738,
+     "test_unseen_rate": 0.8522,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 102,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "gpt-4o-retail": {
+       "calls": 306,
+       "hits": 14,
+       "hit_rate": 0.0458
+      },
+      "sonnet-35-new-airline": {
+       "calls": 101,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 357,
+       "hits": 11,
+       "hit_rate": 0.0308
+      }
+     }
+    },
+    "64": {
+     "n": 64,
+     "calls": 866,
+     "hits": 51,
+     "hit_rate": 0.0589,
+     "test_keys_unseen_in_train": 738,
+     "test_unseen_rate": 0.8522,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 102,
+       "hits": 2,
+       "hit_rate": 0.0196
+      },
+      "gpt-4o-retail": {
+       "calls": 306,
+       "hits": 26,
+       "hit_rate": 0.085
+      },
+      "sonnet-35-new-airline": {
+       "calls": 101,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 357,
+       "hits": 23,
+       "hit_rate": 0.0644
+      }
+     }
+    },
+    "256": {
+     "n": 256,
+     "calls": 866,
+     "hits": 128,
+     "hit_rate": 0.1478,
+     "test_keys_unseen_in_train": 738,
+     "test_unseen_rate": 0.8522,
+     "per_source": {
+      "gpt-4o-airline": {
+       "calls": 102,
+       "hits": 4,
+       "hit_rate": 0.0392
+      },
+      "gpt-4o-retail": {
+       "calls": 306,
+       "hits": 56,
+       "hit_rate": 0.183
+      },
+      "sonnet-35-new-airline": {
+       "calls": 101,
+       "hits": 0,
+       "hit_rate": 0.0
+      },
+      "sonnet-35-new-retail": {
+       "calls": 357,
+       "hits": 68,
+       "hit_rate": 0.1905
+      }
+     }
+    }
+   },
+   "train_distinct_keys": 378,
+   "train_top_key_share": 0.0163,
+   "train_top_key_count": 15
+  }
+ },
+ "split_half_diagnostics": {
+  "per_source": {
+   "gpt-4o-retail": {
+    "train_tasks": 57,
+    "test_tasks": 58,
+    "train_keys": 153,
+    "test_calls": 306,
+    "test_calls_with_train_key": 56,
+    "static_ceiling": 0.183,
+    "test_calls_repeating_within_test": 112,
+    "online_reuse_rate": 0.366
+   },
+   "gpt-4o-airline": {
+    "train_tasks": 22,
+    "test_tasks": 23,
+    "train_keys": 103,
+    "test_calls": 102,
+    "test_calls_with_train_key": 4,
+    "static_ceiling": 0.0392,
+    "test_calls_repeating_within_test": 23,
+    "online_reuse_rate": 0.2255
+   },
+   "sonnet-35-new-retail": {
+    "train_tasks": 57,
+    "test_tasks": 58,
+    "train_keys": 166,
+    "test_calls": 357,
+    "test_calls_with_train_key": 68,
+    "static_ceiling": 0.1905,
+    "test_calls_repeating_within_test": 140,
+    "online_reuse_rate": 0.3922
+   },
+   "sonnet-35-new-airline": {
+    "train_tasks": 25,
+    "test_tasks": 25,
+    "train_keys": 127,
+    "test_calls": 101,
+    "test_calls_with_train_key": 0,
+    "static_ceiling": 0.0,
+    "test_calls_repeating_within_test": 30,
+    "online_reuse_rate": 0.297
+   }
+  },
+  "note": "static_ceiling bounds every hot-set row; online_reuse_rate is what a cache that learns during the run can still collect"
+ },
+ "cross_task": {
+  "per_source_unbounded_sound": {
+   "gpt-4o-retail": {
+    "calls": 794,
+    "cacheable_calls": 619,
+    "hits": 303,
+    "hit_rate": 0.4895,
+    "hits_cross_task": 299,
+    "hits_same_task": 4,
+    "cross_task_hit_rate": 0.483,
+    "same_task_hit_rate": 0.0065
+   },
+   "gpt-4o-airline": {
+    "calls": 282,
+    "cacheable_calls": 215,
+    "hits": 35,
+    "hit_rate": 0.1628,
+    "hits_cross_task": 30,
+    "hits_same_task": 5,
+    "cross_task_hit_rate": 0.1395,
+    "same_task_hit_rate": 0.0233
+   },
+   "sonnet-35-new-retail": {
+    "calls": 872,
+    "cacheable_calls": 701,
+    "hits": 352,
+    "hit_rate": 0.5021,
+    "hits_cross_task": 345,
+    "hits_same_task": 7,
+    "cross_task_hit_rate": 0.4922,
+    "same_task_hit_rate": 0.01
+   },
+   "sonnet-35-new-airline": {
+    "calls": 327,
+    "cacheable_calls": 254,
+    "hits": 56,
+    "hit_rate": 0.2205,
+    "hits_cross_task": 50,
+    "hits_same_task": 6,
+    "cross_task_hit_rate": 0.1969,
+    "same_task_hit_rate": 0.0236
+   }
+  },
+  "capacity_cliff": [
+   {
+    "scope": "task",
+    "uncapped_hit_rate": 0.0173,
+    "smallest_capacity_within_1pct_of_uncapped": 16
+   },
+   {
+    "scope": "run",
+    "uncapped_hit_rate": 0.417,
+    "smallest_capacity_within_1pct_of_uncapped": 256
+   },
+   {
+    "scope": "global",
+    "uncapped_hit_rate": 0.6294,
+    "smallest_capacity_within_1pct_of_uncapped": 1024
+   }
+  ]
+ },
+ "global_scope_decomposition": {
+  "calls": 1789,
+  "hits": 1126,
+  "hit_rate": 0.6294,
+  "hits_same_task": 14,
+  "hits_same_task_other_backbone": 371,
+  "hits_other_task_same_run": 354,
+  "hits_other_task_other_run": 387,
+  "note": "only the two hits_other_task_* buckets are independent-task reuse; hits_same_task_other_backbone is one task replayed under a second model (the same inflation the all-trials sensitivity shows), and hits_other_task_same_run is already counted by the run scope"
+ },
+ "cannot_emulate": [
+  {
+   "baseline": "semantic / embedding cache",
+   "why_not": "The corpus stores parsed (tool, arguments) pairs only. There are no argument embeddings, no similarity scores and no threshold anywhere in the record, and no model is reachable offline. Reconstructing equivalence classes would mean choosing an embedder, a distance metric and a threshold -- three free parameters that are ours, not the workload's -- so any hit rate would measure our reconstruction, not the cache. It is also non-deterministic across embedder versions, which the paper's reproducibility discipline forbids."
+  },
+  {
+   "baseline": "provider prefix cache (Anthropic/OpenAI prompt caching)",
+   "why_not": "A prefix cache keys on the serialized prompt prefix of a model call (system prompt + message history) and bills input tokens as cache reads. The trace keeps neither the prompt text, nor token counts, nor prefix boundaries, nor per-call timestamps, so prefix identity, the minimum cacheable prefix (1024/2048 tokens) and the 5-minute TTL are all unobservable. It also saves input-token cost, not calls: it is a different denominator from the 41.70% call-level hit rate, and converting between them would require re-tokenizing reconstructed prompts -- invention. The paper therefore reports provider prefix caching only under a MODELED pricing overlay on measured tokens, which this corpus also lacks."
+  },
+  {
+   "baseline": "capacity in bytes / TTL-based locality",
+   "why_not": "Tool *results* are absent from the corpus, so entry sizes are unknown; capacity is therefore modeled in entries, not bytes. Timestamps are absent too, so time-to-live and inter-arrival locality cannot be evaluated; the LRU sweep is a logical-access ordering, not a wall-clock trace."
+  },
+  {
+   "baseline": "end-to-end latency or dollar savings",
+   "why_not": "No latency, token or price fields exist in the corpus. Hit rates are the only defensible offline output; any cost claim would need a pricing overlay plus measured tokens, neither of which is here."
+  }
+ ]
+}

@@ -27,7 +27,7 @@ python -m pytest tests/core/isa/test_coordination.py \
 python -m pytest tests/system/ -q
 
 python -m pytest tests/ -q
-# 1366 passed, 14 skipped, 13 subtests passed (full suite)
+# 1420 passed, 14 skipped, 13 subtests passed (full suite)
 ```
 
 Note: the coordination tests initialize a local Ray session; on machines
@@ -75,6 +75,10 @@ marked below; every results JSON records its own provenance (seeds, scale,
 | I.3 multi-seed cache run (live) | `python examples/benchmarks/isa_real_llm_bench.py --backend gateway --tasks 100 --seeds 2 --zipf 0.5 --max-tokens 64` (one invocation per zipf — repeat for 1.0 / 1.5 — with `--output` per raw chunk; `Random(1000+seed)`), then `python examples/benchmarks/e10_gateway_postprocess.py …` to fold the raw runs into the deliverable JSON — see reproduction notes below | `examples/benchmarks/gateway_multiseed_results.json` |
 | I.4 cache-key differentiation | `python examples/benchmarks/cache_key_differentiation.py` (W1 seed base 4000, W2 base 5000; universe 100 × 6-key params, 2000 draws × 5 seeds, Zipf s=1.0; production `build_cache_key` under test) | `examples/benchmarks/cache_key_differentiation_results.json` |
 | I.4 trace-corpus compile control | `python examples/benchmarks/trace_compile_control.py` (deterministic full census of the 100 committed traces; no seeds) | `examples/benchmarks/trace_compile_control_results.json` |
+| External cache baselines (offline, exact-key) | `./venv/bin/python examples/benchmarks/real_trace_external_baselines.py --corpus examples/real_traces/tau_bench_historical.jsonl --output examples/benchmarks/real_trace_external_baselines_results.json` (anchor reproduces 746/1,789; LRU sweep at capacities 0 = unbounded and 8–4096 in within-task, within-run and global scopes; static hot set trained on the first half of each run; same-turn dedup; exact-key cross-task; no seeds, no model calls) | `examples/benchmarks/real_trace_external_baselines_results.json` |
+| Cost model (modeled, not measured) | `./venv/bin/python examples/benchmarks/cost_model.py --output examples/benchmarks/cost_model_results.json` (deterministic; reads only committed results JSONs, listed with their SHA-256 in `provenance.inputs`) | `examples/benchmarks/cost_model_results.json` |
+| Compound transfer (cross-model, cross-domain) | `./venv/bin/python examples/benchmarks/compound_transfer.py --corpus examples/real_traces/tau_bench_observed.jsonl --output examples/benchmarks/compound_transfer_results.json` (max k=4, min support=2; the observed-observation corpus of I.9) | `examples/benchmarks/compound_transfer_results.json` |
+| Bootstrap CIs over committed records | `./venv/bin/python scripts/bootstrap_ci.py --output examples/benchmarks/bootstrap_ci_results.json` (percentile bootstrap over the committed per-seed microbench results; fixed base seed, so a rerun reproduces the same intervals) | `examples/benchmarks/bootstrap_ci_results.json` |
 
 Offline re-verification of every cited number (main text + supplementary,
 aggregates recomputed from raw records):
@@ -82,6 +86,33 @@ aggregates recomputed from raw records):
 ```bash
 python3 scripts/number_regression.py
 ```
+
+## What is modeled, not measured
+
+The `MODELED` label that `cost_model_results.json` carries (`result_kind:
+MODELED`, `not_observed: true`) is the rule for the files added for the
+revision, and the paper's claims rest on it. The *avoided counts* are measured in
+committed results — result-cache hits (`real_trace_pilot_tau_bench_results.json`),
+template-served dispatches (`instruction_precipitation_results.json`),
+compound-absorbed dispatches (`compound_binding_results.json`) — but the seconds,
+tokens and dollars built on them are arithmetic: a measured per-call unit price
+(2.2976 s mean, 21 input / 64 output tokens, from `isa_real_llm_results.json`)
+times that count. The $3 / $15 per Mtok input/output prices are assumed
+stand-ins taken from the supplementary Appendix G protocol, not a provider quote
+or invoice; the gateway's own prompt-cache probe reports zero cache-creation and
+cache-read tokens, so no provider-cache discount is claimed anywhere; output
+length is censored at the 64-token budget, which makes the dollar figures a
+floor; the template and compound rows additionally require an unmeasured
+planner-bypass assumption and are zero without it; and no total is emitted,
+because the three mechanisms are three readings of the same τ-bench recordings
+and only the largest single mechanism is quoted. The same discipline governs the
+neighbouring files: the cache baselines can defend offline hit rates and nothing
+else (no timestamps, latencies, prices or result bytes in the corpus; capacity
+counted in entries; no TTL; semantic and prefix caches not approximated),
+compound transfer reports binder outcomes over recorded trajectories rather than
+end-to-end executions (with 400-character observation truncation making
+bindability a lower bound), and interval estimates are resampling statements
+about the committed records, not predictions about a deployment.
 
 ## Claim-to-code map
 

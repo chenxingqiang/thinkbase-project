@@ -89,6 +89,30 @@ Appendix I.9 is a lower bound on what a longer observation would support.
 The committed file is 1.0 MB. It is derived from the digests listed above, so
 the provenance argument is the same one.
 
+## Offline cache baselines on this corpus
+
+`examples/benchmarks/real_trace_external_baselines.py` scores four exact-key baselines on
+`tau_bench_historical.jsonl` without a model in the loop: an exact-key LRU sweep
+at capacities 0 (unbounded) and 8–4096 entries, run both within a task (cache
+flushed at every attempt) and across a run (cache shared across a source's
+tasks); a static hot set trained on the first half of each source and measured on
+its second half, so the reported rate is out of sample; same-turn deduplication,
+which finds nothing here because the corpus records one call per turn (2,275
+turns, 2,275 calls) and is therefore flagged `identifiable: false`; and an
+exact-key cross-task rate with unbounded residency, attributing a repeat to the
+task that first inserted the key. Each arm is scored twice — `naive`, which
+caches effectful calls too, and `sound`, which caches only side-effect-free ones
+— because caching a mutating tool is unsound; keys are
+`sha256("tool|" + sorted-JSON(arguments))`, and the sweep reproduces the
+published first-trial rates (41.7% within run, 1.73% within task) as its anchor
+before any other arm is compared against them. What this corpus cannot support
+is semantic/embedding caching and provider prefix caching: both cannot be
+emulated offline here, because the records keep inputs only — no message prose,
+no system prompt, no tokenized prefix spans — so there is nothing to embed and no
+shared prefix to count, and a semantic hit would need a similarity threshold
+chosen by the analyst rather than by the workload, which would measure the
+analysis instead of the traces.
+
 ## Second family: bash-only coding agents
 
 `SWE-agent-trajectories` on Hugging Face (`nebius/SWE-agent-trajectories`,

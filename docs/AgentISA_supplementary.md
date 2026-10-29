@@ -1477,8 +1477,60 @@ Substituting the signature-consistent set would absorb 15.03% of the 2,275 dispa
 
 **The strict test, for contrast.** Requiring every later argument to come from an observation or the entry call — the strictest reading of "compiled" — passes only 7 compounds (1.6%) and absorbs 1.36% of dispatches. The gap between 1.36% and 12.53% is the value of treating external values as instruction parameters rather than as unbound unknowns.
 
-**Threats.** Learning and verification happen within one corpus: a spec is learned on one occurrence and tested on held-out occurrences of the same family, which is a generalization test but not a cross-family transfer test. The 30 replay failures are reported rather than dropped, and they are the reason the mechanism refuses an occurrence whose observations no longer match the recorded read path instead of guessing a value. Environments are mock (τ-bench), so the reduction measures dispatch absorption on recorded traces, not production traffic.
+**Threats.** Learning and verification happen within one corpus: a spec is learned on one occurrence and tested on held-out occurrences of the same family, which is a generalization test but not a cross-family transfer test. The 30 replay failures are reported rather than dropped, and they are the reason the mechanism refuses an occurrence whose observations no longer match the recorded read path instead of guessing a value. Environments are mock (τ-bench), so the reduction measures dispatch absorption on recorded traces, not production traffic. Cross-model transfer is the subject of I.11: parameter-only specifications transfer at 100%, observation-wired ones at 0%, which is why the path-based binding above is a same-model result.
 
+
+## I.10 External Baselines and Priced Effects
+
+Section 5.12's 41.70% is produced by *our* cache: it serves only side-effect-free calls and keeps every key for a whole run. A reader is entitled to ask whether an ISA-agnostic exact-key cache would do as well, how much capacity the figure needs, and whether the reuse is dynamic or a fixed hot set. This appendix answers the part the corpus can answer, and states the part it cannot.
+
+**Protocol.** 325 first-trial tasks (2,275 calls; 1,789 cacheable under the pilot's purity classification), key = `sha256(tool | canonical-args)`, four scopes. As an anchor, the emulation reproduces the paper's numbers exactly — 746/1,789 = 41.70% within a run, 31/1,789 = 1.73% within a task — which fixes that both use the same key, the same records and the same purity filter; a mismatch would void the comparison.
+
+| scope | capacity | hit rate |
+| -- | -- | -- |
+| within a task | unbounded | 1.73% |
+| within a run | 8 | 25.54% |
+| within a run | 16 | 33.82% |
+| within a run | 32 | 34.82% |
+| within a run | 64 | 36.89% |
+| within a run | 128 | 38.62% |
+| within a run | 256 | 41.59% |
+| within a run | 512+ | 41.70% |
+
+**Capacity buys the first 34 points, then saturates.** An LRU of eight entries already reaches 25.5%; 256 entries reach 41.6%, and nothing more is available because the run holds no further repeat. The figure is therefore a property of the workload's key distribution, not of unbounded storage — good news for deployment, since the working set is small.
+
+**The reuse is not a hot set.** A static top-N cache trained on each run's first half and measured on its second (866 calls) reaches 2.77% (N = 16), 5.20% (N = 64) and 13.63% (N = 256), against 41.59% for a 256-entry LRU on the same calls. The reason is structural: 85.22% of the second half's distinct keys never appear in the first half at all, so no static selection can approach the dynamic figure. Dynamics — promotion on first use, eviction on capacity — account for the remaining 28 points.
+
+**Same-turn repetition is unmeasurable here.** Every one of the 2,275 assistant turns contains exactly one call, so the duplicate rate is a structural zero and the parallel-grouping lever of Section 3.4 cannot be exercised on this corpus. We report the zero as a scope limit, not as evidence about batching.
+
+**A global cache needs a decomposition, not a headline.** Sharing one cache across all four runs gives 62.94%. That number must not be quoted as reuse: of its 1,126 hits, 371 are the *same task replayed under a second model* (trial-replay inflation, the same effect Section 5.12 warns about), 14 are same-task same-run, and only 354 + 387 = 741 (41.4% of cacheable calls) are independent-task reuse. The honest reading is that a global cache adds nothing over the per-run boundary; it merely re-counts a task the benchmark ran twice.
+
+**Priced effects, modeled not observed.** At the measured per-call unit prices of the live-gateway run (mean 2.30 s, p50 2.17 s, p95 3.30 s; 21 input and 64 output tokens per call), the 746 measured cache hits correspond to 1,714 s of avoided round trips (28.6 minutes; p50 1,621 s, p95 2,460 s), 15,666 input tokens, 47,744 output tokens and $0.76 at an assumed $3/$15 per-million-token list price. Every dollar figure is a model: the gateway's actual price is unknown, and output tokens are censored at `max_tokens=64`, so dollars are a floor. Two further mechanisms — 2,245 served planning steps and 285 absorbed dispatches — are *conditional* on a planner bypass that was never instrumented; without that assumption their savings are zero, so they are reported as conditional bounds and are not summed with the cache figure (they count the same stream at different granularity, and summing would double count).
+
+**What cannot be measured offline.** A semantic (embedding) cache and a provider prefix cache both need inputs this corpus does not carry — prompts and embeddings — so no GPTCache-style or SGLang-style head-to-head is possible here, and none is claimed. The baselines above emulate standard caching policy, not those systems.
+## I.11 Cross-Model Compound Transfer
+
+Section I.9 learns compound specifications on one corpus and verifies them on held-out occurrences of the same families. A harder question is whether a specification learned from one model's behavior still instantiates when a *different* model performs the same task. The corpus makes this testable: GPT-4o and Claude 3.5 Sonnet each ran the same retail and airline task sets, so a spec learned on one can be tested on the other with the tool vocabulary held fixed.
+
+**Protocol.** Learn on source A, test on source B, in both directions, for retail and airline. A compound is *eligible* when its atomic templates are present in the learner; *exposed* when an occurrence exists in the tester; *transferred* when the learned spec reproduces every exposed occurrence's arguments exactly (the I.9 criterion). Intervals are 95% Wilson.
+
+| cell | eligible | exposed | transferred | rate | occurrence exact |
+| -- | -- | -- | -- | -- | -- |
+| GPT-4o to Sonnet, retail | 49 | 36 | 33 | 91.7% [78.2, 97.1] | 148/176 (84.1%) |
+| Sonnet to GPT-4o, retail | 23 | 17 | 17 | 100% [81.6, 100] | 50/50 (100%) |
+| GPT-4o to Sonnet, airline | 32 | 18 | 18 | 100% [82.4, 100] | 68/68 (100%) |
+| Sonnet to GPT-4o, airline | 8 | 5 | 5 | 100% [56.6, 100] | 20/20 (100%) |
+| within-source control (retail, half to half) | 38 | 28 | 27 | 96.4% [82.3, 99.4] | 100/102 (98.0%) |
+
+**The wiring, not the vocabulary, is what a model change breaks.** Splitting the same cells by how a spec obtains its arguments is decisive: *parameter-only* specifications — those whose later steps take every argument from the compound's own parameters — transfer at **100% in all four cells** with 100% occurrence-exact replay. *Observation-wired* specifications — those that read a value out of an earlier step's result via a recorded JSON path — transfer at **0% in all four cells**: no such specification survives its exposed occurrences (10/6/6/4 in the four cells, 0 transferred). Individual occurrences do replay — 2 of 17 in the reverse retail cell — but never all occurrences of one specification. In the forward retail cell, 28 of 176 occurrence tests fail: 21 as path drift (the recorded path still exists but yields a different value) and 7 as argument mismatch. Zero slots are unbound, which rules out the trivial explanation that the tester lacks the tools.
+
+**Coverage, if the portable half were substituted.** Parameter-only specifications cover 24.4% of the forward retail tester's steps (10.6% reverse), 34.9% of forward airline (12.8% reverse); observation-wired specifications cover 0.0% in every cell. Those are the same dispatch-absorption measure as I.9, so the cross-model penalty is stated in the paper's own units rather than in counts of specifications.
+
+**What that implies.** Tool vocabulary is portable across models; a positional read into an observation is not, because the two models elicit different result shapes from the same mock environment. A compound instruction should therefore record an observation read as a *field selector* (+ retry rule) rather than a positional path, or re-derive its paths per backbone at promotion time. This is a design requirement that only the cross-model arm exposes — the within-family numbers of I.9 are consistent with either wiring.
+
+**Cross-domain exposure is zero by vocabulary, not by failure.** Between retail and airline only four tools are shared (`calculate`, `get_user_details`, `think`, `transfer_to_human_agents`), one of 49 retail compounds is even expressible in the airline vocabulary, and none is exposed in its traces. We report this as a scope boundary rather than a transfer result. Task ids also collide across domains (50 collisions), so joining domains by task id would silently pair unrelated tasks — a trap we avoided by joining on task content instead.
+
+**Threats.** Two models, two domains, one mock environment; the airline-reverse cell has n = 5 eligible compounds, so its 100% carries a wide interval. Transfer is measured on recorded traces, not on fresh runs, so it shows that a spec *fits* a second model's behavior, not that it would improve that model's task success.
 
 ## I.5 Notation
 
