@@ -10,9 +10,10 @@ the commit hash is recorded below at submission time.
   `docs/AgentISA.pdf` (run `git rev-parse HEAD` in the artifact root; the
   submission snapshot is the parent of any post-camera fix).
 - Runtime: Python 3.14 with the packages listed in `requirements.txt`. Those
-  pins are lower bounds (`>=`), not a lock file, and `venv/` is not committed:
-  create an environment with `python3 -m venv venv && ./venv/bin/pip install -r
-  requirements.txt`. Every command below assumes `./venv/bin/python`; the
+  pins are lower bounds (`>=`); `requirements.lock` records the exact 155
+  distributions the committed results were produced with, and `venv/` is not
+  committed. Create the environment with
+  `python3 -m venv venv && ./venv/bin/pip install -r requirements.lock`. Every command below assumes `./venv/bin/python`; the
   `python` / `python3` spellings work only when that interpreter is on `PATH`.
 - Build: `python3 scripts/build_paper.py` regenerates `docs/AgentISA.tex`
   and `docs/AgentISA.pdf` (main paper, ACM `acmart` sigconf two-column)
@@ -49,7 +50,7 @@ model-cost map through `httpx` at import time and fails collection otherwise
 | 5.7 (real-gateway cache) | `python examples/benchmarks/isa_real_llm_bench.py --backend gateway --tasks 200 --seeds 1 --zipf 0.5 1.0 1.5 --max-tokens 64` (`--backend gateway` is required; the CLI default is the offline mock) | `examples/benchmarks/isa_real_llm_results.json` |
 | 5.6 | covered by the functional tests above | — |
 | 5.7 / 5.7.1 | `python examples/paper_real_llm_compiler_test.py --backend real --scale paper` (add `--backend mock` for the offline mock) | `examples/paper_real_llm_compiler_results_mock.json`, `examples/paper_real_llm_compiler_results_real.json` |
-| 5.8 | `python examples/system_task_demo.py`; battery: `python examples/system_task_workload.py` | `examples/system_task_results.json` |
+| 5.8 | `./venv/bin/python examples/system_task_demo.py --output examples/system_task_results.json`; battery: `./venv/bin/python examples/system_task_workload.py --json examples/system_task_workload_results.json` (both default to stdout only) | `examples/system_task_results.json`, `examples/system_task_workload_results.json` |
 
 ## Regenerating the Section 5.10–5.12 and Appendix I extension experiments
 
@@ -61,7 +62,7 @@ artifacts) differ from the committed copy in exactly those fields on a rerun at 
 different revision. `cost_model`, `real_trace_external_baselines`,
 `trace_scope_stats`, `bootstrap_ci` and `compound_transfer` are byte-identical
 apart from `git_rev`/`dirty` where recorded, and `compound_transfer`'s `volatile`
-field names them. The recorded revisions are `0e1671f8` for ten of the Appendix-I files, `c55dc1db` for the trace-corpus compile control, and `b6af966d` for the cache-key control's canonical-arm re-run (Appendix I.4.1); later doc-only commits do not change experiment provenance.
+field names them. Each file records the revision it was generated at: eleven carry `0e1671f8`, the trace-corpus compile control `c55dc1db`, the cache-key control's canonical-arm re-run (Appendix I.4.1) `b6af966d`, and the files regenerated later carry their own — `1e45f9c5` (instruction precipitation, SWE-agent variants), `8f04b8a8` (AgentGym), `945d0345` (τ-bench pilot), `d74c9e66` (compound binding) and `83084f53` (compound transfer), whose `volatile` field names `git_rev`/`dirty`. A later doc-only commit changes the recorded revision of nothing; a rerun of a script that stamps `git_rev` will.
 
 | Experiment | Command | Raw results |
 | --- | --- | --- |

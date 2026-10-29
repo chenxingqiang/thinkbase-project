@@ -4675,10 +4675,13 @@ all & 450 & 102 (22.7\%) & 78 (17.3\%) \\
 
 Substituting the signature-consistent set would absorb 15.03\% of the
 2,275 dispatches; substituting only the replay-verified set absorbs
-\textbf{12.53\%} (285/2,275 steps, 178 applications). The difference is
-the price of assuming that identical signatures imply identical
-bindings: 24 compounds pass the signature test and fail replay, mostly
-because the observation shape moves between occurrences.
+\textbf{12.53\%} (285/2,275 steps, 178 applications) under a greedy
+longest-match policy that removes one dispatch per application and never
+overlaps two applications, so the figure is that policy's yield rather
+than a bound: a different tiling would absorb a different share. The
+difference is the price of assuming that identical signatures imply
+identical bindings: 24 compounds pass the signature test and fail
+replay, mostly because the observation shape moves between occurrences.
 
 \textbf{Where the binding actually comes from.} Of 274 argument slots in
 verified compounds, 43 (15.7\%) are read from an earlier observation or
@@ -4693,9 +4696,10 @@ rather than the 75.0\% that recurrence suggested.
 \textbf{The strict test, for contrast.} Requiring every later argument
 to come from an observation or the entry call --- the strictest reading
 of ``compiled'' --- passes only 7 compounds (1.6\%) and absorbs 1.36\%
-of dispatches. The gap between 1.36\% and 12.53\% is the value of
-treating external values as instruction parameters rather than as
-unbound unknowns.
+of dispatches. The two figures differ because they re-tile different
+compound sets under different definitions, not because of a per-compound
+marginal effect; we report 1.36\% as the strict-definition yield and
+treat the gap as definitional.
 
 \textbf{Threats.} Learning and verification happen within one corpus: a
 spec is learned on one occurrence and tested on held-out occurrences of
@@ -4788,6 +4792,16 @@ whenever a claim would otherwise read as a constant.
 is a structural zero and the parallel-grouping lever of Section 3.4
 cannot be exercised on this corpus. We report the zero as a scope limit,
 not as evidence about batching.
+
+\textbf{Path dependence is small.} Every run starts from an empty cache,
+so the pooled rate is an average along the recorded order rather than a
+steady-state rate. The order turns out not to carry it: the first half
+of each run hits 40.69\% and the second half 42.81\%, the first task
+decile already sits at 43.96\% and the last at 42.86\% (deciles range
+23.4--65.6\%), and only 12.2\% of all hits fall in the first decile. We
+therefore report 41.70\% as a path average over the recorded order,
+which is what a deployed cache would also experience on an unmodified
+trace, not as the rate a reordering scheduler would see.
 
 \textbf{A global cache needs a decomposition, not a headline.} Sharing
 one cache across all four runs gives 62.94\% (1,126/1,789). That number
@@ -4941,8 +4955,13 @@ avoided by joining on task content instead.
 
 \textbf{Threats.} Two models, two domains, one mock environment; the
 airline-reverse cell has n = 5 exposed compounds (8 eligible), so its
-100\% carries a wide interval. Transfer is measured on recorded traces,
-not on fresh runs, so it shows that a spec \emph{fits} a second model's
-behavior, not that it would improve that model's task success.
+100\% carries a wide interval. The retail 33/36 also pools nested
+compounds --- 21 at k = 2, 10 at k = 3, 4 at k = 4 transferred (8 of 10
+and 4 of 5) --- that co-occur in the same tasks, so the Wilson interval
+treats them as independent trials and is narrower than the evidence
+supports; the per-arity cells are the honest granularity, and every
+non-transfer sits at k \textgreater= 3. Transfer is measured on recorded
+traces, not on fresh runs, so it shows that a spec \emph{fits} a second
+model's behavior, not that it would improve that model's task success.
 
 \end{document}

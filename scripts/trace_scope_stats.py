@@ -298,6 +298,81 @@ def hot_set_test_call_lru(
     return out
 
 
+def task_position_curve(
+    streams: Mapping[str, Sequence[Mapping[str, Any]]], bins: int = 10
+) -> Dict[str, Any]:
+    """Hit rate by task position: is 41.70% a cold-start artifact?
+
+    Every run starts with an empty cache, so the first tasks cannot hit and the
+    pooled rate depends on where the shared tasks sit in the recorded order. This
+    splits each run into task-position deciles and pools them, which shows the
+    warm-up cost directly (the first decile's ceiling is zero unless a task
+    repeats inside it).
+    """
+    buckets = [{"hits": 0, "calls": 0} for _ in range(bins)]
+    per_run: Dict[str, Any] = {}
+    for source, recs in streams.items():
+        n = len(recs)
+        seen: set = set()
+        first_decile_hits = 0
+        hits = calls = 0
+        for pos, rec in enumerate(recs):
+            bucket = min(bins - 1, pos * bins // max(n, 1))
+            for _tool, key in pure_calls(rec):
+                calls += 1
+                buckets[bucket]["calls"] += 1
+                if key in seen:
+                    hits += 1
+                    buckets[bucket]["hits"] += 1
+                    if bucket == 0:
+                        first_decile_hits += 1
+                else:
+                    seen.add(key)
+        per_run[source] = {
+            "tasks": n,
+            "hits": hits,
+            "calls": calls,
+            "rate": hits / calls if calls else 0.0,
+            "first_decile_hits": first_decile_hits,
+        }
+    curve = [
+        {"decile": i + 1, **b, "rate": (b["hits"] / b["calls"] if b["calls"] else 0.0)}
+        for i, b in enumerate(buckets)
+    ]
+    total_hits = sum(b["hits"] for b in buckets)
+    total_calls = sum(b["calls"] for b in buckets)
+    half = {"first": {"hits": 0, "calls": 0}, "second": {"hits": 0, "calls": 0}}
+    for source, recs in streams.items():
+        n = len(recs)
+        seen: set = set()
+        for pos, rec in enumerate(recs):
+            slot = half["first"] if pos < n / 2 else half["second"]
+            for _tool, key in pure_calls(rec):
+                slot["calls"] += 1
+                if key in seen:
+                    slot["hits"] += 1
+                else:
+                    seen.add(key)
+    return {
+        "bins": bins,
+        "curve": curve,
+        "per_run": per_run,
+        "first_decile_rate": curve[0]["rate"],
+        "last_decile_rate": curve[-1]["rate"],
+        "share_of_hits_in_first_decile": (
+            buckets[0]["hits"] / total_hits if total_hits else 0.0
+        ),
+        "pooled_rate": total_hits / total_calls if total_calls else 0.0,
+        "first_half_rate": half["first"]["hits"] / half["first"]["calls"],
+        "second_half_rate": half["second"]["hits"] / half["second"]["calls"],
+        "note": (
+            "positions are recorded task order within each run; the curve rises from a "
+            "cold start, so the pooled rate is a path average rather than a steady-state "
+            "rate"
+        ),
+    }
+
+
 def pooled_wired_transfer() -> Dict[str, Any]:
     """Pooled observation-wired transfer and the unconditional eligible rate."""
     path = BENCH / "compound_transfer_results.json"
@@ -355,6 +430,7 @@ def build(corpus: Path) -> Dict[str, Any]:
         "backbone_global": backbone_global(streams),
         "decomposition_order": decomposition_order_sensitivity(streams),
         "hot_set_test_call_lru": hot_set_test_call_lru(streams, test_ids),
+        "task_position_curve": task_position_curve(streams),
         "transfer_pooled": pooled_wired_transfer(),
     }
 

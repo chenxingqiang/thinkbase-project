@@ -1157,6 +1157,14 @@ chk(abs(_hl['capacities']['256']['rate'] - 0.4261) < 5e-4,
 chk(abs(_hl['ceiling']['rate'] - 0.1478) < 5e-4,
     f'static ceiling must be 14.78%, got {_hl["ceiling"]["rate"]:.4%}')
 chk(abs(_hl['ceiling']['rate'] - 0.1363) < 0.02, 'the static hot set must sit near its own ceiling')
+_tpc = _ts['task_position_curve']
+chk(abs(_tpc['first_half_rate'] - 0.4069) < 5e-4 and abs(_tpc['second_half_rate'] - 0.4281) < 5e-4,
+    f"first/second-half rates must be 40.69%/42.81%, got {_tpc['first_half_rate']:.4%}/{_tpc['second_half_rate']:.4%}")
+chk(abs(_tpc['first_decile_rate'] - 0.4396) < 5e-4 and abs(_tpc['last_decile_rate'] - 0.4286) < 5e-4,
+    f'decile endpoints must be 43.96%/42.86%, got {_tpc["first_decile_rate"]:.4%}/{_tpc["last_decile_rate"]:.4%}')
+chk(abs(_tpc['share_of_hits_in_first_decile'] - 0.122) < 5e-3,
+    f"first-decile hit share must be 12.2%, got {_tpc['share_of_hits_in_first_decile']:.4%}")
+chk(len(_tpc['curve']) == 10, 'the position curve must have ten deciles')
 _tp = _ts['transfer_pooled']
 chk(_tp['observation_wired_transferred'] == 0,
     'no observation-wired specification may transfer')
@@ -1189,7 +1197,8 @@ _up = _cm['unit_prices']
 chk(abs(_up['t_mean_s'] - 2.2976) < 5e-4 and _up['input_tokens_per_call'] == 21 and _up['output_tokens_per_call'] == 64,
     f'I.10 unit prices must be 2.30 s and 21/64 tokens, got {_up["t_mean_s"]}/{_up["input_tokens_per_call"]}/{_up["output_tokens_per_call"]}')
 for _line in ('convertible: false', '5,158 s and $2.30', '655 s and $0.29', '40.5%', '1,789 of 2,275',
-              '62.94%', '13.63%', '42.61%', '14.78%', '34.37%', '19.2%', '40.53%', '42.72%', '67.3%'):
+              '62.94%', '13.63%', '42.61%', '14.78%', '34.37%', '19.2%', '40.53%', '42.72%', '67.3%',
+              '40.69%', '42.81%', '43.96%', '12.2%'):
     chk(_line in SUPP, f'supplementary I.10 must state "{_line}"')
 
 _ct = jload('compound_transfer_results.json')
