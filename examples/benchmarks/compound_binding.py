@@ -358,6 +358,10 @@ def verify_learning(tasks: Sequence[Dict[str, Any]],
                                  "task": task.get("task_id"), "error": "argument mismatch"})
         if all_ok and checked:
             passed.add(compound)
+    # Set iteration order is hash-seed dependent, so sort before truncating: the
+    # committed JSON must be reproducible from the corpus alone.
+    failures.sort(key=lambda f: (str(f.get("task")), str(f.get("error")),
+                                 str(f.get("compound"))))
     return passed, {"checked": checked, "verified": verified, "mismatched": mismatched,
                     "path_drift": drifted_count, "failures": failures[:6]}
 

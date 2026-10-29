@@ -89,6 +89,19 @@ Appendix I.9 is a lower bound on what a longer observation would support.
 The committed file is 1.0 MB. It is derived from the digests listed above, so
 the provenance argument is the same one.
 
+## Committed digests
+
+The two files a reader reruns against, with the digest each results file records
+in `provenance.corpus_sha256`:
+
+| File | SHA-256 | Bytes |
+| --- | --- | --- |
+| `tau_bench_historical.jsonl` | `3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116` | 1,481,791 |
+| `tau_bench_observed.jsonl` | `50fb894fb1e2bddda69cb866f93772ccc4e0199c2e28eafbee4d84ecf4fd68e0` | 1,071,187 |
+
+These pin the committed corpora, so the upstream digests above are needed only
+when regenerating them from the 49 MB τ-bench checkout.
+
 ## Offline cache baselines on this corpus
 
 `examples/benchmarks/real_trace_external_baselines.py` scores four exact-key baselines on

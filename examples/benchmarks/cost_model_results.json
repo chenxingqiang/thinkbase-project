@@ -73,9 +73,10 @@
    "id": "F1",
    "name": "result cache, cross-task hits",
    "mechanism": "cache",
-   "unit_kind": "call",
+   "unit_kind": "tool_execution",
+   "convertible": false,
    "effect_units": 746.0,
-   "effect_units_are": "measured cache hits; each replaces one real model call",
+   "effect_units_are": "recorded tool executions replayed from the cache; the model turn that emitted each call is still in the trace, so a hit is not an avoided model call",
    "effect_source": {
     "file": "examples/benchmarks/real_trace_pilot_tau_bench_results.json",
     "json_path": "cache_scopes.first_trial.within_run_hits",
@@ -85,81 +86,17 @@
     "scope": "cacheable first-trial calls, shared across the tasks of one run"
    },
    "assumption_conditioned": false,
-   "conversion_assumption": "none: the avoided unit is a measured model call, so seconds and tokens convert at the measured per-call unit price",
-   "point": {
-    "avoided_units": 746.0,
-    "seconds": {
-     "mean": 1714.000151,
-     "p50": 1620.635267,
-     "p95": 2459.8604
-    },
-    "input_tokens": 15666.0,
-    "output_tokens": 47744.0,
-    "dollars": 0.763158,
-    "unit_cost_dollars": 0.001023,
-    "avoided_calls": 746.0,
-    "avoided_calls_basis": "measured model calls (cache hits)"
-   },
-   "sensitivity": {
-    "declared": {
-     "price_multiplier_range": [
-      0.5,
-      1.5
-     ],
-     "token_multiplier_range": [
-      0.7,
-      1.3
-     ],
-     "note": "declared input bounds, not a confidence interval"
-    },
-    "dollars": {
-     "low": 0.267105,
-     "high": 1.488158,
-     "corners": [
-      {
-       "price_multiplier": 0.5,
-       "token_multiplier": 0.7,
-       "dollars": 0.267105
-      },
-      {
-       "price_multiplier": 0.5,
-       "token_multiplier": 1.3,
-       "dollars": 0.496053
-      },
-      {
-       "price_multiplier": 1.5,
-       "token_multiplier": 0.7,
-       "dollars": 0.801316
-      },
-      {
-       "price_multiplier": 1.5,
-       "token_multiplier": 1.3,
-       "dollars": 1.488158
-      }
-     ]
-    },
-    "input_tokens": {
-     "low": 10966.2,
-     "high": 20365.8
-    },
-    "output_tokens": {
-     "low": 33420.8,
-     "high": 62067.2
-    },
-    "seconds": {
-     "low": 1620.635267,
-     "high": 2459.8604,
-     "invariant_to_price": true,
-     "invariant_to_token_count": true,
-     "note": "width comes from the measured latency axis (p50..p95)"
-    }
-   }
+   "conversion_assumption": "none: a cache hit replays a recorded tool result and avoids a tool execution, not the model turn that emitted the call; no per-tool latency was measured and no model call is avoided, so no second, token or dollar figure is attributable from this corpus",
+   "point": null,
+   "not_priceable": "the avoided unit is a tool execution, not a model call; pricing it at a measured per-model-call unit price would be a unit error",
+   "sensitivity": {}
   },
   {
    "id": "F2",
    "name": "template precipitation, served steps",
    "mechanism": "template",
    "unit_kind": "step",
+   "convertible": true,
    "effect_units": 2245.0,
    "effect_units_are": "measured template-served dispatches (a step count, not a call count)",
    "effect_source": {
@@ -246,6 +183,7 @@
    "name": "compound absorption, dispatches",
    "mechanism": "compound",
    "unit_kind": "dispatch",
+   "convertible": true,
    "effect_units": 285.0,
    "effect_units_are": "measured dispatches absorbed by greedy longest-match substitution",
    "effect_source": {

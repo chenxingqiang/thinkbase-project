@@ -74,6 +74,10 @@ def test_band_brackets_the_point_estimate_for_every_mechanism() -> None:
     assert payload["mechanisms"]
     for row in payload["mechanisms"]:
         point = row["point"]
+        if point is None:
+            # not priceable: the avoided unit is a tool execution, not a model call
+            assert row["convertible"] is False and "not_priceable" in row
+            continue
         band = row["sensitivity"]
         assert band["dollars"]["low"] <= point["dollars"] <= band["dollars"]["high"]
         assert band["input_tokens"]["low"] <= point["input_tokens"] <= band["input_tokens"]["high"]
@@ -89,6 +93,8 @@ def test_band_brackets_the_point_estimate_for_every_mechanism() -> None:
 def test_dollar_band_is_the_four_corner_envelope() -> None:
     payload = _payload()
     for row in payload["mechanisms"]:
+        if row["point"] is None:
+            continue
         corners = row["sensitivity"]["dollars"]["corners"]
         assert len(corners) == 4
         assert {(c["price_multiplier"], c["token_multiplier"]) for c in corners} == {
@@ -168,8 +174,13 @@ def test_denominator_guard_rejects_the_corpus_wide_inflation() -> None:
 def test_point_emits_avoided_calls_with_their_basis() -> None:
     payload = _payload()
     rows = {row["id"]: row for row in payload["mechanisms"]}
-    assert rows["F1"]["point"]["avoided_calls"] == 746.0
-    assert rows["F1"]["point"]["avoided_calls_basis"].startswith("measured model calls")
+    # F1 is deliberately left unpriced: a cache hit replays a recorded tool
+    # execution, and the model turn that emitted the call still happens.
+    assert rows["F1"]["effect_units"] == 746.0
+    assert rows["F1"]["convertible"] is False
+    assert rows["F1"]["point"] is None
+    assert "not_priceable" in rows["F1"]
+    assert "tool execution" in rows["F1"]["effect_units_are"]
     for mechanism in ("F2", "F3"):
         point = rows[mechanism]["point"]
         assert point["avoided_calls"] == rows[mechanism]["effect_units"]

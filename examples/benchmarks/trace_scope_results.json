@@ -1,0 +1,144 @@
+{
+  "schema": "trace_scope_stats/v1",
+  "result_kind": "MEASURED",
+  "description": "Sampling-unit statistics for the recorded-trajectory reuse numbers: run-weighted vs pooled rates with a run-clustered bootstrap, single-backbone global rates, the run-order sensitivity of the origin decomposition, the hot-set comparison on its own test calls, and the pooled observation-wired transfer rate.",
+  "provenance": {
+    "corpus": "examples/real_traces/tau_bench_historical.jsonl",
+    "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+    "records": 1960,
+    "first_trial_records": 325,
+    "deterministic": true,
+    "no_model_calls": true
+  },
+  "run_weighting": {
+    "unit": "run (2 backbones x 2 domains = 4 runs)",
+    "per_run": [
+      {
+        "source": "gpt-4o-retail",
+        "domain": "retail",
+        "tasks": 115,
+        "hits": 303,
+        "calls": 619,
+        "rate": 0.4894991922455573
+      },
+      {
+        "source": "gpt-4o-airline",
+        "domain": "airline",
+        "tasks": 45,
+        "hits": 35,
+        "calls": 215,
+        "rate": 0.16279069767441862
+      },
+      {
+        "source": "sonnet-35-new-retail",
+        "domain": "retail",
+        "tasks": 115,
+        "hits": 352,
+        "calls": 701,
+        "rate": 0.5021398002853067
+      },
+      {
+        "source": "sonnet-35-new-airline",
+        "domain": "airline",
+        "tasks": 50,
+        "hits": 56,
+        "calls": 254,
+        "rate": 0.2204724409448819
+      }
+    ],
+    "pooled_hits": 746,
+    "pooled_calls": 1789,
+    "pooled_rate": 0.4169927333705981,
+    "run_mean_rate": 0.34372553278754114,
+    "run_clustered_ci95": [
+      0.19163156930965025,
+      0.495819496265432
+    ],
+    "min_run_rate": 0.16279069767441862,
+    "max_run_rate": 0.5021398002853067,
+    "retail_share_of_calls": 0.737842370039128,
+    "note": "the pooled rate weights calls, so the larger retail runs dominate; the run-clustered interval resamples the four runs, not the calls"
+  },
+  "backbone_global": {
+    "per_backbone": {
+      "gpt-4o": {
+        "hits": 338,
+        "calls": 834,
+        "rate": 0.4052757793764988
+      },
+      "claude-3.5-sonnet": {
+        "hits": 408,
+        "calls": 955,
+        "rate": 0.4272251308900524
+      }
+    },
+    "shipped_global_hits": 1126,
+    "shipped_global_calls": 1789,
+    "shipped_global_rate": 0.6294019005030743,
+    "single_backbone_rate_range": [
+      0.4052757793764988,
+      0.4272251308900524
+    ],
+    "note": "the shipped key excludes model identity, so a task performed by both backbones is a legitimate hit for it; the single-backbone rates show what the cache earns without that cross-model traffic, and all of the increment over the run scope comes from it"
+  },
+  "decomposition_order": {
+    "as_recorded": {
+      "order": [
+        "gpt-4o-retail",
+        "gpt-4o-airline",
+        "sonnet-35-new-retail",
+        "sonnet-35-new-airline"
+      ],
+      "hits": 1126,
+      "same_task_same_run": 14,
+      "same_task_other_run": 371,
+      "other_task_same_run": 354,
+      "other_task_other_run": 387
+    },
+    "reversed": {
+      "order": [
+        "sonnet-35-new-airline",
+        "sonnet-35-new-retail",
+        "gpt-4o-airline",
+        "gpt-4o-retail"
+      ],
+      "hits": 1126,
+      "same_task_same_run": 17,
+      "same_task_other_run": 350,
+      "other_task_same_run": 403,
+      "other_task_other_run": 356
+    },
+    "note": "an origin bucket is assigned to the stream that inserted the key first, so the split moves with stream order; ranges are the honest statement"
+  },
+  "hot_set_test_call_lru": {
+    "capacities": {
+      "256": {
+        "hits": 369,
+        "calls": 866,
+        "rate": 0.42609699769053117
+      },
+      "0": {
+        "hits": 372,
+        "calls": 866,
+        "rate": 0.4295612009237875
+      }
+    },
+    "ceiling": {
+      "hits": 128,
+      "calls": 866,
+      "rate": 0.14780600461893764
+    },
+    "test_calls": 866,
+    "note": "the cache is warmed on the hot set's training half and scored on its test half, with online admission during the test half; the ceiling is the share of test-half calls whose key was seen in the training half, which no first-half-only policy beats"
+  },
+  "transfer_pooled": {
+    "observation_wired_exposed": 3,
+    "observation_wired_transferred": 0,
+    "parameter_only_transferred": 33,
+    "parameter_only_eligible": 45,
+    "exposed_compounds": 36,
+    "eligible_compounds": 49,
+    "unconditional_transfer_rate": 0.673469387755102,
+    "note": "parameter-only specifications replay every exposed occurrence by construction: they take all arguments from the compound's own parameters, so a transfer there is a harness consistency check. The informative cell is the wired one, and it transfers nothing."
+  }
+}

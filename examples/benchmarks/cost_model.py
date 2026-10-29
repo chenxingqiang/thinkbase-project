@@ -165,9 +165,13 @@ def load_effects(
             "id": "F1",
             "name": "result cache, cross-task hits",
             "mechanism": "cache",
-            "unit_kind": "call",
+            "unit_kind": "tool_execution",
+            "convertible": False,
             "effect_units": cache_hits,
-            "effect_units_are": "measured cache hits; each replaces one real model call",
+            "effect_units_are": (
+                "recorded tool executions replayed from the cache; the model turn that "
+                "emitted each call is still in the trace, so a hit is not an avoided model call"
+            ),
             "effect_source": {
                 "file": _rel(cache_path),
                 "json_path": "cache_scopes.first_trial.within_run_hits",
@@ -178,8 +182,10 @@ def load_effects(
             },
             "assumption_conditioned": False,
             "conversion_assumption": (
-                "none: the avoided unit is a measured model call, so seconds and "
-                "tokens convert at the measured per-call unit price"
+                "none: a cache hit replays a recorded tool result and avoids a tool "
+                "execution, not the model turn that emitted the call; no per-tool latency "
+                "was measured and no model call is avoided, so no second, token or dollar "
+                "figure is attributable from this corpus"
             ),
         },
         {
@@ -187,6 +193,7 @@ def load_effects(
             "name": "template precipitation, served steps",
             "mechanism": "template",
             "unit_kind": "step",
+            "convertible": True,
             "effect_units": served,
             "effect_units_are": "measured template-served dispatches (a step count, not a call count)",
             "effect_source": {
@@ -209,6 +216,7 @@ def load_effects(
             "name": "compound absorption, dispatches",
             "mechanism": "compound",
             "unit_kind": "dispatch",
+            "convertible": True,
             "effect_units": absorbed,
             "effect_units_are": "measured dispatches absorbed by greedy longest-match substitution",
             "effect_source": {
@@ -372,6 +380,19 @@ def build_payload(
 
     rows = []
     for effect in effects:
+        if effect.get("convertible") is False:
+            rows.append(
+                {
+                    **effect,
+                    "point": None,
+                    "not_priceable": (
+                        "the avoided unit is a tool execution, not a model call; pricing it "
+                        "at a measured per-model-call unit price would be a unit error"
+                    ),
+                    "sensitivity": {},
+                }
+            )
+            continue
         point = convert_effect(effect["effect_units"], prices, price_in, price_out)
         point["avoided_calls"] = effect["effect_units"]
         point["avoided_calls_basis"] = (
@@ -391,7 +412,8 @@ def build_payload(
     unit_price = unit_cost(
         price_in, price_out, prices["input_tokens_per_call"], prices["output_tokens_per_call"]
     )
-    top = max(rows, key=lambda row: row["point"]["dollars"])
+    priceable = [row for row in rows if row.get("point")]
+    top = max(priceable, key=lambda row: row["point"]["dollars"])
 
     checks = [
         {

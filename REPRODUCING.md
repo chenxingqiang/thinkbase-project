@@ -9,8 +9,11 @@ the commit hash is recorded below at submission time.
 - Repository state: the commit tagged for the submission build of
   `docs/AgentISA.pdf` (run `git rev-parse HEAD` in the artifact root; the
   submission snapshot is the parent of any post-camera fix).
-- Runtime: Python 3.14, dependencies as pinned in `venv/` and the project
-  lock file; pytest 9.x.
+- Runtime: Python 3.14 with the packages listed in `requirements.txt`. Those
+  pins are lower bounds (`>=`), not a lock file, and `venv/` is not committed:
+  create an environment with `python3 -m venv venv && ./venv/bin/pip install -r
+  requirements.txt`. Every command below assumes `./venv/bin/python`; the
+  `python` / `python3` spellings work only when that interpreter is on `PATH`.
 - Build: `python3 scripts/build_paper.py` regenerates `docs/AgentISA.tex`
   and `docs/AgentISA.pdf` (main paper, ACM `acmart` sigconf two-column)
   plus `docs/AgentISA_supplementary.tex` and
@@ -51,8 +54,14 @@ model-cost map through `httpx` at import time and fails collection otherwise
 ## Regenerating the Section 5.10–5.12 and Appendix I extension experiments
 
 All commands are offline and deterministic except the two live-gateway runs
-marked below; every results JSON records its own provenance (seeds, scale,
-`git_rev`). The recorded revisions are `0e1671f8` for ten of the Appendix-I files, `c55dc1db` for the trace-corpus compile control, and `b6af966d` for the cache-key control's canonical-arm re-run (Appendix I.4.1); later doc-only commits do not change experiment provenance.
+marked below, and every results JSON records its own provenance (seeds, scale,
+`corpus_sha256`). Determinism is a claim about the *numeric payload*: files whose
+provenance block stamps `git_rev` and `utc_timestamp` (most of the Appendix-I
+artifacts) differ from the committed copy in exactly those fields on a rerun at a
+different revision. `cost_model`, `real_trace_external_baselines`,
+`trace_scope_stats`, `bootstrap_ci` and `compound_transfer` are byte-identical
+apart from `git_rev`/`dirty` where recorded, and `compound_transfer`'s `volatile`
+field names them. The recorded revisions are `0e1671f8` for ten of the Appendix-I files, `c55dc1db` for the trace-corpus compile control, and `b6af966d` for the cache-key control's canonical-arm re-run (Appendix I.4.1); later doc-only commits do not change experiment provenance.
 
 | Experiment | Command | Raw results |
 | --- | --- | --- |
@@ -78,14 +87,20 @@ marked below; every results JSON records its own provenance (seeds, scale,
 | External cache baselines (offline, exact-key) | `./venv/bin/python examples/benchmarks/real_trace_external_baselines.py --corpus examples/real_traces/tau_bench_historical.jsonl --output examples/benchmarks/real_trace_external_baselines_results.json` (anchor reproduces 746/1,789; LRU sweep at capacities 0 = unbounded and 8–4096 in within-task, within-run and global scopes; static hot set trained on the first half of each run; same-turn dedup; exact-key cross-task; no seeds, no model calls) | `examples/benchmarks/real_trace_external_baselines_results.json` |
 | Cost model (modeled, not measured) | `./venv/bin/python examples/benchmarks/cost_model.py --output examples/benchmarks/cost_model_results.json` (deterministic; reads only committed results JSONs, listed with their SHA-256 in `provenance.inputs`) | `examples/benchmarks/cost_model_results.json` |
 | Compound transfer (cross-model, cross-domain) | `./venv/bin/python examples/benchmarks/compound_transfer.py --corpus examples/real_traces/tau_bench_observed.jsonl --output examples/benchmarks/compound_transfer_results.json` (max k=4, min support=2; the observed-observation corpus of I.9) | `examples/benchmarks/compound_transfer_results.json` |
+| Sampling-unit statistics (run weighting, per-backbone global scope, hot-set test calls) | `./venv/bin/python scripts/trace_scope_stats.py --corpus examples/real_traces/tau_bench_historical.jsonl --output examples/benchmarks/trace_scope_results.json` (deterministic; no seeds, no model calls) | `examples/benchmarks/trace_scope_results.json` |
 | Bootstrap CIs over committed records | `./venv/bin/python scripts/bootstrap_ci.py --output examples/benchmarks/bootstrap_ci_results.json` (percentile bootstrap over the committed per-seed microbench results; fixed base seed, so a rerun reproduces the same intervals) | `examples/benchmarks/bootstrap_ci_results.json` |
 
 Offline re-verification of every cited number (main text + supplementary,
 aggregates recomputed from raw records):
 
 ```bash
-python3 scripts/number_regression.py
+./venv/bin/python scripts/number_regression.py
 ```
+
+Run the gate with the venv interpreter: it re-collects the test suite with
+`sys.executable`, so an interpreter that cannot import the project's dependencies
+will report a collected-test mismatch instead of a number drift. It resolves the
+repository from its own location, so it validates the checkout it lives in.
 
 ## What is modeled, not measured
 

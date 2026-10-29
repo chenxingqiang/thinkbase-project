@@ -6,7 +6,7 @@ bit-for-bit. Stored aggregates are additionally recomputed from the raw
 per-seed records wherever a file carries them. Aborts nonzero on drift."""
 import json, os, re, subprocess, sys, pathlib, statistics
 
-ROOT = pathlib.Path('/Users/chenxingqiang/thinkbase-project')
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 md = (ROOT / 'docs/AgentISA.md').read_text(encoding='utf-8')
 md += (ROOT / 'docs/AgentISA_supplementary.md').read_text(encoding='utf-8')  # submission-wide probe
 rs = json.loads((ROOT / 'examples/benchmarks/isa_microbench_results.json').read_text())
@@ -800,7 +800,7 @@ chk(f'\u2014{hit05["hit_rate"]:.1%}, {hit10["hit_rate"]:.1%}, {hit15["hit_rate"]
     'paper multi-model rerun citation (hit rates / calls) altered')
 p50s = sorted(z['per_seed'][0]['baseline']['latency_ms_p50'] for z in ddb['data'])
 chk(f'{p50s[0]/1000:.1f}\u2013{p50s[-1]/1000:.1f} s' in md, 'paper multi-model p50 citation altered')
-for s_ in ['two model aliases (one seed per alias', 'Live-gateway conformance checks across four model aliases']:
+for s_ in ['two model aliases (one seed per alias', 'Live-gateway checks on four model aliases']:
     chk(s_ in md, f'paper missing multi-model scope/abstract citation: {s_}')
 
 idd = json.load(open('examples/benchmarks/paper_real_llm_compiler_results_doubao_1500.json'))
@@ -991,7 +991,7 @@ chk(swe_i['repertoire']['templates_active'] == 291,
 rm = swe_p['per_source']['swe-agent-swe-agent-llama-70b']
 chk(round(rm['segments'][0]['coverage'], 2) == 0.43 and round(rm['segments'][-1]['coverage'], 2) == 0.67,
     f"precip swe 70b curve json {[round(x['coverage'], 2) for x in rm['segments']]} vs paper 43..67%")
-for s_ in ['12–14 active templates serve **95.9%**', '291 command templates serve 43%→67%',
+for s_ in ['12 active templates (13–14 per source) match **95.9%**', '291 command templates serve 43%→67%',
            '2,340 tool-use steps', '| 300 | 8,502 | 5,052 | 59.42% |', '| mixed (round-robin) | 330 | 2,340 | 2,245 | 95.94% |',
            '75.0% of the tool-use stream']:
     chk(s_ in md, f'paper missing precipitation citation {s_}')
@@ -1093,6 +1093,11 @@ chk('285/2,275 steps, 178 applications' in md and '231 (84.3%) are external para
 # the corpus so the baselines cannot drift from the paper's own cache figure.
 # ---------------------------------------------------------------------------
 SUPP = (ROOT / 'docs/AgentISA_supplementary.md').read_text(encoding='utf-8')
+MAIN = (ROOT / 'docs/AgentISA.md').read_text(encoding='utf-8')
+for _line in ('40.5 points strictly cross-task', '1,789 side-effect-free first-trial calls', '16.3–50.2% per run',
+              'no second, token or dollar figure is attributable',
+              '33 of the 49 eligible compounds', 'every observation-wired specification fails'):
+    chk(_line in MAIN, f'the paper must state the revised reuse/transfer framing: "{_line}"')
 MD = (ROOT / 'docs/AgentISA.md').read_text(encoding='utf-8')
 _bl = jload('real_trace_external_baselines_results.json')
 _anc = _bl['anchor']
@@ -1117,8 +1122,6 @@ for _n, _exp in ((16, 0.0277), (64, 0.0520), (256, 0.1363)):
         f'I.10 static hot set N={_n} must be {_exp:.2%}, got {_hs[str(_n)]["hit_rate"]:.2%}')
 chk(_hs['256']['calls'] == 866,
     f'I.10 hot-set test half must be 866 calls, got {_hs["256"]["calls"]}')
-chk(abs(_hs['256']['test_unseen_rate'] - 0.8522) < 5e-5,
-    f'I.10 unseen-key share must be 85.22%, got {_hs["256"]["test_unseen_rate"]:.4%}')
 chk(abs(_lru['256']['hit_rate'] - _hs['256']['hit_rate']) > 0.2,
     'I.10 must show the 256-entry LRU far above the static hot set')
 
@@ -1129,10 +1132,38 @@ chk(_st['turns_with_multiple_calls'] == 0 and _st['turns'] == 2275,
 _g = _bl['global_scope_decomposition']
 chk(_g['hits'] == 1126 and _g['hits_same_task_other_backbone'] == 371,
     f'I.10 global hits must decompose as 1,126 with 371 trial-replay hits, got {_g["hits"]}/{_g["hits_same_task_other_backbone"]}')
-_indep = _g['hits_other_task_same_run'] + _g['hits_other_task_other_run']
-chk(_indep == 741, f'I.10 independent-task reuse must be 354+387=741, got {_indep}')
-chk(abs(_indep / _g['calls'] - 0.414) < 5e-4,
-    f'I.10 independent-task reuse must be 41.4%, got {_indep / _g["calls"]:.2%}')
+_ts = jload('trace_scope_results.json')
+_rw = _ts['run_weighting']
+chk(_rw['pooled_hits'] == 746 and _rw['pooled_calls'] == 1789,
+    f'trace scope must reproduce 746/1,789, got {_rw["pooled_hits"]}/{_rw["pooled_calls"]}')
+chk(abs(_rw['pooled_rate'] - 0.417) < 5e-4, f'trace scope pooled rate must be 41.70%, got {_rw["pooled_rate"]:.4%}')
+chk(abs(_rw['run_mean_rate'] - 0.3437) < 5e-4,
+    f'run-weighted mean must be 34.37%, got {_rw["run_mean_rate"]:.4%}')
+chk(abs(_rw['run_clustered_ci95'][0] - 0.192) < 5e-3
+    and abs(_rw['run_clustered_ci95'][1] - 0.496) < 5e-3,
+    f'run-clustered CI must be [19.2, 49.6], got {_rw["run_clustered_ci95"]}')
+chk(len(_rw['per_run']) == 4, 'trace scope must report exactly four runs')
+chk(abs(min(r['rate'] for r in _rw['per_run']) - 0.1628) < 5e-4
+    and abs(max(r['rate'] for r in _rw['per_run']) - 0.5021) < 5e-4,
+    'per-run rates must span 16.28%-50.21%')
+_bg = _ts['backbone_global']
+chk(abs(_bg['per_backbone']['gpt-4o']['rate'] - 0.4053) < 5e-4
+    and abs(_bg['per_backbone']['claude-3.5-sonnet']['rate'] - 0.4272) < 5e-4,
+    f'single-backbone global rates must be 40.53%/42.72%, got {_bg["per_backbone"]}')
+chk(abs(_bg['shipped_global_rate'] - 0.6294) < 5e-5, 'shipped global rate must be 62.94%')
+_hl = _ts['hot_set_test_call_lru']
+chk(abs(_hl['capacities']['256']['rate'] - 0.4261) < 5e-4,
+    f'warmed LRU on the hot-set test calls must be 42.61%, got {_hl["capacities"]["256"]["rate"]:.4%}')
+chk(abs(_hl['ceiling']['rate'] - 0.1478) < 5e-4,
+    f'static ceiling must be 14.78%, got {_hl["ceiling"]["rate"]:.4%}')
+chk(abs(_hl['ceiling']['rate'] - 0.1363) < 0.02, 'the static hot set must sit near its own ceiling')
+_tp = _ts['transfer_pooled']
+chk(_tp['observation_wired_transferred'] == 0,
+    'no observation-wired specification may transfer')
+chk(_tp['parameter_only_transferred'] == 33 and _tp['parameter_only_eligible'] == 45,
+    'parameter-only transfer must be 33/45 eligible')
+chk(abs(_tp['unconditional_transfer_rate'] - 0.6735) < 5e-4,
+    f'unconditional retail transfer must be 67.35%, got {_tp["unconditional_transfer_rate"]:.4%}')
 chk(abs(_g['hit_rate'] - 0.6294) < 5e-5,
     f'I.10 global rate must be 62.94% before decomposition, got {_g["hit_rate"]:.2%}')
 
@@ -1141,17 +1172,24 @@ chk(_cm['result_kind'] == 'MODELED' and _cm['not_observed'] is True,
     'I.10 cost figures must be labelled MODELED and not_observed')
 chk(_cm['aggregate']['sum_allowed'] is False,
     'I.10 must refuse to sum mechanisms (F2/F3 count the same stream)')
-_f1 = _cm['mechanisms'][0]['point']
-chk(_f1['avoided_calls'] == 746, f'I.10 F1 must rest on 746 measured calls, got {_f1["avoided_calls"]}')
-chk(abs(_f1['seconds']['mean'] - 1714.0) < 1.0,
-    f'I.10 F1 avoided wall clock must be 1,714 s, got {_f1["seconds"]["mean"]}')
-chk(_f1['input_tokens'] == 15666 and _f1['output_tokens'] == 47744,
-    f'I.10 F1 tokens must be 15,666/47,744, got {_f1["input_tokens"]}/{_f1["output_tokens"]}')
-chk(abs(_f1['dollars'] - 0.763158) < 1e-5, f'I.10 F1 dollars must be 0.763, got {_f1["dollars"]}')
+_f1 = _cm['mechanisms'][0]
+chk(_f1['effect_units'] == 746, f'I.10 F1 must rest on 746 measured hits, got {_f1["effect_units"]}')
+chk(_f1['convertible'] is False and _f1['point'] is None,
+    'I.10 F1 must NOT be priced: a cache hit avoids a tool execution, not a model call')
+chk('not_priceable' in _f1, 'I.10 F1 must record why it is not priceable')
+_f2 = _cm['mechanisms'][1]['point']; _f3 = _cm['mechanisms'][2]['point']
+chk(abs(_f2['dollars'] - 2.296635) < 1e-5 and abs(_f2['seconds']['mean'] - 5158.08) < 0.1,
+    f'I.10 F2 conditional bound must be 5,158 s / $2.30, got {_f2["seconds"]["mean"]}/{_f2["dollars"]}')
+chk(abs(_f3['dollars'] - 0.291555) < 1e-5 and abs(_f3['seconds']['mean'] - 654.81) < 0.1,
+    f'I.10 F3 conditional bound must be 655 s / $0.29, got {_f3["seconds"]["mean"]}/{_f3["dollars"]}')
+chk(_cm['mechanisms'][0]['assumption_conditioned'] is False
+    and _cm['mechanisms'][1]['assumption_conditioned'] is True,
+    'I.10 must keep F1 unconditioned and F2/F3 conditioned on the bypass')
 _up = _cm['unit_prices']
 chk(abs(_up['t_mean_s'] - 2.2976) < 5e-4 and _up['input_tokens_per_call'] == 21 and _up['output_tokens_per_call'] == 64,
     f'I.10 unit prices must be 2.30 s and 21/64 tokens, got {_up["t_mean_s"]}/{_up["input_tokens_per_call"]}/{_up["output_tokens_per_call"]}')
-for _line in ('28.6 minutes', '2.30 s', '21 input and 64 output tokens', 'modeled not observed', '62.94%', '41.4%', '85.22%', '13.63%'):
+for _line in ('convertible: false', '5,158 s and $2.30', '655 s and $0.29', '40.5%', '1,789 of 2,275',
+              '62.94%', '13.63%', '42.61%', '14.78%', '34.37%', '19.2%', '40.53%', '42.72%', '67.3%'):
     chk(_line in SUPP, f'supplementary I.10 must state "{_line}"')
 
 _ct = jload('compound_transfer_results.json')
@@ -1181,7 +1219,8 @@ if _cd:
     chk(_cd['shared_atomic_templates'] == 4 and _cd['eligible_expressible_in_tester'] == 1
         and _cd['eligible_exposed_in_tester'] == 0,
         'I.11 cross-domain must be 4 shared tools / 1 expressible / 0 exposed')
-for _line in ('91.7% [78.2, 97.1]', '96.4% [82.3, 99.4]', '24.4%', 'path drift'):
+for _line in ('91.7% [78.2, 97.1]', '96.4% [82.3, 99.4]', '24.4%', 'path drift',
+              '33/45, 17/23, 18/32 and 5/8'):
     chk(_line in SUPP, f'supplementary I.11 must state "{_line}"')
 
 _bc = jload('bootstrap_ci_results.json')

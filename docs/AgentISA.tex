@@ -121,27 +121,26 @@ Replaying 1,960 recorded tool-call trajectories (\(\tau\)-bench; GPT-4o
 and Claude 3.5 Sonnet; retail and airline; 14,285 calls) through the
 shipped compiler and result cache, static reduction is 0.0\% at BASIC
 and AGGRESSIVE: recorded traces chain their observations, so no step is
-provably dead and no pure pair provably independent. Reuse is
-conditional on the sharing boundary---1.73\% of cacheable calls hit
-within a task, 41.70\% across the distinct tasks of one run (62.9\% only
-when a second model replays the same tasks, of which 41.4\% survives as
-independent-task reuse)---so caching pays only where instruction memory
-is shared across tasks. That memory does sediment: 12--14 mined
-templates serve 95.9\% of 2,340 tool-use steps (all trials; the
-first-trial corpus used elsewhere in this paragraph is 2,275 calls), and
-replay-verified compound specifications absorb 12.53\% of dispatches,
-far below the 75.0\% that recurrence alone implies, while specifications
-learned on one model reproduce 91.7\% of the compounds another model
-exposes. AgentISA supplies the layer that makes this measurable: a
-formal instruction set with compositional semantics, a type system, and
-pre/post-conditions; Agentic Calling; developer-gated trace learning;
-and a compiler with fusion, dead-code elimination, and hot-path
-specialization. The 34.2\% static reduction is a planted-family
-mechanism demonstration and does not transfer. All measurements are
-offline---recorded-trajectory replay and a mock-backend microbenchmark.
-Live-gateway conformance checks across four model aliases confirm that
-the implementation matches its specification; no production end-to-end
-result is claimed.
+provably dead and no pure pair provably independent. In this benchmark,
+exact-key result reuse was 1.73\% of the 1,789 side-effect-free calls
+within a task and 41.70\% across the tasks of one run (16.3--50.2\% per
+run; 40.5 points strictly cross-task)---reuse lives at the run boundary,
+not inside a task. Instruction memory accumulates: 12 mined templates
+serve 95.9\% of 2,340 tool-use steps, and replay-verified compounds
+absorb 12.53\% of dispatches, far below the 75.0\% that recurrence alone
+implies; specifications learned on one model reproduce 33 of the 49
+eligible compounds (36 of which the second model performs), and every
+observation-wired specification fails. AgentISA supplies the layer that
+makes this measurable: a formal instruction set with compositional
+semantics, a type system, and pre/post-conditions; Agentic Calling;
+developer-gated trace learning; and a compiler with fusion, dead-code
+elimination, and hot-path specialization. The 34.2\% static reduction is
+a planted-family mechanism demonstration and does not transfer. All
+measurements are offline---recorded-trajectory replay and a mock-backend
+microbenchmark. Live-gateway checks on four model aliases (two running
+the identity harness fully, one at the token ceiling, one quality-only)
+confirm that the implementation matches its specification; no production
+end-to-end result is claimed.
 \end{abstract}
 \ccsdesc[500]{Software and its engineering~\textgreater{}Compilers}
 \ccsdesc[500]{Theory of computation~\textgreater{}Program reasoning}
@@ -212,8 +211,9 @@ Five structural challenges motivate AgentISA:
   \textbf{Cost pressure at the wrong layer.} FrugalGPT {[}28{]} shows
   LLM inference cost is a first-order concern, and serving systems
   attack it below the API boundary {[}38, 39, 40, 41{]}; what is missing
-  is the complementary, above-the-API layer that reduces the
-  \emph{number and size} of calls an agent issues in the first place.
+  is not above-the-API call reduction---an application-level response
+  cache already provides that---but program-level reduction of the
+  instruction stream before any request is issued.
 \item
   \textbf{Integration complexity across providers.} Portability is
   handled at the library level {[}26, 27{]}: logic written against one
@@ -247,11 +247,12 @@ contributions are:
   cacheable instructions} (Section 3.2; adapters in 3.2.3; measured in
   5.2 and 5.12). Signatures are preserved verbatim on the dispatch path,
   so semantics are unchanged when the cache is bypassed. The strongest
-  evidence is the reuse that survives recording: 41.70\% of cacheable
-  calls hit across a run's distinct tasks versus 1.73\% within one
-  (1,960 trajectories, 14,285 calls). Caveat: on the synthetic workload
-  a plain exact-response cache matches the call reduction to the digit,
-  so the measured advantage is program reduction before dispatch, not a
+  evidence is the reuse that survives recording: 41.70\% of the 1,789
+  side-effect-free first-trial calls hit across a run's distinct tasks
+  versus 1.73\% within one (14,285 calls in the corpus; 2,275 in the
+  first-trial set these rates use). Caveat: on the synthetic workload a
+  plain exact-response cache matches the call reduction to the digit, so
+  the measured advantage is program reduction before dispatch, not a
   higher hit rate.
 \item
   \textbf{Developer-gated trace-based instruction learning} (Section
@@ -262,7 +263,9 @@ contributions are:
   Workload evidence: replay-verified compounds absorb 12.53\% of
   dispatches (285/2,275) where three-step recurrence alone would suggest
   75.0\%, 12--14 mined templates serve 95.9\% of 2,340 tool-use steps,
-  and cross-model transfer reproduces 33 of the 36 exposed compounds.
+  and cross-model transfer reproduces 33 of the 49 eligible compounds
+  (36 of which the second model performs), with every observation-wired
+  specification failing.
 \item
   \textbf{A compiler and runtime for instruction streams} (Sections 3.4
   and 4; results in 5.2--5.5, 5.8, 5.12). Fusion, dead-code elimination,
@@ -278,12 +281,12 @@ contributions are:
   \textbf{Coordination and security infrastructure} (Section 3.5;
   validation in 5.6 and 5.11). Capability-threshold agent selection,
   execution planning with fallback, and a security monitor enforcing
-  authentication, authorization, resource-access, and data-sensitivity
-  policies, plus an opt-in fail-closed mode. The evidence is functional:
-  43 passing tests, and a paired posture matrix in which strict mode
-  denies the 400 policy-gap tasks fail-open admits, with 0/200 false
-  denials on well-specified tasks---not a throughput or live-deployment
-  measurement.
+  authentication, authorization, and data-sensitivity policies---and, in
+  the opt-in strict mode, resource-access policy---plus a fail-closed
+  option. The evidence is functional: 43 passing tests, and a paired
+  posture matrix in which strict mode denies the 400 policy-gap tasks
+  fail-open admits, with 0/200 false denials on well-specified
+  tasks---not a throughput or live-deployment measurement.
 \end{enumerate}
 
 Our empirical claims are scoped accordingly: Sections 5.2--5.5 exercise
@@ -418,10 +421,11 @@ pipelining, hazard detection, and resource-constrained scheduling
 {[}34{]}; the open, well-specified instruction-set discipline of RISC-V
 {[}35{]}; type safety via progress-and-preservation {[}36{]}; formally
 verified compiler correctness in the CompCert tradition {[}37{]}. Our
-contribution is not a new technique but the demonstration that this
-machinery transfers to LLM agent workloads, with the
-semantic-preservation arguments adapted to instructions with
-pre/post-conditions (Appendix C).
+contribution is not a new technique but the claim that this machinery
+\emph{applies} to LLM agent workloads, which we test rather than
+assume---it yields 0.0\% on recorded traces and is exercised only by the
+planted families---with the semantic-preservation arguments adapted to
+instructions with pre/post-conditions (Appendix C).
 
 \subsection{LLM Serving Systems}\label{llm-serving-systems}
 
@@ -449,14 +453,15 @@ In summary, the literature leaves four gaps that AgentISA addresses:
 \item
   \textbf{No compiler for agent behavior.} Prompt-level compilation
   exists {[}25{]} and model-level cost reduction exists {[}28{]}, and
-  \emph{caching itself is well-trodden ground}---at the response level
-  (GPTCache {[}46{]}), the KV-prefix level (RadixAttention/SGLang
-  {[}47{]}), and the provider prompt-caching level. None of these layers
-  expose an \emph{instruction-level} contract: caching there optimizes
-  model serving---invisible to the agent program's structure, without
-  effect on it. Instruction-level fusion, elimination, and
-  scheduling---with cacheability a declared property of the instruction
-  set---have not, to our knowledge, been demonstrated.
+  \emph{caching itself is well-trodden ground}---at the
+  application-response level (GPTCache {[}46{]}), the KV-prefix level
+  (RadixAttention/SGLang {[}47{]}), and the provider prompt-caching
+  level. None of these layers expose an \emph{instruction-level}
+  contract: caching there optimizes model serving---invisible to the
+  agent program's structure, without effect on it. Instruction-level
+  fusion, elimination, and scheduling---with cacheability a declared
+  property of the instruction set---have not, to our knowledge, been
+  demonstrated.
 \item
   \textbf{No semantics-preserving account of agent optimization.}
   Serving work verifies kernels and schedulers, not agent-level
@@ -1431,8 +1436,10 @@ Workloads are synthetic and seed-controlled:
 
 Each synthetic-workload configuration (Sections 5.2--5.5) is run with 5
 random seeds; we report mean \(\pm\) sample standard deviation. These
-are \textbf{descriptive statistics only}: no hypothesis-test claims (no
-p-values, no significance tests) anywhere in this paper. Five seeds
+are \textbf{descriptive statistics only}: the intervals reported in
+Sections 5.4 and 5.5 and in Appendix I.11 are percentile-bootstrap
+resampling statements about the committed records, not significance
+tests, and no p-values are computed anywhere in this paper. Five seeds
 characterize variability across the tested workload instances, not
 statistical significance or population-level generality. Section 5.2's
 naive response-cache baseline shares the mock-backend instrumentation; a
@@ -1660,11 +1667,11 @@ these two passes account for the entire static gain at length 200. The
 \textbf{paired interaction}, computed per seed as (fusion+DCE − NONE) −
 (fusion − NONE) − (DCE − NONE)---34.2 − 21.6 − 24.5 = −11.9 points---is
 −11.9\% \(\pm\) 2.0\% (per-seed −14.5/−9.5/−13.0/−12.0/−10.5 points;
-bootstrap 95\% CI −13.4 to −10.4, excluding zero): the passes
-overlap---dead slots break fusion chains and fused pairs absorb
-neighbors DCE would otherwise have removed individually---so the sum of
-the single-pass gains (46.1 points) overstates the joint effect by 11.9
-points.
+bootstrap 95\% CI −13.4 to −10.4, descriptive only; the interaction is
+negative in all five seeds): the passes overlap---dead slots break
+fusion chains and fused pairs absorb neighbors DCE would otherwise have
+removed individually---so the sum of the single-pass gains (46.1 points)
+overstates the joint effect by 11.9 points.
 
 The secondary ablation is an \textbf{independent-draw replication} (seed
 base 4,000, same distribution): fusion alone 21.9\% \(\pm\) 3.5\%, DCE
@@ -1899,13 +1906,12 @@ recording follows execution, as in Section 5.8): realizations 1--6
 executed the full seven-instruction stream, realizations 7--50 the
 shrunken six-instruction form with \texttt{check\_format} absorbed by
 fusion---306 instruction executions against 350 in arm (a), a 12.6\%
-executed-instruction reduction attributable to the adopted trace
-(per-stream shrink 14.3\%, 7 \(\rightarrow\) 6; the static compiler
-alone reproduces the 7 \(\rightarrow\) 6 shrink at AGGRESSIVE, so the
-two mechanisms' contributions are not separated), reported separately
-from the cache's call savings. Static compilation of the same stream:
-NONE 7 \(\rightarrow\) AGGRESSIVE 6 effective instructions, dataflow
-preserved.
+executed-instruction reduction observed on the adopted trace (per-stream
+shrink 14.3\%, 7 \(\rightarrow\) 6; the static compiler alone reproduces
+the 7 \(\rightarrow\) 6 shrink at AGGRESSIVE, so the two mechanisms'
+contributions are not separated), reported separately from the cache's
+call savings. Static compilation of the same stream: NONE 7
+\(\rightarrow\) AGGRESSIVE 6 effective instructions, dataflow preserved.
 
 \textbf{Identity rerun with live-model values.} Re-running the harness
 on \texttt{claude-doubao-seed-2.0-code} at \texttt{max\_tokens} = 1,500
@@ -2090,8 +2096,9 @@ We enumerate the limitations of the evaluation explicitly:
 \item
   \textbf{Descriptive statistics only.} Synthetic configurations use
   five seeds (Section 5.1.3); the real-gateway and system-level runs are
-  single-seed by design (Section 5.7's two-seed rerun excepted); no
-  hypothesis tests, confidence intervals, or significance claims are
+  single-seed by design (Section 5.7's two-seed rerun excepted); the
+  only intervals are percentile-bootstrap resampling statements about
+  committed records; no hypothesis tests and no p-value claims are
   made---standard deviations indicate stability across seeds, nothing
   more.
 \item
@@ -2164,37 +2171,48 @@ cannot delete the answer. Static reduction is \textbf{0.0\%} at BASIC
 and AGGRESSIVE---real traces chain their observations, so no step is
 provably dead and no pure pair provably independent, confirming Section
 5.3's 34.2\% as a property of the planted family. Reuse transfers
-conditionally: \textbf{1.73\%} of cacheable calls hit within a task,
-\textbf{41.70\%} across the distinct tasks of one run (retail
-49.0--50.2\%, airline 16.3--22.1\%), and 83.4\% under the benchmark's
-trial replay, which repeats identical tasks rather than exhibiting
-workload repetition. Section 5.2's benefit therefore survives on real
-workloads only where a cache is shared across tasks. A second, bash-only
-coding-agent family (supplementary I.6) also earns 0.0\% statically and
-contains no cacheable instruction at all, though 47.2\% of its commands
-repeat verbatim: repetition is not cacheability. Do instructions
-themselves sediment, so that reuse pays as experience accumulates? Yes,
-and Figure 7 measures it: 12--14 active templates serve \textbf{95.9\%}
-of the 2,340 tool-use steps and 103 serve 84.9\% of household
-manipulation, while 291 command templates serve 43\% \(\rightarrow\)
-67\% on shell coding and 16 serve 45.2\% of SQL analytics. A finite
-action space is therefore necessary but not sufficient; parameter reuse
-governs the payoff (protocols: supplementary I.7, I.8). The compound
-level is where reduction reappears once observations are kept: 78 of 450
+conditionally: of the 1,789 side-effect-free first-trial calls (2,275
+calls total, 486 effectful ones excluded), \textbf{1.73\%} hit within a
+task and \textbf{41.70\%} across the tasks of one run (retail
+49.0--50.2\%, airline 16.3--22.1\%; run-weighted mean 34.4\%,
+run-clustered 95\% CI 19.2--49.6\%; 40.5 points strictly cross-task),
+and 83.4\% (9,372/11,240 all-trial cacheable calls) under the
+benchmark's trial replay, which repeats identical tasks rather than
+exhibiting workload repetition. Section 5.2's benefit therefore survives
+on real workloads only where a cache is shared across tasks. A second,
+bash-only coding-agent family (supplementary I.6) also earns 0.0\%
+statically and contains no cacheable instruction at all, though 47.2\%
+of its commands repeat verbatim: repetition is not cacheability. Do
+instructions themselves sediment as experience accumulates? Figure 7
+shows that they do: 12 active templates (13--14 per source) match
+\textbf{95.9\%} of the 2,340 tool-use steps (330 tasks, five more
+airline attempts than the 325-task slice these cache numbers use) and
+103 serve 84.9\% of household manipulation, while 291 command templates
+serve 43\% \(\rightarrow\) 67\% on shell coding and 16 serve 45.2\% of
+SQL analytics. A finite action space is therefore necessary but not
+sufficient; parameter reuse governs the payoff (protocols: supplementary
+I.7, I.8). Matching is coverage, not saving---whether a match removes a
+dispatch depends on the planner bypass that I.10 declines to assume---so
+we report the coverage and claim no payoff from it. The compound level
+is where reduction reappears once observations are kept: 78 of 450
 recurring compounds (17.3\%) yield a spec that reproduces held-out
 occurrences exactly, absorbing \textbf{12.53\%} of dispatches---against
-0.0\% statically, and far below the 75.0\% recurrence alone suggested
-(supplementary I.9). Two external checks bound these numbers
-(I.10--I.11). A static hot set trained on a run's first half reaches
-only 13.6\% even with 256 rows, a capacity-limited LRU needs 256 entries
+0.0\% statically, and far below the 15.0\% that signature-consistent
+substitution credits and the 75.0\% that three-step recurrence suggests
+on the inputs-only corpus (supplementary I.9). Two external checks bound
+these numbers (I.10--I.11). A static hot set trained on a run's first
+half reaches 13.6\% with 256 rows against 42.6\% for an online LRU
+warm-started on that same half, a capacity-limited LRU needs 256 entries
 to approach 41.6\%, and sharing one cache across all four runs lifts the
-exact-key rate to 62.9\%---of which 371 hits are the same task replayed
-under a second model, leaving 41.4\% as independent-task reuse. Learned
-compounds also cross models: specifications from GPT-4o's retail
-trajectories reproduce 33 of the 36 Claude-exposed compounds (91.7\%),
-observation-wired ones failing. Priced at the gateway's measured 2.30 s
-and 21/64 tokens, the 746 measured hits are 28.6 minutes of avoided
-round trips---modeled, not observed.
+exact-key rate to 62.9\%, but one backbone alone reaches only
+40.5--42.7\%: the whole increment is a task both backbones performed,
+which the shipped key (it excludes model identity) legitimately serves.
+Learned compounds also cross models: specifications from GPT-4o's retail
+trajectories reproduce 33 of the 49 eligible compounds, 36 of which the
+Claude run performs, and all three observation-wired specifications
+fail. A hit avoids one recorded tool execution, not the model turn that
+emitted the call, so no second, token or dollar figure is attributable
+from this corpus and none is quoted (I.10).
 
 \begin{figure}
 \centering
@@ -2228,7 +2246,7 @@ Challenges}\label{system-limitations-and-challenges}
   \textbf{Evaluation scope}: the quantitative evidence is
   microbenchmark-based (Sections 5.2--5.5), supplemented by real-gateway
   spot checks (Sections 5.7--5.7.1), a four-task characterization
-  (Section 5.8), and recorded-trajectory replay on four public families
+  (Section 5.8), and recorded-trajectory replay on public families
   (Section 5.12; Appendices I.6--I.11); production end-to-end
   evaluation---including task success under an ISA---remains required
   before any deployment claim (Section 5.9).
@@ -2411,11 +2429,12 @@ BASIC and AGGRESSIVE---recorded traces chain their observations---so the
 34.2\% figure reported for planted targets measures a mechanism, not a
 workload. Reuse reappears where sharing exists: 41.70\% of cacheable
 calls hit across the distinct tasks of a run against 1.73\% within a
-task, an exact-key cache over all four runs reaches 62.9\% but only
-41.4\% of that is independent-task reuse, mined templates serve 95.9\%
+task, an exact-key cache over all four runs reaches 62.9\%, though one
+backbone alone reaches only 40.5--42.7\%, mined templates serve 95.9\%
 of 2,340 tool-use steps, replay-verified compounds absorb 12.53\% of
-dispatches, and specifications learned on one model reproduce 91.7\% of
-the compounds another model exposes. Synthetic Zipf workloads reduce
+dispatches, and specifications learned on one model reproduce 33 of the
+49 eligible compounds (36 of which another model performs), with every
+observation-wired specification failing. Synthetic Zipf workloads reduce
 simulated calls by 59.5--79.6\%, and hot-path optimization shrinks
 repeated traces by 65.8\%. Every number comes from a mock backend or
 recorded replay; live-gateway checks establish that the implementation
@@ -2449,9 +2468,7 @@ AgentISA's longer-term significance is architectural: an
 instruction-level contract for agent behavior makes agent systems
 amenable to the discipline that transformed hardware and compiler
 engineering---precise specification, portability across backends, and
-semantics-preserving optimization. Establishing these gains on
-production workloads and mechanically verifying the conditional
-arguments are the immediate next steps.
+semantics-preserving optimization.
 
 \section*{Artifact Availability}\label{artifact-availability}
 \addcontentsline{toc}{section}{Artifact Availability}
@@ -2469,14 +2486,15 @@ repository state whose build produces this PDF (\texttt{REPRODUCING.md}
 records the submission-time \texttt{git\ rev-parse\ HEAD}, the
 dependency lock, and the Python/system versions). A fresh clone
 reproduces the full suite (\texttt{python\ -m\ pytest\ tests/\ -q}:
-1,366 passed, 14 skipped at run time), the Section 5.6 functional-test
-counts, and, via the Appendix F command lines, every results table from
-scratch---real-gateway runs included, with a mock-backend fallback for
-environments without credentials. \texttt{REPRODUCING.md} also maps each
-claim to the implementing module, the exercising test, and the
-raw-results file, flagging specified-only components; the artifact is
-inventoried in Appendix F.7, and the figures regenerate from committed
-results JSONs (\texttt{scripts/make\_figures.py}).
+1,420 passed, 14 skipped, 13 subtests passed at run time), the Section
+5.6 functional-test counts, and, via the Appendix F command lines, every
+results table from scratch---real-gateway runs included, with a
+mock-backend fallback for environments without credentials.
+\texttt{REPRODUCING.md} also maps each claim to the implementing module,
+the exercising test, and the raw-results file, flagging specified-only
+components; the artifact is inventoried in Appendix F.7, and the figures
+regenerate from committed results JSONs
+(\texttt{scripts/make\_figures.py}).
 
 \begin{thebibliography}{99}
 \bibitem{ref1} Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, et al. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.

@@ -4078,8 +4078,11 @@ model every signature's final classification is the live model's own
 (versus +13.1 on the reasoning alias). The gold remains a planted
 keyword rubric over synthetic signatures, recorded verbatim in the
 results file; both runs are rubric-following diagnostics at one gateway,
-not deployment-quality claims. \#\# Review-Motivated Control
-Experiments: Cache-Key Differentiation and Trace-Corpus Compile Control
+not deployment-quality claims.
+
+\subsection{Review-Motivated Control Experiments: Cache-Key
+Differentiation and Trace-Corpus Compile
+Control}\label{review-motivated-control-experiments-cache-key-differentiation-and-trace-corpus-compile-control}
 
 Two deterministic, offline experiments added in response to external
 review; both artifacts carry full provenance (git rev, UTC timestamp,
@@ -4201,6 +4204,81 @@ the fusion share of the 34.2\% headline is a property of the planted
 linear family, not of this corpus. The corpus is itself
 generator-produced (Section 5.10's disclosure applies): this experiment
 varies the workload family, it does not remove planting altogether.
+
+\subsection{Notation}\label{notation}
+
+Notation used across the main paper and this supplement, with the
+location of each symbol's definition. Section, definition, and theorem
+numbers follow the main paper; appendix references are to this
+supplement.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Symbol
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Meaning
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Defined at
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\(\tau_i\) & Per-call latency & Section 2.1 \\
+\(\omega_i\) & Per-call context-reconstruction overhead & Section 2.1 \\
+\(\delta_i\) & Per-instruction state-transition function & Appendix
+B.1 \\
+\(C(n)\) & Overhead of executing \(n\) function calls & Definition
+2.1 \\
+\(C_{cached}(n)\) & Measured overhead under the result cache &
+Definition 2.1 \\
+\(\llbracket P \rrbracket\) & Denotation of program \(P\) & Appendix
+C.1 \\
+\(\parallel\) & Parallel composition (disjoint state footprints) &
+Definition 3.6 (Section 3.4.1) \\
+\(\circ\) & Sequential composition & Definition 3.6 (Section 3.4.1) \\
+\(\otimes\) & Capability-type composition & Section 6.3.1 (Appendix
+E.1) \\
+\(\text{cap}\) & Capability type (Basic / Composite / Emergent) &
+Section 6.3.1 (Appendix E.1) \\
+\(L\) & Security-level assignment on states and outputs & Section 6.3.6
+(Appendix E.1) \\
+\(s_k\) & Capability score of domain \(k\) & Definition 3.9 (Section
+3.5) \\
+\(w_k\) & Capability-domain weight & Definition 3.9 (Section 3.5) \\
+\(v_m\), \(\text{conf}_m\) & Metric value / metric confidence & Section
+3.5 \\
+\(\phi_{A \rightarrow B}\) & Cross-model instruction mapping
+\(I_A \rightarrow I_B\) & Section 6.3.2 \\
+\((I, T, \Sigma, \Delta, \Phi)\) & The AgentISA core tuple: instruction
+set, type system, state space, transition-function set,
+verification-function set & Definition 3.1 (Section 3.1) \\
+\(pre(i)\), \(post(i)\) & Pre-/post-condition predicates of instruction
+\(i\) & Section 3.1.1 (Definition 3.5's obligation) \\
+\(\Pi\), \(\Sigma\), \(\mu\) & Type constructors: dependent function,
+dependent pair, recursive types & Section 3.1.2 \\
+\(s\) & Zipf skew parameter & Section 5.2 \\
+\(\epsilon_i\), \(\delta_i\) & Per-mechanism differential-privacy
+parameters & Section 6.3.6 \\
+\end{longtable}
+}
+
+\textbf{Symbol reuse.} \(\Sigma\) is overloaded beyond the core
+tuple---state space (Definition 3.1) and the dependent-pair type
+constructor (Section 3.1.2); \(s\) denotes both the Zipf skew (Section
+5.2) and arbitrary states in the semantics (Appendix B). \(\delta_i\) is
+deliberately overloaded---per-instruction transition function (Appendix
+B.1) and per-mechanism DP parameter (Section 6.3.6), a reuse the main
+paper itself flags (Section 2.1); \(\delta\) further denotes the
+state-machine transition function (Section 3.2.2) and the pipeline
+data-transfer function (Definition 3.7). \(\tau\) doubles as the
+selection-pattern tree of Definition 3.8, and \(\phi\) as the
+context-interpretation function of Theorem 3.3.
 
 \subsection{Second Real Family: Bash-Only Coding-Agent
 Trajectories}\label{second-real-family-bash-only-coding-agent-trajectories}
@@ -4643,11 +4721,17 @@ can answer, and states the part it cannot.
 
 \textbf{Protocol.} 325 first-trial tasks (2,275 calls; 1,789 cacheable
 under the pilot's purity classification), key =
-\texttt{sha256(tool\ \textbar{}\ canonical-args)}, four scopes. As an
-anchor, the emulation reproduces the paper's numbers exactly ---
-746/1,789 = 41.70\% within a run, 31/1,789 = 1.73\% within a task ---
-which fixes that both use the same key, the same records and the same
-purity filter; a mismatch would void the comparison.
+\texttt{sha256(tool\ \textbar{}\ canonical-args)}, three scopes (within
+a task, within a run, and global over the whole corpus). As an anchor,
+the emulation reproduces the paper's numbers exactly --- 746/1,789 =
+41.70\% within a run, 31/1,789 = 1.73\% within a task --- which fixes
+that both use the same key, the same records and the same purity filter;
+a mismatch would void the comparison. The denominator is 1,789 of 2,275
+first-trial calls: the 486 calls on state-changing tools are excluded by
+the purity mapping, and an unbounded cache shared across a run's tasks
+is assumed, so 41.70\% is an upper bound for this policy. The committed
+run-scope split is 724 cross-task hits and 22 same-task hits, so reuse
+that is strictly cross-task is 724/1,789 = 40.5\%.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}lll@{}}
@@ -4668,21 +4752,36 @@ within a run & 512+ & 41.70\% \\
 \end{longtable}
 }
 
-\textbf{Capacity buys the first 34 points, then saturates.} An LRU of
+\textbf{Capacity buys the first 24 points, then saturates.} An LRU of
 eight entries already reaches 25.5\%; 256 entries reach 41.6\%, and
 nothing more is available because the run holds no further repeat. The
 figure is therefore a property of the workload's key distribution, not
 of unbounded storage --- good news for deployment, since the working set
 is small.
 
-\textbf{The reuse is not a hot set.} A static top-N cache trained on
-each run's first half and measured on its second (866 calls) reaches
-2.77\% (N = 16), 5.20\% (N = 64) and 13.63\% (N = 256), against 41.59\%
-for a 256-entry LRU on the same calls. The reason is structural: 85.22\%
-of the second half's distinct keys never appear in the first half at
-all, so no static selection can approach the dynamic figure. Dynamics
---- promotion on first use, eviction on capacity --- account for the
-remaining 28 points.
+\textbf{The reuse is not a fixed hot set.} A single pooled top-N list
+built from the first halves scores 2.77\% (N = 16), 5.20\% (N = 64) and
+13.63\% (N = 256) on the second halves (866 calls); one list per run
+does better, 2.89\%/5.89\%/14.78\%. An online LRU warm-started on the
+same first half scores \textbf{42.61\%} on the same 866 calls (42.96\%
+unbounded), so the gap is 29 points and eviction explains none of it
+(256 entries cost 0.35 points). The ceiling for any first-half-only
+policy is 14.78\% --- the share of second-half calls whose key was seen
+in the first half --- and a per-run list at N = 256 reaches it exactly
+(128/866), so static selection is saturated at its ceiling; everything
+above it comes from keys first seen \emph{during} the second half, which
+requires online promotion.
+
+\textbf{The pooled rate is not a run-level constant.} The four runs
+differ: 48.95\% (GPT-4o retail, 303/619), 16.28\% (GPT-4o airline,
+35/215), 50.21\% (Sonnet retail, 352/701) and 22.05\% (Sonnet airline,
+56/254). Retail is 73.8\% of the cacheable calls, so the call-weighted
+pooled 41.70\% sits above the run-weighted mean of 34.37\%; resampling
+the four runs gives a 95\% interval of {[}19.2\%, 49.6\%{]}. The
+interval is wide because the corpus contains four runs, not because the
+measurement is noisy --- it is deterministic. We report the pooled
+figure for comparability with Section 5.12 and the run-level range
+whenever a claim would otherwise read as a constant.
 
 \textbf{Same-turn repetition is unmeasurable here.} Every one of the
 2,275 assistant turns contains exactly one call, so the duplicate rate
@@ -4691,35 +4790,47 @@ cannot be exercised on this corpus. We report the zero as a scope limit,
 not as evidence about batching.
 
 \textbf{A global cache needs a decomposition, not a headline.} Sharing
-one cache across all four runs gives 62.94\%. That number must not be
-quoted as reuse: of its 1,126 hits, 371 are the \emph{same task replayed
-under a second model} (trial-replay inflation, the same effect Section
-5.12 warns about), 14 are same-task same-run, and only 354 + 387 = 741
-(41.4\% of cacheable calls) are independent-task reuse. The honest
-reading is that a global cache adds nothing over the per-run boundary;
-it merely re-counts a task the benchmark ran twice.
+one cache across all four runs gives 62.94\% (1,126/1,789). That number
+is not reuse in the sense the paper claims, and the committed
+decomposition shows why. Per single backbone, the same global policy
+reaches only \textbf{40.53\%} (GPT-4o, 338/834) and \textbf{42.72\%}
+(Sonnet, 408/955) --- indistinguishable from the per-run scope, because
+a single backbone contributes no cross-run traffic. The entire 21-point
+increment is a \emph{task performed by both backbones}: the shipped key
+deliberately excludes model identity (Section 5.2), so those hits are
+legitimate for the cache, but they are one task counted twice, not two
+tasks sharing a key. The origin buckets are also order-dependent ---
+assigning a hit to the stream that inserted the key first gives
+14/371/354/387 in recorded order and 17/350/403/356 reversed --- so we
+quote the per-backbone rates and treat the bucket split as a range,
+never as a constant.
 
-\textbf{Priced effects, modeled not observed.} At the measured per-call
-unit prices of the live-gateway run (mean 2.30 s, p50 2.17 s, p95 3.30
-s; 21 input and 64 output tokens per call), the 746 measured cache hits
-correspond to 1,714 s of avoided round trips (28.6 minutes; p50 1,621 s,
-p95 2,460 s), 15,666 input tokens, 47,744 output tokens and \$0.76 at an
-assumed \$3/\$15 per-million-token list price. Every dollar figure is a
-model: the gateway's actual price is unknown, and output tokens are
-censored at \texttt{max\_tokens=64}, so dollars are a floor. Two further
-mechanisms --- 2,245 served planning steps and 285 absorbed dispatches
---- are \emph{conditional} on a planner bypass that was never
-instrumented; without that assumption their savings are zero, so they
-are reported as conditional bounds and are not summed with the cache
-figure (they count the same stream at different granularity, and summing
-would double count).
+\textbf{Priced effects: one row is priceable, and it is not the cache.}
+A cache hit replays a recorded tool result; the model turn that emitted
+the call is still in the trace, and no per-tool latency was measured.
+Converting the 746 hits into seconds or dollars at a
+\emph{per-model-call} unit price (mean 2.30 s; 21 input and 64 output
+tokens) would be a unit error, so \texttt{cost\_model\_results.json}
+marks that row \texttt{convertible:\ false} and the paper quotes no
+figure for it. The two rows that \emph{are} priceable both require an
+unmeasured assumption: a template match or a compound substitution
+removes the planner turn that would have emitted the dispatch, which was
+never instrumented, so their seconds, tokens and dollars are conditional
+bounds, zero without the assumption. At an assumed \$3/\$15 per million
+tokens those conditional bounds are 5,158 s and \$2.30 for 2,245
+template-served steps, and 655 s and \$0.29 for 285 absorbed dispatches.
+Output tokens are censored at \texttt{max\_tokens=64}, so every dollar
+figure is a floor; the mechanisms are never summed, because F2 and F3
+count the same stream at different granularity.
 
 \textbf{What cannot be measured offline.} A semantic (embedding) cache
 and a provider prefix cache both need inputs this corpus does not carry
 --- prompts and embeddings --- so no GPTCache-style or SGLang-style
 head-to-head is possible here, and none is claimed. The baselines above
-emulate standard caching policy, not those systems. \#\# Cross-Model
-Compound Transfer
+emulate standard caching policy, not those systems.
+
+\subsection{Cross-Model Compound
+Transfer}\label{cross-model-compound-transfer}
 
 Section I.9 learns compound specifications on one corpus and verifies
 them on held-out occurrences of the same families. A harder question is
@@ -4754,7 +4865,7 @@ exposed
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 transferred
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-rate
+rate over exposed
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 occurrence exact
 \end{minipage} \\
@@ -4775,21 +4886,32 @@ within-source control (retail, half to half) & 38 & 28 & 27 & 96.4\%
 \end{longtable}
 }
 
+\textbf{The unconditional rate.} Measured over all 49 eligible compounds
+rather than the 36 the tester re-exposes, the retail cell transfers
+33/49 = 67.3\%; the 13 that do not transfer are compounds the second
+model never performed at all, which is itself a behavioural difference,
+not a specification error. Both denominators are reported because
+exposure is a post-treatment selection.
+
 \textbf{The wiring, not the vocabulary, is what a model change breaks.}
 Splitting the same cells by how a spec obtains its arguments is
-decisive: \emph{parameter-only} specifications --- those whose later
+decisive. \emph{Parameter-only} specifications --- those whose later
 steps take every argument from the compound's own parameters ---
-transfer at \textbf{100\% in all four cells} with 100\% occurrence-exact
-replay. \emph{Observation-wired} specifications --- those that read a
-value out of an earlier step's result via a recorded JSON path ---
-transfer at \textbf{0\% in all four cells}: no such specification
-survives its exposed occurrences (10/6/6/4 in the four cells, 0
-transferred). Individual occurrences do replay --- 2 of 17 in the
-reverse retail cell --- but never all occurrences of one specification.
-In the forward retail cell, 28 of 176 occurrence tests fail: 21 as path
-drift (the recorded path still exists but yields a different value) and
-7 as argument mismatch. Zero slots are unbound, which rules out the
-trivial explanation that the tester lacks the tools.
+transferred in 33/45, 17/23, 18/32 and 5/8 \emph{eligible} cases (100\%
+of the exposed ones in every cell, with occurrence-exact replay); the
+cases that did not transfer are ones the second model never performed at
+all. \emph{Observation-wired} specifications --- those that read a value
+out of an earlier step's result via a recorded JSON path --- transferred
+0 of 3 in the retail cell, the only cell where any is exposed, so no
+such specification survives; in the broader category that counts every
+specification merely \emph{containing} an observation read (10/6/6/4
+exposed across the cells) the transferred count is likewise zero.
+Individual occurrences do replay --- 2 of 17 in the reverse retail cell
+--- but never all occurrences of one specification. In the forward
+retail cell, 28 of 176 occurrence tests fail: 21 as path drift (the
+recorded path still exists but yields a different value) and 7 as
+argument mismatch. Zero slots are unbound, which rules out the trivial
+explanation that the tester lacks the tools.
 
 \textbf{Coverage, if the portable half were substituted.} Parameter-only
 specifications cover 24.4\% of the forward retail tester's steps (10.6\%
@@ -4818,84 +4940,9 @@ domains by task id would silently pair unrelated tasks --- a trap we
 avoided by joining on task content instead.
 
 \textbf{Threats.} Two models, two domains, one mock environment; the
-airline-reverse cell has n = 5 eligible compounds, so its 100\% carries
-a wide interval. Transfer is measured on recorded traces, not on fresh
-runs, so it shows that a spec \emph{fits} a second model's behavior, not
-that it would improve that model's task success.
-
-\subsection{Notation}\label{notation}
-
-Notation used across the main paper and this supplement, with the
-location of each symbol's definition. Section, definition, and theorem
-numbers follow the main paper; appendix references are to this
-supplement.
-
-{\def\LTcaptype{none} % do not increment counter
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Symbol
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Meaning
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Defined at
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\(\tau_i\) & Per-call latency & Section 2.1 \\
-\(\omega_i\) & Per-call context-reconstruction overhead & Section 2.1 \\
-\(\delta_i\) & Per-instruction state-transition function & Appendix
-B.1 \\
-\(C(n)\) & Overhead of executing \(n\) function calls & Definition
-2.1 \\
-\(C_{cached}(n)\) & Measured overhead under the result cache &
-Definition 2.1 \\
-\(\llbracket P \rrbracket\) & Denotation of program \(P\) & Appendix
-C.1 \\
-\(\parallel\) & Parallel composition (disjoint state footprints) &
-Definition 3.6 (Section 3.4.1) \\
-\(\circ\) & Sequential composition & Definition 3.6 (Section 3.4.1) \\
-\(\otimes\) & Capability-type composition & Section 6.3.1 (Appendix
-E.1) \\
-\(\text{cap}\) & Capability type (Basic / Composite / Emergent) &
-Section 6.3.1 (Appendix E.1) \\
-\(L\) & Security-level assignment on states and outputs & Section 6.3.6
-(Appendix E.1) \\
-\(s_k\) & Capability score of domain \(k\) & Definition 3.9 (Section
-3.5) \\
-\(w_k\) & Capability-domain weight & Definition 3.9 (Section 3.5) \\
-\(v_m\), \(\text{conf}_m\) & Metric value / metric confidence & Section
-3.5 \\
-\(\phi_{A \rightarrow B}\) & Cross-model instruction mapping
-\(I_A \rightarrow I_B\) & Section 6.3.2 \\
-\((I, T, \Sigma, \Delta, \Phi)\) & The AgentISA core tuple: instruction
-set, type system, state space, transition-function set,
-verification-function set & Definition 3.1 (Section 3.1) \\
-\(pre(i)\), \(post(i)\) & Pre-/post-condition predicates of instruction
-\(i\) & Section 3.1.1 (Definition 3.5's obligation) \\
-\(\Pi\), \(\Sigma\), \(\mu\) & Type constructors: dependent function,
-dependent pair, recursive types & Section 3.1.2 \\
-\(s\) & Zipf skew parameter & Section 5.2 \\
-\(\epsilon_i\), \(\delta_i\) & Per-mechanism differential-privacy
-parameters & Section 6.3.6 \\
-\end{longtable}
-}
-
-\textbf{Symbol reuse.} \(\Sigma\) is overloaded beyond the core
-tuple---state space (Definition 3.1) and the dependent-pair type
-constructor (Section 3.1.2); \(s\) denotes both the Zipf skew (Section
-5.2) and arbitrary states in the semantics (Appendix B). \(\delta_i\) is
-deliberately overloaded---per-instruction transition function (Appendix
-B.1) and per-mechanism DP parameter (Section 6.3.6), a reuse the main
-paper itself flags (Section 2.1); \(\delta\) further denotes the
-state-machine transition function (Section 3.2.2) and the pipeline
-data-transfer function (Definition 3.7). \(\tau\) doubles as the
-selection-pattern tree of Definition 3.8, and \(\phi\) as the
-context-interpretation function of Theorem 3.3.
+airline-reverse cell has n = 5 exposed compounds (8 eligible), so its
+100\% carries a wide interval. Transfer is measured on recorded traces,
+not on fresh runs, so it shows that a spec \emph{fits} a second model's
+behavior, not that it would improve that model's task success.
 
 \end{document}

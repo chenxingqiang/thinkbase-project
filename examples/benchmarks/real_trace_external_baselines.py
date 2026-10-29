@@ -126,6 +126,18 @@ def call_key(tool: str, args: Mapping[str, Any]) -> str:
     return hashlib.sha256(f"{tool}|{args_text(args)}".encode("utf-8")).hexdigest()
 
 
+def _rel(path: Path) -> str:
+    """Repo-relative path when possible, else the resolved absolute path.
+
+    A reviewer who checks out the artifact under a symlinked root (macOS /tmp)
+    must not crash here, and the record must not embed the author's home.
+    """
+    try:
+        return str(Path(path).resolve().relative_to(REPO_ROOT))
+    except ValueError:
+        return str(Path(path).resolve())
+
+
 def load_records(path: Path) -> List[Dict[str, Any]]:
     records = []
     with path.open("r", encoding="utf-8") as fh:
@@ -743,7 +755,7 @@ def build_report(corpus: Path, records: Sequence[Mapping[str, Any]]) -> Dict[str
             "the like-for-like comparison with the published 41.70%."
         ),
         "provenance": {
-            "corpus": str(corpus.relative_to(REPO_ROOT)),
+            "corpus": _rel(corpus),
             "corpus_sha256": corpus_sha256(corpus),
             "records": len(records),
             "first_trial_records": len(first),

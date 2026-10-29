@@ -671,16 +671,17 @@ MIN_SUPPORT = 2
 
 def run(corpus: Path, max_k: int = MAX_K, min_support: int = MIN_SUPPORT) -> Dict[str, Any]:
     sources = load_sources(corpus)
+    prov = provenance(corpus)
     return {
         "schema": SCHEMA_VERSION,
-        "corpus": str(corpus),
+        "corpus": prov["corpus"],
         "max_k": max_k,
         "min_support": min_support,
         "sources": source_profile(sources),
         "cross_model": cross_model(sources, max_k, min_support),
         "controls": controls(sources, max_k, min_support),
         "cross_domain": cross_domain(sources, max_k, min_support),
-        "provenance": provenance(corpus),
+        "provenance": prov,
     }
 
 
@@ -692,10 +693,19 @@ def provenance(corpus: Path) -> Dict[str, Any]:
                                   text=True, check=True).stdout.strip()
         except Exception:
             return "unknown"
+    try:
+        corpus_rel = str(corpus.resolve().relative_to(REPO_ROOT))
+    except ValueError:
+        corpus_rel = str(corpus.resolve())
     return {"git_rev": git("rev-parse", "HEAD"),
             "dirty": bool(git("status", "--porcelain")),
+            "corpus": corpus_rel,
             "corpus_sha256": hashlib.sha256(corpus.read_bytes()).hexdigest(),
-            "corpus_bytes": corpus.stat().st_size}
+            "corpus_bytes": corpus.stat().st_size,
+            "volatile": ["git_rev", "dirty"],
+            "note": ("the numeric payload is a deterministic function of the corpus (pinned "
+                     "by corpus_sha256); git_rev and dirty record the checkout and change by "
+                     "design")}
 
 
 def summarise(report: Dict[str, Any]) -> str:
