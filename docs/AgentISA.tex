@@ -2131,51 +2131,40 @@ designed to expose them.
 Census}\label{generated-trace-vocabulary-census}
 
 This census characterizes the generator's own vocabulary; it does
-\textbf{not} discharge the synthetic-workload threat of Section 5.9 (a
-generated corpus cannot validate a hand-built benchmark's realism). We
-analyze 100 seeded random-task stress traces---randomly shaped streams
-through the production engine, not hand-picked---792 steps, 12
-signatures (protocol and tables: supplementary Appendix I). The
-empirical rank-frequency decay is flatter than classical Zipf yet
-strongly log-linear (descriptive log-log slope 0.593; a 12-signature
-vocabulary is too small to support a tail-exponent claim, so none is
-made---supplementary I.3). 98.5\% of instances recur corpus-wide
-(780/792)---reflecting the 12-signature vocabulary as much as the
-generator; per-workflow repetition, 18.3\%, is more informative---so
-reuse is cross-task vocabulary, not intra-task duplication (shape
-census, fusibility counts: supplementary I.3).
+\textbf{not} discharge the synthetic-workload threat of Section 5.9. On
+100 seeded random-task stress traces (792 steps, 12 signatures) the
+rank-frequency decay is log-linear with descriptive slope 0.593, and
+98.5\% of instances recur corpus-wide (780/792), while per-workflow
+repetition, 18.3\%, is more informative---reuse here is cross-task
+vocabulary, not intra-task duplication (protocols and tables:
+supplementary I.1, I.3).
 
 \subsection{Mechanism Extensions}\label{mechanism-extensions}
 
 Six experiments exercise opt-in mechanisms (protocols and tables:
-Appendix I). \textbf{Capability calibration:} extracted domain scores
-correlate with mock-backend behavior on declaration-injection pools
-(Pearson r; n = 25 pools, generation n = 15): memory +0.948 (cache hit
-rate), coordination −0.977 (dispatch compression---the negative sign is
-the designed coupling: more declared dataflow edges, more fusion
-barriers, less compression), reasoning −0.965 (fusion reduction),
-generation +0.790; optimization −1.000 and security +1.000 are
-step-function artifacts of declared-and-enforced gates---consistency
-checks, not calibration; 2/8 domains, 9/17 metrics N/A (probe-evidenced;
-per-metric table with n, p, and Spearman ρ: supplementary I.2).
-\textbf{DP tree-pattern selection:} covering cost \(\leq\) heuristic on
-20/20 random IR trees (ratio 0.361; time 0.950); gap size is
-synthetic-pricing-dependent. \textbf{EMA hot-path detection:} 3/3
-rotated variants promoted (exact: 0/3; Zipf recall per seed: {[}0.333,
-1.000, 1.000, 1.000, 1.000{]} (mean 0.867)), zero false promotions on
-one-shot diversity. \textbf{Strict security:} of 1,000 paired tasks,
-fail-closed denies 400 policy-gap tasks fail-open admits; 0/200
-normal-task false denials. \textbf{Cache namespacing:} 100\%
-invalidation under template/decoding drift (legacy keys 100\% stale);
-modeled cost under the result cache is no higher than under the modeled
-provider prompt cache in 195/195 token-mix cells. \textbf{Parameterized
-replay:} all 1,050 unseen-parameter replays match the oracle exactly.
-Chain-enriched workloads amplify BASIC\(\rightarrow\)ADVANCED dispatch
-reduction to 79.1\% (random-slots control 46.7\%---paralleling Section
-5.3's 43.8\% random-sequence dispatch reduction (131.6 \(\rightarrow\)
-74.0 at length 200; the control's 46.7\% is measured on its own
-length-200 slots); protocol and per-seed tables: supplementary I.2),
-AGGRESSIVE differing only in the advisory memory plan.
+supplementary I.2). \textbf{Capability calibration:} domain scores
+correlate with mock-backend behavior on declaration-injection pools:
+memory +0.948, coordination −0.977 (the sign is the designed coupling:
+more declared edges, more fusion barriers), reasoning −0.965, generation
++0.790; optimization and security are step-function gate
+artifacts---consistency checks, not calibration---and with 2/8 domains,
+9/17 metrics N/A. \textbf{DP tree-pattern selection:} covering cost
+\(\leq\) heuristic on 20/20 IR trees (ratio 0.361; time 0.950).
+\textbf{EMA hot-path detection:} 3/3 rotated variants promoted (exact:
+0/3; Zipf recall per seed: {[}0.333, 1.000, 1.000, 1.000, 1.000{]} (mean
+0.867)), zero false promotions on one-shot diversity. \textbf{Strict
+security:} fail-closed denies 400 policy-gap tasks fail-open admits;
+0/200 normal-task false denials. \textbf{Cache namespacing:} 100\%
+invalidation under template/decoding drift; modeled cost no higher than
+the provider prompt cache in 195/195 token-mix cells.
+\textbf{Parameterized replay:} all 1,050 unseen-parameter replays match
+the oracle exactly. Chain-enriched workloads amplify
+BASIC\(\rightarrow\)ADVANCED dispatch reduction to 79.1\% (random-slots
+control 46.7\%---paralleling Section 5.3's 43.8\% random-sequence
+dispatch reduction (131.6 \(\rightarrow\) 74.0 at length 200; the
+control's 46.7\% is measured on its own length-200 slots); protocol and
+per-seed tables: supplementary I.2), AGGRESSIVE differing only in the
+advisory memory plan.
 
 \subsection{Do the Reductions Survive Real
 Traces?}\label{do-the-reductions-survive-real-traces}
@@ -2200,22 +2189,29 @@ workloads only where a cache is shared across tasks. A second, bash-only
 coding-agent family (supplementary I.6) also earns 0.0\% statically and
 contains no cacheable instruction at all, though 47.2\% of its commands
 repeat verbatim: repetition is not cacheability. Do instructions
-themselves sediment, so that reuse pays as experience accumulates?
-Running both streams through a support-gated repertoire--promote at two
-occurrences, credit a hit only to a template promoted before the task,
-retire on staleness--answers it: 12--14 active templates serve
-\textbf{95.9\%} of the 2,340 tool-use steps (76--88\% in the first
-quarter, 97--100\% after), and 291 command templates serve 43\%
-\(\rightarrow\) 67\% on the coding traces, while retirement and
-re-mining fire throughout (protocol and CRUD counts: supplementary I.7).
-Three further task families with explicitly finite action
-spaces---household manipulation (13 verbs, 2,420 episodes), grid
-navigation (8 verbs, 810), and SQL analytics (1 verb, 3,000)---separate
-two regimes: closed argument vocabularies saturate at 85--93\% of steps
-within the first quarter, while open ones flatten at 45\% (SQL) or climb
-43\% \(\rightarrow\) 67\% (shell), so a finite action space is necessary
-but not sufficient---parameter reuse governs the payoff (supplementary
-I.8).
+themselves sediment, so that reuse pays as experience accumulates? Yes,
+and Figure 7 measures it: 12--14 active templates serve \textbf{95.9\%}
+of the 2,340 tool-use steps and 103 serve 84.9\% of household
+manipulation, while 291 command templates serve 43\% \(\rightarrow\)
+67\% on shell coding and 16 serve 45.2\% of SQL analytics. A finite
+action space is therefore necessary but not sufficient; parameter reuse
+governs the payoff (protocols: supplementary I.7, I.8).
+
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Instruction memory is an asset, and its payoff is workload-shaped. (A) Share of a stream's steps served by instructions mined from earlier tasks, versus experience, on five recorded task families (first trial per task; promotion at two occurrences; a step is credited only to an instruction promoted in an earlier task). Closed argument vocabularies saturate at 85--96\% almost immediately; open ones climb slowly (43\% \textbackslash rightarrow 67\%) or flatten near 45\%, because the verb is shared while the parameters are not. (B) What the same memory does not buy: the 34.2\% static reduction belongs to the planted family, not to recorded traces (0.0\%), and reuse pays only across tasks (41.7\% versus 1.7\% within one).}]{figures/7_instruction_memory.pdf}
+\caption{\textbf{Instruction memory is an asset, and its payoff is
+workload-shaped.} (A) Share of a stream's steps served by instructions
+mined from earlier tasks, versus experience, on five recorded task
+families (first trial per task; promotion at two occurrences; a step is
+credited only to an instruction promoted in an earlier task). Closed
+argument vocabularies saturate at 85--96\% almost immediately; open ones
+climb slowly (43\% \(\rightarrow\) 67\%) or flatten near 45\%, because
+the verb is shared while the parameters are not. (B) What the same
+memory does not buy: the 34.2\% static reduction belongs to the planted
+family, not to recorded traces (0.0\%), and reuse pays only across tasks
+(41.7\% versus 1.7\% within one).}
+\end{figure}
 
 \section{Discussion}\label{discussion}
 
@@ -2494,7 +2490,8 @@ scratch---real-gateway runs included, with a mock-backend fallback for
 environments without credentials. \texttt{REPRODUCING.md} also maps each
 claim to the implementing module, the exercising test, and the
 raw-results file, flagging specified-only components; the artifact is
-inventoried in Appendix F.7.
+inventoried in Appendix F.7, and the figures regenerate from committed
+results JSONs (\texttt{scripts/make\_figures.py}).
 
 \begin{thebibliography}{99}
 \bibitem{ref1} Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, et al. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.

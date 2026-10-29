@@ -1032,5 +1032,24 @@ for s_ in ['household manipulation (13 verbs, 2,420 episodes)', 'flatten at 45% 
            '`go to cabinet` serves 4,422 steps']:
     chk(s_ in md, f'paper missing cross-family citation {s_}')
 
+# ---- Figure 7: manifest values must equal their sources ------------------
+fig7 = json.loads((ROOT / 'docs/figures/figures_manifest.json').read_text())['figures']['7_instruction_memory.pdf']
+_prec_tau = jload('instruction_precipitation_results.json')['per_source']
+_prec_swe = jload('instruction_precipitation_swe_agent_results.json')['per_source']
+_prec_ag = jload('instruction_precipitation_agentgym_results.json')['per_source']
+for label, stream in [('closed: tool use, retail', _prec_tau['gpt-4o-retail']),
+                      ('closed: household manipulation', _prec_ag['agentgym-alfworld']),
+                      ('closed: grid navigation', _prec_ag['agentgym-babyai']),
+                      ('open: shell coding', _prec_swe['swe-agent-swe-agent-llama-70b']),
+                      ('open: SQL analytics', _prec_ag['agentgym-sqlgym'])]:
+    chk(abs(fig7['series_final_pct'][label] - round(100.0 * stream['coverage'], 2)) < 1e-9,
+        f'figure 7 series {label} json vs precipitation source mismatch')
+chk(fig7['bars_pct']['compiler_real'] == 0.0
+    and abs(fig7['bars_pct']['cache_within_task'] - round(100.0 * tau_ft['within_task_hit_rate'], 2)) < 1e-9
+    and abs(fig7['bars_pct']['cache_across_tasks'] - round(100.0 * tau_ft['within_run_hit_rate'], 2)) < 1e-9,
+    'figure 7 bars json vs real_trace_pilot mismatch')
+chk(abs(fig7['bars_pct']['compiler_planted'] - round(100.0 * comp_red(200)['mean'], 2)) < 1e-9,
+    'figure 7 planted bar json vs compiler microbench mismatch')
+
 print('ALL NUMBERS REGRESSION-CLEAN: every cited benchmark number matches its committed results JSON '
       '(microbench + real-gateway + Appendix-I extension experiments; aggregates recomputed from raw records)')

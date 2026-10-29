@@ -285,7 +285,7 @@ python examples/paper_real_llm_quality_check.py --backend real --scale paper    
   surface provider prompt-cache billing, which is why the
   Appendix-G/I.3 provider-cache column stays MODELED while the
   result-cache column's calls and tokens stay gateway-measured.
-- Figures: `python scripts/make_figures.py` regenerates all six figures
+- Figures: `python scripts/make_figures.py` regenerates all seven figures
   (docs/figures/) from the committed results JSONs — every plotted value is
   asserted against its artifact inside the script, and
   scripts/number_regression.py independently re-verifies the emitted

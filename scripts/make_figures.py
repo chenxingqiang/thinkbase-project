@@ -16,6 +16,7 @@ Figure inventory
   4_token_mix_sweep.pdf     promptcache_sweep JSON    main, Section 5.7.1
   5_quality_per_class.pdf   quality JSONs             supplementary I.3
   6_ceiling_census.pdf      compiler/identity JSONs   supplementary I.3
+  7_instruction_memory.pdf  precipitation + pilot JSONs main, Section 5.12
 """
 from __future__ import annotations
 
@@ -380,6 +381,112 @@ def fig6() -> None:
         "minimax_512": list(mm512), "minimax_1500": list(mm1500)}
 
 
+def _smoothed(tasks, points=60):
+    """Task-wise coverage -> a readable curve: x and y on a percentage scale."""
+    if not tasks:
+        return [], []
+    window = max(3, len(tasks) // 40)
+    values, xs = [], []
+    for i in range(len(tasks)):
+        lo = max(0, i - window + 1)
+        chunk = tasks[lo:i + 1]
+        values.append(100.0 * sum(t["served"] for t in chunk)
+                      / max(1, sum(t["steps"] for t in chunk)))
+        xs.append(100.0 * (i + 1) / len(tasks))
+    step = max(1, len(xs) // points)
+    return xs[::step], values[::step]
+
+
+def fig7() -> None:
+    """Instruction memory: what accumulates from experience, and what it does not buy."""
+    tau = jload("instruction_precipitation_results.json")
+    swe = jload("instruction_precipitation_swe_agent_results.json")
+    agt = jload("instruction_precipitation_agentgym_results.json")
+    pilot = jload("real_trace_pilot_tau_bench_results.json")
+    micro = json.loads((BENCH / "isa_microbench_results.json").read_text(encoding="utf-8"))
+    compiler = next(r for r in micro if r["experiment"] == "compiler")
+    planted_row = next(d for d in compiler["data"]
+                       if d["length"] == 200 and d["level"] == "BASIC")
+    planted = 100.0 * planted_row["effective_instruction_count_reduction"]["mean"]
+
+    series = [
+        ("closed: tool use, retail", tau["per_source"]["gpt-4o-retail"], "#1f4e79", "-"),
+        ("closed: household manipulation", agt["per_source"]["agentgym-alfworld"], "#2e7d32", "-"),
+        ("closed: grid navigation", agt["per_source"]["agentgym-babyai"], "#8a5a00", "-"),
+        ("open: shell coding", swe["per_source"]["swe-agent-swe-agent-llama-70b"], "#6a3d9a", "-"),
+        ("open: SQL analytics", agt["per_source"]["agentgym-sqlgym"], "#b03030", "--"),
+    ]
+
+    fig, (ax, ax2) = plt.subplots(
+        1, 2, figsize=(7.0, 1.80),
+        gridspec_kw={"width_ratios": [2.0, 1.0], "wspace": 0.32})
+
+    ax.axhspan(80, 103, color="#eef4ee", zorder=0)
+    ax.axhspan(-2, 70, color="#fbf2e8", zorder=0)
+    for label, stream, color, ls in series:
+        xs, ys = _smoothed(stream["per_task"])
+        ax.plot(xs, ys, color=color, ls=ls, lw=1.15, solid_capstyle="round")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 102)
+    ax.set_xticks([0, 25, 50, 75, 100])
+    ax.set_yticks([0, 25, 50, 75, 100])
+    ax.set_xlabel("experience: share of the stream already seen (%)", labelpad=1.5)
+    ax.set_ylabel("steps served by memory (%)", labelpad=1.5)
+    ax.set_title("A  instructions sediment; the workload decides how far", loc="left",
+                 fontsize=7.0, pad=3)
+    handles = [plt.Line2D([], [], color=c, ls=ls, lw=1.15) for _, _, c, ls in series]
+    labels = [f"{name} ({100.0 * st['coverage']:.0f}%)" for name, st, _, _ in series]
+    ax.legend(handles, labels, loc="lower left", bbox_to_anchor=(0.005, 0.015),
+              frameon=False, handlelength=1.4, borderaxespad=0.0, labelspacing=0.22,
+              fontsize=5.7)
+
+    real_static = 100.0 * pilot["aggregate"]["effective_reduction_vs_none"]["BASIC"]
+    within = 100.0 * pilot["cache_scopes"]["first_trial"]["within_task_hit_rate"]
+    across = 100.0 * pilot["cache_scopes"]["first_trial"]["within_run_hit_rate"]
+    chk(abs(planted - 34.2) < 0.05, f"planted reduction {planted:.2f} != 34.2")
+    chk(abs(real_static) < 1e-9, f"real-trace static reduction {real_static} != 0.0")
+    chk(abs(within - 1.73) < 0.005 and abs(across - 41.70) < 0.005,
+        f"cache rates {within:.2f}/{across:.2f} != 1.73/41.70")
+
+    # two metric groups, each with a planted/synthetic arm and a real-traces arm
+    groups = [
+        ("static reduction", [("planted\nstream", planted, "#c3d2e2"),
+                              ("real\ntraces", real_static, "#33475b")]),
+        ("cache hit rate", [("within\ntask", within, "#c3d2e2"),
+                            ("across\ntasks", across, "#33475b")]),
+    ]
+    tick_positions, tick_labels = [], []
+    for g, (title, bars) in enumerate(groups):
+        base = g * 3
+        for k, (label, value, color) in enumerate(bars):
+            x = base + k
+            ax2.bar(x, value, width=0.70, color=color, edgecolor="#33475b",
+                    linewidth=0.6)
+            ax2.text(x, value + 1.4, f"{value:.1f}", ha="center", va="bottom",
+                     fontsize=6.2, color="#1b2b3a")
+            tick_positions.append(x)
+            tick_labels.append(label)
+        ax2.text(base + 0.5, 47.0, title, ha="center", fontsize=6.2, color="#33475b")
+    ax2.set_xticks(tick_positions)
+    ax2.set_xticklabels(tick_labels, fontsize=5.5, linespacing=1.05)
+    ax2.set_ylim(0, 50)
+    ax2.set_yticks([0, 20, 40])
+    ax2.set_ylabel("share (%)", labelpad=1.5)
+    ax2.set_title("B  what memory does not buy", loc="left", fontsize=7.0, pad=3)
+    ax2.grid(axis="x", visible=False)
+
+    save(fig, "7_instruction_memory.pdf")
+    MANIFEST["figures"]["7_instruction_memory.pdf"] = {
+        "kind": "data",
+        "series_final_pct": {name: round(100.0 * st["coverage"], 2)
+                             for name, st, _, _ in series},
+        "bars_pct": {"compiler_planted": round(planted, 2),
+                     "compiler_real": round(real_static, 2),
+                     "cache_within_task": round(within, 2),
+                     "cache_across_tasks": round(across, 2)},
+    }
+
+
 def main() -> int:
     fig1()
     fig2()
@@ -387,6 +494,7 @@ def main() -> int:
     fig4()
     fig5()
     fig6()
+    fig7()
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "figures_manifest.json").write_text(
         json.dumps(MANIFEST, indent=1, sort_keys=True) + "\n",
