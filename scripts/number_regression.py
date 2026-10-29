@@ -4,7 +4,7 @@ docs/AgentISA_supplementary.md (Sections 5.2-5.8 plus the Appendix-I extension
 experiments) must match the committed results JSONs under examples/benchmarks/
 bit-for-bit. Stored aggregates are additionally recomputed from the raw
 per-seed records wherever a file carries them. Aborts nonzero on drift."""
-import json, re, sys, pathlib, statistics
+import json, os, re, subprocess, sys, pathlib, statistics
 
 ROOT = pathlib.Path('/Users/chenxingqiang/thinkbase-project')
 md = (ROOT / 'docs/AgentISA.md').read_text(encoding='utf-8')
@@ -996,10 +996,6 @@ for s_ in ['12–14 active templates serve **95.9%**', '291 command templates se
            '75.0% of the tool-use stream']:
     chk(s_ in md, f'paper missing precipitation citation {s_}')
 
-if fails:
-    print('REGRESSION FAILURES:')
-    for f in fails: print(' -', f)
-    sys.exit(1)
 # ---- 5.12 / I.8 cross-family instruction flow (agentgym) ----------------
 ag_p, ag_i = _prec('instruction_precipitation_agentgym_results.json')
 FAMILIES = [('agentgym-alfworld', 2420, 32247, 0.8494, 0.858),
@@ -1011,8 +1007,8 @@ for name, tasks, steps, coverage, first_q in FAMILIES:
         f"precip {name} scale json {st['tasks']}/{st['steps']} vs paper {tasks}/{steps}")
     chk(round(st['coverage'], 4) == coverage,
         f"precip {name} coverage json {st['coverage']:.4f} vs paper {coverage:.4f}")
-    chk(round(st['segments'][0]['coverage'], 2) == first_q,
-        f"precip {name} first-quarter json {st['segments'][0]['coverage']:.3f} vs paper {first_q:.3f}")
+    chk(abs(st['segments'][0]['coverage'] - first_q) < 0.005,
+        f"precip {name} first-quarter json {st['segments'][0]['coverage']:.4f} vs paper {first_q:.4f}")
 chk(ag_p['per_source']['agentgym-alfworld']['repertoire']['templates_active'] == 103,
     "precip alfworld active templates json != paper 103")
 chk(ag_p['per_source']['agentgym-babyai']['repertoire']['templates_active'] == 54,
@@ -1024,8 +1020,9 @@ chk(top_alf[0]['tool'] == 'go to' and top_alf[0]['uses'] == 4422,
     f"precip alfworld top template json {top_alf[0]} vs paper go to/4,422")
 top_sql = ag_p['per_source']['agentgym-sqlgym']['top_templates']
 chk(top_sql[0]['uses'] == 38, f"precip sqlgym top template uses json {top_sql[0]['uses']} vs paper 38")
-for s_ in ['household manipulation (13 verbs, 2,420 episodes)', 'flatten at 45% (SQL)',
-           'climb 43%→67% (shell)', 'a finite action space is necessary but not sufficient',
+for s_ in ['household manipulation, 2,420 episode prefixes, 32,247 actions, 13 verbs',
+           'flatten near 45%', 'climb slowly (43%→67%)',
+           'A finite action space is therefore necessary but not sufficient',
            'parameter reuse governs the payoff', '| household manipulation (alfworld) | 13 verbs | 103 | 2,420 | 32,247 | 84.94% |',
            '| grid navigation (babyai) | 8 verbs | 54 | 810 | 4,642 | 92.72% |',
            '| SQL analytics (sqlgym) | 1 verb | 16 | 3,000 | 3,000 | 45.17% |',
@@ -1051,5 +1048,68 @@ chk(fig7['bars_pct']['compiler_real'] == 0.0
 chk(abs(fig7['bars_pct']['compiler_planted'] - round(100.0 * comp_red(200)['mean'], 2)) < 1e-9,
     'figure 7 planted bar json vs compiler microbench mismatch')
 
+# ---- I.9 compound binding: recompute from the observation-carrying corpus ---
+import importlib.util
+_cb_path = ROOT / 'examples' / 'benchmarks' / 'compound_binding.py'
+_cb_spec = importlib.util.spec_from_file_location('_gate_compound_binding', _cb_path)
+_cb = importlib.util.module_from_spec(_cb_spec)
+sys.modules['_gate_compound_binding'] = _cb
+_cb_spec.loader.exec_module(_cb)
+_committed = json.loads((ROOT / 'examples/benchmarks/compound_binding_results.json').read_text())
+_recomputed = _cb.run((ROOT / 'examples/real_traces/tau_bench_observed.jsonl').resolve())
+chk(_recomputed['tasks'] == _committed['tasks'] == 325, 'compound tasks drift')
+chk(_recomputed['steps'] == _committed['steps'] == 2275, 'compound steps drift')
+chk(_recomputed['compounds']['recurring'] == _committed['compounds']['recurring'] == 450,
+    'compound recurring count drift')
+chk(_recomputed['compounds']['signature_consistent'] ==
+    _committed['compounds']['signature_consistent'] == 102, 'signature-consistent count drift')
+chk(_recomputed['compounds']['replay_verified'] ==
+    _committed['compounds']['replay_verified'] == 78, 'replay-verified count drift')
+chk(_recomputed['reduction_if_substituted'] == _committed['reduction_if_substituted'],
+    'compound earned reduction drift')
+chk(_recomputed['strict_reduction'] == _committed['strict_reduction'],
+    'compound strict reduction drift')
+chk(abs(_committed['reduction_if_substituted']['reduction'] * 100 - 12.53) < 0.005,
+    'paper says 12.53% but the corpus gives '
+    f"{_committed['reduction_if_substituted']['reduction'] * 100:.2f}%")
+chk(abs(_committed['upper_bound_signature_consistent']['reduction'] * 100 - 15.03) < 0.005,
+    'paper says 15.03% but the corpus gives '
+    f"{_committed['upper_bound_signature_consistent']['reduction'] * 100:.2f}%")
+chk(abs(_committed['wiring']['internal_share'] * 100 - 15.7) < 0.05,
+    'paper says 15.7% internal slots')
+chk(abs(_committed['strict_reduction']['reduction'] * 100 - 1.36) < 0.005,
+    'paper says 1.36% strict')
+chk('12.53% of dispatches' in md and '78 of 450 recurring compounds (17.3%)' in md,
+    'main paper missing the compound-binding result')
+chk('| all | 450 | 102 (22.7%) | 78 (17.3%) |' in md,
+    'supplement missing the compound-binding table row')
+chk('285/2,275 steps, 178 applications' in md and '231 (84.3%) are external parameters' in md,
+    'supplement missing compound wiring detail')
+
+# ---- suite count: the paper's "N passing" must equal collected - skipped ------
+_m = re.search(r'([\d,]+) passing, (\d+) skipped at run time', md)
+if _m:
+    _passed = int(_m.group(1).replace(',', ''))
+    _skipped = int(_m.group(2))
+    _collected_out = subprocess.run(
+        [sys.executable, '-m', 'pytest', '--collect-only', '-q', 'tests/'],
+        cwd=ROOT, capture_output=True, text=True,
+        env={**os.environ, 'HOME': str(ROOT / '.test_home'),
+             'ALL_PROXY': '', 'all_proxy': '', 'HTTP_PROXY': '', 'http_proxy': '',
+             'HTTPS_PROXY': '', 'https_proxy': ''})
+    _c = re.search(r'(\d+) tests? collected', _collected_out.stdout)
+    if _c:
+        _collected = int(_c.group(1))
+        chk(_passed + _skipped == _collected,
+            f'paper cites {_passed} passing + {_skipped} skipped but pytest collects '
+            f'{_collected} tests; a test was added or removed without updating the count')
+
+# This branch must stay last: every check above appends to `fails`, and a check
+# added after it would be silently swallowed (it happened twice).
+if fails:
+    print('REGRESSION FAILURES:')
+    for f in fails:
+        print(' -', f)
+    sys.exit(1)
 print('ALL NUMBERS REGRESSION-CLEAN: every cited benchmark number matches its committed results JSON '
       '(microbench + real-gateway + Appendix-I extension experiments; aggregates recomputed from raw records)')

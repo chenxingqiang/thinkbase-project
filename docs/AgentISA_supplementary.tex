@@ -4424,16 +4424,17 @@ shapes \texttt{edit\ 1:1}, \texttt{python\ reproduce.py}, and
 skew is why a small active set can carry most of the traffic, and why
 retirement fires often while re-mining stays rare.
 
-\textbf{Boundary: compound instructions are not claimed.} Three-step
-windows recur in 75.0\% of the tool-use stream's windows and
-32.8--36.0\% of the coding stream's, and it is tempting to read that as
-the compound-instruction opportunity. We do not: instantiating a
-compound from the window's first call requires binding later steps to
-\emph{observation values}, which inputs-only corpora do not carry, so
-these figures are recurrence upper bounds and are never added to
-coverage. Establishing them would need a corpus of recorded
-observations, and would be the next experiment, not a result of this
-one.
+\textbf{Boundary: recurrence is not instantiation, and I.9 measures the
+gap.} Three-step windows recur in 75.0\% of the tool-use stream's
+windows and 32.8--36.0\% of the coding stream's, and it is tempting to
+read that as the compound-instruction opportunity. We do not:
+instantiating a compound from the window's first call requires binding
+later steps to \emph{observation values}, which this corpus does not
+carry, so these figures remain recurrence upper bounds and are never
+added to coverage. Appendix I.9 repeats the count on a corpus that does
+keep observations: there, 17.3\% of recurring compounds survive a replay
+test and carry 12.53\% of dispatches, not 75.0\% --- recurrence
+overstates the opportunity roughly fourfold.
 
 \textbf{What the measurement does and does not mean.} Served steps are
 identity-level reuse: the system recognizes an instruction it already
@@ -4538,6 +4539,94 @@ agents satisfy it for furniture, receptacles, and objects; analytical
 agents satisfy the verb and fail the schema. This refines the embodied
 intuition rather than contradicting it---a robot's advantage is not that
 its verbs are few, but that its \emph{objects} are few and recur.
+
+\subsection{Compound Instructions on Traces with
+Observations}\label{compound-instructions-on-traces-with-observations}
+
+I.7 refused to claim compound instructions: three-step windows recur in
+75.0\% of the tool-use stream's windows, but instantiating a compound
+requires that its later steps take their arguments from earlier
+\emph{results}, and an inputs-only corpus cannot tell whether they do.
+This appendix supplies the missing half and measures what survives.
+
+\textbf{Data.} The same \(\tau\)-bench historical trajectories at
+revision \texttt{59a200c6d575}, re-read so that each call keeps the
+observation the environment returned for it (the \texttt{tool} message
+joined by \texttt{tool\_call\_id}): 325 tasks (first trial each), 2,275
+calls, of which 2,221 (97.6\%) have an observation. Observations are
+truncated at 400 characters; truncation can only hide a value from the
+binder, so every bindability figure below is conservative. The compactor
+is \texttt{examples/real\_traces/prepare\_tau\_bench\_observed.py}.
+
+\textbf{Definitions, all mechanical.} An \emph{atomic template} is a
+\texttt{(tool,\ argument\ keys)} signature, as in I.7. A \emph{compound}
+is a contiguous k-gram of atomic templates (k = 2..4) with support ≥ 2.
+For an occurrence, each argument of each step after the first gets a
+\emph{provenance}: \texttt{obs:i} if every scalar in the value appears
+in step \emph{i}'s observation (i \textless{} current; the latest match
+wins), \texttt{param} if it appears in the compound's entry arguments,
+\texttt{constant} if the value has no scalars, and \texttt{external}
+otherwise --- a value the environment supplies from outside the call
+sequence, such as an order id the user typed. The \emph{wiring
+signature} is the tuple of (step, argument, kind, source) for the whole
+occurrence. A compound is \emph{signature-consistent} when every
+occurrence has the same signature; it is \emph{replay-verified} when a
+spec learned on one occurrence (parameters abstracted, observation reads
+recorded as JSON paths) reproduces the arguments of every other
+occurrence exactly. \emph{Earned reduction} substitutes verified
+compounds greedily, longest match first and without overlap, and credits
+k−1 dispatches per application; it is a dispatch bound from a binder,
+not an end-to-end latency or cost measurement.
+
+\textbf{Results (min\_support = 2, max\_k = 4).}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+k & recurring & signature-consistent & replay-verified \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+2 & 135 & 47 & 41 \\
+3 & 174 & 36 & 27 \\
+4 & 141 & 19 & 10 \\
+all & 450 & 102 (22.7\%) & 78 (17.3\%) \\
+\end{longtable}
+}
+
+Substituting the signature-consistent set would absorb 15.03\% of the
+2,275 dispatches; substituting only the replay-verified set absorbs
+\textbf{12.53\%} (285/2,275 steps, 178 applications). The difference is
+the price of assuming that identical signatures imply identical
+bindings: 24 compounds pass the signature test and fail replay, mostly
+because the observation shape moves between occurrences.
+
+\textbf{Where the binding actually comes from.} Of 274 argument slots in
+verified compounds, 43 (15.7\%) are read from an earlier observation or
+a constant, while 231 (84.3\%) are external parameters. The compound
+level is therefore mostly \emph{parameter plumbing}: fusing a chain
+saves the dispatches and the wiring decisions, but it does not derive
+most of its arguments from data --- the values come from the user's
+request. This is the substantive answer to why an inputs-only corpus
+could not have produced the figure, and why the earned number is 12.5\%
+rather than the 75.0\% that recurrence suggested.
+
+\textbf{The strict test, for contrast.} Requiring every later argument
+to come from an observation or the entry call --- the strictest reading
+of ``compiled'' --- passes only 7 compounds (1.6\%) and absorbs 1.36\%
+of dispatches. The gap between 1.36\% and 12.53\% is the value of
+treating external values as instruction parameters rather than as
+unbound unknowns.
+
+\textbf{Threats.} Learning and verification happen within one corpus: a
+spec is learned on one occurrence and tested on held-out occurrences of
+the same family, which is a generalization test but not a cross-family
+transfer test. The 30 replay failures are reported rather than dropped,
+and they are the reason the mechanism refuses an occurrence whose
+observations no longer match the recorded read path instead of guessing
+a value. Environments are mock (\(\tau\)-bench), so the reduction
+measures dispatch absorption on recorded traces, not production traffic.
 
 \subsection{Notation}\label{notation}
 

@@ -65,6 +65,30 @@ upstream tree; the upstream digests above let a reader verify the provenance.
 
 Tasks whose trajectory contained no tool call are omitted (28 of them).
 
+## The same trajectories, with observations
+
+`tau_bench_observed.jsonl` is the second reading of the *same* files: each call
+keeps the observation the environment returned for it, joined by `tool_call_id`.
+It exists because compound instructions cannot be tested on an inputs-only
+corpus — asking whether a fused sequence can be instantiated means asking
+whether its later arguments come from earlier *results*, and that information is
+in the `tool` messages the pilot corpus drops.
+
+```bash
+./venv/bin/python examples/real_traces/prepare_tau_bench_observed.py \
+    --tau-bench-root ./tau-bench-59a200c6d575 \
+    --output examples/real_traces/tau_bench_observed.jsonl
+```
+
+Scale: first trial of each task only (325 tasks), 2,275 calls, 2,221 (97.6%)
+carrying an observation. Observations are truncated at 400 characters. The
+truncation is disclosed because it is not neutral in the direction that matters:
+a value cut off cannot be found by the binder, so every bindability figure in
+Appendix I.9 is a lower bound on what a longer observation would support.
+
+The committed file is 1.0 MB. It is derived from the digests listed above, so
+the provenance argument is the same one.
+
 ## Second family: bash-only coding agents
 
 `SWE-agent-trajectories` on Hugging Face (`nebius/SWE-agent-trajectories`,
