@@ -1,0 +1,35 @@
+{
+  "schema": "cache-coarse-footprint-cost/v1",
+  "task": "cost of a typed default before any instruction implements footprint(params)",
+  "result_kind": "measured",
+  "scope": "the shipped_sound_cache_replay corpus and key policy, re-run twice: once with the replay's exact footprints, once with every admission forced to the coarse token so that any landed write flushes the run-scope cache. Only the footprint differs.",
+  "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+  "sound_cache_sha256": "3ee9a2653d60a48fd39988442f3f739f280f566e39abf650dbfc85f6db2ab2a3",
+  "arms": {
+    "exact_footprint": {
+      "hits": 459,
+      "cacheable_calls": 1728,
+      "hit_rate": 0.265625,
+      "unsafe_hits": 0,
+      "coarse_invalidations": 0
+    },
+    "coarse_footprint": {
+      "hits": 67,
+      "cacheable_calls": 1728,
+      "hit_rate": 0.038773,
+      "unsafe_hits": 0,
+      "coarse_invalidations": 446
+    }
+  },
+  "delta": {
+    "hits": 392,
+    "hit_rate_points": 22.69
+  },
+  "checks": {
+    "exact_arm_reproduces_committed_459": true,
+    "coarse_arm_is_sound": true,
+    "coarse_costs_hits": true,
+    "same_denominator": true
+  },
+  "reading": "A typed default without footprint() implementations is sound but pays the coarse eviction on every landed write. This is the cost of flipping the default *today*; it is a hit-rate cost, not a correctness cost, and it disappears site by site as footprint() is implemented."
+}

@@ -93,6 +93,8 @@ field names them. Each file records the revision it was generated at: eleven car
 | Damage split and task-clustered intervals | `./venv/bin/python examples/benchmarks/unsafe_damage.py` | `examples/benchmarks/unsafe_damage_results.json` |
 | Cost-of-soundness ladder | `./venv/bin/python examples/benchmarks/soundness_ladder.py` | `examples/benchmarks/soundness_ladder_results.json` |
 | Task-clustered intervals (325 cells) | `./venv/bin/python examples/benchmarks/safety_ci.py` | `examples/benchmarks/safety_ci_results.json` |
+| Cache call-site census (purity, footprint, tenant) | `./venv/bin/python examples/benchmarks/cache_default_census.py` (AST pass; deterministic) | `examples/benchmarks/cache_default_census.json` |
+| Cost of a typed default before footprints exist | `./venv/bin/python examples/benchmarks/cache_coarse_footprint_cost.py` | `examples/benchmarks/cache_coarse_footprint_cost.json` |
 | Shipped typed cache, replayed on the corpus | `./venv/bin/python examples/benchmarks/shipped_sound_cache_replay.py` (drives `agentflow/core/isa/sound_cache.py` itself; deterministic) | `examples/benchmarks/shipped_sound_cache_results.json` |
 | Out-of-sample compound absorption | `./venv/bin/python examples/benchmarks/compound_holdout.py` | `examples/benchmarks/compound_holdout_results.json` |
 | Bootstrap CIs over committed records | `./venv/bin/python scripts/bootstrap_ci.py --output examples/benchmarks/bootstrap_ci_results.json` (percentile bootstrap over the committed per-seed microbench results; fixed base seed, so a rerun reproduces the same intervals) | `examples/benchmarks/bootstrap_ci_results.json` |

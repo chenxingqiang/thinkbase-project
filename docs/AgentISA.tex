@@ -2127,20 +2127,24 @@ We enumerate the limitations of the evaluation explicitly:
   there by construction, but the sensitivity is not quantified.
 \item
   \textbf{The typed cache is opt-in, and the default is still the
-  unsound store.} \texttt{SoundResultCache} enforces Theorem 3.7's three
+  unsound store.} \texttt{SoundResultCache} enforces Theorem 3.7's
   hypotheses and is wired into the execution path behind a
   per-instruction flag, but the default remains the legacy
-  \texttt{InstructionCache}, which carries no tenant in its key, admits
-  effectful instructions and evicts by TTL and LRU alone. The zero in
-  Section 5.13 is a property of the class, measured by replaying the
-  corpus through it (459 of 1,728 calls, zero damaging hits); the 240
-  damaging hits are a property of the untyped policies on the same
-  replay. Making the typed path the default requires a tenant channel on
-  every execution path (96 \texttt{execute()} implementations), a
-  footprint method on every instruction, and regeneration of the
-  committed artifacts whose provenance pins
-  \texttt{instruction.py}---not an estimate of deployment incidence, and
-  not something this revision claims.
+  \texttt{InstructionCache}. An AST-attributed census of every cache
+  call site in this repository (15 sites) says what flipping the default
+  would take: 11 already declare \texttt{side\_effects=False}, 2 declare
+  nothing, and 2 declare themselves effectful yet are memoised
+  anyway---one of them \texttt{CompositeInstruction}'s own store, which
+  is exactly the reuse Theorem 3.7 forbids (the other is a probe inside
+  our own harness); and none of the 45 \texttt{execute()} definitions
+  that own a cache can name a tenant. The last two are the blockers, not
+  the purity declarations. Flipping the default today would be sound but
+  expensive: with no instruction implementing
+  \texttt{footprint(params)}, every read is unknown and every write is
+  coarse, and the replay falls from 459 hits of 1,728 to 67 (26.56\% to
+  3.88\%, zero damaging hits on both arms). That is a hit-rate cost, not
+  a correctness cost, and it disappears site by site as footprints are
+  implemented.
 \end{enumerate}
 
 Despite these limitations, each optimization mechanism is implemented,

@@ -1,0 +1,2594 @@
+{
+  "schema_version": 1,
+  "generated_by": "examples/benchmarks/cache_default_census.py",
+  "scope": {
+    "roots": [
+      "agentflow",
+      "examples",
+      "scripts"
+    ],
+    "excluded_dirs": [
+      ".git",
+      ".mypy_cache",
+      ".pytest_cache",
+      "__pycache__",
+      "node_modules",
+      "venv"
+    ],
+    "in_scope_cache_types": [
+      "InstructionCache",
+      "SoundResultCache"
+    ],
+    "other_store_types_recorded_separately": [
+      "DecompositionCache"
+    ],
+    "classification_rule": "bucket is the effective side_effects declaration governing the put: literal put keyword > enclosing class declaration > caller-resolved declaration for module-level helpers. Only pure_declared (side_effects is False) is admitted by the typed default; True and undeclared are refused (undeclared fails closed)."
+  },
+  "method": {
+    "parser": "python ast (ast.parse + ast.walk); no grep",
+    "file_discovery": "os.walk over the three roots, sorted",
+    "constructors": "Call whose callee resolves to a store class name",
+    "put_sites": "Call with Attribute(attr='put') whose receiver type is inferred from (i) a constructor call, (ii) self.<attr> = <store>(...), (iii) an annotated parameter whose class assigns .cache, (iv) a local assignment whose RHS is a store constructor or a method returning one, or (v) method-usage inference for unannotated parameters",
+    "side_effects": "class-body attribute, self.side_effects assignment, or super().__init__(side_effects=...) in the class's own __init__; an explicit declaration on a local ancestor is inherited; a bare constructor default is recorded as undeclared (legacy default True)",
+    "helper_puts": "a put inside a module-level helper is resolved to the factory calls / callers that pass side_effects=<literal>; unresolved or conflicting callers stay undeclared",
+    "tenant_reach": "execute signature argument containing 'tenant', a class-level tenant attribute, a current_tenant/tenant_scope reference, else nothing; precedence argument > contextvar > class_attribute",
+    "determinism": "sorted files and sites, no timestamps or wall-clock values"
+  },
+  "counts": {
+    "python_files_scanned": 337,
+    "put_calls_all_receivers": 16,
+    "put_calls_unattributed": 0,
+    "store_constructor_calls_all": 7,
+    "execute_defs_in_dict_cache_classes": 4,
+    "constructors_in_scope": 6,
+    "constructors_out_of_scope": 1,
+    "put_sites_in_scope": 15,
+    "put_sites_out_of_scope": 1,
+    "put_sites_on_legacy_instruction_cache": 11,
+    "put_sites_on_sound_result_cache": 4,
+    "put_sites_governed_by_instruction_default_flip": 10,
+    "execute_defs_total": 144,
+    "execute_defs_agentflow": 104,
+    "execute_defs_agentflow_core": 96,
+    "execute_defs_agentflow_agents": 7,
+    "execute_defs_agentflow_services": 1,
+    "execute_defs_examples": 40,
+    "execute_defs_scripts": 0,
+    "execute_defs_with_input_params_signature": 44,
+    "execute_defs_in_caching_classes": 45,
+    "execute_defs_in_caching_classes_in_scope": 44,
+    "execute_defs_in_caching_classes_other_store": 1
+  },
+  "buckets": {
+    "pure_declared": {
+      "count": 11,
+      "admitted_by_typed_default": true,
+      "meaning": "side_effects is False; the typed default admits",
+      "sites": [
+        {
+          "file": "agentflow/core/isa/instruction.py",
+          "line": 526,
+          "cache_type": "SoundResultCache",
+          "flip_applies": false,
+          "legacy_memoised": false
+        },
+        {
+          "file": "examples/benchmarks/isa_microbench.py",
+          "line": 116,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/benchmarks/isa_real_llm_bench.py",
+          "line": 306,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+          "line": 430,
+          "cache_type": "SoundResultCache",
+          "flip_applies": false,
+          "legacy_memoised": false
+        },
+        {
+          "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+          "line": 731,
+          "cache_type": "SoundResultCache",
+          "flip_applies": false,
+          "legacy_memoised": false
+        },
+        {
+          "file": "examples/paper_real_llm_compiler_test.py",
+          "line": 516,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/paper_real_llm_test.py",
+          "line": 164,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/random_tasks_stress.py",
+          "line": 182,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/system_task_demo.py",
+          "line": 267,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/system_task_workload.py",
+          "line": 153,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/thesis_direction_suites.py",
+          "line": 555,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        }
+      ]
+    },
+    "effectful_declared": {
+      "count": 2,
+      "admitted_by_typed_default": false,
+      "meaning": "side_effects is True; the typed default refuses (legacy put stored it unconditionally)",
+      "sites": [
+        {
+          "file": "agentflow/core/isa/instruction.py",
+          "line": 537,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+          "line": 411,
+          "cache_type": "SoundResultCache",
+          "flip_applies": false,
+          "legacy_memoised": false
+        }
+      ]
+    },
+    "undeclared": {
+      "count": 2,
+      "admitted_by_typed_default": false,
+      "meaning": "no declaration; the legacy default is True, so the typed default refuses (fail closed)",
+      "sites": [
+        {
+          "file": "agentflow/core/isa/agentic_calling.py",
+          "line": 153,
+          "cache_type": "InstructionCache",
+          "flip_applies": true,
+          "legacy_memoised": true
+        },
+        {
+          "file": "agentflow/core/isa/instruction_learning.py",
+          "line": 192,
+          "cache_type": "InstructionCache",
+          "flip_applies": false,
+          "legacy_memoised": true
+        }
+      ]
+    }
+  },
+  "summary": {
+    "buckets": {
+      "pure_declared": 11,
+      "effectful_declared": 2,
+      "undeclared": 2
+    },
+    "admitted_under_typed_default": 11,
+    "refused_under_typed_default": 4,
+    "legacy_store_buckets": {
+      "pure_declared": 8,
+      "effectful_declared": 1,
+      "undeclared": 2
+    },
+    "sound_store_buckets": {
+      "pure_declared": 3,
+      "effectful_declared": 1,
+      "undeclared": 0
+    },
+    "flip_cohort_buckets": {
+      "pure_declared": 8,
+      "effectful_declared": 1,
+      "undeclared": 1
+    },
+    "flip_impact": {
+      "legacy_sites": 11,
+      "sites_governed_by_instruction_flip": 10,
+      "flip_cohort_buckets": {
+        "survive_unchanged": 8,
+        "need_side_effects_false": 1,
+        "effectful_memoised_bug": 1
+      },
+      "all_legacy_buckets": {
+        "survive_unchanged": 8,
+        "need_side_effects_false": 2,
+        "effectful_memoised_bug": 1
+      },
+      "effectful_bug_sites": [
+        "agentflow/core/isa/instruction.py:537"
+      ],
+      "legacy_sites_outside_instruction_flip": [
+        "agentflow/core/isa/instruction_learning.py:192"
+      ],
+      "undeclared_sites_all_legacy": [
+        "agentflow/core/isa/agentic_calling.py:153",
+        "agentflow/core/isa/instruction_learning.py:192"
+      ]
+    },
+    "footprint": {
+      "overrides_found": 0,
+      "sites_with_exact_put_argument": 3,
+      "sites_with_exact_put_argument_list": [
+        "examples/benchmarks/shipped_sound_cache_replay.py:411",
+        "examples/benchmarks/shipped_sound_cache_replay.py:430",
+        "examples/benchmarks/shipped_sound_cache_replay.py:731"
+      ],
+      "admitted_sites_needing_footprint": 9,
+      "admitted_sites_needing_footprint_list": [
+        "agentflow/core/isa/instruction.py:526",
+        "examples/benchmarks/isa_microbench.py:116",
+        "examples/benchmarks/isa_real_llm_bench.py:306",
+        "examples/paper_real_llm_compiler_test.py:516",
+        "examples/paper_real_llm_test.py:164",
+        "examples/random_tasks_stress.py:182",
+        "examples/system_task_demo.py:267",
+        "examples/system_task_workload.py:153",
+        "examples/thesis_direction_suites.py:555"
+      ],
+      "legacy_sites_needing_footprint_after_declaration_fix": 10
+    },
+    "tenant": {
+      "constructors_with_tenant_at_construction": 0,
+      "put_sites_with_tenant_in_lexical_scope": 3,
+      "put_sites_with_explicit_tenant_keyword": 3,
+      "admitted_sites_without_tenant_channel": 8,
+      "admitted_sites_without_tenant_channel_list": [
+        "examples/benchmarks/isa_microbench.py:116",
+        "examples/benchmarks/isa_real_llm_bench.py:306",
+        "examples/paper_real_llm_compiler_test.py:516",
+        "examples/paper_real_llm_test.py:164",
+        "examples/random_tasks_stress.py:182",
+        "examples/system_task_demo.py:267",
+        "examples/system_task_workload.py:153",
+        "examples/thesis_direction_suites.py:555"
+      ],
+      "execute_defs_tenant_reach": {
+        "argument": 0,
+        "class_attribute": 0,
+        "contextvar": 0,
+        "nothing": 45
+      },
+      "all_execute_defs_tenant_reach": {
+        "argument": 0,
+        "class_attribute": 0,
+        "contextvar": 0,
+        "nothing": 144
+      },
+      "all_execute_defs_with_tenant_channel": 0
+    },
+    "execute_defs_by_root": {
+      "agentflow": 6,
+      "examples": 39,
+      "scripts": 0
+    }
+  },
+  "constructors": [
+    {
+      "file": "agentflow/core/isa/agentic_calling.py",
+      "line": 57,
+      "cache_type": "InstructionCache",
+      "enclosing_class": "AgenticTransformer",
+      "enclosing_function": "__init__",
+      "constructor_accepts_tenant": false,
+      "tenant_available_at_construction": false,
+      "tenant_at_construction": {
+        "available": false,
+        "reason": "__init__(max_size, ttl) has no tenant parameter and the key contract has no identity component"
+      },
+      "tenant_available_in_enclosing_scope": false,
+      "tenant_channel_at_use": "none",
+      "key_contract": {
+        "tenant_in_key": false,
+        "evidence": "agentflow/core/isa/instruction_cache.py:78-98 (build_cache_key has no tenant parameter; namespace is model/template/decoding, not identity)"
+      },
+      "already_typed": false
+    },
+    {
+      "file": "agentflow/core/isa/instruction.py",
+      "line": 251,
+      "cache_type": "InstructionCache",
+      "enclosing_class": "Instruction",
+      "enclosing_function": "__init__",
+      "constructor_accepts_tenant": false,
+      "tenant_available_at_construction": false,
+      "tenant_at_construction": {
+        "available": false,
+        "reason": "__init__(max_size, ttl) has no tenant parameter and the key contract has no identity component"
+      },
+      "tenant_available_in_enclosing_scope": false,
+      "tenant_channel_at_use": "none",
+      "key_contract": {
+        "tenant_in_key": false,
+        "evidence": "agentflow/core/isa/instruction_cache.py:78-98 (build_cache_key has no tenant parameter; namespace is model/template/decoding, not identity)"
+      },
+      "already_typed": false
+    },
+    {
+      "file": "agentflow/core/isa/instruction.py",
+      "line": 350,
+      "cache_type": "SoundResultCache",
+      "enclosing_class": "Instruction",
+      "enclosing_function": "_get_sound_cache",
+      "constructor_accepts_tenant": false,
+      "tenant_available_at_construction": false,
+      "tenant_at_construction": {
+        "available": false,
+        "reason": "__init__(max_size, ttl) has no tenant parameter; get/put resolve tenant= or the current_tenant ContextVar per call"
+      },
+      "tenant_available_in_enclosing_scope": false,
+      "tenant_channel_at_use": "contextvar_in_sound_cache",
+      "key_contract": {
+        "tenant_in_key": true,
+        "evidence": "agentflow/core/isa/sound_cache.py:89-97 (_cache_key payload scope is {kind: tenant, tenant} when identity_dependent, 'shared' otherwise)"
+      },
+      "already_typed": true
+    },
+    {
+      "file": "agentflow/core/isa/instruction_learning.py",
+      "line": 144,
+      "cache_type": "InstructionCache",
+      "enclosing_class": "PatternRecognizer",
+      "enclosing_function": "__init__",
+      "constructor_accepts_tenant": false,
+      "tenant_available_at_construction": false,
+      "tenant_at_construction": {
+        "available": false,
+        "reason": "__init__(max_size, ttl) has no tenant parameter and the key contract has no identity component"
+      },
+      "tenant_available_in_enclosing_scope": false,
+      "tenant_channel_at_use": "none",
+      "key_contract": {
+        "tenant_in_key": false,
+        "evidence": "agentflow/core/isa/instruction_cache.py:78-98 (build_cache_key has no tenant parameter; namespace is model/template/decoding, not identity)"
+      },
+      "already_typed": false
+    },
+    {
+      "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+      "line": 399,
+      "cache_type": "SoundResultCache",
+      "enclosing_class": null,
+      "enclosing_function": "replay_arm",
+      "constructor_accepts_tenant": false,
+      "tenant_available_at_construction": false,
+      "tenant_at_construction": {
+        "available": false,
+        "reason": "__init__(max_size, ttl) has no tenant parameter; get/put resolve tenant= or the current_tenant ContextVar per call"
+      },
+      "tenant_available_in_enclosing_scope": true,
+      "tenant_channel_at_use": "explicit_put_argument",
+      "key_contract": {
+        "tenant_in_key": true,
+        "evidence": "agentflow/core/isa/sound_cache.py:89-97 (_cache_key payload scope is {kind: tenant, tenant} when identity_dependent, 'shared' otherwise)"
+      },
+      "already_typed": true
+    },
+    {
+      "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+      "line": 713,
+      "cache_type": "SoundResultCache",
+      "enclosing_class": null,
+      "enclosing_function": "lookup_scope_probe",
+      "constructor_accepts_tenant": false,
+      "tenant_available_at_construction": false,
+      "tenant_at_construction": {
+        "available": false,
+        "reason": "__init__(max_size, ttl) has no tenant parameter; get/put resolve tenant= or the current_tenant ContextVar per call"
+      },
+      "tenant_available_in_enclosing_scope": true,
+      "tenant_channel_at_use": "explicit_put_argument",
+      "key_contract": {
+        "tenant_in_key": true,
+        "evidence": "agentflow/core/isa/sound_cache.py:89-97 (_cache_key payload scope is {kind: tenant, tenant} when identity_dependent, 'shared' otherwise)"
+      },
+      "already_typed": true
+    }
+  ],
+  "put_sites": [
+    {
+      "file": "agentflow/core/isa/agentic_calling.py",
+      "line": 153,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "FunctionInstruction",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute",
+        "transform_to_instruction"
+      ],
+      "class_ref": "agentflow.core.isa.agentic_calling.FunctionInstruction",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "undeclared",
+      "bucket_basis": "none",
+      "bucket_basis_detail": "no declaration (legacy default True)",
+      "admitted_under_typed_default": false,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "undeclared",
+        "legacy_default": true,
+        "source": "none"
+      },
+      "enclosing_class_declaration": {
+        "kind": "undeclared",
+        "legacy_default": true,
+        "source": "none"
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "agentflow/core/isa/agentic_calling.py",
+            "line": 153,
+            "kind": "enclosing_class",
+            "class": "FunctionInstruction"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, result)"
+    },
+    {
+      "file": "agentflow/core/isa/instruction.py",
+      "line": 526,
+      "cache_type": "SoundResultCache",
+      "already_typed": true,
+      "receiver": "sound",
+      "enclosing_class": "CompositeInstruction",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute"
+      ],
+      "class_ref": "agentflow.core.isa.instruction.CompositeInstruction",
+      "class_is_instruction_subclass": true,
+      "flip_applies": false,
+      "bucket": "pure_declared",
+      "bucket_basis": "put_keyword",
+      "bucket_basis_detail": "explicit side_effects keyword on this put call",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": false,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "put_keyword"
+      },
+      "enclosing_class_declaration": {
+        "kind": "conditional",
+        "value": true,
+        "default_value": true,
+        "overridable": true,
+        "expression": "True if side_effects is None else side_effects",
+        "source": "super_init_keyword",
+        "lineno": 423
+      },
+      "resolution": {
+        "method": "put_keyword_literal",
+        "evidence": [
+          {
+            "file": "agentflow/core/isa/instruction.py",
+            "line": 526,
+            "kind": "put_keyword",
+            "side_effects": false
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": true,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "contextvar_in_sound_cache",
+        "identity_gate_applies": true,
+        "identity_dependent_key_requires_tenant": true
+      },
+      "put_arguments": {
+        "positional": 3,
+        "keywords": [
+          "footprint",
+          "side_effects"
+        ]
+      },
+      "expression": "sound.put(self.id, input_params, result, footprint=self._sound_footprint(input_params), side_effects=False)"
+    },
+    {
+      "file": "agentflow/core/isa/instruction.py",
+      "line": 537,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "CompositeInstruction",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute"
+      ],
+      "class_ref": "agentflow.core.isa.instruction.CompositeInstruction",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "effectful_declared",
+      "bucket_basis": "super_init_keyword",
+      "bucket_basis_detail": "enclosing class declaration",
+      "admitted_under_typed_default": false,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "conditional",
+        "value": true,
+        "default_value": true,
+        "overridable": true,
+        "expression": "True if side_effects is None else side_effects",
+        "source": "super_init_keyword",
+        "lineno": 423
+      },
+      "enclosing_class_declaration": {
+        "kind": "conditional",
+        "value": true,
+        "default_value": true,
+        "overridable": true,
+        "expression": "True if side_effects is None else side_effects",
+        "source": "super_init_keyword",
+        "lineno": 423
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "agentflow/core/isa/instruction.py",
+            "line": 537,
+            "kind": "enclosing_class",
+            "class": "CompositeInstruction"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, result)"
+    },
+    {
+      "file": "agentflow/core/isa/instruction_learning.py",
+      "line": 192,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "PatternRecognizer",
+      "enclosing_function": "extract_patterns",
+      "enclosing_function_chain": [
+        "extract_patterns"
+      ],
+      "class_ref": "agentflow.core.isa.instruction_learning.PatternRecognizer",
+      "class_is_instruction_subclass": false,
+      "flip_applies": false,
+      "bucket": "undeclared",
+      "bucket_basis": "none",
+      "bucket_basis_detail": "no declaration (legacy default True)",
+      "admitted_under_typed_default": false,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "undeclared",
+        "legacy_default": true,
+        "source": "none"
+      },
+      "enclosing_class_declaration": {
+        "kind": "undeclared",
+        "legacy_default": true,
+        "source": "none"
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "agentflow/core/isa/instruction_learning.py",
+            "line": 192,
+            "kind": "enclosing_class",
+            "class": "PatternRecognizer"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, patterns)"
+    },
+    {
+      "file": "examples/benchmarks/isa_microbench.py",
+      "line": 116,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "MockLLMInstruction",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute"
+      ],
+      "class_ref": "examples.benchmarks.isa_microbench.MockLLMInstruction",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "super_init_keyword",
+      "bucket_basis_detail": "enclosing class declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 92
+      },
+      "enclosing_class_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 92
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "examples/benchmarks/isa_microbench.py",
+            "line": 116,
+            "kind": "enclosing_class",
+            "class": "MockLLMInstruction"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, result)"
+    },
+    {
+      "file": "examples/benchmarks/isa_real_llm_bench.py",
+      "line": 306,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "RealLLMInstruction",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute"
+      ],
+      "class_ref": "examples.benchmarks.isa_real_llm_bench.RealLLMInstruction",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "super_init_keyword",
+      "bucket_basis_detail": "enclosing class declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 283
+      },
+      "enclosing_class_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 283
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "examples/benchmarks/isa_real_llm_bench.py",
+            "line": 306,
+            "kind": "enclosing_class",
+            "class": "RealLLMInstruction"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, result)"
+    },
+    {
+      "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+      "line": 411,
+      "cache_type": "SoundResultCache",
+      "already_typed": true,
+      "receiver": "cache",
+      "enclosing_class": null,
+      "enclosing_function": "replay_arm",
+      "enclosing_function_chain": [
+        "replay_arm"
+      ],
+      "class_ref": null,
+      "class_is_instruction_subclass": false,
+      "flip_applies": false,
+      "bucket": "effectful_declared",
+      "bucket_basis": "put_keyword",
+      "bucket_basis_detail": "explicit side_effects keyword on this put call",
+      "admitted_under_typed_default": false,
+      "legacy_memoised": false,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": true,
+        "source": "put_keyword"
+      },
+      "enclosing_class_declaration": null,
+      "resolution": {
+        "method": "put_keyword_literal",
+        "evidence": [
+          {
+            "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+            "line": 411,
+            "kind": "put_keyword",
+            "side_effects": true
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": true,
+        "eviction_exactness": "exact_argument"
+      },
+      "tenant": {
+        "explicit_put_keyword": true,
+        "tenant_value_in_lexical_scope": true,
+        "channel": "explicit_put_keyword",
+        "identity_gate_applies": true,
+        "identity_dependent_key_requires_tenant": true
+      },
+      "put_arguments": {
+        "positional": 3,
+        "keywords": [
+          "footprint",
+          "side_effects",
+          "identity_dependent",
+          "tenant"
+        ]
+      },
+      "expression": "cache.put(call.tool, call.args, None, footprint=(), side_effects=True, identity_dependent=True, tenant=call.tenant)"
+    },
+    {
+      "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+      "line": 430,
+      "cache_type": "SoundResultCache",
+      "already_typed": true,
+      "receiver": "cache",
+      "enclosing_class": null,
+      "enclosing_function": "replay_arm",
+      "enclosing_function_chain": [
+        "replay_arm"
+      ],
+      "class_ref": null,
+      "class_is_instruction_subclass": false,
+      "flip_applies": false,
+      "bucket": "pure_declared",
+      "bucket_basis": "put_keyword",
+      "bucket_basis_detail": "explicit side_effects keyword on this put call",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": false,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "put_keyword"
+      },
+      "enclosing_class_declaration": null,
+      "resolution": {
+        "method": "put_keyword_literal",
+        "evidence": [
+          {
+            "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+            "line": 430,
+            "kind": "put_keyword",
+            "side_effects": false
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": true,
+        "eviction_exactness": "exact_argument"
+      },
+      "tenant": {
+        "explicit_put_keyword": true,
+        "tenant_value_in_lexical_scope": true,
+        "channel": "explicit_put_keyword",
+        "identity_gate_applies": true,
+        "identity_dependent_key_requires_tenant": true
+      },
+      "put_arguments": {
+        "positional": 3,
+        "keywords": [
+          "footprint",
+          "side_effects",
+          "identity_dependent",
+          "tenant"
+        ]
+      },
+      "expression": "cache.put(call.tool, call.args, OrderedDict(pos=call.pos, tenant=call.tenant, entity_ids=ids), footprint=ids, side_effects=False, identity_dependent=dependent, tenant=tenant)"
+    },
+    {
+      "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+      "line": 731,
+      "cache_type": "SoundResultCache",
+      "already_typed": true,
+      "receiver": "cache",
+      "enclosing_class": null,
+      "enclosing_function": "lookup_scope_probe",
+      "enclosing_function_chain": [
+        "lookup_scope_probe"
+      ],
+      "class_ref": null,
+      "class_is_instruction_subclass": false,
+      "flip_applies": false,
+      "bucket": "pure_declared",
+      "bucket_basis": "put_keyword",
+      "bucket_basis_detail": "explicit side_effects keyword on this put call",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": false,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "put_keyword"
+      },
+      "enclosing_class_declaration": null,
+      "resolution": {
+        "method": "put_keyword_literal",
+        "evidence": [
+          {
+            "file": "examples/benchmarks/shipped_sound_cache_replay.py",
+            "line": 731,
+            "kind": "put_keyword",
+            "side_effects": false
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": true,
+        "eviction_exactness": "exact_argument"
+      },
+      "tenant": {
+        "explicit_put_keyword": true,
+        "tenant_value_in_lexical_scope": true,
+        "channel": "explicit_put_keyword",
+        "identity_gate_applies": true,
+        "identity_dependent_key_requires_tenant": true
+      },
+      "put_arguments": {
+        "positional": 3,
+        "keywords": [
+          "footprint",
+          "side_effects",
+          "identity_dependent",
+          "tenant"
+        ]
+      },
+      "expression": "cache.put(call.tool, call.args, OrderedDict(pos=call.pos), footprint=footprint, side_effects=False, identity_dependent=True, tenant=call.tenant)"
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 516,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "ClassifySignature",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute",
+        "build_triage_stream"
+      ],
+      "class_ref": "examples.paper_real_llm_compiler_test.ClassifySignature",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "super_init_keyword",
+      "bucket_basis_detail": "enclosing class declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 489
+      },
+      "enclosing_class_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 489
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "examples/paper_real_llm_compiler_test.py",
+            "line": 516,
+            "kind": "enclosing_class",
+            "class": "ClassifySignature"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, result)"
+    },
+    {
+      "file": "examples/paper_real_llm_test.py",
+      "line": 164,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "instr.cache",
+      "enclosing_class": null,
+      "enclosing_function": "_run",
+      "enclosing_function_chain": [
+        "_run",
+        "_cacheable"
+      ],
+      "class_ref": null,
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "caller_declaration",
+      "bucket_basis_detail": "caller factory declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "caller_declaration"
+      },
+      "enclosing_class_declaration": null,
+      "resolution": {
+        "method": "caller_resolution",
+        "evidence": [
+          {
+            "file": "examples/paper_real_llm_test.py",
+            "line": 227,
+            "kind": "factory_keyword",
+            "function": "_classify",
+            "side_effects": false
+          },
+          {
+            "file": "examples/paper_real_llm_test.py",
+            "line": 255,
+            "kind": "factory_keyword",
+            "function": "_synthesize",
+            "side_effects": false
+          }
+        ],
+        "unresolved": []
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_no_footprint_hook"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "instr.cache.put(cache_key, computed)"
+    },
+    {
+      "file": "examples/random_tasks_stress.py",
+      "line": 182,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "instr.cache",
+      "enclosing_class": null,
+      "enclosing_function": "_classify",
+      "enclosing_function_chain": [
+        "_classify",
+        "build_task_stream"
+      ],
+      "class_ref": null,
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "caller_declaration",
+      "bucket_basis_detail": "caller factory declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "caller_declaration"
+      },
+      "enclosing_class_declaration": null,
+      "resolution": {
+        "method": "caller_resolution",
+        "evidence": [
+          {
+            "file": "examples/random_tasks_stress.py",
+            "line": 184,
+            "kind": "factory_keyword",
+            "function": "_classify",
+            "side_effects": false
+          }
+        ],
+        "unresolved": []
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_no_footprint_hook"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "instr.cache.put(cache_key, classification)"
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 267,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "ClassifySignature",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute",
+        "build_stream"
+      ],
+      "class_ref": "examples.system_task_demo.ClassifySignature",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "super_init_keyword",
+      "bucket_basis_detail": "enclosing class declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 248
+      },
+      "enclosing_class_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 248
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "examples/system_task_demo.py",
+            "line": 267,
+            "kind": "enclosing_class",
+            "class": "ClassifySignature"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, {'classified': classification})"
+    },
+    {
+      "file": "examples/system_task_workload.py",
+      "line": 153,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "self.cache",
+      "enclosing_class": "Classify",
+      "enclosing_function": "execute",
+      "enclosing_function_chain": [
+        "execute",
+        "_mk_classify"
+      ],
+      "class_ref": "examples.system_task_workload.Classify",
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "super_init_keyword",
+      "bucket_basis_detail": "enclosing class declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 135
+      },
+      "enclosing_class_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "super_init_keyword",
+        "lineno": 135
+      },
+      "resolution": {
+        "method": "enclosing_class",
+        "evidence": [
+          {
+            "file": "examples/system_task_workload.py",
+            "line": 153,
+            "kind": "enclosing_class",
+            "class": "Classify"
+          }
+        ]
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_method_default"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "self.cache.put(cache_key, result)"
+    },
+    {
+      "file": "examples/thesis_direction_suites.py",
+      "line": 555,
+      "cache_type": "InstructionCache",
+      "already_typed": false,
+      "receiver": "instr.cache",
+      "enclosing_class": null,
+      "enclosing_function": "_cacheable_compute",
+      "enclosing_function_chain": [
+        "_cacheable_compute"
+      ],
+      "class_ref": null,
+      "class_is_instruction_subclass": true,
+      "flip_applies": true,
+      "bucket": "pure_declared",
+      "bucket_basis": "caller_declaration",
+      "bucket_basis_detail": "caller factory declaration",
+      "admitted_under_typed_default": true,
+      "legacy_memoised": true,
+      "side_effects_declaration": {
+        "kind": "literal",
+        "value": false,
+        "source": "caller_declaration"
+      },
+      "enclosing_class_declaration": null,
+      "resolution": {
+        "method": "caller_resolution",
+        "evidence": [
+          {
+            "file": "examples/thesis_direction_suites.py",
+            "line": 125,
+            "kind": "factory_keyword",
+            "function": "_enrich",
+            "side_effects": false
+          },
+          {
+            "file": "examples/thesis_direction_suites.py",
+            "line": 189,
+            "kind": "factory_keyword",
+            "function": "_embed",
+            "side_effects": false
+          },
+          {
+            "file": "examples/thesis_direction_suites.py",
+            "line": 212,
+            "kind": "factory_keyword",
+            "function": "_rerank",
+            "side_effects": false
+          },
+          {
+            "file": "examples/thesis_direction_suites.py",
+            "line": 397,
+            "kind": "factory_keyword",
+            "function": "_classify",
+            "side_effects": false
+          }
+        ],
+        "unresolved": []
+      },
+      "footprint": {
+        "overridden": false,
+        "override_definition": null,
+        "explicit_put_argument": false,
+        "eviction_exactness": "coarse_no_footprint_hook"
+      },
+      "tenant": {
+        "explicit_put_keyword": false,
+        "tenant_value_in_lexical_scope": false,
+        "channel": "none",
+        "identity_gate_applies": false,
+        "identity_dependent_key_requires_tenant": false
+      },
+      "put_arguments": {
+        "positional": 2,
+        "keywords": []
+      },
+      "expression": "instr.cache.put(cache_key, computed)"
+    }
+  ],
+  "execute_defs": [
+    {
+      "file": "agentflow/core/instructions/objective_decomposition.py",
+      "line": 110,
+      "class": "ObjectiveDecompositionInstruction",
+      "class_ref": "agentflow.core.instructions.objective_decomposition.ObjectiveDecompositionInstruction",
+      "signature": "execute(self, context)",
+      "cache_types": [
+        "DecompositionCache"
+      ],
+      "direct_cache_attributes": [
+        {
+          "attribute": "cache",
+          "cache_type": "DecompositionCache",
+          "line": 104
+        }
+      ],
+      "stores_constructed_in_class": [
+        {
+          "cache_type": "DecompositionCache",
+          "line": 104,
+          "method": "__init__"
+        }
+      ],
+      "in_scope_cache": false,
+      "is_instruction_subclass": false,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "agentflow/core/isa/agentic_calling.py",
+      "line": 127,
+      "class": "FunctionInstruction",
+      "class_ref": "agentflow.core.isa.agentic_calling.FunctionInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "agentflow/core/isa/instruction.py",
+      "line": 403,
+      "class": "Instruction",
+      "class_ref": "agentflow.core.isa.instruction.Instruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [
+        {
+          "attribute": "cache",
+          "cache_type": "InstructionCache",
+          "line": 251
+        }
+      ],
+      "stores_constructed_in_class": [
+        {
+          "cache_type": "InstructionCache",
+          "line": 251,
+          "method": "__init__"
+        },
+        {
+          "cache_type": "SoundResultCache",
+          "line": 350,
+          "method": "_get_sound_cache"
+        }
+      ],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "agentflow/core/isa/instruction.py",
+      "line": 440,
+      "class": "CompositeInstruction",
+      "class_ref": "agentflow.core.isa.instruction.CompositeInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "agentflow/core/isa/instruction_learning.py",
+      "line": 774,
+      "class": "LearnedInstruction",
+      "class_ref": "agentflow.core.isa.instruction_learning.LearnedInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "agentflow/core/isa/instruction_optimization.py",
+      "line": 129,
+      "class": "_PatternPlaceholderInstruction",
+      "class_ref": "agentflow.core.isa.instruction_optimization._PatternPlaceholderInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/benchmark_runner.py",
+      "line": 60,
+      "class": "BenchmarkInstruction",
+      "class_ref": "examples.benchmarks.benchmark_runner.BenchmarkInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/cache_namespace_experiment.py",
+      "line": 169,
+      "class": "_DriftSensitiveInstruction",
+      "class_ref": "examples.benchmarks.cache_namespace_experiment._DriftSensitiveInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/hotpath_ema_stress.py",
+      "line": 122,
+      "class": "_TraceInstr",
+      "class_ref": "examples.benchmarks.hotpath_ema_stress._TraceInstr",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/isa_microbench.py",
+      "line": 105,
+      "class": "MockLLMInstruction",
+      "class_ref": "examples.benchmarks.isa_microbench.MockLLMInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/isa_real_llm_bench.py",
+      "line": 296,
+      "class": "RealLLMInstruction",
+      "class_ref": "examples.benchmarks.isa_real_llm_bench.RealLLMInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/learning_benchmark.py",
+      "line": 58,
+      "class": "TextProcessingInstruction",
+      "class_ref": "examples.benchmarks.learning_benchmark.TextProcessingInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/optimization_benchmark.py",
+      "line": 55,
+      "class": "ComputeInstruction",
+      "class_ref": "examples.benchmarks.optimization_benchmark.ComputeInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/replay_generalization_bench.py",
+      "line": 112,
+      "class": "GenValues",
+      "class_ref": "examples.benchmarks.replay_generalization_bench.GenValues",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/replay_generalization_bench.py",
+      "line": 131,
+      "class": "ScaleValues",
+      "class_ref": "examples.benchmarks.replay_generalization_bench.ScaleValues",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/replay_generalization_bench.py",
+      "line": 149,
+      "class": "ShiftValues",
+      "class_ref": "examples.benchmarks.replay_generalization_bench.ShiftValues",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/replay_generalization_bench.py",
+      "line": 168,
+      "class": "FilterValues",
+      "class_ref": "examples.benchmarks.replay_generalization_bench.FilterValues",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/replay_generalization_bench.py",
+      "line": 186,
+      "class": "TotalKept",
+      "class_ref": "examples.benchmarks.replay_generalization_bench.TotalKept",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/tests_bench_support.py",
+      "line": 32,
+      "class": "BenchInstruction",
+      "class_ref": "examples.benchmarks.tests_bench_support.BenchInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/benchmarks/tests_bench_support.py",
+      "line": 50,
+      "class": "StatefulBenchInstruction",
+      "class_ref": "examples.benchmarks.tests_bench_support.StatefulBenchInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/chatbot_agent/main.py",
+      "line": 68,
+      "class": "ProcessMessageInstruction",
+      "class_ref": "examples.chatbot_agent.main.ProcessMessageInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/chatbot_agent/main.py",
+      "line": 125,
+      "class": "GenerateResponseInstruction",
+      "class_ref": "examples.chatbot_agent.main.GenerateResponseInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 422,
+      "class": "IngestLogs",
+      "class_ref": "examples.paper_real_llm_compiler_test.IngestLogs",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 443,
+      "class": "CheckFormat",
+      "class_ref": "examples.paper_real_llm_compiler_test.CheckFormat",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 460,
+      "class": "NormalizeEntries",
+      "class_ref": "examples.paper_real_llm_compiler_test.NormalizeEntries",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 476,
+      "class": "ExtractIncidents",
+      "class_ref": "examples.paper_real_llm_compiler_test.ExtractIncidents",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 499,
+      "class": "ClassifySignature",
+      "class_ref": "examples.paper_real_llm_compiler_test.ClassifySignature",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 530,
+      "class": "AggregateTriage",
+      "class_ref": "examples.paper_real_llm_compiler_test.AggregateTriage",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_compiler_test.py",
+      "line": 565,
+      "class": "WriteReport",
+      "class_ref": "examples.paper_real_llm_compiler_test.WriteReport",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/paper_real_llm_test.py",
+      "line": 131,
+      "class": "_Step",
+      "class_ref": "examples.paper_real_llm_test._Step",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/random_tasks_stress.py",
+      "line": 115,
+      "class": "_Step",
+      "class_ref": "examples.random_tasks_stress._Step",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 173,
+      "class": "IngestLogs",
+      "class_ref": "examples.system_task_demo.IngestLogs",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 194,
+      "class": "CheckSyntax",
+      "class_ref": "examples.system_task_demo.CheckSyntax",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 212,
+      "class": "NormalizeEntries",
+      "class_ref": "examples.system_task_demo.NormalizeEntries",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 235,
+      "class": "ExtractIncidents",
+      "class_ref": "examples.system_task_demo.ExtractIncidents",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 258,
+      "class": "ClassifySignature",
+      "class_ref": "examples.system_task_demo.ClassifySignature",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 281,
+      "class": "AggregateTriage",
+      "class_ref": "examples.system_task_demo.AggregateTriage",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_demo.py",
+      "line": 313,
+      "class": "WriteReport",
+      "class_ref": "examples.system_task_demo.WriteReport",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_workload.py",
+      "line": 79,
+      "class": "Ingest",
+      "class_ref": "examples.system_task_workload.Ingest",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_workload.py",
+      "line": 99,
+      "class": "Guard",
+      "class_ref": "examples.system_task_workload.Guard",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_workload.py",
+      "line": 118,
+      "class": "Pure",
+      "class_ref": "examples.system_task_workload.Pure",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_workload.py",
+      "line": 144,
+      "class": "Classify",
+      "class_ref": "examples.system_task_workload.Classify",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/system_task_workload.py",
+      "line": 172,
+      "class": "Write",
+      "class_ref": "examples.system_task_workload.Write",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/task_automation/main.py",
+      "line": 79,
+      "class": "FileProcessingInstruction",
+      "class_ref": "examples.task_automation.main.FileProcessingInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    },
+    {
+      "file": "examples/task_automation/main.py",
+      "line": 158,
+      "class": "DataTransformationInstruction",
+      "class_ref": "examples.task_automation.main.DataTransformationInstruction",
+      "signature": "execute(self, input_params)",
+      "cache_types": [
+        "InstructionCache",
+        "SoundResultCache"
+      ],
+      "direct_cache_attributes": [],
+      "stores_constructed_in_class": [],
+      "in_scope_cache": true,
+      "is_instruction_subclass": true,
+      "tenant_reach": {
+        "reach": "nothing",
+        "arguments": [],
+        "class_attributes": [],
+        "contextvar_use": false
+      }
+    }
+  ],
+  "out_of_scope": {
+    "constructors": [
+      {
+        "file": "agentflow/core/instructions/objective_decomposition.py",
+        "line": 104,
+        "cache_type": "DecompositionCache",
+        "enclosing_class": "ObjectiveDecompositionInstruction",
+        "enclosing_function": "__init__",
+        "constructor_accepts_tenant": false,
+        "tenant_available_at_construction": false,
+        "tenant_at_construction": {
+          "available": false,
+          "reason": "caller supplies the string key; the store has no identity field"
+        },
+        "tenant_available_in_enclosing_scope": false,
+        "tenant_channel_at_use": "caller_supplied_key_only",
+        "key_contract": {
+          "tenant_in_key": false,
+          "evidence": "agentflow/core/instructions/objective_decomposition.py:42-84 (key is the caller-supplied string; no identity component)"
+        },
+        "already_typed": false,
+        "exclusion_reason": "DecompositionCache is a second, independent TTL/LRU store; changing the Instruction cache default does not touch it"
+      }
+    ],
+    "put_sites": [
+      {
+        "file": "agentflow/core/instructions/objective_decomposition.py",
+        "line": 156,
+        "cache_type": "DecompositionCache",
+        "already_typed": false,
+        "receiver": "self.cache",
+        "enclosing_class": "ObjectiveDecompositionInstruction",
+        "enclosing_function": "execute",
+        "enclosing_function_chain": [
+          "execute"
+        ],
+        "class_ref": "agentflow.core.instructions.objective_decomposition.ObjectiveDecompositionInstruction",
+        "class_is_instruction_subclass": false,
+        "flip_applies": false,
+        "bucket": "undeclared",
+        "bucket_basis": "none",
+        "bucket_basis_detail": "no declaration (legacy default True)",
+        "admitted_under_typed_default": false,
+        "legacy_memoised": false,
+        "side_effects_declaration": {
+          "kind": "undeclared",
+          "legacy_default": true,
+          "source": "none"
+        },
+        "enclosing_class_declaration": {
+          "kind": "undeclared",
+          "legacy_default": true,
+          "source": "none"
+        },
+        "resolution": {
+          "method": "enclosing_class",
+          "evidence": [
+            {
+              "file": "agentflow/core/instructions/objective_decomposition.py",
+              "line": 156,
+              "kind": "enclosing_class",
+              "class": "ObjectiveDecompositionInstruction"
+            }
+          ]
+        },
+        "footprint": {
+          "overridden": false,
+          "override_definition": null,
+          "explicit_put_argument": false,
+          "eviction_exactness": "coarse_method_default"
+        },
+        "tenant": {
+          "explicit_put_keyword": false,
+          "tenant_value_in_lexical_scope": false,
+          "channel": "none",
+          "identity_gate_applies": false,
+          "identity_dependent_key_requires_tenant": false
+        },
+        "put_arguments": {
+          "positional": 2,
+          "keywords": []
+        },
+        "expression": "self.cache.put(cache_key, result)",
+        "exclusion_reason": "put on DecompositionCache, not InstructionCache/SoundResultCache"
+      }
+    ],
+    "dict_based_caches": [
+      {
+        "file": "agentflow/core/instructions/base.py",
+        "class": "CacheableInstruction",
+        "assignments": [
+          {
+            "attribute": "_cache",
+            "line": 694,
+            "method": "__init__"
+          }
+        ]
+      },
+      {
+        "file": "agentflow/core/instructions/documentation.py",
+        "class": "DocumentationInstruction",
+        "assignments": [
+          {
+            "attribute": "_cache",
+            "line": 60,
+            "method": "__init__"
+          }
+        ]
+      }
+    ],
+    "dict_based_caches_note": "plain-dict stores are not instances of InstructionCache or SoundResultCache and are outside this census; their execute definitions are counted separately (4 definitions)",
+    "dict_based_cache_execute_defs": [
+      "agentflow/core/instructions/base.py:696 CacheableInstruction.execute",
+      "agentflow/core/instructions/documentation.py:108 DocumentationGenerationInstruction.execute",
+      "agentflow/core/instructions/documentation.py:207 APIDocumentationInstruction.execute",
+      "agentflow/core/instructions/documentation.py:306 ReadmeGenerationInstruction.execute"
+    ]
+  },
+  "notes": [
+    "Reconciliation with gap report section 1: it states 96 execute(input_params) implementations in agentflow/. This AST pass finds 96 execute definitions under agentflow/core, 104 under agentflow/ and 144 repo-wide; 44 have the (self, input_params) signature.",
+    "The (c) cohort is every execute definition whose class transitively holds a result store: 45 definitions (44 with an InstructionCache/SoundResultCache and 1 with ObjectiveDecompositionInstruction's DecompositionCache).",
+    "Every .put call in the three roots is attributed: 16 total = 15 on the two in-scope stores + 1 on DecompositionCache.",
+    "A put inside a module-level helper is resolved through the factory calls that receive the helper; each such site carries the resolving file:line in resolution.evidence.",
+    "All numbers are recomputed from the tree on every run; no value is copied from a report or artifact. The file contains no timestamps, absolute paths or wall-clock values."
+  ],
+  "caveats": [
+    "admitted_under_typed_default applies the effect gate exactly as specified (only side_effects is False admits). SoundResultCache also refuses an identity-dependent put with no tenant and a put with footprint=None; the tenant and footprint blocks report those readiness gaps separately instead of folding them into the buckets.",
+    "8 of the admitted sites have no tenant channel in lexical scope. They pass the effect gate but would need tenant_scope(...) or identity_dependent=False to be admitted by the typed store.",
+    "Effectful_declared contains one intentional already-typed probe (shipped_sound_cache_replay.py:411) that the class refuses; only the flip-cohort effectful sites are legacy memoisation bugs.",
+    "CompositeInstruction's effectful declaration is conditional (True when the caller passes no side_effects argument, overridable per instance).  Its unconditional legacy put at instruction.py:537 is the memoisation bug only under that default; a caller that passes side_effects=False is pure.",
+    "benchmark-local policy helpers (cache_identity.remember / invalidate) operate on caller-owned dictionaries and are not store constructors; they are not part of this census.",
+    "The pass is static: it counts lexical construction/put sites and cannot see stores created dynamically (getattr, exec, factories that return a cache object)."
+  ],
+  "checks": [
+    {
+      "name": "buckets_sum_to_put_sites",
+      "ok": true,
+      "detail": "{'pure_declared': 11, 'effectful_declared': 2, 'undeclared': 2} vs 15"
+    },
+    {
+      "name": "legacy_buckets_sum_to_legacy_sites",
+      "ok": true,
+      "detail": "OrderedDict({'pure_declared': 8, 'effectful_declared': 1, 'undeclared': 2}) vs 11"
+    },
+    {
+      "name": "flip_buckets_sum_to_flip_sites",
+      "ok": true,
+      "detail": "OrderedDict({'pure_declared': 8, 'effectful_declared': 1, 'undeclared': 1}) vs 10"
+    },
+    {
+      "name": "admitted_equals_pure_declared",
+      "ok": true,
+      "detail": "11 vs 11"
+    },
+    {
+      "name": "refused_equals_non_pure",
+      "ok": true,
+      "detail": "4 vs 4"
+    },
+    {
+      "name": "flip_cohort_sums_to_flip_sites",
+      "ok": true,
+      "detail": "OrderedDict({'survive_unchanged': 8, 'need_side_effects_false': 1, 'effectful_memoised_bug': 1}) vs 10"
+    },
+    {
+      "name": "all_legacy_sums_to_legacy_sites",
+      "ok": true,
+      "detail": "OrderedDict({'survive_unchanged': 8, 'need_side_effects_false': 2, 'effectful_memoised_bug': 1}) vs 11"
+    },
+    {
+      "name": "flip_sites_are_legacy_instructioncache",
+      "ok": true,
+      "detail": "every flip site is a legacy store in an Instruction subclass"
+    },
+    {
+      "name": "every_declared_bucket_has_matching_value",
+      "ok": true,
+      "detail": "literal/conditional declarations agree with their bucket"
+    },
+    {
+      "name": "undeclared_sites_have_no_boolean_value",
+      "ok": true,
+      "detail": "all undeclared sites report value=None"
+    },
+    {
+      "name": "effectful_bug_list_matches_legacy_memoised",
+      "ok": true,
+      "detail": "every effectful site governed by the legacy store is memoised"
+    },
+    {
+      "name": "put_site_keys_unique",
+      "ok": true,
+      "detail": "no duplicate (file, line, cache_type)"
+    },
+    {
+      "name": "constructor_types_known",
+      "ok": true,
+      "detail": "every constructor resolves to a known store class"
+    },
+    {
+      "name": "execute_defs_breakdown_sums",
+      "ok": true,
+      "detail": "agentflow + examples + scripts == repo total"
+    },
+    {
+      "name": "execute_defs_agentflow_breakdown_sums",
+      "ok": true,
+      "detail": "core + agents + services == agentflow total"
+    },
+    {
+      "name": "caching_execute_defs_subset_of_total",
+      "ok": true,
+      "detail": "45 <= 144"
+    },
+    {
+      "name": "caching_execute_defs_split_sums",
+      "ok": true,
+      "detail": "in-scope + other-store == caching total"
+    },
+    {
+      "name": "tenant_reach_counts_sum",
+      "ok": true,
+      "detail": "OrderedDict({'argument': 0, 'class_attribute': 0, 'contextvar': 0, 'nothing': 45}) vs 45"
+    },
+    {
+      "name": "footprint_need_is_subset_of_admitted",
+      "ok": true,
+      "detail": "sites needing a footprint cannot exceed admitted sites"
+    },
+    {
+      "name": "no_footprint_overrides_implies_coarse_default",
+      "ok": true,
+      "detail": "footprint override count agrees with per-site flags"
+    },
+    {
+      "name": "all_put_calls_attributed",
+      "ok": true,
+      "detail": "16 .put calls == 15 in scope + 1 out of scope"
+    },
+    {
+      "name": "no_unattributed_put_calls",
+      "ok": true,
+      "detail": "0 .put calls with no inferred receiver type"
+    },
+    {
+      "name": "all_store_constructors_attributed",
+      "ok": true,
+      "detail": "7 constructor calls == 6 in scope + 1 out of scope"
+    },
+    {
+      "name": "all_execute_tenant_counts_sum",
+      "ok": true,
+      "detail": "OrderedDict({'argument': 0, 'class_attribute': 0, 'contextvar': 0, 'nothing': 144}) vs 144"
+    },
+    {
+      "name": "counts_nonnegative",
+      "ok": true,
+      "detail": "all counts are non-negative"
+    }
+  ]
+}

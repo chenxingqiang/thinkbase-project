@@ -1320,6 +1320,29 @@ chk(_arm['harness_matched']['refusals_by_reason']['effectful'] == 547,
 for _line in ('returns 459 hits of 1,728', 'seven hits below the harness'):
     chk(_line in MD, f'main paper must state "{_line}"')
 
+# ---- default-flip cost: census buckets and the coarse-footprint penalty
+_cen = jload('cache_default_census.json')
+_sum = _cen.get('summary', {})
+_buckets = _sum.get('buckets') or _sum.get('sites_by_bucket') or {}
+chk(int(_buckets.get('pure_declared', -1)) == 11, f"census must find 11 pure_declared sites, got {_buckets.get('pure_declared')}")
+chk(int(_buckets.get('effectful_declared', -1)) == 2, 'census must find 2 effectful_declared sites')
+chk(int(_buckets.get('undeclared', -1)) == 2, 'census must find 2 undeclared sites')
+_tot = sum(int(v) for v in _buckets.values())
+chk(_tot == 15, f'the three buckets must cover 15 put sites, got {_tot}')
+_t = _sum.get('tenant', {})
+chk(int(_t['execute_defs_tenant_reach'].get('nothing', -1)) == 45,
+    f"45 caching execute definitions must have no tenant channel, got {_t['execute_defs_tenant_reach'].get('nothing')}")
+chk(int(_t.get('admitted_sites_without_tenant_channel', -1)) == 8, '8 admitted sites must lack a tenant channel')
+
+_cf = jload('cache_coarse_footprint_cost.json')
+chk(_cf['arms']['exact_footprint']['hits'] == 459, 'the exact arm must reproduce 459 hits')
+chk(_cf['arms']['coarse_footprint']['hits'] == 67, 'the coarse arm must return 67 hits')
+chk(_cf['arms']['coarse_footprint']['unsafe_hits'] == 0, 'the coarse arm must stay sound')
+chk(all(_cf['checks'].values()), 'every coarse-footprint check must pass')
+chk(abs(_cf['delta']['hit_rate_points'] - 22.69) < 0.01, f"the penalty must be 22.69 points, got {_cf['delta']['hit_rate_points']}")
+for _line in ('15 sites', '459 hits of 1,728 to 67', '26.56% to 3.88%'):
+    chk(_line in MD, f'main paper must state "{_line}"')
+
 # ---- suite count: the paper's "N passing" must equal collected - skipped ------
 _m = re.search(r'([\d,]+) passing, (\d+) skipped at run time', md)
 if _m:
