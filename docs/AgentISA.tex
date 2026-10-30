@@ -116,32 +116,29 @@
 \begin{document}
 \begin{abstract}
 Agent systems are usually evaluated on constructed workloads, so the
-load-bearing question is what survives when the workload is recorded.
-Replaying 1,960 recorded tool-call trajectories (\(\tau\)-bench; GPT-4o
-and Claude 3.5 Sonnet; retail and airline; 14,285 calls) through the
-shipped compiler and result cache, static reduction is 0.0\% at BASIC
-and AGGRESSIVE: recorded traces chain their observations, so no step is
-provably dead and no pure pair provably independent. Reuse works only
-when it is allowed to be wrong: over 2,275 first-trial calls a blind key
-of tool and arguments serves 807 hits, 344 unwarranted and 240 damaging,
-while a typed cache that binds the tenant, refuses writes and evicts on
-them admits 1,728 calls and serves 466 hits with none unwarranted;
-soundness costs 16.1 points of hit rate. Reuse lives at the run
-boundary, not inside a task: 1.73\% of the 1,789 side-effect-free
-first-trial calls hit within a task and 41.70\% across the tasks of one
-run (16.3--50.2\% per run; 40.5 points strictly cross-task). Instruction
+question is what survives when the workload is recorded. Replaying 1,960
+tool-call trajectories (\(\tau\)-bench; GPT-4o and Claude 3.5 Sonnet;
+retail and airline; 14,285 calls) static reduction is 0.0\% at BASIC and
+AGGRESSIVE: traces chain their observations, so no step is provably dead
+and no pure pair provably independent. Reuse works only if it may be
+wrong: over 2,275 calls a blind key serves 807 hits (344 unwarranted,
+240 damaging), while a typed cache that binds the tenant, refuses writes
+and evicts on them admits 1,728 calls and serves 466 hits with none
+unwarranted, at a cost of 16.1 points. Reuse lives at the run boundary,
+not inside a task: 1.73\% of the 1,789 side-effect-free first-trial
+calls hit within a task and 41.70\% across the tasks of one run
+(16.3--50.2\% per run; 40.5 points strictly cross-task). Instruction
 memory accumulates: 12 active templates (13--14 per source) match
 \textbf{95.9\%} of the 2,340 tool-use steps, and replay-verified
-compounds absorb 10.07\% of dispatches out of sample; specifications
-learned on one model reproduce 33 of the 49 eligible compounds, and
-every observation-wired specification fails. AgentISA supplies the layer
-that makes this measurable: a formal instruction set with a
-no-unsafe-reuse theorem, Agentic Calling, developer-gated trace
-learning, and a compiler with fusion and dead-code elimination. The
-34.2\% static reduction is a planted-family demonstration and does not
-transfer. All measurements are offline. Live-gateway checks on four
-model aliases confirm that the implementation matches its specification;
-no production end-to-end result is claimed.
+compounds absorb 10.07\% out of sample; specifications learned on one
+model reproduce 33 of the 49 eligible compounds, and every
+observation-wired specification fails. AgentISA supplies the layer that
+makes it measurable: a formal instruction set with a no-unsafe-reuse
+theorem, Agentic Calling, trace learning, and a compiler with fusion and
+dead-code elimination. The 34.2\% static reduction is a planted-family
+demonstration that does not transfer. All measurements are offline.
+Live-gateway checks on four model aliases confirm the implementation
+matches its specification; no production end-to-end result is claimed.
 \end{abstract}
 \ccsdesc[500]{Software and its engineering~\textgreater{}Compilers}
 \ccsdesc[500]{Theory of computation~\textgreater{}Program reasoning}
