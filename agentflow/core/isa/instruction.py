@@ -5,10 +5,13 @@ from typing import Any, Dict, Optional, List, Callable, TypeVar, Generic, Set, T
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import asyncio
+import threading
 import time
+import weakref
 from collections import OrderedDict
 
 from .instruction_cache import CacheKeyNamespace, build_cache_key
+from .sound_cache import MISS, SoundResultCache
 
 # Type definitions
 T = TypeVar('T')
@@ -71,9 +74,105 @@ class InstructionContext:
     parallel_config: Optional[Dict[str, Any]] = None
     metrics: InstructionMetrics = field(default_factory=InstructionMetrics)
 
+# ---------------------------------------------------------------------------
+# Shared write registry for the opt-in sound cache
+# ---------------------------------------------------------------------------
+#
+# A ``SoundResultCache`` is private to one instruction object, so a write
+# executed by instruction A cannot reach an entry cached by instruction B.
+# H3(cross-instruction invalidation) therefore needs a process-wide fan-out:
+# every live sound cache registers itself weakly here, and a successful
+# effectful ``execute()`` calls :func:`record_write` with its footprint.
+# Weak references keep garbage-collected caches from leaking into the list.
+
+#: Footprint token carried by entries whose read dependencies are unknown.
+#: Every named write also evicts it (coarse invalidation) so an unknown
+#: footprint can never outlive a write it might have depended on.
+COARSE_FOOTPRINT_TOKEN = "__af_coarse__"
+
+_live_sound_caches: List["weakref.ReferenceType[SoundResultCache]"] = []
+_live_sound_caches_lock = threading.Lock()
+
+
+def register_sound_cache(cache: SoundResultCache) -> None:
+    """Register ``cache`` for cross-instruction write invalidation."""
+    with _live_sound_caches_lock:
+        _live_sound_caches[:] = [r for r in _live_sound_caches if r() is not None]
+        _live_sound_caches.append(weakref.ref(cache))
+
+
+def live_sound_caches() -> List[SoundResultCache]:
+    """Return the sound caches still alive, pruning dead weak references."""
+    with _live_sound_caches_lock:
+        live = [
+            cache
+            for ref in _live_sound_caches
+            if (cache := ref()) is not None
+        ]
+        if len(live) != len(_live_sound_caches):
+            _live_sound_caches[:] = [r for r in _live_sound_caches if r() is not None]
+        return live
+
+
+def record_write(entities: Optional[Any] = None) -> int:
+    """Fan a completed write out to every live sound cache; return evictions.
+
+    ``entities`` is the write's entity footprint.  ``None`` or an empty
+    footprint means the write could not name what it touched: every live
+    cache is flushed instead (coarse invalidation -- over-eviction is
+    sound, under-eviction is not).  A named write also evicts entries
+    admitted with an unknown *read* footprint (they carry
+    :data:`COARSE_FOOTPRINT_TOKEN`).
+    """
+    if entities is None:
+        names: Set[str] = set()
+    elif isinstance(entities, str):
+        names = {entities}
+    else:
+        names = set(entities)
+    total = 0
+    for cache in live_sound_caches():
+        if names:
+            total += cache.record_write(names | {COARSE_FOOTPRINT_TOKEN})
+        else:
+            total += cache.record_write(coarse=True)
+    return total
+
+
 class InstructionCache:
-    """Cache for instruction results."""
-    
+    """Legacy, unsound result store (TTL + LRU only).
+
+    .. warning::
+
+       This class enforces none of Theorem 3.7's conditions (H1)-(H3).  It
+       is kept as the default purely for backwards compatibility: existing
+       call sites, tests and benchmark artifacts pin its historical
+       hit/miss behaviour, and changing that default would break them.
+       That compatibility is not a claim of soundness.
+
+       - **H1 (identity) is violated.**  The default key built by
+         ``build_cache_key`` is the sha256 of ``input_params`` alone: no
+         instruction id, no tenant.  Two callers with different identity
+         but equal parameters share one entry.
+       - **H2 (effects) is violated.**  :meth:`put` stores unconditionally
+         and never consults ``side_effects``.  An effectful instruction
+         memoises its result, so a hit returns success without performing
+         the mutation it was supposed to perform.
+       - **H3 (staleness) is violated.**  Entries carry no entity
+         footprint, there is no reverse index and there is no invalidation
+         hook; a read cached before a write to the same entity is served
+         until TTL/LRU eviction.  Each instruction also owns a private
+         store (``Instruction.__init__``), so cross-instruction
+         invalidation is impossible even if a footprint existed.
+
+       Theorem 3.7's conditions are implemented by
+       :class:`agentflow.core.isa.sound_cache.SoundResultCache`, which an
+       instruction opts into with ``sound_cache = True`` (and, for reads,
+       ``side_effects = False``); effectful instructions then never
+       memoise and successful writes fan out through
+       :func:`record_write`.
+    """
+
     def __init__(self, max_size: int = 1000, ttl: int = 3600):
         self.cache: OrderedDict[str, Tuple[Any, float]] = OrderedDict()
         self.max_size = max_size
@@ -107,7 +206,16 @@ class InstructionCache:
 
 class Instruction(ABC):
     """Base instruction class following AgentISA formal specification."""
-    
+
+    #: Opt into :class:`~agentflow.core.isa.sound_cache.SoundResultCache`
+    #: instead of the legacy :class:`InstructionCache`.  Defaults to False
+    #: so the shipped behaviour (and every test/artifact pinning it) is
+    #: unchanged.  Set it on a subclass or instance; a sound read also
+    #: needs ``side_effects = False`` and a computable :meth:`footprint`,
+    #: plus a tenant (see ``sound_cache.tenant_scope``) unless
+    #: ``identity_dependent`` is disabled.
+    sound_cache: bool = False
+
     def __init__(self, 
                  id: str,
                  name: str, 
@@ -214,6 +322,46 @@ class Instruction(ABC):
         """
         return build_cache_key(self.id, input_params, self.cache_namespace)
 
+    def footprint(self, params: Dict[str, Any]) -> "frozenset[str]":
+        """Entity ids this call reads (or, when effectful, writes).
+
+        Empty means the caller cannot compute it, the cache then falls
+        back to coarse invalidation: a read is admitted under
+        :data:`COARSE_FOOTPRINT_TOKEN` and evicted by *any* successful
+        write, and a write with an empty footprint flushes every live
+        sound cache.  Returning a wrong non-empty footprint is the one
+        thing this hook cannot make sound; it is the caller's (H0)
+        declaration, exactly like ``side_effects``.
+
+        The default is empty: an instruction must override this to get
+        meaningful (non-coarse) invalidation.
+        """
+        return frozenset()
+
+    def _sound_caching_enabled(self) -> bool:
+        """Whether reads go through the sound cache instead of the legacy one."""
+        return bool(self.sound_cache) and not self.side_effects
+
+    def _get_sound_cache(self) -> SoundResultCache:
+        """Lazily build (and register) this instruction's sound cache."""
+        cache = self.__dict__.get("_sound_cache_store")
+        if cache is None:
+            config = self.context.cache_config or {}
+            cache = SoundResultCache(
+                max_size=config.get("max_size", 1000),
+                ttl=config.get("ttl", 3600),
+            )
+            self._sound_cache_store = cache
+            register_sound_cache(cache)
+        return cache
+
+    def _sound_footprint(self, params: Dict[str, Any]) -> "frozenset[str]":
+        """Read footprint for admission; unknown becomes the coarse token."""
+        declared = self.footprint(params)
+        if not declared:
+            return frozenset({COARSE_FOOTPRINT_TOKEN})
+        return frozenset(declared)
+
     async def _execute_parallel(self, tasks: List[Callable]) -> List[Any]:
         """Execute tasks in parallel with configured limits."""
         if not self.context.parallel_config:
@@ -258,7 +406,11 @@ class Instruction(ABC):
 
 class CompositeInstruction(Instruction):
     """Composite instruction supporting instruction composition."""
-    
+
+    #: Explicit (same value as the inherited default) so the opt-in is
+    #: visible at the class that actually owns the get/put sites below.
+    sound_cache: bool = False
+
     def __init__(self,
                  id: str,
                  name: str,
@@ -266,7 +418,8 @@ class CompositeInstruction(Instruction):
                  composition_type: str = "sequential",
                  cache_config: Optional[Dict[str, Any]] = None,
                  parallel_config: Optional[Dict[str, Any]] = None,
-                 cache_namespace: Optional[CacheKeyNamespace] = None):
+                 cache_namespace: Optional[CacheKeyNamespace] = None,
+                 side_effects: Optional[bool] = None):
         super().__init__(
             id=id,
             name=name,
@@ -275,22 +428,48 @@ class CompositeInstruction(Instruction):
             description=f"Composite instruction with {composition_type} composition",
             cache_config=cache_config,
             parallel_config=parallel_config,
-            cache_namespace=cache_namespace
+            cache_namespace=cache_namespace,
+            # None preserves the historical default (True).  An explicit
+            # False lets a composite of pure reads opt into sound caching;
+            # it is the caller's declaration, not derived here.
+            side_effects=True if side_effects is None else side_effects,
         )
         self.components = components
         self.composition_type = composition_type
 
     async def execute(self, input_params: Dict[str, Any]) -> Any:
-        """Execute composite instruction based on composition type."""
+        """Execute composite instruction based on composition type.
+
+        ``sound_cache = True`` swaps the legacy store for
+        :class:`SoundResultCache`: pure composites read/write it, while
+        effectful composites are never read from or written to any cache.
+        Independently, a successful effectful composite records its
+        :meth:`footprint` with :func:`record_write` whenever a sound cache
+        is live anywhere in the process, so a write by this instruction
+        invalidates other instructions' entries (H3).
+        """
         start_time = time.time()
-        
+        sound_mode = bool(self.sound_cache)
+        sound = self._get_sound_cache() if self._sound_caching_enabled() else None
+
         try:
             # Check cache
-            cache_key = self._get_cache_key(input_params)
-            cached_result = self.cache.get(cache_key)
-            if cached_result is not None:
-                self._update_metrics(start_time, True, cache_hit=True)
-                return cached_result
+            if sound is not None:
+                try:
+                    cached_result = sound.get(self.id, input_params)
+                except (TypeError, ValueError):
+                    # Unkeyable params (e.g. non-JSON values): miss, never
+                    # let cache infrastructure fail the execution.
+                    cached_result = MISS
+                if cached_result is not MISS:
+                    self._update_metrics(start_time, True, cache_hit=True)
+                    return cached_result
+            elif not sound_mode:
+                cache_key = self._get_cache_key(input_params)
+                cached_result = self.cache.get(cache_key)
+                if cached_result is not None:
+                    self._update_metrics(start_time, True, cache_hit=True)
+                    return cached_result
             
             if self.composition_type == "sequential":
                 # Thread component results: in a sequential composition
@@ -342,8 +521,30 @@ class CompositeInstruction(Instruction):
                 raise ValueError(f"Unsupported composition type: {self.composition_type}")
             
             # Cache result
-            self.cache.put(cache_key, result)
-            
+            if sound is not None:
+                try:
+                    sound.put(
+                        self.id,
+                        input_params,
+                        result,
+                        footprint=self._sound_footprint(input_params),
+                        side_effects=False,
+                    )
+                except (TypeError, ValueError):
+                    # Unkeyable params: skip admission, keep the result.
+                    pass
+            elif not sound_mode:
+                self.cache.put(cache_key, result)
+
+            # H3 cross-instruction invalidation: a write performed here must
+            # reach entries held by *every* other live sound cache, which a
+            # per-instruction store cannot do.  Runs only on the success path
+            # (a failed write changed nothing) and only once any sound cache
+            # exists, so the legacy-only path pays nothing.  An empty
+            # footprint flushes all of them (coarse invalidation).
+            if self.side_effects and live_sound_caches():
+                record_write(self.footprint(input_params))
+
             self._update_metrics(start_time, True)
             return result
             

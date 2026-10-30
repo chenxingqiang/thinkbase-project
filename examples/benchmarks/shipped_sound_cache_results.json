@@ -1,0 +1,893 @@
+{
+  "schema": "shipped_sound_cache_replay/v1",
+  "task": "S3 - replay the first-trial tau-bench corpus through the shipped SoundResultCache (agentflow/core/isa/sound_cache.py) with its effect gate on, counting hits, misses, refusals by reason and the three damage classes",
+  "result_kind": "REPLAY",
+  "scope": "tau-bench only: the first trial of every task in the committed corpus (325 records, 2,275 calls, four source runs), replayed through the shipped SoundResultCache with its effect gate on. Every call is offered to put(); the class's own counters decide what was refused. Damage is counted from the replay, not assumed, in the harness's three classes; the identity map decides which cross-tenant hits are damage.",
+  "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+  "expectation": {
+    "harness_hits": 466,
+    "harness_cacheable": 1728,
+    "harness_hit_rate": 0.2697,
+    "tolerance": 0.02,
+    "compared_arm": "harness_matched",
+    "rule": "the shipped class's hit count must be within 2% of 466, and every damage class must be zero. If the count differs, the difference is explained in reconciliation.hit_gap_primary; the threshold is not widened"
+  },
+  "shipped_class": {
+    "module": "agentflow/core/isa/sound_cache.py",
+    "class_name": "SoundResultCache",
+    "sha256": "871abec878b3b1e1bc63b20383806b64db45c26a5421165e53d6aaca89f45759",
+    "imported_from": "agentflow/core/isa/sound_cache.py",
+    "opt_in": true,
+    "wired_into_execute_path": false,
+    "note": "instruction.py's InstructionCache is untouched and still enforces none of (H1)-(H3); this script measures the opt-in class, not a change to the shipped default. Its soundness is relative to the declarations this replay supplies: footprints, side_effects=False for reads, record_write after every write"
+  },
+  "measurement": {
+    "arm": "harness_matched",
+    "calls": 2275,
+    "cacheable_calls": 1728,
+    "hits": 459,
+    "misses": 1269,
+    "hit_rate": 0.2656,
+    "hit_rate_of_all_calls": 0.2018,
+    "refusals_by_reason": {
+      "effectful": 547,
+      "no_tenant": 121,
+      "footprint_unknown": 0
+    },
+    "refusal_total": 668,
+    "unsafe_hits": 0,
+    "unsafe_breakdown": {
+      "writes_served": 0,
+      "stale_reads": 0,
+      "cross_tenant": 0
+    },
+    "identity_independent_cross_tenant_hits": 0
+  },
+  "arms": [
+    {
+      "id": "harness_matched",
+      "name": "tenant bound on every read",
+      "key_recipe": "SoundResultCache(instruction_id=tool, params=args, tenant=call tenant, identity_dependent=True)",
+      "why": "P4's key policy, held fixed so the arm is a like-for-like re-implementation of the harness experiment: same stream, same admission, same eviction, different implementation. This is the arm the 2% assertion compares.",
+      "identity_dependent_read_tools": [
+        "calculate",
+        "find_user_id_by_email",
+        "find_user_id_by_name_zip",
+        "get_order_details",
+        "get_product_details",
+        "get_reservation_details",
+        "get_user_details",
+        "list_all_airports",
+        "list_all_product_types",
+        "search_direct_flight",
+        "search_onestop_flight"
+      ],
+      "calls_total": 2275,
+      "cacheable_calls": 1728,
+      "hits": 459,
+      "misses": 1269,
+      "hit_rate": 0.2656,
+      "hit_rate_of_all_calls": 0.2018,
+      "refusals_by_reason": {
+        "effectful": 547,
+        "no_tenant": 121,
+        "footprint_unknown": 0
+      },
+      "refusal_total": 668,
+      "admissions": 1148,
+      "evictions_by_reason": {
+        "write": 338,
+        "capacity": 0,
+        "ttl": 0
+      },
+      "coarse_invalidations": 0,
+      "unsafe_hits": 0,
+      "unsafe_breakdown": {
+        "writes_served": 0,
+        "stale_reads": 0,
+        "cross_tenant": 0
+      },
+      "unsafe_share_of_hits": 0.0,
+      "unsafe_by_tool": {
+        "writes_served": {},
+        "stale_reads": {},
+        "cross_tenant": {}
+      },
+      "control_hits_served": 0,
+      "effectful_admitted": 0,
+      "identity_independent_cross_tenant_hits": 0,
+      "identity_independent_cross_tenant_by_tool": {},
+      "lookup_hits_with_intervening_address_change": 18,
+      "hits_by_tool": {
+        "calculate": 1,
+        "find_user_id_by_email": 25,
+        "find_user_id_by_name_zip": 84,
+        "get_order_details": 145,
+        "get_product_details": 50,
+        "get_reservation_details": 25,
+        "get_user_details": 107,
+        "list_all_product_types": 7,
+        "search_direct_flight": 11,
+        "search_onestop_flight": 4
+      },
+      "per_run": {
+        "gpt-4o-retail": {
+          "calls": 794,
+          "reads": 609,
+          "hits": 178,
+          "misses": 431,
+          "hit_rate": 0.2923,
+          "effectful_refusals": 185,
+          "no_tenant_refusals": 50,
+          "footprint_unknown_refusals": 0,
+          "admissions": 381,
+          "write_evictions": 128,
+          "entries_at_end": 253,
+          "unsafe_hits": 0
+        },
+        "gpt-4o-airline": {
+          "calls": 282,
+          "reads": 191,
+          "hits": 18,
+          "misses": 173,
+          "hit_rate": 0.0942,
+          "effectful_refusals": 91,
+          "no_tenant_refusals": 28,
+          "footprint_unknown_refusals": 0,
+          "admissions": 145,
+          "write_evictions": 31,
+          "entries_at_end": 114,
+          "unsafe_hits": 0
+        },
+        "sonnet-35-new-retail": {
+          "calls": 872,
+          "reads": 680,
+          "hits": 227,
+          "misses": 453,
+          "hit_rate": 0.3338,
+          "effectful_refusals": 192,
+          "no_tenant_refusals": 29,
+          "footprint_unknown_refusals": 0,
+          "admissions": 424,
+          "write_evictions": 137,
+          "entries_at_end": 287,
+          "unsafe_hits": 0
+        },
+        "sonnet-35-new-airline": {
+          "calls": 327,
+          "reads": 248,
+          "hits": 36,
+          "misses": 212,
+          "hit_rate": 0.1452,
+          "effectful_refusals": 79,
+          "no_tenant_refusals": 14,
+          "footprint_unknown_refusals": 0,
+          "admissions": 198,
+          "write_evictions": 42,
+          "entries_at_end": 156,
+          "unsafe_hits": 0
+        }
+      },
+      "examples": []
+    },
+    {
+      "id": "identity_map",
+      "name": "tenant bound only on user-scoped reads",
+      "key_recipe": "SoundResultCache(instruction_id=tool, params=args, tenant=call tenant only where tool_effect_map.json's entity is user-scoped, identity_dependent=map)",
+      "why": "the task's stated policy: tenant where tool_effect_map.json makes the tool identity-dependent, shared keys for catalog reads. Sound under the map, but a different key policy from P4, so its extra hits are reported, not asserted to be within 2%.",
+      "identity_dependent_read_tools": [
+        "find_user_id_by_email",
+        "find_user_id_by_name_zip",
+        "get_order_details",
+        "get_reservation_details",
+        "get_user_details"
+      ],
+      "calls_total": 2275,
+      "cacheable_calls": 1728,
+      "hits": 558,
+      "misses": 1170,
+      "hit_rate": 0.3229,
+      "hit_rate_of_all_calls": 0.2453,
+      "refusals_by_reason": {
+        "effectful": 547,
+        "no_tenant": 91,
+        "footprint_unknown": 0
+      },
+      "refusal_total": 638,
+      "admissions": 1079,
+      "evictions_by_reason": {
+        "write": 338,
+        "capacity": 0,
+        "ttl": 0
+      },
+      "coarse_invalidations": 0,
+      "unsafe_hits": 0,
+      "unsafe_breakdown": {
+        "writes_served": 0,
+        "stale_reads": 0,
+        "cross_tenant": 0
+      },
+      "unsafe_share_of_hits": 0.0,
+      "unsafe_by_tool": {
+        "writes_served": {},
+        "stale_reads": {},
+        "cross_tenant": {}
+      },
+      "control_hits_served": 0,
+      "effectful_admitted": 0,
+      "identity_independent_cross_tenant_hits": 104,
+      "identity_independent_cross_tenant_by_tool": {
+        "get_product_details": 76,
+        "list_all_airports": 1,
+        "list_all_product_types": 24,
+        "search_direct_flight": 3
+      },
+      "lookup_hits_with_intervening_address_change": 18,
+      "hits_by_tool": {
+        "calculate": 1,
+        "find_user_id_by_email": 25,
+        "find_user_id_by_name_zip": 84,
+        "get_order_details": 145,
+        "get_product_details": 122,
+        "get_reservation_details": 25,
+        "get_user_details": 107,
+        "list_all_airports": 2,
+        "list_all_product_types": 29,
+        "search_direct_flight": 14,
+        "search_onestop_flight": 4
+      },
+      "per_run": {
+        "gpt-4o-retail": {
+          "calls": 794,
+          "reads": 609,
+          "hits": 224,
+          "misses": 385,
+          "hit_rate": 0.3678,
+          "effectful_refusals": 185,
+          "no_tenant_refusals": 41,
+          "footprint_unknown_refusals": 0,
+          "admissions": 344,
+          "write_evictions": 128,
+          "entries_at_end": 216,
+          "unsafe_hits": 0
+        },
+        "gpt-4o-airline": {
+          "calls": 282,
+          "reads": 191,
+          "hits": 20,
+          "misses": 171,
+          "hit_rate": 0.1047,
+          "effectful_refusals": 91,
+          "no_tenant_refusals": 15,
+          "footprint_unknown_refusals": 0,
+          "admissions": 156,
+          "write_evictions": 31,
+          "entries_at_end": 125,
+          "unsafe_hits": 0
+        },
+        "sonnet-35-new-retail": {
+          "calls": 872,
+          "reads": 680,
+          "hits": 275,
+          "misses": 405,
+          "hit_rate": 0.4044,
+          "effectful_refusals": 192,
+          "no_tenant_refusals": 22,
+          "footprint_unknown_refusals": 0,
+          "admissions": 383,
+          "write_evictions": 137,
+          "entries_at_end": 246,
+          "unsafe_hits": 0
+        },
+        "sonnet-35-new-airline": {
+          "calls": 327,
+          "reads": 248,
+          "hits": 39,
+          "misses": 209,
+          "hit_rate": 0.1573,
+          "effectful_refusals": 79,
+          "no_tenant_refusals": 13,
+          "footprint_unknown_refusals": 0,
+          "admissions": 196,
+          "write_evictions": 42,
+          "entries_at_end": 154,
+          "unsafe_hits": 0
+        }
+      },
+      "examples": []
+    }
+  ],
+  "harness": {
+    "source": "unsafe_cache_baselines.replay(streams, POLICIES['P4'], cache_identity)",
+    "policy": "P4 typed (tenant-bound, reads only, entity-invalidating)",
+    "hits": 466,
+    "cacheable_calls": 1728,
+    "hit_rate": 0.2697,
+    "unsafe_hits": 0,
+    "per_run": {
+      "gpt-4o-retail": {
+        "hits": 182,
+        "cacheable_calls": 609,
+        "hit_rate": 0.2989
+      },
+      "gpt-4o-airline": {
+        "hits": 22,
+        "cacheable_calls": 191,
+        "hit_rate": 0.1152
+      },
+      "sonnet-35-new-retail": {
+        "hits": 224,
+        "cacheable_calls": 680,
+        "hit_rate": 0.3294
+      },
+      "sonnet-35-new-airline": {
+        "hits": 38,
+        "cacheable_calls": 248,
+        "hit_rate": 0.1532
+      }
+    },
+    "committed": [
+      466,
+      1728
+    ],
+    "matches_committed": true
+  },
+  "identity_map": {
+    "source": "examples/benchmarks/tool_effect_map.json",
+    "sha256": "b3ba46b95cf99b96b72ad9ade3602f1b004e773bec4b44f8b6fe0aa2e9ae9b68",
+    "derivation": "identity_dependent = the tool's map entity is user-scoped. The file has no identity_dependent field; this is derived from `entity`, checked against the map's `entities` document, and used only by the identity_map arm and by the cross-tenant class",
+    "user_scoped_entities": [
+      "user",
+      "order",
+      "reservation",
+      "payment_method",
+      "certificate"
+    ],
+    "non_identity_entities": [
+      "product",
+      "flight",
+      "airport",
+      "none",
+      "episode"
+    ],
+    "entity_aliases": {
+      "airport (catalog)": "airport",
+      "product (catalog)": "product"
+    },
+    "entity_aliases_note": "two catalog rows spell the entity with a parenthetical qualifier the map's entities document does not; the fold is recorded here so the partition stays auditable",
+    "read_tools": {
+      "calculate": {
+        "entity": "none",
+        "identity_dependent": false,
+        "declared_entity_keys": [
+          "expression"
+        ]
+      },
+      "find_user_id_by_email": {
+        "entity": "user",
+        "identity_dependent": true,
+        "declared_entity_keys": [
+          "email"
+        ]
+      },
+      "find_user_id_by_name_zip": {
+        "entity": "user",
+        "identity_dependent": true,
+        "declared_entity_keys": [
+          "first_name",
+          "last_name",
+          "zip"
+        ]
+      },
+      "get_order_details": {
+        "entity": "order",
+        "identity_dependent": true,
+        "declared_entity_keys": [
+          "order_id"
+        ]
+      },
+      "get_product_details": {
+        "entity": "product",
+        "identity_dependent": false,
+        "declared_entity_keys": [
+          "product_id"
+        ]
+      },
+      "get_reservation_details": {
+        "entity": "reservation",
+        "identity_dependent": true,
+        "declared_entity_keys": [
+          "reservation_id"
+        ]
+      },
+      "get_user_details": {
+        "entity": "user",
+        "identity_dependent": true,
+        "declared_entity_keys": [
+          "user_id"
+        ]
+      },
+      "list_all_airports": {
+        "entity": "airport (catalog)",
+        "identity_dependent": false,
+        "declared_entity_keys": []
+      },
+      "list_all_product_types": {
+        "entity": "product (catalog)",
+        "identity_dependent": false,
+        "declared_entity_keys": []
+      },
+      "search_direct_flight": {
+        "entity": "flight",
+        "identity_dependent": false,
+        "declared_entity_keys": [
+          "origin",
+          "destination",
+          "date"
+        ]
+      },
+      "search_onestop_flight": {
+        "entity": "flight",
+        "identity_dependent": false,
+        "declared_entity_keys": [
+          "origin",
+          "destination",
+          "date"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "arm": "one key policy replayed over the whole corpus: one SoundResultCache per source run, every call offered to the class, hits counted from get()",
+    "hit": "a read whose (tool, args, tenant) key is present in the run's shipped cache: the class returns the memoised value and the tool does not run",
+    "cacheable_call": "a read. Writes and control tools are offered to put() and refused by the class's effect gate, so they are counted as refusals, not as cacheable calls. Hit rate is hits / cacheable calls (1,728), matching the harness's P4 denominator",
+    "refusal": "a put() the class refused: effectful (side_effects not False -- every write and control call, 547), no_tenant (identity-dependent read with no tenant, 121 on the harness_matched arm), footprint_unknown (footprint is None; never used here -- entity_keys returns () for an entityless read, which the class treats as a legitimate constant read)",
+    "writes_served": "a write answered from the cache. Structurally zero here: a write is refused at put() and the replay never issues a get() for one, so there is nothing to serve",
+    "stale_read": "a read hit whose entity ids intersect a write that executed at a position strictly between the memo's store position and the hit. The write log contains every write the replay treated as landed -- all of them, since none was served",
+    "cross_tenant": "a read hit served from a memo stored under a different known tenant, counted only for tools the identity map marks identity-dependent. Catalog hits that cross a tenant under the identity_map arm are reported separately as identity_independent_cross_tenant_hits and are not damage by the map's definition -- the harness counts them (provenance-only), this script does not, and both numbers are given",
+    "unsafe_hit": "the union of writes_served, stale_reads and cross_tenant, each hit assigned to one class by the precedence writes_served > stale_reads > cross_tenant; the breakdown sums to the total",
+    "identity_dependent": "derived from tool_effect_map.json's per-tool entity: records of user, order, reservation, payment_method and certificate belong to one user and are tenant-bound; product, flight, airport, none and episode are not. The file has no identity_dependent field, so this is a derivation, stated as such; it is checked against the map's entities document rather than assumed",
+    "tenant": "the single distinct user_id named by a record's calls, else unknown. Unknown-tenant reads that are identity-dependent cannot be keyed by the class (no_tenant) and stay misses; the harness instead keys them under tenant=None, which is most of why its hit count differs",
+    "hit_rate": "hits / cacheable_calls, rounded to 4 decimals; hit_rate_of_all_calls uses all 2,275 replayed calls as the denominator",
+    "lookup_scope": "cache_identity files id-less lookup reads (find_user_id_by_*) under LOOKUP_SCOPE and flushes that scope when modify_user_address lands, because a zip change can falsify a name+zip answer. entity_keys never emits that token, so the task's footprint declaration leaves those memos in place; the shipped class will honour the token if the caller declares it (reconciliation.lookup_scope)",
+    "not_verified": "the class cannot verify (H0) read determinism or the truth of side_effects=False; this replay asserts the declarations on the corpus's behalf, so the zero is class-relative and corpus-scoped, not a proof about arbitrary callers"
+  },
+  "reconciliation": {
+    "why_two_arms": "the task asks for tenant only on identity-dependent tools, but the 2% target is 466, P4's figure under a key that binds the tenant on every read. tool_effect_map.json has no identity_dependent field, so that policy has to be derived from `entity`; deriving it makes catalog reads shareable and moves the hit count well outside 2%. Both readings are measured: harness_matched holds the key policy fixed (the like-for-like comparison the 2% assertion is about), identity_map applies the derived map (the task's stated policy) and is reported with its decomposition instead of being asserted inside the band",
+    "harness": {
+      "hits": 466,
+      "cacheable_calls": 1728,
+      "hit_rate": 0.2697,
+      "matches_committed": true,
+      "p1": {
+        "hits": 807,
+        "cacheable_calls": 2275,
+        "unsafe_hits": 344,
+        "cross_tenant": 104,
+        "cross_tenant_by_tool": {
+          "get_product_details": 76,
+          "list_all_airports": 1,
+          "list_all_product_types": 24,
+          "search_direct_flight": 3
+        }
+      }
+    },
+    "primary_arm": {
+      "id": "harness_matched",
+      "hits": 459,
+      "cacheable_calls": 1728,
+      "hit_rate": 0.2656,
+      "difference_hits": -7,
+      "difference_share": 0.015,
+      "within_tolerance": true,
+      "why_this_arm": "only this arm holds the key policy fixed at P4's; the identity_map arm changes the key (catalog reads stop being tenant-bound) and therefore measures a different policy, not a different implementation"
+    },
+    "identity_map_arm": {
+      "id": "identity_map",
+      "hits": 558,
+      "cacheable_calls": 1728,
+      "hit_rate": 0.3229,
+      "difference_hits": 92,
+      "difference_share": 0.1974,
+      "within_tolerance": false,
+      "why_outside": "the map marks five catalog reads identity-independent, so their memos are shared across tenants and P4's tenant-bound key cannot reach them; the gain is catalog traffic P4's key deliberately separates. Not a drift of the class and not asserted inside the 2% band -- reported with its decomposition below",
+      "identity_independent_cross_tenant_hits": 104,
+      "identity_independent_cross_tenant_by_tool": {
+        "get_product_details": 76,
+        "list_all_airports": 1,
+        "list_all_product_types": 24,
+        "search_direct_flight": 3
+      }
+    },
+    "mirror": {
+      "hits": 466,
+      "misses": 1262,
+      "matches_harness": true,
+      "per_run": {
+        "gpt-4o-retail": {
+          "hits": 182,
+          "misses": 427
+        },
+        "gpt-4o-airline": {
+          "hits": 22,
+          "misses": 169
+        },
+        "sonnet-35-new-retail": {
+          "hits": 224,
+          "misses": 456
+        },
+        "sonnet-35-new-airline": {
+          "hits": 38,
+          "misses": 210
+        }
+      },
+      "why": "the per-call mirror exists only to name which calls the two implementations disagree on; its totals are checked against the harness's own replay, so an attribution built on a drifted mirror would fail a check rather than print"
+    },
+    "hit_gap_primary": {
+      "harness_hits": 466,
+      "shipped_hits": 459,
+      "delta": -7,
+      "both_hit": 444,
+      "only_harness": 22,
+      "only_harness_by_tool": {
+        "find_user_id_by_email": 2,
+        "find_user_id_by_name_zip": 10,
+        "get_product_details": 4,
+        "get_reservation_details": 6
+      },
+      "only_harness_tenants": {
+        "unknown": 22
+      },
+      "only_shipped": 15,
+      "only_shipped_by_tool": {
+        "find_user_id_by_email": 3,
+        "find_user_id_by_name_zip": 12
+      },
+      "only_shipped_examples": [
+        {
+          "source": "gpt-4o-retail",
+          "pos": 251,
+          "tool": "find_user_id_by_name_zip",
+          "tenant": "noah_patel_6952",
+          "args": {
+            "first_name": "Noah",
+            "last_name": "Patel",
+            "zip": "10108"
+          }
+        },
+        {
+          "source": "gpt-4o-retail",
+          "pos": 320,
+          "tool": "find_user_id_by_name_zip",
+          "tenant": "mei_patel_7272",
+          "args": {
+            "first_name": "Mei",
+            "last_name": "Patel",
+            "zip": "76165"
+          }
+        },
+        {
+          "source": "gpt-4o-retail",
+          "pos": 467,
+          "tool": "find_user_id_by_name_zip",
+          "tenant": "sofia_hernandez_5364",
+          "args": {
+            "first_name": "Sofia",
+            "last_name": "Hernandez",
+            "zip": "98193"
+          }
+        },
+        {
+          "source": "gpt-4o-retail",
+          "pos": 659,
+          "tool": "find_user_id_by_name_zip",
+          "tenant": "sofia_li_9219",
+          "args": {
+            "first_name": "Sofia",
+            "last_name": "Li",
+            "zip": "78260"
+          }
+        },
+        {
+          "source": "gpt-4o-retail",
+          "pos": 678,
+          "tool": "find_user_id_by_name_zip",
+          "tenant": "noah_ito_3850",
+          "args": {
+            "first_name": "Noah",
+            "last_name": "Ito",
+            "zip": "98187"
+          }
+        }
+      ],
+      "explanation": "the gap is two mechanisms, both visible per call. (a) The class refuses an identity-dependent put with no tenant (no_tenant), where the harness keys such reads under tenant=None: 22 hits the harness serves are unreachable here, all on unknown-tenant reads ({\"unknown\": 22}). (b) The class has no LOOKUP_SCOPE notion and is driven with entity_keys footprints, so 15 lookup-read hits survive that the harness evicts on modify_user_address ({\"find_user_id_by_email\": 3, \"find_user_id_by_name_zip\": 12}). Arithmetic: 444 both-hit + 15 shipped-only = 459; 444 + 22 harness-only = 466"
+    },
+    "hit_gap_identity_map": {
+      "harness_hits": 466,
+      "shipped_hits": 558,
+      "delta": 92,
+      "both_hit": 448,
+      "only_harness": 18,
+      "only_harness_by_tool": {
+        "find_user_id_by_email": 2,
+        "find_user_id_by_name_zip": 10,
+        "get_reservation_details": 6
+      },
+      "only_shipped": 110,
+      "only_shipped_by_tool": {
+        "find_user_id_by_email": 3,
+        "find_user_id_by_name_zip": 12,
+        "get_product_details": 68,
+        "list_all_airports": 2,
+        "list_all_product_types": 22,
+        "search_direct_flight": 3
+      },
+      "explanation": "448 both-hit + 110 shipped-only = 558; 448 + 18 harness-only = 466. The shipped-only hits are catalog memos a shared key can serve ({\"find_user_id_by_email\": 3, \"find_user_id_by_name_zip\": 12, \"get_product_details\": 68, \"list_all_airports\": 2, \"list_all_product_types\": 22, \"search_direct_flight\": 3}) plus the lookup hits above; the harness-only ones are identity-dependent reads with no recoverable tenant, which the class refuses and the harness keys under None ({\"unknown\": 18})"
+    },
+    "catalog_cross_tenant": {
+      "harness_p1_cross_tenant": 104,
+      "harness_p1_cross_tenant_by_tool": {
+        "get_product_details": 76,
+        "list_all_airports": 1,
+        "list_all_product_types": 24,
+        "search_direct_flight": 3
+      },
+      "identity_map_arm_hits_across_tenants": 104,
+      "by_tool": {
+        "get_product_details": 76,
+        "list_all_airports": 1,
+        "list_all_product_types": 24,
+        "search_direct_flight": 3
+      },
+      "equal": true,
+      "note": "the harness's whole P1 cross-tenant count is catalog traffic. The map calls those tools identity-independent, so the identity_map arm serves the same hits across tenants and reports them as harmless-by-map rather than damage; the harness counts them because it classifies by provenance, not by dependence. Equality of the two counts is checked, not assumed"
+    },
+    "lookup_scope": {
+      "lookup_hits_with_intervening_address_change": 18,
+      "of_which_harness_misses": 15,
+      "of_which_harness_serves_from_a_fresher_memo": 3,
+      "lookup_hits_only_shipped": {
+        "find_user_id_by_email": 3,
+        "find_user_id_by_name_zip": 12
+      },
+      "counterfactual": {
+        "hits": 444,
+        "misses": 1284,
+        "hit_rate": 0.2569,
+        "lookup_hits_with_intervening_address_change": 0,
+        "note": "not an arm: the same harness_matched key policy with LOOKUP_SCOPE declared as an extra footprint token. It shows the class can express the harness's lookup eviction; the task pins footprints to entity_keys, which never emits that token."
+      },
+      "counterfactual_reproduces_the_harness_hits": true,
+      "note": "with the task's footprint (entity_keys) the class serves lookup hits whose memo predates a modify_user_address write; the three classes do not count them because no entity id joins a name+zip read to a user_id write, and the harness evicts them through LOOKUP_SCOPE. Declaring that token as a footprint restores the harness's behaviour, which is what the counterfactual shows. The zero above is therefore zero for the three defined classes, and the blind spot is stated rather than netted away"
+    },
+    "determinism": {
+      "clock_used": false,
+      "ttl": "disabled (ttl=None) so wall-clock time cannot evict",
+      "capacity": "disabled (max_size=None); the largest run is 872 calls, below the shipped 1,000",
+      "two_builds_identical": true
+    }
+  },
+  "provenance": {
+    "script": {
+      "path": "examples/benchmarks/shipped_sound_cache_replay.py",
+      "sha256": "667829013273fd1dee2c04721a77a548505a45c8305db9091c2907f157e71cf5",
+      "schema": "shipped_sound_cache_replay/v1"
+    },
+    "corpus": {
+      "path": "examples/real_traces/tau_bench_historical.jsonl",
+      "sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "expected_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "matches_expected": true,
+      "records": 325,
+      "records_total": 1960,
+      "calls": 2275,
+      "runs": 4,
+      "first_trial_only": true
+    },
+    "identity_module": {
+      "path": "examples/benchmarks/cache_identity.py",
+      "sha256": "fdb03597c057d1c604b924c27cb3d4a06bd3bb9731ef923671fd8e1d89dfe4e5",
+      "effect_map_source": "file",
+      "effect_map_path": "examples/benchmarks/tool_effect_map.json",
+      "effect_map_error": null,
+      "tools": 26
+    },
+    "effect_map": {
+      "path": "examples/benchmarks/tool_effect_map.json",
+      "sha256": "b3ba46b95cf99b96b72ad9ade3602f1b004e773bec4b44f8b6fe0aa2e9ae9b68",
+      "schema": "tool_effect_map/v1"
+    },
+    "harness": {
+      "path": "examples/benchmarks/unsafe_cache_baselines.py",
+      "sha256": "9a2eb6c57d76a09e93889a0476663ec1a801e5c42add65bd34e0efa6edffb7fe",
+      "policy": "P4 typed (tenant-bound, reads only, entity-invalidating)",
+      "figure": "466/1728",
+      "recomputed": true
+    },
+    "shipped_class": {
+      "path": "agentflow/core/isa/sound_cache.py",
+      "sha256": "871abec878b3b1e1bc63b20383806b64db45c26a5421165e53d6aaca89f45759"
+    },
+    "determinism": "no clock, no environment, no randomness; one cache per run; counters and collections emitted in a stable order; main() builds the document twice and refuses to write if the two differ",
+    "arithmetic": "integer counts; shares are round(numerator/denominator, 4)"
+  },
+  "checks": {
+    "corpus_matches_committed": {
+      "ok": true,
+      "expected": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "observed": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116"
+    },
+    "corpus_shape": {
+      "ok": true,
+      "records": 325,
+      "records_total": 1960,
+      "calls": 2275,
+      "runs": 4
+    },
+    "effect_totals_match_map": {
+      "ok": true,
+      "observed": {
+        "control": 101,
+        "read": 1728,
+        "write": 446
+      },
+      "committed": {
+        "control": 101,
+        "read": 1728,
+        "write": 446
+      }
+    },
+    "harness_figure_reproduced": {
+      "ok": true,
+      "observed": "466/1728",
+      "committed": "466/1728"
+    },
+    "harness_mirror_agrees": {
+      "ok": true,
+      "mirror_hits": 466,
+      "harness_hits": 466,
+      "mirror_misses": 1262,
+      "harness_misses": 1262
+    },
+    "zero_damaging_hits": {
+      "ok": true,
+      "primary": 0,
+      "identity_map": 0,
+      "breakdown": {
+        "harness_matched": {
+          "writes_served": 0,
+          "stale_reads": 0,
+          "cross_tenant": 0
+        },
+        "identity_map": {
+          "writes_served": 0,
+          "stale_reads": 0,
+          "cross_tenant": 0
+        }
+      }
+    },
+    "hit_count_within_2pct_of_harness": {
+      "ok": true,
+      "arm": "harness_matched",
+      "shipped_hits": 459,
+      "harness_hits": 466,
+      "difference": -7,
+      "share": 0.015,
+      "tolerance": 0.02
+    },
+    "identity_map_arm_outside_tolerance_reported": {
+      "ok": true,
+      "arm": "identity_map",
+      "shipped_hits": 558,
+      "harness_hits": 466,
+      "difference": 92,
+      "share": 0.1974,
+      "note": "not a soundness failure: a different key policy, reported rather than asserted inside the band; see reconciliation.identity_map_arm"
+    },
+    "no_write_or_control_served": {
+      "ok": true,
+      "effectful_admitted": {
+        "harness_matched": 0,
+        "identity_map": 0
+      }
+    },
+    "identity_dependent_cross_tenant_zero": {
+      "ok": true
+    },
+    "hits_plus_misses_equal_reads": {
+      "ok": true,
+      "arms": {
+        "harness_matched": {
+          "hits": 459,
+          "misses": 1269,
+          "reads": 1728
+        },
+        "identity_map": {
+          "hits": 558,
+          "misses": 1170,
+          "reads": 1728
+        }
+      }
+    },
+    "admissions_consistent": {
+      "ok": true,
+      "arms": {
+        "harness_matched": {
+          "admissions": 1148,
+          "misses": 1269,
+          "no_tenant": 121
+        },
+        "identity_map": {
+          "admissions": 1079,
+          "misses": 1170,
+          "no_tenant": 91
+        }
+      }
+    },
+    "effectful_refusals_are_the_non_reads": {
+      "ok": true,
+      "expected": 547,
+      "observed": {
+        "harness_matched": 547,
+        "identity_map": 547
+      }
+    },
+    "footprint_unknown_never_triggered": {
+      "ok": true
+    },
+    "identity_map_covers_the_map": {
+      "ok": true,
+      "mapped_tool_entities": [
+        "airport",
+        "certificate",
+        "episode",
+        "flight",
+        "none",
+        "order",
+        "product",
+        "reservation",
+        "user"
+      ],
+      "documented_entities": [
+        "airport",
+        "certificate",
+        "episode",
+        "flight",
+        "none",
+        "order",
+        "payment_method",
+        "product",
+        "reservation",
+        "user"
+      ],
+      "documented_but_never_a_tool_entity": [
+        "payment_method"
+      ],
+      "note": "every tool entity is assigned to one of the two identity sets, and every entity the map documents is assigned; payment_method is documented and named by every money-moving write's entity_keys but is never a tool's primary entity, so it appears on the documented side only. The partition is also validated inside build_identity_map, which aborts on an unassigned entity rather than guessing"
+    },
+    "catalog_cross_tenant_recovered": {
+      "ok": true,
+      "map_arm": {
+        "get_product_details": 76,
+        "list_all_airports": 1,
+        "list_all_product_types": 24,
+        "search_direct_flight": 3
+      },
+      "harness_p1": {
+        "get_product_details": 76,
+        "list_all_airports": 1,
+        "list_all_product_types": 24,
+        "search_direct_flight": 3
+      },
+      "note": "the shared-key arm's cross-tenant hits must be exactly the harness's P1 cross-tenant hits, by tool; otherwise the identity map and the corpus disagree"
+    },
+    "lookup_scope_counterfactual": {
+      "ok": true,
+      "hits": 444,
+      "misses": 1284,
+      "both_hit_primary": 444,
+      "lookup_hits_with_intervening_address_change": 0,
+      "note": "not a pass/fail on the class: the probe shows the lookup gap is a footprint declaration, not a missing API. It checks two things -- the probe replayed every read, and with LOOKUP_SCOPE declared it hits exactly the calls both implementations hit (the harness total minus its 22 unknown-tenant hits)"
+    }
+  }
+}

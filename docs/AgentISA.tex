@@ -731,10 +731,13 @@ every cache-consistent execution of \(P\) reaches at each position the
 state the bypassed execution reaches, returns the same value, and ends
 in the same store: the cache is \emph{observationally transparent}.
 \emph{Proof}: Appendix C.8. \textbf{Scope.} The statement specifies a
-cache rather than describing ours: the shipped cache enforces (H0)
-partially and none of (H1)--(H3)---its key carries no tenant field and
-eviction is TTL and LRU alone---which is why Section 5.13 counts
-unjustified hits instead of assuming there are none.
+cache, not a default. \texttt{SoundResultCache} (this revision) enforces
+(H1)--(H3): a tenant component in the key, a fail-closed effect gate
+that refuses to memoise anything not declared pure, and a footprint
+registry whose write hook evicts by entity across instructions. The
+legacy \texttt{InstructionCache} is unchanged and still enforces none of
+them, which is why Section 5.13 counts unjustified hits rather than
+assuming there are none.
 
 \subsection{Trace-Based Instruction
 Learning}\label{trace-based-instruction-learning}
@@ -1709,7 +1712,7 @@ Validation}\label{multi-agent-coordination-functional-validation}
 The multi-agent layer---\texttt{AgentCoordinator},
 \texttt{SecurityMonitor}, and the collaborative instruction set---is
 validated functionally by 43 tests, all passing---the
-coordination-and-security subset of the repository's full suite (1,441
+coordination-and-security subset of the repository's full suite (1,457
 passing, 14 skipped at run time), which also covers the ISA core,
 compiler, and optimizer units of Sections 5.2--5.5. This is
 \textbf{qualitative functional validation}: the tests verify the
@@ -2123,18 +2126,21 @@ We enumerate the limitations of the evaluation explicitly:
   responses---are unmeasured; the exact-match key design forfeits reuse
   there by construction, but the sensitivity is not quantified.
 \item
-  \textbf{The shipped cache is not the typed cache.} Section 5.13
-  measures a typed policy that enforces Theorem 3.7's three hypotheses,
-  but the cache in this repository enforces none of them: its key
-  carries no tenant, it admits effectful instructions, and it evicts by
-  TTL and LRU capacity alone. The zero in Section 5.13 is therefore a
-  property of the harness, and the 240 damaging hits are a property of
-  the untyped policies on the same replay---not a claim that the shipped
-  system is sound, and not an estimate of how often it fails in
-  deployment. Closing the gap needs a shared run-scope registry, a
-  tenant channel in the execution API, and roughly 400--470 changed
-  lines across fifteen call sites (Appendix C.8 audits the hypotheses
-  one by one).
+  \textbf{The typed cache is opt-in, and the default is still the
+  unsound store.} \texttt{SoundResultCache} enforces Theorem 3.7's three
+  hypotheses and is wired into the execution path behind a
+  per-instruction flag, but the default remains the legacy
+  \texttt{InstructionCache}, which carries no tenant in its key, admits
+  effectful instructions and evicts by TTL and LRU alone. The zero in
+  Section 5.13 is a property of the class, measured by replaying the
+  corpus through it (459 of 1,728 calls, zero damaging hits); the 240
+  damaging hits are a property of the untyped policies on the same
+  replay. Making the typed path the default requires a tenant channel on
+  every execution path (96 \texttt{execute()} implementations), a
+  footprint method on every instruction, and regeneration of the
+  committed artifacts whose provenance pins
+  \texttt{instruction.py}---not an estimate of deployment incidence, and
+  not something this revision claims.
 \end{enumerate}
 
 Despite these limitations, each optimization mechanism is implemented,
@@ -2283,10 +2289,13 @@ Resampling 165 task instances puts the blind key at 105.5 damaging hits
 per 1,000 calls {[}82.3, 130.1{]}, with 70 of 165 instances (42.4\%)
 containing at least one. The typed row is the least productive of the
 four and the only one whose hits cannot be wrong; the unsound rows are
-what a cache looks like when only purity is checked, which is what our
-own shipped cache checks, so the typed policy is a harness stating what
-the shipped one would have to become (Section 5.9, Appendix C.8, and
-I.12 for the full table).
+what a cache looks like when only purity is checked, which is what the
+legacy store in this repository checks. That policy is now shipped as
+\texttt{SoundResultCache}, and replaying the same workload through the
+class itself returns 459 hits of 1,728 (26.56\%) with zero damaging
+hits---seven hits below the harness, inside the 1.5\% reconciliation
+band---while the legacy store stays the default and enforces none of the
+hypotheses (Section 5.9, Appendix C.8, and I.12 for both tables).
 
 \subsection{System Limitations and
 Challenges}\label{system-limitations-and-challenges}
@@ -2439,7 +2448,7 @@ repository state whose build produces this PDF (\texttt{REPRODUCING.md}
 records the submission-time \texttt{git\ rev-parse\ HEAD}, the
 dependency lock, and the Python/system versions). A fresh clone
 reproduces the full suite (\texttt{python\ -m\ pytest\ tests/\ -q}:
-1,441 passed, 14 skipped, 13 subtests passed at run time), the Section
+1,457 passed, 14 skipped, 13 subtests passed at run time), the Section
 5.6 functional-test counts, and, via the Appendix F command lines, every
 results table from scratch---real-gateway runs included, with a
 mock-backend fallback for environments without credentials.

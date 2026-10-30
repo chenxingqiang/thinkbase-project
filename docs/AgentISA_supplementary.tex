@@ -937,17 +937,28 @@ omitting (H1) yields the double-write counterexample (a write's response
 replayed as if the write had run twice). Section 5.13 measures these
 three on the recorded corpus: 104, 179 and 61 hits respectively.
 
-\textbf{Hypothesis audit of the shipped implementation.}
-\texttt{build\_cache\_key} carries instruction identity and parameters
-but no tenant field, so (H2) fails; \texttt{InstructionCache} evicts by
-TTL and LRU capacity only, so (H3) fails; the cache is consulted for
-instructions whether or not they are effectful, so (H1) fails. (H0)
-holds only where the instruction is typed as a read and the tool is
-deterministic. The typed policy of Section 5.13 is therefore a harness
-that enforces the hypotheses, not a description of the shipped
-cache---which is why the paper reports a measured zero for the harness
-and a measured 240 damaging hits for the untyped policies rather than
-claiming the shipped system is sound.
+\textbf{Hypothesis audit of the shipped implementation.} The legacy
+store fails all three: \texttt{build\_cache\_key} carries instruction
+identity and parameters but no tenant field (H2),
+\texttt{InstructionCache} evicts by TTL and LRU capacity only (H3), and
+the cache is consulted whether or not an instruction is effectful (H1).
+(H0) holds only where the instruction is typed as a read and the tool is
+deterministic. This revision adds \texttt{SoundResultCache}
+(\texttt{agentflow/core/isa/sound\_cache.py}), which enforces the three
+hypotheses as refusal and eviction rules rather than caller discipline:
+an identity-dependent put with no tenant is refused instead of being
+folded into a params-only key; \texttt{put} refuses anything not
+declared pure and counts the refusal by reason; entries carry a
+footprint, a reverse index maps entities to keys, and
+\texttt{record\_write} evicts exactly the intersecting entries across
+instructions through a shared registry. Replaying the Section 5.13
+workload through that class returns 459 hits of 1,728 calls with zero
+damaging hits, seven below the harness figure. It is opt-in
+(\texttt{sound\_cache\ =\ True} per instruction) because making it the
+default requires a tenant channel on every \texttt{execute()}
+implementation and regeneration of the artifacts whose provenance pins
+\texttt{instruction.py}; the legacy store therefore remains the default
+and remains unsound, which is what the 240 damaging hits measure.
 
 \subsection{Tree-Pattern Instruction Selection
 (MATCH-TREE)}\label{tree-pattern-instruction-selection-match-tree}
@@ -5107,6 +5118,20 @@ key damages 105.5 hits per 1,000 calls {[}82.3, 130.1{]} and 70 of 165
 instances (42.4\%) contain at least one damaging hit; the typed policy's
 zero is reported with its exact one-sided bound rather than a bootstrap
 interval, because a percentile interval on a zero count is degenerate.
+
+\textbf{The shipped class, not just the harness.}
+\texttt{shipped\_sound\_cache\_results.json} drives
+\texttt{agentflow/core/isa/sound\_cache.py} itself over the same 2,275
+calls. With the tenant bound on every read (the like-for-like arm) the
+class returns 459 hits of 1,728 (26.56\%) and zero damaging hits, seven
+below the harness's 466---the difference is the class's refusal of 121
+identity-dependent puts with no tenant in scope, which the harness's key
+recipe supplies by construction. Binding the tenant only where the tool
+map says the output depends on identity raises the class to 558 hits
+(32.29\%) with zero damaging hits and 104 identity-independent
+cross-tenant hits, which are harmless by that map's definition. The
+legacy \texttt{InstructionCache} is untouched and still serves the
+807/344 pattern of P1.
 
 \textbf{Why the anchor still holds.} The three policies admit different
 call sets, so their rates are not directly comparable: 807 − 61 = 746

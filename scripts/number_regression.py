@@ -1300,11 +1300,25 @@ chk(abs(_ch['committed_rate'] - 0.1253) < 5e-5, 'the in-sample anchor must stay 
 
 for _line in ('344 unwarranted and 240 damaging', 'serves 466 hits with none unwarranted',
               '105.5 damaging hits per 1,000 calls', 'the tenant 7.29 points', 'invalidation 8.85 points',
-              '10.07% of dispatches out of sample', 'none of (H1)–(H3)'):
+              '10.07% of dispatches out of sample', 'still enforces none of them'):
     chk(_line in MD, f'main paper must state "{_line}"')
 for _line in ('240 (61 writes + 179 stale)', '491 (250 one tool)', 'the typed policy \'s zero is reported with its exact one-sided bound'
               if False else 'exact one-sided bound', '16.14 points on one base'):
     chk(_line in SUPP, f'supplement must state "{_line}"')
+
+# ---- shipped SoundResultCache replay (Section 5.13, last paragraph)
+_ss = jload('shipped_sound_cache_results.json')
+_arm = {a['id']: a for a in _ss['arms']}
+chk(_arm['harness_matched']['hits'] == 459 and _arm['harness_matched']['cacheable_calls'] == 1728,
+    f"the shipped class must return 459 of 1,728, got {_arm['harness_matched']['hits']}")
+chk(_arm['harness_matched']['unsafe_hits'] == 0 and _arm['identity_map']['unsafe_hits'] == 0,
+    'the shipped class must serve zero damaging hits on both arms')
+chk(_ss['checks']['zero_damaging_hits']['ok'] is True, 'zero-damaging check must pass')
+chk(_ss['checks']['harness_figure_reproduced']['ok'] is True, 'the harness 466/1,728 must be reproduced')
+chk(_arm['harness_matched']['refusals_by_reason']['effectful'] == 547,
+    'the effect gate must refuse the 547 effectful calls')
+for _line in ('returns 459 hits of 1,728', 'seven hits below the harness'):
+    chk(_line in MD, f'main paper must state "{_line}"')
 
 # ---- suite count: the paper's "N passing" must equal collected - skipped ------
 _m = re.search(r'([\d,]+) passing, (\d+) skipped at run time', md)
