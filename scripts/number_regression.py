@@ -1317,7 +1317,8 @@ chk(_ss['checks']['zero_damaging_hits']['ok'] is True, 'zero-damaging check must
 chk(_ss['checks']['harness_figure_reproduced']['ok'] is True, 'the harness 466/1,728 must be reproduced')
 chk(_arm['harness_matched']['refusals_by_reason']['effectful'] == 547,
     'the effect gate must refuse the 547 effectful calls')
-for _line in ('returns 459 hits of 1,728', 'seven hits below the harness'):
+for _line in ('returns 459 hits of 1,728', 'seven hits below the harness',
+              'replayed at 459 hits of 1,728 with zero unjustified hits'):
     chk(_line in MD, f'main paper must state "{_line}"')
 
 # ---- default-flip cost: census buckets and the coarse-footprint penalty
