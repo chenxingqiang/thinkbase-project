@@ -1249,6 +1249,63 @@ for _line in ('62.2–69.2%', '−13.4 to −10.4'):
 # ---------------------------------------------------------------------------
 # suite-count invariant (computed last; the failure branch follows it)
 # ---------------------------------------------------------------------------
+# ---- Section 5.13: cache soundness (four policies, damage split, ladder, holdout)
+_uc = jload('unsafe_cache_results.json')
+_pol = {p['id']: p for p in _uc['policies']}
+chk(_pol['P1']['hits'] == 807 and _pol['P1']['unsafe_hits'] == 344,
+    f'P1 must be 807 hits / 344 unsafe, got {_pol["P1"]["hits"]}/{_pol["P1"]["unsafe_hits"]}')
+chk(_pol['P2']['hits'] == 655 and _pol['P2']['unsafe_hits'] == 165,
+    f'P2 must be 655/165, got {_pol["P2"]["hits"]}/{_pol["P2"]["unsafe_hits"]}')
+chk(_pol['P3']['hits'] == 963 and _pol['P3']['unsafe_hits'] == 595,
+    f'P3 must be 963/595, got {_pol["P3"]["hits"]}/{_pol["P3"]["unsafe_hits"]}')
+chk(_pol['P4']['hits'] == 466 and _pol['P4']['cacheable_calls'] == 1728 and _pol['P4']['unsafe_hits'] == 0,
+    'P4 must be 466 hits of 1,728 admitted with zero unsafe')
+chk(_pol['P1']['unsafe_breakdown']['writes_served'] == 61
+    and _pol['P1']['unsafe_breakdown']['stale_reads'] == 179
+    and _pol['P1']['unsafe_breakdown']['cross_tenant'] == 104,
+    'P1 breakdown must be 61 writes + 179 stale + 104 cross-tenant')
+
+_ud = jload('unsafe_damage_results.json')
+_dpol = {p['id']: p for p in _ud['policies']}
+chk(_dpol['P1']['warranted_unsafe'] == 240 and _dpol['P1']['D1'] == 61 and _dpol['P1']['D2'] == 179,
+    f'P1 damage must be 240 = 61 + 179, got {_dpol["P1"]["warranted_unsafe"]}')
+chk(_dpol['P1']['D3_harmless'] == 104, 'the harmless cross-tenant class must be 104')
+chk(_dpol['P2']['warranted_unsafe'] == 61, 'P2 damage must be 61 (writes only)')
+chk(_dpol['P3']['warranted_unsafe'] == 491 and _dpol['P3']['D3_damaging'] == 250,
+    'P3 damage must be 491 with 250 identity-dependent')
+chk(_dpol['P4']['warranted_unsafe'] == 0, 'P4 must have zero damaging hits')
+_ci = _ud['intervals']['p1_warranted_per_1000_calls']
+chk(abs(_ci['estimate'] - 105.495) < 5e-3 and abs(_ci['ci_low'] - 82.27) < 5e-3
+    and abs(_ci['ci_high'] - 130.086) < 5e-3,
+    f"P1 damage interval must be 105.5 [82.3, 130.1], got {_ci['estimate']} [{_ci['ci_low']}, {_ci['ci_high']}]")
+chk(_ud['instances']['total'] == 165 and _ud['instances']['p1']['with_warranted_unsafe'] == 70,
+    'the cluster unit must be 165 task instances with 70 affected')
+chk(abs(_ud['instances']['p1']['share_with_warranted_unsafe'] - 0.424242) < 5e-5,
+    'the affected-instance share must be 42.4%')
+chk(abs(_ud['typed_zero_bound']['admitted_reads']['exact_upper_per_1000'] - 1.732) < 5e-3,
+    'the typed zero bound must be 1.73 per 1,000 admitted reads')
+
+_sl = jload('soundness_ladder_results.json')
+_r = _sl['ladders']['main']['rungs']
+chk([r['hits'] for r in _r[:3]] == [745, 619, 466] and [r['unsafe_hits'] for r in _r[:3]] == [283, 168, 0],
+    f'ladder hits must be 745/619/466 with unsafe 283/168/0, got {[r["hits"] for r in _r[:3]]}')
+chk(abs(_r[1]['hit_rate_on_denominator'] - 0.3582) < 5e-4 and abs(_r[2]['hit_rate_on_denominator'] - 0.2697) < 5e-4,
+    'ladder rates must be 35.82% and 26.97% on the 1,728 base')
+
+_ch = jload('compound_holdout_results.json')['verdict']
+chk(_ch['holdout_dispatches_removed'] == 229 and _ch['dispatches'] == 2275,
+    'the holdout must remove 229 of 2,275 dispatches')
+chk(abs(_ch['holdout_rate'] - 0.1007) < 5e-5, f"holdout rate must be 10.07%, got {_ch['holdout_rate']:.4%}")
+chk(abs(_ch['committed_rate'] - 0.1253) < 5e-5, 'the in-sample anchor must stay 12.53%')
+
+for _line in ('344 unwarranted and 240 damaging', 'serves 466 hits with none unwarranted',
+              '105.5 damaging hits per 1,000 calls', 'the tenant 7.29 points', 'invalidation 8.85 points',
+              '10.07% of dispatches out of sample', 'none of (H1)–(H3)'):
+    chk(_line in MD, f'main paper must state "{_line}"')
+for _line in ('240 (61 writes + 179 stale)', '491 (250 one tool)', 'the typed policy \'s zero is reported with its exact one-sided bound'
+              if False else 'exact one-sided bound', '16.14 points on one base'):
+    chk(_line in SUPP, f'supplement must state "{_line}"')
+
 # ---- suite count: the paper's "N passing" must equal collected - skipped ------
 _m = re.search(r'([\d,]+) passing, (\d+) skipped at run time', md)
 if _m:

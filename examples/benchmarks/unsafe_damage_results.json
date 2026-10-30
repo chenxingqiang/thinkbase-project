@@ -1,0 +1,1198 @@
+{
+  "schema": "unsafe_damage/v1",
+  "task": "E1 - damage-based unsafe accounting: reclassify every committed unsafe hit of P1/P2/P3 into write-served, stale-read and identity-damage (with the harmless catalog residue counted separately), then bound the typed policy's zero",
+  "result_kind": "RECLASSIFICATION+BOOTSTRAP",
+  "reviewer_objection": "the committed unsafe predicate is the union of the three components of the typed key (effect, entity/freshness, identity), so the typed policy's zero is analytic. This document reclassifies the same hits by damage -- a mutation that did not run, a value older than a landed write, a value produced under another identity -- and splits the identity class by an empirical measure of whether the tool's output depends on identity at all.",
+  "scope": "tau-bench only: the first trial of every task in the committed corpus, replayed through the P1/P2/P3 run-scope caches of unsafe_cache_baselines, plus P4 so the typed policy's zero is re-derived by the same walk rather than trusted. The hits are the committed ones; only their classification, the intervals and the bound are new.",
+  "method": {
+    "damage_classes": {
+      "D1": "a write served from cache: the mutation never ran while the agent's belief that it did is unchanged (the committed writes_served class)",
+      "D2": "a read served across a landed write to the same entity: the memo predates a write that executed and names an entity the read names, so the value is older than the database (the committed stale_reads class)",
+      "D3_damaging": "a cross-tenant read on a tool whose output depends on identity: the served value is some other identity's answer",
+      "D3_harmless": "a cross-tenant read on a tool whose output does not depend on identity: the served value is what the tool would have returned anyway",
+      "warranted_unsafe": "D1 + D2 + D3_damaging",
+      "precedence": "one class per hit, with the committed precedence writes_served > stale_reads > cross_tenant, so the four buckets partition the committed unsafe set and their sum equals the committed count",
+      "why_not_analytic": "each bucket is defined by an observable damage mode, not by a key component: a missing side effect, a value older than a landed write, a payload selected by another identity. A policy could implement all three gates and still serve a stale value if its eviction index were wrong; the zero is measured here, and then bounded"
+    },
+    "identity_dependence": {
+      "source": "examples/real_traces/tau_bench_observed.jsonl, the observation-bearing twin of the committed corpus (same 325 first-trial records, outputs truncated to 400 characters by the compactor)",
+      "validation": "each observation must echo the argument that identifies its record (\"product_id\": \"<arg>\", \"order_id\": \"<arg>\", ...) or match the tool's documented return shape (bare user id or Error for the lookups, a numeric literal for calculate, an empty observation for think); rejected observations are counted per tool, never dropped silently",
+      "degenerate_join_filter": "a record whose distinct (tool, arguments) calls all carry one non-empty observation is a provably broken join and is excluded from the evidence",
+      "state_control": "only calls with no earlier write in their own record are used: both records are then in the initial environment state, so divergence cannot be state drift",
+      "E1": "identity selection: a (tool, non-identity arguments) group with two or more distinct identity values (user_id/email) and two or more distinct observations shows the payload is selected by the identity argument",
+      "E2": "tenant divergence: a (tool, all arguments) group shared by two or more tenants with two or more distinct observations shows the payload is relative to who asked",
+      "verdict": "identity-dependent iff E1 or E2 fires",
+      "identity_arguments": [
+        "user_id",
+        "email"
+      ]
+    },
+    "denominators": {
+      "calls": "admitted (cacheable) calls: every replayed call for P1-P3, reads only for P4, which refuses writes and control tools",
+      "hits": "the policy's hits, the base of every share_of_hits figure",
+      "share_of_hits": "class count / hits, so the four classes sum to the committed unsafe share of hits",
+      "warranted_per_1000_calls": "1000 * warranted / admitted calls"
+    },
+    "bootstrap": {
+      "cluster_unit": "task instance: one task as one or two models performed it, labelled domain#task_id; 165 instances over 4 runs",
+      "clusters": 165,
+      "resamples": 10000,
+      "resamples_used": 10000,
+      "seed": 20240601,
+      "replacement": true,
+      "confidence": 0.95,
+      "percentiles": [
+        2.5,
+        97.5
+      ],
+      "percentile_rule": "linear interpolation on the sorted draws: h = (n-1)*p, value at floor(h) plus the fraction to the next",
+      "rng": "CPython random.Random (Mersenne Twister); indices drawn with rejection on getrandbits(64), so the draws depend only on the bit stream",
+      "why_instances_not_cells": "the two model runs of one task are two attempts at the same task, not two independent draws from the task population; their calls share an initial environment state and a user, so cells are dependent. Resampling instances keeps every attempt inside its cluster and makes the unit of variation the deployment's: another batch of tasks.",
+      "paired": true
+    },
+    "exact_bound": {
+      "statistic": "one-sided 95% upper limit for a count of zero",
+      "formula": "1 - alpha**(1/n), alpha = 0.05 (Clopper-Pearson at k = 0)",
+      "rule_of_three": "3/n, reported beside the exact limit as the familiar approximation",
+      "denominators": "admitted reads (1,728), all replayed calls (2,275), served hits (466)"
+    }
+  },
+  "provenance": {
+    "script": {
+      "path": "examples/benchmarks/unsafe_damage.py",
+      "sha256": "cd9acfa8715850008f9192cedf1879b6ea2f280647ac2718d6b97bfe42d7bf3a",
+      "schema": "unsafe_damage/v1"
+    },
+    "corpus": {
+      "path": "examples/real_traces/tau_bench_historical.jsonl",
+      "sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "records": 325,
+      "calls": 2275,
+      "cells": 325,
+      "instances": 165,
+      "expected_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "matches_expected": true
+    },
+    "observed_corpus": {
+      "path": "examples/real_traces/tau_bench_observed.jsonl",
+      "sha256": "50fb894fb1e2bddda69cb866f93772ccc4e0199c2e28eafbee4d84ecf4fd68e0",
+      "records": 325
+    },
+    "identity_module": {
+      "path": "examples/benchmarks/cache_identity.py",
+      "sha256": "fdb03597c057d1c604b924c27cb3d4a06bd3bb9731ef923671fd8e1d89dfe4e5"
+    },
+    "unsafe_module": {
+      "path": "examples/benchmarks/unsafe_cache_baselines.py",
+      "sha256": "9a2eb6c57d76a09e93889a0476663ec1a801e5c42add65bd34e0efa6edffb7fe",
+      "why": "the keys, the effect classes, the eviction index and the staleness join are imported from the module that produced the committed hits; only the classification is re-derived here"
+    },
+    "determinism": "no clock, no environment, no randomness outside the seeded bootstrap; sorted collections everywhere; main() builds the document twice and refuses to write if the two differ",
+    "arithmetic": "integer counts; shares are round(n/d, 6); rates round(..., 4); no averages of averages"
+  },
+  "identity_dependence": {
+    "tools": {
+      "calculate": {
+        "observed_argument_keys": [
+          "expression"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 30,
+        "observations_rejected": 1,
+        "zero_prior_writes": 20,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {expression} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "expression": "3131.1 + 4777.75 + 2025.51"
+          },
+          "tenant": "fatima_johnson_7581",
+          "output": "9934.36"
+        }
+      },
+      "find_user_id_by_email": {
+        "observed_argument_keys": [
+          "email"
+        ],
+        "takes_identity_argument": true,
+        "identity_arguments": [
+          "email"
+        ],
+        "observations_accepted": 42,
+        "observations_rejected": 3,
+        "zero_prior_writes": 42,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 1,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 1,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": true,
+        "verdict": "identity-dependent",
+        "basis": "measured",
+        "reason": "E1: 1 non-identity argument group(s) hold two or more identity values and return different observations",
+        "evidence_example": {
+          "non_identity_arguments": "{}",
+          "identity_values": 34,
+          "distinct_outputs": 16,
+          "examples": [
+            {
+              "identity": {
+                "email": "yusuf.rossi@example.com"
+              },
+              "tenant": "yusuf_rossi_9620",
+              "output": "Error: user not found"
+            },
+            {
+              "identity": {
+                "email": "mia.garcia2723@example.com"
+              },
+              "tenant": "mia_garcia_4516",
+              "output": "mia_garcia_4516"
+            },
+            {
+              "identity": {
+                "email": "aarav.santos8320@example.com"
+              },
+              "tenant": "aarav_santos_2259",
+              "output": "aarav_santos_2259"
+            }
+          ]
+        }
+      },
+      "find_user_id_by_name_zip": {
+        "observed_argument_keys": [
+          "first_name",
+          "last_name",
+          "zip"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 87,
+        "observations_rejected": 6,
+        "zero_prior_writes": 87,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": true,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {first_name, last_name, zip} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "first_name": "Yusuf",
+            "last_name": "Rossi",
+            "zip": "19122"
+          },
+          "tenant": "yusuf_rossi_9620",
+          "output": "yusuf_rossi_9620"
+        }
+      },
+      "get_order_details": {
+        "observed_argument_keys": [
+          "order_id"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 240,
+        "observations_rejected": 14,
+        "zero_prior_writes": 211,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": true,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {order_id} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "order_id": "#W6247578"
+          },
+          "tenant": "yusuf_rossi_9620",
+          "output": "{\"order_id\": \"#W6247578\", \"user_id\": \"yusuf_rossi_9620\", \"address\": {\"address1\": \"763 Broadway\", \"address2\": \"Suite 135\", \"city\": \"Philadelphia\", \"country\": \"US"
+        }
+      },
+      "get_product_details": {
+        "observed_argument_keys": [
+          "product_id"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 88,
+        "observations_rejected": 6,
+        "zero_prior_writes": 66,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 14
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": true,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "measured",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (14 group(s) compared); the tool's observed arguments {product_id} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "product_id": "1656367028"
+          },
+          "tenants": 3,
+          "distinct_outputs": 1,
+          "examples": [
+            {
+              "tenant": "yusuf_rossi_9620",
+              "output": "{\"name\": \"Mechanical Keyboard\", \"product_id\": \"1656367028\", \"variants\": {\"9690244451\": {\"item_id\": \"9690244451\", \"options\": {\"switch type\": \"clicky\", \"backlight"
+            }
+          ]
+        }
+      },
+      "get_reservation_details": {
+        "observed_argument_keys": [
+          "reservation_id"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 89,
+        "observations_rejected": 6,
+        "zero_prior_writes": 87,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {reservation_id} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "reservation_id": "JG7FMM"
+          },
+          "tenant": "omar_davis_3817",
+          "output": "{\"reservation_id\": \"JG7FMM\", \"user_id\": \"omar_davis_3817\", \"origin\": \"MCO\", \"destination\": \"CLT\", \"flight_type\": \"one_way\", \"cabin\": \"business\", \"flights\": [{\"o"
+        }
+      },
+      "get_user_details": {
+        "observed_argument_keys": [
+          "user_id"
+        ],
+        "takes_identity_argument": true,
+        "identity_arguments": [
+          "user_id"
+        ],
+        "observations_accepted": 120,
+        "observations_rejected": 9,
+        "zero_prior_writes": 117,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 1,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 1,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": true,
+        "identity_dependent": true,
+        "verdict": "identity-dependent",
+        "basis": "measured",
+        "reason": "E1: 1 non-identity argument group(s) hold two or more identity values and return different observations",
+        "evidence_example": {
+          "non_identity_arguments": "{}",
+          "identity_values": 70,
+          "distinct_outputs": 70,
+          "examples": [
+            {
+              "identity": {
+                "user_id": "yusuf_rossi_9620"
+              },
+              "tenant": "yusuf_rossi_9620",
+              "output": "{\"name\": {\"first_name\": \"Yusuf\", \"last_name\": \"Rossi\"}, \"address\": {\"address1\": \"763 Broadway\", \"address2\": \"Suite 135\", \"city\": \"Philadelphia\", \"country\": \"USA"
+            },
+            {
+              "identity": {
+                "user_id": "mia_garcia_4516"
+              },
+              "tenant": "mia_garcia_4516",
+              "output": "{\"name\": {\"first_name\": \"Mia\", \"last_name\": \"Garcia\"}, \"address\": {\"address1\": \"537 Main Street\", \"address2\": \"Suite 572\", \"city\": \"Indianapolis\", \"country\": \"U"
+            },
+            {
+              "identity": {
+                "user_id": "fatima_johnson_7581"
+              },
+              "tenant": "fatima_johnson_7581",
+              "output": "{\"name\": {\"first_name\": \"Fatima\", \"last_name\": \"Johnson\"}, \"address\": {\"address1\": \"123 Elm Street\", \"address2\": \"Suite 640\", \"city\": \"Austin\", \"country\": \"USA\""
+            }
+          ]
+        }
+      },
+      "list_all_airports": {
+        "observed_argument_keys": [],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 2,
+        "observations_rejected": 0,
+        "zero_prior_writes": 2,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {} carry no identity binding",
+        "evidence_example": {
+          "arguments": {},
+          "tenant": "mia_kim_4397",
+          "output": "{\"SFO\": \"San Francisco\", \"JFK\": \"New York\", \"LAX\": \"Los Angeles\", \"ORD\": \"Chicago\", \"DFW\": \"Dallas\", \"DEN\": \"Denver\", \"SEA\": \"Seattle\", \"ATL\": \"Atlanta\", \"MIA\":"
+        }
+      },
+      "list_all_product_types": {
+        "observed_argument_keys": [],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 18,
+        "observations_rejected": 1,
+        "zero_prior_writes": 14,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 1
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "measured",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (1 group(s) compared); the tool's observed arguments {} carry no identity binding",
+        "evidence_example": {
+          "arguments": {},
+          "tenants": 10,
+          "distinct_outputs": 1,
+          "examples": [
+            {
+              "tenant": "yusuf_rossi_9620",
+              "output": "{\"Action Camera\": \"3377618313\", \"Air Purifier\": \"3821016478\", \"Backpack\": \"2524789262\", \"Bicycle\": \"9783735446\", \"Bluetooth Speaker\": \"4768869376\", \"Bookshelf\":"
+            }
+          ]
+        }
+      },
+      "search_direct_flight": {
+        "observed_argument_keys": [
+          "date",
+          "destination",
+          "origin"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 25,
+        "observations_rejected": 13,
+        "zero_prior_writes": 21,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {date, destination, origin} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "date": "2024-05-20",
+            "destination": "SFO",
+            "origin": "JFK"
+          },
+          "tenant": "mia_kim_4397",
+          "output": "[{\"flight_number\": \"HAT023\", \"origin\": \"JFK\", \"destination\": \"SFO\", \"scheduled_departure_time_est\": \"14:00:00\", \"scheduled_arrival_time_est\": \"20:00:00\", \"statu"
+        }
+      },
+      "search_onestop_flight": {
+        "observed_argument_keys": [
+          "date",
+          "destination",
+          "origin"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 0,
+        "observations_rejected": 9,
+        "zero_prior_writes": 0,
+        "evidence_sufficient": false,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no observation survived validation (9 rejected, 0 accepted); the verdict rests on the tool's observed arguments {date, destination, origin}, which carry no identity binding",
+        "evidence_example": null
+      },
+      "think": {
+        "observed_argument_keys": [
+          "thought"
+        ],
+        "takes_identity_argument": false,
+        "identity_arguments": [],
+        "observations_accepted": 36,
+        "observations_rejected": 1,
+        "zero_prior_writes": 24,
+        "evidence_sufficient": true,
+        "comparisons": {
+          "identity_value_groups": 0,
+          "cross_tenant_identical_argument_groups": 0
+        },
+        "identity_divergent_groups": 0,
+        "tenant_divergent_groups": 0,
+        "payload_user_specific": false,
+        "identity_dependent": false,
+        "verdict": "identity-independent",
+        "basis": "structural",
+        "reason": "no validated observation differs across identity values (0 group(s) compared) or across tenants for identical arguments (0 group(s) compared); the tool's observed arguments {thought} carry no identity binding",
+        "evidence_example": {
+          "arguments": {
+            "thought": "Yusuf has two pending orders: #W6247578 and #W4776164. Order #W4776164 contains a small, v-neck t-shirt that can be modified. The user wants to change it to a purple, small, polyester, v-neck t-shirt. The item id for this option is 9647292434. I will proceed to modify this item in the pending order."
+          },
+          "tenant": "yusuf_rossi_9620",
+          "output": ""
+        }
+      }
+    },
+    "coverage": {
+      "records": 325,
+      "records_excluded_degenerate_join": 166,
+      "records_used": 159,
+      "records_by_source": {
+        "gpt-4o-airline": 45,
+        "gpt-4o-retail": 115,
+        "sonnet-35-new-airline": 50,
+        "sonnet-35-new-retail": 115
+      },
+      "excluded_by_source": {
+        "gpt-4o-airline": 2,
+        "gpt-4o-retail": 3,
+        "sonnet-35-new-airline": 48,
+        "sonnet-35-new-retail": 113
+      },
+      "used_by_source": {
+        "gpt-4o-airline": 43,
+        "gpt-4o-retail": 112,
+        "sonnet-35-new-airline": 2,
+        "sonnet-35-new-retail": 2
+      },
+      "observations_accepted": 777,
+      "observations_rejected": 69,
+      "acceptance_share": 0.9184,
+      "accepted_by_tool": {
+        "calculate": 30,
+        "find_user_id_by_email": 42,
+        "find_user_id_by_name_zip": 87,
+        "get_order_details": 240,
+        "get_product_details": 88,
+        "get_reservation_details": 89,
+        "get_user_details": 120,
+        "list_all_airports": 2,
+        "list_all_product_types": 18,
+        "search_direct_flight": 25,
+        "think": 36
+      },
+      "rejected_by_tool": {
+        "calculate": 1,
+        "find_user_id_by_email": 3,
+        "find_user_id_by_name_zip": 6,
+        "get_order_details": 14,
+        "get_product_details": 6,
+        "get_reservation_details": 6,
+        "get_user_details": 9,
+        "list_all_product_types": 1,
+        "search_direct_flight": 13,
+        "search_onestop_flight": 9,
+        "think": 1
+      },
+      "caveat": "the compactor's join collapses to one observation per call for 166 of 325 records, almost all of them sonnet runs, so the validated evidence is drawn from the gpt-4o runs (155 of 159 usable records). The call sequences are unaffected -- they match the committed corpus exactly (checked) -- so the evidence is about the same calls whose hits are classified; only the observations are thinner than the call count suggests."
+    }
+  },
+  "policies": [
+    {
+      "id": "P1",
+      "name": "blind",
+      "calls": 2275,
+      "hits": 807,
+      "hits_committed": 807,
+      "D1": 61,
+      "D2": 179,
+      "D3_damaging": 0,
+      "D3_harmless": 104,
+      "warranted_unsafe": 240,
+      "warranted_unsafe_per_1000_calls": 105.4945,
+      "warranted_share_of_hits": 0.297398,
+      "share_of_hits": {
+        "D1": 0.075589,
+        "D2": 0.221809,
+        "D3_damaging": 0.0,
+        "D3_harmless": 0.128872,
+        "warranted": 0.297398
+      },
+      "committed_unsafe_hits": 344,
+      "reclassified_total": 344,
+      "reduction_vs_committed": 104,
+      "by_tool": {
+        "D1": {
+          "cancel_pending_order": 7,
+          "cancel_reservation": 2,
+          "exchange_delivered_order_items": 7,
+          "modify_pending_order_address": 9,
+          "modify_pending_order_items": 11,
+          "modify_user_address": 3,
+          "return_delivered_order_items": 16,
+          "update_reservation_baggages": 1,
+          "update_reservation_flights": 4,
+          "update_reservation_passengers": 1
+        },
+        "D2": {
+          "get_order_details": 144,
+          "get_reservation_details": 17,
+          "get_user_details": 18
+        },
+        "D3_damaging": {},
+        "D3_harmless": {
+          "get_product_details": 76,
+          "list_all_airports": 1,
+          "list_all_product_types": 24,
+          "search_direct_flight": 3
+        }
+      },
+      "identity_arguments_differ": {},
+      "examples": [
+        {
+          "tool": "return_delivered_order_items",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#14",
+          "committed_class": "writes_served",
+          "cached_arguments": {
+            "item_ids": [
+              "5796612084"
+            ],
+            "order_id": "#W7387996",
+            "payment_method_id": "paypal_9497703"
+          },
+          "hitting_arguments": {
+            "item_ids": [
+              "5796612084"
+            ],
+            "order_id": "#W7387996",
+            "payment_method_id": "paypal_9497703"
+          },
+          "cached_tenant": "mia_garcia_4516",
+          "hit_tenant": "mia_garcia_4516",
+          "identity_arguments_differ": false
+        },
+        {
+          "tool": "get_order_details",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#1",
+          "committed_class": "stale_reads",
+          "cached_arguments": {
+            "order_id": "#W2378156"
+          },
+          "hitting_arguments": {
+            "order_id": "#W2378156"
+          },
+          "cached_tenant": "yusuf_rossi_9620",
+          "hit_tenant": "yusuf_rossi_9620",
+          "identity_arguments_differ": false
+        },
+        {
+          "tool": "get_product_details",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#20",
+          "committed_class": "cross_tenant",
+          "cached_arguments": {
+            "product_id": "4794339885"
+          },
+          "hitting_arguments": {
+            "product_id": "4794339885"
+          },
+          "cached_tenant": "mei_davis_8935",
+          "hit_tenant": "ethan_garcia_1261",
+          "identity_arguments_differ": false
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "blind+invalidate",
+      "calls": 2275,
+      "hits": 655,
+      "hits_committed": 655,
+      "D1": 61,
+      "D2": 0,
+      "D3_damaging": 0,
+      "D3_harmless": 104,
+      "warranted_unsafe": 61,
+      "warranted_unsafe_per_1000_calls": 26.8132,
+      "warranted_share_of_hits": 0.09313,
+      "share_of_hits": {
+        "D1": 0.09313,
+        "D2": 0.0,
+        "D3_damaging": 0.0,
+        "D3_harmless": 0.158779,
+        "warranted": 0.09313
+      },
+      "committed_unsafe_hits": 165,
+      "reclassified_total": 165,
+      "reduction_vs_committed": 104,
+      "by_tool": {
+        "D1": {
+          "cancel_pending_order": 7,
+          "cancel_reservation": 2,
+          "exchange_delivered_order_items": 7,
+          "modify_pending_order_address": 9,
+          "modify_pending_order_items": 11,
+          "modify_user_address": 3,
+          "return_delivered_order_items": 16,
+          "update_reservation_baggages": 1,
+          "update_reservation_flights": 4,
+          "update_reservation_passengers": 1
+        },
+        "D2": {},
+        "D3_damaging": {},
+        "D3_harmless": {
+          "get_product_details": 76,
+          "list_all_airports": 1,
+          "list_all_product_types": 24,
+          "search_direct_flight": 3
+        }
+      },
+      "identity_arguments_differ": {},
+      "examples": [
+        {
+          "tool": "return_delivered_order_items",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#14",
+          "committed_class": "writes_served",
+          "cached_arguments": {
+            "item_ids": [
+              "5796612084"
+            ],
+            "order_id": "#W7387996",
+            "payment_method_id": "paypal_9497703"
+          },
+          "hitting_arguments": {
+            "item_ids": [
+              "5796612084"
+            ],
+            "order_id": "#W7387996",
+            "payment_method_id": "paypal_9497703"
+          },
+          "cached_tenant": "mia_garcia_4516",
+          "hit_tenant": "mia_garcia_4516",
+          "identity_arguments_differ": false
+        },
+        {
+          "tool": "get_product_details",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#20",
+          "committed_class": "cross_tenant",
+          "cached_arguments": {
+            "product_id": "4794339885"
+          },
+          "hitting_arguments": {
+            "product_id": "4794339885"
+          },
+          "cached_tenant": "mei_davis_8935",
+          "hit_tenant": "ethan_garcia_1261",
+          "identity_arguments_differ": false
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "semantic-ish",
+      "calls": 2275,
+      "hits": 963,
+      "hits_committed": 963,
+      "D1": 62,
+      "D2": 179,
+      "D3_damaging": 250,
+      "D3_harmless": 104,
+      "warranted_unsafe": 491,
+      "warranted_unsafe_per_1000_calls": 215.8242,
+      "warranted_share_of_hits": 0.509865,
+      "share_of_hits": {
+        "D1": 0.064382,
+        "D2": 0.185877,
+        "D3_damaging": 0.259605,
+        "D3_harmless": 0.107996,
+        "warranted": 0.509865
+      },
+      "committed_unsafe_hits": 595,
+      "reclassified_total": 595,
+      "reduction_vs_committed": 104,
+      "by_tool": {
+        "D1": {
+          "cancel_pending_order": 7,
+          "cancel_reservation": 2,
+          "exchange_delivered_order_items": 7,
+          "modify_pending_order_address": 9,
+          "modify_pending_order_items": 12,
+          "modify_user_address": 3,
+          "return_delivered_order_items": 16,
+          "update_reservation_baggages": 1,
+          "update_reservation_flights": 4,
+          "update_reservation_passengers": 1
+        },
+        "D2": {
+          "get_order_details": 144,
+          "get_reservation_details": 17,
+          "get_user_details": 18
+        },
+        "D3_damaging": {
+          "get_user_details": 250
+        },
+        "D3_harmless": {
+          "get_product_details": 76,
+          "list_all_airports": 1,
+          "list_all_product_types": 24,
+          "search_direct_flight": 3
+        }
+      },
+      "identity_arguments_differ": {
+        "D3_damaging": 250
+      },
+      "examples": [
+        {
+          "tool": "return_delivered_order_items",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#14",
+          "committed_class": "writes_served",
+          "cached_arguments": {
+            "item_ids": [
+              "5796612084"
+            ],
+            "order_id": "#W7387996",
+            "payment_method_id": "paypal_9497703"
+          },
+          "hitting_arguments": {
+            "item_ids": [
+              "5796612084"
+            ],
+            "order_id": "#W7387996",
+            "payment_method_id": "paypal_9497703"
+          },
+          "cached_tenant": "mia_garcia_4516",
+          "hit_tenant": "mia_garcia_4516",
+          "identity_arguments_differ": false
+        },
+        {
+          "tool": "get_order_details",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#1",
+          "committed_class": "stale_reads",
+          "cached_arguments": {
+            "order_id": "#W2378156"
+          },
+          "hitting_arguments": {
+            "order_id": "#W2378156"
+          },
+          "cached_tenant": "yusuf_rossi_9620",
+          "hit_tenant": "yusuf_rossi_9620",
+          "identity_arguments_differ": false
+        },
+        {
+          "tool": "get_user_details",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#10",
+          "committed_class": "cross_tenant",
+          "cached_arguments": {
+            "user_id": "yusuf_rossi_9620"
+          },
+          "hitting_arguments": {
+            "user_id": "mia_garcia_4516"
+          },
+          "cached_tenant": "yusuf_rossi_9620",
+          "hit_tenant": "mia_garcia_4516",
+          "identity_arguments_differ": true
+        },
+        {
+          "tool": "get_product_details",
+          "source": "gpt-4o-retail",
+          "cluster": "retail#20",
+          "committed_class": "cross_tenant",
+          "cached_arguments": {
+            "product_id": "4794339885"
+          },
+          "hitting_arguments": {
+            "product_id": "4794339885"
+          },
+          "cached_tenant": "mei_davis_8935",
+          "hit_tenant": "ethan_garcia_1261",
+          "identity_arguments_differ": false
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "typed",
+      "calls": 1728,
+      "hits": 466,
+      "hits_committed": 466,
+      "D1": 0,
+      "D2": 0,
+      "D3_damaging": 0,
+      "D3_harmless": 0,
+      "warranted_unsafe": 0,
+      "warranted_unsafe_per_1000_calls": 0.0,
+      "warranted_share_of_hits": 0.0,
+      "share_of_hits": {
+        "D1": 0.0,
+        "D2": 0.0,
+        "D3_damaging": 0.0,
+        "D3_harmless": 0.0,
+        "warranted": 0.0
+      },
+      "committed_unsafe_hits": 0,
+      "reclassified_total": 0,
+      "reduction_vs_committed": 0,
+      "by_tool": {
+        "D1": {},
+        "D2": {},
+        "D3_damaging": {},
+        "D3_harmless": {}
+      },
+      "identity_arguments_differ": {},
+      "examples": []
+    }
+  ],
+  "instances": {
+    "total": 165,
+    "composition": {
+      "airline": 50,
+      "retail": 115
+    },
+    "cells": 325,
+    "p1": {
+      "with_warranted_unsafe": 70,
+      "share_with_warranted_unsafe": 0.424242,
+      "with_any_hit_by_class": {
+        "D1": 28,
+        "D2": 68,
+        "D3_damaging": 0,
+        "D3_harmless": 51
+      }
+    },
+    "p2": {
+      "with_warranted_unsafe": 28,
+      "share_with_warranted_unsafe": 0.169697
+    },
+    "p3": {
+      "with_warranted_unsafe": 154,
+      "share_with_warranted_unsafe": 0.933333
+    }
+  },
+  "intervals": {
+    "p1_warranted_per_1000_calls": {
+      "estimate": 105.495,
+      "ci_low": 82.27,
+      "ci_high": 130.086,
+      "unit": "warranted-unsafe hits per 1,000 calls",
+      "confidence": 0.95,
+      "resamples": 10000,
+      "percentile_rule": "linear interpolation: h = (n-1)*p, floor plus the fraction"
+    },
+    "p1_share_instances_with_warranted": {
+      "estimate": 0.4242,
+      "ci_low": 0.3455,
+      "ci_high": 0.497,
+      "unit": "share of task instances with at least one warranted-unsafe hit",
+      "confidence": 0.95,
+      "resamples": 10000,
+      "percentile_rule": "linear interpolation: h = (n-1)*p, floor plus the fraction"
+    }
+  },
+  "supplementary_point_estimates": {
+    "note": "point estimates only, from the same 10,000 draws (paired with P1) but not required by the task; the intervals reported above are P1's",
+    "p2": {
+      "warranted_unsafe": 61,
+      "warranted_per_1000_calls": 26.8132,
+      "instances_with_warranted": 28,
+      "share_instances_with_warranted": 0.169697
+    },
+    "p3": {
+      "warranted_unsafe": 491,
+      "warranted_per_1000_calls": 215.8242,
+      "instances_with_warranted": 154,
+      "share_instances_with_warranted": 0.933333
+    }
+  },
+  "typed_zero_bound": {
+    "method": "exact one-sided Clopper-Pearson limit for k = 0, closed form 1 - alpha**(1/n); the rule-of-three approximation 3/n is reported beside it",
+    "alpha_one_sided": 0.05,
+    "observed_unsafe": 0,
+    "admitted_reads": {
+      "n": 1728,
+      "exact_upper": 0.00173214,
+      "exact_upper_per_1000": 1.732,
+      "rule_of_three_per_1000": 1.736
+    },
+    "all_replayed_calls": {
+      "n": 2275,
+      "exact_upper": 0.00131594,
+      "exact_upper_per_1000": 1.316,
+      "rule_of_three_per_1000": 1.319
+    },
+    "served_hits": {
+      "n": 466,
+      "exact_upper": 0.00640799,
+      "exact_upper_per_1000": 6.408,
+      "rule_of_three_per_1000": 6.438
+    },
+    "reading": "a zero on 1,728 admitted reads is consistent with a true warranted-unsafe rate up to 1.73 per 1,000 reads at 95% one-sided confidence; the point estimate is 0, the honest claim is 'below that bound', not 'impossible'"
+  },
+  "checks": {
+    "committed_totals_reproduced": {
+      "expected": "the committed (calls, hits, unsafe) for every policy",
+      "observed": {
+        "P1": {
+          "rebuilt": [
+            2275,
+            807,
+            344
+          ],
+          "committed": [
+            2275,
+            807,
+            344
+          ]
+        },
+        "P2": {
+          "rebuilt": [
+            2275,
+            655,
+            165
+          ],
+          "committed": [
+            2275,
+            655,
+            165
+          ]
+        },
+        "P3": {
+          "rebuilt": [
+            2275,
+            963,
+            595
+          ],
+          "committed": [
+            2275,
+            963,
+            595
+          ]
+        },
+        "P4": {
+          "rebuilt": [
+            1728,
+            466,
+            0
+          ],
+          "committed": [
+            1728,
+            466,
+            0
+          ]
+        }
+      },
+      "passed": true
+    },
+    "partition_of_committed_unsafe": {
+      "expected": "D1 = writes_served, D2 = stale_reads, D3_damaging + D3_harmless = cross_tenant, and the four buckets sum to the committed total",
+      "observed": {
+        "P1": {
+          "D1": 61,
+          "committed_writes_served": 61,
+          "D2": 179,
+          "committed_stale_reads": 179,
+          "D3": 104,
+          "committed_cross_tenant": 104,
+          "class_sum": 344,
+          "reclassified_total": 344
+        },
+        "P2": {
+          "D1": 61,
+          "committed_writes_served": 61,
+          "D2": 0,
+          "committed_stale_reads": 0,
+          "D3": 104,
+          "committed_cross_tenant": 104,
+          "class_sum": 165,
+          "reclassified_total": 165
+        },
+        "P3": {
+          "D1": 62,
+          "committed_writes_served": 62,
+          "D2": 179,
+          "committed_stale_reads": 179,
+          "D3": 354,
+          "committed_cross_tenant": 354,
+          "class_sum": 595,
+          "reclassified_total": 595
+        },
+        "P4": {
+          "D1": 0,
+          "committed_writes_served": 0,
+          "D2": 0,
+          "committed_stale_reads": 0,
+          "D3": 0,
+          "committed_cross_tenant": 0,
+          "class_sum": 0,
+          "reclassified_total": 0
+        }
+      },
+      "passed": true
+    },
+    "cluster_count": {
+      "clusters": 165,
+      "cells": 325,
+      "composition": {
+        "airline": 50,
+        "retail": 115
+      },
+      "passed": true,
+      "why": "165 task instances, 325 cells: retail contributes 115 tasks performed by two models, airline 50 tasks of which 45 were performed by two models (115*2 + 50 + 45 = 325). Resampling cells would treat two runs of one task as independent draws of the task population."
+    },
+    "identity_priors": {
+      "catalog_tools": {
+        "tools": [
+          "get_product_details",
+          "list_all_product_types",
+          "calculate",
+          "think"
+        ],
+        "present": {
+          "get_product_details": true,
+          "list_all_product_types": true,
+          "calculate": true,
+          "think": true
+        },
+        "measured": {
+          "get_product_details": false,
+          "list_all_product_types": false,
+          "calculate": false,
+          "think": false
+        },
+        "passed": true
+      },
+      "dependent_tools": {
+        "tools": [
+          "get_user_details",
+          "find_user_id_by_email"
+        ],
+        "present": {
+          "get_user_details": true,
+          "find_user_id_by_email": true
+        },
+        "measured": {
+          "get_user_details": true,
+          "find_user_id_by_email": true
+        },
+        "passed": true
+      },
+      "passed": true,
+      "why": "the catalog list is the task's prior; the measurement is independent of it, so agreement is evidence and disagreement would be a finding"
+    },
+    "identity_evidence_covers_every_hit_tool": {
+      "tools_with_d3_hits": [
+        "get_product_details",
+        "get_user_details",
+        "list_all_airports",
+        "list_all_product_types",
+        "search_direct_flight"
+      ],
+      "missing": [],
+      "passed": true
+    },
+    "typed_zero_under_damage_split": {
+      "warranted_unsafe": 0,
+      "passed": true,
+      "why": "0 is a count on 1,728 admitted reads, not an analytic consequence of the classification: D1/D2/D3 are defined by missing side effects, stale state and identity-selected payloads, none of which names the typed key. The bound below says how much a zero on this sample could hide."
+    },
+    "p1_p2_cross_tenant_hits_are_all_harmless": {
+      "p1_d3_damaging": 0,
+      "p2_d3_damaging": 0,
+      "passed": true,
+      "why": "both keys include every argument, so a cross-tenant hit needs arguments that carry no identity, which is exactly the set of tools measured identity-independent; P3 drops user_id, which is why its identity class is not all harmless"
+    },
+    "identity_arguments_on_d3_hits": {
+      "D3_damaging": 250,
+      "D3_damaging_with_a_different_identity_argument": 250,
+      "D3_harmless": 312,
+      "D3_harmless_with_a_different_identity_argument": 0,
+      "passed": true,
+      "why": "the tool-class verdict and the per-hit diagnosis must agree: every hit called identity-damaging must carry a different identity argument than its memo, and no hit called harmless may. This is the internal consistency test of D3, independent of the tool table"
+    },
+    "bootstrap_resamples": {
+      "requested": 10000,
+      "used": 10000,
+      "passed": true
+    },
+    "walk_equals_module_replay": {
+      "passed": true,
+      "why": "each policy's per-call walk was folded and compared field for field with unsafe_cache_baselines.replay() before any hit was classified"
+    },
+    "observed_corpus_aligned_with_committed": {
+      "observed_records": 325,
+      "first_trial_records": 325,
+      "missing_twin": 0,
+      "call_sequence_mismatches": 0,
+      "passed": true,
+      "why": "the identity evidence is about *these* calls only if the observation-bearing corpus carries the same calls in the same order; a mismatch would mean the evidence comes from a different workload"
+    }
+  },
+  "notes": [
+    "D3's harmlessness is a property of the tool, not of the hit: an identical argument list that names no identity cannot return a different answer to a different tenant, and the catalog tools are shown to return identical observations for identical arguments across tenants before any write.",
+    "The reduction is one-sided: a hit counted damaging here is damaging, a hit called harmless is harmless only in the sense that the served value equals the value the tool would have produced. Both claims are auditable in policies[].by_tool and identity_dependence.tools.",
+    "P3's identity damage is all get_user_details: its key drops user_id, so tenant B's profile read is answered with tenant A's profile. P1/P2 cannot do this, because their keys include the identity argument -- which is why their identity class is entirely harmless and P3's is not.",
+    "The exact bound is per denominator, and the denominators differ in meaning: per admitted read is a call-level error rate, per served hit is the 'how much of what it served could be wrong' rate. Both are reported rather than one being chosen.",
+    "payload_user_specific is not the verdict. get_order_details and get_reservation_details return payloads that name a user (the order's owner) and find_user_id_by_name_zip returns a user id, yet all three are identity-independent: the answer is selected by non-identity arguments, so a key that includes those arguments cannot confuse two people. The task's second clause -- takes user_id/email and returns user-specific data -- is realised as E1, which asks whether the payload changes when only the identity argument changes.",
+    "The reduction, spelled out: P1's committed 344 = 240 warranted + 104 harmless; P2's 165 = 61 + 104; P3's 595 = 491 + 104. The harmless 104 is the same hit set in all three policies -- the catalog and flight reads -- so it is one measured quantity seen three times, not three independent findings.",
+    "Clustered intervals stay slightly optimistic: each run keeps its own run-scope cache, so an instance's outcomes also depend on the instances before it in the same run. Four runs cannot support a block bootstrap, so that carryover is stated, not modelled."
+  ],
+  "reproduce": "python3 examples/benchmarks/unsafe_damage.py  (seed 20240601, 10,000 instance resamples; byte-identical output on repeat)"
+}

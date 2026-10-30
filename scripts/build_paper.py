@@ -135,14 +135,14 @@ def escape_bib(text: str) -> str:
 
 def make_bibliography(body: str) -> str:
     entries = [e.strip() for e in re.split(r"\n\s*\n", body) if e.strip()]
-    lines = ["```{=latex}", r"\begin{thebibliography}{99}"]
+    lines = ["```{=latex}", r"{\small\setlength{\bibsep}{1.2pt}", r"\begin{thebibliography}{99}"]
     for entry in entries:
         m = re.match(r"\[(\d+)\]\s*(.+)", entry, re.S)
         if not m:
             raise ValueError(f"unparsable reference entry: {entry[:60]!r}")
         content = " ".join(m.group(2).split())
         lines.append(rf"\bibitem{{ref{m.group(1)}}} {escape_bib(content)}")
-    lines.append(r"\end{thebibliography}")
+    lines.append(r"\end{thebibliography}}")
     lines.append("```")
     return "\n".join(lines)
 

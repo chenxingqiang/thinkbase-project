@@ -1,0 +1,1133 @@
+{
+  "schema": "compound_holdout/v1",
+  "self_test": false,
+  "corpus": {
+    "path": "examples/real_traces/tau_bench_observed.jsonl",
+    "sha256": "50fb894fb1e2bddda69cb866f93772ccc4e0199c2e28eafbee4d84ecf4fd68e0",
+    "bytes": 1071187,
+    "tasks": 325,
+    "dispatches": 2275,
+    "domains": [
+      "airline",
+      "retail"
+    ]
+  },
+  "split": {
+    "rule": "task_id parity, applied within each domain: even -> A, odd -> B",
+    "note": "a task instance appears in exactly one half, and both model runs of a task are on the same side; file order is preserved inside each half",
+    "max_k": 4,
+    "min_support": 2
+  },
+  "definitions": {
+    "mined": "recurring contiguous k-gram (2 <= k <= max_k, support >= min_support) on the learn half",
+    "signature_consistent": "every learn-half occurrence has the same provenance signature",
+    "verified_on_learn": "spec learned on one learn-half occurrence replays exactly on the half's other occurrences",
+    "exposed": "the compound has at least one occurrence in the measure half",
+    "transferred_to_measure": "the learn-half spec replays exactly on every exposed measure-half occurrence; reported once for the verified repertoire and once for every mined compound",
+    "absorption": "greedy longest-first, non-overlapping substitution of gate compounds; k - 1 dispatches removed per application; dispatches are recorded calls",
+    "holdout": "absorption on the measure half with the verified-on-learn gate",
+    "strict": "absorption with the verified-on-learn and transferred gates",
+    "in_sample": "absorption on the learn half with its own verified gate",
+    "full_repertoire": "the committed repertoire (all tasks), measured on the given half"
+  },
+  "baseline": {
+    "path": "examples/benchmarks/compound_binding_results.json",
+    "sha256": "9f4103a0217bc1cef9a0f88515c6121fe1f3a31b6811dde50ba3fe847f08189f",
+    "schema": "compound_binding/v1",
+    "git_rev": "90e0f4b1c1b111e4830393f5e50909261bf0b2bc",
+    "in_sample": {
+      "compounds_mined": 450,
+      "signature_consistent": 102,
+      "replay_verified": 78,
+      "dispatches_removed": 285,
+      "dispatches": 2275,
+      "applications": 178,
+      "rate": 0.1253
+    }
+  },
+  "reproduction": {
+    "committed": {
+      "compounds_mined": 450,
+      "signature_consistent": 102,
+      "replay_verified": 78,
+      "dispatches_removed": 285,
+      "dispatches": 2275,
+      "applications": 178,
+      "rate": 0.1253
+    },
+    "reproduced": {
+      "compounds_mined": 450,
+      "signature_consistent": 102,
+      "replay_verified": 78,
+      "dispatches_removed": 285,
+      "dispatches": 2275,
+      "applications": 178,
+      "rate": 0.1253
+    },
+    "comparisons": [
+      {
+        "field": "compounds_mined",
+        "committed": 450,
+        "reproduced": 450,
+        "matches": true
+      },
+      {
+        "field": "signature_consistent",
+        "committed": 102,
+        "reproduced": 102,
+        "matches": true
+      },
+      {
+        "field": "replay_verified",
+        "committed": 78,
+        "reproduced": 78,
+        "matches": true
+      },
+      {
+        "field": "dispatches_removed",
+        "committed": 285,
+        "reproduced": 285,
+        "matches": true
+      },
+      {
+        "field": "dispatches",
+        "committed": 2275,
+        "reproduced": 2275,
+        "matches": true
+      },
+      {
+        "field": "applications",
+        "committed": 178,
+        "reproduced": 178,
+        "matches": true
+      },
+      {
+        "field": "rate",
+        "committed": 0.1253,
+        "reproduced": 0.1253,
+        "matches": true
+      }
+    ],
+    "matches": true
+  },
+  "pooled": {
+    "label": "pooled",
+    "tasks": 325,
+    "dispatches": 2275,
+    "halves": {
+      "A": {
+        "tasks": 164,
+        "dispatches": 1164
+      },
+      "B": {
+        "tasks": 161,
+        "dispatches": 1111
+      }
+    },
+    "A_to_B": {
+      "learn": {
+        "half": "A",
+        "tasks": 164,
+        "dispatches": 1164
+      },
+      "measure": {
+        "half": "B",
+        "tasks": 161,
+        "dispatches": 1111
+      },
+      "compounds": {
+        "mined_on_learn": 268,
+        "signature_consistent_on_learn": 66,
+        "verified_on_learn": 52,
+        "mined_exposed_in_measure": 188,
+        "mined_transferred_to_measure": 92,
+        "verified_exposed_in_measure": 40,
+        "verified_transferred_to_measure": 39
+      },
+      "funnel": {
+        "recurring": 268,
+        "signature_consistent": 66,
+        "in_source_replay": 52
+      },
+      "replay_on_learn": {
+        "occurrence_tests": 146,
+        "occurrence_exact": 131,
+        "path_drift": 0,
+        "mismatched": 15
+      },
+      "transfer_to_measure": {
+        "specs": 52,
+        "exposed": 40,
+        "transferred": 39,
+        "unexposed": 12,
+        "occurrence_tests": 146,
+        "occurrence_exact": 145,
+        "path_drift": 1,
+        "mismatched": 0,
+        "failures": [
+          {
+            "compound": [
+              [
+                "find_user_id_by_name_zip",
+                [
+                  "first_name",
+                  "last_name",
+                  "zip"
+                ]
+              ],
+              [
+                "list_all_product_types",
+                []
+              ],
+              [
+                "get_product_details",
+                [
+                  "product_id"
+                ]
+              ],
+              [
+                "get_user_details",
+                [
+                  "user_id"
+                ]
+              ]
+            ],
+            "task": "89",
+            "mode": "ambiguous_read"
+          }
+        ]
+      },
+      "absorption": {
+        "measure_holdout": {
+          "gate": "verified_on_learn",
+          "applications": 90,
+          "dispatches_removed": 118,
+          "dispatches": 1111,
+          "rate": 0.1062
+        },
+        "measure_holdout_strict": {
+          "gate": "verified_on_learn and transferred_to_measure",
+          "applications": 90,
+          "dispatches_removed": 118,
+          "dispatches": 1111,
+          "rate": 0.1062
+        },
+        "measure_signature_bound": {
+          "gate": "signature_consistent_on_learn",
+          "applications": 96,
+          "dispatches_removed": 139,
+          "dispatches": 1111,
+          "rate": 0.1251
+        },
+        "measure_full_repertoire": {
+          "gate": "verified on all tasks",
+          "applications": 87,
+          "dispatches_removed": 132,
+          "dispatches": 1111,
+          "rate": 0.1188
+        },
+        "learn_in_sample": {
+          "gate": "verified_on_learn",
+          "applications": 106,
+          "dispatches_removed": 160,
+          "dispatches": 1164,
+          "rate": 0.1375
+        }
+      },
+      "by_k": {
+        "2": {
+          "mined": 92,
+          "verified_on_learn": 30,
+          "transferred": 26
+        },
+        "3": {
+          "mined": 97,
+          "verified_on_learn": 15,
+          "transferred": 10
+        },
+        "4": {
+          "mined": 79,
+          "verified_on_learn": 7,
+          "transferred": 3
+        }
+      }
+    },
+    "B_to_A": {
+      "learn": {
+        "half": "B",
+        "tasks": 161,
+        "dispatches": 1111
+      },
+      "measure": {
+        "half": "A",
+        "tasks": 164,
+        "dispatches": 1164
+      },
+      "compounds": {
+        "mined_on_learn": 246,
+        "signature_consistent_on_learn": 61,
+        "verified_on_learn": 53,
+        "mined_exposed_in_measure": 189,
+        "mined_transferred_to_measure": 94,
+        "verified_exposed_in_measure": 44,
+        "verified_transferred_to_measure": 44
+      },
+      "funnel": {
+        "recurring": 246,
+        "signature_consistent": 61,
+        "in_source_replay": 53
+      },
+      "replay_on_learn": {
+        "occurrence_tests": 117,
+        "occurrence_exact": 107,
+        "path_drift": 1,
+        "mismatched": 10
+      },
+      "transfer_to_measure": {
+        "specs": 53,
+        "exposed": 44,
+        "transferred": 44,
+        "unexposed": 9,
+        "occurrence_tests": 140,
+        "occurrence_exact": 140,
+        "path_drift": 0,
+        "mismatched": 0,
+        "failures": []
+      },
+      "absorption": {
+        "measure_holdout": {
+          "gate": "verified_on_learn",
+          "applications": 68,
+          "dispatches_removed": 111,
+          "dispatches": 1164,
+          "rate": 0.0954
+        },
+        "measure_holdout_strict": {
+          "gate": "verified_on_learn and transferred_to_measure",
+          "applications": 68,
+          "dispatches_removed": 111,
+          "dispatches": 1164,
+          "rate": 0.0954
+        },
+        "measure_signature_bound": {
+          "gate": "signature_consistent_on_learn",
+          "applications": 77,
+          "dispatches_removed": 132,
+          "dispatches": 1164,
+          "rate": 0.1134
+        },
+        "measure_full_repertoire": {
+          "gate": "verified on all tasks",
+          "applications": 91,
+          "dispatches_removed": 153,
+          "dispatches": 1164,
+          "rate": 0.1314
+        },
+        "learn_in_sample": {
+          "gate": "verified_on_learn",
+          "applications": 86,
+          "dispatches_removed": 139,
+          "dispatches": 1111,
+          "rate": 0.1251
+        }
+      },
+      "by_k": {
+        "2": {
+          "mined": 84,
+          "verified_on_learn": 27,
+          "transferred": 23
+        },
+        "3": {
+          "mined": 92,
+          "verified_on_learn": 18,
+          "transferred": 14
+        },
+        "4": {
+          "mined": 70,
+          "verified_on_learn": 8,
+          "transferred": 7
+        }
+      }
+    }
+  },
+  "by_domain": {
+    "retail": {
+      "label": "retail",
+      "tasks": 230,
+      "dispatches": 1666,
+      "halves": {
+        "A": {
+          "tasks": 116,
+          "dispatches": 857
+        },
+        "B": {
+          "tasks": 114,
+          "dispatches": 809
+        }
+      },
+      "A_to_B": {
+        "learn": {
+          "half": "A",
+          "tasks": 116,
+          "dispatches": 857
+        },
+        "measure": {
+          "half": "B",
+          "tasks": 114,
+          "dispatches": 809
+        },
+        "compounds": {
+          "mined_on_learn": 192,
+          "signature_consistent_on_learn": 47,
+          "verified_on_learn": 36,
+          "mined_exposed_in_measure": 132,
+          "mined_transferred_to_measure": 59,
+          "verified_exposed_in_measure": 26,
+          "verified_transferred_to_measure": 25
+        },
+        "funnel": {
+          "recurring": 192,
+          "signature_consistent": 47,
+          "in_source_replay": 36
+        },
+        "replay_on_learn": {
+          "occurrence_tests": 105,
+          "occurrence_exact": 93,
+          "path_drift": 0,
+          "mismatched": 12
+        },
+        "transfer_to_measure": {
+          "specs": 36,
+          "exposed": 26,
+          "transferred": 25,
+          "unexposed": 10,
+          "occurrence_tests": 95,
+          "occurrence_exact": 94,
+          "path_drift": 1,
+          "mismatched": 0,
+          "failures": [
+            {
+              "compound": [
+                [
+                  "find_user_id_by_name_zip",
+                  [
+                    "first_name",
+                    "last_name",
+                    "zip"
+                  ]
+                ],
+                [
+                  "list_all_product_types",
+                  []
+                ],
+                [
+                  "get_product_details",
+                  [
+                    "product_id"
+                  ]
+                ],
+                [
+                  "get_user_details",
+                  [
+                    "user_id"
+                  ]
+                ]
+              ],
+              "task": "89",
+              "mode": "ambiguous_read"
+            }
+          ]
+        },
+        "absorption": {
+          "measure_holdout": {
+            "gate": "verified_on_learn",
+            "applications": 64,
+            "dispatches_removed": 78,
+            "dispatches": 809,
+            "rate": 0.0964
+          },
+          "measure_holdout_strict": {
+            "gate": "verified_on_learn and transferred_to_measure",
+            "applications": 64,
+            "dispatches_removed": 78,
+            "dispatches": 809,
+            "rate": 0.0964
+          },
+          "measure_signature_bound": {
+            "gate": "signature_consistent_on_learn",
+            "applications": 66,
+            "dispatches_removed": 95,
+            "dispatches": 809,
+            "rate": 0.1174
+          },
+          "measure_full_repertoire": {
+            "gate": "verified on all tasks",
+            "applications": 58,
+            "dispatches_removed": 83,
+            "dispatches": 809,
+            "rate": 0.1026
+          },
+          "learn_in_sample": {
+            "gate": "verified_on_learn",
+            "applications": 76,
+            "dispatches_removed": 116,
+            "dispatches": 857,
+            "rate": 0.1354
+          }
+        },
+        "by_k": {
+          "2": {
+            "mined": 57,
+            "verified_on_learn": 21,
+            "transferred": 17
+          },
+          "3": {
+            "mined": 71,
+            "verified_on_learn": 9,
+            "transferred": 6
+          },
+          "4": {
+            "mined": 64,
+            "verified_on_learn": 6,
+            "transferred": 2
+          }
+        }
+      },
+      "B_to_A": {
+        "learn": {
+          "half": "B",
+          "tasks": 114,
+          "dispatches": 809
+        },
+        "measure": {
+          "half": "A",
+          "tasks": 116,
+          "dispatches": 857
+        },
+        "compounds": {
+          "mined_on_learn": 172,
+          "signature_consistent_on_learn": 40,
+          "verified_on_learn": 35,
+          "mined_exposed_in_measure": 130,
+          "mined_transferred_to_measure": 57,
+          "verified_exposed_in_measure": 30,
+          "verified_transferred_to_measure": 30
+        },
+        "funnel": {
+          "recurring": 172,
+          "signature_consistent": 40,
+          "in_source_replay": 35
+        },
+        "replay_on_learn": {
+          "occurrence_tests": 69,
+          "occurrence_exact": 65,
+          "path_drift": 1,
+          "mismatched": 4
+        },
+        "transfer_to_measure": {
+          "specs": 35,
+          "exposed": 30,
+          "transferred": 30,
+          "unexposed": 5,
+          "occurrence_tests": 95,
+          "occurrence_exact": 95,
+          "path_drift": 0,
+          "mismatched": 0,
+          "failures": []
+        },
+        "absorption": {
+          "measure_holdout": {
+            "gate": "verified_on_learn",
+            "applications": 46,
+            "dispatches_removed": 76,
+            "dispatches": 857,
+            "rate": 0.0887
+          },
+          "measure_holdout_strict": {
+            "gate": "verified_on_learn and transferred_to_measure",
+            "applications": 46,
+            "dispatches_removed": 76,
+            "dispatches": 857,
+            "rate": 0.0887
+          },
+          "measure_signature_bound": {
+            "gate": "signature_consistent_on_learn",
+            "applications": 53,
+            "dispatches_removed": 95,
+            "dispatches": 857,
+            "rate": 0.1109
+          },
+          "measure_full_repertoire": {
+            "gate": "verified on all tasks",
+            "applications": 63,
+            "dispatches_removed": 106,
+            "dispatches": 857,
+            "rate": 0.1237
+          },
+          "learn_in_sample": {
+            "gate": "verified_on_learn",
+            "applications": 59,
+            "dispatches_removed": 94,
+            "dispatches": 809,
+            "rate": 0.1162
+          }
+        },
+        "by_k": {
+          "2": {
+            "mined": 53,
+            "verified_on_learn": 18,
+            "transferred": 16
+          },
+          "3": {
+            "mined": 62,
+            "verified_on_learn": 10,
+            "transferred": 8
+          },
+          "4": {
+            "mined": 57,
+            "verified_on_learn": 7,
+            "transferred": 6
+          }
+        }
+      }
+    },
+    "airline": {
+      "label": "airline",
+      "tasks": 95,
+      "dispatches": 609,
+      "halves": {
+        "A": {
+          "tasks": 48,
+          "dispatches": 307
+        },
+        "B": {
+          "tasks": 47,
+          "dispatches": 302
+        }
+      },
+      "A_to_B": {
+        "learn": {
+          "half": "A",
+          "tasks": 48,
+          "dispatches": 307
+        },
+        "measure": {
+          "half": "B",
+          "tasks": 47,
+          "dispatches": 302
+        },
+        "compounds": {
+          "mined_on_learn": 75,
+          "signature_consistent_on_learn": 18,
+          "verified_on_learn": 15,
+          "mined_exposed_in_measure": 55,
+          "mined_transferred_to_measure": 32,
+          "verified_exposed_in_measure": 13,
+          "verified_transferred_to_measure": 13
+        },
+        "funnel": {
+          "recurring": 75,
+          "signature_consistent": 18,
+          "in_source_replay": 15
+        },
+        "replay_on_learn": {
+          "occurrence_tests": 37,
+          "occurrence_exact": 34,
+          "path_drift": 0,
+          "mismatched": 3
+        },
+        "transfer_to_measure": {
+          "specs": 15,
+          "exposed": 13,
+          "transferred": 13,
+          "unexposed": 2,
+          "occurrence_tests": 43,
+          "occurrence_exact": 43,
+          "path_drift": 0,
+          "mismatched": 0,
+          "failures": []
+        },
+        "absorption": {
+          "measure_holdout": {
+            "gate": "verified_on_learn",
+            "applications": 28,
+            "dispatches_removed": 39,
+            "dispatches": 302,
+            "rate": 0.1291
+          },
+          "measure_holdout_strict": {
+            "gate": "verified_on_learn and transferred_to_measure",
+            "applications": 28,
+            "dispatches_removed": 39,
+            "dispatches": 302,
+            "rate": 0.1291
+          },
+          "measure_signature_bound": {
+            "gate": "signature_consistent_on_learn",
+            "applications": 32,
+            "dispatches_removed": 43,
+            "dispatches": 302,
+            "rate": 0.1424
+          },
+          "measure_full_repertoire": {
+            "gate": "verified on all tasks",
+            "applications": 29,
+            "dispatches_removed": 49,
+            "dispatches": 302,
+            "rate": 0.1623
+          },
+          "learn_in_sample": {
+            "gate": "verified_on_learn",
+            "applications": 29,
+            "dispatches_removed": 43,
+            "dispatches": 307,
+            "rate": 0.1401
+          }
+        },
+        "by_k": {
+          "2": {
+            "mined": 35,
+            "verified_on_learn": 9,
+            "transferred": 9
+          },
+          "3": {
+            "mined": 25,
+            "verified_on_learn": 5,
+            "transferred": 3
+          },
+          "4": {
+            "mined": 15,
+            "verified_on_learn": 1,
+            "transferred": 1
+          }
+        }
+      },
+      "B_to_A": {
+        "learn": {
+          "half": "B",
+          "tasks": 47,
+          "dispatches": 302
+        },
+        "measure": {
+          "half": "A",
+          "tasks": 48,
+          "dispatches": 307
+        },
+        "compounds": {
+          "mined_on_learn": 74,
+          "signature_consistent_on_learn": 21,
+          "verified_on_learn": 18,
+          "mined_exposed_in_measure": 59,
+          "mined_transferred_to_measure": 37,
+          "verified_exposed_in_measure": 14,
+          "verified_transferred_to_measure": 14
+        },
+        "funnel": {
+          "recurring": 74,
+          "signature_consistent": 21,
+          "in_source_replay": 18
+        },
+        "replay_on_learn": {
+          "occurrence_tests": 46,
+          "occurrence_exact": 40,
+          "path_drift": 0,
+          "mismatched": 6
+        },
+        "transfer_to_measure": {
+          "specs": 18,
+          "exposed": 14,
+          "transferred": 14,
+          "unexposed": 4,
+          "occurrence_tests": 39,
+          "occurrence_exact": 39,
+          "path_drift": 0,
+          "mismatched": 0,
+          "failures": []
+        },
+        "absorption": {
+          "measure_holdout": {
+            "gate": "verified_on_learn",
+            "applications": 22,
+            "dispatches_removed": 34,
+            "dispatches": 307,
+            "rate": 0.1107
+          },
+          "measure_holdout_strict": {
+            "gate": "verified_on_learn and transferred_to_measure",
+            "applications": 22,
+            "dispatches_removed": 34,
+            "dispatches": 307,
+            "rate": 0.1107
+          },
+          "measure_signature_bound": {
+            "gate": "signature_consistent_on_learn",
+            "applications": 24,
+            "dispatches_removed": 36,
+            "dispatches": 307,
+            "rate": 0.1173
+          },
+          "measure_full_repertoire": {
+            "gate": "verified on all tasks",
+            "applications": 28,
+            "dispatches_removed": 47,
+            "dispatches": 307,
+            "rate": 0.1531
+          },
+          "learn_in_sample": {
+            "gate": "verified_on_learn",
+            "applications": 26,
+            "dispatches_removed": 44,
+            "dispatches": 302,
+            "rate": 0.1457
+          }
+        },
+        "by_k": {
+          "2": {
+            "mined": 31,
+            "verified_on_learn": 9,
+            "transferred": 7
+          },
+          "3": {
+            "mined": 30,
+            "verified_on_learn": 8,
+            "transferred": 6
+          },
+          "4": {
+            "mined": 13,
+            "verified_on_learn": 1,
+            "transferred": 1
+          }
+        }
+      }
+    }
+  },
+  "reference": {
+    "full_repertoire": {
+      "compounds": {
+        "mined": 450,
+        "signature_consistent": 102,
+        "verified": 78,
+        "funnel": {
+          "recurring": 450,
+          "signature_consistent": 102,
+          "in_source_replay": 78
+        },
+        "replay": {
+          "occurrence_tests": 277,
+          "occurrence_exact": 247,
+          "path_drift": 1,
+          "mismatched": 30
+        }
+      },
+      "absorption": {
+        "on_all": {
+          "gate": "verified on all tasks",
+          "applications": 178,
+          "dispatches_removed": 285,
+          "dispatches": 2275,
+          "rate": 0.1253
+        },
+        "on_half_A": {
+          "gate": "verified on all tasks",
+          "applications": 91,
+          "dispatches_removed": 153,
+          "dispatches": 1164,
+          "rate": 0.1314
+        },
+        "on_half_B": {
+          "gate": "verified on all tasks",
+          "applications": 87,
+          "dispatches_removed": 132,
+          "dispatches": 1111,
+          "rate": 0.1188
+        },
+        "on_domain": {
+          "retail": {
+            "gate": "verified on all tasks",
+            "applications": 121,
+            "dispatches_removed": 189,
+            "dispatches": 1666,
+            "rate": 0.1134
+          },
+          "airline": {
+            "gate": "verified on all tasks",
+            "applications": 57,
+            "dispatches_removed": 96,
+            "dispatches": 609,
+            "rate": 0.1576
+          }
+        }
+      }
+    },
+    "unfiltered_replay": {
+      "note": "diagnostic only: the committed run verifies the signature-consistent set, not every mined compound; this cell shows how much the stage changes the answer",
+      "compounds_verified": 217,
+      "absorption": {
+        "gate": "verified on all mined",
+        "applications": 600,
+        "dispatches_removed": 1109,
+        "dispatches": 2275,
+        "rate": 0.4875
+      },
+      "replay": {
+        "occurrence_tests": 3699,
+        "occurrence_exact": 2583
+      }
+    },
+    "in_sample_on_half": {
+      "A": {
+        "gate": "verified_on_learn",
+        "applications": 106,
+        "dispatches_removed": 160,
+        "dispatches": 1164,
+        "rate": 0.1375
+      },
+      "B": {
+        "gate": "verified_on_learn",
+        "applications": 86,
+        "dispatches_removed": 139,
+        "dispatches": 1111,
+        "rate": 0.1251
+      }
+    },
+    "domain_composition": {
+      "note": "pooled mining can mint compounds over the tools both domains share (calculate, think, get_user_details, transfer_to_human_agents), so the pooled holdout is not exactly the sum of the domain holdouts",
+      "pooled_holdout_dispatches_removed": 229,
+      "sum_of_domain_holdouts": 227,
+      "difference": 2
+    }
+  },
+  "verdict": {
+    "criterion": "the committed 12.53% survives as a point estimate if out-of-sample absorption is within 1 percentage point of it in both directions; it survives as a qualitative claim if the pooled holdout is at least half the committed rate",
+    "committed_rate": 0.1253,
+    "holdout_rate": 0.1007,
+    "holdout_dispatches_removed": 229,
+    "dispatches": 2275,
+    "shortfall": {
+      "dispatches": 56,
+      "points": 2.46,
+      "relative": 0.1963
+    },
+    "directional": {
+      "A_to_B": 0.1062,
+      "B_to_A": 0.0954,
+      "spread_points": 1.08
+    },
+    "holds_as_point_estimate": false,
+    "holds_as_claim_about_magnitude": true,
+    "decomposition": {
+      "note": "keys are the measured half; in-sample minus holdout = repertoire loss (half the learning data) + the half-corpus gate's fitting edge over the full repertoire",
+      "in_sample": {
+        "A": 160,
+        "B": 139,
+        "total": 299
+      },
+      "holdout": {
+        "A": 111,
+        "B": 118,
+        "total": 229
+      },
+      "full_repertoire": {
+        "A": 153,
+        "B": 132,
+        "total": 285
+      },
+      "in_sample_minus_holdout": {
+        "A": 49,
+        "B": 21,
+        "total": 70
+      },
+      "repertoire_loss": {
+        "A": 42,
+        "B": 14,
+        "total": 56
+      },
+      "gate_fitting_edge": {
+        "A": 7,
+        "B": 7,
+        "total": 14
+      }
+    },
+    "statement": "The committed 12.53% does not survive as a point estimate. On disjoint task halves, absorption is 10.07% (229/2275), 2.46 points (19.6% relative) lower, and both directions sit below it (10.62% A to B, 9.54% B to A; a 1.08-point spread, smaller than the shortfall). It survives as a claim about magnitude: verified compounds still absorb about a tenth of dispatches, far below the 75.0% recurrence ceiling reported for the inputs-only corpus, so the paper should quote the holdout rate (or both rates) rather than 12.53% alone."
+  },
+  "checks": [
+    {
+      "name": "halves_partition_the_corpus",
+      "ok": true,
+      "detail": {
+        "A": 164,
+        "B": 161,
+        "shared_task_instances": 0
+      }
+    },
+    {
+      "name": "dispatches_sum",
+      "ok": true,
+      "detail": {
+        "A": 1164,
+        "B": 1111,
+        "all": 2275
+      }
+    },
+    {
+      "name": "domains_partition_the_corpus",
+      "ok": true,
+      "detail": {
+        "retail": 230,
+        "airline": 95
+      }
+    },
+    {
+      "name": "holdout_denominator_is_the_corpus",
+      "ok": true,
+      "detail": {
+        "A_to_B": 1111,
+        "B_to_A": 1164
+      }
+    },
+    {
+      "name": "reproduction_matches_committed",
+      "ok": true,
+      "detail": {
+        "compounds_mined": true,
+        "signature_consistent": true,
+        "replay_verified": true,
+        "dispatches_removed": true,
+        "dispatches": true,
+        "applications": true,
+        "rate": true
+      }
+    },
+    {
+      "name": "gate_is_a_subset_chain:pooled:A_to_B",
+      "ok": true,
+      "detail": {
+        "mined_on_learn": 268,
+        "signature_consistent_on_learn": 66,
+        "verified_on_learn": 52
+      }
+    },
+    {
+      "name": "verify_learning_matches_funnel:pooled:A_to_B",
+      "ok": true,
+      "detail": {
+        "verify_learning": 52,
+        "funnel_in_source_replay": 52
+      }
+    },
+    {
+      "name": "gate_is_a_subset_chain:pooled:B_to_A",
+      "ok": true,
+      "detail": {
+        "mined_on_learn": 246,
+        "signature_consistent_on_learn": 61,
+        "verified_on_learn": 53
+      }
+    },
+    {
+      "name": "verify_learning_matches_funnel:pooled:B_to_A",
+      "ok": true,
+      "detail": {
+        "verify_learning": 53,
+        "funnel_in_source_replay": 53
+      }
+    },
+    {
+      "name": "gate_is_a_subset_chain:airline:A_to_B",
+      "ok": true,
+      "detail": {
+        "mined_on_learn": 75,
+        "signature_consistent_on_learn": 18,
+        "verified_on_learn": 15
+      }
+    },
+    {
+      "name": "verify_learning_matches_funnel:airline:A_to_B",
+      "ok": true,
+      "detail": {
+        "verify_learning": 15,
+        "funnel_in_source_replay": 15
+      }
+    },
+    {
+      "name": "gate_is_a_subset_chain:airline:B_to_A",
+      "ok": true,
+      "detail": {
+        "mined_on_learn": 74,
+        "signature_consistent_on_learn": 21,
+        "verified_on_learn": 18
+      }
+    },
+    {
+      "name": "verify_learning_matches_funnel:airline:B_to_A",
+      "ok": true,
+      "detail": {
+        "verify_learning": 18,
+        "funnel_in_source_replay": 18
+      }
+    },
+    {
+      "name": "gate_is_a_subset_chain:retail:A_to_B",
+      "ok": true,
+      "detail": {
+        "mined_on_learn": 192,
+        "signature_consistent_on_learn": 47,
+        "verified_on_learn": 36
+      }
+    },
+    {
+      "name": "verify_learning_matches_funnel:retail:A_to_B",
+      "ok": true,
+      "detail": {
+        "verify_learning": 36,
+        "funnel_in_source_replay": 36
+      }
+    },
+    {
+      "name": "gate_is_a_subset_chain:retail:B_to_A",
+      "ok": true,
+      "detail": {
+        "mined_on_learn": 172,
+        "signature_consistent_on_learn": 40,
+        "verified_on_learn": 35
+      }
+    },
+    {
+      "name": "verify_learning_matches_funnel:retail:B_to_A",
+      "ok": true,
+      "detail": {
+        "verify_learning": 35,
+        "funnel_in_source_replay": 35
+      }
+    }
+  ],
+  "provenance": {
+    "git_rev": "f3cd91be6786dbe6401900eb9c7c7cbf34041594",
+    "dirty": true,
+    "script": "examples/benchmarks/compound_holdout.py",
+    "script_sha256": "5e6973c655f05c7c78f95ddf344feecc2442f06b972f3b236cb0bff2549ff129",
+    "corpus": "examples/real_traces/tau_bench_observed.jsonl",
+    "corpus_sha256": "50fb894fb1e2bddda69cb866f93772ccc4e0199c2e28eafbee4d84ecf4fd68e0",
+    "corpus_bytes": 1071187,
+    "baseline": "examples/benchmarks/compound_binding_results.json",
+    "baseline_sha256": "9f4103a0217bc1cef9a0f88515c6121fe1f3a31b6811dde50ba3fe847f08189f",
+    "modules": {
+      "compound_binding": {
+        "path": "examples/benchmarks/compound_binding.py",
+        "sha256": "dba09a84d980bcf0bfe9ef3e93648c1997b3ab6d72797beec312200164516e41"
+      },
+      "compound_transfer": {
+        "path": "examples/benchmarks/compound_transfer.py",
+        "sha256": "39fc1abaad284151dc42267097221bd932e2bab19231ddcddeb6b19c8415a8f6"
+      }
+    },
+    "python": "3.14.5",
+    "max_k": 4,
+    "min_support": 2,
+    "volatile": [
+      "git_rev",
+      "dirty"
+    ],
+    "note": "the numeric payload is a deterministic function of the corpus, the baseline and the two imported modules (each pinned by sha256); git_rev and dirty record the checkout and change by design"
+  }
+}

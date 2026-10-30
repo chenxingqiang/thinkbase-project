@@ -1,0 +1,3949 @@
+{
+  "schema": "unsafe_reuse_audit/v1",
+  "title": "Unsafe-reuse audit: repeated cache keys and the effect filter they require",
+  "question_map": {
+    "a": "all_trials.a / first_trial.a",
+    "b": "all_trials.b / first_trial.b",
+    "c": "all_trials.c / first_trial.c",
+    "d": "first_trial.b and first_trial.c (the two counts restricted to first-trial records)"
+  },
+  "provenance": {
+    "effect_map": {
+      "path": "examples/benchmarks/tool_effect_map.json",
+      "present": true,
+      "sha256": "b3ba46b95cf99b96b72ad9ade3602f1b004e773bec4b44f8b6fe0aa2e9ae9b68",
+      "schema": "tool_effect_map/v1",
+      "scope": "covers the 26 tau-bench tools only: class, entity, entity_keys, for examples/real_traces/tau_bench_historical.jsonl",
+      "how_used": "imported at build time and authoritative for every tau-bench tool: its class decides b/c and its entity/entity_keys decide which id is compared. Its vocabulary is read/write/control, mapped to this audit's read/write/other (control -> other)",
+      "not_covered_there": "swe-agent bash verbs and the agentgym action set are outside that map; they are derived here and flagged per tool in derived_effect_classes.tool_table.class_source",
+      "timing": "absent when this audit started and created by task A1 while it ran; the sha256 above pins the exact version whose classes these numbers were computed from, and rebuilding against an edited map is expected to move them",
+      "created_nothing": "this audit wrote no file at that path"
+    },
+    "corpus": [
+      {
+        "path": "examples/real_traces/tau_bench_historical.jsonl",
+        "sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+        "records": 1960,
+        "calls": 14285
+      },
+      {
+        "path": "examples/real_traces/tau_bench_observed.jsonl",
+        "sha256": "50fb894fb1e2bddda69cb866f93772ccc4e0199c2e28eafbee4d84ecf4fd68e0",
+        "records": 325,
+        "calls": 2275
+      },
+      {
+        "path": "examples/real_traces/swe_agent_sample.jsonl",
+        "sha256": "3a67fd2e23a5a6b1143d4c7895396ce8e2b24bf0f9d4ad24e66b033ce9b4f30f",
+        "records": 300,
+        "calls": 8502
+      },
+      {
+        "path": "examples/real_traces/agentgym_sample.jsonl",
+        "sha256": "28e416d5f8410dc96e8a931f0402018eb87669fcf67039a50c50e2ea38ae7818",
+        "records": 6230,
+        "calls": 39889
+      }
+    ],
+    "corpus_totals": {
+      "files": 4,
+      "records": 8815,
+      "calls": 64951,
+      "runs": 14,
+      "tasks": 7185
+    },
+    "corpus_selection": {
+      "included": [
+        "examples/real_traces/tau_bench_historical.jsonl",
+        "examples/real_traces/tau_bench_observed.jsonl",
+        "examples/real_traces/swe_agent_sample.jsonl",
+        "examples/real_traces/agentgym_sample.jsonl"
+      ],
+      "excluded": [
+        {
+          "path": "examples/paper_real_llm_trace.jsonl",
+          "reason": "workflow definition (steps + declared side_effects); no tool-call records, so no (tool,args) key exists to repeat"
+        },
+        {
+          "path": "examples/system_task_ell_trace.jsonl",
+          "reason": "same: workflow definition, no tool-call records"
+        },
+        {
+          "path": "examples/thesis_direction_traces/*.jsonl",
+          "reason": "same: workflow definitions"
+        },
+        {
+          "path": "examples/random_task_traces/*.jsonl",
+          "reason": "same: workflow definitions"
+        },
+        {
+          "path": "thesis/experiments/results/rsi_gated_trace.jsonl",
+          "reason": "same: workflow definition"
+        }
+      ]
+    },
+    "definitions": {
+      "record": "one line of a corpus file = one task attempt (one trajectory)",
+      "key": "sha256(tool || canonical-json(arguments)); the key a (tool,args) cache uses",
+      "repeat": "a key with two or more occurrences",
+      "run": "one corpus file x one source label = one evaluation campaign. The two tau-bench files reuse the same source labels for disjoint task splits, so a file is part of the run identity; merging them is measured in sensitivity.run_equals_source",
+      "task_uid": "domain::task_id (the model is not part of task identity)",
+      "within_task": "all occurrences of the key fall in one record; it repeats nowhere else",
+      "within_run_across_tasks": "the key occurs in two or more records inside one run, but in only one run",
+      "cross_run": "the key occurs in two or more runs",
+      "scope_rule": "the three buckets are exclusive and assigned by widest span (cross_run > within_run_across_tasks > within_task); a.repeated_keys_by_scope sums to a.repeated_keys while a.nested_repeat_levels counts the levels non-exclusively",
+      "first_trial": "records with trial in (None, 0), the pilot's headline convention",
+      "stale_read": "a read key that repeats inside one scope and whose entity was written by an earlier call in that scope, so the cached answer predates the write"
+    },
+    "effect_classes": {
+      "read": "returns entity state",
+      "write": "mutates entity state; a hit serves the call without performing it",
+      "other": "side-effect-free on the store but not an entity read: navigation, scroll, think/calculate, submit"
+    },
+    "class_derivation": {
+      "tau-bench tools": "examples/benchmarks/tool_effect_map.json (task A1's map: 26 tools, class + entity + entity_keys, imported at build time)",
+      "swe-agent bash": "per-invocation verb table; verbs outside the table are writes (conservative)",
+      "agentgym": "derived here: navigation -> other, look/inventory/examine/select -> read, manipulation -> write",
+      "unknown_verbs_treated_as_write": {
+        "distinct_verbs": 157,
+        "calls": 506,
+        "top": {
+          "from": 181,
+          "sqlfluff": 16,
+          "touch.sqlfluff": 14,
+          "bash": 13,
+          "search_github": 10,
+          "flake8": 9,
+          "asv": 9,
+          "_fetch_from_eutils(Homo": 5,
+          "create.sqlfluff": 4,
+          "_fetch_from_eutils(Canis": 4,
+          "_fetch_from_eutils(Bos": 4,
+          "_fetch_from_eutils(Pan": 4
+        }
+      }
+    },
+    "entity_rules": {
+      "tau-bench": "tool_effect_map.json entity + entity_keys; a handle is (entity, value of that argument key), so order#W1 read and order#W1 written compare equal while user#email never equals user#user_id",
+      "swe-agent": "the file path token of the command; edits and file reads on the same path share an entity",
+      "agentgym": "examine -> object name; open/close -> receptacle; put -> object + receptacle",
+      "no_entity": "name lookups, list_*, flight search, navigation, think/calculate, sqlgym table sets are entity-bearing only for select (tables)"
+    },
+    "reproduce": {
+      "determinism": "same inputs -> identical bytes; no timestamps, no eval order, sorted dicts",
+      "inputs_pinned": "corpus sha256 per file in provenance.corpus, effect map sha256 in provenance.effect_map; if a file's digest moves, every count here is stale",
+      "algorithm": "for each call build key=sha256(tool|sorted args), classify the effect, extract entity handles; group occurrences by key; assign a repeat to within_task / within_run_across_tasks / cross_run by widest span; count write-class repeats (b); for (c) walk each run and each task attempt in recorded order, let the first occurrence of a read key populate the cache and flag a later occurrence when a write to the same entity handle lands between them"
+    },
+    "known_limitations": [
+      "sqlgym select arguments carry only the table set, not the SQL text, so its keys are degenerate; its repeats are real key repeats but the trace cannot show whether the queries were equal",
+      "agentgym entity names are receptacle/object classes (e.g. cabinet), not instances; cross-task entity identity in an embodied benchmark is a class match, not an object match",
+      "the four corpora reset environment state per task attempt, so run-scope staleness (c.scope_run) holds only under a shared-store assumption; c.scope_task does not need it",
+      "no timing information is retained, so 'earlier' means earlier in recorded call order",
+      "the corpus is an inputs-only capture; it never shows what a tool returned, so staleness is inferred from the write/read order, not observed"
+    ]
+  },
+  "derived_effect_classes": {
+    "tool_count": 47,
+    "tool_count_by_class_source": {
+      "derived:agentgym-verb": 20,
+      "derived:bash-verb": 1,
+      "tool_effect_map.json": 26
+    },
+    "tool_table": {
+      "go to": {
+        "classes": {
+          "other": 18428
+        },
+        "calls": 18428,
+        "class_source": "derived:agentgym-verb"
+      },
+      "bash": {
+        "classes": {
+          "other": 784,
+          "read": 2474,
+          "write": 5244
+        },
+        "calls": 8502,
+        "class_source": "derived:bash-verb"
+      },
+      "open": {
+        "classes": {
+          "write": 6646
+        },
+        "calls": 6646,
+        "class_source": "derived:agentgym-verb"
+      },
+      "get_order_details": {
+        "classes": {
+          "read": 3997
+        },
+        "calls": 3997,
+        "class_source": "tool_effect_map.json"
+      },
+      "take": {
+        "classes": {
+          "write": 3071
+        },
+        "calls": 3071,
+        "class_source": "derived:agentgym-verb"
+      },
+      "select": {
+        "classes": {
+          "read": 3000
+        },
+        "calls": 3000,
+        "class_source": "derived:agentgym-verb"
+      },
+      "put": {
+        "classes": {
+          "write": 2635
+        },
+        "calls": 2635,
+        "class_source": "derived:agentgym-verb"
+      },
+      "get_user_details": {
+        "classes": {
+          "read": 1999
+        },
+        "calls": 1999,
+        "class_source": "tool_effect_map.json"
+      },
+      "get_reservation_details": {
+        "classes": {
+          "read": 1649
+        },
+        "calls": 1649,
+        "class_source": "tool_effect_map.json"
+      },
+      "get_product_details": {
+        "classes": {
+          "read": 1403
+        },
+        "calls": 1403,
+        "class_source": "tool_effect_map.json"
+      },
+      "find_user_id_by_name_zip": {
+        "classes": {
+          "read": 1353
+        },
+        "calls": 1353,
+        "class_source": "tool_effect_map.json"
+      },
+      "move forward": {
+        "classes": {
+          "other": 1210
+        },
+        "calls": 1210,
+        "class_source": "derived:agentgym-verb"
+      },
+      "pick up": {
+        "classes": {
+          "write": 853
+        },
+        "calls": 853,
+        "class_source": "derived:agentgym-verb"
+      },
+      "find_user_id_by_email": {
+        "classes": {
+          "read": 801
+        },
+        "calls": 801,
+        "class_source": "tool_effect_map.json"
+      },
+      "toggle and go through": {
+        "classes": {
+          "write": 647
+        },
+        "calls": 647,
+        "class_source": "derived:agentgym-verb"
+      },
+      "search_direct_flight": {
+        "classes": {
+          "read": 617
+        },
+        "calls": 617,
+        "class_source": "tool_effect_map.json"
+      },
+      "return_delivered_order_items": {
+        "classes": {
+          "write": 571
+        },
+        "calls": 571,
+        "class_source": "tool_effect_map.json"
+      },
+      "modify_pending_order_items": {
+        "classes": {
+          "write": 532
+        },
+        "calls": 532,
+        "class_source": "tool_effect_map.json"
+      },
+      "exchange_delivered_order_items": {
+        "classes": {
+          "write": 484
+        },
+        "calls": 484,
+        "class_source": "tool_effect_map.json"
+      },
+      "turn left": {
+        "classes": {
+          "other": 462
+        },
+        "calls": 462,
+        "class_source": "derived:agentgym-verb"
+      },
+      "clean": {
+        "classes": {
+          "write": 456
+        },
+        "calls": 456,
+        "class_source": "derived:agentgym-verb"
+      },
+      "think": {
+        "classes": {
+          "other": 450
+        },
+        "calls": 450,
+        "class_source": "tool_effect_map.json"
+      },
+      "cool": {
+        "classes": {
+          "write": 395
+        },
+        "calls": 395,
+        "class_source": "derived:agentgym-verb"
+      },
+      "close": {
+        "classes": {
+          "write": 356
+        },
+        "calls": 356,
+        "class_source": "derived:agentgym-verb"
+      },
+      "cancel_pending_order": {
+        "classes": {
+          "write": 337
+        },
+        "calls": 337,
+        "class_source": "tool_effect_map.json"
+      },
+      "update_reservation_flights": {
+        "classes": {
+          "write": 337
+        },
+        "calls": 337,
+        "class_source": "tool_effect_map.json"
+      },
+      "heat": {
+        "classes": {
+          "write": 327
+        },
+        "calls": 327,
+        "class_source": "derived:agentgym-verb"
+      },
+      "transfer_to_human_agents": {
+        "classes": {
+          "other": 323
+        },
+        "calls": 323,
+        "class_source": "tool_effect_map.json"
+      },
+      "turn right": {
+        "classes": {
+          "other": 294
+        },
+        "calls": 294,
+        "class_source": "derived:agentgym-verb"
+      },
+      "inventory": {
+        "classes": {
+          "read": 290
+        },
+        "calls": 290,
+        "class_source": "derived:agentgym-verb"
+      },
+      "calculate": {
+        "classes": {
+          "read": 282
+        },
+        "calls": 282,
+        "class_source": "tool_effect_map.json"
+      },
+      "modify_pending_order_address": {
+        "classes": {
+          "write": 265
+        },
+        "calls": 265,
+        "class_source": "tool_effect_map.json"
+      },
+      "search_onestop_flight": {
+        "classes": {
+          "read": 235
+        },
+        "calls": 235,
+        "class_source": "tool_effect_map.json"
+      },
+      "examine": {
+        "classes": {
+          "read": 230
+        },
+        "calls": 230,
+        "class_source": "derived:agentgym-verb"
+      },
+      "list_all_product_types": {
+        "classes": {
+          "read": 221
+        },
+        "calls": 221,
+        "class_source": "tool_effect_map.json"
+      },
+      "use": {
+        "classes": {
+          "write": 220
+        },
+        "calls": 220,
+        "class_source": "derived:agentgym-verb"
+      },
+      "cancel_reservation": {
+        "classes": {
+          "write": 216
+        },
+        "calls": 216,
+        "class_source": "tool_effect_map.json"
+      },
+      "book_reservation": {
+        "classes": {
+          "write": 172
+        },
+        "calls": 172,
+        "class_source": "tool_effect_map.json"
+      },
+      "go through": {
+        "classes": {
+          "other": 165
+        },
+        "calls": 165,
+        "class_source": "derived:agentgym-verb"
+      },
+      "modify_user_address": {
+        "classes": {
+          "write": 137
+        },
+        "calls": 137,
+        "class_source": "tool_effect_map.json"
+      },
+      "look": {
+        "classes": {
+          "read": 128
+        },
+        "calls": 128,
+        "class_source": "derived:agentgym-verb"
+      },
+      "other": {
+        "classes": {
+          "write": 76
+        },
+        "calls": 76,
+        "class_source": "derived:agentgym-verb"
+      },
+      "update_reservation_baggages": {
+        "classes": {
+          "write": 74
+        },
+        "calls": 74,
+        "class_source": "tool_effect_map.json"
+      },
+      "send_certificate": {
+        "classes": {
+          "write": 34
+        },
+        "calls": 34,
+        "class_source": "tool_effect_map.json"
+      },
+      "update_reservation_passengers": {
+        "classes": {
+          "write": 28
+        },
+        "calls": 28,
+        "class_source": "tool_effect_map.json"
+      },
+      "list_all_airports": {
+        "classes": {
+          "read": 22
+        },
+        "calls": 22,
+        "class_source": "tool_effect_map.json"
+      },
+      "modify_pending_order_payment": {
+        "classes": {
+          "write": 21
+        },
+        "calls": 21,
+        "class_source": "tool_effect_map.json"
+      }
+    }
+  },
+  "all_trials": {
+    "denominators": {
+      "records": 8815,
+      "runs": 14,
+      "tasks": 7185,
+      "calls": 64951,
+      "read_calls": 18701,
+      "write_calls": 24134,
+      "other_calls": 22116,
+      "distinct_keys": 7787,
+      "distinct_read_keys": 3517,
+      "distinct_write_keys": 3219,
+      "distinct_other_keys": 1051
+    },
+    "a": {
+      "repeated_keys": 3342,
+      "share_of_distinct_keys": 0.4292,
+      "repeat_occurrences": 60506,
+      "share_of_calls": 0.9316,
+      "by_scope": {
+        "within_task": 530,
+        "within_run_across_tasks": 1749,
+        "cross_run": 1063
+      },
+      "by_scope_occurrences": {
+        "within_task": 3154,
+        "within_run_across_tasks": 40307,
+        "cross_run": 17045
+      },
+      "nested_repeat_levels": {
+        "within_task": 993,
+        "within_run": 3130,
+        "cross_run": 1063
+      },
+      "within_run_across_tasks_split": {
+        "same_task_other_trial": 113,
+        "different_task": 1636
+      },
+      "cross_run_split": {
+        "same_task_uid": 677,
+        "different_task_uid": 386
+      },
+      "by_scope_share": {
+        "within_task": 0.1586,
+        "within_run_across_tasks": 0.5233,
+        "cross_run": 0.3181
+      },
+      "by_scope_occurrence_share": {
+        "within_task": 0.0521,
+        "within_run_across_tasks": 0.6662,
+        "cross_run": 0.2817
+      },
+      "by_class": {
+        "read": 1444,
+        "write": 1643,
+        "other": 255
+      },
+      "by_tool": {
+        "bash": {
+          "calls": 8502,
+          "distinct_keys": 3311,
+          "repeated_keys": 689,
+          "repeat_occurrences": 5880,
+          "read": 184,
+          "write": 443,
+          "other": 62
+        },
+        "book_reservation": {
+          "calls": 172,
+          "distinct_keys": 96,
+          "repeated_keys": 35,
+          "repeat_occurrences": 111,
+          "read": 0,
+          "write": 35,
+          "other": 0
+        },
+        "calculate": {
+          "calls": 282,
+          "distinct_keys": 163,
+          "repeated_keys": 58,
+          "repeat_occurrences": 177,
+          "read": 58,
+          "write": 0,
+          "other": 0
+        },
+        "cancel_pending_order": {
+          "calls": 337,
+          "distinct_keys": 37,
+          "repeated_keys": 31,
+          "repeat_occurrences": 331,
+          "read": 0,
+          "write": 31,
+          "other": 0
+        },
+        "cancel_reservation": {
+          "calls": 216,
+          "distinct_keys": 36,
+          "repeated_keys": 27,
+          "repeat_occurrences": 207,
+          "read": 0,
+          "write": 27,
+          "other": 0
+        },
+        "clean": {
+          "calls": 456,
+          "distinct_keys": 22,
+          "repeated_keys": 21,
+          "repeat_occurrences": 455,
+          "read": 0,
+          "write": 21,
+          "other": 0
+        },
+        "close": {
+          "calls": 356,
+          "distinct_keys": 4,
+          "repeated_keys": 3,
+          "repeat_occurrences": 355,
+          "read": 0,
+          "write": 3,
+          "other": 0
+        },
+        "cool": {
+          "calls": 395,
+          "distinct_keys": 13,
+          "repeated_keys": 13,
+          "repeat_occurrences": 395,
+          "read": 0,
+          "write": 13,
+          "other": 0
+        },
+        "examine": {
+          "calls": 230,
+          "distinct_keys": 43,
+          "repeated_keys": 21,
+          "repeat_occurrences": 208,
+          "read": 21,
+          "write": 0,
+          "other": 0
+        },
+        "exchange_delivered_order_items": {
+          "calls": 484,
+          "distinct_keys": 98,
+          "repeated_keys": 62,
+          "repeat_occurrences": 448,
+          "read": 0,
+          "write": 62,
+          "other": 0
+        },
+        "find_user_id_by_email": {
+          "calls": 801,
+          "distinct_keys": 136,
+          "repeated_keys": 78,
+          "repeat_occurrences": 743,
+          "read": 78,
+          "write": 0,
+          "other": 0
+        },
+        "find_user_id_by_name_zip": {
+          "calls": 1353,
+          "distinct_keys": 62,
+          "repeated_keys": 52,
+          "repeat_occurrences": 1343,
+          "read": 52,
+          "write": 0,
+          "other": 0
+        },
+        "get_order_details": {
+          "calls": 3997,
+          "distinct_keys": 168,
+          "repeated_keys": 166,
+          "repeat_occurrences": 3995,
+          "read": 166,
+          "write": 0,
+          "other": 0
+        },
+        "get_product_details": {
+          "calls": 1403,
+          "distinct_keys": 44,
+          "repeated_keys": 43,
+          "repeat_occurrences": 1402,
+          "read": 43,
+          "write": 0,
+          "other": 0
+        },
+        "get_reservation_details": {
+          "calls": 1649,
+          "distinct_keys": 125,
+          "repeated_keys": 114,
+          "repeat_occurrences": 1638,
+          "read": 114,
+          "write": 0,
+          "other": 0
+        },
+        "get_user_details": {
+          "calls": 1999,
+          "distinct_keys": 92,
+          "repeated_keys": 87,
+          "repeat_occurrences": 1994,
+          "read": 87,
+          "write": 0,
+          "other": 0
+        },
+        "go through": {
+          "calls": 165,
+          "distinct_keys": 6,
+          "repeated_keys": 6,
+          "repeat_occurrences": 165,
+          "read": 0,
+          "write": 0,
+          "other": 6
+        },
+        "go to": {
+          "calls": 18428,
+          "distinct_keys": 116,
+          "repeated_keys": 80,
+          "repeat_occurrences": 18392,
+          "read": 0,
+          "write": 0,
+          "other": 80
+        },
+        "heat": {
+          "calls": 327,
+          "distinct_keys": 9,
+          "repeated_keys": 9,
+          "repeat_occurrences": 327,
+          "read": 0,
+          "write": 9,
+          "other": 0
+        },
+        "inventory": {
+          "calls": 290,
+          "distinct_keys": 2,
+          "repeated_keys": 1,
+          "repeat_occurrences": 289,
+          "read": 1,
+          "write": 0,
+          "other": 0
+        },
+        "list_all_airports": {
+          "calls": 22,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 22,
+          "read": 1,
+          "write": 0,
+          "other": 0
+        },
+        "list_all_product_types": {
+          "calls": 221,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 221,
+          "read": 1,
+          "write": 0,
+          "other": 0
+        },
+        "look": {
+          "calls": 128,
+          "distinct_keys": 13,
+          "repeated_keys": 3,
+          "repeat_occurrences": 118,
+          "read": 3,
+          "write": 0,
+          "other": 0
+        },
+        "modify_pending_order_address": {
+          "calls": 265,
+          "distinct_keys": 28,
+          "repeated_keys": 20,
+          "repeat_occurrences": 257,
+          "read": 0,
+          "write": 20,
+          "other": 0
+        },
+        "modify_pending_order_items": {
+          "calls": 532,
+          "distinct_keys": 92,
+          "repeated_keys": 58,
+          "repeat_occurrences": 498,
+          "read": 0,
+          "write": 58,
+          "other": 0
+        },
+        "modify_pending_order_payment": {
+          "calls": 21,
+          "distinct_keys": 4,
+          "repeated_keys": 2,
+          "repeat_occurrences": 19,
+          "read": 0,
+          "write": 2,
+          "other": 0
+        },
+        "modify_user_address": {
+          "calls": 137,
+          "distinct_keys": 19,
+          "repeated_keys": 12,
+          "repeat_occurrences": 130,
+          "read": 0,
+          "write": 12,
+          "other": 0
+        },
+        "move forward": {
+          "calls": 1210,
+          "distinct_keys": 6,
+          "repeated_keys": 3,
+          "repeat_occurrences": 1207,
+          "read": 0,
+          "write": 0,
+          "other": 3
+        },
+        "open": {
+          "calls": 6646,
+          "distinct_keys": 7,
+          "repeated_keys": 5,
+          "repeat_occurrences": 6644,
+          "read": 0,
+          "write": 5,
+          "other": 0
+        },
+        "other": {
+          "calls": 76,
+          "distinct_keys": 15,
+          "repeated_keys": 7,
+          "repeat_occurrences": 68,
+          "read": 0,
+          "write": 7,
+          "other": 0
+        },
+        "pick up": {
+          "calls": 853,
+          "distinct_keys": 21,
+          "repeated_keys": 19,
+          "repeat_occurrences": 851,
+          "read": 0,
+          "write": 19,
+          "other": 0
+        },
+        "put": {
+          "calls": 2635,
+          "distinct_keys": 741,
+          "repeated_keys": 490,
+          "repeat_occurrences": 2384,
+          "read": 0,
+          "write": 490,
+          "other": 0
+        },
+        "return_delivered_order_items": {
+          "calls": 571,
+          "distinct_keys": 56,
+          "repeated_keys": 49,
+          "repeat_occurrences": 564,
+          "read": 0,
+          "write": 49,
+          "other": 0
+        },
+        "search_direct_flight": {
+          "calls": 617,
+          "distinct_keys": 131,
+          "repeated_keys": 84,
+          "repeat_occurrences": 570,
+          "read": 84,
+          "write": 0,
+          "other": 0
+        },
+        "search_onestop_flight": {
+          "calls": 235,
+          "distinct_keys": 64,
+          "repeated_keys": 31,
+          "repeat_occurrences": 202,
+          "read": 31,
+          "write": 0,
+          "other": 0
+        },
+        "select": {
+          "calls": 3000,
+          "distinct_keys": 875,
+          "repeated_keys": 520,
+          "repeat_occurrences": 2645,
+          "read": 520,
+          "write": 0,
+          "other": 0
+        },
+        "send_certificate": {
+          "calls": 34,
+          "distinct_keys": 10,
+          "repeated_keys": 6,
+          "repeat_occurrences": 30,
+          "read": 0,
+          "write": 6,
+          "other": 0
+        },
+        "take": {
+          "calls": 3071,
+          "distinct_keys": 306,
+          "repeated_keys": 250,
+          "repeat_occurrences": 3015,
+          "read": 0,
+          "write": 250,
+          "other": 0
+        },
+        "think": {
+          "calls": 450,
+          "distinct_keys": 385,
+          "repeated_keys": 62,
+          "repeat_occurrences": 127,
+          "read": 0,
+          "write": 0,
+          "other": 62
+        },
+        "toggle and go through": {
+          "calls": 647,
+          "distinct_keys": 15,
+          "repeated_keys": 8,
+          "repeat_occurrences": 640,
+          "read": 0,
+          "write": 8,
+          "other": 0
+        },
+        "transfer_to_human_agents": {
+          "calls": 323,
+          "distinct_keys": 283,
+          "repeated_keys": 40,
+          "repeat_occurrences": 80,
+          "read": 0,
+          "write": 0,
+          "other": 40
+        },
+        "turn left": {
+          "calls": 462,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 462,
+          "read": 0,
+          "write": 0,
+          "other": 1
+        },
+        "turn right": {
+          "calls": 294,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 294,
+          "read": 0,
+          "write": 0,
+          "other": 1
+        },
+        "update_reservation_baggages": {
+          "calls": 74,
+          "distinct_keys": 21,
+          "repeated_keys": 10,
+          "repeat_occurrences": 63,
+          "read": 0,
+          "write": 10,
+          "other": 0
+        },
+        "update_reservation_flights": {
+          "calls": 337,
+          "distinct_keys": 101,
+          "repeated_keys": 59,
+          "repeat_occurrences": 295,
+          "read": 0,
+          "write": 59,
+          "other": 0
+        },
+        "update_reservation_passengers": {
+          "calls": 28,
+          "distinct_keys": 2,
+          "repeated_keys": 2,
+          "repeat_occurrences": 28,
+          "read": 0,
+          "write": 2,
+          "other": 0
+        },
+        "use": {
+          "calls": 220,
+          "distinct_keys": 5,
+          "repeated_keys": 2,
+          "repeat_occurrences": 217,
+          "read": 0,
+          "write": 2,
+          "other": 0
+        }
+      },
+      "top_repeated_keys": [
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "cabinet"
+            ]
+          },
+          "class": "other",
+          "occurrences": 4424,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 987
+        },
+        {
+          "tool": "open",
+          "args": {
+            "shape": [
+              "cabinet"
+            ]
+          },
+          "class": "write",
+          "occurrences": 3437,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 937
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "drawer"
+            ]
+          },
+          "class": "other",
+          "occurrences": 3326,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 900
+        },
+        {
+          "tool": "open",
+          "args": {
+            "shape": [
+              "drawer"
+            ]
+          },
+          "class": "write",
+          "occurrences": 2577,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 785
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "countertop"
+            ]
+          },
+          "class": "other",
+          "occurrences": 1935,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 1207
+        },
+        {
+          "tool": "move forward",
+          "args": {
+            "shape": []
+          },
+          "class": "other",
+          "occurrences": 1200,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 445
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "shelf"
+            ]
+          },
+          "class": "other",
+          "occurrences": 1056,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 428
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "sinkbasin"
+            ]
+          },
+          "class": "other",
+          "occurrences": 939,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 729
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "fridge"
+            ]
+          },
+          "class": "other",
+          "occurrences": 793,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 676
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "diningtable"
+            ]
+          },
+          "class": "other",
+          "occurrences": 749,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 566
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "sidetable"
+            ]
+          },
+          "class": "other",
+          "occurrences": 709,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 449
+        },
+        {
+          "tool": "bash",
+          "args": {
+            "cmd": "edit 1:1"
+          },
+          "class": "write",
+          "occurrences": 606,
+          "scope": "cross_run",
+          "runs": 3,
+          "tasks": 205
+        }
+      ]
+    },
+    "b": {
+      "repeated_write_keys": 1643,
+      "denominator_repeated_keys": 3342,
+      "share_of_repeated_keys": 0.4916,
+      "repeated_write_key_occurrences": 22558,
+      "denominator_repeat_occurrences": 60506,
+      "share_of_repeat_occurrences": 0.3728,
+      "by_scope": {
+        "within_task": 336,
+        "within_run_across_tasks": 977,
+        "cross_run": 330
+      },
+      "by_scope_share": {
+        "within_task": 0.2045,
+        "within_run_across_tasks": 0.5946,
+        "cross_run": 0.2009
+      },
+      "by_tool": {
+        "put": 490,
+        "bash": 443,
+        "take": 250,
+        "exchange_delivered_order_items": 62,
+        "update_reservation_flights": 59,
+        "modify_pending_order_items": 58,
+        "return_delivered_order_items": 49,
+        "book_reservation": 35,
+        "cancel_pending_order": 31,
+        "cancel_reservation": 27,
+        "clean": 21,
+        "modify_pending_order_address": 20,
+        "pick up": 19,
+        "cool": 13,
+        "modify_user_address": 12,
+        "update_reservation_baggages": 10,
+        "heat": 9,
+        "toggle and go through": 8,
+        "other": 7,
+        "send_certificate": 6,
+        "open": 5,
+        "close": 3,
+        "modify_pending_order_payment": 2,
+        "update_reservation_passengers": 2,
+        "use": 2
+      },
+      "write_repeats_outside_the_first_issuing_trajectory": 1307,
+      "share_of_write_repeats_outside_first_issuing_trajectory": 0.7955
+    },
+    "c": {
+      "scope_run": {
+        "repeated_read_key_instances": 2221,
+        "of_which_with_identifiable_entity": 2165,
+        "of_which_without_entity": 56,
+        "stale_read_key_instances": 407,
+        "of_which_handle_is_named_by_a_write_tool_somewhere_in_the_corpus": 489,
+        "share_of_entity_bearing_instances": 0.188,
+        "share_of_handle_assessable_instances": 0.8323,
+        "stale_read_distinct_keys": 168,
+        "stale_read_occurrences": 3092,
+        "stale_instances_with_a_stale_read_in_the_invalidating_write_s_task": 34,
+        "by_tool": {
+          "get_order_details": 279,
+          "get_reservation_details": 91,
+          "get_user_details": 22,
+          "bash": 12,
+          "examine": 3
+        },
+        "by_run": {
+          "tau_bench_historical::gpt-4o-retail": {
+            "repeated_read_key_instances": 316,
+            "with_entity": 306,
+            "stale": 100
+          },
+          "tau_bench_historical::gpt-4o-airline": {
+            "repeated_read_key_instances": 159,
+            "with_entity": 147,
+            "stale": 36
+          },
+          "tau_bench_historical::sonnet-35-new-retail": {
+            "repeated_read_key_instances": 366,
+            "with_entity": 357,
+            "stale": 101
+          },
+          "tau_bench_historical::sonnet-35-new-airline": {
+            "repeated_read_key_instances": 246,
+            "with_entity": 235,
+            "stale": 42
+          },
+          "tau_bench_observed::gpt-4o-retail": {
+            "repeated_read_key_instances": 156,
+            "with_entity": 154,
+            "stale": 47
+          },
+          "tau_bench_observed::gpt-4o-airline": {
+            "repeated_read_key_instances": 28,
+            "with_entity": 27,
+            "stale": 6
+          },
+          "tau_bench_observed::sonnet-35-new-retail": {
+            "repeated_read_key_instances": 176,
+            "with_entity": 175,
+            "stale": 53
+          },
+          "tau_bench_observed::sonnet-35-new-airline": {
+            "repeated_read_key_instances": 45,
+            "with_entity": 44,
+            "stale": 7
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b": {
+            "repeated_read_key_instances": 159,
+            "with_entity": 156,
+            "stale": 10
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-8b": {
+            "repeated_read_key_instances": 25,
+            "with_entity": 24,
+            "stale": 2
+          },
+          "agentgym_sample::agentgym-alfworld": {
+            "repeated_read_key_instances": 25,
+            "with_entity": 21,
+            "stale": 3
+          },
+          "agentgym_sample::agentgym-sqlgym": {
+            "repeated_read_key_instances": 520,
+            "with_entity": 519,
+            "stale": 0
+          }
+        },
+        "examples": [
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W6247578"
+            },
+            "entity": [
+              [
+                "order",
+                "#W6247578"
+              ]
+            ],
+            "occurrences_in_group": 16,
+            "stale_occurrences": 11
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4776164"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4776164"
+              ]
+            ],
+            "occurrences_in_group": 12,
+            "stale_occurrences": 8
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W2378156"
+            },
+            "entity": [
+              [
+                "order",
+                "#W2378156"
+              ]
+            ],
+            "occurrences_in_group": 13,
+            "stale_occurrences": 12
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5490111"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5490111"
+              ]
+            ],
+            "occurrences_in_group": 19,
+            "stale_occurrences": 17
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W7387996"
+            },
+            "entity": [
+              [
+                "order",
+                "#W7387996"
+              ]
+            ],
+            "occurrences_in_group": 14,
+            "stale_occurrences": 12
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5199551"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5199551"
+              ]
+            ],
+            "occurrences_in_group": 8,
+            "stale_occurrences": 7
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W8665881"
+            },
+            "entity": [
+              [
+                "order",
+                "#W8665881"
+              ]
+            ],
+            "occurrences_in_group": 8,
+            "stale_occurrences": 7
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W9389413"
+            },
+            "entity": [
+              [
+                "order",
+                "#W9389413"
+              ]
+            ],
+            "occurrences_in_group": 5,
+            "stale_occurrences": 4
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W2890441"
+            },
+            "entity": [
+              [
+                "order",
+                "#W2890441"
+              ]
+            ],
+            "occurrences_in_group": 8,
+            "stale_occurrences": 7
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_user_details",
+            "args": {
+              "user_id": "ethan_garcia_1261"
+            },
+            "entity": [
+              [
+                "user",
+                "ethan_garcia_1261"
+              ]
+            ],
+            "occurrences_in_group": 8,
+            "stale_occurrences": 6
+          }
+        ],
+        "share_of_all_repeated_read_instances": 0.1833,
+        "stale_instances_requiring_cross_task_state_sharing": 373
+      },
+      "scope_task": {
+        "repeated_read_key_instances": 486,
+        "of_which_with_identifiable_entity": 441,
+        "of_which_without_entity": 45,
+        "stale_read_key_instances": 42,
+        "of_which_handle_is_named_by_a_write_tool_somewhere_in_the_corpus": 134,
+        "share_of_entity_bearing_instances": 0.0952,
+        "share_of_handle_assessable_instances": 0.3134,
+        "stale_read_distinct_keys": 22,
+        "stale_read_occurrences": 61,
+        "stale_instances_with_a_stale_read_in_the_invalidating_write_s_task": 42,
+        "by_tool": {
+          "get_order_details": 23,
+          "bash": 13,
+          "get_reservation_details": 6
+        },
+        "by_run": {
+          "tau_bench_historical::gpt-4o-retail::20::t0": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 2
+          },
+          "tau_bench_historical::gpt-4o-retail::16::t1": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::gpt-4o-retail::27::t2": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::gpt-4o-retail::27::t3": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::gpt-4o-retail::96::t3": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::105::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::104::t1": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::20::t2": {
+            "repeated_read_key_instances": 3,
+            "with_entity": 3,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::27::t2": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::52::t2": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::80::t3": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::27::t4": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::52::t4": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::62::t4": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::63::t4": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::105::t4": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::5::t5": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::27::t5": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-retail::104::t6": {
+            "repeated_read_key_instances": 3,
+            "with_entity": 3,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-airline::8::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-airline::24::t1": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-airline::8::t2": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-airline::9::t2": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-airline::8::t3": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_observed::gpt-4o-retail::20::t0": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 2
+          },
+          "tau_bench_observed::sonnet-35-new-retail::105::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_observed::sonnet-35-new-airline::8::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::AnalogJ__lexicon-336::t0": {
+            "repeated_read_key_instances": 3,
+            "with_entity": 3,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::oasis-open__cti-python-stix2-74::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::reata__sqllineage-17::t0": {
+            "repeated_read_key_instances": 6,
+            "with_entity": 6,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::iterative__dvc-3726::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::iterative__dvc-8425::t0": {
+            "repeated_read_key_instances": 3,
+            "with_entity": 3,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::iterative__dvc-3405::t0": {
+            "repeated_read_key_instances": 5,
+            "with_entity": 5,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::marshmallow-code__flask-smorest-561::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::ICB-DCM__pyPESTO-676::t0": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::ithaka__apiron-8::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::locustio__locust-994::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::mps-gmbh__hl7-parser-24::t0": {
+            "repeated_read_key_instances": 6,
+            "with_entity": 6,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-8b::streamlink__streamlink-1696::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 2
+          }
+        },
+        "examples": [
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::20::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4967593"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4967593"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::20::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5733668"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5733668"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::16::t1",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W9389413"
+            },
+            "entity": [
+              [
+                "order",
+                "#W9389413"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::27::t2",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W7181492"
+            },
+            "entity": [
+              [
+                "order",
+                "#W7181492"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::27::t3",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W7181492"
+            },
+            "entity": [
+              [
+                "order",
+                "#W7181492"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::96::t3",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W2905754"
+            },
+            "entity": [
+              [
+                "order",
+                "#W2905754"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::sonnet-35-new-retail::105::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4860251"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4860251"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::sonnet-35-new-retail::104::t1",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W6239298"
+            },
+            "entity": [
+              [
+                "order",
+                "#W6239298"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::sonnet-35-new-retail::20::t2",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4967593"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4967593"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::sonnet-35-new-retail::27::t2",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W7181492"
+            },
+            "entity": [
+              [
+                "order",
+                "#W7181492"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          }
+        ],
+        "share_of_all_repeated_read_instances": 0.0864
+      }
+    },
+    "by_run": {
+      "tau_bench_historical::gpt-4o-retail": {
+        "records": 460,
+        "calls": 3274,
+        "distinct_keys": 704,
+        "repeated_keys_touching_run": 560,
+        "write_repeated_keys_touching_run": 195,
+        "repeated_keys_within_run": 19,
+        "write_repeated_keys_within_run": 10
+      },
+      "tau_bench_historical::gpt-4o-airline": {
+        "records": 182,
+        "calls": 1164,
+        "distinct_keys": 568,
+        "repeated_keys_touching_run": 345,
+        "write_repeated_keys_touching_run": 95,
+        "repeated_keys_within_run": 24,
+        "write_repeated_keys_within_run": 14
+      },
+      "tau_bench_historical::sonnet-35-new-retail": {
+        "records": 919,
+        "calls": 7086,
+        "distinct_keys": 921,
+        "repeated_keys_touching_run": 607,
+        "write_repeated_keys_touching_run": 194,
+        "repeated_keys_within_run": 49,
+        "write_repeated_keys_within_run": 21
+      },
+      "tau_bench_historical::sonnet-35-new-airline": {
+        "records": 399,
+        "calls": 2761,
+        "distinct_keys": 772,
+        "repeated_keys_touching_run": 388,
+        "write_repeated_keys_touching_run": 103,
+        "repeated_keys_within_run": 66,
+        "write_repeated_keys_within_run": 20
+      },
+      "tau_bench_observed::gpt-4o-retail": {
+        "records": 115,
+        "calls": 794,
+        "distinct_keys": 469,
+        "repeated_keys_touching_run": 469,
+        "write_repeated_keys_touching_run": 146,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::gpt-4o-airline": {
+        "records": 45,
+        "calls": 282,
+        "distinct_keys": 243,
+        "repeated_keys_touching_run": 243,
+        "write_repeated_keys_touching_run": 54,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::sonnet-35-new-retail": {
+        "records": 115,
+        "calls": 872,
+        "distinct_keys": 489,
+        "repeated_keys_touching_run": 489,
+        "write_repeated_keys_touching_run": 130,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::sonnet-35-new-airline": {
+        "records": 50,
+        "calls": 327,
+        "distinct_keys": 267,
+        "repeated_keys_touching_run": 267,
+        "write_repeated_keys_touching_run": 55,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "swe_agent_sample::swe-agent-swe-agent-llama-70b": {
+        "records": 283,
+        "calls": 7726,
+        "distinct_keys": 3153,
+        "repeated_keys_touching_run": 651,
+        "write_repeated_keys_touching_run": 430,
+        "repeated_keys_within_run": 622,
+        "write_repeated_keys_within_run": 410
+      },
+      "swe_agent_sample::swe-agent-swe-agent-llama-405b": {
+        "records": 2,
+        "calls": 24,
+        "distinct_keys": 15,
+        "repeated_keys_touching_run": 8,
+        "write_repeated_keys_touching_run": 6,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "swe_agent_sample::swe-agent-swe-agent-llama-8b": {
+        "records": 15,
+        "calls": 752,
+        "distinct_keys": 178,
+        "repeated_keys_touching_run": 65,
+        "write_repeated_keys_touching_run": 31,
+        "repeated_keys_within_run": 38,
+        "write_repeated_keys_within_run": 13
+      },
+      "agentgym_sample::agentgym-alfworld": {
+        "records": 2420,
+        "calls": 32247,
+        "distinct_keys": 1251,
+        "repeated_keys_touching_run": 869,
+        "write_repeated_keys_touching_run": 800,
+        "repeated_keys_within_run": 867,
+        "write_repeated_keys_within_run": 798
+      },
+      "agentgym_sample::agentgym-babyai": {
+        "records": 810,
+        "calls": 4642,
+        "distinct_keys": 97,
+        "repeated_keys_touching_run": 76,
+        "write_repeated_keys_touching_run": 29,
+        "repeated_keys_within_run": 74,
+        "write_repeated_keys_within_run": 27
+      },
+      "agentgym_sample::agentgym-sqlgym": {
+        "records": 3000,
+        "calls": 3000,
+        "distinct_keys": 875,
+        "repeated_keys_touching_run": 520,
+        "write_repeated_keys_touching_run": 0,
+        "repeated_keys_within_run": 520,
+        "write_repeated_keys_within_run": 0
+      }
+    }
+  },
+  "first_trial": {
+    "denominators": {
+      "records": 7180,
+      "runs": 14,
+      "tasks": 7180,
+      "calls": 52941,
+      "read_calls": 9578,
+      "write_calls": 21818,
+      "other_calls": 21545,
+      "distinct_keys": 6511,
+      "distinct_read_keys": 3133,
+      "distinct_write_keys": 2895,
+      "distinct_other_keys": 483
+    },
+    "a": {
+      "repeated_keys": 3131,
+      "share_of_distinct_keys": 0.4809,
+      "repeat_occurrences": 49561,
+      "share_of_calls": 0.9362,
+      "by_scope": {
+        "within_task": 516,
+        "within_run_across_tasks": 1605,
+        "cross_run": 1010
+      },
+      "by_scope_occurrences": {
+        "within_task": 3122,
+        "within_run_across_tasks": 39895,
+        "cross_run": 6544
+      },
+      "nested_repeat_levels": {
+        "within_task": 888,
+        "within_run": 2422,
+        "cross_run": 1010
+      },
+      "within_run_across_tasks_split": {
+        "same_task_other_trial": 0,
+        "different_task": 1605
+      },
+      "cross_run_split": {
+        "same_task_uid": 710,
+        "different_task_uid": 300
+      },
+      "by_scope_share": {
+        "within_task": 0.1648,
+        "within_run_across_tasks": 0.5126,
+        "cross_run": 0.3226
+      },
+      "by_scope_occurrence_share": {
+        "within_task": 0.063,
+        "within_run_across_tasks": 0.805,
+        "cross_run": 0.132
+      },
+      "by_class": {
+        "read": 1332,
+        "write": 1546,
+        "other": 253
+      },
+      "by_tool": {
+        "bash": {
+          "calls": 8502,
+          "distinct_keys": 3311,
+          "repeated_keys": 689,
+          "repeat_occurrences": 5880,
+          "read": 184,
+          "write": 443,
+          "other": 62
+        },
+        "book_reservation": {
+          "calls": 46,
+          "distinct_keys": 22,
+          "repeated_keys": 22,
+          "repeat_occurrences": 46,
+          "read": 0,
+          "write": 22,
+          "other": 0
+        },
+        "calculate": {
+          "calls": 78,
+          "distinct_keys": 38,
+          "repeated_keys": 38,
+          "repeat_occurrences": 78,
+          "read": 38,
+          "write": 0,
+          "other": 0
+        },
+        "cancel_pending_order": {
+          "calls": 92,
+          "distinct_keys": 27,
+          "repeated_keys": 27,
+          "repeat_occurrences": 92,
+          "read": 0,
+          "write": 27,
+          "other": 0
+        },
+        "cancel_reservation": {
+          "calls": 56,
+          "distinct_keys": 21,
+          "repeated_keys": 21,
+          "repeat_occurrences": 56,
+          "read": 0,
+          "write": 21,
+          "other": 0
+        },
+        "clean": {
+          "calls": 456,
+          "distinct_keys": 22,
+          "repeated_keys": 21,
+          "repeat_occurrences": 455,
+          "read": 0,
+          "write": 21,
+          "other": 0
+        },
+        "close": {
+          "calls": 356,
+          "distinct_keys": 4,
+          "repeated_keys": 3,
+          "repeat_occurrences": 355,
+          "read": 0,
+          "write": 3,
+          "other": 0
+        },
+        "cool": {
+          "calls": 395,
+          "distinct_keys": 13,
+          "repeated_keys": 13,
+          "repeat_occurrences": 395,
+          "read": 0,
+          "write": 13,
+          "other": 0
+        },
+        "examine": {
+          "calls": 230,
+          "distinct_keys": 43,
+          "repeated_keys": 21,
+          "repeat_occurrences": 208,
+          "read": 21,
+          "write": 0,
+          "other": 0
+        },
+        "exchange_delivered_order_items": {
+          "calls": 136,
+          "distinct_keys": 43,
+          "repeated_keys": 43,
+          "repeat_occurrences": 136,
+          "read": 0,
+          "write": 43,
+          "other": 0
+        },
+        "find_user_id_by_email": {
+          "calls": 212,
+          "distinct_keys": 56,
+          "repeated_keys": 56,
+          "repeat_occurrences": 212,
+          "read": 56,
+          "write": 0,
+          "other": 0
+        },
+        "find_user_id_by_name_zip": {
+          "calls": 388,
+          "distinct_keys": 48,
+          "repeated_keys": 48,
+          "repeat_occurrences": 388,
+          "read": 48,
+          "write": 0,
+          "other": 0
+        },
+        "get_order_details": {
+          "calls": 1084,
+          "distinct_keys": 156,
+          "repeated_keys": 156,
+          "repeat_occurrences": 1084,
+          "read": 156,
+          "write": 0,
+          "other": 0
+        },
+        "get_product_details": {
+          "calls": 392,
+          "distinct_keys": 42,
+          "repeated_keys": 42,
+          "repeat_occurrences": 392,
+          "read": 42,
+          "write": 0,
+          "other": 0
+        },
+        "get_reservation_details": {
+          "calls": 460,
+          "distinct_keys": 111,
+          "repeated_keys": 111,
+          "repeat_occurrences": 460,
+          "read": 111,
+          "write": 0,
+          "other": 0
+        },
+        "get_user_details": {
+          "calls": 560,
+          "distinct_keys": 86,
+          "repeated_keys": 86,
+          "repeat_occurrences": 560,
+          "read": 86,
+          "write": 0,
+          "other": 0
+        },
+        "go through": {
+          "calls": 165,
+          "distinct_keys": 6,
+          "repeated_keys": 6,
+          "repeat_occurrences": 165,
+          "read": 0,
+          "write": 0,
+          "other": 6
+        },
+        "go to": {
+          "calls": 18428,
+          "distinct_keys": 116,
+          "repeated_keys": 80,
+          "repeat_occurrences": 18392,
+          "read": 0,
+          "write": 0,
+          "other": 80
+        },
+        "heat": {
+          "calls": 327,
+          "distinct_keys": 9,
+          "repeated_keys": 9,
+          "repeat_occurrences": 327,
+          "read": 0,
+          "write": 9,
+          "other": 0
+        },
+        "inventory": {
+          "calls": 290,
+          "distinct_keys": 2,
+          "repeated_keys": 1,
+          "repeat_occurrences": 289,
+          "read": 1,
+          "write": 0,
+          "other": 0
+        },
+        "list_all_airports": {
+          "calls": 8,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 8,
+          "read": 1,
+          "write": 0,
+          "other": 0
+        },
+        "list_all_product_types": {
+          "calls": 62,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 62,
+          "read": 1,
+          "write": 0,
+          "other": 0
+        },
+        "look": {
+          "calls": 128,
+          "distinct_keys": 13,
+          "repeated_keys": 3,
+          "repeat_occurrences": 118,
+          "read": 3,
+          "write": 0,
+          "other": 0
+        },
+        "modify_pending_order_address": {
+          "calls": 76,
+          "distinct_keys": 17,
+          "repeated_keys": 17,
+          "repeat_occurrences": 76,
+          "read": 0,
+          "write": 17,
+          "other": 0
+        },
+        "modify_pending_order_items": {
+          "calls": 148,
+          "distinct_keys": 41,
+          "repeated_keys": 41,
+          "repeat_occurrences": 148,
+          "read": 0,
+          "write": 41,
+          "other": 0
+        },
+        "modify_pending_order_payment": {
+          "calls": 6,
+          "distinct_keys": 2,
+          "repeated_keys": 2,
+          "repeat_occurrences": 6,
+          "read": 0,
+          "write": 2,
+          "other": 0
+        },
+        "modify_user_address": {
+          "calls": 36,
+          "distinct_keys": 10,
+          "repeated_keys": 10,
+          "repeat_occurrences": 36,
+          "read": 0,
+          "write": 10,
+          "other": 0
+        },
+        "move forward": {
+          "calls": 1210,
+          "distinct_keys": 6,
+          "repeated_keys": 3,
+          "repeat_occurrences": 1207,
+          "read": 0,
+          "write": 0,
+          "other": 3
+        },
+        "open": {
+          "calls": 6646,
+          "distinct_keys": 7,
+          "repeated_keys": 5,
+          "repeat_occurrences": 6644,
+          "read": 0,
+          "write": 5,
+          "other": 0
+        },
+        "other": {
+          "calls": 76,
+          "distinct_keys": 15,
+          "repeated_keys": 7,
+          "repeat_occurrences": 68,
+          "read": 0,
+          "write": 7,
+          "other": 0
+        },
+        "pick up": {
+          "calls": 853,
+          "distinct_keys": 21,
+          "repeated_keys": 19,
+          "repeat_occurrences": 851,
+          "read": 0,
+          "write": 19,
+          "other": 0
+        },
+        "put": {
+          "calls": 2635,
+          "distinct_keys": 741,
+          "repeated_keys": 490,
+          "repeat_occurrences": 2384,
+          "read": 0,
+          "write": 490,
+          "other": 0
+        },
+        "return_delivered_order_items": {
+          "calls": 164,
+          "distinct_keys": 42,
+          "repeated_keys": 42,
+          "repeat_occurrences": 164,
+          "read": 0,
+          "write": 42,
+          "other": 0
+        },
+        "search_direct_flight": {
+          "calls": 158,
+          "distinct_keys": 48,
+          "repeated_keys": 48,
+          "repeat_occurrences": 158,
+          "read": 48,
+          "write": 0,
+          "other": 0
+        },
+        "search_onestop_flight": {
+          "calls": 54,
+          "distinct_keys": 16,
+          "repeated_keys": 16,
+          "repeat_occurrences": 54,
+          "read": 16,
+          "write": 0,
+          "other": 0
+        },
+        "select": {
+          "calls": 3000,
+          "distinct_keys": 875,
+          "repeated_keys": 520,
+          "repeat_occurrences": 2645,
+          "read": 520,
+          "write": 0,
+          "other": 0
+        },
+        "send_certificate": {
+          "calls": 8,
+          "distinct_keys": 4,
+          "repeated_keys": 4,
+          "repeat_occurrences": 8,
+          "read": 0,
+          "write": 4,
+          "other": 0
+        },
+        "take": {
+          "calls": 3071,
+          "distinct_keys": 306,
+          "repeated_keys": 250,
+          "repeat_occurrences": 3015,
+          "read": 0,
+          "write": 250,
+          "other": 0
+        },
+        "think": {
+          "calls": 122,
+          "distinct_keys": 60,
+          "repeated_keys": 60,
+          "repeat_occurrences": 122,
+          "read": 0,
+          "write": 0,
+          "other": 60
+        },
+        "toggle and go through": {
+          "calls": 647,
+          "distinct_keys": 15,
+          "repeated_keys": 8,
+          "repeat_occurrences": 640,
+          "read": 0,
+          "write": 8,
+          "other": 0
+        },
+        "transfer_to_human_agents": {
+          "calls": 80,
+          "distinct_keys": 40,
+          "repeated_keys": 40,
+          "repeat_occurrences": 80,
+          "read": 0,
+          "write": 0,
+          "other": 40
+        },
+        "turn left": {
+          "calls": 462,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 462,
+          "read": 0,
+          "write": 0,
+          "other": 1
+        },
+        "turn right": {
+          "calls": 294,
+          "distinct_keys": 1,
+          "repeated_keys": 1,
+          "repeat_occurrences": 294,
+          "read": 0,
+          "write": 0,
+          "other": 1
+        },
+        "update_reservation_baggages": {
+          "calls": 16,
+          "distinct_keys": 6,
+          "repeated_keys": 6,
+          "repeat_occurrences": 16,
+          "read": 0,
+          "write": 6,
+          "other": 0
+        },
+        "update_reservation_flights": {
+          "calls": 100,
+          "distinct_keys": 39,
+          "repeated_keys": 39,
+          "repeat_occurrences": 100,
+          "read": 0,
+          "write": 39,
+          "other": 0
+        },
+        "update_reservation_passengers": {
+          "calls": 8,
+          "distinct_keys": 2,
+          "repeated_keys": 2,
+          "repeat_occurrences": 8,
+          "read": 0,
+          "write": 2,
+          "other": 0
+        },
+        "use": {
+          "calls": 220,
+          "distinct_keys": 5,
+          "repeated_keys": 2,
+          "repeat_occurrences": 217,
+          "read": 0,
+          "write": 2,
+          "other": 0
+        }
+      },
+      "top_repeated_keys": [
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "cabinet"
+            ]
+          },
+          "class": "other",
+          "occurrences": 4424,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 987
+        },
+        {
+          "tool": "open",
+          "args": {
+            "shape": [
+              "cabinet"
+            ]
+          },
+          "class": "write",
+          "occurrences": 3437,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 937
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "drawer"
+            ]
+          },
+          "class": "other",
+          "occurrences": 3326,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 900
+        },
+        {
+          "tool": "open",
+          "args": {
+            "shape": [
+              "drawer"
+            ]
+          },
+          "class": "write",
+          "occurrences": 2577,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 785
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "countertop"
+            ]
+          },
+          "class": "other",
+          "occurrences": 1935,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 1207
+        },
+        {
+          "tool": "move forward",
+          "args": {
+            "shape": []
+          },
+          "class": "other",
+          "occurrences": 1200,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 445
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "shelf"
+            ]
+          },
+          "class": "other",
+          "occurrences": 1056,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 428
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "sinkbasin"
+            ]
+          },
+          "class": "other",
+          "occurrences": 939,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 729
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "fridge"
+            ]
+          },
+          "class": "other",
+          "occurrences": 793,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 676
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "diningtable"
+            ]
+          },
+          "class": "other",
+          "occurrences": 749,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 566
+        },
+        {
+          "tool": "go to",
+          "args": {
+            "shape": [
+              "sidetable"
+            ]
+          },
+          "class": "other",
+          "occurrences": 709,
+          "scope": "within_run_across_tasks",
+          "runs": 1,
+          "tasks": 449
+        },
+        {
+          "tool": "bash",
+          "args": {
+            "cmd": "edit 1:1"
+          },
+          "class": "write",
+          "occurrences": 606,
+          "scope": "cross_run",
+          "runs": 3,
+          "tasks": 205
+        }
+      ]
+    },
+    "b": {
+      "repeated_write_keys": 1546,
+      "denominator_repeated_keys": 3131,
+      "share_of_repeated_keys": 0.4938,
+      "repeated_write_key_occurrences": 20469,
+      "denominator_repeat_occurrences": 49561,
+      "share_of_repeat_occurrences": 0.413,
+      "by_scope": {
+        "within_task": 328,
+        "within_run_across_tasks": 920,
+        "cross_run": 298
+      },
+      "by_scope_share": {
+        "within_task": 0.2122,
+        "within_run_across_tasks": 0.5951,
+        "cross_run": 0.1928
+      },
+      "by_tool": {
+        "put": 490,
+        "bash": 443,
+        "take": 250,
+        "exchange_delivered_order_items": 43,
+        "return_delivered_order_items": 42,
+        "modify_pending_order_items": 41,
+        "update_reservation_flights": 39,
+        "cancel_pending_order": 27,
+        "book_reservation": 22,
+        "cancel_reservation": 21,
+        "clean": 21,
+        "pick up": 19,
+        "modify_pending_order_address": 17,
+        "cool": 13,
+        "modify_user_address": 10,
+        "heat": 9,
+        "toggle and go through": 8,
+        "other": 7,
+        "update_reservation_baggages": 6,
+        "open": 5,
+        "send_certificate": 4,
+        "close": 3,
+        "modify_pending_order_payment": 2,
+        "update_reservation_passengers": 2,
+        "use": 2
+      },
+      "write_repeats_outside_the_first_issuing_trajectory": 1218,
+      "share_of_write_repeats_outside_first_issuing_trajectory": 0.7878
+    },
+    "c": {
+      "scope_run": {
+        "repeated_read_key_instances": 1539,
+        "of_which_with_identifiable_entity": 1520,
+        "of_which_without_entity": 19,
+        "stale_read_key_instances": 241,
+        "of_which_handle_is_named_by_a_write_tool_somewhere_in_the_corpus": 321,
+        "share_of_entity_bearing_instances": 0.1586,
+        "share_of_handle_assessable_instances": 0.7508,
+        "stale_read_distinct_keys": 83,
+        "stale_read_occurrences": 389,
+        "stale_instances_with_a_stale_read_in_the_invalidating_write_s_task": 23,
+        "by_tool": {
+          "get_order_details": 184,
+          "get_reservation_details": 26,
+          "get_user_details": 16,
+          "bash": 12,
+          "examine": 3
+        },
+        "by_run": {
+          "tau_bench_historical::gpt-4o-retail": {
+            "repeated_read_key_instances": 156,
+            "with_entity": 154,
+            "stale": 47
+          },
+          "tau_bench_historical::gpt-4o-airline": {
+            "repeated_read_key_instances": 28,
+            "with_entity": 27,
+            "stale": 6
+          },
+          "tau_bench_historical::sonnet-35-new-retail": {
+            "repeated_read_key_instances": 176,
+            "with_entity": 175,
+            "stale": 53
+          },
+          "tau_bench_historical::sonnet-35-new-airline": {
+            "repeated_read_key_instances": 45,
+            "with_entity": 44,
+            "stale": 7
+          },
+          "tau_bench_observed::gpt-4o-retail": {
+            "repeated_read_key_instances": 156,
+            "with_entity": 154,
+            "stale": 47
+          },
+          "tau_bench_observed::gpt-4o-airline": {
+            "repeated_read_key_instances": 28,
+            "with_entity": 27,
+            "stale": 6
+          },
+          "tau_bench_observed::sonnet-35-new-retail": {
+            "repeated_read_key_instances": 176,
+            "with_entity": 175,
+            "stale": 53
+          },
+          "tau_bench_observed::sonnet-35-new-airline": {
+            "repeated_read_key_instances": 45,
+            "with_entity": 44,
+            "stale": 7
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b": {
+            "repeated_read_key_instances": 159,
+            "with_entity": 156,
+            "stale": 10
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-8b": {
+            "repeated_read_key_instances": 25,
+            "with_entity": 24,
+            "stale": 2
+          },
+          "agentgym_sample::agentgym-alfworld": {
+            "repeated_read_key_instances": 25,
+            "with_entity": 21,
+            "stale": 3
+          },
+          "agentgym_sample::agentgym-sqlgym": {
+            "repeated_read_key_instances": 520,
+            "with_entity": 519,
+            "stale": 0
+          }
+        },
+        "examples": [
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W2378156"
+            },
+            "entity": [
+              [
+                "order",
+                "#W2378156"
+              ]
+            ],
+            "occurrences_in_group": 4,
+            "stale_occurrences": 3
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5490111"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5490111"
+              ]
+            ],
+            "occurrences_in_group": 4,
+            "stale_occurrences": 2
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W7387996"
+            },
+            "entity": [
+              [
+                "order",
+                "#W7387996"
+              ]
+            ],
+            "occurrences_in_group": 4,
+            "stale_occurrences": 2
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5199551"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5199551"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W8665881"
+            },
+            "entity": [
+              [
+                "order",
+                "#W8665881"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W2890441"
+            },
+            "entity": [
+              [
+                "order",
+                "#W2890441"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4967593"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4967593"
+              ]
+            ],
+            "occurrences_in_group": 4,
+            "stale_occurrences": 3
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W9911714"
+            },
+            "entity": [
+              [
+                "order",
+                "#W9911714"
+              ]
+            ],
+            "occurrences_in_group": 3,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5733668"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5733668"
+              ]
+            ],
+            "occurrences_in_group": 4,
+            "stale_occurrences": 3
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W3561391"
+            },
+            "entity": [
+              [
+                "order",
+                "#W3561391"
+              ]
+            ],
+            "occurrences_in_group": 3,
+            "stale_occurrences": 2
+          }
+        ],
+        "share_of_all_repeated_read_instances": 0.1566,
+        "stale_instances_requiring_cross_task_state_sharing": 218
+      },
+      "scope_task": {
+        "repeated_read_key_instances": 299,
+        "of_which_with_identifiable_entity": 261,
+        "of_which_without_entity": 38,
+        "stale_read_key_instances": 21,
+        "of_which_handle_is_named_by_a_write_tool_somewhere_in_the_corpus": 45,
+        "share_of_entity_bearing_instances": 0.0805,
+        "share_of_handle_assessable_instances": 0.4667,
+        "stale_read_distinct_keys": 13,
+        "stale_read_occurrences": 40,
+        "stale_instances_with_a_stale_read_in_the_invalidating_write_s_task": 21,
+        "by_tool": {
+          "bash": 13,
+          "get_order_details": 6,
+          "get_reservation_details": 2
+        },
+        "by_run": {
+          "tau_bench_historical::gpt-4o-retail::20::t0": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 2
+          },
+          "tau_bench_historical::sonnet-35-new-retail::105::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_historical::sonnet-35-new-airline::8::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_observed::gpt-4o-retail::20::t0": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 2
+          },
+          "tau_bench_observed::sonnet-35-new-retail::105::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "tau_bench_observed::sonnet-35-new-airline::8::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::AnalogJ__lexicon-336::t0": {
+            "repeated_read_key_instances": 3,
+            "with_entity": 3,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::oasis-open__cti-python-stix2-74::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::reata__sqllineage-17::t0": {
+            "repeated_read_key_instances": 6,
+            "with_entity": 6,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::iterative__dvc-3726::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::iterative__dvc-8425::t0": {
+            "repeated_read_key_instances": 3,
+            "with_entity": 3,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::iterative__dvc-3405::t0": {
+            "repeated_read_key_instances": 5,
+            "with_entity": 5,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::marshmallow-code__flask-smorest-561::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::ICB-DCM__pyPESTO-676::t0": {
+            "repeated_read_key_instances": 2,
+            "with_entity": 2,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::ithaka__apiron-8::t0": {
+            "repeated_read_key_instances": 1,
+            "with_entity": 1,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::locustio__locust-994::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-70b::mps-gmbh__hl7-parser-24::t0": {
+            "repeated_read_key_instances": 6,
+            "with_entity": 6,
+            "stale": 1
+          },
+          "swe_agent_sample::swe-agent-swe-agent-llama-8b::streamlink__streamlink-1696::t0": {
+            "repeated_read_key_instances": 4,
+            "with_entity": 4,
+            "stale": 2
+          }
+        },
+        "examples": [
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::20::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4967593"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4967593"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::gpt-4o-retail::20::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5733668"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5733668"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::sonnet-35-new-retail::105::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4860251"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4860251"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_historical::sonnet-35-new-airline::8::t0",
+            "tool": "get_reservation_details",
+            "args": {
+              "reservation_id": "K1NW8N"
+            },
+            "entity": [
+              [
+                "reservation",
+                "K1NW8N"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_observed::gpt-4o-retail::20::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4967593"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4967593"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_observed::gpt-4o-retail::20::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W5733668"
+            },
+            "entity": [
+              [
+                "order",
+                "#W5733668"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_observed::sonnet-35-new-retail::105::t0",
+            "tool": "get_order_details",
+            "args": {
+              "order_id": "#W4860251"
+            },
+            "entity": [
+              [
+                "order",
+                "#W4860251"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "tau_bench_observed::sonnet-35-new-airline::8::t0",
+            "tool": "get_reservation_details",
+            "args": {
+              "reservation_id": "K1NW8N"
+            },
+            "entity": [
+              [
+                "reservation",
+                "K1NW8N"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "swe_agent_sample::swe-agent-swe-agent-llama-70b::AnalogJ__lexicon-336::t0",
+            "tool": "bash",
+            "args": {
+              "cmd": "open reproduce.py"
+            },
+            "entity": [
+              [
+                "file",
+                "reproduce.py"
+              ]
+            ],
+            "occurrences_in_group": 2,
+            "stale_occurrences": 1
+          },
+          {
+            "group": "swe_agent_sample::swe-agent-swe-agent-llama-70b::oasis-open__cti-python-stix2-74::t0",
+            "tool": "bash",
+            "args": {
+              "cmd": "open reproduce.py"
+            },
+            "entity": [
+              [
+                "file",
+                "reproduce.py"
+              ]
+            ],
+            "occurrences_in_group": 8,
+            "stale_occurrences": 7
+          }
+        ],
+        "share_of_all_repeated_read_instances": 0.0702
+      }
+    },
+    "by_run": {
+      "tau_bench_historical::gpt-4o-retail": {
+        "records": 115,
+        "calls": 794,
+        "distinct_keys": 469,
+        "repeated_keys_touching_run": 469,
+        "write_repeated_keys_touching_run": 146,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_historical::gpt-4o-airline": {
+        "records": 45,
+        "calls": 282,
+        "distinct_keys": 243,
+        "repeated_keys_touching_run": 243,
+        "write_repeated_keys_touching_run": 54,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_historical::sonnet-35-new-retail": {
+        "records": 115,
+        "calls": 872,
+        "distinct_keys": 489,
+        "repeated_keys_touching_run": 489,
+        "write_repeated_keys_touching_run": 130,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_historical::sonnet-35-new-airline": {
+        "records": 50,
+        "calls": 327,
+        "distinct_keys": 267,
+        "repeated_keys_touching_run": 267,
+        "write_repeated_keys_touching_run": 55,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::gpt-4o-retail": {
+        "records": 115,
+        "calls": 794,
+        "distinct_keys": 469,
+        "repeated_keys_touching_run": 469,
+        "write_repeated_keys_touching_run": 146,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::gpt-4o-airline": {
+        "records": 45,
+        "calls": 282,
+        "distinct_keys": 243,
+        "repeated_keys_touching_run": 243,
+        "write_repeated_keys_touching_run": 54,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::sonnet-35-new-retail": {
+        "records": 115,
+        "calls": 872,
+        "distinct_keys": 489,
+        "repeated_keys_touching_run": 489,
+        "write_repeated_keys_touching_run": 130,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "tau_bench_observed::sonnet-35-new-airline": {
+        "records": 50,
+        "calls": 327,
+        "distinct_keys": 267,
+        "repeated_keys_touching_run": 267,
+        "write_repeated_keys_touching_run": 55,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "swe_agent_sample::swe-agent-swe-agent-llama-70b": {
+        "records": 283,
+        "calls": 7726,
+        "distinct_keys": 3153,
+        "repeated_keys_touching_run": 651,
+        "write_repeated_keys_touching_run": 430,
+        "repeated_keys_within_run": 622,
+        "write_repeated_keys_within_run": 410
+      },
+      "swe_agent_sample::swe-agent-swe-agent-llama-405b": {
+        "records": 2,
+        "calls": 24,
+        "distinct_keys": 15,
+        "repeated_keys_touching_run": 8,
+        "write_repeated_keys_touching_run": 6,
+        "repeated_keys_within_run": 0,
+        "write_repeated_keys_within_run": 0
+      },
+      "swe_agent_sample::swe-agent-swe-agent-llama-8b": {
+        "records": 15,
+        "calls": 752,
+        "distinct_keys": 178,
+        "repeated_keys_touching_run": 65,
+        "write_repeated_keys_touching_run": 31,
+        "repeated_keys_within_run": 38,
+        "write_repeated_keys_within_run": 13
+      },
+      "agentgym_sample::agentgym-alfworld": {
+        "records": 2420,
+        "calls": 32247,
+        "distinct_keys": 1251,
+        "repeated_keys_touching_run": 869,
+        "write_repeated_keys_touching_run": 800,
+        "repeated_keys_within_run": 867,
+        "write_repeated_keys_within_run": 798
+      },
+      "agentgym_sample::agentgym-babyai": {
+        "records": 810,
+        "calls": 4642,
+        "distinct_keys": 97,
+        "repeated_keys_touching_run": 76,
+        "write_repeated_keys_touching_run": 29,
+        "repeated_keys_within_run": 74,
+        "write_repeated_keys_within_run": 27
+      },
+      "agentgym_sample::agentgym-sqlgym": {
+        "records": 3000,
+        "calls": 3000,
+        "distinct_keys": 875,
+        "repeated_keys_touching_run": 520,
+        "write_repeated_keys_touching_run": 0,
+        "repeated_keys_within_run": 520,
+        "write_repeated_keys_within_run": 0
+      }
+    }
+  },
+  "sensitivity": {
+    "bash_as_monolithic_write": {
+      "why": "the pilot's convention treats every bash call as effectful; this shows what (b)/(c) become without the verb refinement",
+      "all_trials": {
+        "b": {
+          "repeated_write_keys": 1889,
+          "denominator_repeated_keys": 3342,
+          "repeated_write_key_occurrences": 24212,
+          "denominator_repeat_occurrences": 60506,
+          "by_scope": {
+            "within_task": 515,
+            "within_run_across_tasks": 1035,
+            "cross_run": 339
+          }
+        },
+        "c_scope_run": {
+          "repeated_read_key_instances": 2037,
+          "of_which_with_identifiable_entity": 1985,
+          "stale_read_key_instances": 395,
+          "stale_read_distinct_keys": 156,
+          "stale_read_occurrences": 3046
+        },
+        "c_scope_task": {
+          "repeated_read_key_instances": 315,
+          "of_which_with_identifiable_entity": 276,
+          "stale_read_key_instances": 29,
+          "stale_read_distinct_keys": 13,
+          "stale_read_occurrences": 29
+        },
+        "a_by_scope": {
+          "within_task": 530,
+          "within_run_across_tasks": 1749,
+          "cross_run": 1063
+        }
+      },
+      "first_trial": {
+        "b": {
+          "repeated_write_keys": 1792,
+          "denominator_repeated_keys": 3131,
+          "repeated_write_key_occurrences": 22123,
+          "denominator_repeat_occurrences": 49561,
+          "by_scope": {
+            "within_task": 507,
+            "within_run_across_tasks": 978,
+            "cross_run": 307
+          }
+        },
+        "c_scope_run": {
+          "repeated_read_key_instances": 1355,
+          "of_which_with_identifiable_entity": 1340,
+          "stale_read_key_instances": 229,
+          "stale_read_distinct_keys": 71,
+          "stale_read_occurrences": 343
+        },
+        "c_scope_task": {
+          "repeated_read_key_instances": 128,
+          "of_which_with_identifiable_entity": 96,
+          "stale_read_key_instances": 8,
+          "stale_read_distinct_keys": 4,
+          "stale_read_occurrences": 8
+        },
+        "a_by_scope": {
+          "within_task": 516,
+          "within_run_across_tasks": 1605,
+          "cross_run": 1010
+        }
+      }
+    },
+    "run_equals_source": {
+      "why": "merges the two tau-bench capture files under one source label; shows how much of cross_run is a run-identity artifact",
+      "all_trials": {
+        "b": {
+          "repeated_write_keys": 1643,
+          "denominator_repeated_keys": 3342,
+          "repeated_write_key_occurrences": 22558,
+          "denominator_repeat_occurrences": 60506,
+          "by_scope": {
+            "within_task": 336,
+            "within_run_across_tasks": 1071,
+            "cross_run": 236
+          }
+        },
+        "c_scope_run": {
+          "repeated_read_key_instances": 1871,
+          "of_which_with_identifiable_entity": 1800,
+          "stale_read_key_instances": 297,
+          "stale_read_distinct_keys": 168,
+          "stale_read_occurrences": 3458
+        },
+        "c_scope_task": {
+          "repeated_read_key_instances": 486,
+          "of_which_with_identifiable_entity": 441,
+          "stale_read_key_instances": 42,
+          "stale_read_distinct_keys": 22,
+          "stale_read_occurrences": 61
+        },
+        "a_by_scope": {
+          "within_task": 530,
+          "within_run_across_tasks": 2071,
+          "cross_run": 741
+        },
+        "keys_moved_from_cross_run_to_within_run": 322
+      },
+      "first_trial": {
+        "b": {
+          "repeated_write_keys": 1546,
+          "denominator_repeated_keys": 3131,
+          "repeated_write_key_occurrences": 20469,
+          "denominator_repeat_occurrences": 49561,
+          "by_scope": {
+            "within_task": 328,
+            "within_run_across_tasks": 1087,
+            "cross_run": 131
+          }
+        },
+        "c_scope_run": {
+          "repeated_read_key_instances": 1712,
+          "of_which_with_identifiable_entity": 1661,
+          "stale_read_key_instances": 250,
+          "stale_read_distinct_keys": 153,
+          "stale_read_occurrences": 694
+        },
+        "c_scope_task": {
+          "repeated_read_key_instances": 299,
+          "of_which_with_identifiable_entity": 261,
+          "stale_read_key_instances": 21,
+          "stale_read_distinct_keys": 13,
+          "stale_read_occurrences": 40
+        },
+        "a_by_scope": {
+          "within_task": 516,
+          "within_run_across_tasks": 2095,
+          "cross_run": 520
+        },
+        "keys_moved_from_cross_run_to_within_run": 490
+      }
+    },
+    "unknown_bash_verbs_as_read": {
+      "why": "lower bound on write repeats: verbs outside the table are reads instead of writes",
+      "all_trials": {
+        "b": {
+          "repeated_write_keys": 1589,
+          "denominator_repeated_keys": 3342,
+          "repeated_write_key_occurrences": 22219,
+          "denominator_repeat_occurrences": 60506,
+          "by_scope": {
+            "within_task": 283,
+            "within_run_across_tasks": 976,
+            "cross_run": 330
+          }
+        },
+        "c_scope_run": {
+          "repeated_read_key_instances": 2275,
+          "of_which_with_identifiable_entity": 2212,
+          "stale_read_key_instances": 406,
+          "stale_read_distinct_keys": 167,
+          "stale_read_occurrences": 3092
+        },
+        "c_scope_task": {
+          "repeated_read_key_instances": 539,
+          "of_which_with_identifiable_entity": 488,
+          "stale_read_key_instances": 41,
+          "stale_read_distinct_keys": 21,
+          "stale_read_occurrences": 61
+        },
+        "a_by_scope": {
+          "within_task": 530,
+          "within_run_across_tasks": 1749,
+          "cross_run": 1063
+        }
+      },
+      "first_trial": {
+        "b": {
+          "repeated_write_keys": 1492,
+          "denominator_repeated_keys": 3131,
+          "repeated_write_key_occurrences": 20130,
+          "denominator_repeat_occurrences": 49561,
+          "by_scope": {
+            "within_task": 275,
+            "within_run_across_tasks": 919,
+            "cross_run": 298
+          }
+        },
+        "c_scope_run": {
+          "repeated_read_key_instances": 1593,
+          "of_which_with_identifiable_entity": 1567,
+          "stale_read_key_instances": 240,
+          "stale_read_distinct_keys": 82,
+          "stale_read_occurrences": 389
+        },
+        "c_scope_task": {
+          "repeated_read_key_instances": 352,
+          "of_which_with_identifiable_entity": 308,
+          "stale_read_key_instances": 20,
+          "stale_read_distinct_keys": 12,
+          "stale_read_occurrences": 40
+        },
+        "a_by_scope": {
+          "within_task": 516,
+          "within_run_across_tasks": 1605,
+          "cross_run": 1010
+        }
+      }
+    }
+  },
+  "paper_claim": {
+    "load_bearing": "all_trials.b.repeated_write_keys (and first_trial.b for the headline sample)",
+    "why": "it needs no assumption about entity identity or state sharing: a cache keyed on (tool,args) that stores writes replays them, and the replay is what the caller asked to happen but which did not happen",
+    "supporting": "c bounds the second failure mode (a read answered from a pre-write value). c.scope_task is the variant that survives per-task state reset; c.scope_run is the run-scoped upper bound the task asked for"
+  },
+  "stale": {
+    "schema": "stale_window_audit/v1",
+    "result_kind": "MEASURED",
+    "scope": "tau-bench only: 4 source runs (gpt-4o-retail, gpt-4o-airline, sonnet-35-new-retail, sonnet-35-new-airline), first trial of each task, file order. Counts *hits* answered from a value that predates a write to the same entity; the corpus-wide key-level companion is first_trial.c / all_trials.c above, which counts read keys, not hits.",
+    "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+    "provenance": {
+      "corpus": "examples/real_traces/tau_bench_historical.jsonl",
+      "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "records": 1960,
+      "streams": "4 runs, first trial per task (325 records, 2,275 calls), file order",
+      "positions": "0-based call index within a run, every call counted",
+      "key": "sha256('tool|' + sorted-json(arguments))",
+      "purity": "real_trace_pilot.TOOL_CLASSES (unknown -> effectful)",
+      "cache": "one per run, first insertion wins, unbounded residency",
+      "deterministic": true,
+      "no_model_calls": true
+    },
+    "anchor": {
+      "published_hits": 746,
+      "published_cacheable_calls": 1789,
+      "reproduced_hits": 746,
+      "reproduced_cacheable_calls": 1789,
+      "matches_published": true
+    },
+    "accounting": {
+      "calls": 2275,
+      "reads": 1789,
+      "writes": 486,
+      "read_hits": 746,
+      "stale_hits": 169,
+      "stale_share_of_hits": 0.2265,
+      "stale_share_of_cacheable_calls": 0.0945,
+      "stale_share_of_all_calls": 0.0743,
+      "stale_same_task": 3,
+      "stale_cross_task": 166,
+      "stale_with_duplicate_write": 14,
+      "duplicate_writes": 61,
+      "duplicate_share_of_writes": 0.1255
+    },
+    "entity_types": {
+      "order": 144,
+      "reservation": 17,
+      "user": 8
+    },
+    "per_tool": {
+      "calculate": {
+        "hits": 1,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "find_user_id_by_email": {
+        "hits": 29,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "find_user_id_by_name_zip": {
+        "hits": 105,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "get_order_details": {
+        "hits": 267,
+        "stale": 144,
+        "stale_share": 0.5393,
+        "joinable": true
+      },
+      "get_product_details": {
+        "hits": 122,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "get_reservation_details": {
+        "hits": 51,
+        "stale": 17,
+        "stale_share": 0.3333,
+        "joinable": true
+      },
+      "get_user_details": {
+        "hits": 121,
+        "stale": 8,
+        "stale_share": 0.0661,
+        "joinable": true
+      },
+      "list_all_airports": {
+        "hits": 2,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "list_all_product_types": {
+        "hits": 29,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "search_direct_flight": {
+        "hits": 14,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "search_onestop_flight": {
+        "hits": 4,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      },
+      "think": {
+        "hits": 1,
+        "stale": 0,
+        "stale_share": 0.0,
+        "joinable": false
+      }
+    },
+    "per_run": {
+      "gpt-4o-retail": {
+        "calls": 794,
+        "reads": 619,
+        "writes": 175,
+        "read_hits": 303,
+        "stale_hits": 69,
+        "stale_share_of_hits": 0.2277,
+        "duplicate_writes": 22,
+        "duplicate_share_of_writes": 0.1257,
+        "entity_types": {
+          "order": 66,
+          "user": 3
+        },
+        "distinct_stale_read_keys": 47,
+        "cross_task_stale": 67,
+        "same_task_stale": 2,
+        "stale_share_of_cacheable_calls": 0.1115,
+        "stale_share_of_all_calls": 0.0869,
+        "hit_rate": 0.4895,
+        "coherent_hits": 244,
+        "coherent_hit_rate": 0.3942,
+        "invalidated_hits": 59
+      },
+      "gpt-4o-airline": {
+        "calls": 282,
+        "reads": 215,
+        "writes": 67,
+        "read_hits": 35,
+        "stale_hits": 8,
+        "stale_share_of_hits": 0.2286,
+        "duplicate_writes": 4,
+        "duplicate_share_of_writes": 0.0597,
+        "entity_types": {
+          "reservation": 8
+        },
+        "distinct_stale_read_keys": 6,
+        "cross_task_stale": 8,
+        "same_task_stale": 0,
+        "stale_share_of_cacheable_calls": 0.0372,
+        "stale_share_of_all_calls": 0.0284,
+        "hit_rate": 0.1628,
+        "coherent_hits": 28,
+        "coherent_hit_rate": 0.1302,
+        "invalidated_hits": 7
+      },
+      "sonnet-35-new-retail": {
+        "calls": 872,
+        "reads": 701,
+        "writes": 171,
+        "read_hits": 352,
+        "stale_hits": 83,
+        "stale_share_of_hits": 0.2358,
+        "duplicate_writes": 31,
+        "duplicate_share_of_writes": 0.1813,
+        "entity_types": {
+          "order": 78,
+          "user": 5
+        },
+        "distinct_stale_read_keys": 53,
+        "cross_task_stale": 83,
+        "same_task_stale": 0,
+        "stale_share_of_cacheable_calls": 0.1184,
+        "stale_share_of_all_calls": 0.0952,
+        "hit_rate": 0.5021,
+        "coherent_hits": 283,
+        "coherent_hit_rate": 0.4037,
+        "invalidated_hits": 69
+      },
+      "sonnet-35-new-airline": {
+        "calls": 327,
+        "reads": 254,
+        "writes": 73,
+        "read_hits": 56,
+        "stale_hits": 9,
+        "stale_share_of_hits": 0.1607,
+        "duplicate_writes": 4,
+        "duplicate_share_of_writes": 0.0548,
+        "entity_types": {
+          "reservation": 9
+        },
+        "distinct_stale_read_keys": 7,
+        "cross_task_stale": 8,
+        "same_task_stale": 1,
+        "stale_share_of_cacheable_calls": 0.0354,
+        "stale_share_of_all_calls": 0.0275,
+        "hit_rate": 0.2205,
+        "coherent_hits": 49,
+        "coherent_hit_rate": 0.1929,
+        "invalidated_hits": 7
+      }
+    },
+    "windows": {
+      "min_calls": 2,
+      "median_calls": 13,
+      "max_calls": 346
+    },
+    "write_task_scope": {
+      "cached_task_only": 106,
+      "intermediate_task_only": 32,
+      "cached_and_intermediate": 26,
+      "hit_task_only": 1,
+      "hit_task_and_cached": 4
+    },
+    "reset_reading": {
+      "assumption": "tau-bench runs every task attempt in a fresh environment built from the domain's base data, so a cached value captured before any write of its own task equals the state the hit's task starts from",
+      "hits_whose_own_task_rewrote_the_record": 5,
+      "share_of_hits": 0.0067,
+      "in_reward_1_episodes": 0,
+      "note": "a window inside a failed episode cannot be shown to have served a wrong value, because the write may have been rejected; all five sit in reward-0 episodes, so this corpus exhibits unjustified hits, not an observable wrong replay"
+    },
+    "episode_reward": {
+      "both_episodes_reward_1": 72,
+      "hit_episode_reward_0": 22,
+      "write_episode_reward_0": 75,
+      "write_episode_reward_1": 94
+    },
+    "counterfactual": {
+      "description": "the same stream with a cache that drops a read's key when its entity is written; the gap to the 746 hits is what coherence costs this run",
+      "read_hits": 746,
+      "coherent_read_hits": 604,
+      "invalidated_hits": 142,
+      "hit_rate_before": 0.417,
+      "hit_rate_after": 0.3376,
+      "points_lost": 7.94
+    },
+    "examples": [
+      {
+        "source": "gpt-4o-retail",
+        "hit_task_id": 52,
+        "cached_task_id": 51,
+        "entity_type": "order",
+        "entity_id": "#W4689314",
+        "read_tool": "get_order_details",
+        "cached_pos": 365,
+        "writes": [
+          {
+            "tool": "return_delivered_order_items",
+            "pos": 366,
+            "task_id": 51,
+            "episode_reward": 1.0
+          }
+        ],
+        "hit_pos": 369,
+        "window_calls": 4,
+        "hit_turn": 2,
+        "hit_episode_reward": 1.0
+      },
+      {
+        "source": "gpt-4o-airline",
+        "hit_task_id": 7,
+        "cached_task_id": 6,
+        "entity_type": "reservation",
+        "entity_id": "M05KNL",
+        "read_tool": "get_reservation_details",
+        "cached_pos": 48,
+        "writes": [
+          {
+            "tool": "update_reservation_flights",
+            "pos": 52,
+            "task_id": 6,
+            "episode_reward": 1.0
+          }
+        ],
+        "hit_pos": 54,
+        "window_calls": 6,
+        "hit_turn": 1,
+        "hit_episode_reward": 0.0
+      },
+      {
+        "source": "sonnet-35-new-retail",
+        "hit_task_id": 57,
+        "cached_task_id": 56,
+        "entity_type": "order",
+        "entity_id": "#W4284542",
+        "read_tool": "get_order_details",
+        "cached_pos": 418,
+        "writes": [
+          {
+            "tool": "modify_pending_order_items",
+            "pos": 420,
+            "task_id": 56,
+            "episode_reward": 1.0
+          }
+        ],
+        "hit_pos": 422,
+        "window_calls": 4,
+        "hit_turn": 1,
+        "hit_episode_reward": 1.0
+      },
+      {
+        "source": "sonnet-35-new-airline",
+        "hit_task_id": 5,
+        "cached_task_id": 4,
+        "entity_type": "reservation",
+        "entity_id": "FQ8APE",
+        "read_tool": "get_reservation_details",
+        "cached_pos": 44,
+        "writes": [
+          {
+            "tool": "update_reservation_flights",
+            "pos": 46,
+            "task_id": 4,
+            "episode_reward": 1.0
+          },
+          {
+            "tool": "update_reservation_baggages",
+            "pos": 47,
+            "task_id": 4,
+            "episode_reward": 1.0
+          },
+          {
+            "tool": "update_reservation_passengers",
+            "pos": 48,
+            "task_id": 4,
+            "episode_reward": 1.0
+          }
+        ],
+        "hit_pos": 52,
+        "window_calls": 8,
+        "hit_turn": 3,
+        "hit_episode_reward": 1.0
+      },
+      {
+        "source": "sonnet-35-new-retail",
+        "hit_task_id": 34,
+        "cached_task_id": 33,
+        "entity_type": "user",
+        "entity_id": "noah_patel_6952",
+        "read_tool": "get_user_details",
+        "cached_pos": 265,
+        "writes": [
+          {
+            "tool": "modify_user_address",
+            "pos": 268,
+            "task_id": 33,
+            "episode_reward": 1.0
+          }
+        ],
+        "hit_pos": 270,
+        "window_calls": 5,
+        "hit_turn": 1,
+        "hit_episode_reward": 0.0
+      }
+    ],
+    "duplicate_writes": {
+      "by_tool": {
+        "cancel_pending_order": 7,
+        "cancel_reservation": 2,
+        "exchange_delivered_order_items": 7,
+        "modify_pending_order_address": 9,
+        "modify_pending_order_items": 11,
+        "modify_user_address": 3,
+        "return_delivered_order_items": 16,
+        "update_reservation_baggages": 1,
+        "update_reservation_flights": 4,
+        "update_reservation_passengers": 1
+      },
+      "by_entity": {
+        "order": 50,
+        "reservation": 8,
+        "user": 3
+      },
+      "same_task": 4,
+      "cross_task": 57,
+      "examples": [
+        {
+          "source": "gpt-4o-retail",
+          "task_id": 31,
+          "cached_task_id": 30,
+          "write_tool": "cancel_pending_order",
+          "entities": [
+            {
+              "type": "order",
+              "id": "#W9373487"
+            }
+          ],
+          "cached_pos": 221,
+          "write_pos": 230,
+          "gap_calls": 9,
+          "same_task": false
+        },
+        {
+          "source": "gpt-4o-airline",
+          "task_id": 27,
+          "cached_task_id": 26,
+          "write_tool": "cancel_reservation",
+          "entities": [
+            {
+              "type": "reservation",
+              "id": "NQNU5R"
+            }
+          ],
+          "cached_pos": 154,
+          "write_pos": 162,
+          "gap_calls": 8,
+          "same_task": false
+        },
+        {
+          "source": "sonnet-35-new-retail",
+          "task_id": 37,
+          "cached_task_id": 36,
+          "write_tool": "cancel_pending_order",
+          "entities": [
+            {
+              "type": "order",
+              "id": "#W9348897"
+            }
+          ],
+          "cached_pos": 291,
+          "write_pos": 297,
+          "gap_calls": 6,
+          "same_task": false
+        },
+        {
+          "source": "sonnet-35-new-airline",
+          "task_id": 9,
+          "cached_task_id": 8,
+          "write_tool": "cancel_reservation",
+          "entities": [
+            {
+              "type": "reservation",
+              "id": "K1NW8N"
+            }
+          ],
+          "cached_pos": 80,
+          "write_pos": 86,
+          "gap_calls": 6,
+          "same_task": false
+        }
+      ]
+    },
+    "reconciliation": {
+      "distinct_stale_read_keys_by_run": {
+        "gpt-4o-retail": 47,
+        "gpt-4o-airline": 6,
+        "sonnet-35-new-retail": 53,
+        "sonnet-35-new-airline": 7
+      },
+      "total_distinct_stale_read_keys": 113,
+      "note": "one read key can be answered stale several times, which is why 113 keys carry the 169 hits; these per-run key counts are the tau_bench_historical rows of first_trial.c.scope_run.by_run"
+    },
+    "sensitivity": {
+      "all_trials": {
+        "description": "the same audit over every record: trial replay re-runs one conversation against a reset backend, which inflates hits, stale windows and duplicate writes, so this is a bound, not a headline",
+        "accounting": {
+          "calls": 14285,
+          "reads": 11240,
+          "writes": 3045,
+          "read_hits": 9372,
+          "stale_hits": 2872,
+          "stale_share_of_hits": 0.3064,
+          "stale_share_of_cacheable_calls": 0.2555,
+          "stale_share_of_all_calls": 0.2011,
+          "stale_same_task": 1299,
+          "stale_cross_task": 1573,
+          "stale_with_duplicate_write": 2216,
+          "duplicate_writes": 1948,
+          "duplicate_share_of_writes": 0.6397
+        },
+        "entity_types": {
+          "order": 2159,
+          "reservation": 566,
+          "user": 147
+        },
+        "duplicate_writes": {
+          "by_tool": {
+            "book_reservation": 49,
+            "cancel_pending_order": 233,
+            "cancel_reservation": 133,
+            "exchange_delivered_order_items": 286,
+            "modify_pending_order_address": 182,
+            "modify_pending_order_items": 331,
+            "modify_pending_order_payment": 12,
+            "modify_user_address": 91,
+            "return_delivered_order_items": 394,
+            "send_certificate": 16,
+            "update_reservation_baggages": 40,
+            "update_reservation_flights": 161,
+            "update_reservation_passengers": 20
+          },
+          "same_task": 1469,
+          "cross_task": 479
+        }
+      },
+      "unjoined": {
+        "reads_without_id": [
+          "find_user_id_by_email",
+          "find_user_id_by_name_zip",
+          "list_all_product_types",
+          "list_all_airports",
+          "search_direct_flight",
+          "search_onestop_flight",
+          "calculate",
+          "think"
+        ],
+        "writes_without_joinable_id": [
+          "book_reservation",
+          "send_certificate",
+          "transfer_to_human_agents"
+        ],
+        "note": "reads and writes that share no id are never counted as stale, and product reads cannot be joined to item ids from another namespace, so every count here is a lower bound on staleness"
+      },
+      "write_success": "the corpus records inputs only, so whether a write call landed is not observable; episode_reward splits the windows by the reward of the write's episode and of the hit's episode"
+    }
+  }
+}

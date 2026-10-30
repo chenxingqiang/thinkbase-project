@@ -1,0 +1,1141 @@
+{
+  "schema": "tool_effect_map/v1",
+  "task": "A1 - effect-class map: every tool in the tau-bench trace corpus, with call counts, entity-identifying argument keys, and the entity each write mutates",
+  "corpus": {
+    "path": "examples/real_traces/tau_bench_historical.jsonl",
+    "sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+    "bytes": 1481791,
+    "records": 1960,
+    "tool_calls": 14285,
+    "tools": 26,
+    "role": "primary: every trial of every task, 1,960 trajectories, 14,285 calls"
+  },
+  "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+  "observation_corpus": {
+    "path": "examples/real_traces/tau_bench_observed.jsonl",
+    "sha256": "50fb894fb1e2bddda69cb866f93772ccc4e0199c2e28eafbee4d84ecf4fd68e0",
+    "bytes": 1071187,
+    "records": 325,
+    "tool_calls": 2275,
+    "tools": 26,
+    "calls_with_observation": 2221,
+    "calls_without_observation": 54,
+    "observations_truncated_at_400_chars": 1734,
+    "observations_carrying_an_error_string": 120,
+    "records_with_collapsed_observations": 158,
+    "calls_with_collapsed_observations": 1173,
+    "records_with_per_call_observations": 167,
+    "role": "secondary: first trial of each task, with the observation each call returned. Used only as corroboration; the classification is computed from the primary corpus"
+  },
+  "rule": {
+    "statement": "A tool's class is decided by what the call does to server state, read from the tool name's verb and confirmed against the recorded call arguments and the observation, applying the three definitions below in that order. read = the call returns data and creates, changes, or removes nothing the server persists; write = the call creates, changes, or removes persisted server state; control = the call acts on the episode itself (reasoning step or hand-off) rather than on a domain record, and is neither a read nor a write of an entity.",
+    "decision_order": [
+      "1. control if the name denotes an episode-level act (think, transfer_to_human_agents); these two are fixed by the task, not derived, and the flag class_stipulated records that.",
+      "2. write if the verb is a mutation verb: cancel_, modify_, update_, return_, exchange_, book_, send_.",
+      "3. read if the verb is a retrieval verb: get_, find_, search_, list_, or a computation over its own arguments (calculate).",
+      "4. otherwise: unknown -> effectful (conservative default inherited from examples/benchmarks/real_trace_pilot.py). This branch is not exercised by this corpus: every tool that appears is covered by rules 1-3, and no tool outside the two domains' published inventory appears."
+    ],
+    "entity_identification": "A tool's entity_keys are the argument keys that name the entity it touches, not every key it takes. Payload keys (address1, city, zip on the modify_* tools; cabin, flights, passengers on the reservation tools) describe the new value and are excluded; composite lookups list all of their parts (find_user_id_by_name_zip -> first_name, last_name, zip). argument keys that are only meaningful nested inside another argument are written dotted (payment_methods[].payment_id). An empty list means the tool takes no entity key: either it is catalog-wide (list_all_airports, list_all_product_types) or it touches no server entity at all (calculate, think).",
+    "inference_flags": {
+      "class_inferred": "true when the read/write/control class is a judgement rather than a reading of the verb: either the verb is compatible with more than one class, or the tool has no entity for 'read' to mean, or the corroborating evidence is too thin to call it established. Set for calculate and send_certificate.",
+      "class_stipulated": "true when the class comes from the task's definition (think, transfer_to_human_agents) rather than from inference or from the verb.",
+      "target_inferred": "true for a write whose effect reaches an entity that no argument names: a server-assigned id, or a refund target read out of a record. Set for book_reservation, cancel_pending_order, cancel_reservation, send_certificate."
+    },
+    "evidence_limit": "No tool schema or implementation ships with the corpus, so no class is 'known' in the sense of being read off a signature. 'Known' here means settled by the verb plus the recorded arguments and observation; the three flags above mark every case that needed more than that.",
+    "rounding": "Shares and rates are rounded to four decimal places; the 26 shares sum to 1.0001 for that reason, not because a call is double-counted (14,285 calls are accounted for exactly once).",
+    "determinism": "Byte-identical on rerun over the same corpora: no timestamps, no host paths, tools sorted by name, counts derived rather than typed, key order fixed."
+  },
+  "entities": {
+    "order": "retail order, keyed order_id, form #W#######; owns items and an address",
+    "user": "customer, keyed user_id, shared by both domains; owns addresses, payment methods, orders (retail) and certificates (airline)",
+    "product": "retail catalog entry, keyed product_id",
+    "reservation": "airline booking, keyed reservation_id; owns flights, passengers, baggages, payment methods",
+    "flight": "airline inventory, keyed by flight_number and date; searched by origin, destination, date",
+    "airport": "airline catalog of airport codes",
+    "payment_method": "card/certificate/gift-card id of the form <type>_<digits>; charged or refunded by every write that moves money",
+    "certificate": "airline credit owned by a user; id assigned by the server",
+    "episode": "the conversation itself; only transfer_to_human_agents acts on it",
+    "none": "calculate and think touch no server entity"
+  },
+  "summary": {
+    "tools": 26,
+    "by_class": {
+      "read": {
+        "tools": 11,
+        "tool_names": [
+          "calculate",
+          "find_user_id_by_email",
+          "find_user_id_by_name_zip",
+          "get_order_details",
+          "get_product_details",
+          "get_reservation_details",
+          "get_user_details",
+          "list_all_airports",
+          "list_all_product_types",
+          "search_direct_flight",
+          "search_onestop_flight"
+        ],
+        "calls_historical": 10851,
+        "calls_observed": 1728
+      },
+      "write": {
+        "tools": 13,
+        "tool_names": [
+          "book_reservation",
+          "cancel_pending_order",
+          "cancel_reservation",
+          "exchange_delivered_order_items",
+          "modify_pending_order_address",
+          "modify_pending_order_items",
+          "modify_pending_order_payment",
+          "modify_user_address",
+          "return_delivered_order_items",
+          "send_certificate",
+          "update_reservation_baggages",
+          "update_reservation_flights",
+          "update_reservation_passengers"
+        ],
+        "calls_historical": 2762,
+        "calls_observed": 446
+      },
+      "control": {
+        "tools": 2,
+        "tool_names": [
+          "think",
+          "transfer_to_human_agents"
+        ],
+        "calls_historical": 672,
+        "calls_observed": 101
+      }
+    },
+    "calls_historical_total": 14285,
+    "calls_observed_total": 2275,
+    "read_share_of_historical_calls": 0.7596,
+    "inferred_classes": [
+      "calculate",
+      "send_certificate"
+    ],
+    "stipulated_classes": [
+      "think",
+      "transfer_to_human_agents"
+    ],
+    "writes_with_unname_argument_target": [
+      "book_reservation",
+      "cancel_pending_order",
+      "cancel_reservation",
+      "send_certificate"
+    ],
+    "top5_call_share": 0.6272
+  },
+  "tools": [
+    {
+      "name": "book_reservation",
+      "class": "write",
+      "calls": {
+        "historical": 149,
+        "observed": 23
+      },
+      "share_of_historical_calls": 0.0104,
+      "entity": "reservation",
+      "entity_keys": [
+        "user_id",
+        "payment_methods[].payment_id"
+      ],
+      "arg_keys": [
+        "cabin",
+        "destination",
+        "flight_type",
+        "flights",
+        "insurance",
+        "nonfree_baggages",
+        "origin",
+        "passengers",
+        "payment_methods",
+        "total_baggages",
+        "user_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "reservation",
+          "key": null,
+          "derived_from": "user_id",
+          "change": "creates a reservation (reservation_id assigned by the server) carrying flights, cabin, passengers, baggages"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_methods[].payment_id",
+          "derived_from": null,
+          "change": "charges each listed payment method the stated amount"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": true,
+      "note": "Write by the verb 'book', but the created entity is named by no argument: its reservation_id is server-assigned, and all 20 successful observations return the same literal id 'HATHAT', so the new id cannot be recovered from the recording."
+    },
+    {
+      "name": "calculate",
+      "class": "read",
+      "calls": {
+        "historical": 243,
+        "observed": 39
+      },
+      "share_of_historical_calls": 0.017,
+      "entity": "none",
+      "entity_keys": [
+        "expression"
+      ],
+      "arg_keys": [
+        "expression"
+      ],
+      "reads": [],
+      "mutates": [],
+      "class_basis": "judgment",
+      "class_inferred": true,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Pure arithmetic over the expression argument; touches no server entity. Placed in read because the rule defines read as 'no state change', so an entityless pure computation has no other slot; it is not a read of a record."
+    },
+    {
+      "name": "cancel_pending_order",
+      "class": "write",
+      "calls": {
+        "historical": 291,
+        "observed": 46
+      },
+      "share_of_historical_calls": 0.0204,
+      "entity": "order",
+      "entity_keys": [
+        "order_id"
+      ],
+      "arg_keys": [
+        "order_id",
+        "reason"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "derived_from": null,
+          "change": "status pending -> cancelled"
+        },
+        {
+          "entity": "payment_method",
+          "key": null,
+          "derived_from": "order#order_id",
+          "change": "refund credited to the order's payment method"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": true,
+      "note": "Observation returns the order record truncated at 400 chars, so the status field (and the refund) is never visible: 0 of 45 observations contain 'cancel'. The status change is verb-inferred, the refund target is derived from the order record rather than named by an argument."
+    },
+    {
+      "name": "cancel_reservation",
+      "class": "write",
+      "calls": {
+        "historical": 188,
+        "observed": 28
+      },
+      "share_of_historical_calls": 0.0132,
+      "entity": "reservation",
+      "entity_keys": [
+        "reservation_id"
+      ],
+      "arg_keys": [
+        "reservation_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "reservation",
+          "key": "reservation_id",
+          "derived_from": null,
+          "change": "status active -> cancelled"
+        },
+        {
+          "entity": "payment_method",
+          "key": null,
+          "derived_from": "reservation#reservation_id",
+          "change": "refund credited to the payment methods stored on the reservation"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": true,
+      "note": "The refund target is read out of the reservation record, not passed in: cancel_reservation takes reservation_id only. Observation is truncated before the status field in all 27 truncated observations."
+    },
+    {
+      "name": "exchange_delivered_order_items",
+      "class": "write",
+      "calls": {
+        "historical": 416,
+        "observed": 68
+      },
+      "share_of_historical_calls": 0.0291,
+      "entity": "order",
+      "entity_keys": [
+        "order_id",
+        "item_ids",
+        "new_item_ids",
+        "payment_method_id"
+      ],
+      "arg_keys": [
+        "item_ids",
+        "new_item_ids",
+        "order_id",
+        "payment_method_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "derived_from": null,
+          "change": "named items (item_ids) replaced by new_item_ids; status delivered -> exchanged"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_method_id",
+          "derived_from": null,
+          "change": "price difference charged or refunded"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "find_user_id_by_email",
+      "class": "read",
+      "calls": {
+        "historical": 695,
+        "observed": 106
+      },
+      "share_of_historical_calls": 0.0487,
+      "entity": "user",
+      "entity_keys": [
+        "email"
+      ],
+      "arg_keys": [
+        "email"
+      ],
+      "reads": [
+        {
+          "entity": "user",
+          "key": "email",
+          "returns": "user_id"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Identity-key lookup: email -> user_id. Returns an id, not a record."
+    },
+    {
+      "name": "find_user_id_by_name_zip",
+      "class": "read",
+      "calls": {
+        "historical": 1159,
+        "observed": 194
+      },
+      "share_of_historical_calls": 0.0811,
+      "entity": "user",
+      "entity_keys": [
+        "first_name",
+        "last_name",
+        "zip"
+      ],
+      "arg_keys": [
+        "first_name",
+        "last_name",
+        "zip"
+      ],
+      "reads": [
+        {
+          "entity": "user",
+          "key": "first_name+last_name+zip",
+          "returns": "user_id"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Three-key identity lookup; the only tool in the corpus that joins on a composite of name and zip rather than a single id."
+    },
+    {
+      "name": "get_order_details",
+      "class": "read",
+      "calls": {
+        "historical": 3455,
+        "observed": 542
+      },
+      "share_of_historical_calls": 0.2419,
+      "entity": "order",
+      "entity_keys": [
+        "order_id"
+      ],
+      "arg_keys": [
+        "order_id"
+      ],
+      "reads": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "returns": "order record"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "get_product_details",
+      "class": "read",
+      "calls": {
+        "historical": 1207,
+        "observed": 196
+      },
+      "share_of_historical_calls": 0.0845,
+      "entity": "product",
+      "entity_keys": [
+        "product_id"
+      ],
+      "arg_keys": [
+        "product_id"
+      ],
+      "reads": [
+        {
+          "entity": "product",
+          "key": "product_id",
+          "returns": "product record"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "get_reservation_details",
+      "class": "read",
+      "calls": {
+        "historical": 1419,
+        "observed": 230
+      },
+      "share_of_historical_calls": 0.0993,
+      "entity": "reservation",
+      "entity_keys": [
+        "reservation_id"
+      ],
+      "arg_keys": [
+        "reservation_id"
+      ],
+      "reads": [
+        {
+          "entity": "reservation",
+          "key": "reservation_id",
+          "returns": "reservation record"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "get_user_details",
+      "class": "read",
+      "calls": {
+        "historical": 1719,
+        "observed": 280
+      },
+      "share_of_historical_calls": 0.1203,
+      "entity": "user",
+      "entity_keys": [
+        "user_id"
+      ],
+      "arg_keys": [
+        "user_id"
+      ],
+      "reads": [
+        {
+          "entity": "user",
+          "key": "user_id",
+          "returns": "user record"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Shared by both domains (retail and airline)."
+    },
+    {
+      "name": "list_all_airports",
+      "class": "read",
+      "calls": {
+        "historical": 18,
+        "observed": 4
+      },
+      "share_of_historical_calls": 0.0013,
+      "entity": "airport (catalog)",
+      "entity_keys": [],
+      "arg_keys": [],
+      "reads": [
+        {
+          "entity": "airport",
+          "key": null,
+          "returns": "all airport codes"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Catalog-wide, no argument keys: the only argument-free tools in the corpus are this one and list_all_product_types."
+    },
+    {
+      "name": "list_all_product_types",
+      "class": "read",
+      "calls": {
+        "historical": 190,
+        "observed": 31
+      },
+      "share_of_historical_calls": 0.0133,
+      "entity": "product (catalog)",
+      "entity_keys": [],
+      "arg_keys": [],
+      "reads": [
+        {
+          "entity": "product",
+          "key": null,
+          "returns": "product name -> product_id map"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Returns product_id values, so it is the binding source for product_id arguments to get_product_details."
+    },
+    {
+      "name": "modify_pending_order_address",
+      "class": "write",
+      "calls": {
+        "historical": 227,
+        "observed": 38
+      },
+      "share_of_historical_calls": 0.0159,
+      "entity": "order",
+      "entity_keys": [
+        "order_id"
+      ],
+      "arg_keys": [
+        "address1",
+        "address2",
+        "city",
+        "country",
+        "order_id",
+        "state",
+        "zip"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "derived_from": null,
+          "change": "address (address1, address2, city, state, country, zip) replaced"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "The address keys are payload, not identity: they describe the new value, not which entity is touched (order_id does that)."
+    },
+    {
+      "name": "modify_pending_order_items",
+      "class": "write",
+      "calls": {
+        "historical": 458,
+        "observed": 74
+      },
+      "share_of_historical_calls": 0.0321,
+      "entity": "order",
+      "entity_keys": [
+        "order_id",
+        "item_ids",
+        "new_item_ids",
+        "payment_method_id"
+      ],
+      "arg_keys": [
+        "item_ids",
+        "new_item_ids",
+        "order_id",
+        "payment_method_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "derived_from": null,
+          "change": "named items (item_ids) replaced by new_item_ids"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_method_id",
+          "derived_from": null,
+          "change": "price difference charged or refunded"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "modify_pending_order_payment",
+      "class": "write",
+      "calls": {
+        "historical": 18,
+        "observed": 3
+      },
+      "share_of_historical_calls": 0.0013,
+      "entity": "order",
+      "entity_keys": [
+        "order_id",
+        "payment_method_id"
+      ],
+      "arg_keys": [
+        "order_id",
+        "payment_method_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "derived_from": null,
+          "change": "payment method on the order replaced"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_method_id",
+          "derived_from": null,
+          "change": "new method becomes the refund target"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Rarest retail write (18 calls)."
+    },
+    {
+      "name": "modify_user_address",
+      "class": "write",
+      "calls": {
+        "historical": 119,
+        "observed": 18
+      },
+      "share_of_historical_calls": 0.0083,
+      "entity": "user",
+      "entity_keys": [
+        "user_id"
+      ],
+      "arg_keys": [
+        "address1",
+        "address2",
+        "city",
+        "country",
+        "state",
+        "user_id",
+        "zip"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "user",
+          "key": "user_id",
+          "derived_from": null,
+          "change": "address (address1, address2, city, state, country, zip) replaced"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "return_delivered_order_items",
+      "class": "write",
+      "calls": {
+        "historical": 489,
+        "observed": 82
+      },
+      "share_of_historical_calls": 0.0342,
+      "entity": "order",
+      "entity_keys": [
+        "order_id",
+        "item_ids",
+        "payment_method_id"
+      ],
+      "arg_keys": [
+        "item_ids",
+        "order_id",
+        "payment_method_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "order",
+          "key": "order_id",
+          "derived_from": null,
+          "change": "named items (item_ids) marked returned; status delivered -> returned"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_method_id",
+          "derived_from": null,
+          "change": "refund credited"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "search_direct_flight",
+      "class": "read",
+      "calls": {
+        "historical": 538,
+        "observed": 79
+      },
+      "share_of_historical_calls": 0.0377,
+      "entity": "flight",
+      "entity_keys": [
+        "origin",
+        "destination",
+        "date"
+      ],
+      "arg_keys": [
+        "date",
+        "destination",
+        "origin"
+      ],
+      "reads": [
+        {
+          "entity": "flight",
+          "key": "origin+destination+date",
+          "returns": "direct flights"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "search_onestop_flight",
+      "class": "read",
+      "calls": {
+        "historical": 208,
+        "observed": 27
+      },
+      "share_of_historical_calls": 0.0146,
+      "entity": "flight",
+      "entity_keys": [
+        "origin",
+        "destination",
+        "date"
+      ],
+      "arg_keys": [
+        "date",
+        "destination",
+        "origin"
+      ],
+      "reads": [
+        {
+          "entity": "flight",
+          "key": "origin+destination+date",
+          "returns": "one-stop itineraries"
+        }
+      ],
+      "mutates": [],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "send_certificate",
+      "class": "write",
+      "calls": {
+        "historical": 30,
+        "observed": 4
+      },
+      "share_of_historical_calls": 0.0021,
+      "entity": "certificate",
+      "entity_keys": [
+        "user_id",
+        "amount"
+      ],
+      "arg_keys": [
+        "amount",
+        "user_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "certificate",
+          "key": null,
+          "derived_from": "user_id",
+          "change": "creates a certificate of 'amount' owned by the user (id assigned by the server)"
+        },
+        {
+          "entity": "user",
+          "key": "user_id",
+          "derived_from": null,
+          "change": "certificate added to the user's balance"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": true,
+      "class_stipulated": false,
+      "target_inferred": true,
+      "note": "Class rests on 4 observations and a domain verb. All four read 'Certificate certificate_3221322 added to user <id> with amount <n>' - the same literal id four times, so the observation proves a user-level effect but cannot distinguish issuing a certificate from logging one; with n=4 that is corroboration, not proof. Flagged inferred."
+    },
+    {
+      "name": "think",
+      "class": "control",
+      "calls": {
+        "historical": 389,
+        "observed": 61
+      },
+      "share_of_historical_calls": 0.0272,
+      "entity": "none",
+      "entity_keys": [
+        "thought"
+      ],
+      "arg_keys": [
+        "thought"
+      ],
+      "reads": [],
+      "mutates": [],
+      "class_basis": "task-stipulated",
+      "class_inferred": false,
+      "class_stipulated": true,
+      "target_inferred": false,
+      "note": "Control by the task's definition. Effect-free: it is the only control tool that is also pure, and the pilot's purity table counts it cacheable, which is why the published 1,789/11,240 denominators include it."
+    },
+    {
+      "name": "transfer_to_human_agents",
+      "class": "control",
+      "calls": {
+        "historical": 283,
+        "observed": 40
+      },
+      "share_of_historical_calls": 0.0198,
+      "entity": "episode",
+      "entity_keys": [
+        "summary"
+      ],
+      "arg_keys": [
+        "summary"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "episode",
+          "key": null,
+          "derived_from": "summary",
+          "change": "conversation handed to a human agent; the episode ends (observation: 'Transfer successful')"
+        }
+      ],
+      "class_basis": "task-stipulated",
+      "class_inferred": false,
+      "class_stipulated": true,
+      "target_inferred": false,
+      "note": "Control by the task's definition, but not pure: it terminates the episode. Grouping it with think under 'control' hides that difference."
+    },
+    {
+      "name": "update_reservation_baggages",
+      "class": "write",
+      "calls": {
+        "historical": 66,
+        "observed": 8
+      },
+      "share_of_historical_calls": 0.0046,
+      "entity": "reservation",
+      "entity_keys": [
+        "reservation_id",
+        "payment_id"
+      ],
+      "arg_keys": [
+        "nonfree_baggages",
+        "payment_id",
+        "reservation_id",
+        "total_baggages"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "reservation",
+          "key": "reservation_id",
+          "derived_from": null,
+          "change": "total_baggages and nonfree_baggages replaced"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_id",
+          "derived_from": null,
+          "change": "baggage fee charged"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": null
+    },
+    {
+      "name": "update_reservation_flights",
+      "class": "write",
+      "calls": {
+        "historical": 287,
+        "observed": 50
+      },
+      "share_of_historical_calls": 0.0201,
+      "entity": "reservation",
+      "entity_keys": [
+        "reservation_id",
+        "payment_id"
+      ],
+      "arg_keys": [
+        "cabin",
+        "flights",
+        "payment_id",
+        "payment_methods",
+        "reservation_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "reservation",
+          "key": "reservation_id",
+          "derived_from": null,
+          "change": "flights list and cabin replaced"
+        },
+        {
+          "entity": "payment_method",
+          "key": "payment_id",
+          "derived_from": null,
+          "change": "fare difference charged"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "One of 287 calls (source sonnet-35-new-airline, task 17, trial 1, reward 0.0 - trial > 0, so it is absent from the observed corpus) passes the observed corpus) passes payment_methods as a JSON *string* instead of payment_id; every other call uses payment_id. Recorded as a malformed call, not a schema variant."
+    },
+    {
+      "name": "update_reservation_passengers",
+      "class": "write",
+      "calls": {
+        "historical": 24,
+        "observed": 4
+      },
+      "share_of_historical_calls": 0.0017,
+      "entity": "reservation",
+      "entity_keys": [
+        "reservation_id"
+      ],
+      "arg_keys": [
+        "passengers",
+        "reservation_id"
+      ],
+      "reads": [],
+      "mutates": [
+        {
+          "entity": "reservation",
+          "key": "reservation_id",
+          "derived_from": null,
+          "change": "passengers list replaced (names and dates of birth)"
+        }
+      ],
+      "class_basis": "verb+observation",
+      "class_inferred": false,
+      "class_stipulated": false,
+      "target_inferred": false,
+      "note": "Only update_* tool with no payment argument: it charges nothing."
+    }
+  ],
+  "checks": [
+    {
+      "id": "tool_set_is_identical_in_both_corpora",
+      "expected": "same 26 names",
+      "observed": "same 26 names",
+      "pass": true
+    },
+    {
+      "id": "corpus_matches_published_tau_bench_inventory",
+      "expected": "16 retail + 14 airline - 4 shared = 26",
+      "observed": "16 + 14 - 4 = 26",
+      "shared_tools": [
+        "calculate",
+        "get_user_details",
+        "think",
+        "transfer_to_human_agents"
+      ],
+      "pass": true
+    },
+    {
+      "id": "no_unknown_tool",
+      "expected": "0 tools outside the map, 0 map entries absent from the corpus",
+      "observed": "0 / 0",
+      "pass": true
+    },
+    {
+      "id": "reproduces_published_pure_call_denominators",
+      "expected": "observed read+think = 1789, observed write+transfer = 486, historical read+think = 11240",
+      "observed": {
+        "read_plus_think_observed": 1789,
+        "write_plus_transfer_observed": 486,
+        "read_plus_think_historical": 11240
+      },
+      "note": "The three figures are quoted in docs/AgentISA.md (1,789 of 2,275; 486 effectful; 11,240 all-trial cacheable). They are reproduced here without being used as an input, which is why they count as a check.",
+      "pass": true
+    },
+    {
+      "id": "agrees_with_pilot_purity_table",
+      "expected": "pilot pure = read + think; pilot effectful = write + transfer",
+      "observed": {
+        "pilot_pure": [
+          "calculate",
+          "find_user_id_by_email",
+          "find_user_id_by_name_zip",
+          "get_order_details",
+          "get_product_details",
+          "get_reservation_details",
+          "get_user_details",
+          "list_all_airports",
+          "list_all_product_types",
+          "search_direct_flight",
+          "search_onestop_flight",
+          "think"
+        ],
+        "pilot_effectful": [
+          "book_reservation",
+          "cancel_pending_order",
+          "cancel_reservation",
+          "exchange_delivered_order_items",
+          "modify_pending_order_address",
+          "modify_pending_order_items",
+          "modify_pending_order_payment",
+          "modify_user_address",
+          "return_delivered_order_items",
+          "send_certificate",
+          "transfer_to_human_agents",
+          "update_reservation_baggages",
+          "update_reservation_flights",
+          "update_reservation_passengers"
+        ],
+        "map_read_plus_think": [
+          "calculate",
+          "find_user_id_by_email",
+          "find_user_id_by_name_zip",
+          "get_order_details",
+          "get_product_details",
+          "get_reservation_details",
+          "get_user_details",
+          "list_all_airports",
+          "list_all_product_types",
+          "search_direct_flight",
+          "search_onestop_flight",
+          "think"
+        ],
+        "map_write_plus_transfer": [
+          "book_reservation",
+          "cancel_pending_order",
+          "cancel_reservation",
+          "exchange_delivered_order_items",
+          "modify_pending_order_address",
+          "modify_pending_order_items",
+          "modify_pending_order_payment",
+          "modify_user_address",
+          "return_delivered_order_items",
+          "send_certificate",
+          "transfer_to_human_agents",
+          "update_reservation_baggages",
+          "update_reservation_flights",
+          "update_reservation_passengers"
+        ]
+      },
+      "pass": true,
+      "note": "Agreement is not independent confirmation: TOOL_CLASSES in real_trace_pilot.py is the table the paper's sound-caching arm already uses, and this map was written with it in view."
+    }
+  ],
+  "observation_notes": {
+    "truncated_share": 0.7622,
+    "truncation_effect": "Observations are cut at 400 characters. For the retail and airline write tools the returned record is longer than that, so the field that would prove the mutation (status) is always past the cut: 0 of 45 cancel_pending_order observations contain 'cancel'. Mutate claims are therefore verb-based, and the observation is used only to confirm which record type the call returned.",
+    "explicit_effect_statements": [
+      "transfer_to_human_agents: 40/40 'Transfer successful'",
+      "send_certificate: 4/4 'Certificate <id> added to user <id> with amount <n>'"
+    ],
+    "constant_ids": "book_reservation returns the literal reservation_id 'HATHAT' in all 20 successful observations, and send_certificate returns 'certificate_3221322' in all 4. Whether this is a mock that reuses one id or a recording artefact cannot be decided from the corpus; either way a created entity's real id is not recoverable from it.",
+    "per_call_observation_collapse": {
+      "records_where_every_call_carries_the_same_observation": 158,
+      "records_total": 325,
+      "calls_inside_those_records": 1173,
+      "share_of_calls": 0.5156,
+      "by_source": {
+        "gpt-4o-retail": 1,
+        "sonnet-35-new-airline": 45,
+        "sonnet-35-new-retail": 112
+      },
+      "shared_value_is_the_final_tool_result": "In all 130 such records whose last call has a recognisable return shape, the shared value is that call's own result: the record it returns (126 records, e.g. an order record where the last call is exchange_delivered_order_items) or its own error string (4 records, e.g. 'Error: non-delivered order cannot be returned' where the last call is return_delivered_order_items).",
+      "cause": "Not established. examples/real_traces/prepare_tau_bench_observed.py stores each observation under its tool_call_id and falls back to the oldest pending id when a message has none; if a history carries no tool_call ids at all, every write lands on the empty key, every call resolves to the last stored value, and the result is exactly this pattern. That would also explain why 157 of the 158 affected records are sonnet-35-new-*.",
+      "consequence": "For those 158 records the observation is not evidence about the call that supposedly produced it. Classification here does not depend on observations; any statistic that does (argument binding, observation-wired specifications) should be re-derived on the 167 clean records as a sensitivity check."
+    },
+    "residual_misalignment": "Outside the collapsed records, 1 of the remaining 1,048 observations carries an error string that belongs to another tool's contract (24 such strings sit inside the collapsed records, where they are explained), so the collapse accounts for the pattern rather than a second defect."
+  },
+  "provenance": {
+    "generator": "one-off script over the two committed corpora; the counting procedure is reproduced in .drafts/audit_effect_map.md",
+    "git_rev": "f3cd91be6786dbe6401900eb9c7c7cbf34041594",
+    "git_dirty": true,
+    "paths_are_repo_relative": true
+  }
+}

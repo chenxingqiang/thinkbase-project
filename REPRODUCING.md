@@ -31,7 +31,7 @@ python -m pytest tests/core/isa/test_coordination.py \
 python -m pytest tests/system/ -q
 
 python -m pytest tests/ -q
-# 1420 passed, 14 skipped, 13 subtests passed (full suite)
+# 1441 passed, 14 skipped, 13 subtests passed (full suite)
 ```
 
 Note: the coordination tests initialize a local Ray session; on machines
@@ -89,6 +89,11 @@ field names them. Each file records the revision it was generated at: eleven car
 | Cost model (modeled, not measured) | `./venv/bin/python examples/benchmarks/cost_model.py --output examples/benchmarks/cost_model_results.json` (deterministic; reads only committed results JSONs, listed with their SHA-256 in `provenance.inputs`) | `examples/benchmarks/cost_model_results.json` |
 | Compound transfer (cross-model, cross-domain) | `./venv/bin/python examples/benchmarks/compound_transfer.py --corpus examples/real_traces/tau_bench_observed.jsonl --output examples/benchmarks/compound_transfer_results.json` (max k=4, min support=2; the observed-observation corpus of I.9) | `examples/benchmarks/compound_transfer_results.json` |
 | Sampling-unit statistics (run weighting, per-backbone global scope, hot-set test calls) | `./venv/bin/python scripts/trace_scope_stats.py --corpus examples/real_traces/tau_bench_historical.jsonl --output examples/benchmarks/trace_scope_results.json` (deterministic; no seeds, no model calls) | `examples/benchmarks/trace_scope_results.json` |
+| Cache soundness (four policies) | `./venv/bin/python examples/benchmarks/unsafe_cache_baselines.py --corpus examples/real_traces/tau_bench_historical.jsonl --output examples/benchmarks/unsafe_cache_results.json` (deterministic; replays the first trial of every task) | `examples/benchmarks/unsafe_cache_results.json` |
+| Damage split and task-clustered intervals | `./venv/bin/python examples/benchmarks/unsafe_damage.py` | `examples/benchmarks/unsafe_damage_results.json` |
+| Cost-of-soundness ladder | `./venv/bin/python examples/benchmarks/soundness_ladder.py` | `examples/benchmarks/soundness_ladder_results.json` |
+| Task-clustered intervals (325 cells) | `./venv/bin/python examples/benchmarks/safety_ci.py` | `examples/benchmarks/safety_ci_results.json` |
+| Out-of-sample compound absorption | `./venv/bin/python examples/benchmarks/compound_holdout.py` | `examples/benchmarks/compound_holdout_results.json` |
 | Bootstrap CIs over committed records | `./venv/bin/python scripts/bootstrap_ci.py --output examples/benchmarks/bootstrap_ci_results.json` (percentile bootstrap over the committed per-seed microbench results; fixed base seed, so a rerun reproduces the same intervals) | `examples/benchmarks/bootstrap_ci_results.json` |
 
 Offline re-verification of every cited number (main text + supplementary,

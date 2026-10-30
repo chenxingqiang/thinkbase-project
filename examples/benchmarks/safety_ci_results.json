@@ -1,0 +1,190 @@
+{
+  "schema": "safety_ci/v1",
+  "task": "L2 - task-clustered percentile-bootstrap intervals for the unsafe-cache safety table, resampling the 325 first-trial tau-bench tasks",
+  "result_kind": "BOOTSTRAP",
+  "scope": "tau-bench only: the first trial of every task in the committed corpus, four source runs, replayed through the blind and typed run-scope caches of unsafe_cache_baselines.POLICIES. The interval is over tasks.",
+  "method": {
+    "cluster_unit": "task: one first-trial trajectory, labelled source#task_id; the same task_id replayed by another model is a different trajectory and a different cluster",
+    "clusters": 325,
+    "cluster_sizes_calls": {
+      "min": 1,
+      "max": 23,
+      "mean": 7.0
+    },
+    "resamples": 10000,
+    "resamples_used": 10000,
+    "seed": 20240601,
+    "replacement": true,
+    "confidence": 0.95,
+    "percentiles": [
+      2.5,
+      97.5
+    ],
+    "percentile_rule": "linear interpolation on the sorted bootstrap draws: h = (n - 1) * p, value at floor(h) plus the fraction to the next",
+    "rng": "CPython random.Random (Mersenne Twister); indices drawn with rejection on getrandbits(64), not randrange(), so the draw depends only on the bit stream",
+    "why_tasks_not_calls": "Calls within one task are dependent: they share a trajectory, a user, a tenant and an evolving cache, and an unsafe hit is a property of a sequence (a write landing before a stale read), not of a call in isolation. Resampling calls would treat the calls of one task as independent, shrink the interval and overstate precision. Resampling whole tasks keeps each task's call sequence intact and makes the unit of variation the deployment's: another batch of tasks like these.",
+    "paired": true,
+    "pairing_note": "one task resample feeds every metric, so blind-minus-typed is computed within a resample; the two policies see the same tasks"
+  },
+  "corpus": {
+    "path": "examples/real_traces/tau_bench_historical.jsonl",
+    "sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+    "records": 1960,
+    "first_trial_records": 325,
+    "runs": 4,
+    "calls": 2275,
+    "tasks": 325,
+    "first_trial_only": true
+  },
+  "provenance": {
+    "script": {
+      "path": "examples/benchmarks/safety_ci.py",
+      "sha256": "6b57d0156eecf6336e1e4b82e28fe22da35cd28babc58d98b21da621de0e592d",
+      "schema": "safety_ci/v1"
+    },
+    "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+    "identity_module": {
+      "path": "examples/benchmarks/cache_identity.py",
+      "sha256": "fdb03597c057d1c604b924c27cb3d4a06bd3bb9731ef923671fd8e1d89dfe4e5"
+    },
+    "unsafe_module": {
+      "path": "examples/benchmarks/unsafe_cache_baselines.py",
+      "sha256": "9a2eb6c57d76a09e93889a0476663ec1a801e5c42add65bd34e0efa6edffb7fe"
+    },
+    "external_module": {
+      "path": "examples/benchmarks/real_trace_external_baselines.py",
+      "sha256": "488a980a194553065d2757352e9c0d78b3ab90c6b8f547f60548b5b17b17d3ea"
+    }
+  },
+  "definitions": {
+    "unsafe_hit": "a hit that serves a write (writes_served), a read whose entity was written after the memo was stored (stale_reads), or a read produced under a different known tenant (cross_tenant); one class per hit, by that precedence",
+    "hit_rate": "hits / admitted calls: all 2,275 calls for blind (it memoises writes too), only the 1,728 reads for typed (it refuses writes and control tools)",
+    "task": "one first-trial record, source#task_id; 325 over four runs. Calls within a task are the resampling cluster.",
+    "affected_task": "a task with at least one unsafe hit from the blind policy; the typed view is reported as 0 for completeness, not as evidence of safety on other workloads"
+  },
+  "point": {
+    "blind": {
+      "calls": 2275,
+      "hits": 807,
+      "unsafe_hits": 344,
+      "unsafe_breakdown": {
+        "writes_served": 61,
+        "stale_reads": 179,
+        "cross_tenant": 104
+      },
+      "unsafe_hits_per_1000_calls": 151.208791,
+      "unsafe_share_of_hits": 0.42627,
+      "hit_rate": 0.354725,
+      "read_calls": 1728,
+      "read_hits": 745
+    },
+    "typed": {
+      "admitted_reads": 1728,
+      "hits": 466,
+      "hit_rate_on_admitted_reads": 0.269676,
+      "unsafe_hits": 0
+    },
+    "difference": {
+      "blind_minus_typed": 0.085049,
+      "same_base_read_only": 0.161458,
+      "note": "blind_minus_typed subtracts rates on different denominators (all 2,275 admissible calls vs the 1,728 admitted reads) because that is the pair the safety table publishes; same_base_read_only restricts the blind rate to the same read calls and is the like-for-like comparison"
+    },
+    "tasks": {
+      "total": 325,
+      "with_any_unsafe_hit": 167,
+      "share_with_any_unsafe_hit": 0.513846,
+      "with_unsafe_hit_by_class": {
+        "writes_served": 42,
+        "stale_reads": 115,
+        "cross_tenant": 80
+      },
+      "typed_with_any_unsafe_hit": 0,
+      "note": "unsafe hits are the blind policy's; typed produces none by construction (writes refused, entity invalidation), so its affected-task count is 0"
+    }
+  },
+  "intervals": {
+    "blind_unsafe_hits_per_1000_calls": {
+      "estimate": 151.209,
+      "ci_low": 131.202,
+      "ci_high": 171.262,
+      "unit": "unsafe hits per 1,000 calls",
+      "resamples": 10000
+    },
+    "blind_unsafe_share_of_hits": {
+      "estimate": 0.42627,
+      "ci_low": 0.389851,
+      "ci_high": 0.461943,
+      "unit": "share of hits",
+      "resamples": 10000
+    },
+    "typed_hit_rate_on_admitted_reads": {
+      "estimate": 0.269676,
+      "ci_low": 0.230157,
+      "ci_high": 0.310245,
+      "unit": "share of admitted reads",
+      "resamples": 10000
+    },
+    "hit_rate_difference_blind_minus_typed": {
+      "estimate": 0.085049,
+      "ci_low": 0.066704,
+      "ci_high": 0.103315,
+      "unit": "difference in hit rate",
+      "resamples": 10000
+    },
+    "blind_hit_rate_on_admitted_reads": {
+      "estimate": 0.431134,
+      "ci_low": 0.384794,
+      "ci_high": 0.477603,
+      "unit": "share of read calls",
+      "resamples": 10000
+    },
+    "hit_rate_difference_same_base": {
+      "estimate": 0.161458,
+      "ci_low": 0.142165,
+      "ci_high": 0.181134,
+      "unit": "difference in hit rate",
+      "resamples": 10000
+    },
+    "tasks_with_unsafe_hit": {
+      "estimate": 167,
+      "ci_low": 149,
+      "ci_high": 185,
+      "unit": "tasks",
+      "resamples": 10000
+    },
+    "share_of_tasks_with_unsafe_hit": {
+      "estimate": 0.513846,
+      "ci_low": 0.458462,
+      "ci_high": 0.569231,
+      "unit": "share of tasks",
+      "resamples": 10000
+    }
+  },
+  "checks": {
+    "blind_equals_committed": {
+      "expected": "807 hits, 344 unsafe, 2,275 calls",
+      "observed": "807 hits, 344 unsafe, 2,275 calls",
+      "passed": true
+    },
+    "typed_equals_committed": {
+      "expected": "466 hits, 1,728 admitted reads, 0 unsafe",
+      "observed": "466 hits, 1,728 admitted reads, 0 unsafe",
+      "passed": true
+    },
+    "walk_equals_module_replay": true,
+    "committed_json": {
+      "path": "examples/benchmarks/unsafe_cache_results.json",
+      "sha256": "516f761e2cfd818a228775481a55eb7ba28f0aeb00643f92dac9097c885c90be",
+      "matches": true
+    },
+    "corpus_sha256_pinned": true
+  },
+  "notes": [
+    "The interval resamples tasks, not calls, because calls within a task are dependent.",
+    "Each run keeps its own run-scope cache, so a task's outcomes also depend on the tasks before it in that run. The cluster bootstrap captures within-task dependence; that cross-task carryover remains, making the intervals slightly optimistic. Blocking on runs is not an option: four blocks cannot support an interval.",
+    "Percentile interval, not BCa: no bias correction or acceleration is applied.",
+    "The unsafe share of hits is conditioned on the blind policy's 807 hits; it answers 'how much of what the cache serves would I have to trust', not 'how often does a call go wrong'.",
+    "The per-task view is the deployment-facing one: an unsafe hit on 15.1% of calls still means 51.4% of tasks contain one."
+  ],
+  "reproduce": "python3 examples/benchmarks/safety_ci.py  (seed 20240601, 10,000 resamples, byte-identical output on repeat)"
+}

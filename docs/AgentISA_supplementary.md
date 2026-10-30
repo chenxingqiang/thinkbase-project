@@ -234,6 +234,23 @@ Theorems 3.4–3.6 are *conditional*: they hold of transformations whose verific
 
 This appendix carries the algorithm listings moved from the main paper to respect the page limit; each listing keeps its original framing. Two listings formerly specified-only now describe shipped opt-in components, updated in place: D.1 (the MATCH-TREE selector: `selection_strategy="dp"` in `agentflow.core.isa.instruction_selector`, default heuristic) and D.4 (the EMA hot-path detector: `detection_mode="ema"` in `agentflow.core.isa.instruction_optimization`). The remainder stay as labeled—specified-only (D.2, D.3, D.5–D.7, D.9) or shipped (D.8, D.10, and D.11, the bounded-checker listing relocated from the main paper's Section 3.3.2). The default selection step (the heuristic name-overlap matcher) remains in the source module `agentflow.core.isa.instruction_selector`.
 
+
+## C.8 Theorem 3.7: No Unsafe Reuse
+
+**Definition C.8.1** (Cache state and entry). A cache is a finite partial map $C : K \rightharpoonup E$. An entry $e=(\theta,\rho,v,t)$ carries the tenant $\theta$ that produced $v$, the read footprint $\rho \subseteq \mathrm{Entity}$ the value depends on, and a stamp $t$. The key is $\kappa=(\mathrm{id}(i), p, \theta)$—instruction identity, canonical parameter binding, tenant—and a hit is well-formed only if the reading instruction's key equals the entry's.
+
+**Definition C.8.2** (Effect class and read determinism). Every well-typed instruction carries $\rho(i), \omega(i) \subseteq \mathrm{Entity}$ and a tenant fixed by its typing context. $i$ is a *read* iff $\omega(i)=\emptyset$ and the value returned is determined by $\sigma(\theta)\!\restriction\!\rho(i)$ alone; all else is *effectful*. That determination is (H0).
+
+**Definition C.8.3** (Eviction; replay). A cache is write-invalidating if a write $w$ replaces $C$ by $C\!\restriction\!\{\kappa \mid \rho(\kappa) \cap \omega(w) = \emptyset\}$; extra removal by capacity or age costs hits, never soundness. A cache-consistent execution uses at each position either the miss rule (execute; put if a read) or the hit rule (return $v$; leave state and cache unchanged); the bypassed execution applies the semantics throughout.
+
+**Theorem 3.7** (No Unsafe Reuse). Let $P$ be well-typed with every instruction valid, and assume (H0), (H1) only reads create entries at their executing position, (H2) the tenant is a key component, and (H3) writes evict overlapping footprints. With $C_0=\emptyset$, every cache-consistent execution of $P$ reaches at each position the state the bypassed execution reaches, returns the same value there, and ends in the same store.
+
+*Proof.* Induction on the position $k$. The miss case is immediate. For the hit case, (H1) gives an earlier position $j<k$ that executed the same key and stored its returned value; (H2) makes the tenants equal, so the entry is reachable only from a position typed at the same $\theta$; and no write in $(j,k)$ touches $\rho$—otherwise (H3) would have evicted the entry—so by (H0) the store's restriction to $\rho$ is unchanged and the memoised value is the value the bypassed execution returns at $k$. The store is untouched by a hit, so the induction reaches the same final store. $\square$
+
+**Corollary 3.7.1.** A policy that omits any of (H1)–(H3) admits a program and a store in which a hit returns a value the bypassed execution would not: omitting (H2) yields the tenant counterexample (a profile read of tenant A served at tenant B); omitting (H3) yields the stale counterexample (a read before a landed write served after it); omitting (H1) yields the double-write counterexample (a write's response replayed as if the write had run twice). Section 5.13 measures these three on the recorded corpus: 104, 179 and 61 hits respectively.
+
+**Hypothesis audit of the shipped implementation.** `build_cache_key` carries instruction identity and parameters but no tenant field, so (H2) fails; `InstructionCache` evicts by TTL and LRU capacity only, so (H3) fails; the cache is consulted for instructions whether or not they are effectful, so (H1) fails. (H0) holds only where the instruction is typed as a read and the tool is deterministic. The typed policy of Section 5.13 is therefore a harness that enforces the hypotheses, not a description of the shipped cache—which is why the paper reports a measured zero for the harness and a measured 240 damaging hits for the untyped policies rather than claiming the shipped system is sound.
+
 ## D.1 Tree-Pattern Instruction Selection (MATCH-TREE)
 
 Implementation status: shipped as the opt-in selector of `agentflow.core.isa.instruction_selector` (`selection_strategy="dp"`, engaging only on inputs carrying an `ir_tree`; the default remains the heuristic matcher). `_match_tree` follows the listing's recurrence—candidate-pattern cost plus the optimal subtrees of unspanned children, memoized top-down—and exposes `(costs, selected)` through `TreeSelectionResult`; matching is root-op equality (case-insensitive) with each catalogue pattern's `params["spanned_child_ops"]` spanning whole child subtrees, and the covering is read root-first, skipping spanned subtrees.
@@ -1568,3 +1585,23 @@ Section I.9 learns compound specifications on one corpus and verifies them on he
 **Cross-domain exposure is zero by vocabulary, not by failure.** Between retail and airline only four tools are shared (`calculate`, `get_user_details`, `think`, `transfer_to_human_agents`), one of 49 retail compounds is even expressible in the airline vocabulary, and none is exposed in its traces. We report this as a scope boundary rather than a transfer result. Task ids also collide across domains (50 collisions), so joining domains by task id would silently pair unrelated tasks — a trap we avoided by joining on task content instead.
 
 **Threats.** Two models, two domains, one mock environment; the airline-reverse cell has n = 5 exposed compounds (8 eligible), so its 100% carries a wide interval. The retail 33/36 also pools nested compounds — 21 at k = 2, 10 at k = 3, 4 at k = 4 transferred (8 of 10 and 4 of 5) — that co-occur in the same tasks, so the Wilson interval treats them as independent trials and is narrower than the evidence supports; the per-arity cells are the honest granularity, and every non-transfer sits at k >= 3. Transfer is measured on recorded traces, not on fresh runs, so it shows that a spec *fits* a second model's behavior, not that it would improve that model's task success.
+
+
+## I.12 The Four Cache Policies: Full Table and Cost Ladder
+
+Raw results: `examples/benchmarks/unsafe_cache_results.json`, `soundness_ladder_results.json`, `unsafe_damage_results.json`, `safety_ci_results.json` (scripts: `unsafe_cache_baselines.py`, `soundness_ladder.py`, `unsafe_damage.py`, `safety_ci.py`). Scope: the first trial of every task in the committed corpus, replayed through four run-scope caches over the same 2,275 calls. All four reproduce the committed 746/1,789 = 41.70% anchor before they are allowed to differ.
+
+| Policy | Admitted | Hits | Unwarranted | Damaging | Damaging per 1,000 |
+| --- | --- | --- | --- | --- | --- |
+| P1 blind key, no tenant, no invalidation | 2,275 | 807 (35.47%) | 344 | 240 (61 writes + 179 stale) | 105.5 [82.3, 130.1] |
+| P2 blind + entity invalidation | 2,275 | 655 (28.79%) | 165 | 61 | 26.8 |
+| P3 identity-blind (semantic shape) | 2,275 | 963 (42.33%) | 595 | 491 (250 one tool) | 215.8 |
+| P4 typed (Theorem 3.7) | 1,728 | 466 (26.97%) | 0 | 0 | 0 (95% bound ≤ 1.73) |
+
+The remaining 104 unwarranted hits in P1–P3 are cross-tenant hits on identity-independent catalog tools (`get_product_details` 76, `list_all_product_types` 24, `search_direct_flight` 3, `list_all_airports` 1), counted separately because the value does not depend on the identity.
+
+**Cost ladder, one ingredient at a time on the fixed base of the 1,728 admitted reads:** L0 blind key 745 hits (43.11%) and 283 unsafe; L1 + tenant 619 (35.82%) and 168, i.e. 7.29 points for 115 unsafe hits; L2 + invalidation 466 (26.97%) and 0, i.e. 8.85 points for the remaining 168. Admitting writes again buys 71 hits (3.12 points) and 60 unsafe results, all served writes. The mirror ladder on all 2,275 calls moves 807 → 680 → 537 → 466 and 344 → 228 → 60 → 0, so the two routes agree on the endpoints.
+
+**Intervals.** Clusters are 165 task instances (a task performed by one model), not 325 source-labeled cells; calls within a task share a trajectory and a cache, so resampling calls would understate the interval. 10,000 resamples, seed 20240601, percentile method. The blind key damages 105.5 hits per 1,000 calls [82.3, 130.1] and 70 of 165 instances (42.4%) contain at least one damaging hit; the typed policy's zero is reported with its exact one-sided bound rather than a bootstrap interval, because a percentile interval on a zero count is degenerate.
+
+**Why the anchor still holds.** The three policies admit different call sets, so their rates are not directly comparable: 807 − 61 = 746 (the 61 are `think`/control calls the purity set refuses, which hit within a run), and the typed policy's 466 is on the 1,728 reads it admits. The paper quotes the like-for-like gap (16.14 points on one base), never the difference of two rates computed on different denominators.

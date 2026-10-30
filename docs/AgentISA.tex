@@ -121,26 +121,27 @@ Replaying 1,960 recorded tool-call trajectories (\(\tau\)-bench; GPT-4o
 and Claude 3.5 Sonnet; retail and airline; 14,285 calls) through the
 shipped compiler and result cache, static reduction is 0.0\% at BASIC
 and AGGRESSIVE: recorded traces chain their observations, so no step is
-provably dead and no pure pair provably independent. In this benchmark,
-exact-key result reuse was 1.73\% of the 1,789 side-effect-free calls
-within a task and 41.70\% across the tasks of one run (16.3--50.2\% per
-run; 40.5 points strictly cross-task)---reuse lives at the run boundary,
-not inside a task. Instruction memory accumulates: 12 mined templates
-serve 95.9\% of 2,340 tool-use steps, and replay-verified compounds
-absorb 12.53\% of dispatches, far below the 75.0\% that recurrence alone
-implies; specifications learned on one model reproduce 33 of the 49
-eligible compounds (36 of which the second model performs), and every
-observation-wired specification fails. AgentISA supplies the layer that
-makes this measurable: a formal instruction set with compositional
-semantics, a type system, and pre/post-conditions; Agentic Calling;
-developer-gated trace learning; and a compiler with fusion, dead-code
-elimination, and hot-path specialization. The 34.2\% static reduction is
-a planted-family mechanism demonstration and does not transfer. All
-measurements are offline---recorded-trajectory replay and a mock-backend
-microbenchmark. Live-gateway checks on four model aliases (two running
-the identity harness fully, one at the token ceiling, one quality-only)
-confirm that the implementation matches its specification; no production
-end-to-end result is claimed.
+provably dead and no pure pair provably independent. Reuse works only
+when it is allowed to be wrong: over 2,275 first-trial calls a blind key
+of tool and arguments serves 807 hits, 344 unwarranted and 240 damaging,
+while a typed cache that binds the tenant, refuses writes and evicts on
+them admits 1,728 calls and serves 466 hits with none unwarranted;
+soundness costs 16.1 points of hit rate. Reuse lives at the run
+boundary, not inside a task: 1.73\% of the 1,789 side-effect-free
+first-trial calls hit within a task and 41.70\% across the tasks of one
+run (16.3--50.2\% per run; 40.5 points strictly cross-task). Instruction
+memory accumulates: 12 active templates (13--14 per source) match
+\textbf{95.9\%} of the 2,340 tool-use steps, and replay-verified
+compounds absorb 10.07\% of dispatches out of sample; specifications
+learned on one model reproduce 33 of the 49 eligible compounds, and
+every observation-wired specification fails. AgentISA supplies the layer
+that makes this measurable: a formal instruction set with a
+no-unsafe-reuse theorem, Agentic Calling, developer-gated trace
+learning, and a compiler with fusion and dead-code elimination. The
+34.2\% static reduction is a planted-family demonstration and does not
+transfer. All measurements are offline. Live-gateway checks on four
+model aliases confirm that the implementation matches its specification;
+no production end-to-end result is claimed.
 \end{abstract}
 \ccsdesc[500]{Software and its engineering~\textgreater{}Compilers}
 \ccsdesc[500]{Theory of computation~\textgreater{}Program reasoning}
@@ -255,17 +256,18 @@ contributions are:
   the measured advantage is program reduction before dispatch, not a
   higher hit rate.
 \item
-  \textbf{Developer-gated trace-based instruction learning} (Section
-  3.3; gate in 3.3.1; experiments in 5.11 and 5.12). Mining groups by
-  action signature and promotes through an approval gate into composite
-  replays; with schema-checked binding, 1,050/1,050 unseen-parameter
-  replays match the oracle exactly on deterministic synthetic streams.
-  Workload evidence: replay-verified compounds absorb 12.53\% of
-  dispatches (285/2,275) where three-step recurrence alone would suggest
-  75.0\%, 12--14 mined templates serve 95.9\% of 2,340 tool-use steps,
-  and cross-model transfer reproduces 33 of the 49 eligible compounds
-  (36 of which the second model performs), with every observation-wired
-  specification failing.
+  \textbf{Developer-gated trace-based instruction learning, measured out
+  of sample} (Section 3.3; gate in 3.3.1; experiments in 5.11 and 5.12).
+  Mining groups by action signature and promotes through an approval
+  gate into composite replays; with schema-checked binding, 1,050/1,050
+  unseen-parameter replays match the oracle exactly on deterministic
+  synthetic streams. Workload evidence: replay-verified compounds absorb
+  10.07\% of dispatches out of sample (229/2,275; 12.53\% in sample)
+  where three-step recurrence alone would suggest 75.0\%, 12--14 mined
+  templates serve 95.9\% of 2,340 tool-use steps, and cross-model
+  transfer reproduces 33 of the 49 eligible compounds (36 of which the
+  second model performs), with every observation-wired specification
+  failing.
 \item
   \textbf{A compiler and runtime for instruction streams} (Sections 3.4
   and 4; results in 5.2--5.5, 5.8, 5.12). Fusion, dead-code elimination,
@@ -481,13 +483,16 @@ Building on Sections 1 and 2, we present the AgentISA design: the core
 architecture (Section 3.1), the Agentic Calling framework (Section 3.2),
 trace-based instruction learning (Section 3.3), instruction organization
 and optimization (Section 3.4), and the capability-assessment layer
-(Section 3.5).
+(Section 3.5). Two results carry the guarantees that later sections
+cite: type safety for the pure core (Theorem 3.2, Section 3.1.2) and,
+for the cached path of Section 3.2.1, the conditions under which reuse
+is observationally transparent (Theorem 3.7, Section 3.2.4).
 
 \subsection{Core Architecture}\label{core-architecture}
 
 \begin{figure*}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored streams pass a security gate and a coordinator that routes LLM-type steps through a result cache (first occurrence only) against the production gateway; a hot-path detector and the static optimizer re-optimize and re-adopt the stream (threshold-triggered). Sections 5.7-5.7.1 measure each property on the real code path.}]{figures/wide_1_architecture.pdf}
+\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored streams pass a security gate and a coordinator that routes LLM-type steps through a result cache (first occurrence only) against the production gateway; a hot-path detector and the static optimizer re-optimize and re-adopt the stream (threshold-triggered). Sections 5.7-5.7.1 measure each property on the real code path.}]{figures/wide_1_architecture.pdf}
 \caption{\textbf{AgentISA runtime architecture.} Authored streams pass a
 security gate and a coordinator that routes LLM-type steps through a
 result cache (first occurrence only) against the production gateway; a
@@ -713,6 +718,26 @@ into a common taxonomy. This is deliberately weaker than semantic-output
 equivalence---\(m_1 = m_2\) would already demand determinism, which no
 LLM provides---and cross-model \emph{behavioral} comparison is an
 empirical question at benchmark level (Section 3.5, {[}17, 29{]}).
+
+\subsubsection{What the Cached Path
+Preserves}\label{what-the-cached-path-preserves}
+
+\textbf{Theorem 3.7} (No Unsafe Reuse): Let \(P\) be well-typed
+(Definition 3.2) with every instruction valid (Definition 3.5). Assume a
+read's value is determined by the state it reads (H0, Section 2.1's
+cache-validity conditions); only reads create entries, at the position
+where they executed (H1); the tenant is a key component, so an entry
+made under \(\theta\) is unreachable from a position typed at
+\(\theta' \neq \theta\) (H2); and a write evicts every entry whose read
+footprint (the entities the value depends on) it overlaps (H3). Then
+every cache-consistent execution of \(P\) reaches at each position the
+state the bypassed execution reaches, returns the same value, and ends
+in the same store: the cache is \emph{observationally transparent}.
+\emph{Proof}: Appendix C.8. \textbf{Scope.} The statement specifies a
+cache rather than describing ours: the shipped cache enforces (H0)
+partially and none of (H1)--(H3)---its key carries no tenant field and
+eviction is TTL and LRU alone---which is why Section 5.13 counts
+unjustified hits instead of assuming there are none.
 
 \subsection{Trace-Based Instruction
 Learning}\label{trace-based-instruction-learning}
@@ -1687,7 +1712,7 @@ Validation}\label{multi-agent-coordination-functional-validation}
 The multi-agent layer---\texttt{AgentCoordinator},
 \texttt{SecurityMonitor}, and the collaborative instruction set---is
 validated functionally by 43 tests, all passing---the
-coordination-and-security subset of the repository's full suite (1,420
+coordination-and-security subset of the repository's full suite (1,441
 passing, 14 skipped at run time), which also covers the ISA core,
 compiler, and optimizer units of Sections 5.2--5.5. This is
 \textbf{qualitative functional validation}: the tests verify the
@@ -1755,9 +1780,7 @@ templates) and parameter space (20 values).
 \textbf{Scale.} With each round trip costing \textasciitilde2.2 s, scale
 drops from 2,000 tasks \(\times\) 5 seeds to \textbf{200 tasks
 \(\times\) 1 seed} per Zipf level (s in \{0.5, 1.0, 1.5\}): 1,040
-measured round trips (plus one preflight) in 39.4 minutes. The seed pins
-the task sequence exactly, so the workload is the one the expectation
-below is computed from.
+measured round trips (plus one preflight) in 39.4 minutes.
 
 \textbf{An exactness property.} A cache hit depends only on the
 (instruction, params) pairs seen so far---not on what the model returns.
@@ -1774,7 +1797,7 @@ rates and call counts) it does:
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Live-gateway cache conformance across model aliases. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every (alias, skew) cell; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
+\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={Live-gateway cache conformance across model aliases. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every (alias, skew) cell; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
 \caption{\textbf{Live-gateway cache conformance across model aliases.}
 Bars are measured hit rates under the identical protocol (200 sequential
 requests, one seed, three skews per model); the white tick is the
@@ -1794,26 +1817,19 @@ level, so Section 5.2's synthetic results measure the cache, not a mock
 artifact. Second, avoided calls convert into measured time and
 tokens---14.1\%, 26.6\%, and 45.8\% of the no-cache arm's wall clock at
 s = 0.5, 1.0, 1.5---tracking but not identical to the call reduction
-(wall and token figures are measurements). At N = 200, one seed, the
-wall-clock ratio is sampling-noise-dominated (the 17 avoided calls
-average 1.7 \(\times\) the arm mean); the token ratio is the steadier
-read. Third, the absolute hit rates (8.5--45.5\%) trail Section 5.2's
-(59.5--79.6\%): repetition accumulates with task count---the
-backend-free computation at N = 2,000 reproduces the Section 5.2 figures
-(the gateway run stays at N = 200).
+(wall and token figures are measurements). Third, the absolute hit rates
+(8.5--45.5\%) trail Section 5.2's (59.5--79.6\%): repetition accumulates
+with task count---the backend-free computation at N = 2,000 reproduces
+the Section 5.2 figures (the gateway run stays at N = 200).
 
 \textbf{Multi-model rerun.} The identical protocol re-run on a second
 production model (\texttt{claude-doubao-seed-2.0-code}, replies
 completing below the ceiling) reproduces the expectation exactly in all
 three cells---8.5\%, 26.0\%, 45.5\%; calls 200 \(\rightarrow\)
-183/148/109; p50 3.6--4.0 s (table: supplementary I.3). The exactness
-property is model-independent by construction, so this rerun is a
-conformance check of the implementation on a second platform, not new
-evidence about model variation.
+183/148/109; p50 3.6--4.0 s (table: supplementary I.3).
 
-\textbf{Two-seed rerun.} A reduced-scale rerun (100 tasks \(\times\) 2
-seeds per Zipf level) reproduced the computed expectation exactly in all
-six (Zipf, seed) cells (hit rates, quota record: supplementary I.3).
+\textbf{Two-seed rerun.} A 100-task \(\times\) 2-seed rerun reproduced
+the expectation in all six cells (I.3).
 
 \textbf{Scope of the claim.} This experiment is a conformance check of
 the caching mechanism's implementation---one gateway, two model aliases
@@ -1897,21 +1913,19 @@ the other 28 realizations from the result cache (hit rate 56.0\%),
 consuming 4,027 prompt and 11,264 gateway-reported completion tokens in
 260.2 s of measured call latency. Arm (b)---compiled,
 hot-path-adopted---made zero new gateway calls and reproduced every
-artifact byte-for-byte (the check is sensitive to any transformation
-that perturbs a cache key or an emitted artifact byte; divergence
-confined to non-keyed, non-emitted runtime state would escape it). The
-hot path was adopted at realization 7 (threshold 5; adoption lands two
-realizations past it because the counter must strictly exceed it and
-recording follows execution, as in Section 5.8): realizations 1--6
-executed the full seven-instruction stream, realizations 7--50 the
-shrunken six-instruction form with \texttt{check\_format} absorbed by
-fusion---306 instruction executions against 350 in arm (a), a 12.6\%
-executed-instruction reduction observed on the adopted trace (per-stream
-shrink 14.3\%, 7 \(\rightarrow\) 6; the static compiler alone reproduces
-the 7 \(\rightarrow\) 6 shrink at AGGRESSIVE, so the two mechanisms'
-contributions are not separated), reported separately from the cache's
-call savings. Static compilation of the same stream: NONE 7
-\(\rightarrow\) AGGRESSIVE 6 effective instructions, dataflow preserved.
+artifact byte-for-byte. The hot path was adopted at realization 7
+(threshold 5; adoption lands two realizations past it because the
+counter must strictly exceed it and recording follows execution, as in
+Section 5.8): realizations 1--6 executed the full seven-instruction
+stream, realizations 7--50 the shrunken six-instruction form with
+\texttt{check\_format} absorbed by fusion---306 instruction executions
+against 350 in arm (a), a 12.6\% executed-instruction reduction observed
+on the adopted trace (per-stream shrink 14.3\%, 7 \(\rightarrow\) 6; the
+static compiler alone reproduces the 7 \(\rightarrow\) 6 shrink at
+AGGRESSIVE, so the two mechanisms' contributions are not separated),
+reported separately from the cache's call savings. Static compilation of
+the same stream: NONE 7 \(\rightarrow\) AGGRESSIVE 6 effective
+instructions, dataflow preserved.
 
 \textbf{Identity rerun with live-model values.} Re-running the harness
 on \texttt{claude-doubao-seed-2.0-code} at \texttt{max\_tokens} = 1,500
@@ -1929,7 +1943,7 @@ harness artifact (census: supplementary I.3).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Ceiling-binding census across model aliases and budgets. Calls binding at max\_tokens per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, Doubao Seed 2.0 in all 104 calls below the ceiling at 1,500.}]{figures/6_ceiling_census.pdf}
+\includegraphics[width=0.64\linewidth,height=\textheight,keepaspectratio,alt={Ceiling-binding census across model aliases and budgets. Calls binding at max\_tokens per alias and budget, from the identity runs' raw records: GLM 5.3 flash binds in 22/22 calls at the compiler budget (512), Minimax m3 in 101/104 at 512 and 68/104 at 1,500, Doubao Seed 2.0 in all 104 calls below the ceiling at 1,500.}]{figures/6_ceiling_census.pdf}
 \caption{\textbf{Ceiling-binding census across model aliases and
 budgets.} Calls binding at \protect\texttt{max\_tokens} per alias and
 budget, from the identity runs' raw records: GLM 5.3 flash binds in
@@ -1947,15 +1961,14 @@ Anthropic's published discount; completions at full price); two
 simplifications favor the provider-cache baseline, and list prices are
 parameterized stand-ins---no dollar-savings claim is made. On this run's
 token mix the result cache cuts modeled cost by 56.0\% while the prompt
-cache cuts only 3.3\% (the reasoning model's completions dominate); on
-the mock at paper scale the corresponding figures are 80.1\%, 81.6\%,
-and 85.1\% against 28.9--31.4\%---the ranking of the two caching
-strategies is a function of the input/output token mix, not a constant.
-GPTCache is explicitly out of scope; no head-to-head is claimed.
+cache cuts 3.3\%; at paper scale the figures are 80.1\% and 81.6\%
+against 28.9--31.4\%---the ranking is a function of the input/output
+token mix, not a constant. GPTCache is explicitly out of scope; no
+head-to-head is claimed.
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Token-mix sweep of the priced comparison (MODELED overlay, 195 cells). The provider prompt cache's saving collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the result cache holds 80-88\%: the ranking is a function of the token mix, not a constant (protocol: supplementary I.3).}]{figures/4_token_mix_sweep.pdf}
+\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={Token-mix sweep of the priced comparison (MODELED overlay, 195 cells). The provider prompt cache's saving collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the result cache holds 80-88\%: the ranking is a function of the token mix, not a constant (protocol: supplementary I.3).}]{figures/4_token_mix_sweep.pdf}
 \caption{\textbf{Token-mix sweep of the priced comparison (MODELED
 overlay, 195 cells).} The provider prompt cache's saving collapses as
 completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the
@@ -2000,7 +2013,7 @@ holds on both families (protocol: supplementary I.3).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\linewidth,height=\textheight,keepaspectratio,alt={Per-class agreement with the planted rubric gold. Both live models (GLM @3072, 176 signatures; DeepSeek @1500, 288/288 parsed, zero fallback fills) against the fallback rule recomputed per class from the DeepSeek run's raw records; dotted lines mark overall agreement.}]{figures/5_quality_per_class.pdf}
+\includegraphics[width=0.64\linewidth,height=\textheight,keepaspectratio,alt={Per-class agreement with the planted rubric gold. Both live models (GLM @3072, 176 signatures; DeepSeek @1500, 288/288 parsed, zero fallback fills) against the fallback rule recomputed per class from the DeepSeek run's raw records; dotted lines mark overall agreement.}]{figures/5_quality_per_class.pdf}
 \caption{\textbf{Per-class agreement with the planted rubric gold.} Both
 live models (GLM @3072, 176 signatures; DeepSeek @1500, 288/288 parsed,
 zero fallback fills) against the fallback rule recomputed per class from
@@ -2112,6 +2125,19 @@ We enumerate the limitations of the evaluation explicitly:
   equivalent requests yielding different (instruction, params) keys and
   responses---are unmeasured; the exact-match key design forfeits reuse
   there by construction, but the sensitivity is not quantified.
+\item
+  \textbf{The shipped cache is not the typed cache.} Section 5.13
+  measures a typed policy that enforces Theorem 3.7's three hypotheses,
+  but the cache in this repository enforces none of them: its key
+  carries no tenant, it admits effectful instructions, and it evicts by
+  TTL and LRU capacity alone. The zero in Section 5.13 is therefore a
+  property of the harness, and the 240 damaging hits are a property of
+  the untyped policies on the same replay---not a claim that the shipped
+  system is sound, and not an estimate of how often it fails in
+  deployment. Closing the gap needs a shared run-scope registry, a
+  tenant channel in the execution API, and roughly 400--470 changed
+  lines across fifteen call sites (Appendix C.8 audits the hypotheses
+  one by one).
 \end{enumerate}
 
 Despite these limitations, each optimization mechanism is implemented,
@@ -2175,57 +2201,51 @@ conditionally: of the 1,789 side-effect-free first-trial calls (2,275
 calls total, 486 effectful ones excluded), \textbf{1.73\%} hit within a
 task and \textbf{41.70\%} across the tasks of one run (retail
 49.0--50.2\%, airline 16.3--22.1\%; run-weighted mean 34.4\%,
-run-clustered 95\% CI 19.2--49.6\%; 40.5 points strictly cross-task; a
-run's second half hits 42.8\% against 40.7\% for its first, so warm-up
-does not carry the figure), and 83.4\% (9,372/11,240 all-trial cacheable
-calls) under the benchmark's trial replay, which repeats identical tasks
-rather than exhibiting workload repetition. Section 5.2's benefit
-therefore survives on real workloads only where a cache is shared across
-tasks. A second, bash-only coding-agent family (supplementary I.6) also
-earns 0.0\% statically and contains no cacheable instruction at all,
-though 47.2\% of its commands repeat verbatim: repetition is not
-cacheability. Where a family of estimates exists we name the member we
-quote and give the range rather than picking the most flattering one:
-the strictest substitution definition (1.36\%) beside the
-replay-verified one (12.53\%) and the signature-consistent one
-(15.03\%), the run-weighted mean beside the pooled rate, the smallest
-hot-set budget beside the largest, and the lowest transfer cell beside
-the 100\% cells.
-
-Do instructions themselves sediment as experience accumulates? Figure 7
-shows that they do: 12 active templates (13--14 per source) match
-\textbf{95.9\%} of the 2,340 tool-use steps (330 tasks, five more
-airline attempts than the 325-task slice these cache numbers use) and
-103 serve 84.9\% of household manipulation, while 291 command templates
-serve 43\% \(\rightarrow\) 67\% on shell coding and 16 serve 45.2\% of
-SQL analytics. A finite action space is therefore necessary but not
+run-clustered CI 19.2--49.6\%; 40.5 points strictly cross-task), and
+83.4\% (9,372/11,240 all-trial cacheable calls) under the benchmark's
+trial replay, which repeats identical tasks rather than exhibiting
+workload repetition. Section 5.2's benefit therefore survives on real
+workloads only where a cache is shared across tasks. A second, bash-only
+coding-agent family (supplementary I.6) also earns 0.0\% statically and
+contains no cacheable instruction at all, though 47.2\% of its commands
+repeat verbatim: repetition is not cacheability. Do instructions
+themselves sediment as experience accumulates? Figure 7 shows that they
+do: 12 active templates (13--14 per source) match \textbf{95.9\%} of the
+2,340 tool-use steps (330 tasks, five more airline attempts than the
+325-task slice these cache numbers use) and 103 serve 84.9\% of
+household manipulation, while 291 command templates serve 43\%
+\(\rightarrow\) 67\% on shell coding and 16 serve 45.2\% of SQL
+analytics. A finite action space is therefore necessary but not
 sufficient; parameter reuse governs the payoff (protocols: supplementary
 I.7, I.8). Matching is coverage, not saving---whether a match removes a
 dispatch depends on the planner bypass that I.10 declines to assume---so
 we report the coverage and claim no payoff from it. The compound level
 is where reduction reappears once observations are kept: 78 of 450
 recurring compounds (17.3\%) yield a spec that reproduces held-out
-occurrences exactly, absorbing \textbf{12.53\%} of dispatches---against
-0.0\% statically, and far below the 15.0\% that signature-consistent
-substitution credits and the 75.0\% that three-step recurrence suggests
-on the inputs-only corpus (supplementary I.9). Two external checks bound
-these numbers (I.10--I.11). A static hot set trained on a run's first
-half reaches 13.6\% with 256 rows against 42.6\% for an online LRU
-warm-started on that same half, a capacity-limited LRU needs 256 entries
-to approach 41.6\%, and sharing one cache across all four runs lifts the
-exact-key rate to 62.9\%, but one backbone alone reaches only
-40.5--42.7\%: the whole increment is a task both backbones performed,
-which the shipped key (it excludes model identity) legitimately serves.
-Learned compounds also cross models: specifications from GPT-4o's retail
-trajectories reproduce 33 of the 49 eligible compounds, 36 of which the
-Claude run performs, and all three observation-wired specifications
-fail. A hit avoids one recorded tool execution, not the model turn that
-emitted the call, so no second, token or dollar figure is attributable
-from this corpus and none is quoted (I.10).
+occurrences exactly, absorbing \textbf{12.53\%} of dispatches in sample
+and \textbf{10.07\%} (229/2,275) when compounds are mined on one half of
+the tasks and measured on the other---against 0.0\% statically, and far
+below the 15.0\% that signature-consistent substitution credits and the
+75.0\% that three-step recurrence suggests on the inputs-only corpus
+(supplementary I.9). The point estimate did not survive the holdout; the
+magnitude did. Two external checks bound these numbers (I.10--I.11). A
+static hot set trained on a run's first half reaches 13.6\% with 256
+rows against 42.6\% for an online LRU warm-started on that same half, a
+capacity-limited LRU needs 256 entries to approach 41.6\%, and sharing
+one cache across all four runs lifts the exact-key rate to 62.9\%, but
+one backbone alone reaches only 40.5--42.7\%: the whole increment is a
+task both backbones performed, which the shipped key (it excludes model
+identity) legitimately serves. Learned compounds also cross models:
+specifications from GPT-4o's retail trajectories reproduce 33 of the 49
+eligible compounds, 36 of which the Claude run performs, and all three
+observation-wired specifications fail. A hit avoids one recorded tool
+execution, not the model turn that emitted the call, so no second, token
+or dollar figure is attributable from this corpus and none is quoted
+(I.10).
 
 \begin{figure}
 \centering
-\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Instruction memory is an asset, and its payoff is workload-shaped. (A) Share of a stream's steps served by instructions mined from earlier tasks, versus experience, on five recorded task families (first trial per task; promotion at two occurrences; a step is credited only to an instruction promoted in an earlier task). Closed argument vocabularies saturate at 85--96\% almost immediately; open ones climb slowly (43\% \textbackslash rightarrow 67\%) or flatten near 45\%, because the verb is shared while the parameters are not. (B) What the same memory does not buy: the 34.2\% static reduction belongs to the planted family, not to recorded traces (0.0\%), and reuse pays only across tasks (41.7\% versus 1.7\% within one).}]{figures/7_instruction_memory.pdf}
+\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={Instruction memory is an asset, and its payoff is workload-shaped. (A) Share of a stream's steps served by instructions mined from earlier tasks, versus experience, on five recorded task families (first trial per task; promotion at two occurrences; a step is credited only to an instruction promoted in an earlier task). Closed argument vocabularies saturate at 85--96\% almost immediately; open ones climb slowly (43\% \textbackslash rightarrow 67\%) or flatten near 45\%, because the verb is shared while the parameters are not. (B) What the same memory does not buy: the 34.2\% static reduction belongs to the planted family, not to recorded traces (0.0\%), and reuse pays only across tasks (41.7\% versus 1.7\% within one).}]{figures/7_instruction_memory.pdf}
 \caption{\textbf{Instruction memory is an asset, and its payoff is
 workload-shaped.} (A) Share of a stream's steps served by instructions
 mined from earlier tasks, versus experience, on five recorded task
@@ -2240,6 +2260,36 @@ family, not to recorded traces (0.0\%), and reuse pays only across tasks
 \end{figure}
 
 \section{Discussion}\label{discussion}
+
+\subsection{Soundness: What an Untyped Cache Gets
+Wrong}\label{soundness-what-an-untyped-cache-gets-wrong}
+
+Every reuse number above counts hits, not whether a hit is still
+correct. Replaying the same 2,275 first-trial calls through four
+run-scope caches---a blind key of tool and arguments, that key plus
+entity invalidation, an identity-blind key of the shape a semantic cache
+takes, and the typed policy of Theorem 3.7---all four reproduce the
+committed 746/1,789 anchor before they are allowed to differ. The blind
+key serves 807 hits, 344 unwarranted and 240 damaging: 61 serve a write
+the agent believes it performed twice and 179 return a read from before
+a landed write. Adding invalidation still serves the 61 writes; dropping
+the tenant damages 491 hits, 250 of them one tool returning one tenant's
+profile to another.
+
+The typed policy admits 1,728 reads, refuses 547 calls, serves 466 hits
+and returns nothing its key cannot warrant (one-sided 95\% bound on the
+zero: 1.73 per 1,000 admitted reads). Soundness costs hit rate, priced
+one ingredient at a time on that fixed base: the tenant 7.29 points and
+115 unjustified hits, invalidation 8.85 points and the remaining 168;
+the like-for-like gap is 16.14 points, and 41.70\% becomes 26.97\%.
+Resampling 165 task instances puts the blind key at 105.5 damaging hits
+per 1,000 calls {[}82.3, 130.1{]}, with 70 of 165 instances (42.4\%)
+containing at least one. The typed row is the least productive of the
+four and the only one whose hits cannot be wrong; the unsound rows are
+what a cache looks like when only purity is checked, which is what our
+own shipped cache checks, so the typed policy is a harness stating what
+the shipped one would have to become (Section 5.9, Appendix C.8, and
+I.12 for the full table).
 
 \subsection{System Limitations and
 Challenges}\label{system-limitations-and-challenges}
@@ -2309,122 +2359,19 @@ system provides enforcement hooks, not certification.
 \subsection{Future Research
 Directions}\label{future-research-directions}
 
-\subsubsection{Theoretical Foundations}\label{theoretical-foundations}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{Formal semantics of agent instructions}: consolidating Section
-  3.1 and Appendix B into one standalone semantics---instruction
-  language, state space, reduction rules, type system; nothing in it is
-  new machinery.
-\item
-  \textbf{Compositional reasoning}: a parallel-composition rule whose
-  disjointness side condition mirrors the \(\parallel\)-typing rule of
-  Definition 3.6, enabling modular verification and temporal property
-  preservation (rule in Appendix E.1 of the supplementary material).
-\item
-  \textbf{Type theory for agent capabilities}: a capability type
-  discipline with Basic/Composite/Emergent kinds and a composition rule
-  \(a \circ b : \text{cap}_1 \otimes \text{cap}_2\) (Appendix E.1).
-\end{enumerate}
-
-\subsubsection{Advanced Instruction Set
-Evolution}\label{advanced-instruction-set-evolution}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{Self-modifying instructions}---a formal model for instruction
-  evolution,
-  \(I_{t+1} = f(I_t, \text{Performance}_t, \text{Context}_t)\) with
-  \(f\) left abstract, under semantic-preservation,
-  performance-monotonicity, and safety constraints.
-\item
-  \textbf{Context-aware optimization}---for each observed context,
-  predict the instruction set's performance against a threshold, and if
-  it falls short, select and accumulate a best rewrite variant. The
-  programmatic sketch (OPTIMIZE-CONTEXT) is listed in Appendix D.9; its
-  primitives are future work, not implemented machinery.
-\item
-  \textbf{Cross-model instruction mapping}: a universal mapping
-  framework \(\phi_{A \rightarrow B}: I_A \rightarrow I_B\) with
-  semantic preservation, performance bounds, and capability awareness
-  stated as goals, not delivered guarantees.
-\end{enumerate}
-
-\subsubsection{Theoretical Performance
-Bounds}\label{theoretical-performance-bounds}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{Asymptotic analysis}: deriving cost bounds per composition
-  operator---when does iterative composition \(i_1^*\) admit a
-  closed-form cost model, and under what reuse structure does caching
-  yield amortized \(O(1)\) effective cost per task? The microbenchmarks
-  (Section 5) measure the constants empirically; the asymptotic theory
-  remains open.
-\item
-  \textbf{Resource consumption models}: a calibrated model
-  \(R(i) = \alpha C_{cpu}(i) + \beta C_{mem}(i) + \gamma C_{io}(i)\)
-  with coefficients fitted against real deployments (Appendix E.1).
-\end{enumerate}
-
-\subsubsection{Capability Assessment:
-Extensions}\label{capability-assessment-extensions}
-
-The instruction-level capability assessment subsystem
-(\texttt{CapabilityProfile}, Section 3.5) now ships at the static layer;
-its wiring gap remains disclosed there. Two extensions remain future
-work: (i) \textbf{benchmark-calibrated metrics}---correlating scores
-with \emph{end-to-end} performance {[}17{]} {[}29{]} and grounding the
-weights \(w_k\) therein; and (ii) \textbf{cross-model comparison
-matrices}, a pairwise framework \(\Delta(M_1, M_2)\) over capability
-dimensions for model selection.
-
-\subsubsection{Emergent Behavior
-Analysis}\label{emergent-behavior-analysis}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{Collective intelligence modeling}: the open question is a
-  formal metric for when multi-agent composition exceeds the sum of its
-  members' capabilities.
-\item
-  \textbf{Learning transfer}: knowledge transfer across agents composes
-  Section 3.3's mining-extraction-validation pipeline rather than new
-  machinery---patterns mined from a source agent's traces would be
-  adapted and re-validated before promotion.
-\end{enumerate}
-
-\subsubsection{Security and Privacy
-Extensions}\label{security-and-privacy-extensions}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  \textbf{Information flow control}: the classical noninterference
-  property
-  \(\text{Secure}(P) \iff \forall s_1, s_2: L(s_1) = L(s_2) \implies L(\llbracket P \rrbracket s_1) = L(\llbracket P \rrbracket s_2)\),
-  where \(L\) assigns security levels to states and outputs, stated for
-  terminating runs (divergence and channel leakage out of scope;
-  Appendix E.1).
-\item
-  \textbf{Privacy-preserving computation}: a direction, not a delivered
-  mechanism---if computations over sensitive data were routed through
-  per-step differentially private mechanisms, overall loss would follow
-  a composition theorem over the per-mechanism
-  \((\epsilon_i, \delta_i)\) parameters. We deliberately state no bound:
-  which theorem applies and which mechanisms the runtime would expose
-  are open design choices; the instruction contract is the natural place
-  to carry such annotations once the mechanisms exist.
-\end{enumerate}
-
-None of the frameworks above is implemented today; Sections 6.3.3 and
-6.3.4 are stated precisely enough to be falsifiable, while the remaining
-sketches are programmatic.
+Three directions follow directly from the measurements rather than from
+the framework. Shipping the typed cache is first: Theorem 3.7 states the
+conditions, Section 5.13 prices them, and the shipped cache enforces
+none of the tenant, write and eviction rules, so the next step is an
+implementation with a shared run-scope registry rather than a
+per-instruction store. Second, the holdout result (Section 5.12) says
+compound absorption is real but smaller out of sample; a task-level
+learning curve---mine on \(n\) tasks, measure on the next \(m\)---would
+say whether it grows with experience or saturates. Third, every claim
+here is offline; an end-to-end run that varies task success as well as
+latency is the only way to convert a hit-rate argument into a deployment
+argument, and Section 5.13's damage counts say what the endpoint should
+be: not the number of hits but the number of hits that cannot be wrong.
 
 \section{Conclusion}\label{conclusion}
 
@@ -2482,7 +2429,7 @@ semantics-preserving optimization.
 \section*{Artifact Availability}\label{artifact-availability}
 \addcontentsline{toc}{section}{Artifact Availability}
 
-Full proofs of Theorems 3.1--3.2 and 3.4--3.6, component listings,
+Full proofs of Theorems 3.1--3.2, 3.4--3.6 and 3.7, component listings,
 future-direction sketches, artifact-regeneration commands, the
 priced-comparison protocol, the four-task characterization detail, and
 the extension-experiment protocols and tables behind Sections 5.10--5.12
@@ -2495,7 +2442,7 @@ repository state whose build produces this PDF (\texttt{REPRODUCING.md}
 records the submission-time \texttt{git\ rev-parse\ HEAD}, the
 dependency lock, and the Python/system versions). A fresh clone
 reproduces the full suite (\texttt{python\ -m\ pytest\ tests/\ -q}:
-1,420 passed, 14 skipped, 13 subtests passed at run time), the Section
+1,441 passed, 14 skipped, 13 subtests passed at run time), the Section
 5.6 functional-test counts, and, via the Appendix F command lines, every
 results table from scratch---real-gateway runs included, with a
 mock-backend fallback for environments without credentials.
@@ -2505,6 +2452,7 @@ components; the artifact is inventoried in Appendix F.7, and the figures
 regenerate from committed results JSONs
 (\texttt{scripts/make\_figures.py}).
 
+{\small\setlength{\bibsep}{1.2pt}
 \begin{thebibliography}{99}
 \bibitem{ref1} Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D. Kaplan, Prafulla Dhariwal, et al. 2020. Language Models are Few-Shot Learners. NeurIPS 33. arXiv:2005.14165.
 \bibitem{ref2} Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, et al. 2023. PaLM: Scaling Language Modeling with Pathways. JMLR 24(240):1–113. arXiv:2204.02311.
@@ -2553,6 +2501,6 @@ regenerate from committed results JSONs
 \bibitem{ref45} Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia. 2000. Dynamo: A Transparent Dynamic Optimization System. PLDI 2000. https://doi.org/10.1145/349299.349303
 \bibitem{ref46} Zilliz and community contributors. 2023. GPTCache: Semantics-Aware Caches for LLM Applications. https://github.com/zilliztech/GPTCache.
 \bibitem{ref47} Lianmin Zheng, Liangsheng Yin, Zhiqiang Xie, Chuyue Sun, et al. 2024. SGLang: Efficient Execution of Structured Language Model Programs. NeurIPS 37. arXiv:2312.07104.
-\end{thebibliography}
+\end{thebibliography}}
 
 \end{document}

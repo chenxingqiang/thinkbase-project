@@ -1,0 +1,1721 @@
+{
+  "schema": "soundness_ladder/v1",
+  "task": "L1 - cost-of-soundness ladder: one admitted set (the 1,728 reads cache_identity admits), one ingredient per rung, with hits, hit rate and unsafe hits measured from the replay",
+  "result_kind": "REPLAY",
+  "scope": "tau-bench only: the first trial of every task in the committed corpus, four source runs, replayed through run-scope caches. The main ladder scores one admitted set (the 1,728 reads cache_identity admits) and adds one soundness ingredient per rung; the mirror ladder repeats the rungs with all 2,275 calls admitted. Unsafe hits are counted from the replay, never estimated.",
+  "corpus_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+  "provenance": {
+    "script": {
+      "path": "examples/benchmarks/soundness_ladder.py",
+      "sha256": "d70528dbb3e768780e6e8631636f841bb07eadd56ebf536075c72933438e1caa",
+      "schema": "soundness_ladder/v1"
+    },
+    "corpus": {
+      "path": "examples/real_traces/tau_bench_historical.jsonl",
+      "sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "records": 325,
+      "calls": 2275,
+      "runs": 4,
+      "first_trial_only": true,
+      "expected_sha256": "3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116",
+      "matches_expected": true
+    },
+    "identity_module": {
+      "path": "examples/benchmarks/cache_identity.py",
+      "sha256": "fdb03597c057d1c604b924c27cb3d4a06bd3bb9731ef923671fd8e1d89dfe4e5",
+      "effect_map_source": "file",
+      "effect_map_path": "examples/benchmarks/tool_effect_map.json",
+      "effect_map_error": null,
+      "tools": 26,
+      "classes": {
+        "read": [
+          "calculate",
+          "find_user_id_by_email",
+          "find_user_id_by_name_zip",
+          "get_order_details",
+          "get_product_details",
+          "get_reservation_details",
+          "get_user_details",
+          "list_all_airports",
+          "list_all_product_types",
+          "search_direct_flight",
+          "search_onestop_flight"
+        ],
+        "write": [
+          "book_reservation",
+          "cancel_pending_order",
+          "cancel_reservation",
+          "exchange_delivered_order_items",
+          "modify_pending_order_address",
+          "modify_pending_order_items",
+          "modify_pending_order_payment",
+          "modify_user_address",
+          "return_delivered_order_items",
+          "send_certificate",
+          "update_reservation_baggages",
+          "update_reservation_flights",
+          "update_reservation_passengers"
+        ],
+        "control": [
+          "think",
+          "transfer_to_human_agents"
+        ]
+      },
+      "why_imported": "the admitted set is its effect map, every digest on the ladder is one of its key recipes, and every eviction is its index; re-deriving any of them here is how a ladder drifts from the cache it claims to measure"
+    },
+    "ladders": {
+      "main": {
+        "admitted_set": "reads only, the ladder's admitted set: the 1,728 calls cache_identity admits (given before rung 0, so identical at every rung)",
+        "denominator": 1728,
+        "rungs": [
+          {
+            "id": "L0",
+            "label": "blind key",
+            "ingredient_added": "none -- the baseline",
+            "key": "cache_identity.key_blind(tool, args)",
+            "key_binds_tenant": false,
+            "invalidation": false,
+            "admission": "reads",
+            "note": "sha256 over the tool and its canonical arguments: the published reuse recipe's identity notion. A hit is always the same question, and says nothing about who asked or whether the answer still holds."
+          },
+          {
+            "id": "L1",
+            "label": "blind key + tenant",
+            "ingredient_added": "tenant in the key",
+            "key": "cache_identity.key_typed(tool, args, tenant)",
+            "key_binds_tenant": true,
+            "invalidation": false,
+            "admission": "reads",
+            "note": "the tenant enters the digest, so one tenant cannot be answered with another's row. key_typed also domain-separates and refuses non-reads; on a reads-only admitted set neither can move a hit, and tenant_ingredient_isolated checks that rather than assuming it."
+          },
+          {
+            "id": "L2",
+            "label": "+ entity invalidation",
+            "ingredient_added": "entity invalidation",
+            "key": "cache_identity.key_typed(tool, args, tenant) + remember/invalidate",
+            "key_binds_tenant": true,
+            "invalidation": true,
+            "admission": "reads",
+            "note": "a stored read is filed under every entity id it names; a write that lands evicts the keys filed under the ids it names, so a surviving key names no entity the write named."
+          },
+          {
+            "id": "L3",
+            "label": "+ read-only admission (given)",
+            "ingredient_added": "read-only admission -- already the baseline, adds nothing here",
+            "key": "cache_identity.key_typed(tool, args, tenant) + remember/invalidate",
+            "key_binds_tenant": true,
+            "invalidation": true,
+            "admission": "reads",
+            "note": "the admission gate is what defines this ladder's denominator, so it was paid before rung 0 and this rung must reproduce L2 exactly. Its price is measured on the mirror ladder (M2 -> M3), where the same corpus is admitted in full."
+          }
+        ]
+      },
+      "mirror": {
+        "admitted_set": "all 2,275 calls at M0-M2 (writes and control tools admitted); reads only at M3, the admission rung",
+        "denominator": 2275,
+        "rungs": [
+          {
+            "id": "M0",
+            "label": "blind key",
+            "ingredient_added": "none -- the baseline",
+            "key": "cache_identity.key_blind(tool, args)",
+            "key_binds_tenant": false,
+            "invalidation": false,
+            "admission": "all",
+            "note": "every call stored and served, nothing evicted: the P1 baseline."
+          },
+          {
+            "id": "M1",
+            "label": "blind key + tenant",
+            "ingredient_added": "tenant in the key",
+            "key": "key_tenant_blind(tool, args, tenant) = cache_identity.key_blind([tenant, tool], args)",
+            "key_binds_tenant": true,
+            "invalidation": false,
+            "admission": "all",
+            "note": "the tenant in the key, on a cache that admits writes -- so the key cannot be key_typed, which refuses to key a write at all."
+          },
+          {
+            "id": "M2",
+            "label": "+ entity invalidation",
+            "ingredient_added": "entity invalidation",
+            "key": "key_tenant_blind(tool, args, tenant) + cache_identity.remember/invalidate",
+            "key_binds_tenant": true,
+            "invalidation": true,
+            "admission": "all",
+            "note": "freshness is handled for reads, but a write's own memo is never filed in the index (only reads are), so a repeated write is still served."
+          },
+          {
+            "id": "M3",
+            "label": "+ read-only admission",
+            "ingredient_added": "read-only admission",
+            "key": "cache_identity.key_typed(tool, args, tenant) + remember/invalidate",
+            "key_binds_tenant": true,
+            "invalidation": true,
+            "admission": "reads",
+            "note": "the same chain measured on the 2,275 denominator: refuses the 446 writes and 101 control calls, and is therefore L2 restated. The M2 -> M3 gap is what admitting writes adds."
+          }
+        ]
+      }
+    },
+    "anchors": {
+      "committed_typed_policy": {
+        "source": "examples/benchmarks/unsafe_cache_results.json",
+        "policy": "P4 typed",
+        "hits": 466,
+        "admitted": 1728,
+        "why": "L3 must reproduce the committed typed replay; the anchor is pinned so a drift in either artifact fails the checks instead of moving a paper number"
+      },
+      "published_reuse": {
+        "hits": 746,
+        "cacheable": 1789,
+        "hit_rate": 0.417,
+        "why": "L0 is that recipe's identity notion restricted to reads; the ladder decomposes a stricter cache, it does not re-derive 41.70%"
+      }
+    },
+    "determinism": "no clock, no environment, no randomness, no git lookup; JSON-native arguments; every collection emitted in a stable order; every rung replayed twice and the documents compared before writing",
+    "arithmetic": "integer counts; rates are round(numerator/denominator, 4); point deltas round(., 2); no weighted averages"
+  },
+  "definitions": {
+    "admitted_set": "the calls a rung stores: the 1,728 effect-class reads on the main ladder, all 2,275 calls on mirror rungs M0-M2, reads again at M3. Admission is decided by cache_identity.effect_class before any key is computed.",
+    "rung": "one point on a ladder. Adjacent rungs differ by exactly one ingredient -- the tenant in the key, then entity invalidation, then read-only admission -- so the delta between them is attributable.",
+    "hit": "an admitted call whose key is already in the rung's run-scope cache; the memo is returned and the tool does not run",
+    "hit_rate": "hits / admitted_calls of the same rung, rounded to 4 decimals. The main ladder's denominator is 1,728 for every rung, which is what makes its rungs comparable; hit_rate_of_all_calls divides by 2,275 and is reported so both ladders can be read on one base.",
+    "writes_served": "an unsafe hit where the call is a write: the mutation is answered from a memo and never runs, while the agent's belief that it ran is unchanged",
+    "stale_read": "an unsafe hit where the call is a read and some write that executed names an entity id the read names, at a position strictly between the memo's store position and the hit; the memo predates the write",
+    "cross_tenant": "an unsafe hit where the call is a read, the memo was stored under a different known tenant, and the hit is not already stale. An unknown tenant on either side is never counted, so this class is a lower bound",
+    "unsafe_hit": "the union of writes_served, stale_reads and cross_tenant, each hit assigned to exactly one class by the precedence writes_served > stale_reads > cross_tenant, so the breakdown sums to the total. unsafe_by_class_overlapping keeps the pre-precedence counts where a hit falls in more than one class.",
+    "ingredient": "one of the three soundness ingredients the committed policies bundle: the tenant in the key (identity), entity invalidation (freshness), and read-only admission (effect). The ladder orders them tenant -> invalidation -> admission.",
+    "marginal_cost": "hit_rate_before - hit_rate_after, in percentage points, and unsafe_before - unsafe_after, in hits, for one adjacent pair. Positive points lost and positive unsafe removed are the cost and the benefit of that one ingredient.",
+    "point": "one percentage point of hit rate on the rung's denominator. Every point quoted is measured on 1,728 main-ladder calls or 2,275 mirror calls; no rate is averaged across rungs or runs.",
+    "control_hits": "hits on control tools (think, transfer_to_human_agents). They are admitted and memoised on mirror rungs M0-M2, refused on M3 and by every main rung, and are not one of the three unsafe classes",
+    "not_counted": "reads naming no entity id cannot be joined to a write; unknown tenants cannot be compared; a failed write is indistinguishable from a landed one in this corpus and is treated as landed. Each gap can only understate unsoundness."
+  },
+  "ladders": {
+    "main": {
+      "id": "main",
+      "title": "nested ladder on the 1,728 reads cache_identity admits",
+      "admitted_set": "reads only, the ladder's admitted set: the 1,728 calls cache_identity admits (given before rung 0, so identical at every rung)",
+      "denominator": 1728,
+      "denominator_note": "hit_rate is hits / admitted_calls of that rung; hit_rate_on_denominator is hits over this ladder's fixed base and is the rate adjacent rungs are compared on; hit_rate_of_all_calls is hits / 2,275, so the two ladders can also be read on one base",
+      "rungs": [
+        {
+          "id": "L0",
+          "label": "blind key",
+          "ingredient_added": "none -- the baseline",
+          "key": "cache_identity.key_blind(tool, args)",
+          "key_mode": "blind",
+          "key_binds_tenant": false,
+          "removes": null,
+          "invalidation": "none",
+          "admission": "reads",
+          "note": "sha256 over the tool and its canonical arguments: the published reuse recipe's identity notion. A hit is always the same question, and says nothing about who asked or whether the answer still holds.",
+          "calls_total": 2275,
+          "admitted_calls": 1728,
+          "not_admitted_calls": 547,
+          "hits": 745,
+          "hit_rate": 0.4311,
+          "hit_rate_on_denominator": 0.4311,
+          "hit_rate_of_all_calls": 0.3275,
+          "hits_by_effect": {
+            "read": 745,
+            "write": 0,
+            "control": 0
+          },
+          "unsafe_hits": 283,
+          "unsafe_breakdown": {
+            "writes_served": 0,
+            "stale_reads": 179,
+            "cross_tenant": 104
+          },
+          "unsafe_share_of_hits": 0.3799,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 0,
+            "stale_reads": 179,
+            "cross_tenant": 104
+          },
+          "control_hits_not_counted": 0,
+          "unsafe_by_tool": {
+            "writes_served": {},
+            "stale_reads": {
+              "get_order_details": 144,
+              "get_reservation_details": 17,
+              "get_user_details": 18
+            },
+            "cross_tenant": {
+              "get_product_details": 76,
+              "list_all_airports": 1,
+              "list_all_product_types": 24,
+              "search_direct_flight": 3
+            }
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 609,
+              "hits": 303,
+              "hit_rate": 0.4975,
+              "contribution_to_ladder_rate": 0.1753,
+              "unsafe_hits": 117,
+              "writes_served": 0,
+              "stale_reads": 69,
+              "cross_tenant": 48,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 191,
+              "hits": 35,
+              "hit_rate": 0.1832,
+              "contribution_to_ladder_rate": 0.0203,
+              "unsafe_hits": 14,
+              "writes_served": 0,
+              "stale_reads": 13,
+              "cross_tenant": 1,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 680,
+              "hits": 351,
+              "hit_rate": 0.5162,
+              "contribution_to_ladder_rate": 0.2031,
+              "unsafe_hits": 135,
+              "writes_served": 0,
+              "stale_reads": 83,
+              "cross_tenant": 52,
+              "control_hits": 0
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 248,
+              "hits": 56,
+              "hit_rate": 0.2258,
+              "contribution_to_ladder_rate": 0.0324,
+              "unsafe_hits": 17,
+              "writes_served": 0,
+              "stale_reads": 14,
+              "cross_tenant": 3,
+              "control_hits": 0
+            }
+          },
+          "examples": [
+            {
+              "cls": "stale_reads",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 17,
+                "turn": 7,
+                "task_id": 1,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "cached": {
+                "pos": 6,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "intervening": [
+                {
+                  "pos": 9,
+                  "tool": "exchange_delivered_order_items",
+                  "args": {
+                    "item_ids": [
+                      "1151293680",
+                      "4983901480"
+                    ],
+                    "new_item_ids": [
+                      "7706410293",
+                      "7747408585"
+                    ],
+                    "order_id": "#W2378156",
+                    "payment_method_id": "credit_card_9513926"
+                  },
+                  "entity_ids": [
+                    "#W2378156",
+                    "1151293680",
+                    "4983901480",
+                    "7706410293",
+                    "7747408585",
+                    "credit_card_9513926"
+                  ]
+                }
+              ]
+            },
+            {
+              "cls": "cross_tenant",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 127,
+                "turn": 5,
+                "task_id": 20,
+                "tool": "get_product_details",
+                "args": {
+                  "product_id": "4794339885"
+                }
+              },
+              "cached": {
+                "pos": 115,
+                "tool": "get_product_details",
+                "args": {
+                  "product_id": "4794339885"
+                }
+              },
+              "cached_tenant": "mei_davis_8935",
+              "hit_tenant": "ethan_garcia_1261"
+            }
+          ]
+        },
+        {
+          "id": "L1",
+          "label": "blind key + tenant",
+          "ingredient_added": "tenant in the key",
+          "key": "cache_identity.key_typed(tool, args, tenant)",
+          "key_mode": "typed",
+          "key_binds_tenant": true,
+          "removes": "cross_tenant",
+          "invalidation": "none",
+          "admission": "reads",
+          "note": "the tenant enters the digest, so one tenant cannot be answered with another's row. key_typed also domain-separates and refuses non-reads; on a reads-only admitted set neither can move a hit, and tenant_ingredient_isolated checks that rather than assuming it.",
+          "calls_total": 2275,
+          "admitted_calls": 1728,
+          "not_admitted_calls": 547,
+          "hits": 619,
+          "hit_rate": 0.3582,
+          "hit_rate_on_denominator": 0.3582,
+          "hit_rate_of_all_calls": 0.2721,
+          "hits_by_effect": {
+            "read": 619,
+            "write": 0,
+            "control": 0
+          },
+          "unsafe_hits": 168,
+          "unsafe_breakdown": {
+            "writes_served": 0,
+            "stale_reads": 168,
+            "cross_tenant": 0
+          },
+          "unsafe_share_of_hits": 0.2714,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 0,
+            "stale_reads": 168,
+            "cross_tenant": 0
+          },
+          "control_hits_not_counted": 0,
+          "unsafe_by_tool": {
+            "writes_served": {},
+            "stale_reads": {
+              "get_order_details": 135,
+              "get_reservation_details": 15,
+              "get_user_details": 18
+            },
+            "cross_tenant": {}
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 609,
+              "hits": 243,
+              "hit_rate": 0.399,
+              "contribution_to_ladder_rate": 0.1406,
+              "unsafe_hits": 64,
+              "writes_served": 0,
+              "stale_reads": 64,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 191,
+              "hits": 32,
+              "hit_rate": 0.1675,
+              "contribution_to_ladder_rate": 0.0185,
+              "unsafe_hits": 13,
+              "writes_served": 0,
+              "stale_reads": 13,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 680,
+              "hits": 297,
+              "hit_rate": 0.4368,
+              "contribution_to_ladder_rate": 0.1719,
+              "unsafe_hits": 79,
+              "writes_served": 0,
+              "stale_reads": 79,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 248,
+              "hits": 47,
+              "hit_rate": 0.1895,
+              "contribution_to_ladder_rate": 0.0272,
+              "unsafe_hits": 12,
+              "writes_served": 0,
+              "stale_reads": 12,
+              "cross_tenant": 0,
+              "control_hits": 0
+            }
+          },
+          "examples": [
+            {
+              "cls": "stale_reads",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 17,
+                "turn": 7,
+                "task_id": 1,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "cached": {
+                "pos": 6,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "intervening": [
+                {
+                  "pos": 9,
+                  "tool": "exchange_delivered_order_items",
+                  "args": {
+                    "item_ids": [
+                      "1151293680",
+                      "4983901480"
+                    ],
+                    "new_item_ids": [
+                      "7706410293",
+                      "7747408585"
+                    ],
+                    "order_id": "#W2378156",
+                    "payment_method_id": "credit_card_9513926"
+                  },
+                  "entity_ids": [
+                    "#W2378156",
+                    "1151293680",
+                    "4983901480",
+                    "7706410293",
+                    "7747408585",
+                    "credit_card_9513926"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "L2",
+          "label": "+ entity invalidation",
+          "ingredient_added": "entity invalidation",
+          "key": "cache_identity.key_typed(tool, args, tenant) + remember/invalidate",
+          "key_mode": "typed",
+          "key_binds_tenant": true,
+          "removes": "stale_reads",
+          "invalidation": "entity (remember/invalidate)",
+          "admission": "reads",
+          "note": "a stored read is filed under every entity id it names; a write that lands evicts the keys filed under the ids it names, so a surviving key names no entity the write named.",
+          "calls_total": 2275,
+          "admitted_calls": 1728,
+          "not_admitted_calls": 547,
+          "hits": 466,
+          "hit_rate": 0.2697,
+          "hit_rate_on_denominator": 0.2697,
+          "hit_rate_of_all_calls": 0.2048,
+          "hits_by_effect": {
+            "read": 466,
+            "write": 0,
+            "control": 0
+          },
+          "unsafe_hits": 0,
+          "unsafe_breakdown": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "unsafe_share_of_hits": 0.0,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "control_hits_not_counted": 0,
+          "unsafe_by_tool": {
+            "writes_served": {},
+            "stale_reads": {},
+            "cross_tenant": {}
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 609,
+              "hits": 182,
+              "hit_rate": 0.2989,
+              "contribution_to_ladder_rate": 0.1053,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 191,
+              "hits": 22,
+              "hit_rate": 0.1152,
+              "contribution_to_ladder_rate": 0.0127,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 680,
+              "hits": 224,
+              "hit_rate": 0.3294,
+              "contribution_to_ladder_rate": 0.1296,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 248,
+              "hits": 38,
+              "hit_rate": 0.1532,
+              "contribution_to_ladder_rate": 0.022,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            }
+          },
+          "examples": []
+        },
+        {
+          "id": "L3",
+          "label": "+ read-only admission (given)",
+          "ingredient_added": "read-only admission -- already the baseline, adds nothing here",
+          "key": "cache_identity.key_typed(tool, args, tenant) + remember/invalidate",
+          "key_mode": "typed",
+          "key_binds_tenant": true,
+          "removes": "writes_served",
+          "invalidation": "entity (remember/invalidate)",
+          "admission": "reads",
+          "note": "the admission gate is what defines this ladder's denominator, so it was paid before rung 0 and this rung must reproduce L2 exactly. Its price is measured on the mirror ladder (M2 -> M3), where the same corpus is admitted in full.",
+          "calls_total": 2275,
+          "admitted_calls": 1728,
+          "not_admitted_calls": 547,
+          "hits": 466,
+          "hit_rate": 0.2697,
+          "hit_rate_on_denominator": 0.2697,
+          "hit_rate_of_all_calls": 0.2048,
+          "hits_by_effect": {
+            "read": 466,
+            "write": 0,
+            "control": 0
+          },
+          "unsafe_hits": 0,
+          "unsafe_breakdown": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "unsafe_share_of_hits": 0.0,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "control_hits_not_counted": 0,
+          "unsafe_by_tool": {
+            "writes_served": {},
+            "stale_reads": {},
+            "cross_tenant": {}
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 609,
+              "hits": 182,
+              "hit_rate": 0.2989,
+              "contribution_to_ladder_rate": 0.1053,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 191,
+              "hits": 22,
+              "hit_rate": 0.1152,
+              "contribution_to_ladder_rate": 0.0127,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 680,
+              "hits": 224,
+              "hit_rate": 0.3294,
+              "contribution_to_ladder_rate": 0.1296,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 248,
+              "hits": 38,
+              "hit_rate": 0.1532,
+              "contribution_to_ladder_rate": 0.022,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            }
+          },
+          "examples": []
+        }
+      ],
+      "marginal_costs": [
+        {
+          "from_rung": "L0",
+          "to_rung": "L1",
+          "ingredient": "tenant in the key",
+          "denominator": 1728,
+          "hit_rate_before": 0.4311,
+          "hit_rate_after": 0.3582,
+          "hit_rate_points_lost": 7.29,
+          "hit_rate_before_on_admitted": 0.4311,
+          "hit_rate_after_on_admitted": 0.3582,
+          "hits_before": 745,
+          "hits_after": 619,
+          "hits_lost": 126,
+          "unsafe_before": 283,
+          "unsafe_after": 168,
+          "unsafe_hits_removed": 115,
+          "unsafe_removed_by_class": {
+            "writes_served": 0,
+            "stale_reads": 11,
+            "cross_tenant": 104
+          },
+          "target_class": "cross_tenant",
+          "removed_off_target": {
+            "stale_reads": 11
+          },
+          "caveat": "off-target: tenant in the key also removes 11 stale_reads, because the ingredient changes which memo a call reaches, not only whether a stale one is reachable; the class totals are counted by the replay, not attributed by hand",
+          "sentence": "tenant in the key: costs 7.29 points of hit rate on 1,728 calls (43.11% -> 35.82%) and removes 115 unsafe hits (stale_reads 11, cross_tenant 104)."
+        },
+        {
+          "from_rung": "L1",
+          "to_rung": "L2",
+          "ingredient": "entity invalidation",
+          "denominator": 1728,
+          "hit_rate_before": 0.3582,
+          "hit_rate_after": 0.2697,
+          "hit_rate_points_lost": 8.85,
+          "hit_rate_before_on_admitted": 0.3582,
+          "hit_rate_after_on_admitted": 0.2697,
+          "hits_before": 619,
+          "hits_after": 466,
+          "hits_lost": 153,
+          "unsafe_before": 168,
+          "unsafe_after": 0,
+          "unsafe_hits_removed": 168,
+          "unsafe_removed_by_class": {
+            "writes_served": 0,
+            "stale_reads": 168,
+            "cross_tenant": 0
+          },
+          "target_class": "stale_reads",
+          "removed_off_target": {},
+          "caveat": "",
+          "sentence": "entity invalidation: costs 8.85 points of hit rate on 1,728 calls (35.82% -> 26.97%) and removes 168 unsafe hits (stale_reads 168)."
+        },
+        {
+          "from_rung": "L2",
+          "to_rung": "L3",
+          "ingredient": "read-only admission -- already the baseline, adds nothing here",
+          "denominator": 1728,
+          "hit_rate_before": 0.2697,
+          "hit_rate_after": 0.2697,
+          "hit_rate_points_lost": 0.0,
+          "hit_rate_before_on_admitted": 0.2697,
+          "hit_rate_after_on_admitted": 0.2697,
+          "hits_before": 466,
+          "hits_after": 466,
+          "hits_lost": 0,
+          "unsafe_before": 0,
+          "unsafe_after": 0,
+          "unsafe_hits_removed": 0,
+          "unsafe_removed_by_class": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "target_class": "writes_served",
+          "removed_off_target": {},
+          "caveat": "",
+          "sentence": "read-only admission -- already the baseline, adds nothing here: costs 0.00 points of hit rate on 1,728 calls (26.97% -> 26.97%) and removes 0 unsafe hits."
+        }
+      ],
+      "total_cost": {
+        "hit_rate_first": 0.4311,
+        "hit_rate_last": 0.2697,
+        "hit_rate_points_lost": 16.14,
+        "hits_lost": 279,
+        "unsafe_first": 283,
+        "unsafe_last": 0,
+        "unsafe_hits_removed": 283,
+        "statement": "from L0 to L3, the rungs give up 16.14 points of hit rate on 1,728 calls and remove 283 unsafe hits"
+      }
+    },
+    "mirror": {
+      "id": "mirror",
+      "title": "the same rungs with all 2,275 calls admitted, to price read-only admission",
+      "admitted_set": "all 2,275 calls at M0-M2 (writes and control tools admitted); reads only at M3, the admission rung",
+      "denominator": 2275,
+      "denominator_note": "hit_rate is hits / admitted_calls of that rung; hit_rate_on_denominator is hits over this ladder's fixed base and is the rate adjacent rungs are compared on; hit_rate_of_all_calls is hits / 2,275, so the two ladders can also be read on one base",
+      "rungs": [
+        {
+          "id": "M0",
+          "label": "blind key",
+          "ingredient_added": "none -- the baseline",
+          "key": "cache_identity.key_blind(tool, args)",
+          "key_mode": "blind",
+          "key_binds_tenant": false,
+          "removes": null,
+          "invalidation": "none",
+          "admission": "all",
+          "note": "every call stored and served, nothing evicted: the P1 baseline.",
+          "calls_total": 2275,
+          "admitted_calls": 2275,
+          "not_admitted_calls": 0,
+          "hits": 807,
+          "hit_rate": 0.3547,
+          "hit_rate_on_denominator": 0.3547,
+          "hit_rate_of_all_calls": 0.3547,
+          "hits_by_effect": {
+            "read": 745,
+            "write": 61,
+            "control": 1
+          },
+          "unsafe_hits": 344,
+          "unsafe_breakdown": {
+            "writes_served": 61,
+            "stale_reads": 179,
+            "cross_tenant": 104
+          },
+          "unsafe_share_of_hits": 0.4263,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 61,
+            "stale_reads": 179,
+            "cross_tenant": 104
+          },
+          "control_hits_not_counted": 1,
+          "unsafe_by_tool": {
+            "writes_served": {
+              "cancel_pending_order": 7,
+              "cancel_reservation": 2,
+              "exchange_delivered_order_items": 7,
+              "modify_pending_order_address": 9,
+              "modify_pending_order_items": 11,
+              "modify_user_address": 3,
+              "return_delivered_order_items": 16,
+              "update_reservation_baggages": 1,
+              "update_reservation_flights": 4,
+              "update_reservation_passengers": 1
+            },
+            "stale_reads": {
+              "get_order_details": 144,
+              "get_reservation_details": 17,
+              "get_user_details": 18
+            },
+            "cross_tenant": {
+              "get_product_details": 76,
+              "list_all_airports": 1,
+              "list_all_product_types": 24,
+              "search_direct_flight": 3
+            }
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 794,
+              "hits": 325,
+              "hit_rate": 0.4093,
+              "contribution_to_ladder_rate": 0.1429,
+              "unsafe_hits": 139,
+              "writes_served": 22,
+              "stale_reads": 69,
+              "cross_tenant": 48,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 282,
+              "hits": 39,
+              "hit_rate": 0.1383,
+              "contribution_to_ladder_rate": 0.0171,
+              "unsafe_hits": 18,
+              "writes_served": 4,
+              "stale_reads": 13,
+              "cross_tenant": 1,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 872,
+              "hits": 383,
+              "hit_rate": 0.4392,
+              "contribution_to_ladder_rate": 0.1684,
+              "unsafe_hits": 166,
+              "writes_served": 31,
+              "stale_reads": 83,
+              "cross_tenant": 52,
+              "control_hits": 1
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 327,
+              "hits": 60,
+              "hit_rate": 0.1835,
+              "contribution_to_ladder_rate": 0.0264,
+              "unsafe_hits": 21,
+              "writes_served": 4,
+              "stale_reads": 14,
+              "cross_tenant": 3,
+              "control_hits": 0
+            }
+          },
+          "examples": [
+            {
+              "cls": "writes_served",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 86,
+                "turn": 5,
+                "task_id": 14,
+                "tool": "return_delivered_order_items",
+                "args": {
+                  "item_ids": [
+                    "5796612084"
+                  ],
+                  "order_id": "#W7387996",
+                  "payment_method_id": "paypal_9497703"
+                }
+              },
+              "cached": {
+                "pos": 74,
+                "tool": "return_delivered_order_items",
+                "args": {
+                  "item_ids": [
+                    "5796612084"
+                  ],
+                  "order_id": "#W7387996",
+                  "payment_method_id": "paypal_9497703"
+                }
+              }
+            },
+            {
+              "cls": "stale_reads",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 17,
+                "turn": 7,
+                "task_id": 1,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "cached": {
+                "pos": 6,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "intervening": [
+                {
+                  "pos": 9,
+                  "tool": "exchange_delivered_order_items",
+                  "args": {
+                    "item_ids": [
+                      "1151293680",
+                      "4983901480"
+                    ],
+                    "new_item_ids": [
+                      "7706410293",
+                      "7747408585"
+                    ],
+                    "order_id": "#W2378156",
+                    "payment_method_id": "credit_card_9513926"
+                  },
+                  "entity_ids": [
+                    "#W2378156",
+                    "1151293680",
+                    "4983901480",
+                    "7706410293",
+                    "7747408585",
+                    "credit_card_9513926"
+                  ]
+                }
+              ]
+            },
+            {
+              "cls": "cross_tenant",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 127,
+                "turn": 5,
+                "task_id": 20,
+                "tool": "get_product_details",
+                "args": {
+                  "product_id": "4794339885"
+                }
+              },
+              "cached": {
+                "pos": 115,
+                "tool": "get_product_details",
+                "args": {
+                  "product_id": "4794339885"
+                }
+              },
+              "cached_tenant": "mei_davis_8935",
+              "hit_tenant": "ethan_garcia_1261"
+            }
+          ]
+        },
+        {
+          "id": "M1",
+          "label": "blind key + tenant",
+          "ingredient_added": "tenant in the key",
+          "key": "key_tenant_blind(tool, args, tenant) = cache_identity.key_blind([tenant, tool], args)",
+          "key_mode": "blind_tenant",
+          "key_binds_tenant": true,
+          "removes": "cross_tenant",
+          "invalidation": "none",
+          "admission": "all",
+          "note": "the tenant in the key, on a cache that admits writes -- so the key cannot be key_typed, which refuses to key a write at all.",
+          "calls_total": 2275,
+          "admitted_calls": 2275,
+          "not_admitted_calls": 0,
+          "hits": 680,
+          "hit_rate": 0.2989,
+          "hit_rate_on_denominator": 0.2989,
+          "hit_rate_of_all_calls": 0.2989,
+          "hits_by_effect": {
+            "read": 619,
+            "write": 60,
+            "control": 1
+          },
+          "unsafe_hits": 228,
+          "unsafe_breakdown": {
+            "writes_served": 60,
+            "stale_reads": 168,
+            "cross_tenant": 0
+          },
+          "unsafe_share_of_hits": 0.3353,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 60,
+            "stale_reads": 168,
+            "cross_tenant": 0
+          },
+          "control_hits_not_counted": 1,
+          "unsafe_by_tool": {
+            "writes_served": {
+              "cancel_pending_order": 6,
+              "cancel_reservation": 2,
+              "exchange_delivered_order_items": 7,
+              "modify_pending_order_address": 9,
+              "modify_pending_order_items": 11,
+              "modify_user_address": 3,
+              "return_delivered_order_items": 16,
+              "update_reservation_baggages": 1,
+              "update_reservation_flights": 4,
+              "update_reservation_passengers": 1
+            },
+            "stale_reads": {
+              "get_order_details": 135,
+              "get_reservation_details": 15,
+              "get_user_details": 18
+            },
+            "cross_tenant": {}
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 794,
+              "hits": 264,
+              "hit_rate": 0.3325,
+              "contribution_to_ladder_rate": 0.116,
+              "unsafe_hits": 85,
+              "writes_served": 21,
+              "stale_reads": 64,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 282,
+              "hits": 36,
+              "hit_rate": 0.1277,
+              "contribution_to_ladder_rate": 0.0158,
+              "unsafe_hits": 17,
+              "writes_served": 4,
+              "stale_reads": 13,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 872,
+              "hits": 329,
+              "hit_rate": 0.3773,
+              "contribution_to_ladder_rate": 0.1446,
+              "unsafe_hits": 110,
+              "writes_served": 31,
+              "stale_reads": 79,
+              "cross_tenant": 0,
+              "control_hits": 1
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 327,
+              "hits": 51,
+              "hit_rate": 0.156,
+              "contribution_to_ladder_rate": 0.0224,
+              "unsafe_hits": 16,
+              "writes_served": 4,
+              "stale_reads": 12,
+              "cross_tenant": 0,
+              "control_hits": 0
+            }
+          },
+          "examples": [
+            {
+              "cls": "writes_served",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 86,
+                "turn": 5,
+                "task_id": 14,
+                "tool": "return_delivered_order_items",
+                "args": {
+                  "item_ids": [
+                    "5796612084"
+                  ],
+                  "order_id": "#W7387996",
+                  "payment_method_id": "paypal_9497703"
+                }
+              },
+              "cached": {
+                "pos": 74,
+                "tool": "return_delivered_order_items",
+                "args": {
+                  "item_ids": [
+                    "5796612084"
+                  ],
+                  "order_id": "#W7387996",
+                  "payment_method_id": "paypal_9497703"
+                }
+              }
+            },
+            {
+              "cls": "stale_reads",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 17,
+                "turn": 7,
+                "task_id": 1,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "cached": {
+                "pos": 6,
+                "tool": "get_order_details",
+                "args": {
+                  "order_id": "#W2378156"
+                }
+              },
+              "intervening": [
+                {
+                  "pos": 9,
+                  "tool": "exchange_delivered_order_items",
+                  "args": {
+                    "item_ids": [
+                      "1151293680",
+                      "4983901480"
+                    ],
+                    "new_item_ids": [
+                      "7706410293",
+                      "7747408585"
+                    ],
+                    "order_id": "#W2378156",
+                    "payment_method_id": "credit_card_9513926"
+                  },
+                  "entity_ids": [
+                    "#W2378156",
+                    "1151293680",
+                    "4983901480",
+                    "7706410293",
+                    "7747408585",
+                    "credit_card_9513926"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "M2",
+          "label": "+ entity invalidation",
+          "ingredient_added": "entity invalidation",
+          "key": "key_tenant_blind(tool, args, tenant) + cache_identity.remember/invalidate",
+          "key_mode": "blind_tenant",
+          "key_binds_tenant": true,
+          "removes": "stale_reads",
+          "invalidation": "entity (remember/invalidate)",
+          "admission": "all",
+          "note": "freshness is handled for reads, but a write's own memo is never filed in the index (only reads are), so a repeated write is still served.",
+          "calls_total": 2275,
+          "admitted_calls": 2275,
+          "not_admitted_calls": 0,
+          "hits": 537,
+          "hit_rate": 0.236,
+          "hit_rate_on_denominator": 0.236,
+          "hit_rate_of_all_calls": 0.236,
+          "hits_by_effect": {
+            "read": 476,
+            "write": 60,
+            "control": 1
+          },
+          "unsafe_hits": 60,
+          "unsafe_breakdown": {
+            "writes_served": 60,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "unsafe_share_of_hits": 0.1117,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 60,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "control_hits_not_counted": 1,
+          "unsafe_by_tool": {
+            "writes_served": {
+              "cancel_pending_order": 6,
+              "cancel_reservation": 2,
+              "exchange_delivered_order_items": 7,
+              "modify_pending_order_address": 9,
+              "modify_pending_order_items": 11,
+              "modify_user_address": 3,
+              "return_delivered_order_items": 16,
+              "update_reservation_baggages": 1,
+              "update_reservation_flights": 4,
+              "update_reservation_passengers": 1
+            },
+            "stale_reads": {},
+            "cross_tenant": {}
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 794,
+              "hits": 207,
+              "hit_rate": 0.2607,
+              "contribution_to_ladder_rate": 0.091,
+              "unsafe_hits": 21,
+              "writes_served": 21,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 282,
+              "hits": 26,
+              "hit_rate": 0.0922,
+              "contribution_to_ladder_rate": 0.0114,
+              "unsafe_hits": 4,
+              "writes_served": 4,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 872,
+              "hits": 262,
+              "hit_rate": 0.3005,
+              "contribution_to_ladder_rate": 0.1152,
+              "unsafe_hits": 31,
+              "writes_served": 31,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 1
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 327,
+              "hits": 42,
+              "hit_rate": 0.1284,
+              "contribution_to_ladder_rate": 0.0185,
+              "unsafe_hits": 4,
+              "writes_served": 4,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            }
+          },
+          "examples": [
+            {
+              "cls": "writes_served",
+              "source": "gpt-4o-retail",
+              "hit": {
+                "pos": 86,
+                "turn": 5,
+                "task_id": 14,
+                "tool": "return_delivered_order_items",
+                "args": {
+                  "item_ids": [
+                    "5796612084"
+                  ],
+                  "order_id": "#W7387996",
+                  "payment_method_id": "paypal_9497703"
+                }
+              },
+              "cached": {
+                "pos": 74,
+                "tool": "return_delivered_order_items",
+                "args": {
+                  "item_ids": [
+                    "5796612084"
+                  ],
+                  "order_id": "#W7387996",
+                  "payment_method_id": "paypal_9497703"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "M3",
+          "label": "+ read-only admission",
+          "ingredient_added": "read-only admission",
+          "key": "cache_identity.key_typed(tool, args, tenant) + remember/invalidate",
+          "key_mode": "typed",
+          "key_binds_tenant": true,
+          "removes": "writes_served",
+          "invalidation": "entity (remember/invalidate)",
+          "admission": "reads",
+          "note": "the same chain measured on the 2,275 denominator: refuses the 446 writes and 101 control calls, and is therefore L2 restated. The M2 -> M3 gap is what admitting writes adds.",
+          "calls_total": 2275,
+          "admitted_calls": 1728,
+          "not_admitted_calls": 547,
+          "hits": 466,
+          "hit_rate": 0.2697,
+          "hit_rate_on_denominator": 0.2048,
+          "hit_rate_of_all_calls": 0.2048,
+          "hits_by_effect": {
+            "read": 466,
+            "write": 0,
+            "control": 0
+          },
+          "unsafe_hits": 0,
+          "unsafe_breakdown": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "unsafe_share_of_hits": 0.0,
+          "unsafe_by_class_overlapping": {
+            "writes_served": 0,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "control_hits_not_counted": 0,
+          "unsafe_by_tool": {
+            "writes_served": {},
+            "stale_reads": {},
+            "cross_tenant": {}
+          },
+          "per_run": {
+            "gpt-4o-retail": {
+              "calls": 794,
+              "admitted": 609,
+              "hits": 182,
+              "hit_rate": 0.2989,
+              "contribution_to_ladder_rate": 0.08,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "gpt-4o-airline": {
+              "calls": 282,
+              "admitted": 191,
+              "hits": 22,
+              "hit_rate": 0.1152,
+              "contribution_to_ladder_rate": 0.0097,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-retail": {
+              "calls": 872,
+              "admitted": 680,
+              "hits": 224,
+              "hit_rate": 0.3294,
+              "contribution_to_ladder_rate": 0.0985,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            },
+            "sonnet-35-new-airline": {
+              "calls": 327,
+              "admitted": 248,
+              "hits": 38,
+              "hit_rate": 0.1532,
+              "contribution_to_ladder_rate": 0.0167,
+              "unsafe_hits": 0,
+              "writes_served": 0,
+              "stale_reads": 0,
+              "cross_tenant": 0,
+              "control_hits": 0
+            }
+          },
+          "examples": []
+        }
+      ],
+      "marginal_costs": [
+        {
+          "from_rung": "M0",
+          "to_rung": "M1",
+          "ingredient": "tenant in the key",
+          "denominator": 2275,
+          "hit_rate_before": 0.3547,
+          "hit_rate_after": 0.2989,
+          "hit_rate_points_lost": 5.58,
+          "hit_rate_before_on_admitted": 0.3547,
+          "hit_rate_after_on_admitted": 0.2989,
+          "hits_before": 807,
+          "hits_after": 680,
+          "hits_lost": 127,
+          "unsafe_before": 344,
+          "unsafe_after": 228,
+          "unsafe_hits_removed": 116,
+          "unsafe_removed_by_class": {
+            "writes_served": 1,
+            "stale_reads": 11,
+            "cross_tenant": 104
+          },
+          "target_class": "cross_tenant",
+          "removed_off_target": {
+            "writes_served": 1,
+            "stale_reads": 11
+          },
+          "caveat": "off-target: tenant in the key also removes 1 writes_served, 11 stale_reads, because the ingredient changes which memo a call reaches, not only whether a stale one is reachable; the class totals are counted by the replay, not attributed by hand",
+          "sentence": "tenant in the key: costs 5.58 points of hit rate on 2,275 calls (35.47% -> 29.89%) and removes 116 unsafe hits (writes_served 1, stale_reads 11, cross_tenant 104)."
+        },
+        {
+          "from_rung": "M1",
+          "to_rung": "M2",
+          "ingredient": "entity invalidation",
+          "denominator": 2275,
+          "hit_rate_before": 0.2989,
+          "hit_rate_after": 0.236,
+          "hit_rate_points_lost": 6.29,
+          "hit_rate_before_on_admitted": 0.2989,
+          "hit_rate_after_on_admitted": 0.236,
+          "hits_before": 680,
+          "hits_after": 537,
+          "hits_lost": 143,
+          "unsafe_before": 228,
+          "unsafe_after": 60,
+          "unsafe_hits_removed": 168,
+          "unsafe_removed_by_class": {
+            "writes_served": 0,
+            "stale_reads": 168,
+            "cross_tenant": 0
+          },
+          "target_class": "stale_reads",
+          "removed_off_target": {},
+          "caveat": "",
+          "sentence": "entity invalidation: costs 6.29 points of hit rate on 2,275 calls (29.89% -> 23.60%) and removes 168 unsafe hits (stale_reads 168)."
+        },
+        {
+          "from_rung": "M2",
+          "to_rung": "M3",
+          "ingredient": "read-only admission",
+          "denominator": 2275,
+          "hit_rate_before": 0.236,
+          "hit_rate_after": 0.2048,
+          "hit_rate_points_lost": 3.12,
+          "hit_rate_before_on_admitted": 0.236,
+          "hit_rate_after_on_admitted": 0.2697,
+          "hits_before": 537,
+          "hits_after": 466,
+          "hits_lost": 71,
+          "unsafe_before": 60,
+          "unsafe_after": 0,
+          "unsafe_hits_removed": 60,
+          "unsafe_removed_by_class": {
+            "writes_served": 60,
+            "stale_reads": 0,
+            "cross_tenant": 0
+          },
+          "target_class": "writes_served",
+          "removed_off_target": {},
+          "caveat": "",
+          "sentence": "read-only admission: costs 3.12 points of hit rate on 2,275 calls (23.60% -> 20.48%) and removes 60 unsafe hits (writes_served 60)."
+        }
+      ],
+      "total_cost": {
+        "hit_rate_first": 0.3547,
+        "hit_rate_last": 0.2048,
+        "hit_rate_points_lost": 14.99,
+        "hits_lost": 341,
+        "unsafe_first": 344,
+        "unsafe_last": 0,
+        "unsafe_hits_removed": 344,
+        "statement": "from M0 to M3, the rungs give up 14.99 points of hit rate on 2,275 calls and remove 344 unsafe hits"
+      }
+    }
+  },
+  "what_admitting_writes_adds": {
+    "hits_added": 71,
+    "hit_rate_points_added": 3.12,
+    "hits_added_by_effect": {
+      "read": 10,
+      "write": 60,
+      "control": 1
+    },
+    "read_hits_from_unexecuted_writes": {
+      "count": 10,
+      "why": "a write served from cache never ran, so it evicted nothing: some reads that M3 would have re-read after the mutation are still answered from the memo. These extra read hits are a second-order effect of the writes_served defect, not a separate unsoundness class, and they are why the hits admitting writes buys exceed the write hits themselves"
+    },
+    "unsafe_hits_added": 60,
+    "unsafe_added_by_class": {
+      "writes_served": 60,
+      "stale_reads": 0,
+      "cross_tenant": 0
+    },
+    "statement": "admitting writes and control tools buys 71 extra hits (3.12 points on 2,275 calls) and adds 60 unsafe hits that no key or eviction ingredient removes"
+  },
+  "reconciliation": {
+    "calls_total": 2275,
+    "calls_by_effect": {
+      "control": 101,
+      "read": 1728,
+      "write": 446
+    },
+    "admitted_set": {
+      "denominator": 1728,
+      "reads": 1728,
+      "writes": 446,
+      "controls": 101,
+      "non_reads": 547,
+      "reads_is_the_denominator": true,
+      "why": "cache_identity admits only effect-class read tools; the 446 writes and 101 control calls are refused before the lookup, which is exactly the typed policy's admission decision"
+    },
+    "runs": 4,
+    "records": 325,
+    "tenant_coverage": {
+      "calls_with_known_tenant": 2104,
+      "calls_total": 2275,
+      "share": 0.9248,
+      "records_by_distinct_user_id": {
+        "0": 49,
+        "1": 275,
+        "2": 1
+      }
+    },
+    "write_repeats_independent": {
+      "repeated_write_keys_in_run": 61,
+      "m0_writes_served": 61,
+      "m1_writes_served": 60,
+      "m2_writes_served": 60,
+      "matches_m0": true,
+      "invalidation_leaves_writes_alone": true,
+      "separated_by_the_tenant": 1,
+      "why": "a write's own memo is never filed in the eviction index (only reads are), so no eviction can remove it: writes_served must be unchanged from M1 to M2 and, on the blind rung, must equal the corpus's repeated-write count. M0 can exceed M1 only by pairing two identical writes the tenant separates -- one of them is a call whose record names no user"
+    },
+    "typed_key_neutrality": {
+      "l0_hits": 745,
+      "key_typed_tenant_none_hits": 745,
+      "equal": true,
+      "unsafe_hits": 283,
+      "unsafe_hits_equal": true,
+      "why": "key_typed(tool, args, None) is a bijective relabelling of key_blind's digest classes, so switching recipe without adding the tenant cannot move a hit; any L0 -> L1 difference is therefore the tenant"
+    },
+    "mirror_key_agreement": {
+      "reads_only_blind_tenant_hits": 466,
+      "l2_hits": 466,
+      "equal": true,
+      "unsafe_hits": 0,
+      "why": "the mirror's write-capable tenant key, replayed over reads only, must hit exactly as key_typed does; that is what isolates M2 -> M3 as an admission change rather than a key change"
+    },
+    "typed_policy_anchor": {
+      "committed_policy": "P4 typed in examples/benchmarks/unsafe_cache_results.json",
+      "expected_hits": 466,
+      "l3_hits": 466,
+      "l3_admitted": 1728,
+      "l3_unsafe": 0,
+      "matches": true,
+      "why": "L3 is the typed policy, so the ladder's top rung must reproduce the committed P4 replay; a mismatch means the ladder stopped measuring the cache the paper describes"
+    },
+    "identifying_ingredients": {
+      "L0": {
+        "key_mode": "blind",
+        "key_binds_tenant": false,
+        "invalidation": "none",
+        "admission": "reads"
+      },
+      "L1": {
+        "key_mode": "typed",
+        "key_binds_tenant": true,
+        "invalidation": "none",
+        "admission": "reads"
+      },
+      "L2": {
+        "key_mode": "typed",
+        "key_binds_tenant": true,
+        "invalidation": "entity (remember/invalidate)",
+        "admission": "reads"
+      },
+      "L3": {
+        "key_mode": "typed",
+        "key_binds_tenant": true,
+        "invalidation": "entity (remember/invalidate)",
+        "admission": "reads"
+      },
+      "M0": {
+        "key_mode": "blind",
+        "key_binds_tenant": false,
+        "invalidation": "none",
+        "admission": "all"
+      },
+      "M1": {
+        "key_mode": "blind_tenant",
+        "key_binds_tenant": true,
+        "invalidation": "none",
+        "admission": "all"
+      },
+      "M2": {
+        "key_mode": "blind_tenant",
+        "key_binds_tenant": true,
+        "invalidation": "entity (remember/invalidate)",
+        "admission": "all"
+      },
+      "M3": {
+        "key_mode": "typed",
+        "key_binds_tenant": true,
+        "invalidation": "entity (remember/invalidate)",
+        "admission": "reads"
+      }
+    }
+  },
+  "checks": {
+    "corpus_matches_committed": {
+      "ok": true,
+      "detail": "sha256=3b5d4d29989ad99ed276433027d6ede37acb1197635e4a99febf44f6b5e64116"
+    },
+    "admitted_set_is_1728": {
+      "ok": true,
+      "detail": "main rungs admit [1728] of 2275 calls; reads=1728"
+    },
+    "one_admitted_set": {
+      "ok": true,
+      "detail": "every main rung scores the same calls on the same streams"
+    },
+    "no_non_reads_admitted_on_main": {
+      "ok": true,
+      "detail": "a write or control hit on the main ladder would mean the admitted set leaked"
+    },
+    "unsafe_monotone_main": {
+      "ok": true,
+      "detail": "unsafe along L0..L3 = [283, 168, 0, 0]"
+    },
+    "unsafe_reaches_zero_main": {
+      "ok": true,
+      "detail": "L2=0, L3=0"
+    },
+    "unsafe_monotone_mirror": {
+      "ok": true,
+      "detail": "unsafe along M0..M3 = [344, 228, 60, 0]"
+    },
+    "unsafe_reaches_zero_mirror": {
+      "ok": true,
+      "detail": "M3=0"
+    },
+    "mirror_not_cleared_before_admission": {
+      "ok": true,
+      "detail": "M2=60 unsafe with the tenant and invalidation both in place; only read-only admission clears it"
+    },
+    "rung3_is_the_baseline_not_a_change": {
+      "ok": true,
+      "detail": "L3 restates L2 by construction: admission was given before rung 0"
+    },
+    "typed_policy_anchor_reproduced": {
+      "ok": true,
+      "detail": "L3 466/1728 hits, 0 unsafe; committed P4 466/1728"
+    },
+    "tenant_ingredient_isolated": {
+      "ok": true,
+      "detail": "key_typed(tenant=None) hits 745 vs L0 745"
+    },
+    "mirror_key_agrees_with_typed_on_reads": {
+      "ok": true,
+      "detail": "reads-only blind+tenant hits 466 vs L2 466"
+    },
+    "write_repeats_match": {
+      "ok": true,
+      "detail": "repeated write keys 61 = M0 61; M1 60 == M2 60, so eviction removes no write's own memo"
+    },
+    "breakdown_sums": {
+      "ok": true,
+      "detail": "unsafe_hits == sum of its three classes"
+    },
+    "rates_are_exact_ratios": {
+      "ok": true,
+      "detail": "every rate is round(numerator/denominator, 4); unsafe never exceeds hits"
+    },
+    "deterministic_replay": {
+      "ok": true,
+      "detail": "every rung replayed twice and the two documents compared before writing"
+    }
+  }
+}
