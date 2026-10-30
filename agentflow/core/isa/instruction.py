@@ -11,7 +11,7 @@ import weakref
 from collections import OrderedDict
 
 from .instruction_cache import CacheKeyNamespace, build_cache_key
-from .sound_cache import MISS, SoundResultCache
+from .sound_cache import MISS, SoundResultCache, cache_policy_opts_in
 
 # Type definitions
 T = TypeVar('T')
@@ -214,6 +214,13 @@ class Instruction(ABC):
     #: needs ``side_effects = False`` and a computable :meth:`footprint`,
     #: plus a tenant (see ``sound_cache.tenant_scope``) unless
     #: ``identity_dependent`` is disabled.
+    #:
+    #: ``AGENTFLOW_CACHE_POLICY=typed`` flips this default to True for
+    #: instructions that declare ``side_effects = False`` (see
+    #: ``sound_cache.cache_policy_opts_in``); unset reproduces the
+    #: historical default exactly.  The switch supplies the store, not the
+    #: declarations: without a tenant (or an identity-independent read)
+    #: the typed store refuses admission and every call misses.
     sound_cache: bool = False
 
     def __init__(self, 
@@ -238,6 +245,11 @@ class Instruction(ABC):
         # - outputs: names of values produced by this instruction that
         #   later instructions (or the final result) may consume.
         self.side_effects = side_effects
+        # AGENTFLOW_CACHE_POLICY=typed flips the *default* for declared-pure
+        # instructions only.  Unset leaves __dict__ untouched (no instance
+        # attribute, no behaviour change).  See sound_cache.cache_policy_opts_in.
+        if cache_policy_opts_in(self.__class__.sound_cache, self.side_effects):
+            self.sound_cache = True
         self.outputs = list(outputs) if outputs else []
         self.dependencies: List[str] = []
         self.context = InstructionContext(

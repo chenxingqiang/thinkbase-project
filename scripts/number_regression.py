@@ -1341,7 +1341,8 @@ chk(_cf['arms']['coarse_footprint']['hits'] == 67, 'the coarse arm must return 6
 chk(_cf['arms']['coarse_footprint']['unsafe_hits'] == 0, 'the coarse arm must stay sound')
 chk(all(_cf['checks'].values()), 'every coarse-footprint check must pass')
 chk(abs(_cf['delta']['hit_rate_points'] - 22.69) < 0.01, f"the penalty must be 22.69 points, got {_cf['delta']['hit_rate_points']}")
-for _line in ('15 sites', '459 hits of 1,728 to 67', '26.56% to 3.88%'):
+for _line in ('15 sites', '459 hits of 1,728 to 67', '26.56% to 3.88%',
+              'the flip is one environment variable'):
     chk(_line in MD, f'main paper must state "{_line}"')
 
 # ---- suite count: the paper's "N passing" must equal collected - skipped ------

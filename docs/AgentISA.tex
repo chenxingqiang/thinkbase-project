@@ -494,7 +494,7 @@ is observationally transparent (Theorem 3.7, Section 3.2.4).
 
 \begin{figure*}
 \centering
-\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored streams pass a security gate and a coordinator that routes LLM-type steps through a result cache (first occurrence only) against the production gateway; a hot-path detector and the static optimizer re-optimize and re-adopt the stream (threshold-triggered). Sections 5.7-5.7.1 measure each property on the real code path.}]{figures/wide_1_architecture.pdf}
+\includegraphics[width=0.88\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored streams pass a security gate and a coordinator that routes LLM-type steps through a result cache (first occurrence only) against the production gateway; a hot-path detector and the static optimizer re-optimize and re-adopt the stream (threshold-triggered). Sections 5.7-5.7.1 measure each property on the real code path.}]{figures/wide_1_architecture.pdf}
 \caption{\textbf{AgentISA runtime architecture.} Authored streams pass a
 security gate and a coordinator that routes LLM-type steps through a
 result cache (first occurrence only) against the production gateway; a
@@ -1802,7 +1802,7 @@ rates and call counts) it does:
 
 \begin{figure}
 \centering
-\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={Live-gateway cache conformance across model aliases. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every (alias, skew) cell; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
+\includegraphics[width=0.88\linewidth,height=\textheight,keepaspectratio,alt={Live-gateway cache conformance across model aliases. Bars are measured hit rates under the identical protocol (200 sequential requests, one seed, three skews per model); the white tick is the backend-free computed expectation---matched exactly in every (alias, skew) cell; call, wall-clock, and token figures: supplementary I.3.}]{figures/3_cache_exactness.pdf}
 \caption{\textbf{Live-gateway cache conformance across model aliases.}
 Bars are measured hit rates under the identical protocol (200 sequential
 requests, one seed, three skews per model); the white tick is the
@@ -1973,7 +1973,7 @@ head-to-head is claimed.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={Token-mix sweep of the priced comparison (MODELED overlay, 195 cells). The provider prompt cache's saving collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the result cache holds 80-88\%: the ranking is a function of the token mix, not a constant (protocol: supplementary I.3).}]{figures/4_token_mix_sweep.pdf}
+\includegraphics[width=0.88\linewidth,height=\textheight,keepaspectratio,alt={Token-mix sweep of the priced comparison (MODELED overlay, 195 cells). The provider prompt cache's saving collapses as completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the result cache holds 80-88\%: the ranking is a function of the token mix, not a constant (protocol: supplementary I.3).}]{figures/4_token_mix_sweep.pdf}
 \caption{\textbf{Token-mix sweep of the priced comparison (MODELED
 overlay, 195 cells).} The provider prompt cache's saving collapses as
 completions lengthen (63.6\% at L4 to 2.0\% at L1024, s = 0.5) while the
@@ -2135,21 +2135,22 @@ We enumerate the limitations of the evaluation explicitly:
   unsound store.} \texttt{SoundResultCache} enforces Theorem 3.7's
   hypotheses and is wired into the execution path behind a
   per-instruction flag, but the default remains the legacy
-  \texttt{InstructionCache}. An AST-attributed census of every cache
-  call site in this repository (15 sites) says what flipping the default
-  would take: 11 already declare \texttt{side\_effects=False}, 2 declare
-  nothing, and 2 declare themselves effectful yet are memoised
-  anyway---one of them \texttt{CompositeInstruction}'s own store, which
-  is exactly the reuse Theorem 3.7 forbids (the other is a probe inside
-  our own harness); and none of the 45 \texttt{execute()} definitions
-  that own a cache can name a tenant. The last two are the blockers, not
-  the purity declarations. Flipping the default today would be sound but
-  expensive: with no instruction implementing
-  \texttt{footprint(params)}, every read is unknown and every write is
-  coarse, and the replay falls from 459 hits of 1,728 to 67 (26.56\% to
-  3.88\%, zero damaging hits on both arms). That is a hit-rate cost, not
-  a correctness cost, and it disappears site by site as footprints are
-  implemented.
+  \texttt{InstructionCache}. A census of every cache call site (15
+  sites, AST-attributed) says what flipping would take: 11 already
+  declare \texttt{side\_effects=False}, 2 declare nothing, and 2 declare
+  themselves effectful yet are memoised anyway---one of them
+  \texttt{CompositeInstruction}'s own store, which is exactly the reuse
+  Theorem 3.7 forbids (the other is a probe inside our own harness); and
+  none of the 45 \texttt{execute()} definitions that own a cache can
+  name a tenant. The last two are the blockers, not the purity
+  declarations. Flipping it today would be sound but expensive: with no
+  \texttt{footprint(params)} anywhere, every write is coarse, and the
+  replay falls from 459 hits of 1,728 to 67 (26.56\% to 3.88\%, zero
+  damaging hits on both arms). That is a hit-rate cost, not a
+  correctness cost, and it disappears site by site as footprints are
+  implemented. Compatibility is not the blocker: the flip is one
+  environment variable, and under it the full suite passes (1,456
+  passed, 15 skipped, the skip asserting the legacy default).
 \end{enumerate}
 
 Despite these limitations, each optimization mechanism is implemented,
@@ -2257,7 +2258,7 @@ or dollar figure is attributable from this corpus and none is quoted
 
 \begin{figure}
 \centering
-\includegraphics[width=0.92\linewidth,height=\textheight,keepaspectratio,alt={Instruction memory is an asset, and its payoff is workload-shaped. (A) Share of a stream's steps served by instructions mined from earlier tasks, versus experience, on five recorded task families (first trial per task; promotion at two occurrences; a step is credited only to an instruction promoted in an earlier task). Closed argument vocabularies saturate at 85--96\% almost immediately; open ones climb slowly (43\% \textbackslash rightarrow 67\%) or flatten near 45\%, because the verb is shared while the parameters are not. (B) What the same memory does not buy: the 34.2\% static reduction belongs to the planted family, not to recorded traces (0.0\%), and reuse pays only across tasks (41.7\% versus 1.7\% within one).}]{figures/7_instruction_memory.pdf}
+\includegraphics[width=0.88\linewidth,height=\textheight,keepaspectratio,alt={Instruction memory is an asset, and its payoff is workload-shaped. (A) Share of a stream's steps served by instructions mined from earlier tasks, versus experience, on five recorded task families (first trial per task; promotion at two occurrences; a step is credited only to an instruction promoted in an earlier task). Closed argument vocabularies saturate at 85--96\% almost immediately; open ones climb slowly (43\% \textbackslash rightarrow 67\%) or flatten near 45\%, because the verb is shared while the parameters are not. (B) What the same memory does not buy: the 34.2\% static reduction belongs to the planted family, not to recorded traces (0.0\%), and reuse pays only across tasks (41.7\% versus 1.7\% within one).}]{figures/7_instruction_memory.pdf}
 \caption{\textbf{Instruction memory is an asset, and its payoff is
 workload-shaped.} (A) Share of a stream's steps served by instructions
 mined from earlier tasks, versus experience, on five recorded task

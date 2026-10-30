@@ -17,6 +17,7 @@ import hashlib
 import json
 from typing import Any, Dict
 
+import os
 import pytest
 
 from agentflow.core.isa.instruction import (
@@ -192,6 +193,8 @@ async def test_unknown_read_footprint_is_coarsely_invalidated():
 
 
 def test_legacy_path_is_untouched():
+    if os.environ.get("AGENTFLOW_CACHE_POLICY", "").strip().lower() == "typed":
+        pytest.skip("asserts the legacy default; AGENTFLOW_CACHE_POLICY=typed is the explicit opt-in that changes it")
     """Default instructions keep the legacy store and key; no sound cache."""
     instruction = _CountingLeaf("legacy-untouched")
     assert instruction.sound_cache is False

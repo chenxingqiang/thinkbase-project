@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import threading
 import time
 from collections import OrderedDict
@@ -45,6 +46,14 @@ REFUSAL_FOOTPRINT_UNKNOWN = "footprint_unknown"
 EVICTION_WRITE = "write"
 EVICTION_CAPACITY = "capacity"
 EVICTION_TTL = "ttl"
+
+#: Environment variable that flips the *default* store for pure instructions.
+#: Unset (or any value other than ``"typed"``) means the historical default:
+#: ``Instruction.sound_cache`` stays False and the legacy
+#: ``instruction.InstructionCache`` is used, byte-identical hit/miss behaviour.
+CACHE_POLICY_ENV = "AGENTFLOW_CACHE_POLICY"
+CACHE_POLICY_LEGACY = "legacy"
+CACHE_POLICY_TYPED = "typed"
 
 current_tenant: ContextVar[Optional[str]] = ContextVar(
     "af_sound_cache_tenant", default=None
@@ -76,6 +85,30 @@ def tenant_scope(tenant: Optional[str]):
         yield tenant
     finally:
         current_tenant.reset(token)
+
+
+def cache_policy_opts_in(sound_cache: bool, side_effects: bool) -> bool:
+    """Whether ``AGENTFLOW_CACHE_POLICY=typed`` flips this instruction's default.
+
+    The switch is intentionally narrow and reversible: it returns ``True`` only
+    when
+
+    * the environment variable is set to ``typed`` (case-insensitive; unset,
+      ``legacy`` and any unknown value return ``False``, so the historical
+      default is reproduced exactly), **and**
+    * the instruction declares itself effect-free (``side_effects is False``) --
+      an effectful instruction must never be routed into a result cache, **and**
+    * it has not already opted in (``sound_cache`` False), so an explicit
+      class-level opt-in is left alone.
+
+    The caller (``instruction.Instruction.__init__``) turns a ``True`` into an
+    instance-level ``sound_cache = True``. Nothing else changes: the store is
+    built lazily by the existing wiring, and the instruction still needs a
+    tenant (``tenant_scope``) unless the read is declared identity-independent.
+    """
+    if sound_cache or side_effects:
+        return False
+    return os.environ.get(CACHE_POLICY_ENV, "").strip().lower() == CACHE_POLICY_TYPED
 
 
 def _tokens(entities: Iterable[str]) -> FrozenSet[str]:
