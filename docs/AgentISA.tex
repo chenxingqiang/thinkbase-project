@@ -494,13 +494,14 @@ is observationally transparent (Theorem 3.7, Section 3.2.4).
 
 \begin{figure*}
 \centering
-\includegraphics[width=0.88\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored streams pass a security gate and a coordinator that routes LLM-type steps through a result cache (first occurrence only) against the production gateway; a hot-path detector and the static optimizer re-optimize and re-adopt the stream (threshold-triggered). Sections 5.7-5.7.1 measure each property on the real code path.}]{figures/wide_1_architecture.pdf}
-\caption{\textbf{AgentISA runtime architecture.} Authored streams pass a
-security gate and a coordinator that routes LLM-type steps through a
-result cache (first occurrence only) against the production gateway; a
-hot-path detector and the static optimizer re-optimize and re-adopt the
-stream (threshold-triggered). Sections 5.7-5.7.1 measure each property
-on the real code path.}
+\includegraphics[width=0.86\linewidth,height=\textheight,keepaspectratio,alt={AgentISA runtime architecture. Authored instruction streams pass a security gate and a coordinator that routes LLM-type steps through a typed result cache (served on first occurrence only, and only when Theorem 3.7's hypotheses hold) against the production gateway; a hot-path detector and the compiler re-optimize and re-adopt the stream when the threshold trips. The green return path is the property Section 5.13 measures: a hit serves a value and nothing else executes.}]{figures/wide_dia_1_architecture.pdf}
+\caption{\textbf{AgentISA runtime architecture.} Authored instruction
+streams pass a security gate and a coordinator that routes LLM-type
+steps through a typed result cache (served on first occurrence only, and
+only when Theorem 3.7's hypotheses hold) against the production gateway;
+a hot-path detector and the compiler re-optimize and re-adopt the stream
+when the threshold trips. The green return path is the property Section
+5.13 measures: a hit serves a value and nothing else executes.}
 \end{figure*}
 
 \subsubsection{Instruction Set
@@ -1255,11 +1256,11 @@ Implementation}\label{static-optimization-implementation}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.62\linewidth,height=\textheight,keepaspectratio,alt={The compiler/hot-path pipeline on the Section 5.7.1 triage task. The authored seven-step stream compiles to six steps (dataflow-preserving dead-step elimination); the LLM-type step is served from the result cache after its first occurrence.}]{figures/2_compile_pipeline.pdf}
+\includegraphics[width=0.88\linewidth,height=\textheight,keepaspectratio,alt={The compiler/hot-path pipeline on the Section 5.7.1 triage task. Seven authored steps compile to six: dead-step elimination removes one, and the LLM-type step is served from the cache after its first occurrence.}]{figures/dia_5_compile_pipeline.pdf}
 \caption{\textbf{The compiler/hot-path pipeline on the Section 5.7.1
-triage task.} The authored seven-step stream compiles to six steps
-(dataflow-preserving dead-step elimination); the LLM-type step is served
-from the result cache after its first occurrence.}
+triage task.} Seven authored steps compile to six: dead-step elimination
+removes one, and the LLM-type step is served from the cache after its
+first occurrence.}
 \end{figure}
 
 We implement the optimization passes defined in Section 3.4.4. The
@@ -1777,10 +1778,9 @@ how much \emph{measured} wall-clock time and token usage does it save?
 local Anthropic-protocol gateway (TLS with an internal CA; alias
 \texttt{claude-glm-5.3-flash}, a hosted reasoning-capable GLM model;
 \texttt{max\_tokens=64}; sequential httpx, 90 s timeout, three bounded
-retries---none occurred). Every other component is the production code
-path: the same \texttt{InstructionCache} protocol, instruction objects,
-and workload generator, with Section 5.2's instruction pool (50
-templates) and parameter space (20 values).
+retries---none occurred). Every other component is the production path:
+the same instruction objects and workload generator, with Section 5.2's
+pool (50 templates) and parameter space (20 values).
 
 \textbf{Scale.} With each round trip costing \textasciitilde2.2 s, scale
 drops from 2,000 tasks \(\times\) 5 seeds to \textbf{200 tasks
@@ -1795,10 +1795,9 @@ capacity; under this benchmark none of that can bind: \texttt{max\_size}
 (every cache-enabled arm completes in under seven minutes; the no-cache
 arms run to 7.9 minutes and never consult a cache), a fresh cache per
 arm, failed calls never cached. Hit/miss decisions are therefore a pure
-function of the (instruction, params) sequence, \emph{computable without
-any backend}; if the mechanism is correct the real run must reproduce
-that sequence exactly---and at the recorded granularity (per-arm hit
-rates and call counts) it does:
+function of the (instruction, params) sequence, computable without any
+backend; a correct mechanism must reproduce it exactly, and at the
+recorded granularity (per-arm hit rates and call counts) it does:
 
 \begin{figure}
 \centering
@@ -1827,11 +1826,11 @@ s = 0.5, 1.0, 1.5---tracking but not identical to the call reduction
 with task count---the backend-free computation at N = 2,000 reproduces
 the Section 5.2 figures (the gateway run stays at N = 200).
 
-\textbf{Multi-model rerun.} The identical protocol re-run on a second
-production model (\texttt{claude-doubao-seed-2.0-code}, replies
-completing below the ceiling) reproduces the expectation exactly in all
-three cells---8.5\%, 26.0\%, 45.5\%; calls 200 \(\rightarrow\)
-183/148/109; p50 3.6--4.0 s (table: supplementary I.3).
+\textbf{Multi-model rerun.} The same protocol on a second production
+model (\texttt{claude-doubao-seed-2.0-code}, replies completing below
+the ceiling) reproduces the expectation exactly in all three
+cells---8.5\%, 26.0\%, 45.5\%; calls 200 \(\rightarrow\) 183/148/109;
+p50 3.6--4.0 s (table: supplementary I.3).
 
 \textbf{Two-seed rerun.} A 100-task \(\times\) 2-seed rerun reproduced
 the expectation in all six cells (I.3).
@@ -1843,9 +1842,8 @@ supplementary I.3), sequential requests, no streaming---recording
 per-arm aggregate hit rates and call counts; per-position identity
 follows from the deterministic cache decisions above but is not
 separately logged, and nothing here is a throughput, availability, or
-dollar-cost claim. Sections 5.3--5.5 are structural, never dispatching
-to the backend; Section 5.7.1 extends the real-gateway validation to
-them via a cache-mediated protocol.
+dollar-cost claim. Sections 5.3--5.5 are structural and never dispatch
+to the backend; 5.7.1 extends gateway validation to them.
 
 \subsubsection{Live-Gateway Identity Check of Compilation and Hot-Path
 Optimization}\label{live-gateway-identity-check-of-compilation-and-hot-path-optimization}
@@ -2272,8 +2270,6 @@ family, not to recorded traces (0.0\%), and reuse pays only across tasks
 (41.7\% versus 1.7\% within one).}
 \end{figure}
 
-\section{Discussion}\label{discussion}
-
 \subsection{Soundness: What an Untyped Cache Gets
 Wrong}\label{soundness-what-an-untyped-cache-gets-wrong}
 
@@ -2296,16 +2292,17 @@ one ingredient at a time on that fixed base: the tenant 7.29 points and
 115 unjustified hits, invalidation 8.85 points and the remaining 168;
 the like-for-like gap is 16.14 points, and 41.70\% becomes 26.97\%.
 Resampling 165 task instances puts the blind key at 105.5 damaging hits
-per 1,000 calls {[}82.3, 130.1{]}, with 70 of 165 instances (42.4\%)
-containing at least one. The typed row is the least productive of the
-four and the only one whose hits cannot be wrong; the unsound rows are
-what a cache looks like when only purity is checked, which is what the
-legacy store in this repository checks. That policy is now shipped as
-\texttt{SoundResultCache}, and replaying the same workload through the
-class itself returns 459 hits of 1,728 (26.56\%) with zero damaging
-hits---seven hits below the harness, inside the 1.5\% reconciliation
-band---while the legacy store stays the default and enforces none of the
-hypotheses (Section 5.9, Appendix C.8, and I.12 for both tables).
+per 1,000 calls {[}82.3, 130.1{]}, 42.4\% of instances containing at
+least one. The typed row is the least productive and the only one whose
+hits cannot be wrong; the unsound rows are what a cache looks like when
+only purity is checked---which is what the legacy store checks. That
+policy is now shipped as \texttt{SoundResultCache}, and replaying the
+same workload through the class itself returns 459 hits of 1,728
+(26.56\%) with zero damaging hits---seven hits below the harness, inside
+the 1.5\% reconciliation band---while the legacy store stays the default
+and enforces none of the hypotheses (Section 5.9; Appendix C.8, I.12).
+
+\section{Discussion}\label{discussion}
 
 \subsection{System Limitations and
 Challenges}\label{system-limitations-and-challenges}
@@ -2379,17 +2376,17 @@ Directions}\label{future-research-directions}
 
 Three directions follow directly from the measurements rather than from
 the framework. Shipping the typed cache is first: Theorem 3.7 states the
-conditions, Section 5.13 prices them, and the shipped cache enforces
-none of the tenant, write and eviction rules, so the next step is an
-implementation with a shared run-scope registry rather than a
-per-instruction store. Second, the holdout result (Section 5.12) says
-compound absorption is real but smaller out of sample; a task-level
-learning curve---mine on \(n\) tasks, measure on the next \(m\)---would
-say whether it grows with experience or saturates. Third, every claim
-here is offline; an end-to-end run that varies task success as well as
-latency is the only way to convert a hit-rate argument into a deployment
-argument, and Section 5.13's damage counts say what the endpoint should
-be: not the number of hits but the number of hits that cannot be wrong.
+conditions, Section 5.13 prices them, and \texttt{SoundResultCache}
+enforces them; what remains is the default, which the census shows needs
+a tenant channel on 45 execution paths and a footprint per instruction.
+Second, the holdout result (Section 5.12) says compound absorption is
+real but smaller out of sample; a task-level learning curve---mine on
+\(n\) tasks, measure on the next \(m\)---would say whether it grows with
+experience or saturates. Third, every claim here is offline; an
+end-to-end run that varies task success as well as latency is the only
+way to convert a hit-rate argument into a deployment argument, and
+Section 5.13's damage counts say what the endpoint should be: not the
+number of hits but the number of hits that cannot be wrong.
 
 \section{Conclusion}\label{conclusion}
 

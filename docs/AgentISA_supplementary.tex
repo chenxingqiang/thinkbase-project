@@ -88,6 +88,21 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -4716,6 +4731,7 @@ truncated at 400 characters; truncation can only hide a value from the
 binder, so every bindability figure below is conservative. The compactor
 is \texttt{examples/real\_traces/prepare\_tau\_bench\_observed.py}.
 
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={From recorded traces to a dispatched compound. Mining yields atomic templates and signature-consistent compounds; the developer gate can only refuse; replay verification decides promotion, and the numbers on the right are the I.7 and I.12 figures.}]{figures/wide_dia_3_learning_pipeline.pdf}
 \textbf{Definitions, all mechanical.} An \emph{atomic template} is a
 \texttt{(tool,\ argument\ keys)} signature, as in I.7. A \emph{compound}
 is a contiguous k-gram of atomic templates (k = 2..4) with support ≥ 2.
@@ -5100,6 +5116,17 @@ identity-independent catalog tools (\texttt{get\_product\_details} 76,
 3, \texttt{list\_all\_airports} 1), counted separately because the value
 does not depend on the identity.
 
+\begin{figure}
+\centering
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Four policies over one corpus. Each row is a key condition, its hit count on the same 2,275 first-trial calls, and the hits that change an observable outcome; the typed row is the least productive and the only one whose hits cannot be wrong. Numbers as in the table above.}]{figures/wide_dia_4_policies.pdf}
+\caption{\textbf{Four policies over one corpus.} Each row is a key
+condition, its hit count on the same 2,275 first-trial calls, and the
+hits that change an observable outcome; the typed row is the least
+productive and the only one whose hits cannot be wrong. Numbers as in
+the table above.}
+\end{figure}
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio,alt={Theorem 3.7 as a decision. A call is served only if it is declared pure (H1), its tenant is in scope (H2), the key exists, and no write overlapping its read footprint has landed (H3). Every ``no'' is a refusal or an eviction, never a silent share; capacity and TTL appear only on the band below, where they cost hits and not correctness.}]{figures/wide_dia_2_cache_flow.pdf}
 \textbf{Cost ladder, one ingredient at a time on the fixed base of the
 1,728 admitted reads:} L0 blind key 745 hits (43.11\%) and 283 unsafe;
 L1 + tenant 619 (35.82\%) and 168, i.e.~7.29 points for 115 unsafe hits;

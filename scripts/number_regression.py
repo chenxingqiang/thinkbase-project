@@ -1345,6 +1345,20 @@ for _line in ('15 sites', '459 hits of 1,728 to 67', '26.56% to 3.88%', 'I.13 se
               'the flip is one environment variable'):
     chk(_line in MD, f'main paper must state "{_line}"')
 
+# ---- section order: manual heading prefixes must not go backwards
+# (a section inserted after a later top-level heading renders with the wrong
+# number, and every cross-reference in the text silently points elsewhere)
+_heads = re.findall(r'^(#{1,3})\s+(\d+(?:\.\d+)*)\.?\s', MD, flags=re.MULTILINE)
+_prefixes = [tuple(int(x) for x in num.split('.')) for _, num in _heads]
+if _prefixes:
+    for _a, _b in zip(_prefixes, _prefixes[1:]):
+        chk(_a <= _b, f'section prefixes must be non-decreasing in document order: {_a} then {_b}')
+    _five13 = (5, 13)
+    chk(_five13 in _prefixes, 'the paper must carry a 5.13 heading (soundness)')
+    _six1 = _prefixes.index((6, 1)) if (6, 1) in _prefixes else -1
+    chk(_six1 > _prefixes.index(_five13),
+        '5.13 must precede 6.1 in document order, or it renders as a Discussion subsection')
+
 # ---- suite count: the paper's "N passing" must equal collected - skipped ------
 _m = re.search(r'([\d,]+) passing, (\d+) skipped at run time', md)
 if _m:
