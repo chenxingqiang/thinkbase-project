@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Hand-drawn schematic diagrams for the AgentISA paper.
+"""Schematic diagrams for the AgentISA paper in a journal-house style.
 
 Style is fixed once in ``STYLE`` and every diagram draws through the helpers
-below, so the four figures cannot drift apart: white ground, near-black wobbly
-strokes, marker fills in a green/teal palette, handwriting labels.
+below, so the figures cannot drift apart: white ground, precise thin strokes,
+Helvetica labels, and the NPG (Nature Publishing Group) colour wheel rendered
+as light tints with a full-strength edge -- the look of a professionally drawn
+journal figure, not a slide and not a sketch.
 
-Every label is measured after drawing and asserted to fit its box; a diagram
-that would overflow raises instead of shipping. Output is vector PDF for LaTeX
-plus PNG at 200 dpi for review.
+Every label is measured after drawing and asserted to fit its box, and any two
+labels whose rendered boxes intersect fail the build. Output is vector PDF for
+LaTeX plus PNG at 200 dpi for review.
 """
 
 from __future__ import annotations
@@ -27,20 +29,20 @@ OUT = ROOT / "docs" / "figures"
 
 STYLE = {
     "ground": "#ffffff",
-    "ink": "#1b1b1b",
+    "ink": "#1a1a1a",
     "ink_soft": "#4a4a4a",
-    "green": "#6ba058",
-    "teal": "#84b5b2",
-    "amber": "#e0a458",
-    "blue": "#7aa6c2",
-    "brick": "#c96a6a",
-    "paper": "#f7f4ec",
-    "font": "Bradley Hand",
-    "fs_box": 10.2,
-    "fs_small": 9.0,
-    "fs_title": 12.0,
-    "lw": 2.0,
-    "sketch": (1.0, 120.0, 2.0),
+    "green": "#00a087",   # NPG teal-green -- the sound / typed colour
+    "teal": "#4dbbd5",    # NPG light blue -- routing and data
+    "amber": "#f39b7f",   # NPG soft orange -- gates and thresholds
+    "blue": "#3c5488",    # NPG indigo -- external systems
+    "brick": "#e64b35",   # NPG red -- damage and refusal
+    "paper": "#e9edf2",   # neutral panel
+    "font": "Helvetica",
+    "fs_box": 8.2,
+    "fs_small": 7.2,
+    "fs_title": 9.0,
+    "lw": 1.0,
+    "fill": 0.16,         # tint strength: fill = accent mixed 16% into white
 }
 
 FILL = {"g": "green", "t": "teal", "a": "amber", "b": "blue", "r": "brick", "p": "paper"}
@@ -64,7 +66,6 @@ def mix(color, alpha, ground=(255, 255, 255)):
 
 def new_canvas(width, height, xlim=(0, 100), ylim=(0, 100)):
     plt.rcParams.update({
-        "path.sketch": STYLE["sketch"],
         "font.family": STYLE["font"],
         "font.size": STYLE["fs_box"],
         "figure.facecolor": STYLE["ground"],
@@ -94,13 +95,17 @@ def fit_text(ax, x, y, text, *, fs=None, ha="center", va="center", weight="norma
 
 
 def box(ax, x, y, w, h, text, tone="p", *, fs=None, rounded=0.12, lw=None,
-        alpha=0.55, dash=None, text_y=None, zorder=2):
-    """Rounded box with a marker fill and a wobbly ink outline."""
-    face = mix(FILL.get(tone, tone), alpha) if tone and tone != "n" else STYLE["ground"]
+        alpha=None, dash=None, text_y=None, zorder=2):
+    """Rounded panel: a light tint of the accent, edged in the accent itself."""
+    if alpha is None:
+        alpha = STYLE["fill"]
+    accent = STYLE[FILL.get(tone, tone)] if tone and tone != "n" else None
+    face = mix(FILL.get(tone, tone), alpha) if accent else STYLE["ground"]
+    edge = accent if accent else STYLE["ink_soft"]
     patch = FancyBboxPatch(
         (x, y), w, h,
         boxstyle=f"round,pad=0,rounding_size={rounded * min(w, h)}",
-        linewidth=lw or STYLE["lw"], edgecolor=STYLE["ink"], facecolor=face,
+        linewidth=lw or STYLE["lw"], edgecolor=edge, facecolor=face,
         alpha=1.0,
         zorder=zorder, linestyle=dash or "solid",
     )
@@ -128,9 +133,9 @@ def _assert_fits(ax, text_artist, x, y, w, h, pad=1.0):
 def arrow(ax, p0, p1, *, tone=None, lw=None, style="-|>", rad=0.0, dash=None, zorder=1):
     color = STYLE[tone] if tone else STYLE["ink_soft"]
     a = FancyArrowPatch(
-        p0, p1, arrowstyle=style, mutation_scale=13,
-        linewidth=lw or (STYLE["lw"] - 0.3), color=color,
-        connectionstyle=f"arc3,rad={rad}", shrinkA=2.5, shrinkB=2.5,
+        p0, p1, arrowstyle=style, mutation_scale=9,
+        linewidth=lw or (STYLE["lw"] - 0.15), color=color,
+        connectionstyle=f"arc3,rad={rad}", shrinkA=2.0, shrinkB=2.0,
         linestyle=dash or "solid", zorder=zorder,
     )
     ax.add_patch(a)
@@ -142,35 +147,22 @@ def label(ax, x, y, text, *, fs=None, tone=None, ha="center", va="center", zorde
                     color=STYLE[tone] if tone else STYLE["ink_soft"], ha=ha, va=va, zorder=zorder)
 
 
-def cloud(ax, cx, cy, w, h, text, tone="teal", fs=None):
-    """A cloud drawn as overlapping circles with one ink outline."""
-    import numpy as np
-    from matplotlib.patches import Circle
-    circles = [(-0.28, 0.02, 0.30), (-0.08, 0.14, 0.34), (0.18, 0.08, 0.31), (0.30, -0.06, 0.24),
-               (-0.20, -0.12, 0.26), (0.04, -0.14, 0.29)]
-    for dx, dy, rr in circles:
-        ax.add_patch(Circle((cx + dx * w, cy + dy * h), rr * min(w, h) * 1.05,
-                            facecolor=mix(FILL.get(tone, tone), 0.5), alpha=1.0,
-                            edgecolor="none", zorder=2))
-    for dx, dy, rr in circles:
-        ax.add_patch(Circle((cx + dx * w, cy + dy * h), rr * min(w, h) * 1.05,
-                            facecolor="none", edgecolor=STYLE["ink"],
-                            linewidth=STYLE["lw"] - 0.2, zorder=3))
-    t = fit_text(ax, cx, cy - 0.5, text, fs=fs or STYLE["fs_box"], zorder=8)
-    return t
+def cloud(ax, cx, cy, w, h, text, tone="b", fs=None):
+    """External system: a plain rounded panel drawn from its centre.
+
+    Journal style replaces the cloud metaphor with the same panel as everything
+    else; the label distinguishes it.
+    """
+    box(ax, cx - w / 2, cy - h / 2, w, h, text, tone=tone, fs=fs, rounded=0.22)
+    return None
 
 
 def frame(ax, xlim=(0, 100), ylim=(0, 100), pad=1.2):
-    """A single wobbly border, as on the reference sheet."""
-    ax.add_patch(FancyBboxPatch(
-        (xlim[0] + pad, ylim[0] + pad), (xlim[1] - xlim[0]) - 2 * pad,
-        (ylim[1] - ylim[0]) - 2 * pad,
-        boxstyle="round,pad=0,rounding_size=1.6",
-        linewidth=STYLE["lw"] - 0.5, edgecolor=STYLE["ink"], facecolor="none", zorder=1))
+    """No decorative border: a journal figure is bounded by the page, not a box."""
 
 
 def title(ax, text):
-    fit_text(ax, 50, 97.5, text, fs=STYLE["fs_title"], weight="bold")
+    """No in-figure title; the caption carries it."""
 
 
 def _text_overlaps(fig, ax, tolerance=1.5):
@@ -227,7 +219,7 @@ def diagram_architecture():
     cloud(ax, 74.0, 63.5, 15.0, 17.0, "model\ngateway", tone="b", fs=STYLE["fs_small"])
 
     for a, b in (((15.0, 63), (18.0, 63)), ((30.0, 63), (33.0, 63)),
-                 ((47.0, 63), (50.0, 63)), ((63.5, 63), (65.2, 63.5))):
+                 ((47.0, 63), (50.0, 63)), ((63.5, 63), (66.5, 63))):
         arrow(ax, a, b)
 
     # hit path back to the stream
@@ -344,7 +336,7 @@ def diagram_policies():
         ax.add_patch(FancyBboxPatch((5.4, y + 0.6), 3.2, 9.0,
                                     boxstyle="round,pad=0,rounding_size=0.8",
                                     facecolor=mix(FILL[tone], 0.65 if tone == "g" else 0.3),
-                                    edgecolor=STYLE["ink"], linewidth=1.0, zorder=3))
+                                    edgecolor=STYLE[FILL[tone]], linewidth=1.0, zorder=3))
         label(ax, 40, y + 5.5, key, fs=7.2, ha="left")
         label(ax, 62, y + 5.5, hits, fs=7.4, ha="left")
         label(ax, 78, y + 5.5, dmg, fs=7.4, ha="left",
@@ -360,7 +352,7 @@ def diagram_compile_pipeline():
     """Seven authored steps to six compiled ones, at single-column size."""
     # Drawn at the size it prints: one column of acmart sigconf is 3.33 in.
     legacy_lw = STYLE["lw"]
-    STYLE["lw"] = 1.4  # a 3.3-inch figure needs a thinner pen than a 7-inch one
+    STYLE["lw"] = 0.8  # a 3.3-inch figure takes a finer pen than a 7-inch one
     fig, ax = new_canvas(3.33, 1.42)
     frame(ax, pad=1.0)
 
