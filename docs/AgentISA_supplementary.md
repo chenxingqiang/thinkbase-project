@@ -1607,3 +1607,19 @@ The remaining 104 unwarranted hits in P1–P3 are cross-tenant hits on identity-
 **The shipped class, not just the harness.** `shipped_sound_cache_results.json` drives `agentflow/core/isa/sound_cache.py` itself over the same 2,275 calls. With the tenant bound on every read (the like-for-like arm) the class returns 459 hits of 1,728 (26.56%) and zero damaging hits, seven below the harness's 466—the difference is the class's refusal of 121 identity-dependent puts with no tenant in scope, which the harness's key recipe supplies by construction. Binding the tenant only where the tool map says the output depends on identity raises the class to 558 hits (32.29%) with zero damaging hits and 104 identity-independent cross-tenant hits, which are harmless by that map's definition. The legacy `InstructionCache` is untouched and still serves the 807/344 pattern of P1.
 
 **Why the anchor still holds.** The three policies admit different call sets, so their rates are not directly comparable: 807 − 61 = 746 (the 61 are `think`/control calls the purity set refuses, which hit within a run), and the typed policy's 466 is on the 1,728 reads it admits. The paper quotes the like-for-like gap (16.14 points on one base), never the difference of two rates computed on different denominators.
+
+## I.13 What a Hit Is Worth Depends on the Unit
+
+The two halves of the evidence cache different things, and the paper's claims depend on keeping them apart.
+
+**Live gateway (Section 5.7).** The cached unit is an instruction whose execution is a model round trip. A hit removes the round trip itself, which is why the saving is wall clock: 14.1%, 26.6% and 45.8% of the no-cache arm's time at $s=0.5,1.0,1.5$, on a measured 2.2 s per call and 39.4 minutes for 1,040 calls. The token figures in the same table are measured, not modeled.
+
+**Recorded traces (Sections 5.12 and 5.13).** The cached unit is a tool call, and in a replay a tool call is a lookup of the recorded output: there is no environment, no network and no model in the loop. A hit therefore removes a dictionary lookup and a dispatch, not a round trip. The 41.70% hit rate on 1,789 side-effect-free first-trial calls is a statement about *dispatch count*, and the 16.14-point cost of soundness is the same unit. Neither is a latency claim, and the paper does not make one from them.
+
+| Experiment | Cached unit | What a hit removes | Measured |
+| --- | --- | --- | --- |
+| Live gateway (§5.7) | instruction containing an LLM step | the whole model round trip | 2.2 s per call; 14.1–45.8% wall clock |
+| Trace replay (§5.12, §5.13) | tool call | a recorded-output lookup and one dispatch | 41.70% of calls; 16.14 points lost to soundness |
+| This appendix's ladder (§5.13) | tool call | same, plus the unsafe ones | 745/619/466 hits on 1,728 reads |
+
+**Why this matters for the objection "no agent in the loop."** An end-to-end claim needs a solver that chooses its own tool calls and is scored by an environment reward; this repository has no such loop — `AgentCoordinator` plans capability-labelled agents, it does not solve tasks, and every experiment here replays recorded trajectories. Building that loop, not the compute, is the cost: at the measured 2.2 s per round trip and 8–15 turns per $\tau$-bench episode, a 200-task × 5-seed × 3-arm design is tens of hours of sequential round trips per arm, and the paired success-rate analysis resolves roughly a 6-point difference at 80% power. The pre-registered design, including the decision rules and the commitment to report a smaller effect as inconclusive rather than positive, is `docs/review/end_to_end_protocol.md`; the response letter that cites it is `docs/review/response_letter_en.md`.
