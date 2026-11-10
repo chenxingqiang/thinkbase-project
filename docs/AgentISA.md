@@ -117,7 +117,7 @@ Building on Sections 1 and 2, we present the AgentISA design: the core architect
 
 ## 3.1 Core Architecture
 
-![**AgentISA runtime architecture.** Authored instruction streams pass a security gate and a coordinator that routes LLM-type steps through a typed result cache (served on first occurrence only, and only when Theorem 3.7's hypotheses hold) against the production gateway; a hot-path detector and the compiler re-optimize and re-adopt the stream when the threshold trips. The green return path is the property Section 5.13 measures: a hit serves a value and nothing else executes.](figures/wide_dia_1_architecture.pdf){width=86%}
+![**AgentISA runtime architecture.** Authored instruction streams pass a security gate and a coordinator that routes LLM-type steps through a typed result cache (served on first occurrence only, and only when Theorem 3.7's hypotheses hold) against the production gateway; a hot-path detector and the compiler re-optimize and re-adopt the stream when the threshold trips. The green return path is the property Section 5.13 measures: a hit serves a value and nothing else executes.](figures/wide_dia_1_architecture.pdf){width=82%}
 
 ### 3.1.1 Instruction Set Specification
 
@@ -369,7 +369,7 @@ Schedule verification checks the dependency-ordering condition (S2) of the forma
 
 ### 4.1.3 Static Optimization Implementation
 
-![**The compiler/hot-path pipeline on the Section 5.7.1 triage task.** Seven authored steps compile to six: dead-step elimination removes one, and the LLM-type step is served from the cache after its first occurrence.](figures/dia_5_compile_pipeline.pdf){width=88%}
+![**The compiler/hot-path pipeline on the Section 5.7.1 triage task.** Seven authored steps compile to six: dead-step elimination removes one, and the LLM-type step is served from the cache after its first occurrence.](figures/dia_5_compile_pipeline.pdf){width=84%}
 
 We implement the optimization passes defined in Section 3.4.4. The passes that fire in the benchmarks are fusion (the instruction-combining pass of Section 3.4.4, listed in Appendix D.10 of the supplementary material), dead-code elimination (the shipped two-level design of Section 3.4.4), and parallel grouping (described with its measurement in Section 5.3). The shipped rule set registers no peephole patterns by default, so every peephole obligation below is dormant in the shipped configuration but stated for completeness (one shipped write path can populate it: approved mining-to-optimization proposals, Section 3.3.1, install name-level rules through the audited gate):
 

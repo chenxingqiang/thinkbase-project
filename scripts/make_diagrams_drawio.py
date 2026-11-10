@@ -173,137 +173,142 @@ def raw_edge(d: Diagram, p0, p1, *, color=None, width=1, dashed=False):
 
 # --------------------------------------------------------------------------- 1
 def architecture() -> Diagram:
-    """Figure 1: the runtime band, 700 x 202 px."""
-    d = Diagram("wide_dia_1_architecture", 700, 202)
-    stream = d.node(12, 86, 106, 52, "authored stream", accent="green", fs=10)
-    gate = d.node(146, 92, 88, 40, "security gate", accent="green", fs=10)
-    coord = d.node(264, 86, 98, 52, "coordinator (router)", accent="teal", fs=10)
-    cache = d.node(398, 92, 94, 40, "typed result cache", accent="green", fs=10)
-    gw = d.node(524, 86, 118, 52, "model gateway", accent="blue", fs=10)
+    """Figure 1: the runtime band, 780 x 184 px.
+
+    The hit return path runs along the top, the re-optimization loop along the
+    bottom, so no edge crosses any box. Box labels are sized to print at 8 pt
+    when the 780 px canvas is set to 86% of a 7 in text column.
+    """
+    d = Diagram("wide_dia_1_architecture", 780, 184)
+    stream = d.node(20, 36, 115, 60, "authored stream", accent="green", fs=14)
+    gate = d.node(180, 40, 100, 52, "security gate", accent="green", fs=14)
+    coord = d.node(320, 36, 110, 60, "coordinator (router)", accent="teal", fs=14)
+    cache = d.node(470, 40, 105, 52, "typed result cache", accent="green", fs=14)
+    gw = d.node(615, 36, 140, 60, "model gateway", accent="blue", fs=14)
     d.edge(stream, gate)
     d.edge(gate, coord)
-    d.edge(coord, cache, label="miss", fs=8)
-    d.edge(cache, gw, label="read", fs=8)
-    # the property the paper measures: a hit serves the value and nothing runs
-    d.edge(cache, stream, label="hit: value served, nothing else executes",
-           color=PALETTE["green"], label_color=PALETTE["green"], fs=9,
-           exit_=(0.5, 0), entry=(0.5, 0), points=[(445, 44), (65, 44)], curved=True)
-    # re-optimization loop
-    comp = d.node(264, 14, 98, 44, "compiler (fuse, DCE)", accent="paper", fs=9)
-    hot = d.node(398, 14, 94, 44, "hot-path detector", accent="amber", fs=9)
-    d.edge(coord, comp, label="re-optimize", fs=8,
-           exit_=(0.5, 1), entry=(0.5, 0), points=[(313, 74)])
-    d.edge(hot, comp, fs=8, exit_=(0, 0.5), entry=(1, 0.5))
-    d.edge(comp, stream, label="re-adopt", fs=8,
-           exit_=(0, 0.5), entry=(0.5, 1), points=[(65, 36)])
+    d.edge(coord, cache, label="miss", fs=11)
+    d.edge(cache, gw, label="read", fs=11)
+    d.edge(cache, stream, label="hit", color=PALETTE["green"],
+           label_color=PALETTE["green"], fs=12,
+           exit_=(0.5, 0), entry=(0.3, 0), points=[(522, 6), (55, 6)])
+    comp = d.node(320, 132, 110, 44, "compiler (fuse, DCE)", accent="paper", fs=12)
+    hot = d.node(470, 132, 105, 40, "hot-path detector", accent="amber", fs=12)
+    d.edge(coord, comp, label="re-optimize", fs=11, exit_=(0.5, 1), entry=(0.5, 0))
+    d.edge(hot, comp, fs=11, exit_=(0, 0.5), entry=(1, 0.5))
+    d.edge(comp, stream, label="re-adopt", fs=11,
+           exit_=(0, 0.5), entry=(0.5, 1), points=[(77, 154)])
     return d
 
 
 # --------------------------------------------------------------------------- 2
 def compile_pipeline() -> Diagram:
-    """Figure 2: seven authored steps compile to six, 280 x 150 px."""
-    d = Diagram("dia_5_compile_pipeline", 280, 150)
-    d.text(12, 6, 256, 14, "authored stream, 7 steps", fs=8, color=PALETTE["ink"])
+    """Figure 2: seven authored steps compile to six, 350 x 154 px.
+
+    Annotations live in the inter-row gap and below row two, never on squares;
+    the compile edge reuses the first square of each row (no stacked cells).
+    Labels print at 7 pt at 88% of a 3.33 in column.
+    """
+    d = Diagram("dia_5_compile_pipeline", 350, 154)
+    d.text(20, 4, 200, 14, "authored stream, 7 steps", fs=10, color=PALETTE["ink"])
+    row1 = []
     for k in range(7):
-        x = 12 + k * 36
+        x = 20 + k * 44
         dead = k == 3
-        cid = d.node(x, 26, 30, 30, str(k + 1),
-                     accent="brick" if dead else "paper", fs=8,
-                     fill="#fdeceb" if dead else "#eef1f4")
+        row1.append(d.node(x, 22, 34, 34, str(k + 1),
+                           accent="brick" if dead else "paper", fs=12,
+                           fill="#fdeceb" if dead else "#eef1f4"))
         if dead:
-            raw_edge(d, (x + 1, 27), (x + 29, 55), color=PALETTE["brick"], width=1)
-            raw_edge(d, (x + 29, 27), (x + 1, 55), color=PALETTE["brick"], width=1)
-    d.text(156, 32, 112, 20, "dead step: no consumer", fs=7, color=PALETTE["brick"])
-    # compile: authored 1-3 map to compiled 1-3 unchanged
-    d.node(84 + 15 - 15, 0, 0, 0, "") if False else None
-    src = d.node(12 + 2 * 36, 26, 30, 30, "3", accent="paper", fs=8, fill="#eef1f4")
+            raw_edge(d, (x + 2, 24), (x + 32, 52), color=PALETTE["brick"])
+            raw_edge(d, (x + 32, 24), (x + 2, 52), color=PALETTE["brick"])
+    d.text(94, 62, 150, 16, "dead step: no consumer", fs=11,
+           color=PALETTE["brick"], align="center")
+    row2 = []
     for k in range(6):
-        x = 12 + k * 36
+        x = 20 + k * 44
         cached = k == 3
-        d.node(x, 96, 30, 30, str(k + 1),
-               accent="green" if cached else "paper", fs=8,
-               fill="#d2efe7" if cached else "#eef1f4")
-    dst = d.node(12 + 2 * 36, 96, 30, 30, "3", accent="paper", fs=8, fill="#eef1f4")
-    d.edge(src, dst, label="compile", fs=7,
-           exit_=(0.5, 1), entry=(0.5, 0), points=[(99, 76)])
-    d.text(156, 100, 112, 20, "cache-served after first occurrence",
-           fs=7, color=PALETTE["green"])
-    d.text(12, 130, 256, 14, "compiled, 6 steps", fs=8, color=PALETTE["ink"])
+        row2.append(d.node(x, 94, 34, 34, str(k + 1),
+                           accent="green" if cached else "paper", fs=12,
+                           fill="#d2efe7" if cached else "#eef1f4"))
+    d.text(252, 56, 90, 28, "compiled, 6 steps", fs=10, color=PALETTE["ink"])
+    d.edge(row1[0], row2[0], label="compile", fs=10, exit_=(0.5, 1), entry=(0.5, 0))
+    d.text(59, 134, 220, 16, "cache-served after first occurrence", fs=11,
+           color=PALETTE["green"], align="center")
     return d
 
 
 # --------------------------------------------------------------------------- 3
 def cache_flow() -> Diagram:
-    """Supplement I.12: Theorem 3.7 as a decision, 520 x 210 px."""
-    d = Diagram("wide_dia_2_cache_flow", 520, 210)
+    """Supplement I.12: Theorem 3.7 as a decision, 520 x 214 px."""
+    d = Diagram("wide_dia_2_cache_flow", 520, 214)
     xs = [10, 114, 218, 322, 426]
-    call = d.node(xs[0], 36, 88, 52, "call (instruction, params)", accent="teal", fs=9)
-    pure = d.node(xs[1], 36, 88, 52, "declared pure?", accent="green", fs=9)
-    tenant = d.node(xs[2], 36, 88, 52, "tenant in scope?", accent="green", fs=9)
-    key = d.node(xs[3], 36, 88, 52, "key in cache?", accent="green", fs=9)
-    serve = d.node(xs[4], 36, 88, 52, "serve stored value", accent="green",
-                   fs=9, fill="#d2efe7")
+    call = d.node(xs[0], 36, 88, 54, "call (instruction, params)", accent="teal", fs=11)
+    pure = d.node(xs[1], 36, 88, 54, "declared pure?", accent="green", fs=11)
+    tenant = d.node(xs[2], 36, 88, 54, "tenant in scope?", accent="green", fs=11)
+    key = d.node(xs[3], 36, 88, 54, "key in cache?", accent="green", fs=11)
+    serve = d.node(xs[4], 36, 88, 54, "serve stored value", accent="green",
+                   fs=11, fill="#d2efe7")
     d.edge(call, pure)
-    d.edge(pure, tenant, label="yes", fs=7, color=PALETTE["green"],
+    d.edge(pure, tenant, label="yes", fs=9, color=PALETTE["green"],
            label_color=PALETTE["green"])
-    d.edge(tenant, key, label="yes", fs=7, color=PALETTE["green"],
+    d.edge(tenant, key, label="yes", fs=9, color=PALETTE["green"],
            label_color=PALETTE["green"])
-    d.edge(key, serve, label="hit", fs=7, color=PALETTE["green"],
+    d.edge(key, serve, label="hit", fs=9, color=PALETTE["green"],
            label_color=PALETTE["green"])
-    n1 = d.node(xs[1], 116, 88, 48, "never stored: execute every time",
-                accent="paper", fs=8)
-    n2 = d.node(xs[2], 116, 88, 48, "refuse (do not share)", accent="paper", fs=8)
-    n3 = d.node(xs[3], 116, 88, 48, "execute, store with footprint",
-                accent="paper", fs=8)
+    n1 = d.node(xs[1], 118, 88, 50, "never stored: execute every time",
+                accent="paper", fs=10)
+    n2 = d.node(xs[2], 118, 88, 50, "refuse (do not share)", accent="paper", fs=10)
+    n3 = d.node(xs[3], 118, 88, 50, "execute, store with footprint",
+                accent="paper", fs=10)
     for src, dst in ((pure, n1), (tenant, n2), (key, n3)):
-        d.edge(src, dst, label="no", fs=7, color=PALETTE["brick"],
+        d.edge(src, dst, label="no", fs=9, color=PALETTE["brick"],
                label_color=PALETTE["brick"], exit_=(0.5, 1), entry=(0.5, 0))
-    d.node(10, 180, 350, 22, "any write overlapping a stored footprint evicts that entry",
-           accent="teal", fs=8)
-    d.text(370, 180, 140, 22, "capacity / TTL cost hits, never correctness",
-           fs=7, color=PALETTE["soft"])
+    d.node(10, 184, 350, 24, "any write overlapping a stored footprint evicts that entry",
+           accent="teal", fs=10)
+    d.text(370, 182, 144, 28, "capacity / TTL cost hits, never correctness",
+           fs=9, color=PALETTE["soft"])
     return d
 
 
 # --------------------------------------------------------------------------- 4
 def learning_pipeline() -> Diagram:
-    """Supplement I.9: recorded traces to dispatched compound, 520 x 190 px."""
-    d = Diagram("wide_dia_3_learning_pipeline", 520, 190)
+    """Supplement I.9: recorded traces to dispatched compound, 520 x 194 px."""
+    d = Diagram("wide_dia_3_learning_pipeline", 520, 194)
     xs = [10, 114, 218, 322, 426]
-    tr = d.node(xs[0], 30, 90, 56, "recorded traces", accent="teal", fs=9)
-    mine = d.node(xs[1], 30, 90, 56, "action-signature mining", accent="teal", fs=9)
-    gate = d.node(xs[2], 30, 90, 56, "developer gate", accent="amber", fs=9)
-    comp = d.node(xs[3], 30, 90, 56, "signature-consistent compound", accent="green", fs=9)
-    ver = d.node(xs[4], 30, 90, 56, "replay verification", accent="teal", fs=9)
+    tr = d.node(xs[0], 30, 90, 58, "recorded traces", accent="teal", fs=11)
+    mine = d.node(xs[1], 30, 90, 58, "action-signature mining", accent="teal", fs=11)
+    gate = d.node(xs[2], 30, 90, 58, "developer gate", accent="amber", fs=11)
+    comp = d.node(xs[3], 30, 90, 58, "signature-consistent compound", accent="green", fs=11)
+    ver = d.node(xs[4], 30, 90, 58, "replay verification", accent="teal", fs=11)
     d.edge(tr, mine)
     d.edge(mine, gate)
-    d.edge(gate, comp, label="approve", fs=7, color=PALETTE["amber"],
+    d.edge(gate, comp, label="approve", fs=9, color=PALETTE["amber"],
            label_color=PALETTE["amber"])
     d.edge(comp, ver)
-    o1 = d.node(xs[1], 118, 90, 48, "12 templates, 95.9% of steps",
-                accent="paper", fs=8)
-    o2 = d.node(xs[3], 118, 90, 48, "compounds, 10.07% holdout error",
-                accent="paper", fs=8)
-    o3 = d.node(xs[4], 118, 90, 48, "33 of 49 eligible transfer",
-                accent="paper", fs=8)
+    o1 = d.node(xs[1], 120, 90, 50, "12 templates, 95.9% of steps",
+                accent="paper", fs=10)
+    o2 = d.node(xs[3], 120, 90, 50, "compounds, 10.07% holdout error",
+                accent="paper", fs=10)
+    o3 = d.node(xs[4], 120, 90, 50, "33 of 49 eligible transfer",
+                accent="paper", fs=10)
     d.edge(mine, o1, exit_=(0.5, 1), entry=(0.5, 0), end_arrow=False)
     d.edge(comp, o2, exit_=(0.5, 1), entry=(0.5, 0), end_arrow=False)
     d.edge(ver, o3, exit_=(0.5, 1), entry=(0.5, 0), end_arrow=False)
-    rej = d.node(xs[2], 118, 90, 48, "not promoted: fail closed",
-                 accent="brick", fs=8)
-    d.edge(gate, rej, label="unverified", fs=7, color=PALETTE["brick"],
+    rej = d.node(xs[2], 120, 90, 50, "not promoted: fail closed",
+                 accent="brick", fs=10)
+    d.edge(gate, rej, label="unverified", fs=9, color=PALETTE["brick"],
            label_color=PALETTE["brick"], exit_=(0.5, 1), entry=(0.5, 0))
     return d
 
 
 # --------------------------------------------------------------------------- 5
 def policies() -> Diagram:
-    """Supplement I.12: the four cache policies side by side, 520 x 252 px."""
-    d = Diagram("wide_dia_4_policies", 520, 252)
-    cols = {"cond": (200, 100), "hits": (310, 60), "dmg": (380, 100)}
+    """Supplement I.12: the four cache policies side by side, 520 x 256 px."""
+    d = Diagram("wide_dia_4_policies", 520, 256)
+    cols = {"cond": (200, 100), "hits": (310, 62), "dmg": (380, 100)}
     for key, (x, w) in cols.items():
         d.text(x, 8, w, 14, {"cond": "key condition", "hits": "hits",
-                             "dmg": "damage"}[key], fs=8)
+                             "dmg": "damage"}[key], fs=9)
     rows = [
         ("P1  tool + args", "brick", "tenant-blind", "807", "240", PALETTE["brick"]),
         ("P2  + write invalidation", "amber", "tenant-blind", "655", "61", PALETTE["ink"]),
@@ -314,16 +319,17 @@ def policies() -> Diagram:
     for i, (name, tag, cond, hits, dmg, dmg_color) in enumerate(rows):
         y = 30 + i * 52
         strong = tag == "green"
-        d.node(10, y, 170, 40, name, accent=tag, fs=9, halign="left",
+        d.node(10, y, 170, 40, "", accent=tag,
                fill="#d2efe7" if strong else None)
         d.node(18, y + 10, 20, 20, "", accent=tag, fill=PALETTE[tag])
-        d.text(cols["cond"][0], y + 6, cols["cond"][1], 28, cond, fs=9)
-        d.text(cols["hits"][0], y + 6, cols["hits"][1], 28, hits, fs=9)
-        d.text(cols["dmg"][0], y + 6, cols["dmg"][1], 28, dmg, fs=9,
+        d.text(46, y + 4, 128, 32, name, fs=10, color=PALETTE["ink"])
+        d.text(cols["cond"][0], y + 4, cols["cond"][1], 32, cond, fs=10)
+        d.text(cols["hits"][0], y + 4, cols["hits"][1], 32, hits, fs=10)
+        d.text(cols["dmg"][0], y + 4, cols["dmg"][1], 32, dmg, fs=10,
                color=dmg_color, bold=(tag == "green"))
-    d.text(10, 240, 470, 12,
+    d.text(10, 242, 480, 12,
            "hits per 1,000-task replay of 1,728 admitted reads; damage = cross-tenant or stale hits",
-           fs=7)
+           fs=8)
     return d
 
 
